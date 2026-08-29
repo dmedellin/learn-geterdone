@@ -892,8 +892,8 @@ in-container Caddy (`deploy/Caddyfile`), not from anything in `site/`.
 site/                     the published document root — nothing else is served
 site/paths/<subject>/     one path page per subject (the paths layer)
 Containerfile.release     builds the release image (static files + Caddy)
-compose.template.yaml     immutable Compose template rendered by the deploy wrapper
-deploy/Caddyfile          in-container web server: headers, cache policy, /healthz
+(host-owned Compose)        wrapper renders its own Compose from platform template
+deploy/Caddyfile          in-container web server: headers, cache policy, /healthz, /release.txt
 deploy/registry-entry.PROPOSED.yaml   proposed platform registry entry (for review)
 release/contract.json                 committed release-contract source (see below)
 release/contract.schema.json          release-contract schema
@@ -917,29 +917,19 @@ touch platform-ops, the shared Caddy edge, or any registry reservation, and it
 is **not** a shortcut around those gates — they govern the Hetzner platform,
 which is a different path.
 
-**2. The Hetzner container platform — not built.** That platform serves
-applications **only** as containers behind `reverse_proxy 127.0.0.1:<port>`; it
-has no file server and no host document root. So the site would ship as an image:
-`Containerfile.release` copies `site/` into `/srv` behind a small in-container
-Caddy that also answers `GET /healthz` with `200`.
+**2. The Hetzner container platform — active.** The host serves this application
+through the already-onboarded `shared-private-edge` model: the image listens on
+plain HTTP port `8080`, the root-owned wrapper attaches it to the external
+`platform-private-edge` network at fixed private IPv4 `10.89.2.22`, and host Caddy
+proxies the public domain to that address. The image also serves `/healthz` and the
+uncached `/release.txt` identity endpoint.
 
-A push to protected `main` re-runs the full check set, renders the deployment
-placeholders, builds the image, pushes it to
-`ghcr.io/dmedellin/learn-geterdone` by **immutable digest**, and emits the
-immutable release contract plus release metadata (image digest, git revision,
-release-contract sha256, compose template and rendered-Compose sha256).
-
-`release/contract.json` is the committed contract source and the **single source
-of truth for `__LOOPBACK_PORT__` and `__APP_SUBNET__`**. The release workflow
-renders `Containerfile.release`, `deploy/Caddyfile` and
-`deploy/compose.template.yaml` from it, fills in only the fields the run can
-prove, and validates the emitted document against `release/contract.schema.json`.
-Because the port and subnet are still unallocated, that render step **fails the
-workflow on purpose** with a message naming the allocation gate; no image can be
-built until a human allocates them. A future host deploy would consume that
-metadata through a root-owned wrapper on a self-hosted runner; the deploy job in
-`release.yml` is committed but **inert**, and a public route and DNS pointing at
-that host would be a separate, human-reviewed edge transaction.
+A push to protected `main` re-runs the full check set, builds the image with the
+commit SHA in `/release.txt`, pushes it to
+`ghcr.io/dmedellin/learn-geterdone` by **immutable digest**, emits the release
+contract and metadata, and—after the protected production environment approval—calls
+`platform-deploy-static`. The host wrapper renders its own Compose configuration;
+this repository carries no authoritative Compose template or loopback allocation.
 
 The normative rules live in `dmedellin/platform-ops`
 (`docs/DEPLOYMENT_CONTRACT.md`, `docs/EDGE_ROUTING_CONTRACT.md`,
@@ -960,28 +950,14 @@ a ninth, and nothing in the library is announced without a page behind it.
 
 Platform onboarding is **built and active**, not pending:
 
-- **The registry entry exists** and is `deployment_state: active`, owned by
-  `platform-ops/apps/registry.yaml`.
-- **The loopback port and app subnet are ALLOCATED** — 8082 and `10.89.4.0/24`,
-  allocated against a live host preflight. The `__LOOPBACK_PORT__` and
-  `__APP_SUBNET__` tokens survive only in templates and in the proposed-entry
-  example, which is what those files are for.
-- **An edge route exists** for `learn.geterdone.io` on that host, with its own Caddy
-  fragment. DNS for the subdomain resolves to the Hetzner host, not to GitHub Pages.
-- **Container acceptance has occurred** repeatedly. Each release is cut over by
-  digest and smoke-tested against production — the most recent runs recorded 386
-  checks passed, 0 failed, with all seven neighbour hostnames verified 200.
-
-Two things genuinely remain open, and they are the reason this repository begins
-with fresh history:
-
-- **The self-hosted runner is registered to the PREDECESSOR repository**
-  (`dmedellin/market-structure-lab`). Until a runner is registered for
-  `dmedellin/learn-geterdone` with the `learn-geterdone` label, the deploy job here
-  has nowhere to run. Registering it is a host mutation and an explicit human step.
-- **The release deploy job is inert** (`if: false` in `release.yml`), pending that
-  runner and a human-approved `production` environment. Build and publish-by-digest
-  DO run and are green; only the deploy step is held.
+- **The registry entry exists** and declares `shared-private-edge`, internal port
+  `8080`, network `platform-private-edge`, and private IPv4 `10.89.2.22`.
+- **The self-hosted runner is online** with the `learn-geterdone` label.
+- **The edge route and production environment exist**, including protected-main
+  review and the root-owned `platform-deploy-static` wrapper.
+- **Container acceptance is enforced by the wrapper**: health, exact `/release.txt`
+  identity on the private and public paths, and the public site routes are probed
+  during cutover, with rollback on failure.
 
 `pages.yml` is a **secondary, optional** delivery path and is not how production is
 served. It requires the repository to be public with Settings > Pages > Source set

@@ -11,12 +11,11 @@
 # authorizes no host installation, no container, no Caddy fragment, no DNS
 # record and no release. Flipping either field is a separate lifecycle gate.
 #
-# THIS FILE DOES NOT VALIDATE YET, ON PURPOSE.
-#   network.loopback_port / network.internal_port -> __LOOPBACK_PORT__
-#   network.subnet                                -> __APP_SUBNET__
-# Port and subnet allocation is explicitly a human decision plus a live host
-# preflight; it must not be automated or guessed here. A reviewer substitutes
-# the allocated integer and CIDR, then runs, from the platform-ops checkout:
+# The production host is now onboarded to shared-private-edge. This proposal is
+# retained only as historical review documentation; platform-ops is authoritative.
+# The reviewed values are class shared-private-edge, internal port 8080,
+# platform-private-edge, private IPv4 10.89.2.22. Validation is run from the
+# platform-ops checkout:
 #     python3 scripts/validate_app_registry.py
 #     python3 -m unittest discover -s tests -v
 # Constraints the chosen values must satisfy:
@@ -60,11 +59,10 @@ apps:
         - hetzner-prod
         - learn-geterdone
     network:
-      loopback_host: 127.0.0.1
-      loopback_port: 8082   # allocated; free per live ss -ltn on the host
-      internal_port: 8082   # same value; the container listens on the published port
-      subnet: 10.89.4.0/24   # allocated; proved non-overlapping per live podman network inspect
-      class: ordinary-rootful-bridge
+      class: shared-private-edge
+      internal_port: 8080
+      shared_network: platform-private-edge
+      private_ipv4: 10.89.2.22
     health:
       path: /healthz
       success_status: 200

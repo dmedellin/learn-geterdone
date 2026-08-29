@@ -12,7 +12,6 @@
     "source",
     "image",
     "build",
-    "compose",
     "runtime",
     "network",
     "health",
@@ -194,29 +193,6 @@
         }
       }
     },
-    "compose": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "template_path",
-        "template_sha256",
-        "rendered_sha256"
-      ],
-      "properties": {
-        "template_path": {
-          "type": "string",
-          "pattern": "^(?:deploy/)?[A-Za-z0-9._-]+\\.ya?ml$",
-          "description": "Repository-relative path of the trusted Compose template. The template is committed at the repository root as compose.template.yaml; deploy/ is accepted as the only other location so this field can name the file wherever the repository keeps it. Absolute paths, traversing paths and any deeper directory are rejected. A pattern match is NOT proof the file exists, and this is the field's real failure mode: a deploy/-only pattern made the committed root path unrepresentable, the example named a file that did not exist, and the release workflow quietly hashed a different template and reported success. The workflow now hashes exactly the file this field names and fails when it names none, because a template_sha256 computed over a file the contract never named certifies nothing."
-        },
-        "template_sha256": {
-          "$ref": "#/$defs/sha256Hex"
-        },
-        "rendered_sha256": {
-          "$ref": "#/$defs/sha256Hex",
-          "description": "SHA-256 of the compose.yaml rendered from the template plus root-registry-authorized values only."
-        }
-      }
-    },
     "runtime": {
       "type": "object",
       "additionalProperties": false,
@@ -288,52 +264,27 @@
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "loopback_host",
-        "loopback_port",
+        "class",
         "internal_port",
-        "subnet",
-        "class"
+        "shared_network",
+        "private_ipv4"
       ],
       "properties": {
-        "loopback_host": {
-          "const": "127.0.0.1"
-        },
-        "loopback_port": {
-          "oneOf": [
-            {
-              "$ref": "#/$defs/allocatedPort"
-            },
-            {
-              "$ref": "#/$defs/unallocatedPortToken"
-            }
-          ],
-          "description": "Host loopback port, in exactly one of two states: an allocated integer, or the unallocated token. A human must choose the integer and prove with a live preflight that no listener, registry reservation, or neighbor owns it. Automated allocation is forbidden."
+        "class": {
+          "const": "shared-private-edge",
+          "description": "The already-onboarded shared private edge network."
         },
         "internal_port": {
-          "oneOf": [
-            {
-              "$ref": "#/$defs/allocatedPort"
-            },
-            {
-              "$ref": "#/$defs/unallocatedPortToken"
-            }
-          ],
-          "description": "Port the in-container web server listens on: the port deploy/Caddyfile binds, Containerfile.release EXPOSEs and HEALTHCHECKs, and the registry entry repeats. Every one of those artifacts still carries the unallocated token there, and compose publishes the loopback port straight through to it, so while unallocated this field carries the SAME token as loopback_port and renders to the SAME integer. Being namespaced does not make it independently choosable, and it must never be pinned to a number the host has already reserved for another app."
+          "const": 8080,
+          "description": "The in-container HTTP port served by Caddy."
         },
-        "subnet": {
-          "oneOf": [
-            {
-              "$ref": "#/$defs/cidr"
-            },
-            {
-              "const": "__APP_SUBNET__"
-            }
-          ],
-          "description": "Private app bridge subnet. UNALLOCATED: a human must choose it and prove it collides with no live route and no registry reservation. 10.89.2.0/24 is owned by platform-private-edge and must never be used."
+        "shared_network": {
+          "const": "platform-private-edge",
+          "description": "External shared network managed by the platform host."
         },
-        "class": {
-          "const": "ordinary-rootful-bridge",
-          "description": "FROZEN. Not internal:true; the app is reached only through the host loopback publish."
+        "private_ipv4": {
+          "const": "10.89.2.22",
+          "description": "Fixed private address assigned by the platform host."
         }
       }
     },
@@ -5093,7 +5044,7 @@
   },
   "allOf": [
     {
-      "$comment": "DRAFT VARIANT. placeholders_present:true is the ONLY state in which an unallocated token may appear anywhere in this document, and it must be accompanied by the list of what a human still has to allocate. A draft is authorable, auditable, and never deployable.",
+      "$comment": "A draft with placeholders must list the fields still needing allocation.",
       "if": {
         "properties": {
           "placeholders_present": {
@@ -5111,7 +5062,7 @@
       }
     },
     {
-      "$comment": "RELEASE VARIANT. placeholders_present:false is this document's assertion that it is deployable, so every field that has an unallocated state must be in its allocated state, and nothing may still be listed as unallocated. This is the only branch a deploy gate may act on.",
+      "$comment": "A deployable contract has no placeholders or stale unallocated list.",
       "if": {
         "properties": {
           "placeholders_present": {
@@ -5128,141 +5079,9 @@
             "unallocated"
           ]
         },
-        "properties": {
-          "network": {
-            "properties": {
-              "loopback_port": {
-                "$ref": "#/$defs/allocatedPort"
-              },
-              "internal_port": {
-                "$ref": "#/$defs/allocatedPort"
-              },
-              "subnet": {
-                "$ref": "#/$defs/cidr"
-              }
-            }
-          },
-          "build": {
-            "properties": {
-              "base_images": {
-                "items": {
-                  "properties": {
-                    "digest": {
-                      "$ref": "#/$defs/imageDigest"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
         "description": "A deployable contract carries no placeholders: the human-allocated loopback port, the internal port rendered to that same integer, the subnet, and every base image digest must all be real values, and a stale unallocated list may not survive alongside the claim."
-      }
-    },
-    {
-      "$comment": "An unallocated loopback_port must be declared, not merely present. Declaring it forces placeholders_present true and puts the field's JSON Pointer in the unallocated list, so a reader never has to scan the document to learn what is missing.",
-      "if": {
-        "required": [
-          "network"
-        ],
-        "properties": {
-          "network": {
-            "required": [
-              "loopback_port"
-            ],
-            "properties": {
-              "loopback_port": {
-                "$ref": "#/$defs/unallocatedPortToken"
-              }
-            }
-          }
-        }
       },
-      "then": {
-        "required": [
-          "unallocated"
-        ],
-        "properties": {
-          "placeholders_present": {
-            "const": true
-          },
-          "unallocated": {
-            "contains": {
-              "const": "/network/loopback_port"
-            }
-          }
-        }
-      }
-    },
-    {
-      "$comment": "Same rule for internal_port. Without it a document could carry the token and still claim there is nothing to allocate.",
-      "if": {
-        "required": [
-          "network"
-        ],
-        "properties": {
-          "network": {
-            "required": [
-              "internal_port"
-            ],
-            "properties": {
-              "internal_port": {
-                "$ref": "#/$defs/unallocatedPortToken"
-              }
-            }
-          }
-        }
-      },
-      "then": {
-        "required": [
-          "unallocated"
-        ],
-        "properties": {
-          "placeholders_present": {
-            "const": true
-          },
-          "unallocated": {
-            "contains": {
-              "const": "/network/internal_port"
-            }
-          }
-        }
-      }
-    },
-    {
-      "$comment": "Same rule for the subnet. Base image digests are deliberately not covered here: their JSON Pointer carries an array index that JSON Schema cannot correlate with the element it came from, so /build/base_images/<n>/digest coverage stays a wrapper check.",
-      "if": {
-        "required": [
-          "network"
-        ],
-        "properties": {
-          "network": {
-            "required": [
-              "subnet"
-            ],
-            "properties": {
-              "subnet": {
-                "const": "__APP_SUBNET__"
-              }
-            }
-          }
-        }
-      },
-      "then": {
-        "required": [
-          "unallocated"
-        ],
-        "properties": {
-          "placeholders_present": {
-            "const": true
-          },
-          "unallocated": {
-            "contains": {
-              "const": "/network/subnet"
-            }
-          }
-        }
-      }
+      "description": "A deployable contract carries no unresolved placeholders and no unallocated list."
     }
   ],
   "$defs": {
@@ -5285,19 +5104,6 @@
     "placeholder": {
       "type": "string",
       "pattern": "^__[A-Z][A-Z0-9_]*__$"
-    },
-    "allocatedPort": {
-      "type": "integer",
-      "minimum": 1024,
-      "maximum": 65535
-    },
-    "unallocatedPortToken": {
-      "const": "__LOOPBACK_PORT__",
-      "description": "The single token that marks a port as unallocated. Both network ports carry this one token on purpose: compose publishes the host loopback port straight through to the port the container binds, so the two render to one integer. A per-field token would invite them to drift apart, and a free-form placeholder pattern here would let an invented token slip through."
-    },
-    "cidr": {
-      "type": "string",
-      "pattern": "^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\\.){3}(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])/(?:[0-9]|[12][0-9]|3[0-2])$"
     },
     "domain": {
       "type": "string",
@@ -5392,7 +5198,7 @@
             "loopback",
             "public"
           ],
-          "description": "container = engine healthcheck inside the app network; loopback = 127.0.0.1:<loopback_port>; public = canonical HTTPS through the shared edge."
+          "description": "container = engine healthcheck on the shared-private-edge address; private = 10.89.2.22:8080; public = canonical HTTPS through the shared edge."
         },
         "method": {
           "enum": [

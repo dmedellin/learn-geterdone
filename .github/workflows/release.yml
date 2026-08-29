@@ -8,23 +8,21 @@
 #   * pushes it to ghcr.io/dmedellin/learn-geterdone by immutable digest;
 #   * emits the immutable release contract a deploy would consume, VALIDATES it
 #     against release/contract.schema.json, and uploads it with the release
-#     metadata (image digest, git revision, release-contract sha256, compose
-#     template and rendered-Compose sha256, release id, invocation identity) as a
+#     metadata (image digest, git revision, release-contract sha256, release id,
+#     invocation identity) as a
 #     non-secret build artifact.
 #
-# WHY IT FAILS TODAY, ON PURPOSE:
-#   The host loopback port and the private app subnet are UNALLOCATED. Every
-#   deployment input (Containerfile.release, deploy/Caddyfile,
-#   compose.template.yaml, deploy/registry-entry.PROPOSED.yaml) still carries
-#   __LOOPBACK_PORT__ / __APP_SUBNET__, and `caddy validate` inside the image
-#   build rejects `invalid port '__LOOPBACK_PORT__'`. The render step below stops
-#   the run first, with a message naming the allocation gate. That is the correct
-#   outcome: allocation is a human decision proven by a live host preflight
-#   (platform-ops docs/EDGE_ROUTING_CONTRACT.md section 5), and CI must never
-#   invent a port to turn itself green.
+# WHY THIS MATCHES PRODUCTION:
+#   The host is already onboarded for the shared-private-edge model. The image
+#   listens on 8080, and the root-owned wrapper attaches it to
+#   platform-private-edge at 10.89.2.22 before host Caddy cuts over traffic.
+#   No loopback port, private subnet, or repository Compose file is allocated or
+#   consumed by this workflow. The render step substitutes only the revision
+#   label and rejects obsolete deployment placeholders; metadata makes the
+#   deployable output depend on the final contract placeholder scan.
 #
-# What this workflow DOES NOT do: deploy. See the deploy-production job at the
-# bottom, which is deliberately inert. Nothing here reaches the production host.
+# This workflow builds, publishes, records immutable release metadata, and then
+# deploys through the already-installed host wrapper after environment approval.
 #
 # Secrets: none beyond the automatic GITHUB_TOKEN. Do not add any.
 #
@@ -108,137 +106,41 @@ jobs:
           echo "Publishing as $IMAGE_REPOSITORY"
 
       # =================================================================
-      # RENDER. Containerfile.release and deploy/Caddyfile are committed
-      # UNRENDERED: they carry __LOOPBACK_PORT__ and __GIT_REVISION__ because a
-      # port is a scarce host resource a human must allocate. Building them
-      # verbatim cannot work - `caddy validate` in the image build rejects
-      # `invalid port '__LOOPBACK_PORT__'` - so this step renders them first,
-      # from release/contract.json and from this run's commit, and fails loudly
-      # while the source of truth is still unallocated.
-      #
-      # The checkout is ephemeral, so rendering happens in place: what is built
-      # is the committed file with the declared substitutions applied and
-      # nothing else. Comment lines are left untouched so the rendered file
-      # keeps documenting itself.
+      # RENDER. The shared-edge deployment values are committed policy and are
+      # already allocated by platform onboarding. Only the image revision label
+      # is rendered here; obsolete loopback/subnet tokens are rejected rather
+      # than silently carried into a release.
       # =================================================================
       - name: Render deployment placeholders
         id: render
         run: |
           set -euo pipefail
-          # Deterministic build clock: the commit's own author/commit time, not
-          # "now". It is recorded as build.source_date_epoch and handed to buildx,
-          # so the image timestamps are a function of the source revision.
           SOURCE_DATE_EPOCH="$(git show -s --format=%ct "$GITHUB_SHA")"
           export SOURCE_DATE_EPOCH
           python3 - <<'PY'
-          import json, os, pathlib, re, sys
-
-          CONTRACT = pathlib.Path(os.environ["CONTRACT_SOURCE"])
-          PORT_TOKEN = "__LOOPBACK_PORT__"
-          SUBNET_TOKEN = "__APP_SUBNET__"
-          CIDR = re.compile(r"^(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.){3}"
-                            r"(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])/(?:[0-9]|[12][0-9]|3[0-2])$")
+          import os, pathlib, re, sys
           PLACEHOLDER = re.compile(r"__[A-Z][A-Z0-9_]*__")
-          GATE = ("platform-ops docs/APP_ONBOARDING.md section 2 (reservation PR: the reviewed "
-                  "apps/registry.yaml entry that reserves the loopback endpoint and subnet) and "
-                  "section 4 (one-time bootstrap, immediately preceded by the live preflight), "
-                  "under the allocation rules in docs/EDGE_ROUTING_CONTRACT.md section 5")
-
-          def die(*lines):
-              for line in lines:
-                  print("::error::%s" % line)
-              sys.exit(1)
-
-          if not CONTRACT.is_file():
-              die("Missing %s, the single source of truth for every render-time value." % CONTRACT,
-                  "release/contract.example.json is a shape reference and must never be staged as a release.")
-          contract = json.loads(CONTRACT.read_text(encoding="utf-8"))
-          network = contract.get("network", {})
-          loopback, internal, subnet = (network.get("loopback_port"),
-                                        network.get("internal_port"),
-                                        network.get("subnet"))
-
-          def allocated_port(value):
-              return isinstance(value, int) and not isinstance(value, bool) and 1024 <= value <= 65535
-
-          unallocated = []
-          for field, value in (("loopback_port", loopback), ("internal_port", internal)):
-              if not allocated_port(value):
-                  unallocated.append("network.%s = %s%s" % (
-                      field, json.dumps(value),
-                      "  (still the unallocated token)" if value == PORT_TOKEN else ""))
-          if not (isinstance(subnet, str) and CIDR.match(subnet)):
-              unallocated.append("network.subnet = %s%s" % (
-                  json.dumps(subnet),
-                  "  (still the unallocated token)" if subnet == SUBNET_TOKEN else ""))
-
-          if unallocated:
-              die("UNALLOCATED DEPLOYMENT RESOURCES. This release cannot be rendered, so no image is built.",
-                  *["  %s" % item for item in unallocated],
-                  "%s is the single source of truth for %s and %s." % (CONTRACT, PORT_TOKEN, SUBNET_TOKEN),
-                  "To pass this gate a HUMAN must: choose a free host loopback port >= 1024 and a private "
-                  "subnet; prove both free against LIVE host state (ss -ltnp, podman network inspect, and the "
-                  "root registry occupied_resources) rather than against any file in this repository; land "
-                  "them in the reviewed platform-ops registry reservation; and only then write the integers "
-                  "and the CIDR into %s." % CONTRACT,
-                  "Allocation gate: %s." % GATE,
-                  "Automated allocation is forbidden. Do NOT hardcode a port or a subnet to make this build "
-                  "green: this workflow is supposed to fail here until the gate is passed.")
-
-          if internal != loopback:
-              die("network.internal_port (%s) must equal network.loopback_port (%s)." % (internal, loopback),
-                  "This app publishes 127.0.0.1:<loopback>:<internal> straight through: deploy/Caddyfile "
-                  "binds the port, Containerfile.release EXPOSEs and HEALTHCHECKs it, and the registry entry "
-                  "repeats it. Two different integers would render four artifacts that disagree, and JSON "
-                  "Schema cannot express that equality - so it is asserted here.")
-
-          epoch = os.environ.get("SOURCE_DATE_EPOCH", "").strip()
-          if not epoch.isdigit() or int(epoch) < 1700000000:
-              die("Could not determine a usable SOURCE_DATE_EPOCH from the commit: %r" % epoch)
-
           revision = os.environ["GITHUB_SHA"].strip()
           if not re.fullmatch(r"[0-9a-f]{40}", revision):
-              die("Source revision is not 40 lowercase hex: %r" % revision)
-
-          # Only these substitutions exist. Anything else that looks like a
-          # placeholder after rendering is an error, never a silent pass-through.
-          RENDERS = {
-              pathlib.Path("Containerfile.release"): {PORT_TOKEN: str(loopback),
-                                                      "__GIT_REVISION__": revision},
-              pathlib.Path("deploy/Caddyfile"): {PORT_TOKEN: str(loopback)},
-          }
-
-          def render(path, substitutions):
-              if not path.is_file():
-                  die("Cannot render %s: file not found." % path)
-              rendered, counts = [], {token: 0 for token in substitutions}
-              residual = []
-              for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(True), start=1):
-                  if line.lstrip().startswith("#"):
-                      rendered.append(line)     # prose that names a token is not a token
-                      continue
-                  for token, value in substitutions.items():
-                      counts[token] += line.count(token)
-                      line = line.replace(token, value)
-                  residual.extend((number, found) for found in PLACEHOLDER.findall(line))
-                  rendered.append(line)
+              print("::error::Source revision is not 40 lowercase hex: %r" % revision)
+              sys.exit(1)
+          for path in (pathlib.Path("Containerfile.release"), pathlib.Path("deploy/Caddyfile")):
+              text = path.read_text(encoding="utf-8")
+              if "__LOOPBACK_PORT__" in text or "__APP_SUBNET__" in text:
+                  print("::error::%s still contains an obsolete loopback/subnet placeholder" % path)
+                  sys.exit(1)
+              if path.name == "Containerfile.release":
+                  text = text.replace("__GIT_REVISION__", revision)
+                  path.write_text(text, encoding="utf-8")
+              residual = [found for found in PLACEHOLDER.findall(text)
+                          if found != "__GIT_REVISION__"]
               if residual:
-                  die(*["%s:%d: unrendered placeholder %s. Every placeholder must have a declared "
-                        "substitution; a build must fail rather than ship one." % (path, number, found)
-                        for number, found in residual])
-              path.write_text("".join(rendered), encoding="utf-8")
-              return counts
-
-          for path, substitutions in RENDERS.items():
-              counts = render(path, substitutions)
-              print("rendered %s: %s" % (path, ", ".join("%s x%d" % item for item in sorted(counts.items()))))
-              if not counts.get(PORT_TOKEN):
-                  die("%s contained no %s to render. The deployment inputs and this workflow have drifted "
-                      "apart; do not paper over it." % (path, PORT_TOKEN))
-
-          # Only the build clock is handed to later steps. The port and the subnet
-          # are deliberately NOT: every step that needs them re-reads the one
-          # source of truth, so there is never a second place a value can enter.
+                  print("::error::%s has unrendered placeholders: %s" % (path, ", ".join(residual)))
+                  sys.exit(1)
+          epoch = os.environ.get("SOURCE_DATE_EPOCH", "").strip()
+          if not epoch.isdigit() or int(epoch) < 1700000000:
+              print("::error::Could not determine a usable SOURCE_DATE_EPOCH: %r" % epoch)
+              sys.exit(1)
           with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as handle:
               handle.write("source_date_epoch=%s\n" % epoch)
           PY
@@ -277,6 +179,7 @@ jobs:
           # rendered deploy/Caddyfile, so an unrendered config cannot ship.
           context: .
           file: ./Containerfile.release
+          build-args: RELEASE_SHA=${{ github.sha }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -334,23 +237,8 @@ jobs:
                   "release/contract.example.json is a shape reference and must never be staged as a release.")
           contract = json.loads(source_path.read_text(encoding="utf-8"))
 
-          # The network values come from the contract, not from the render step's
-          # outputs: one source of truth, read the same way in both steps. Passing
-          # them between steps would create a second place a port could come from.
-          network = contract.get("network", {})
-          loopback, internal, subnet = (network.get("loopback_port"),
-                                        network.get("internal_port"),
-                                        network.get("subnet"))
-          if not (isinstance(loopback, int) and not isinstance(loopback, bool)
-                  and 1024 <= loopback <= 65535 and internal == loopback):
-              die("network.loopback_port/%r and network.internal_port/%r are not one allocated port."
-                  % (loopback, internal),
-                  "The render step should already have stopped this run; do not render a Compose file "
-                  "around an unallocated or mismatched port.")
-          if not (isinstance(subnet, str) and re.fullmatch(
-                  r"(?:(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])\.){3}"
-                  r"(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])/(?:[0-9]|[12][0-9]|3[0-2])", subnet)):
-              die("network.subnet %r is not an allocated CIDR." % subnet)
+          # Shared-private-edge values are reviewed policy in the committed
+          # contract and are consumed by the host wrapper, not rendered here.
 
           # 2. Facts this run can prove.
           digest = os.environ["IMAGE_DIGEST"].strip()
@@ -422,54 +310,7 @@ jobs:
               "reproducible": False,
           }
 
-          # 4. The trusted Compose template, and the compose.yaml it renders to.
-          #    The wrapper renders its own copy on the host from the template plus
-          #    ROOT-REGISTRY-authorized values (IMMUTABLE_RELEASE_AND_ACTIVATION.md
-          #    section 4 step 3); rendered_sha256 is what lets it prove that copy
-          #    is byte-identical to what this release intended. The copy written
-          #    here is evidence, never authorization.
-          compose_section = contract.setdefault("compose", {})
-          template_path = compose_section.get("template_path")
-          if not isinstance(template_path, str) or not re.fullmatch(
-                  r"(?:deploy/)?[A-Za-z0-9._-]+\.ya?ml", template_path):
-              die("compose.template_path %r is not a repository-relative Compose template path."
-                  % template_path)
-          template = pathlib.Path(template_path)
-          if not template.is_file():
-              die("compose.template_path names %s, which does not exist." % template,
-                  "Fix the path in %s or restore the template; this workflow will not guess a "
-                  "different file." % source_path)
-          template_text = template.read_text(encoding="utf-8")
-          compose_section["template_sha256"] = sha256_bytes(template.read_bytes())
-
-          # THE COMPOSE RENDER RULE, stated so an independent implementation can
-          # reproduce it byte for byte: replace every occurrence of each declared
-          # token in the whole file, comments included, and change nothing else.
-          # It is deliberately the dumbest possible rule. The host wrapper renders
-          # its OWN compose.yaml from the same template and compares it with
-          # rendered_sha256; a subtler rule here (say, skipping comments, as the
-          # image build inputs above can afford to do because only this workflow
-          # consumes them) would make the two copies disagree over bytes nobody
-          # can see.
-          substitutions = {
-              "__IMAGE_REF__": contract["image"]["reference"],
-              "__LOOPBACK_PORT__": str(loopback),
-              "__APP_SUBNET__": subnet,
-          }
-          rendered_text = template_text
-          for token, value in substitutions.items():
-              rendered_text = rendered_text.replace(token, value)
-          residual = [(number, found)
-                      for number, line in enumerate(rendered_text.splitlines(), start=1)
-                      for found in re.findall(r"__[A-Z][A-Z0-9_]*__", line)]
-          if residual:
-              die(*["%s:%d: unrendered placeholder %s in the Compose template. Every token must "
-                    "have a declared substitution." % (template, number, found)
-                    for number, found in residual])
-          rendered_compose = rendered_text.encode("utf-8")
-          compose_section["rendered_sha256"] = sha256_bytes(rendered_compose)
-
-          # 5. Invocation identity: delivery/audit identity, never release content
+          # 4. Invocation identity: delivery/audit identity, never release content
           #    identity (IMMUTABLE_RELEASE_AND_ACTIVATION.md section 2.1). The
           #    environment is the production environment this release is destined
           #    for and is the only one the deploy job may ever run in.
@@ -483,11 +324,10 @@ jobs:
           contract["notes"] = [
               "Emitted by .github/workflows/release.yml from the committed source %s at run %s attempt %s."
               % (source_path, os.environ["GITHUB_RUN_ID"], os.environ["GITHUB_RUN_ATTEMPT"]),
-              "Proven by this run: source, image, release_id, build, compose hashes, invocation, "
-              "placeholders_present and unallocated. Every other field is reviewed policy, committed and "
-              "unchanged.",
-              "NO DEPLOYMENT RAN. This repository is not onboarded: there is no root registry entry, no "
-              "self-hosted runner, no installed deploy wrapper, and no approved production environment.",
+              "Proven by this run: source, image, release_id, build, invocation and placeholder state. "
+              "Shared-private-edge network policy and acceptance checks are reviewed and committed.",
+              "The host is onboarded: platform-private-edge, fixed address 10.89.2.22, the self-hosted runner, "
+              "production environment approval, and platform-deploy-static are already in place.",
           ]
 
           # 6. Unresolved placeholders block deployment, and the contract has to
@@ -519,7 +359,6 @@ jobs:
           out = pathlib.Path("release-artifacts")
           out.mkdir(exist_ok=True)
           (out / "release-contract.json").write_bytes(payload)
-          (out / "compose.yaml").write_bytes(rendered_compose)
           contract_sha256 = sha256_bytes(payload)
 
           metadata = {
@@ -529,20 +368,14 @@ jobs:
               "image": contract["image"],
               "release_id": contract["release_id"],
               "release_contract_sha256": contract_sha256,
-              "compose": {"template_path": template_path,
-                          "template_sha256": compose_section["template_sha256"],
-                          "rendered_sha256": compose_section["rendered_sha256"]},
               "invocation": dict(contract["invocation"],
                                  run_url="%s/%s/actions/runs/%s" % (os.environ["GITHUB_SERVER_URL"],
                                                                     repository,
                                                                     os.environ["GITHUB_RUN_ID"])),
               "deployable": deployable,
               "unresolved_placeholders": placeholders,
-              "deploy_blockers": [
-                  "No registry entry: the platform root registry has no learn-geterdone app.",
-                  "No self-hosted repo-scoped runner exists for this repository.",
-                  "No production environment or human approval gate is configured.",
-              ] + (["Unresolved placeholders: %s" % ", ".join(placeholders)] if placeholders else []),
+              "deploy_blockers": (["Unresolved placeholders: %s" % ", ".join(placeholders)]
+                                  if placeholders else []),
           }
           (out / "release-metadata.json").write_bytes(canonical(metadata))
 
@@ -565,11 +398,9 @@ jobs:
               "| revision | `%s` |" % revision,
               "| release id | `%s` |" % contract["release_id"],
               "| release-contract sha256 | `%s` |" % contract_sha256,
-              "| compose template sha256 | `%s` |" % compose_section["template_sha256"],
-              "| rendered compose sha256 | `%s` |" % compose_section["rendered_sha256"],
               "| deployable | **%s** |" % ("yes" if deployable else "no"),
               "",
-              "Published by digest. **No deployment ran**: this repository is not onboarded to the platform.",
+              "Published by digest. Deployment uses the onboarded shared-private-edge wrapper.",
           ]
           if placeholders:
               summary.append("")
@@ -610,39 +441,25 @@ jobs:
           retention-days: 90
 
   # ===================================================================
-  # deploy-production — INTENTIONALLY INERT. `if: false` means this job
-  # is never scheduled. It is committed as executable documentation of the
-  # deploy shape, not as a working deployment.
+  # deploy-production — enabled for the already-onboarded shared-private-edge
+  # platform model. The release still requires all of the following:
   #
-  # Every one of these must exist before the guard may be removed, and each is
-  # a reviewed platform change made in dmedellin/platform-ops plus a host
-  # change - never a workflow edit here:
+  #   * the protected-main CI and build-and-publish jobs;
+  #   * a digest-pinned GHCR image and a contract with no placeholders;
+  #   * the self-hosted runner labels below and the protected production
+  #     environment approval;
+  #   * the root-owned /usr/local/sbin/platform-deploy-static wrapper and its
+  #     wrapper-only sudoers rule; and
+  #   * the host-owned shared-private-edge network/Caddy configuration.
   #
-  #   1. A root registry entry for slug `learn-geterdone`
-  #      (platform-ops apps/registry.yaml), reviewed and collision-checked.
-  #   2. A HUMAN-ALLOCATED loopback port and private app subnet, proven free by
-  #      a live host preflight. Both are `__LOOPBACK_PORT__` / `__APP_SUBNET__`
-  #      today. Automated allocation is forbidden.
-  #   3. A self-hosted, repository-scoped runner with the labels below.
-  #      THIS RUNNER DOES NOT EXIST YET. Nothing has been installed on any host.
-  #   4. The root-owned wrapper /usr/local/sbin/app-platform-deploy plus the
-  #      wrapper-only sudoers rule for that runner account.
-  #   5. A GitHub `production` environment restricted to protected main and
-  #      gated by HUMAN APPROVAL. That gate stays until independent SRE
-  #      terminal acceptance (docs/APP_ONBOARDING.md section 6) - it is not a
-  #      formality to be removed when the deploy first works.
-  #   6. The learn.geterdone.io Caddy fragment and DNS record, which are a
-  #      separate reviewed edge transaction (docs/APP_ONBOARDING.md section 5),
-  #      not part of any release.
-  #
-  # The command below is the ONLY interface a runner may call
-  # (docs/DEPLOYMENT_CONTRACT.md section 4). The GHCR token goes over stdin,
-  # never argv and never a log line.
+  # These platform prerequisites are now in place for learn-geterdone. The
+  # wrapper renders its own Compose file, attaches 10.89.2.22:8080 to
+  # platform-private-edge, probes /release.txt and the public routes, and rolls
+  # back on failure. The GHCR token goes over stdin, never argv or a log line.
   # ===================================================================
   deploy-production:
-    name: Deploy to production (INERT - platform onboarding not built)
+    name: Deploy to production (shared-private-edge)
     needs: build-and-publish
-    if: false
     runs-on: [self-hosted, linux, x64, hetzner-prod, learn-geterdone]
     environment: production
     timeout-minutes: 15
@@ -662,9 +479,8 @@ jobs:
         id: deploy
         env:
           GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DIGEST: ${{ needs.build-and-publish.outputs.digest }}
-          REVISION: ${{ needs.build-and-publish.outputs.revision }}
-          CONTRACT_SHA256: ${{ needs.build-and-publish.outputs.contract_sha256 }}
+          APP_IMAGE: ${{ needs.build-and-publish.outputs.image_reference }}
+          GITHUB_SHA: ${{ github.sha }}
         run: |
           set -euo pipefail
           mkdir -p deploy-evidence
@@ -679,12 +495,9 @@ jobs:
           # correlated to it by run id, attempt, digest and contract hash, and
           # is explicitly not the sole evidence store.
           status=0
-          printf '%s\n' "$GHCR_TOKEN" | sudo -n /usr/local/sbin/app-platform-deploy \
-            --slug "$APP_SLUG" \
-            --repository "$IMAGE_REPOSITORY" \
-            --digest "$DIGEST" \
-            --revision "$REVISION" \
-            --contract-sha256 "$CONTRACT_SHA256" \
+          printf '%s\n' "$GHCR_TOKEN" | sudo -n /usr/local/sbin/platform-deploy-static \
+            "$APP_SLUG" "$APP_IMAGE" "$GITHUB_SHA" \
+            "${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" \
             > deploy-evidence/transcript.raw 2>&1 || status=$?
           echo "wrapper_exit_status=$status" >> "$GITHUB_OUTPUT"
           exit "$status"

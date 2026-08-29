@@ -6,12 +6,9 @@
 # stage, verify and normalize the document root; the final stage is Caddy + files.
 #
 # RENDER-TIME PLACEHOLDERS (substitute before `podman build`):
-#   __LOOPBACK_PORT__  UNALLOCATED. Human allocation + live host preflight required.
-#                      Must be the SAME integer here, in deploy/Caddyfile, in
-#                      compose.template.yaml, and in the registry entry.
 #   __GIT_REVISION__   Exact 40-lowercase-hex protected-main commit being released.
-#                      The deploy wrapper inspects this label and fails on mismatch
-#                      (DEPLOYMENT_CONTRACT.md §6 step 7).
+#                      The deploy wrapper inspects this label and fails on mismatch.
+# RELEASE_SHA is supplied as a build argument and written to /srv/release.txt.
 # A build must fail, not proceed, if any __PLACEHOLDER__ survives rendering.
 
 # Base image pinned by digest, mirroring the reference deployment.
@@ -534,6 +531,9 @@ LABEL org.opencontainers.image.source="https://github.com/dmedellin/learn-geterd
 COPY --chmod=0644 deploy/Caddyfile /etc/caddy/Caddyfile
 COPY --from=site /srv /srv
 
+ARG RELEASE_SHA=local
+RUN printf '%s\n' "$RELEASE_SHA" > /srv/release.txt && chmod 0644 /srv/release.txt
+
 # Fail the build on a malformed or unrendered config instead of shipping an
 # image that crash-loops on the host.
 RUN caddy validate --adapter caddyfile --config /etc/caddy/Caddyfile
@@ -544,12 +544,11 @@ RUN caddy validate --adapter caddyfile --config /etc/caddy/Caddyfile
 RUN setcap -r /usr/bin/caddy
 
 USER 1000:1000
-EXPOSE __LOOPBACK_PORT__
+EXPOSE 8080
 
 # NOTE: `podman build` defaults to OCI image format, which DROPS HEALTHCHECK
 # ("HEALTHCHECK is not supported for OCI image format and will be ignored").
 # Build with `--format docker` if the image-level healthcheck is wanted. The
-# authoritative liveness signal for the platform is the compose healthcheck in
-# compose.template.yaml, which is what the deploy wrapper waits on; this line is
-# a convenience for local runs and must not be relied on alone.
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 CMD wget -q -O- http://127.0.0.1:__LOOPBACK_PORT__/healthz || exit 1
+# authoritative liveness signal for the platform is the wrapper's health probe;
+# this image-level check is also used by the host's generated Compose service.
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 CMD wget -q -O- http://127.0.0.1:8080/healthz || exit 1

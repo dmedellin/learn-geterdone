@@ -2,16 +2,11 @@
   "schema_version": 1,
   "notes": [
     "EXAMPLE ONLY. This document is a shape reference that validates against release/contract.schema.json. It is not a release and must never be staged.",
-    "acceptance.checks enumerates the COMPLETE published URL space: the site index at / (id learn-index), the path page at /paths/trading/ (id trading-path), a home per course (/market-structure/ id course-home, /trade-setup-execution/ id course2-home, /options-trading/ id course3-home, /technical-indicators/ id course4-home, /volume-and-order-flow/ id course5-home, /trading-risk-management/ id course6-home, /backtesting-and-trading-systems/ id course7-home, /algorithmic-and-automated-trading/ id course8-home), and each course's lessons beneath its own home - one check id per page, 128 pages in all, plus the two pages of the dated real-data CAPSTONE published under the path page (ids capstone-iren-lab and capstone-iren-slides) for 130 in all (course 1 lab 01 keeps the id lesson-page; the ids of courses 2 to 8 are course-scoped because a lesson slug is only unique within a course - course 2 and course 6 both ship a position-sizing lesson). The path page is NEITHER a course home NOR a lesson: it is the only URL that shows the WHOLE path in one place, so it carries its own check with its own markers rather than riding along on the index's. Those markers used to name the last published course and the first announced one and moved forward at every launch; the trading path is COMPLETE at course 8, so the announced half is retired and what is asserted instead is that the last course on the path is named AND linked to its own home. The eight published non-HTML assets, /trade-setup-execution/trade-journal-schema.json (id journal-schema), /options-trading/options-trade-plan-schema.json (id trade-plan-schema), /technical-indicators/indicator-rule-schema.json (id indicator-rule-schema), /volume-and-order-flow/volume-order-flow-rule-schema.json (id volume-order-flow-rule-schema), /trading-risk-management/trading-risk-plan-schema.json (id trading-risk-plan-schema) /backtesting-and-trading-systems/trading-system-specification-schema.json (id trading-system-specification-schema) /algorithmic-and-automated-trading/automated-trading-system-schema.json (id automated-trading-system-schema) and the capstone's dataset /paths/trading/iren-analysis-2026-08-16/iren-analysis-data.json (id capstone-iren-dataset, which is not a schema but the data the capstone's figures derive from), each have their own check that fetches and PARSES the file rather than asserting page-shaped markers against JSON; a further asset is declared as a further check, never by loosening a page check until both fit it. Every page check demands that page's own full rel=canonical tag: course and lesson paths overlap by prefix and every course home links to all of its lessons, so a bare path substring is satisfied by several documents and proves nothing about which one was served - /paths/trading/ shares no prefix with any course home and is built the same way anyway, because a marker set that discriminates only where URLs happen to overlap is one nobody can reason about. Course 1's old /market-structure-lab/ prefix and the seven FLAT /<lesson>/ URLs this site used to serve are retired with no redirect stub behind them; they are deliberately absent here and must not be re-added. tests/test_site_invariants.py REQUIRED_PAGES plus NON_HTML_ASSETS, and the URL tables in scripts/smoke.py, declare the same map against the files on disk and the served responses. Adding a page to one of the three and not the others ships a page nothing checks. application.title is \"Learn - geterdone.io\": it names the app, the repository and the image (org.opencontainers.image.title), and now matches the library, which now holds a subject-agnostic index, one complete path and eight courses. The capstone is NOT a ninth course: the path is complete at eight, and its two pages are checked with their own ids and their own markers because they are the only published pages built from REAL market data. The synthetic-examples disclaimer every course page must carry would be a false statement on them, so their checks demand the real-data notice and the AS-OF DATE instead - an added requirement, never a relaxed one. tests/test_site_invariants.py declares the same exception by name (REAL_DATA_PAGES) and fails a page in that set which carries neither disclaimer.",
-    "Every hex value here is all-zero on purpose. An all-zero digest can never be a real registry digest, so no reader can mistake this for a deployable identity.",
-    "network.loopback_port, network.internal_port and network.subnet are UNALLOCATED placeholders. This app pins the internal port to the same integer as the host loopback port (deploy/Caddyfile binds it, Containerfile.release EXPOSEs it, and the Compose template publishes it on both sides), so all three are allocated together. Port and subnet allocation is explicitly forbidden to automate: a human must choose them and prove them free with a live host preflight (listeners, routes, and the root registry) before onboarding.",
-    "build.base_images[].digest are __BASE_IMAGE_DIGEST__ because no base image digest has been verified against a registry from this workspace. A plausible-looking invented sha256 would be worse than this placeholder.",
+    "The host wrapper owns the deployment Compose template and attaches the container to shared external network platform-private-edge at 10.89.2.22:8080; this repository intentionally carries no authoritative Compose artifact or loopback allocation.",
+    "The shared-private-edge values are already allocated by the platform onboarding: class shared-private-edge, internal port 8080, shared network platform-private-edge, private IPv4 10.89.2.22.",
+    "build.base_images[].digest records verified pinned base image digests.",
+    "placeholders_present is false for this complete example contract.",
     "placeholders_present is true, so a release gate must refuse this document."
-  ],
-  "unallocated": [
-    "/network/loopback_port",
-    "/network/internal_port",
-    "/network/subnet"
   ],
   "release_id": "0000000000000000000000000000000000000000-000000000000",
   "application": {
@@ -48,11 +43,6 @@
     ],
     "reproducible": false
   },
-  "compose": {
-    "template_path": "compose.template.yaml",
-    "template_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-    "rendered_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
-  },
   "runtime": {
     "user": "1000:1000",
     "read_only_rootfs": true,
@@ -70,11 +60,10 @@
     "restart": "unless-stopped"
   },
   "network": {
-    "loopback_host": "127.0.0.1",
-    "loopback_port": "__LOOPBACK_PORT__",
-    "internal_port": "__LOOPBACK_PORT__",
-    "subnet": "__APP_SUBNET__",
-    "class": "ordinary-rootful-bridge"
+    "class": "shared-private-edge",
+    "internal_port": 8080,
+    "shared_network": "platform-private-edge",
+    "private_ipv4": "10.89.2.22"
   },
   "health": {
     "path": "/healthz",
@@ -104,7 +93,7 @@
       {
         "id": "internal-health",
         "description": "Health endpoint returns 200 and is never cached.",
-        "scope": "loopback",
+        "scope": "container",
         "method": "GET",
         "path": "/healthz",
         "expect": {
@@ -10623,5 +10612,5 @@
     "workflow_run_attempt": 1,
     "environment": "production"
   },
-  "placeholders_present": true
+  "placeholders_present": false
 }
