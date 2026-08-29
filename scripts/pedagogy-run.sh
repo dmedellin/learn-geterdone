@@ -65,6 +65,15 @@ lesson before changing anything, write the assessment to docs/pedagogy/$slug.md
 citing lesson slugs, refactor against your own findings, then verify, commit and
 push to origin/main.
 
+If docs/pedagogy/prior/$slug.md exists, this is a RE-ASSESSMENT. Form your own
+judgement FIRST, from the lessons themselves — do not read the prior assessment
+until your own findings are written down. Then read it and add a short section
+to your assessment recording the delta: what you found that it missed, and
+anything it claimed that you dispute. The repairs it describes are already live
+and were verified green; you are re-judging the course as it now stands, not
+reviewing that document. If you believe one of those repairs was wrong, say so
+explicitly with your reasoning rather than silently reverting it.
+
 Run every gate before committing and do not commit if any is red. If the course
 needs a structural change, update all five URL declarations in the same commit.
 Report at the end: what you changed, which gates you ran, and the commit SHA." \
