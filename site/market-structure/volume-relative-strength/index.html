@@ -1502,9 +1502,9 @@ td.bad { color: var(--red); font-weight: 800; }
         </div>
 
         <div class="metric-grid">
-          <div class="metric"><span class="k">Event volume</span><span class="v" id="eventVolume">2.1K</span></div>
+          <div class="metric"><span class="k">Event volume</span><span class="v" id="eventVolume">2.2K</span></div>
           <div class="metric"><span class="k">Prior baseline</span><span class="v" id="baselineVolume">0.9K</span></div>
-          <div class="metric"><span class="k">Expansion</span><span class="v" id="volumeExpansion">2.3×</span></div>
+          <div class="metric"><span class="k">Expansion</span><span class="v" id="volumeExpansion">2.4×</span></div>
         </div>
 
         <div class="checklist">
@@ -1601,6 +1601,24 @@ td.bad { color: var(--red); font-weight: 800; }
   <div class="grid-2">
     <article class="card practice">
       <div class="practice-head">
+        <h3>Participation drill</h3>
+        <span class="score" id="pvScore">Score 0 / 0</span>
+      </div>
+      <div class="live-readout flow" aria-live="polite">
+      <p id="pvQuizPrompt" style="margin:0;color:var(--muted);font-size:.9rem;"></p>
+      <div class="choice-grid" id="pvChoices">
+        <button class="choice" data-answer="supported" type="button">Expanded, and accepted</button>
+        <button class="choice" data-answer="faded" type="button">Expanded, but not accepted</button>
+        <button class="choice" data-answer="within" type="button">Within its own baseline</button>
+        <button class="choice" data-answer="unknown" type="button">Cannot judge from these numbers</button>
+      </div>
+      <div class="feedback" id="pvFeedback">Judge the event bar against the ten bars before it, then let the follow-through decide.</div>
+      </div>
+      <button class="btn small" id="nextPvQuiz" type="button" style="margin-top:10px;">New event bar</button>
+    </article>
+
+    <article class="card practice">
+      <div class="practice-head">
         <h3>Leadership drill</h3>
         <span class="score" id="rsScore">Score 0 / 0</span>
       </div>
@@ -1617,7 +1635,7 @@ td.bad { color: var(--red); font-weight: 800; }
       <button class="btn small" id="nextRsQuiz" type="button" style="margin-top:10px;">New comparison</button>
     </article>
 
-    <article class="card card-pad">
+    <article class="card card-pad" style="grid-column:1 / -1;">
       <h3 style="margin-top:0;">A practical confirmation stack</h3>
       <div class="lesson-list">
         <div class="lesson-row">
@@ -2372,11 +2390,39 @@ document.getElementById("rsTabs").addEventListener("click", (event) => {
   document.getElementById(id).addEventListener("change", renderRelativeStrength);
 });
 
+// `why` holds one line per wrong answer, so the feedback names the error made
+// rather than restating the right answer. The fourth item used to give both
+// starting prices, which made it answerable by normalising -- exactly what the
+// lesson teaches -- while its key said "cannot compare". It now withholds them.
 const rsQuizItems = [
-  { prompt: "Asset: +4.2% · Benchmark: +6.0%. How did the asset perform relatively?", answer: "laggard", explanation: "The asset rose, but it underperformed the benchmark by 1.8 percentage points." },
-  { prompt: "Asset: −2.0% · Benchmark: −8.0%. How did the asset perform relatively?", answer: "leader", explanation: "The asset fell less, outperforming the benchmark by 6.0 percentage points." },
-  { prompt: "Asset: +7.1% · Benchmark: +7.0%. How did the asset perform relatively?", answer: "equal", explanation: "The difference is only 0.1 percentage point, so performance is roughly equal for this exercise." },
-  { prompt: "Asset raw price: $42 → $45. Benchmark raw price: 5,100 → 5,250. No percentage calculation is provided. What should you do?", answer: "unknown", explanation: "Raw point changes are not directly comparable. Normalize both series or calculate percentage returns." }
+  { prompt: "Asset: +4.2% · Benchmark: +6.0%. How did the asset perform relatively?", answer: "laggard",
+    explanation: "The asset rose, but it underperformed the benchmark by 1.8 percentage points.",
+    why: {
+      leader: "Green is not the same as leading. +4.2% against +6.0% is 1.8 points behind the benchmark — a positive return and weak relative strength at once.",
+      equal: "1.8 percentage points on a 6% move is not roughly equal; it is nearly a third of the benchmark's whole gain given up.",
+      unknown: "Both are percentages over the same span, so they compare directly. Nothing is missing."
+    } },
+  { prompt: "Asset: −2.0% · Benchmark: −8.0%. How did the asset perform relatively?", answer: "leader",
+    explanation: "The asset fell less, outperforming the benchmark by 6.0 percentage points.",
+    why: {
+      laggard: "Falling is not the same as lagging. −2.0% against −8.0% is 6.0 points ahead: losing less is leading.",
+      equal: "Six percentage points is a wide gap. Both fell, but one fell four times as far.",
+      unknown: "Both are percentages over the same span; the sign does not stop them being comparable."
+    } },
+  { prompt: "Asset: +7.1% · Benchmark: +7.0%. How did the asset perform relatively?", answer: "equal",
+    explanation: "The difference is only 0.1 percentage point, so performance is roughly equal for this exercise.",
+    why: {
+      leader: "0.1 of a point is inside the noise of any such comparison. Reading leadership into it is reading a signal that is not there.",
+      laggard: "0.1 of a point is inside the noise of any such comparison. Reading weakness into it is reading a signal that is not there.",
+      unknown: "They are directly comparable — and the comparison says they are the same."
+    } },
+  { prompt: "Asset raw price change: +$3. Benchmark raw change: +150 points. The starting prices are not given. What should you do?", answer: "unknown",
+    explanation: "Raw point changes on two different scales are not comparable, and without the starting prices there is no percentage. Normalise both series or compute percentage returns first.",
+    why: {
+      leader: "+$3 on a $20 stock is 15%; on a $300 stock it is 1%. Without the starting price you cannot say which, so you cannot say who led.",
+      laggard: "+$3 on a $20 stock is 15%; on a $300 stock it is 1%. Without the starting price you cannot say which, so you cannot say who lagged.",
+      equal: "Nothing supports equal either: $3 and 150 points are not in the same units, and neither is a percentage."
+    } }
 ];
 
 const rsQuizState = { index: 0, score: 0, attempts: 0, answered: false };
@@ -2410,7 +2456,8 @@ document.getElementById("rsChoices").addEventListener("click", (event) => {
   document.getElementById("rsScore").textContent = `Score ${rsQuizState.score} / ${rsQuizState.attempts}`;
   const feedback = document.getElementById("rsFeedback");
   feedback.className = `feedback ${correct ? "good" : "bad"}`;
-  feedback.innerHTML = `<strong>${correct ? "Correct." : "Not quite."}</strong> ${q.explanation}`;
+  const misread = correct ? "" : `${(q.why && q.why[button.dataset.answer]) || ""} `;
+  feedback.innerHTML = `<strong>${correct ? "Correct." : "Not quite."}</strong> ${misread}${q.explanation}`;
 });
 
 document.getElementById("nextRsQuiz").addEventListener("click", () => {
@@ -2418,9 +2465,91 @@ document.getElementById("nextRsQuiz").addEventListener("click", () => {
   renderRsQuiz();
 });
 
+// Participation drill. The hero promises the drills measure BOTH judgements
+// this lesson teaches; until this existed only leadership was tested. Each
+// item gives an event bar, its ten-bar baseline (or withholds it), and the
+// follow-through, and `why` names the error behind each wrong answer.
+const pvQuizItems = [
+  { prompt: "Event bar: 2,240. Average of the ten bars before it: 950. The bar closed above the range high, and the next three bars closed above it too.", answer: "supported",
+    why: {
+      supported: "2,240 against 950 is 2.4× — expansion — and the closes that followed stayed outside. Activity arrived at the new prices and they held.",
+      faded: "The expansion is real, but so is the follow-through: three closes held above the range. Nothing was given back.",
+      within: "2,240 against a 950 baseline is 2.4×. That is far outside this market's own habit; it is not a normal bar.",
+      unknown: "Both numbers needed are given — the bar and its ten-bar baseline — and so is the follow-through. The ratio is 2.4×, and it held."
+    } },
+  { prompt: "Event bar: 690. Average of the ten bars before it: 940. The bar closed above the range high; two bars later price closed back inside on 1,180 and 1,420.", answer: "within",
+    why: {
+      within: "690 against 940 is 0.7× — the quietest bar of the sequence at the moment that mattered most. The expansion came later, against the break, and price went back inside.",
+      supported: "The bar that broke out traded less than its own baseline, and the heavy bars arrived while price was falling back inside. That is participation against the break, not behind it.",
+      faded: "There was no expansion to fade: 690 is below the 940 baseline. The heavy bars belong to the failure, not to the break.",
+      unknown: "Both numbers are given. 690 ÷ 940 is 0.7×, and the follow-through is stated."
+    } },
+  { prompt: "The event bar traded 4.2 million shares — the tallest bar on the screen. The average of the ten bars before it: 4.0 million.", answer: "within",
+    why: {
+      within: "4.2M is a large number and a normal bar for this market: 1.05× its own baseline. Expansion is a ratio, not a size.",
+      supported: "Tallest on the screen is not the same as unusual. Against its own ten-bar average this bar is 1.05× — ordinary activity for this market.",
+      faded: "There is nothing to fade; 1.05× is not an expansion. Only the ratio to the market's own habit says whether a bar is unusual.",
+      unknown: "The comparison the lesson asks for is available: event bar against ten-bar average, 4.2M against 4.0M. It is a ratio of 1.05."
+    } },
+  { prompt: "Event bar: 1,900. Average of the ten bars before it: 640. The bar closed above the range high; the very next bar closed back inside it.", answer: "faded",
+    why: {
+      faded: "3.0× is a real expansion — and the next close gave the new prices back. Activity arrived and was not accepted; the candles after the event decide, not the tall bar.",
+      supported: "The expansion was there, but acceptance was not: the next bar closed back inside. High volume can accompany exhaustion as easily as continuation.",
+      within: "1,900 against 640 is 3.0×, well outside this market's habit. The problem with this break is not participation; it is that price did not hold.",
+      unknown: "Both numbers are given and so is the follow-through. 3.0× expanded; the next close failed."
+    } },
+  { prompt: "Event bar: 2,600. It closed above the range high. The chart shows no earlier bars.", answer: "unknown",
+    why: {
+      unknown: "2,600 means nothing on its own. Without the bars before it there is no baseline, and without a baseline there is no ratio — for one market 2,600 is a surge, for another a quiet hour.",
+      supported: "A large-looking number is not evidence until it is compared with this market's own habit. No baseline, no reading.",
+      within: "You cannot know it is ordinary either. The baseline is missing, and the baseline is the whole judgement.",
+      faded: "Nothing has faded — no follow-through is shown, and no baseline is given to say whether 2,600 was even unusual."
+    } }
+];
+
+const pvQuizState = { index: 0, score: 0, attempts: 0, answered: false };
+
+function renderPvQuiz() {
+  const q = pvQuizItems[pvQuizState.index];
+  pvQuizState.answered = false;
+  document.getElementById("pvQuizPrompt").textContent = q.prompt;
+  document.querySelectorAll("#pvChoices .choice").forEach(button => {
+    button.disabled = false;
+    button.classList.remove("correct", "incorrect");
+  });
+  const feedback = document.getElementById("pvFeedback");
+  feedback.className = "feedback";
+  feedback.textContent = "Judge the event bar against the ten bars before it, then let the follow-through decide.";
+}
+
+document.getElementById("pvChoices").addEventListener("click", (event) => {
+  const button = event.target.closest("[data-answer]");
+  if (!button || pvQuizState.answered) return;
+  pvQuizState.answered = true;
+  pvQuizState.attempts += 1;
+  const q = pvQuizItems[pvQuizState.index];
+  const correct = button.dataset.answer === q.answer;
+  if (correct) pvQuizState.score += 1;
+  document.querySelectorAll("#pvChoices .choice").forEach(choice => {
+    choice.disabled = true;
+    if (choice.dataset.answer === q.answer) choice.classList.add("correct");
+  });
+  if (!correct) button.classList.add("incorrect");
+  document.getElementById("pvScore").textContent = `Score ${pvQuizState.score} / ${pvQuizState.attempts}`;
+  const feedback = document.getElementById("pvFeedback");
+  feedback.className = `feedback ${correct ? "good" : "bad"}`;
+  feedback.innerHTML = `<strong>${correct ? "Correct." : "Not quite."}</strong> ${q.why[button.dataset.answer]}`;
+});
+
+document.getElementById("nextPvQuiz").addEventListener("click", () => {
+  pvQuizState.index = (pvQuizState.index + 1) % pvQuizItems.length;
+  renderPvQuiz();
+});
+
 renderVolumeScenario();
 renderRelativeStrength();
 renderRsQuiz();
+renderPvQuiz();
 
   </script>
   <script data-progress-marks>

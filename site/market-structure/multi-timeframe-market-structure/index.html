@@ -1436,7 +1436,7 @@ td.bad { color: var(--red); font-weight: 800; }
     <article class="card concept-card">
       <div class="icon">D</div>
       <h3>Location</h3>
-      <p>The intermediate chart shows whether price is at support, resistance, a range edge, or an unhelpful midpoint.</p>
+      <p>Whether price is at support, resistance, a range edge, or an unhelpful midpoint. On a three-chart desk this is the intermediate chart's job; with the two charts this lab uses, the daily is read twice — once for direction, once for position.</p>
     </article>
     <article class="card concept-card">
       <div class="icon">H</div>
@@ -2278,33 +2278,33 @@ document.getElementById("tfScenarioTabs").addEventListener("click", (event) => {
 
 const tfQuizScenarios = [
   {
-    prompt: "Higher timeframe: bullish. Location: pullback into prior breakout support. Lower timeframe: the selloff forms a higher low and breaks its last lower high.",
+    prompt: "Location: price has pulled back into prior daily breakout support. Read the regime from the daily chart and the trigger from the hourly, then decide.",
     answer: "bullish",
-    explanation: "The regime, location, and lower-timeframe trigger align for a bullish setup.",
+    explanation: "The daily prints higher highs and higher lows — a bullish regime. The hourly selloff stopped above its previous low and closed through its last lower high — a trigger. Regime, location and trigger align.",
     participation: "Read as buyers stepping in on the hourly at a level the daily reading already favoured: the selloff stopped above the prior low and then took out the last lower high. If that higher low gives way, the trigger is gone even though the daily reading has not yet changed.",
     htf: [92,94,93,97,99,98,102,105,104,108,110,109,113,116,114,112,111,113,116],
     ltf: [114,113,112,111,110.5,111.2,112.0,113.1,112.7,114.0,115.0]
   },
   {
-    prompt: "Higher timeframe: bearish. Location: bounce into prior breakdown resistance. Lower timeframe: the bounce forms a lower high and breaks its last higher low.",
+    prompt: "Location: price has bounced into prior daily breakdown resistance. Read the regime from the daily chart and the trigger from the hourly, then decide.",
     answer: "bearish",
-    explanation: "The regime, resistance location, and bearish lower-timeframe shift align.",
+    explanation: "The daily prints lower lows and lower highs — a bearish regime. The hourly bounce made a lower high and closed below its last higher low — a trigger. Regime, resistance location and bearish shift align.",
     participation: "Read as sellers capping the bounce at a level that had already stopped price once, after which the hourly gave back its last higher low. A reclaim of that lower high would remove the trigger without changing the daily reading.",
     htf: [122,120,121,117,115,116,112,109,110,106,103,104,100,98,100,102,101,98,96],
     ltf: [98,99,100,101,102,101.5,100.6,99.8,100.1,98.8,97.6]
   },
   {
-    prompt: "Higher timeframe: bullish. Location: approaching support. Lower timeframe: still making lower highs and lower lows with no reclaim.",
+    prompt: "Location: price is approaching daily support. Read the regime from the daily chart and the trigger from the hourly, then decide.",
     answer: "wait",
-    explanation: "The larger thesis may remain bullish, but the lower timeframe has not produced a reversal trigger.",
+    explanation: "The daily is still bullish — its last higher low has not been closed through — but the hourly is still making lower highs and lower lows with no reclaim. Context without a trigger is a wait.",
     participation: "Read as sellers still holding the pullback: every hourly bounce has stopped below the one before it. The daily reading that buyers keep defending higher lows can still be true at the same time — what is absent is any hourly sign that they have arrived.",
-    htf: [90,92,91,95,97,96,100,103,102,106,109,108,112,114,113,111,109,108,107],
+    htf: [90,92,91,95,97,96,100,103,102,106,109,108,112,114,113,111,110,109.5,109],
     ltf: [113,112.2,111.5,111.9,110.7,109.9,110.2,109.1,108.5,108.8,107.9]
   },
   {
-    prompt: "Higher timeframe: wide range. Location: midpoint. Lower timeframe: locally bullish with clean higher highs and higher lows.",
+    prompt: "Location: the middle of the daily chart's span. Read the regime from the daily chart and the trigger from the hourly, then decide.",
     answer: "noedge",
-    explanation: "The lower timeframe is bullish, but the higher timeframe midpoint provides weak location and no clear directional edge.",
+    explanation: "The daily has turned back and forth across the same span without holding beyond either end — a range. The hourly is bullish, but from the midpoint of an unresolved range, so there is no higher-timeframe edge behind it.",
     participation: "Read as buyers in control locally and neither side in control on the bigger chart, which has turned back and forth without holding beyond either end of its span. A local trend that starts from the middle of an unresolved range has as much room to be turned back as to continue, and the range gives no reason to prefer either.",
     htf: [100,104,106,103,99,98,102,105,106,103,100,99,103,105,104,102,103,104,103],
     ltf: [101,101.6,102.2,101.9,102.8,103.4,103.1,104.0,104.6,104.2,105.0]
@@ -2337,6 +2337,25 @@ function renderTfQuiz() {
   });
 }
 
+// Wrong-answer feedback keyed chosen->correct. The confusions this drill is
+// built to catch are "wait" against an aligned setup (the trigger has already
+// printed), an aligned call against a wait (the trigger has not), and reading a
+// local trend inside a higher-timeframe range as an edge.
+const tfMisreadings = {
+  "bearish->bullish": "The hourly looked bearish on the way down, but that was the pullback of a rising daily. Read the daily first — higher highs and higher lows — and a short is a trade against the regime.",
+  "wait->bullish": "The trigger has already printed: the hourly stopped making lower lows and closed through its last lower high. Waiting past a trigger is not caution; it is a later entry.",
+  "noedge->bullish": "The daily has an edge — a rising sequence with a protected low — and price is at a level it broke out from. That is regime and location both; the hourly supplied the trigger.",
+  "bullish->bearish": "The hourly bounce looked bullish on the way up, but that was the bounce of a falling daily. Read the daily first — lower lows and lower highs — and a long is a trade against the regime.",
+  "wait->bearish": "The hourly has already shifted: the bounce made a lower high and closed below its last higher low. That is the trigger; waiting past it is a later entry.",
+  "noedge->bearish": "The daily has an edge — a falling sequence with a protected high — and price is at a level it broke down from. Regime and location are there; the hourly supplied the trigger.",
+  "bullish->wait": "Regime and location are right, but the hourly is still printing lower highs and lower lows. Nothing on the right chart says buyers have arrived; that is a setup forming, not a trigger.",
+  "bearish->wait": "The hourly is bearish because it is the pullback of a rising daily — the exact case the lesson warns about. A short trades against the regime, and a long has no trigger yet. Neither is supported.",
+  "noedge->wait": "There is an edge: the daily is bullish and price is approaching a level it has defended before. What is missing is the hourly trigger, not the higher-timeframe context.",
+  "bullish->noedge": "The hourly is bullish, but bullish from the middle of a daily range. The daily gives no direction and no boundary to lean on, so the local structure has nothing above it.",
+  "bearish->noedge": "Nothing here is bearish — the hourly is rising and the daily is a range. The problem is not direction; it is the absence of a higher-timeframe edge.",
+  "wait->noedge": "Waiting implies a trigger could arrive and make this a trade. It cannot: the daily is a range and price is at its midpoint, so no hourly trigger would have context behind it."
+};
+
 document.getElementById("tfChoices").addEventListener("click", (event) => {
   const button = event.target.closest("[data-answer]");
   if (!button || tfState.quizAnswered) return;
@@ -2355,7 +2374,8 @@ document.getElementById("tfChoices").addEventListener("click", (event) => {
   feedback.className = `feedback ${correct ? "good" : "bad"}`;
   // Structure and its reading are two different kinds of claim, so they render
   // as two blocks rather than one run-on sentence.
-  feedback.innerHTML = `<strong>${correct ? "Correct." : "Not quite."}</strong> ${q.explanation}<div class="reading"><small>What this is normally read as</small><p>${q.participation}</p></div>`;
+  const misread = correct ? "" : `${tfMisreadings[`${button.dataset.answer}->${q.answer}`] || ""} `;
+  feedback.innerHTML = `<strong>${correct ? "Correct." : "Not quite."}</strong> ${misread}${q.explanation}<div class="reading"><small>What this is normally read as</small><p>${q.participation}</p></div>`;
 });
 
 document.getElementById("nextTfQuiz").addEventListener("click", () => {

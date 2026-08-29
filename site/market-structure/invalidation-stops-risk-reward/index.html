@@ -1148,6 +1148,10 @@ td.bad { color: var(--red); font-weight: 800; }
   .calc-result { grid-template-columns: 1fr; }
 }
 
+  /* Second step of the stop drill: size the position from the chosen stop. */
+  .sizing-step { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line-strong); }
+  .sizing-step h3 { margin: 0; font-size: 1rem; }
+  .sizing-step p { margin: 6px 0 10px; color: var(--muted); font-size: .88rem; }
     /* progress-marks:begin */
     .lesson-feedback {
       margin-top: 18px;
@@ -1560,7 +1564,7 @@ td.bad { color: var(--red); font-weight: 800; }
 <section class="section" id="stop-quality">
   <div class="section-head">
     <div><h2>Stop-quality drill</h2></div>
-    <p>The rule for this setup: the long thesis is invalid only when the protected low breaks with enough room for ordinary noise.</p>
+    <p>The rule for this setup: the long thesis is invalid only when the protected low breaks with enough room for ordinary noise. Pick the stop that says so — then size the position from the distance it imposes.</p>
   </div>
 
   <div class="grid-2">
@@ -1591,6 +1595,17 @@ td.bad { color: var(--red); font-weight: 800; }
         <button class="choice" data-answer="D" type="button">No stop; wait for recovery</button>
       </div>
       <div class="feedback" id="stopFeedback" aria-live="polite">Choose the level that matches the stated structural rule.</div>
+      <div class="sizing-step" id="sizingStep" hidden>
+        <h3>Now size it</h3>
+        <p>Entry 105.00, stop B at 97.80. Account $25,000, risk 0.50% per trade, $1 per 1.00 move per unit, whole units only. How many units?</p>
+        <div class="choice-grid" id="sizingChoices">
+          <button class="choice" data-answer="56" type="button">56 units</button>
+          <button class="choice" data-answer="17" type="button">17 units</button>
+          <button class="choice" data-answer="3472" type="button">3,472 units</button>
+          <button class="choice" data-answer="8" type="button">8 units</button>
+        </div>
+        <div class="feedback" id="sizingFeedback" aria-live="polite">Budget first, then the distance the stop imposes, then divide.</div>
+      </div>
       <button class="btn small" id="resetStopQuiz" type="button" style="margin-top:10px;">Reset drill</button>
     </article>
 
@@ -2207,7 +2222,7 @@ document.getElementById("showRLadder").addEventListener("change", () => renderRi
 
 const stopQuizData = candlesFromCloses(
   [92,94,96,95,98,100,99,102,104,103,101,99.2,100.4,102.0,104.1,105.2,106.0],
-  { 11: { l: 98.45 } },
+  { 11: { l: 98.45 }, 12: { l: 98.7 } },
   150
 );
 
@@ -2232,6 +2247,15 @@ let stopAnswered = false;
 let stopScore = 0;
 let stopAttempts = 0;
 
+// One verdict per candidate, so a wrong choice hears what is wrong with the
+// stop it chose. D is the dangerous one and had no answer before.
+const stopVerdicts = {
+  A: "A sits inside ordinary noise: the candle before the entry wicked to 100.69 with the structure fully intact, so 102.80 can be hit without the thesis being wrong. The larger size it allows is bought with a stop that does not express the rule.",
+  B: "B sits beyond the protected low at 98.45 with 0.65 of room for ordinary noise, and directly matches the stated invalidation rule.",
+  C: "C is beyond the protected low, but 6.80 points further than the rule needs, with no stated reason. The extra distance cuts the position size without adding structural meaning; B expresses the same thesis at 97.80.",
+  D: "“Wait for recovery” is not a stop; it is the absence of one. The rule names the price at which the thesis is wrong — a close below 98.45 — and a plan that will not act there is a plan to hold a broken structure."
+};
+
 document.getElementById("stopChoices").addEventListener("click", (event) => {
   const button = event.target.closest("[data-answer]");
   if (!button || stopAnswered) return;
@@ -2247,7 +2271,49 @@ document.getElementById("stopChoices").addEventListener("click", (event) => {
   document.getElementById("stopScore").textContent = `Score ${stopScore} / ${stopAttempts}`;
   const feedback = document.getElementById("stopFeedback");
   feedback.className = `feedback ${correct ? "good" : "bad"}`;
-  feedback.innerHTML = `<strong>${correct ? "Correct." : "Not quite."}</strong> B sits beyond the protected low and directly matches the stated invalidation rule. A can be hit while structure survives; C adds distance without a defined reason.`;
+  feedback.innerHTML = `<strong>${correct ? "Correct." : "Not quite."}</strong> ${stopVerdicts[button.dataset.answer]}`;
+  showSizingStep();
+});
+
+// Second step: the objective is to pick the stop AND size from its distance,
+// so the drill asks for the size. Every distractor is the number one specific
+// error produces, and the feedback names that error.
+//   $25,000 × 0.50% = $125 budget; stop B is 7.20 points away → ⌊125 / 7.20⌋ = 17
+//   56 = ⌊125 / 2.20⌋ (stop A's distance); 8 = ⌊125 / 14.00⌋ (stop C's);
+//   3,472 = ⌊25,000 / 7.20⌋ (the whole account instead of the budget).
+const sizingVerdicts = {
+  "17": "$25,000 × 0.50% = $125 of risk. Stop B is 105.00 − 97.80 = 7.20 points below the entry, so $7.20 per unit; ⌊$125 ÷ 7.20⌋ = 17 units, risking $122.40.",
+  "56": "That is $125 ÷ 2.20 — the budget divided by stop A's distance. The size followed the stop you rejected. Size from the stop that expresses the thesis: 7.20 points, so 17 units.",
+  "8": "That is $125 ÷ 14.00 — stop C's distance. Extra distance with no structural reason has cost more than half the position. The structural stop is 7.20 points away: 17 units.",
+  "3472": "That is $25,000 ÷ 7.20: the whole account divided by the stop distance. The budget is 0.50% of the account, $125, not all of it; $125 ÷ 7.20 gives 17."
+};
+let sizingAnswered = false;
+
+function showSizingStep() {
+  sizingAnswered = false;
+  document.querySelectorAll("#sizingChoices .choice").forEach(choice => {
+    choice.disabled = false;
+    choice.classList.remove("correct", "incorrect");
+  });
+  const feedback = document.getElementById("sizingFeedback");
+  feedback.className = "feedback";
+  feedback.textContent = "Budget first, then the distance the stop imposes, then divide.";
+  document.getElementById("sizingStep").hidden = false;
+}
+
+document.getElementById("sizingChoices").addEventListener("click", (event) => {
+  const button = event.target.closest("[data-answer]");
+  if (!button || sizingAnswered) return;
+  sizingAnswered = true;
+  const correct = button.dataset.answer === "17";
+  document.querySelectorAll("#sizingChoices .choice").forEach(choice => {
+    choice.disabled = true;
+    if (choice.dataset.answer === "17") choice.classList.add("correct");
+  });
+  if (!correct) button.classList.add("incorrect");
+  const feedback = document.getElementById("sizingFeedback");
+  feedback.className = `feedback ${correct ? "good" : "bad"}`;
+  feedback.innerHTML = `<strong>${correct ? "Correct." : "Not quite."}</strong> ${sizingVerdicts[button.dataset.answer]}`;
 });
 
 document.getElementById("resetStopQuiz").addEventListener("click", () => {
@@ -2259,6 +2325,7 @@ document.getElementById("resetStopQuiz").addEventListener("click", () => {
   const feedback = document.getElementById("stopFeedback");
   feedback.className = "feedback";
   feedback.textContent = "Choose the level that matches the stated structural rule.";
+  document.getElementById("sizingStep").hidden = true;
 });
 
 renderRiskPlanner(true);

@@ -921,6 +921,12 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
     }
+    /* Second step of the practice drill: name the level the label rests on. */
+    .level-step { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line-strong); }
+    .level-step h3 { margin: 0; font-size: 1rem; }
+    .level-step p { margin: 6px 0 0; color: var(--muted); font-size: 0.84rem; }
+    .level-step .answer-grid { grid-template-columns: 1fr; }
+    .candle-key { width: 100%; height: auto; display: block; margin: 10px 0 8px; }
     /* progress-marks:begin */
     .lesson-feedback {
       margin-top: 18px;
@@ -1220,6 +1226,31 @@
           </div>
         </div>
 
+        <div class="concept-grid" style="margin-bottom:22px;">
+          <article class="panel learn-card">
+            <h3><span class="term">Candle</span>What one candle records</h3>
+            <svg class="candle-key" viewBox="0 0 360 124" role="img" aria-label="Two candles. The up candle's filled body runs from a lower open to a higher close; the down candle's hollow body runs from a higher open to a lower close. Thin wicks above and below each body reach the high and the low.">
+              <g stroke="var(--green)" fill="var(--green)"><line x1="110" y1="14" x2="110" y2="104" stroke-width="2" /><rect x="96" y="34" width="28" height="50" rx="3" /></g>
+              <g stroke="var(--red)" fill="none"><line x1="250" y1="14" x2="250" y2="104" stroke-width="2" /><rect x="236" y="34" width="28" height="50" rx="3" stroke-width="2" /></g>
+              <g fill="var(--muted)" font-family="system-ui" font-size="11" font-weight="800">
+                <text x="18" y="18">HIGH</text><text x="18" y="108">LOW</text>
+                <text x="132" y="39">CLOSE</text><text x="132" y="88">OPEN</text>
+                <text x="272" y="39">OPEN</text><text x="272" y="88">CLOSE</text>
+                <text x="110" y="121" text-anchor="middle">UP</text><text x="250" y="121" text-anchor="middle">DOWN</text>
+              </g>
+            </svg>
+            <p>Each candle summarises one span of time — an hour, a day. Its body runs from the <strong>open</strong> to the <strong>close</strong>; the thin lines above and below it, the <strong>wicks</strong>, reach to the <strong>high</strong> and <strong>low</strong> the span touched. A body in the up colour closed above its open; one in the down colour closed below it.</p>
+          </article>
+          <article class="panel learn-card">
+            <h3><span class="term">Close</span>The price the rules use</h3>
+            <p>A wick shows where price went; the close shows where it was accepted when the span ended. Every rule in this course keys on the close — “a close below the low”, “a close beyond the edge” — because a wick through a level that closes back on the right side of it is a level tested, not a level broken.</p>
+          </article>
+          <article class="panel learn-card">
+            <h3><span class="term">Swing</span>A turning point</h3>
+            <p>A swing high is a candle whose high stands above the highs on either side of it; a swing low is the mirror. Structure is read from the sequence of these turning points, not from single candles: label the moves that visibly changed direction and leave the rest unlabelled.</p>
+          </article>
+        </div>
+
         <div class="cards-3">
           <article class="concept-card">
             <div class="card-title-row"><h3>Bullish structure</h3><span class="status-pill up">Buyers lead</span></div>
@@ -1426,7 +1457,7 @@
           <div>
             <div class="kicker">Practice mode</div>
             <h2>Classify the chart without labels</h2>
-            <p>Choose the dominant structure. After checking, the important swings and explanation will appear.</p>
+            <p>Choose the dominant structure. After checking, the important swings and explanation appear — and a second question asks for the level that would prove your label wrong.</p>
           </div>
         </div>
 
@@ -1449,6 +1480,12 @@
             </div>
             <div class="feedback" id="quizFeedback" aria-live="polite"><strong>Look for the sequence.</strong> Are highs and lows rising, falling, staying inside boundaries, or changing direction?</div>
             <div class="score-row"><span>Score <strong id="scoreValue">0 / 0</strong></span><span>Best streak <strong id="streakValue">0</strong></span></div>
+            <div class="level-step" id="levelStep" hidden>
+              <h3>Which level would prove that label wrong?</h3>
+              <p id="levelPrompt">Pick the price the reading rests on.</p>
+              <div class="answer-grid" id="levelGrid"></div>
+              <div class="feedback" id="levelFeedback" aria-live="polite"><strong>Name the level.</strong> Not the most recent swing — the one the current reading is defending.</div>
+            </div>
           </aside>
         </div>
       </section>
@@ -2020,6 +2057,7 @@
         quizSeed = Math.floor(Math.random() * 10000) + 100;
         selectedAnswer = null;
         quizChecked = false;
+        $('#levelStep').hidden = true;
         answerButtons.forEach(b => b.className = 'answer');
         $('#quizFeedback').innerHTML = '<strong>Look for the sequence.</strong> Are highs and lows rising, falling, staying inside boundaries, or changing direction?';
         renderChart(quizChart, quizKey, scenarios[quizKey].anchors.length, { seedOffset: quizSeed, forcePath: false, forceLabels: false, forceLevels: false, height: 450 });
@@ -2032,6 +2070,99 @@
           answerButtons.forEach(b => b.classList.toggle('selected', b === btn));
         });
       });
+
+      // Feedback for a wrong label names what was misread, keyed by the answer
+      // chosen and the answer that was right. Restating the rule tells a reader
+      // who called a transition "bullish" nothing they did not already know;
+      // what they missed is the break at the end of the sequence.
+      const misreadings = {
+        'bearish->bullish': 'You read it as falling. Trace the swing highs: each clears the last, and each low holds above the previous low. The direction of the sequence, not the colour of the last few candles.',
+        'range->bullish': 'Rising, not bounded. In a range the highs stop at about the same price each time; here each high clears the last one and the lows step up behind it.',
+        'reversal->bullish': 'You saw a change of character that is not there. Every pullback held above the previous low — none of the protected lows was closed through. A red candle or two inside a rising sequence is a pullback, not a transition.',
+        'bullish->bearish': 'You read it as rising. Trace the swing lows: each is below the last, and each bounce stalls below the previous high. Falling highs and falling lows.',
+        'range->bearish': 'Falling, not bounded. In a range the lows hold at about the same price each time; here each low undercuts the last one and the highs step down behind it.',
+        'reversal->bearish': 'Look for the break that should have started a transition: there is none. Every bounce stalled below the previous high; the lower highs and lower lows were there from the first swings.',
+        'bullish->range': 'Bounded, not trending. The highs keep stopping in the same area and the lows keep holding the same area; nothing has been closed through. A trend needs the highs and lows to keep moving.',
+        'bearish->range': 'Bounded, not trending. The lows keep holding the same area and the highs keep stopping in the same area; nothing has been closed through.',
+        'reversal->range': 'A transition is a trend that ends. Here there is no trend to end: highs and lows keep landing at the same two areas, so nothing was protected and nothing was broken.',
+        'bullish->reversal': 'The chart begins bullish, and if you stopped reading there you would call it that. It does not stay bullish: the last protected low is closed through, and a lower high and lower low follow. Read the sequence to its end.',
+        'bearish->reversal': 'The end is bearish, but that is not how it started. The first swings are higher highs and higher lows; what you are labelling is the change from one to the other, and the label for that is transition.',
+        'range->reversal': 'Not two boundaries — one break. Price was making higher highs, then closed through the low it had been defending, then made a lower high and a lower low. Nothing here rotated between the same two levels.'
+      };
+
+      // Second step of the drill. The objective is to label the chart AND name
+      // the level that would prove the label wrong, so the drill asks for both.
+      // Options are read from the scenario's own anchors, so the level offered
+      // is always the one the chart is drawing.
+      function levelOptions(key) {
+        const a = scenarios[key].anchors;
+        if (key === 'bullish') return {
+          prompt: 'The chart reads bullish. Which close would end that reading?',
+          options: [
+            { label: `A close below ${a[4]}`, correct: true, why: `${a[4]} is the higher low the last advance began from. Close below it and buyers were not there before the previous low after all.` },
+            { label: `A close below ${a[5]}`, correct: false, why: `${a[5]} is the latest high. Pulling back from it is what every higher low in this sequence did; the reading fails only when a pullback closes below the low the last advance began from, ${a[4]}.` },
+            { label: `A close below ${a[3]}`, correct: false, why: `${a[3]} was the high that got broken — it confirmed the structure, it does not protect it. The level being defended is the higher low that launched that break, ${a[4]}.` }
+          ]
+        };
+        if (key === 'bearish') return {
+          prompt: 'The chart reads bearish. Which close would end that reading?',
+          options: [
+            { label: `A close above ${a[4]}`, correct: true, why: `${a[4]} is the lower high the last decline began from. Close above it and sellers were not there below the previous high after all.` },
+            { label: `A close above ${a[5]}`, correct: false, why: `${a[5]} is the latest low. Bouncing from it is what every lower high in this sequence did; the reading fails only when a bounce closes above the high the last decline began from, ${a[4]}.` },
+            { label: `A close above ${a[3]}`, correct: false, why: `${a[3]} was the low that got broken — it confirmed the structure, it does not protect it. The level being defended is the lower high that launched that break, ${a[4]}.` }
+          ]
+        };
+        if (key === 'range') {
+          const rangeHigh = Math.max(...a.filter((_, i) => i % 2 === 1));
+          const rangeLow = Math.min(...a.filter((_, i) => i % 2 === 0));
+          const mid = ((rangeHigh + rangeLow) / 2).toFixed(2);
+          const last = a[a.length - 1];
+          return {
+            prompt: 'The chart reads as a range. What would end that reading?',
+            options: [
+              { label: `A close held beyond ${rangeHigh} or ${rangeLow}`, correct: true, why: 'The edges are the only levels a range defends. Acceptance beyond one — a close that stays outside, not a wick through — is what turns rotation into a break.' },
+              { label: `A close through the midpoint, ${mid}`, correct: false, why: `The middle of a range is the one place neither side is defending; price crosses it on every rotation. Only acceptance beyond an edge, ${rangeHigh} or ${rangeLow}, changes the reading.` },
+              { label: `A close below the last swing, ${last}`, correct: false, why: `${last} is the latest turn at the lower edge, and the next rotation will make another. The range reading breaks on a held close beyond ${rangeHigh} or ${rangeLow}, not on the next turn inside them.` }
+            ]
+          };
+        }
+        return {
+          prompt: 'The chart has transitioned to bearish. Which close would undo that?',
+          options: [
+            { label: `A close above ${a[7]}`, correct: true, why: `${a[7]} is the lower high that formed after the change of character — the first level the new bearish reading defends. Reclaim it and the transition was a deeper pullback, not a reversal.` },
+            { label: `A close above ${a[4]}`, correct: false, why: `${a[4]} was the protected low of the old bullish reading, and it has already been closed through — that break is what made this a transition. What the new reading defends is the lower high that followed, ${a[7]}.` },
+            { label: `A close below ${a[8]}`, correct: false, why: `${a[8]} is the latest lower low — the break that confirmed the new reading. Going through it would strengthen the bearish case, not end it. The level to reclaim is ${a[7]}.` }
+          ]
+        };
+      }
+
+      let levelAnswered = false;
+      function showLevelStep() {
+        const spec = levelOptions(quizKey);
+        const grid = $('#levelGrid');
+        levelAnswered = false;
+        $('#levelPrompt').textContent = spec.prompt;
+        $('#levelFeedback').innerHTML = '<strong>Name the level.</strong> Not the most recent swing — the one the current reading is defending.';
+        grid.innerHTML = '';
+        const order = spec.options.slice().sort(() => Math.random() - 0.5);
+        order.forEach((opt, i) => {
+          const b = document.createElement('button');
+          b.className = 'answer';
+          b.type = 'button';
+          b.textContent = opt.label;
+          b.addEventListener('click', () => {
+            if (levelAnswered) return;
+            levelAnswered = true;
+            [...grid.children].forEach((c, j) => {
+              if (order[j].correct) c.classList.add('correct');
+              else if (j === i) c.classList.add('wrong');
+            });
+            $('#levelFeedback').innerHTML = `<strong>${opt.correct ? 'Correct.' : 'Not that one.'}</strong>${opt.why}`;
+          });
+          grid.appendChild(b);
+        });
+        $('#levelStep').hidden = false;
+      }
 
       $('#checkAnswer').addEventListener('click', () => {
         if (!selectedAnswer || quizChecked) {
@@ -2068,7 +2199,9 @@
           range: 'Read as both sides defending the edges and neither defending the middle: price turns near the low, then again near the high. Closing beyond an edge, rather than wicking through it, breaks that reading.',
           reversal: 'Read as the low buyers had been defending giving way, after which rallies stall below the previous high. That describes a pattern that has changed, not one that must continue: reclaiming the broken level would undo the reading.'
         };
-        $('#quizFeedback').innerHTML = `<strong>${correct ? 'Correct.' : `This chart is ${scenarios[quizKey].title.toLowerCase()}.`}</strong>${summary[quizKey]}<div class="reading"><small>What this is normally read as</small><p>${participation[quizKey]}</p></div>`;
+        const misread = correct ? '' : `${misreadings[`${selectedAnswer}->${quizKey}`] || ''} `;
+        $('#quizFeedback').innerHTML = `<strong>${correct ? 'Correct.' : `This chart is ${scenarios[quizKey].title.toLowerCase()}.`}</strong>${misread}${summary[quizKey]}<div class="reading"><small>What this is normally read as</small><p>${participation[quizKey]}</p></div>`;
+        showLevelStep();
         $('#scoreValue').textContent = `${score} / ${attempts}`;
         $('#streakValue').textContent = bestStreak;
         renderChart(quizChart, quizKey, scenarios[quizKey].anchors.length, { seedOffset: quizSeed, forcePath: true, forceLabels: true, forceLevels: true, height: 450 });

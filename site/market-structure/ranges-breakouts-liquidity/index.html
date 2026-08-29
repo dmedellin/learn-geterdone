@@ -1378,6 +1378,7 @@ td.bad { color: var(--red); font-weight: 800; }
       <div class="icon">↶</div>
       <h3>Liquidity sweep</h3>
       <p>Price trades beyond an obvious level, then rejects and closes back inside. The failed break is the evidence.</p>
+      <p><strong>Liquidity</strong> here means the orders resting just beyond an obvious level: the stops of traders positioned inside the range, and the entries of traders waiting for the break. A sweep trades far enough through the level to fill them, finds nothing behind them, and comes back.</p>
     </article>
   </div>
 </section>
@@ -1485,7 +1486,7 @@ td.bad { color: var(--red); font-weight: 800; }
     <article class="card concept-card">
       <div class="icon">4</div>
       <h3>Liquidity sweep</h3>
-      <p>The failed break of the concept card, completed: price pierces the level, closes back inside, and the rejection often accelerates back through the range.</p>
+      <p>The failed break, completed: price trades clearly through the level — far enough to fill the orders resting beyond it — closes back inside, and the rejection often accelerates back through the range. Degree is what separates it from a rejection: a rejection reaches or grazes the boundary and turns; a sweep runs well past it and comes back.</p>
     </article>
   </div>
 </section>
@@ -2309,6 +2310,25 @@ function newBoundaryQuiz() {
   feedback.textContent = "Choose the classification that best explains the full sequence.";
 }
 
+// Feedback for a wrong classification names what separates the chosen class
+// from the right one, keyed chosen->correct. The predictable confusions here
+// are sweep against rejection (both end inside; degree decides) and breakout
+// against retest (both close outside; the return decides).
+const boundaryMisreadings = {
+  "rejection->sweep": "A rejection reaches or grazes the edge and turns. Look at the event candle's wick: it ran well through the boundary before the close came back inside — that excursion, and its failure, is the sweep.",
+  "breakout->sweep": "The candle that crossed did not close outside. A breakout is a close beyond the boundary with acceptance after it; here the close was back inside on the same candle.",
+  "retest->sweep": "There was no break to retest. Price crossed and closed back inside on one candle; a retest needs a close outside first, then a return to the old boundary that holds from the other side.",
+  "sweep->rejection": "The wick only grazes the boundary — a fraction of a point, not a run through it. A sweep goes well beyond the level to take out what rests there and then comes back; this turned at the level.",
+  "breakout->rejection": "No close landed outside. Switch on the closes: every one stays inside the range, so the boundary held and the classification is a rejection.",
+  "retest->rejection": "A retest happens after a break, from the other side of the boundary. Price never closed outside here, so it is still testing the edge from within.",
+  "rejection->breakout": "A close outside, then further closes outside. That is acceptance, not a test: the boundary stopped holding the moment price closed beyond it and stayed there.",
+  "sweep->breakout": "A sweep closes back inside; this did not. The close outside was followed by more closes outside, so the higher prices were accepted rather than rejected.",
+  "retest->breakout": "Price left and did not come back. A retest needs a return to the old boundary that holds from the new side; here the closes kept moving away from it.",
+  "rejection->retest": "Price closed outside first, then came back to the old high and held it from above. The return is the retest and the hold is what completed the breakout.",
+  "sweep->retest": "The close outside held. Price came back to the old boundary and was turned away from above it — the opposite of a sweep's return inside.",
+  "breakout->retest": "The break is real, so this is close. But price then returned to the old boundary and held it from the other side before resuming; that retest is the distinguishing event."
+};
+
 document.getElementById("boundaryChoices").addEventListener("click", (event) => {
   const button = event.target.closest("[data-answer]");
   if (!button || boundaryState.quizAnswered) return;
@@ -2327,7 +2347,8 @@ document.getElementById("boundaryChoices").addEventListener("click", (event) => 
   feedback.className = `feedback ${correct ? "good" : "bad"}`;
   // Structure and its reading are two different kinds of claim, so they render
   // as two blocks rather than one run-on sentence.
-  feedback.innerHTML = `<strong>${correct ? "Correct." : "Not quite."}</strong> ${scenario.explanation}<div class="reading"><small>What this is normally read as</small><p>${scenario.participationSummary}</p></div>`;
+  const misread = correct ? "" : `${boundaryMisreadings[`${button.dataset.answer}->${scenario.answer}`] || ""} `;
+  feedback.innerHTML = `<strong>${correct ? "Correct." : "Not quite."}</strong> ${misread}${scenario.explanation}<div class="reading"><small>What this is normally read as</small><p>${scenario.participationSummary}</p></div>`;
 });
 
 document.getElementById("nextBoundaryQuiz").addEventListener("click", newBoundaryQuiz);
