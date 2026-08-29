@@ -15,10 +15,16 @@ for **reading** state — `podman ps`, `curl -o /dev/null`, `cat` a compose file
 
 What you should check, because each has failed here before:
 
-- **Port and subnet allocation is a human decision and must not be automated.**
-  Templates keep `__LOOPBACK_PORT__` and `__APP_SUBNET__`; the contract keeps the
-  integers. Never `10.89.2.0/24`. A rendered port committed into a template is a
-  release failure, and papering over it is worse than the failure.
+- **The host owns the topology; this repo pins one constant.** The app is a
+  tenant of the shared `platform-private-edge` network, deployed by
+  `/usr/local/sbin/platform-deploy-static`, which renders its own Compose and owns
+  the Caddy fragment. The container MUST listen on `8080` and MUST serve
+  `/srv/release.txt` containing the release commit, `no-store`; the wrapper checks
+  that marker privately and publicly and rolls back if either disagrees. The
+  `__LOOPBACK_PORT__` / `__APP_SUBNET__` placeholders are retired and CI fails if
+  they reappear. Never `10.89.2.0/24` as an app subnet - that CIDR *is* the shared
+  network. Changing the private IPv4 or domain is a platform-ops change, not a
+  workflow edit.
 - **Digests, not tags.** A deployment references
   `ghcr.io/…@sha256:<manifest digest>`. Layer digests scraped from a build log
   are not the manifest digest; that mistake has already cost a wasted diagnosis.
