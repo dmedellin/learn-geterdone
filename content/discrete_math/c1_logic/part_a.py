@@ -78,11 +78,13 @@ LESSONS = [
                   "for whole sentences, not for numbers."),
         ],
         "lab": ("truth_table", {
-            "formulas": ["p", "~p", "p & q", "p | q", "p -> q", "p <-> q", "p ^ q"],
+            "formulas": ["p", "~p", "p & q", "p | q"],
             "compare_with": "p | q",
             "panel_title": "One variable at a time",
             "panel_intro": "Start with `p` alone: two rows, because one proposition has "
-                           "two possible truth values and nothing else.",
+                           "two possible truth values and nothing else. The two-variable "
+                           "formulas are a preview — lesson 2 defines `&` and `|` "
+                           "properly. Watch only the row count for now: it doubles.",
         }),
         "steps_title": "Deciding whether a sentence is a proposition",
         "steps_intro": "Four questions, in this order. The first \"no\" settles it.",

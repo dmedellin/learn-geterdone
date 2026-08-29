@@ -204,16 +204,28 @@ LESSONS = [
              "changes the claim."),
         ],
         "read_title": "Stacked quantifiers",
-        "read_intro": "The four two-variable forms, and the implication that holds between two of them.",
+        "read_intro": "The six two-variable forms, and the implication that holds between two of them.",
         "body": [
-            ("p", "With one two-place predicate and two quantifiers there are four "
-                  "statements. Written out over a domain, they say quite different things."),
+            ("p", "With one two-place predicate and two quantifiers there are eight "
+                  "strings to write &mdash; but same-kind quantifiers commute, so "
+                  "`∀x ∀y` and `∀y ∀x` are one claim, and likewise the two `∃∃` forms. "
+                  "Six distinct statements remain, and the mixed ones pair up as "
+                  "mirror images: a claim about rows and a claim about columns."),
             ("math", [
                 "∀x ∀y P(x, y)     P holds for every pair",
                 "∀x ∃y P(x, y)     for each x there is SOME y (which may depend on x)",
+                "∃y ∀x P(x, y)     there is ONE y that works with every x",
+                "∀y ∃x P(x, y)     for each y there is SOME x (the mirror of the second)",
                 "∃x ∀y P(x, y)     there is ONE x that works with every y",
                 "∃x ∃y P(x, y)     some pair works",
             ]),
+            ("p", "Keep the two mirror pairs apart. `∃y ∀x P(x, y)` asks for one `y` "
+                  "serving every `x`; `∃x ∀y P(x, y)` asks for one `x` serving every "
+                  "`y`. Over the grid in the lab those are a full column and a full "
+                  "row, and a grid can have either without the other. The theorem "
+                  "below pairs each `∃∀` with the `∀∃` that shares its variables "
+                  "&mdash; mixing a row claim into a column argument is how proofs "
+                  "about quantifier order go quietly wrong."),
             ("thm", ("The one implication",
                      "`∃y ∀x P(x, y) ⟹ ∀x ∃y P(x, y)`, and the converse does not hold in "
                      "general.")),
@@ -245,11 +257,16 @@ LESSONS = [
         ],
         "lab": ("quantifier", {
             "size": 4,
-            "preset": "succ",
+            "preset": "diag",
             "panel_title": "Separate the two orders",
-            "panel_intro": "The successor preset is the classic separator: every `x` has "
-                           "a `y` with `y = x + 1`, but no single `y` is the successor of "
-                           "everything. Watch the two middle rows disagree.",
+            "panel_intro": "The identity preset separates the theorem pair: every `x` "
+                           "has a `y` with `y = x` — its own — so `∀x ∃y` holds, but no "
+                           "single `y` equals everything, so `∃y ∀x` fails. Then try the "
+                           "successor preset and explain why `∀x ∃y` fails there too: on "
+                           "the finite universe `{1, …, 4}` the top element has no "
+                           "successor. The claim true over all of `ℕ` dies at the edge "
+                           "of a truncated domain — the domain is part of the statement, "
+                           "exactly as lesson 8 said.",
         }),
         "steps_title": "Reading a nested statement",
         "steps_intro": "Left to right, and never rearrange.",
@@ -324,9 +341,11 @@ LESSONS = [
         ],
         "standard": ("Finish when you can build a predicate separating `∀∃` from `∃∀`.",
                      "Using the lab's grid, construct a relation where `∀x ∃y` holds and "
-                     "`∃x ∀y` fails, and one where both hold. Being able to build the "
-                     "separating case is stronger evidence of understanding than "
-                     "recognising it."),
+                     "`∃y ∀x` fails, and one where both hold &mdash; then say, for the "
+                     "successor preset on `{1, …, 4}`, why `∀x ∃y` fails there and for "
+                     "which `x`. Being able to build the separating case, and to name "
+                     "the element a truncated domain breaks, is stronger evidence of "
+                     "understanding than recognising either."),
         "note": "The `∀ε ∃δ` versus `∃δ ∀ε` distinction is the single place this lesson "
                 "pays off outside discrete mathematics: pointwise and uniform continuity "
                 "differ by precisely this swap, and so do pointwise and uniform convergence.",
@@ -408,11 +427,14 @@ LESSONS = [
         ],
         "lab": ("quantifier", {
             "size": 4,
-            "preset": "diag",
+            "preset": "le",
             "panel_title": "Negation as a flip",
-            "panel_intro": "Use the complement button: it replaces `P` by `¬P` everywhere. "
-                           "Watch `∀x ∀y` and `∃x ∃y` swap verdicts, and the two mixed "
-                           "rows swap with each other.",
+            "panel_intro": "Start from the order preset — five of the six verdicts are "
+                           "true. Press Complement: it replaces `P` by `¬P` everywhere, "
+                           "and only `∃x ∃y` survives. That collapse is the theorem in "
+                           "action: each new verdict is the negation of its dual's old "
+                           "one — `∀x∀y` with `∃x∃y`, `∀x∃y` with `∃x∀y`, `∀y∃x` with "
+                           "`∃y∀x`. Predict all six before pressing, then check.",
         }),
         "steps_title": "Negating a statement",
         "steps_intro": "One quantifier at a time, outside in. Never guess the result.",

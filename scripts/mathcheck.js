@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
- * Test the ARITHMETIC the algebra path is built on.
+ * Test the ARITHMETIC the generated paths are built on.
  *
  * WHY THIS EXISTS, and why it is separate from labcheck.js. That harness proves
  * every published lab runs and paints. It cannot prove the numbers are right: a
@@ -9,10 +9,17 @@
  * reader that each figure is computed from the stated definition and that the
  * arithmetic is exact. This file is what makes that promise checkable.
  *
+ * The same holds for the logic course: its truth tables and quantifier
+ * verdicts are computed by evaluators in scripts/mathpath/labs/logic.py, and a
+ * quantifier lab whose status text reasons about a different statement than
+ * its evaluator computes runs, paints, and passes labcheck while teaching a
+ * falsehood. That defect shipped once; the logic section below is what now
+ * catches it.
+ *
  * The JavaScript under test IS the JavaScript that ships. It is extracted from
- * scripts/mathpath/labs/algebra_core.py, which holds it as raw strings, so
- * there is no second copy to drift -- testing a transcription would prove
- * nothing about the published pages.
+ * scripts/mathpath/labs/algebra_core.py and scripts/mathpath/labs/logic.py,
+ * which hold it as raw strings, so there is no second copy to drift -- testing
+ * a transcription would prove nothing about the published pages.
  *
  * Usage:  node scripts/mathcheck.js
  */
@@ -22,13 +29,17 @@ const path = require('path');
 
 const SOURCE = path.join(__dirname, 'mathpath', 'labs', 'algebra_core.py');
 const src = fs.readFileSync(SOURCE, 'utf8');
+const LOGIC_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'logic.py');
+const logicSrc = fs.readFileSync(LOGIC_SOURCE, 'utf8');
 
 /* Each block is  NAME = r"""..."""  in the Python module. */
-function block(name) {
-  const m = new RegExp(name + ' = r"""([\\s\\S]*?)"""', 'm').exec(src);
-  if (!m) { console.error('cannot find ' + name + ' in ' + SOURCE); process.exit(2); }
+function blockFrom(text, name, where) {
+  const m = new RegExp(name + ' = r"""([\\s\\S]*?)"""', 'm').exec(text);
+  if (!m) { console.error('cannot find ' + name + ' in ' + where); process.exit(2); }
   return m[1];
 }
+function block(name) { return blockFrom(src, name, SOURCE); }
+function logicBlock(name) { return blockFrom(logicSrc, name, LOGIC_SOURCE); }
 
 let fails = 0;
 function eq(got, want, label) {
@@ -239,6 +250,106 @@ eq(runs(x => 1 / (x * x - 0.09)).length, 3, 'two stepped-over poles give three r
   eq(ends[0].attrs.class, 'plot-end closed', 'a closed end is filled');
   eq(ends[1].attrs.class, 'plot-end open', 'an open end is hollow');
   near(parseFloat(ends[0].attrs.cx), 30 + (7 / 20) * 600, 0.01, 'the closed end is placed correctly');
+}
+
+// ---------------------------------------------------- propositional logic
+console.log('propositional logic (course 1 labs)');
+eval(logicBlock('PARSER_JS'));
+{
+  const T = { p: true }, F = { p: false };
+  const env = (p, q) => ({ p, q });
+  /* The conditional's one false row, and vacuous truth in both false-p rows. */
+  const imp = parse('p -> q');
+  eq(evalNode(imp, env(true, false)), false, 'T -> F is the one false row');
+  eq(evalNode(imp, env(false, true)), true, 'F -> T is vacuously true');
+  eq(evalNode(imp, env(false, false)), true, 'F -> F is vacuously true');
+  /* Precedence: ~ binds tighter than &, and ~p & q differs from ~(p & q). */
+  eq(evalNode(parse('~p & q'), env(false, false)), false, '~p & q at FF: negation binds tight');
+  eq(evalNode(parse('~(p & q)'), env(false, false)), true, '~(p & q) at FF');
+  /* Inclusive or vs xor part company in exactly the TT row. */
+  eq(evalNode(parse('p | q'), env(true, true)), true, 'inclusive or is true at TT');
+  eq(evalNode(parse('p ^ q'), env(true, true)), false, 'xor is false at TT');
+  /* -> is right-associative: p -> q -> r is p -> (q -> r). */
+  eq(evalNode(parse('p -> q -> r'), { p: true, q: true, r: false }), false, 'p->q->r at TTF');
+  eq(evalNode(parse('p -> q -> r'), { p: false, q: true, r: false }), true, 'p->q->r at FTF: right-associative');
+  /* Constants, so ⊤ and ⊥ mean what the pages say they mean. */
+  eq(evalNode(parse('⊤'), {}), true, 'top is true');
+  eq(evalNode(parse('⊥ -> p'), F), true, 'ex falso: bottom implies anything');
+  /* Whole-table facts, over every assignment: the identities the lessons teach. */
+  function rowsFor(vars) { return assignments(vars); }
+  function agreeEverywhere(aSrc, bSrc, vars) {
+    const a = parse(aSrc), b = parse(bSrc);
+    return rowsFor(vars).every((e) => evalNode(a, e) === evalNode(b, e));
+  }
+  eq(agreeEverywhere('~(p & q)', '~p | ~q', ['p', 'q']), true, 'De Morgan over all four rows');
+  eq(agreeEverywhere('p -> q', '~q -> ~p', ['p', 'q']), true, 'contraposition over all four rows');
+  eq(agreeEverywhere('p -> q', 'q -> p', ['p', 'q']), false, 'the converse is NOT equivalent');
+  const mt = parse('((p -> q) & ~q) -> ~p');
+  eq(rowsFor(['p', 'q']).every((e) => evalNode(mt, e)), true, 'modus tollens is a tautology');
+  const ac = parse('((p -> q) & q) -> p');
+  eq(rowsFor(['p', 'q']).every((e) => evalNode(ac, e)), false, 'affirming the consequent is not');
+  /* The row order the lessons teach: T before F, rightmost fastest. */
+  eq(rowsFor(['p', 'q']).map((e) => (e.p ? 'T' : 'F') + (e.q ? 'T' : 'F')).join(' '),
+     'TT TF FT FF', 'conventional row order');
+}
+
+// ------------------------------------------------------- quantifier verdicts
+console.log('quantifier verdicts (course 1 labs)');
+eval(logicBlock('QUANT_EVAL_JS'));
+{
+  /* Exhaustive over every 3x3 predicate: 512 grids. This is the check that
+     would have caught the shipped row/column confusion, so it is done by
+     enumeration rather than by trusting a handful of examples. */
+  const N = 3;
+  let thmOk = true, mirrorOk = true, negOk = true;
+  for (let bits = 0; bits < 512; bits += 1) {
+    const P = [], C = [];
+    for (let x = 0; x < N; x += 1) {
+      P.push([]); C.push([]);
+      for (let y = 0; y < N; y += 1) {
+        const v = ((bits >> (x * N + y)) & 1) === 1;
+        P[x].push(v); C[x].push(!v);
+      }
+    }
+    /* The lesson's theorem, and its mirror -- each in its own variables. */
+    if (qExistsYForallX(P, N).v && !qForallXExistsY(P, N).v) thmOk = false;
+    if (qExistsXForallY(P, N).v && !qForallYExistsX(P, N).v) mirrorOk = false;
+    /* Lesson 10: negation flips every quantifier. Three dual pairs. */
+    if (qForallForall(P, N).v !== !qExistsExists(C, N).v) negOk = false;
+    if (qForallXExistsY(P, N).v !== !qExistsXForallY(C, N).v) negOk = false;
+    if (qExistsYForallX(P, N).v !== !qForallYExistsX(C, N).v) negOk = false;
+  }
+  eq(thmOk, true, 'exists-y-forall-x implies forall-x-exists-y, all 512 grids');
+  eq(mirrorOk, true, 'exists-x-forall-y implies forall-y-exists-x, all 512 grids');
+  eq(negOk, true, 'negation duality across all three pairs, all 512 grids');
+
+  /* A full row is not a full column: the regression that shipped. */
+  const rowGrid = [[true, true, true], [false, false, false], [false, false, false]];
+  eq(qExistsXForallY(rowGrid, N).v, true, 'a full row satisfies exists-x-forall-y');
+  eq(qExistsYForallX(rowGrid, N).v, false, 'a full row does NOT satisfy exists-y-forall-x');
+  eq(qForallXExistsY(rowGrid, N).v, false, 'and forall-x-exists-y fails: x = 2 has no y');
+
+  /* The presets, on the 4-element universe the lessons publish. */
+  function fill(n, fn) {
+    const P = [];
+    for (let x = 0; x < n; x += 1) { P.push([]); for (let y = 0; y < n; y += 1) P[x].push(!!fn(x + 1, y + 1)); }
+    return P;
+  }
+  const diag = fill(4, (x, y) => x === y);
+  eq(qForallXExistsY(diag, 4).v, true, 'identity: every x has its own y');
+  eq(qExistsYForallX(diag, 4).v, false, 'identity: no single y serves every x — the lesson-9 separator');
+  const succ = fill(4, (x, y) => y === x + 1);
+  eq(qForallXExistsY(succ, 4).v, false, 'successor on {1..4}: forall-x-exists-y FAILS');
+  eq(qForallXExistsY(succ, 4).why, 'x = 4 has no y at all', 'and names the top element as the reason');
+  const le = fill(4, (x, y) => x <= y);
+  const leVerdicts = [qForallForall(le, 4), qForallXExistsY(le, 4), qExistsYForallX(le, 4),
+                      qForallYExistsX(le, 4), qExistsXForallY(le, 4), qExistsExists(le, 4)];
+  eq(leVerdicts.filter((r) => r.v).length, 5, 'order preset: five of six verdicts true, as lesson 10 says');
+  const leC = fill(4, (x, y) => !(x <= y));
+  const leCVerdicts = [qForallForall(leC, 4), qForallXExistsY(leC, 4), qExistsYForallX(leC, 4),
+                       qForallYExistsX(leC, 4), qExistsXForallY(leC, 4), qExistsExists(leC, 4)];
+  eq(leCVerdicts.filter((r) => r.v).map((r) => r.why).join(';'),
+     'x = 2, y = 1 works', 'complemented order preset: only exists-exists survives');
 }
 
 if (fails) {

@@ -146,6 +146,66 @@ PARSER_JS = r"""
   }
 """
 
+# --------------------------------------------------------------------------
+# The six distinct two-variable quantifier forms, as pure functions of the
+# predicate grid. Module-level and named so scripts/mathcheck.js can extract
+# and execute the SHIPPED code -- an earlier version of this lab evaluated
+# ∃x∀y (a full row) while its status text reasoned about ∃y∀x (a full
+# column), and nothing could catch that: the lab ran, painted, and passed
+# every markup check while its explanation was false of its own verdicts.
+#
+# Six, not four: the two mixed forms each come in an x-first and a y-first
+# version, and conflating a full row with a full column is exactly the
+# misreading the nested-quantifiers lesson exists to correct.
+#
+# Each function returns the verdict AND the element that decides it, because
+# a bare T or F is the half of the answer that teaches nothing.
+QUANT_EVAL_JS = r"""
+  /* ---- the six distinct two-variable quantifier forms ------------------- */
+  function qForallForall(P, N) {
+    for (var x = 0; x < N; x += 1) for (var y = 0; y < N; y += 1)
+      if (!P[x][y]) return { v: false, why: 'x = ' + (x + 1) + ', y = ' + (y + 1) + ' fails' };
+    return { v: true, why: 'no pair fails' };
+  }
+  function qForallXExistsY(P, N) {
+    for (var x = 0; x < N; x += 1) {
+      var found = -1;
+      for (var y = 0; y < N; y += 1) if (P[x][y]) { found = y + 1; break; }
+      if (found === -1) return { v: false, why: 'x = ' + (x + 1) + ' has no y at all' };
+    }
+    return { v: true, why: 'every x has some y (the y may differ per x)' };
+  }
+  function qExistsYForallX(P, N) {  /* one y serving every x: a full COLUMN */
+    for (var y = 0; y < N; y += 1) {
+      var ok = true;
+      for (var x = 0; x < N; x += 1) if (!P[x][y]) { ok = false; break; }
+      if (ok) return { v: true, why: 'y = ' + (y + 1) + ' works for every x' };
+    }
+    return { v: false, why: 'no single y works for all x' };
+  }
+  function qForallYExistsX(P, N) {
+    for (var y = 0; y < N; y += 1) {
+      var found = -1;
+      for (var x = 0; x < N; x += 1) if (P[x][y]) { found = x + 1; break; }
+      if (found === -1) return { v: false, why: 'y = ' + (y + 1) + ' has no x at all' };
+    }
+    return { v: true, why: 'every y has some x (the x may differ per y)' };
+  }
+  function qExistsXForallY(P, N) {  /* one x paired with every y: a full ROW */
+    for (var x = 0; x < N; x += 1) {
+      var ok = true;
+      for (var y = 0; y < N; y += 1) if (!P[x][y]) { ok = false; break; }
+      if (ok) return { v: true, why: 'x = ' + (x + 1) + ' works for every y' };
+    }
+    return { v: false, why: 'no single x works for all y' };
+  }
+  function qExistsExists(P, N) {
+    for (var x = 0; x < N; x += 1) for (var y = 0; y < N; y += 1)
+      if (P[x][y]) return { v: true, why: 'x = ' + (x + 1) + ', y = ' + (y + 1) + ' works' };
+    return { v: false, why: 'no pair holds' };
+  }
+"""
+
 
 def truth_table(cfg):
     """Build the truth table of a formula, column by column.
@@ -340,9 +400,13 @@ def quantifier(cfg):
 
     The order of two quantifiers is the single most common misreading in
     predicate logic, and prose cannot settle it. A grid can: the reader toggles
-    the truth of P(x, y) cell by cell, and the four orderings are re-evaluated
-    against the grid they can see. The lab reports the witness or the
-    counterexample, because "false" without the x that kills it teaches nothing.
+    the truth of P(x, y) cell by cell, and the six distinct orderings are
+    re-evaluated against the grid they can see. All six, not four: the two
+    mixed forms each come in an x-first and a y-first version, and showing
+    only one of each pair is how a full row gets mistaken for a full column --
+    a mistake an earlier version of this very lab made in its status text.
+    The lab reports the witness or the counterexample, because "false" without
+    the x that kills it teaches nothing.
     """
     n = cfg.get("size", 4)
     markup = """      <div class="lab-toolbar">
@@ -365,9 +429,9 @@ def quantifier(cfg):
           <button class="btn small" id="qClear" type="button">Clear</button>
           <button class="btn small" id="qFlip" type="button">Complement</button>
         </div>
-        <div class="status-banner" id="qStatus">Toggle cells and watch the four orderings move independently.</div>"""
+        <div class="status-banner" id="qStatus">Toggle cells and watch the six orderings move independently.</div>"""
 
-    script = cfg_literal("QN", n) + r"""
+    script = cfg_literal("QN", n) + QUANT_EVAL_JS + r"""
   var grid = document.getElementById('qGrid');
   var verdicts = document.getElementById('qVerdicts');
   var status = document.getElementById('qStatus');
@@ -391,36 +455,6 @@ def quantifier(cfg):
     none: function () { return false; }
   };
 
-  /* The four orderings, evaluated by actually walking the grid. Each returns a
-     verdict AND the element that decides it, because "false" on its own is the
-     half of the answer that teaches nothing. */
-  function forallForall() {
-    for (var x = 0; x < QN; x += 1) for (var y = 0; y < QN; y += 1)
-      if (!P[x][y]) return { v: false, why: 'x = ' + (x + 1) + ', y = ' + (y + 1) + ' fails' };
-    return { v: true, why: 'no pair fails' };
-  }
-  function forallExists() {
-    for (var x = 0; x < QN; x += 1) {
-      var found = -1;
-      for (var y = 0; y < QN; y += 1) if (P[x][y]) { found = y + 1; break; }
-      if (found === -1) return { v: false, why: 'x = ' + (x + 1) + ' has no y at all' };
-    }
-    return { v: true, why: 'every x has some y (the y may differ per x)' };
-  }
-  function existsForall() {
-    for (var x = 0; x < QN; x += 1) {
-      var ok = true;
-      for (var y = 0; y < QN; y += 1) if (!P[x][y]) { ok = false; break; }
-      if (ok) return { v: true, why: 'x = ' + (x + 1) + ' works for every y' };
-    }
-    return { v: false, why: 'no single x works for all y' };
-  }
-  function existsExists() {
-    for (var x = 0; x < QN; x += 1) for (var y = 0; y < QN; y += 1)
-      if (P[x][y]) return { v: true, why: 'x = ' + (x + 1) + ', y = ' + (y + 1) + ' works' };
-    return { v: false, why: 'no pair holds' };
-  }
-
   function paintGrid() {
     var h = '<table class="tt"><caption>rows are x, columns are y, over U = {1, …, ' + QN + '}</caption><thead><tr><th></th>';
     for (var y = 1; y <= QN; y += 1) h += '<th>y=' + y + '</th>';
@@ -438,10 +472,12 @@ def quantifier(cfg):
 
   function paintVerdicts() {
     var rows = [
-      ['∀x ∀y P(x, y)', forallForall(), 'every pair'],
-      ['∀x ∃y P(x, y)', forallExists(), 'each x gets its own y'],
-      ['∃x ∀y P(x, y)', existsForall(), 'one x works for all y'],
-      ['∃x ∃y P(x, y)', existsExists(), 'some pair']
+      ['∀x ∀y P(x, y)', qForallForall(P, QN), 'every pair'],
+      ['∀x ∃y P(x, y)', qForallXExistsY(P, QN), 'each x gets its own y'],
+      ['∃y ∀x P(x, y)', qExistsYForallX(P, QN), 'ONE y (a full column) serves every x'],
+      ['∀y ∃x P(x, y)', qForallYExistsX(P, QN), 'each y gets its own x'],
+      ['∃x ∀y P(x, y)', qExistsXForallY(P, QN), 'ONE x (a full row) pairs with every y'],
+      ['∃x ∃y P(x, y)', qExistsExists(P, QN), 'some pair']
     ];
     var h = '<thead><tr><th>statement</th><th>value</th><th>reads as</th><th>decided by</th></tr></thead><tbody>';
     rows.forEach(function (r) {
@@ -449,17 +485,19 @@ def quantifier(cfg):
         + '</td><td>' + r[2] + '</td><td>' + r[1].why + '</td></tr>';
     });
     verdicts.innerHTML = h + '</tbody></table>';
-    var fe = forallExists(), ef = existsForall();
+    var fe = qForallXExistsY(P, QN), ef = qExistsYForallX(P, QN);
     if (fe.v && !ef.v) {
       status.innerHTML = '<strong>This is the case that settles the order question.</strong> '
-        + '∀x∃y is true and ∃x∀y is false: every x has a partner, but there is no '
-        + 'single y that serves them all. Swapping two quantifiers changes what is claimed.';
+        + '∀x∃y is true and ∃y∀x is false: every x has a partner, but there is no '
+        + 'single y — no full column — that serves them all. Swapping two quantifiers changes what is claimed.';
     } else if (fe.v && ef.v) {
-      status.innerHTML = 'Both ∀x∃y and ∃x∀y hold here. That is allowed &mdash; ∃x∀y '
-        + 'implies ∀x∃y always &mdash; so this grid does not separate them. Try the successor preset.';
-    } else if (!fe.v) {
-      status.innerHTML = '∀x∃y already fails (' + fe.why + '), so ∃x∀y cannot hold either: '
-        + 'the stronger statement implies the weaker one, never the other way round.';
+      status.innerHTML = 'Both ∀x∃y and ∃y∀x hold here. That is allowed &mdash; ∃y∀x '
+        + 'implies ∀x∃y always &mdash; so this grid does not separate them. Try the identity preset, '
+        + 'or empty one cell of a full column.';
+    } else {
+      status.innerHTML = '∀x∃y already fails (' + fe.why + '), so ∃y∀x cannot hold either: '
+        + 'the stronger statement implies the weaker one, never the other way round. '
+        + 'The mirrored pair ∀y∃x / ∃x∀y is a separate question &mdash; check it on the grid.';
     }
   }
 
