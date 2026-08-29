@@ -274,18 +274,18 @@ risk plan built from all of it.
 
 | # | Lesson | What it does |
 | --- | --- | --- |
-| 01 | Risk Management Fundamentals | Understand which trading risks can be controlled, define a planned loss, and separate market uncertainty from account damage. |
+| 01 | Risk Management Fundamentals | Sort a trade's variables into the ones you set and the ones you absorb, state the planned loss in dollars before entry, and separate market uncertainty from account damage. |
 | 02 | Account Risk and Risk Budget | Allocate risk across individual trades, open positions, daily limits, and weekly limits without exceeding the account risk budget. |
 | 03 | Risk Per Trade | Measure how fixed-percentage risk changes account decay, losing-streak impact, and the return required to recover. |
 | 04 | Stop-Loss and Structural Invalidation | Place the stop where the trade thesis becomes invalid, then size the position to make that structural distance affordable. |
 | 05 | Position Sizing | Calculate shares or contracts from account risk, entry price, stop price, contract multiplier, and estimated execution cost. |
 | 06 | Reward-to-Risk and R-Multiples | Express trade outcomes in units of initial risk, compare targets consistently, and avoid confusing a large target with a high-quality setup. |
 | 07 | Win Rate, Average Win/Loss, and Expectancy | Combine win rate, average win, average loss, and trading costs to estimate the average outcome per trade. |
-| 08 | Losing Streaks and Drawdown | Measure peak-to-trough decline, understand recovery requirements, and distinguish normal strategy variance from unacceptable account damage. |
+| 08 | Losing Streaks and Drawdown | Measure peak-to-trough decline, compute the gain required to recover it, and distinguish normal strategy variance from unacceptable account damage. |
 | 09 | Risk of Ruin | Estimate how strategy expectancy, payoff, risk per trade, and sequence variance affect the probability of crossing a failure threshold. |
 | 10 | Volatility and ATR-Based Risk | Use recent price range and Average True Range to adapt stop distance and position size when market volatility changes. |
 | 11 | Gap, Slippage, Liquidity, and Execution Risk | Model the difference between the planned stop and the actual fill when price gaps, spreads widen, or available liquidity is insufficient. |
-| 12 | Leverage and Margin Risk | Understand how leverage magnifies equity changes, how margin requirements constrain positions, and why buying power is not a risk limit. |
+| 12 | Leverage and Margin Risk | Compute how far a price move reaches account equity through leverage, check a position against a maintenance requirement, and say why buying power is not a risk limit. |
 | 13 | Correlation, Concentration, and Portfolio Exposure | Measure how positions that share sector, market, or factor exposure can behave like one oversized trade during stress. |
 | 14 | Options Risk Management | Compare premium risk, assignment exposure, expiration behavior, volatility sensitivity, and defined versus undefined option risk. |
 | 15 | Daily and Weekly Risk Limits | Use hard session and weekly limits to stop adding exposure after losses, execution errors, or unfavorable market conditions. |
