@@ -1,0 +1,503 @@
+# GitHub Pages delivery for learn.geterdone.io
+#
+# This is a SEPARATE delivery path from the Hetzner platform. It does not
+# touch platform-ops, the shared Caddy edge, or any registry reservation,
+# and it is NOT a shortcut around those gates -- they govern the Hetzner
+# platform, which remains unbuilt. See README STATUS.
+#
+# PREREQUISITE: the repository must be PUBLIC (GitHub Pages on a private
+# repo requires a paid plan), and Settings > Pages > Source must be set to
+# "GitHub Actions". Until then this workflow is inert by the `if` below.
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # Inert while the repo is private: Pages cannot publish and the run would
+    # fail confusingly. Flips on automatically once visibility changes.
+    if: ${{ github.event.repository.visibility == 'public' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify the published tree is self-contained
+        run: |
+          set -eu
+          # Two pages are excused, by name, and only these two: signing in with
+          # Microsoft is a conversation with an identity provider and cannot be
+          # had silently. Everything else in site/ must still reach nothing, so
+          # the exclusion is a path list rather than a loosened pattern -- a
+          # lesson that started calling an identity provider still fails here.
+          if grep -rEn 'src="https?://|@import|XMLHttpRequest|fetch\(' site/ \
+               --exclude-dir=oauth2 --exclude-dir=progress ; then
+            echo "::error::external reference found in site/ -- refusing to publish"
+            exit 1
+          fi
+          # The published URL space: the site index at /, the path page at
+          # /paths/trading/, a home per course (/market-structure/,
+          # /trade-setup-execution/, /options-trading/, /technical-indicators/,
+          # /volume-and-order-flow/, /trading-risk-management/,
+          # /backtesting-and-trading-systems/ and
+          # /algorithmic-and-automated-trading/), and each course's lessons
+          # beneath its own home -- 128 pages, in path order -- plus the two
+          # pages of the dated real-data capstone at
+          # /paths/trading/iren-analysis-2026-08-16/ for 130 in all, plus eight
+          # published non-HTML assets (seven course schemas and the capstone's
+          # dataset). Same map as REQUIRED_PAGES + NON_HTML_ASSETS in
+          # tests/test_site_invariants.py and acceptance.checks in
+          # release/contract.json. Publishing a tree that is missing a page
+          # would 404 a live URL, so refuse instead.
+          # The path page is a page like any other here, and it is NOT a course:
+          # /paths/ belongs to the paths layer, and no course may take it.
+          # The seven flat /<lesson>/ URLs are retired with no redirect stub,
+          # and so is course 1's old /market-structure-lab/ prefix; neither is
+          # listed here and neither may come back.
+          # After the eight courses, the path publishes one DATED, REAL-DATA
+          # capstone: /paths/trading/iren-analysis-2026-08-16/ (interactive lab)
+          # and its /slides/ deck, plus the dataset they derive from. It is NOT a
+          # ninth course -- the path is complete at eight -- and it is the only
+          # published material built from real market data, which is why its
+          # pages carry a real-data notice instead of the synthetic-examples
+          # disclaimer every course page carries. See REAL_DATA_PAGES in
+          # tests/test_site_invariants.py.
+          missing=0
+          pages=0
+          # --- the DISCRETE MATHEMATICS path below: one path page, eight
+          # --- course homes and 106 lessons. These pages are GENERATED from
+          # --- content/discrete_math/ by scripts/build_paths.py, and
+          # --- the suite fails if a published page differs from what that
+          # --- script renders (TestGeneratedPathIsCurrent).
+          for page in index.html \
+                      paths/trading/index.html \
+                      paths/trading/iren-analysis-2026-08-16/index.html \
+                      paths/trading/iren-analysis-2026-08-16/slides/index.html \
+                      market-structure/index.html \
+                      market-structure/market-structure/index.html \
+                      market-structure/ranges-breakouts-liquidity/index.html \
+                      market-structure/multi-timeframe-market-structure/index.html \
+                      market-structure/pullbacks-entry-models/index.html \
+                      market-structure/invalidation-stops-risk-reward/index.html \
+                      market-structure/volume-relative-strength/index.html \
+                      market-structure/options-contract-selection/index.html \
+                      trade-setup-execution/index.html \
+                      trade-setup-execution/trade-thesis/index.html \
+                      trade-setup-execution/support-resistance/index.html \
+                      trade-setup-execution/confluence/index.html \
+                      trade-setup-execution/breakout-setups/index.html \
+                      trade-setup-execution/pullback-setups/index.html \
+                      trade-setup-execution/reversal-setups/index.html \
+                      trade-setup-execution/entry-confirmation/index.html \
+                      trade-setup-execution/stop-loss-placement/index.html \
+                      trade-setup-execution/profit-targets/index.html \
+                      trade-setup-execution/risk-to-reward/index.html \
+                      trade-setup-execution/position-sizing/index.html \
+                      trade-setup-execution/trade-management/index.html \
+                      trade-setup-execution/backtesting/index.html \
+                      trade-setup-execution/trading-journal/index.html \
+                      trade-setup-execution/performance-review/index.html \
+                      options-trading/index.html \
+                      options-trading/options-contract-fundamentals/index.html \
+                      options-trading/calls-and-puts/index.html \
+                      options-trading/moneyness/index.html \
+                      options-trading/option-premium/index.html \
+                      options-trading/option-chain-and-liquidity/index.html \
+                      options-trading/expiration-and-time-decay/index.html \
+                      options-trading/implied-volatility/index.html \
+                      options-trading/delta-and-gamma/index.html \
+                      options-trading/theta-and-vega/index.html \
+                      options-trading/long-calls-and-long-puts/index.html \
+                      options-trading/covered-calls/index.html \
+                      options-trading/cash-secured-puts/index.html \
+                      options-trading/vertical-debit-spreads/index.html \
+                      options-trading/vertical-credit-spreads/index.html \
+                      options-trading/exercise-assignment-and-expiration/index.html \
+                      options-trading/options-trade-planning/index.html \
+                      technical-indicators/index.html \
+                      technical-indicators/technical-indicator-fundamentals/index.html \
+                      technical-indicators/moving-averages/index.html \
+                      technical-indicators/moving-average-crossovers/index.html \
+                      technical-indicators/relative-strength-index/index.html \
+                      technical-indicators/stochastic-oscillator/index.html \
+                      technical-indicators/macd/index.html \
+                      technical-indicators/average-directional-index/index.html \
+                      technical-indicators/average-true-range/index.html \
+                      technical-indicators/bollinger-bands/index.html \
+                      technical-indicators/keltner-channels/index.html \
+                      technical-indicators/donchian-channels/index.html \
+                      technical-indicators/rate-of-change-and-momentum/index.html \
+                      technical-indicators/indicator-divergence/index.html \
+                      technical-indicators/combining-indicators/index.html \
+                      technical-indicators/indicator-selection-by-market-regime/index.html \
+                      technical-indicators/indicator-based-trading-rules/index.html \
+                      volume-and-order-flow/index.html \
+                      volume-and-order-flow/volume-fundamentals/index.html \
+                      volume-and-order-flow/price-volume-relationships/index.html \
+                      volume-and-order-flow/relative-volume-and-volume-spikes/index.html \
+                      volume-and-order-flow/volume-confirmation/index.html \
+                      volume-and-order-flow/on-balance-volume/index.html \
+                      volume-and-order-flow/accumulation-distribution-and-chaikin-money-flow/index.html \
+                      volume-and-order-flow/volume-weighted-average-price/index.html \
+                      volume-and-order-flow/anchored-volume-weighted-average-price/index.html \
+                      volume-and-order-flow/volume-profile/index.html \
+                      volume-and-order-flow/value-area-poc-hvn-lvn/index.html \
+                      volume-and-order-flow/bid-ask-spread-and-order-types/index.html \
+                      volume-and-order-flow/time-and-sales/index.html \
+                      volume-and-order-flow/footprint-charts-and-bid-ask-delta/index.html \
+                      volume-and-order-flow/cumulative-volume-delta/index.html \
+                      volume-and-order-flow/order-book-and-market-depth/index.html \
+                      volume-and-order-flow/volume-and-order-flow-trading-rules/index.html \
+                      trading-risk-management/index.html \
+                      trading-risk-management/risk-management-fundamentals/index.html \
+                      trading-risk-management/account-risk-and-risk-budget/index.html \
+                      trading-risk-management/risk-per-trade/index.html \
+                      trading-risk-management/stop-loss-and-structural-invalidation/index.html \
+                      trading-risk-management/position-sizing/index.html \
+                      trading-risk-management/reward-to-risk-and-r-multiples/index.html \
+                      trading-risk-management/win-rate-average-win-loss-and-expectancy/index.html \
+                      trading-risk-management/losing-streaks-and-drawdown/index.html \
+                      trading-risk-management/risk-of-ruin/index.html \
+                      trading-risk-management/volatility-and-atr-based-risk/index.html \
+                      trading-risk-management/gap-slippage-liquidity-and-execution-risk/index.html \
+                      trading-risk-management/leverage-and-margin-risk/index.html \
+                      trading-risk-management/correlation-concentration-and-portfolio-exposure/index.html \
+                      trading-risk-management/options-risk-management/index.html \
+                      trading-risk-management/daily-and-weekly-risk-limits/index.html \
+                      trading-risk-management/trading-risk-plan/index.html \
+                      backtesting-and-trading-systems/index.html \
+                      backtesting-and-trading-systems/backtesting-fundamentals/index.html \
+                      backtesting-and-trading-systems/testable-trading-rules-and-hypotheses/index.html \
+                      backtesting-and-trading-systems/historical-data-and-data-quality/index.html \
+                      backtesting-and-trading-systems/survivorship-selection-and-corporate-actions/index.html \
+                      backtesting-and-trading-systems/timeframes-sessions-and-bar-construction/index.html \
+                      backtesting-and-trading-systems/signal-timing-look-ahead-bias-and-data-leakage/index.html \
+                      backtesting-and-trading-systems/trade-execution-simulation/index.html \
+                      backtesting-and-trading-systems/position-sizing-and-portfolio-accounting/index.html \
+                      backtesting-and-trading-systems/transaction-costs-spread-slippage-and-liquidity/index.html \
+                      backtesting-and-trading-systems/trade-log-equity-curve-and-drawdown/index.html \
+                      backtesting-and-trading-systems/performance-metrics-and-expectancy/index.html \
+                      backtesting-and-trading-systems/benchmarking-and-risk-adjusted-performance/index.html \
+                      backtesting-and-trading-systems/in-sample-validation-and-out-of-sample-data/index.html \
+                      backtesting-and-trading-systems/walk-forward-testing/index.html \
+                      backtesting-and-trading-systems/overfitting-sensitivity-monte-carlo-and-stress-testing/index.html \
+                      backtesting-and-trading-systems/trading-system-specification-and-backtest-report/index.html \
+                      algorithmic-and-automated-trading/index.html \
+                      algorithmic-and-automated-trading/algorithmic-and-automated-trading-fundamentals/index.html \
+                      algorithmic-and-automated-trading/trading-system-architecture-and-components/index.html \
+                      algorithmic-and-automated-trading/market-data-ingestion-and-normalization/index.html \
+                      algorithmic-and-automated-trading/time-sessions-events-and-scheduling/index.html \
+                      algorithmic-and-automated-trading/signal-engine-and-strategy-state/index.html \
+                      algorithmic-and-automated-trading/portfolio-position-and-risk-engine/index.html \
+                      algorithmic-and-automated-trading/broker-apis-and-order-lifecycle/index.html \
+                      algorithmic-and-automated-trading/order-management-and-execution/index.html \
+                      algorithmic-and-automated-trading/paper-trading-and-forward-testing/index.html \
+                      algorithmic-and-automated-trading/scanners-alerts-and-human-approval/index.html \
+                      algorithmic-and-automated-trading/reliability-idempotency-retries-and-recovery/index.html \
+                      algorithmic-and-automated-trading/observability-logging-and-auditability/index.html \
+                      algorithmic-and-automated-trading/security-secrets-permissions-and-kill-switches/index.html \
+                      algorithmic-and-automated-trading/deployment-environments-and-configuration/index.html \
+                      algorithmic-and-automated-trading/ai-assisted-and-agentic-trading-workflows/index.html \
+                      algorithmic-and-automated-trading/automated-trading-system-specification-and-production-readiness/index.html \
+                      paths/discrete-math/index.html \
+                      logic-and-proof/index.html \
+                      logic-and-proof/propositions-and-truth-values/index.html \
+                      logic-and-proof/logical-connectives/index.html \
+                      logic-and-proof/truth-tables/index.html \
+                      logic-and-proof/conditional-statements/index.html \
+                      logic-and-proof/logical-equivalence/index.html \
+                      logic-and-proof/tautologies-and-satisfiability/index.html \
+                      logic-and-proof/normal-forms-and-boolean-algebra/index.html \
+                      logic-and-proof/predicates-and-quantifiers/index.html \
+                      logic-and-proof/nested-quantifiers/index.html \
+                      logic-and-proof/negating-quantified-statements/index.html \
+                      logic-and-proof/rules-of-inference/index.html \
+                      logic-and-proof/direct-proof/index.html \
+                      logic-and-proof/contraposition-and-contradiction/index.html \
+                      logic-and-proof/proof-by-cases-and-counterexample/index.html \
+                      sets-relations-functions/index.html \
+                      sets-relations-functions/sets-and-membership/index.html \
+                      sets-relations-functions/subsets-and-power-sets/index.html \
+                      sets-relations-functions/set-operations/index.html \
+                      sets-relations-functions/set-identities/index.html \
+                      sets-relations-functions/cartesian-products-and-tuples/index.html \
+                      sets-relations-functions/binary-relations/index.html \
+                      sets-relations-functions/properties-of-relations/index.html \
+                      sets-relations-functions/equivalence-relations-and-partitions/index.html \
+                      sets-relations-functions/partial-orders/index.html \
+                      sets-relations-functions/functions/index.html \
+                      sets-relations-functions/injective-surjective-bijective/index.html \
+                      sets-relations-functions/composition-and-inverses/index.html \
+                      sets-relations-functions/cardinality-and-countability/index.html \
+                      sets-relations-functions/the-pigeonhole-principle/index.html \
+                      induction-and-recursion/index.html \
+                      induction-and-recursion/the-well-ordering-principle/index.html \
+                      induction-and-recursion/mathematical-induction/index.html \
+                      induction-and-recursion/induction-with-sums-and-products/index.html \
+                      induction-and-recursion/induction-with-inequalities-and-divisibility/index.html \
+                      induction-and-recursion/strong-induction/index.html \
+                      induction-and-recursion/recursive-definitions/index.html \
+                      induction-and-recursion/structural-induction/index.html \
+                      induction-and-recursion/recursive-algorithms/index.html \
+                      induction-and-recursion/recurrence-relations/index.html \
+                      induction-and-recursion/solving-linear-recurrences/index.html \
+                      induction-and-recursion/divide-and-conquer-recurrences/index.html \
+                      induction-and-recursion/loop-invariants-and-correctness/index.html \
+                      combinatorics-and-counting/index.html \
+                      combinatorics-and-counting/sum-and-product-rules/index.html \
+                      combinatorics-and-counting/counting-with-restrictions/index.html \
+                      combinatorics-and-counting/permutations/index.html \
+                      combinatorics-and-counting/combinations/index.html \
+                      combinatorics-and-counting/binomial-coefficients/index.html \
+                      combinatorics-and-counting/the-binomial-theorem/index.html \
+                      combinatorics-and-counting/permutations-with-repetition/index.html \
+                      combinatorics-and-counting/combinations-with-repetition/index.html \
+                      combinatorics-and-counting/inclusion-exclusion/index.html \
+                      combinatorics-and-counting/derangements/index.html \
+                      combinatorics-and-counting/generalized-pigeonhole/index.html \
+                      combinatorics-and-counting/generating-functions/index.html \
+                      combinatorics-and-counting/combinatorial-proof/index.html \
+                      combinatorics-and-counting/choosing-a-counting-method/index.html \
+                      discrete-probability/index.html \
+                      discrete-probability/sample-spaces-and-events/index.html \
+                      discrete-probability/computing-probabilities/index.html \
+                      discrete-probability/probability-axioms/index.html \
+                      discrete-probability/conditional-probability/index.html \
+                      discrete-probability/independence/index.html \
+                      discrete-probability/bayes-theorem/index.html \
+                      discrete-probability/random-variables/index.html \
+                      discrete-probability/expected-value/index.html \
+                      discrete-probability/linearity-of-expectation/index.html \
+                      discrete-probability/variance/index.html \
+                      discrete-probability/binomial-distribution/index.html \
+                      discrete-probability/geometric-distribution/index.html \
+                      number-theory-and-cryptography/index.html \
+                      number-theory-and-cryptography/divisibility-and-the-division-algorithm/index.html \
+                      number-theory-and-cryptography/primes-and-factorisation/index.html \
+                      number-theory-and-cryptography/the-sieve-of-eratosthenes/index.html \
+                      number-theory-and-cryptography/greatest-common-divisor/index.html \
+                      number-theory-and-cryptography/the-euclidean-algorithm/index.html \
+                      number-theory-and-cryptography/bezout-and-modular-inverses/index.html \
+                      number-theory-and-cryptography/modular-arithmetic/index.html \
+                      number-theory-and-cryptography/modular-exponentiation/index.html \
+                      number-theory-and-cryptography/linear-congruences/index.html \
+                      number-theory-and-cryptography/chinese-remainder-theorem/index.html \
+                      number-theory-and-cryptography/fermat-and-euler/index.html \
+                      number-theory-and-cryptography/hashing-and-pseudorandom-numbers/index.html \
+                      number-theory-and-cryptography/classical-ciphers/index.html \
+                      number-theory-and-cryptography/rsa-encryption/index.html \
+                      graphs-and-trees/index.html \
+                      graphs-and-trees/graphs-and-graph-models/index.html \
+                      graphs-and-trees/degree-and-the-handshake-theorem/index.html \
+                      graphs-and-trees/graph-representations/index.html \
+                      graphs-and-trees/paths-and-connectivity/index.html \
+                      graphs-and-trees/graph-isomorphism/index.html \
+                      graphs-and-trees/bipartite-graphs/index.html \
+                      graphs-and-trees/euler-and-hamilton/index.html \
+                      graphs-and-trees/graph-traversal/index.html \
+                      graphs-and-trees/shortest-paths/index.html \
+                      graphs-and-trees/trees/index.html \
+                      graphs-and-trees/tree-traversals/index.html \
+                      graphs-and-trees/spanning-trees/index.html \
+                      graphs-and-trees/graph-colouring/index.html \
+                      graphs-and-trees/planar-graphs/index.html \
+                      algorithms-and-complexity/index.html \
+                      algorithms-and-complexity/algorithms-and-pseudocode/index.html \
+                      algorithms-and-complexity/correctness-and-termination/index.html \
+                      algorithms-and-complexity/growth-of-functions/index.html \
+                      algorithms-and-complexity/big-o-notation/index.html \
+                      algorithms-and-complexity/analysing-iterative-algorithms/index.html \
+                      algorithms-and-complexity/searching-and-sorting/index.html \
+                      algorithms-and-complexity/divide-and-conquer/index.html \
+                      algorithms-and-complexity/recursion-trees-and-amortised-analysis/index.html \
+                      algorithms-and-complexity/greedy-algorithms/index.html \
+                      algorithms-and-complexity/dynamic-programming/index.html \
+                      algorithms-and-complexity/complexity-classes/index.html \
+                      algorithms-and-complexity/decidability-and-the-halting-problem/index.html \
+                      paths/algebra/index.html \
+                      algebra-foundations/index.html \
+                      algebra-foundations/real-numbers-and-the-number-line/index.html \
+                      algebra-foundations/properties-of-the-real-numbers/index.html \
+                      algebra-foundations/order-of-operations/index.html \
+                      algebra-foundations/absolute-value/index.html \
+                      algebra-foundations/integer-exponents/index.html \
+                      algebra-foundations/scientific-notation/index.html \
+                      algebra-foundations/roots-and-radicals/index.html \
+                      algebra-foundations/rational-exponents/index.html \
+                      algebra-foundations/algebraic-expressions-and-terms/index.html \
+                      algebra-foundations/the-distributive-law/index.html \
+                      algebra-foundations/combining-like-terms/index.html \
+                      algebra-foundations/evaluating-expressions/index.html \
+                      algebra-foundations/translating-words-into-algebra/index.html \
+                      linear-equations-and-inequalities/index.html \
+                      linear-equations-and-inequalities/what-it-means-to-solve-an-equation/index.html \
+                      linear-equations-and-inequalities/one-and-two-step-equations/index.html \
+                      linear-equations-and-inequalities/variables-on-both-sides/index.html \
+                      linear-equations-and-inequalities/equations-with-fractions/index.html \
+                      linear-equations-and-inequalities/literal-equations-and-formulas/index.html \
+                      linear-equations-and-inequalities/identities-and-contradictions/index.html \
+                      linear-equations-and-inequalities/ratio-proportion-and-percent/index.html \
+                      linear-equations-and-inequalities/modelling-with-linear-equations/index.html \
+                      linear-equations-and-inequalities/linear-inequalities/index.html \
+                      linear-equations-and-inequalities/compound-inequalities/index.html \
+                      linear-equations-and-inequalities/absolute-value-equations/index.html \
+                      linear-equations-and-inequalities/absolute-value-inequalities/index.html \
+                      linear-equations-and-inequalities/interval-and-set-builder-notation/index.html \
+                      lines-functions-and-graphs/index.html \
+                      lines-functions-and-graphs/the-coordinate-plane/index.html \
+                      lines-functions-and-graphs/graphing-a-linear-equation/index.html \
+                      lines-functions-and-graphs/slope/index.html \
+                      lines-functions-and-graphs/slope-intercept-form/index.html \
+                      lines-functions-and-graphs/point-slope-and-standard-form/index.html \
+                      lines-functions-and-graphs/parallel-and-perpendicular-lines/index.html \
+                      lines-functions-and-graphs/what-a-function-is/index.html \
+                      lines-functions-and-graphs/function-notation/index.html \
+                      lines-functions-and-graphs/domain-and-range/index.html \
+                      lines-functions-and-graphs/piecewise-functions/index.html \
+                      lines-functions-and-graphs/transformations-of-graphs/index.html \
+                      lines-functions-and-graphs/composition-of-functions/index.html \
+                      lines-functions-and-graphs/inverse-functions/index.html \
+                      lines-functions-and-graphs/linear-inequalities-in-two-variables/index.html \
+                      polynomials-and-factoring/index.html \
+                      polynomials-and-factoring/polynomials-degree-and-standard-form/index.html \
+                      polynomials-and-factoring/adding-and-subtracting-polynomials/index.html \
+                      polynomials-and-factoring/multiplying-polynomials/index.html \
+                      polynomials-and-factoring/special-products/index.html \
+                      polynomials-and-factoring/factoring-out-the-greatest-common-factor/index.html \
+                      polynomials-and-factoring/factoring-by-grouping/index.html \
+                      polynomials-and-factoring/factoring-simple-trinomials/index.html \
+                      polynomials-and-factoring/the-ac-method/index.html \
+                      polynomials-and-factoring/factoring-special-forms/index.html \
+                      polynomials-and-factoring/polynomial-long-division/index.html \
+                      polynomials-and-factoring/synthetic-division-and-the-remainder-theorem/index.html \
+                      polynomials-and-factoring/the-factor-theorem-and-rational-roots/index.html \
+                      polynomials-and-factoring/graphs-of-polynomial-functions/index.html \
+                      rational-and-radical-expressions/index.html \
+                      rational-and-radical-expressions/rational-expressions-and-their-domains/index.html \
+                      rational-and-radical-expressions/simplifying-rational-expressions/index.html \
+                      rational-and-radical-expressions/multiplying-and-dividing-rational-expressions/index.html \
+                      rational-and-radical-expressions/adding-and-subtracting-rational-expressions/index.html \
+                      rational-and-radical-expressions/complex-fractions/index.html \
+                      rational-and-radical-expressions/solving-rational-equations/index.html \
+                      rational-and-radical-expressions/graphs-and-asymptotes/index.html \
+                      rational-and-radical-expressions/simplifying-radical-expressions/index.html \
+                      rational-and-radical-expressions/operations-with-radicals/index.html \
+                      rational-and-radical-expressions/rationalizing-denominators/index.html \
+                      rational-and-radical-expressions/solving-radical-equations/index.html \
+                      rational-and-radical-expressions/radical-functions-and-their-graphs/index.html \
+                      quadratics-and-complex-numbers/index.html \
+                      quadratics-and-complex-numbers/quadratic-equations-and-the-zero-product-property/index.html \
+                      quadratics-and-complex-numbers/solving-by-factoring/index.html \
+                      quadratics-and-complex-numbers/the-square-root-property/index.html \
+                      quadratics-and-complex-numbers/completing-the-square/index.html \
+                      quadratics-and-complex-numbers/the-quadratic-formula/index.html \
+                      quadratics-and-complex-numbers/the-discriminant/index.html \
+                      quadratics-and-complex-numbers/complex-numbers/index.html \
+                      quadratics-and-complex-numbers/operations-with-complex-numbers/index.html \
+                      quadratics-and-complex-numbers/complex-roots-of-quadratics/index.html \
+                      quadratics-and-complex-numbers/graphs-of-quadratic-functions/index.html \
+                      quadratics-and-complex-numbers/vertex-form-and-the-axis-of-symmetry/index.html \
+                      quadratics-and-complex-numbers/maximum-and-minimum-problems/index.html \
+                      quadratics-and-complex-numbers/quadratic-inequalities/index.html \
+                      quadratics-and-complex-numbers/equations-reducible-to-quadratic-form/index.html \
+                      exponential-and-logarithmic-functions/index.html \
+                      exponential-and-logarithmic-functions/exponential-functions/index.html \
+                      exponential-and-logarithmic-functions/growth-and-decay/index.html \
+                      exponential-and-logarithmic-functions/the-number-e/index.html \
+                      exponential-and-logarithmic-functions/what-a-logarithm-is/index.html \
+                      exponential-and-logarithmic-functions/logarithmic-functions-and-their-graphs/index.html \
+                      exponential-and-logarithmic-functions/the-laws-of-logarithms/index.html \
+                      exponential-and-logarithmic-functions/common-and-natural-logarithms/index.html \
+                      exponential-and-logarithmic-functions/change-of-base/index.html \
+                      exponential-and-logarithmic-functions/solving-exponential-equations/index.html \
+                      exponential-and-logarithmic-functions/solving-logarithmic-equations/index.html \
+                      exponential-and-logarithmic-functions/compound-interest-and-continuous-growth/index.html \
+                      exponential-and-logarithmic-functions/logarithmic-scales/index.html \
+                      systems-and-matrices/index.html \
+                      systems-and-matrices/systems-of-two-linear-equations/index.html \
+                      systems-and-matrices/solving-by-substitution/index.html \
+                      systems-and-matrices/solving-by-elimination/index.html \
+                      systems-and-matrices/systems-in-three-variables/index.html \
+                      systems-and-matrices/matrices-and-row-operations/index.html \
+                      systems-and-matrices/gaussian-elimination/index.html \
+                      systems-and-matrices/matrix-arithmetic/index.html \
+                      systems-and-matrices/determinants-and-cramers-rule/index.html \
+                      systems-and-matrices/inverse-matrices/index.html \
+                      systems-and-matrices/systems-of-inequalities-and-linear-programming/index.html \
+                      sequences-and-series/index.html \
+                      sequences-and-series/sequences-and-recursion/index.html \
+                      sequences-and-series/sigma-notation/index.html \
+                      sequences-and-series/arithmetic-sequences-and-series/index.html \
+                      sequences-and-series/geometric-sequences-and-series/index.html \
+                      sequences-and-series/partial-sums-and-telescoping/index.html \
+                      sequences-and-series/infinite-geometric-series/index.html \
+                      sequences-and-series/repeating-decimals-as-series/index.html \
+                      sequences-and-series/annuities-and-accumulated-payments/index.html \
+                      sequences-and-series/pascals-triangle/index.html \
+                      sequences-and-series/the-binomial-theorem/index.html \
+                      sequences-and-series/the-general-term-of-an-expansion/index.html \
+                      oauth2/spa/callback/index.html \
+                      progress/index.html ; do
+            pages=$((pages + 1))
+            if [ ! -f "site/$page" ]; then
+              echo "::error::missing site/$page -- refusing to publish an incomplete course"
+              missing=1
+            fi
+          done
+          # Seven courses ship an exchange schema as a real published file, and the
+          # capstone ships the dataset its two pages derive from:
+          # course 2's lesson 14 exports the journal shape and its lesson 15
+          # imports it, course 3's lesson 16 exports the trade plan shape,
+          # course 4's lesson 16 exports the indicator rule shape, course
+          # 5's lesson 16 exports the volume and order flow rule shape, course
+          # 6's lesson 16 exports the trading risk plan shape, course 7's
+          # lesson 16 exports the trading system specification shape, and
+          # course 8's lesson 16 exports the automated trading system shape.
+          # Each course home links to its file. An unparseable one 404s nothing
+          # and breaks the handoff silently, so all seven are parsed here, not
+          # merely counted -- and declared as assets rather than pushed through
+          # the page loop above, which asserts things only a document can have.
+          for asset in trade-setup-execution/trade-journal-schema.json \
+                       options-trading/options-trade-plan-schema.json \
+                       technical-indicators/indicator-rule-schema.json \
+                       volume-and-order-flow/volume-order-flow-rule-schema.json \
+                       trading-risk-management/trading-risk-plan-schema.json \
+                       backtesting-and-trading-systems/trading-system-specification-schema.json \
+                       algorithmic-and-automated-trading/automated-trading-system-schema.json \
+                       paths/trading/iren-analysis-2026-08-16/iren-analysis-data.json ; do
+            if [ ! -f "site/$asset" ]; then
+              echo "::error::missing site/$asset -- refusing to publish an incomplete course"
+              missing=1
+            elif ! python3 -c "import json,sys; json.load(open(sys.argv[1]))" "site/$asset"; then
+              echo "::error::site/$asset does not parse as JSON -- refusing to publish"
+              missing=1
+            fi
+          done
+          [ "$missing" -eq 0 ] || exit 1
+          echo "self-containment OK; all $pages pages and 8 assets present"
+
+      # NOTE: `enablement: true` was tried here and fails --- GITHUB_TOKEN
+      # cannot create a Pages site ("Resource not accessible by integration").
+      # Enabling Pages is a one-time administrative action, done out of band:
+      #   gh api -X POST repos/OWNER/REPO/pages -f build_type=workflow
+      # Once enabled, this step only reads the existing configuration.
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,1436 @@
+# Pull-request CI for the Learn - geterdone.io site.
+#
+# Scope boundary (docs/DEPLOYMENT_CONTRACT.md section 2): this workflow runs on
+# GitHub-hosted runners only. It must never reference self-hosted labels, the
+# production environment, the root-owned deploy wrapper, or production
+# credentials. It requires no secrets beyond the default read-only GITHUB_TOKEN.
+#
+# Action pinning: the platform contract prefers commit-pinned third-party
+# actions. The tags below mirror the sibling application repo
+# (dmedellin/pixelbattle-landing) because no verified commit SHA was available
+# offline. Replace each tag with its verified 40-hex commit SHA before this repo
+# is onboarded; do not guess a SHA.
+
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  # release.yml calls this workflow so that a protected-main build cannot be
+  # published unless the exact same commit passed the exact same checks.
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  # Superseded pull-request pushes may be cancelled. A release run may not:
+  # queued releases must never terminate an in-flight one.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  site:
+    name: Site checks (well-formed, self-contained, links resolve)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Resolve the web root
+        id: webroot
+        run: |
+          set -euo pipefail
+          # The container serves one directory as "/" for learn.geterdone.io.
+          # Resolution order is deterministic:
+          #   1. $SITE_WEB_ROOT if exported by a later change,
+          #   2. site/ when site/index.html exists,
+          #   3. the single immediate subdirectory of site/ when there is
+          #      exactly one and site/index.html does not exist.
+          # Anything else is ambiguous and fails, because a root-absolute link
+          # cannot be resolved without knowing which directory is "/".
+          root="${SITE_WEB_ROOT:-}"
+          if [ -z "$root" ]; then
+            if [ -f site/index.html ]; then
+              root=site
+            else
+              mapfile -t subs < <(find site -mindepth 1 -maxdepth 1 -type d | sort)
+              if [ "${#subs[@]}" -eq 1 ]; then
+                root="${subs[0]}"
+              else
+                echo "::error::Cannot resolve the web root. Expected site/index.html or exactly one subdirectory of site/. Set SITE_WEB_ROOT to disambiguate."
+                exit 1
+              fi
+            fi
+          fi
+          echo "Web root: $root"
+          if [ ! -f "$root/index.html" ]; then
+            echo "::warning file=$root::No index.html at the web root; https://learn.geterdone.io/ (the library index) would 404."
+          fi
+          echo "root=$root" >> "$GITHUB_OUTPUT"
+
+      - name: Published URL space is complete
+        env:
+          WEB_ROOT: ${{ steps.webroot.outputs.root }}
+        run: |
+          set -euo pipefail
+          # The public URL space — the site index, the paths layer, then a
+          # course, then that course's lessons:
+          #   /                                    the site index (paths + search)
+          #   /paths/trading/                      the trading PATH PAGE
+          #   /market-structure/                   course 1 home
+          #   /market-structure/<lesson>/          course 1's seven lessons
+          #   /trade-setup-execution/              course 2 home
+          #   /trade-setup-execution/<lesson>/     course 2's fifteen lessons
+          #   /options-trading/                    course 3 home
+          #   /options-trading/<lesson>/           course 3's sixteen lessons
+          #   /technical-indicators/               course 4 home
+          #   /technical-indicators/<lesson>/      course 4's sixteen lessons
+          #   /volume-and-order-flow/              course 5 home
+          #   /volume-and-order-flow/<lesson>/     course 5's sixteen lessons
+          #   /trading-risk-management/            course 6 home
+          #   /trading-risk-management/<lesson>/   course 6's sixteen lessons
+          #   /backtesting-and-trading-systems/    course 7 home
+          #   /backtesting-and-trading-systems/<lesson>/
+          #                                        course 7's sixteen lessons
+          #   /algorithmic-and-automated-trading/  course 8 home
+          #   /algorithmic-and-automated-trading/<lesson>/
+          #                                        course 8's sixteen lessons
+          # 128 pages, in path order, plus the two pages of the dated real-data
+          # capstone at /paths/trading/iren-analysis-2026-08-16/ -- 130 pages --
+          # plus eight published non-HTML assets (the seven course schemas and
+          # the capstone's dataset).
+          # Same map as REQUIRED_PAGES + NON_HTML_ASSETS in
+          # tests/test_site_invariants.py, acceptance.checks in
+          # release/contract.json, the publish guard in pages.yml, and the build
+          # guard in Containerfile.release. A file missing here is a 404 on a
+          # live URL, so fail the pull request rather than let an incomplete
+          # course reach the publish step.
+          # The path page is listed like any other page and is NOT a course:
+          # /paths/ is the paths layer's own segment, so nothing under it may be
+          # treated as a course home or a lesson.
+          # The seven FLAT /<lesson>/ URLs this site used to serve are retired
+          # with no redirect stub, and so is course 1's old
+          # /market-structure-lab/ prefix. They are deliberately absent from
+          # this list and must not be re-added.
+          # After the eight courses, the path publishes one DATED, REAL-DATA
+          # capstone: /paths/trading/iren-analysis-2026-08-16/ (interactive lab)
+          # and its /slides/ deck, plus the dataset they derive from. It is NOT a
+          # ninth course -- the path is complete at eight -- and it is the only
+          # published material built from real market data, which is why its
+          # pages carry a real-data notice instead of the synthetic-examples
+          # disclaimer every course page carries. See REAL_DATA_PAGES in
+          # tests/test_site_invariants.py.
+          missing=0
+          pages=0
+          # --- the DISCRETE MATHEMATICS path below: one path page, eight
+          # --- course homes and 106 lessons. These pages are GENERATED from
+          # --- content/discrete_math/ by scripts/build_paths.py, and
+          # --- the suite fails if a published page differs from what that
+          # --- script renders (TestGeneratedPathIsCurrent).
+          for page in index.html \
+                      paths/trading/index.html \
+                      paths/trading/iren-analysis-2026-08-16/index.html \
+                      paths/trading/iren-analysis-2026-08-16/slides/index.html \
+                      market-structure/index.html \
+                      market-structure/market-structure/index.html \
+                      market-structure/ranges-breakouts-liquidity/index.html \
+                      market-structure/multi-timeframe-market-structure/index.html \
+                      market-structure/pullbacks-entry-models/index.html \
+                      market-structure/invalidation-stops-risk-reward/index.html \
+                      market-structure/volume-relative-strength/index.html \
+                      market-structure/options-contract-selection/index.html \
+                      trade-setup-execution/index.html \
+                      trade-setup-execution/trade-thesis/index.html \
+                      trade-setup-execution/support-resistance/index.html \
+                      trade-setup-execution/confluence/index.html \
+                      trade-setup-execution/breakout-setups/index.html \
+                      trade-setup-execution/pullback-setups/index.html \
+                      trade-setup-execution/reversal-setups/index.html \
+                      trade-setup-execution/entry-confirmation/index.html \
+                      trade-setup-execution/stop-loss-placement/index.html \
+                      trade-setup-execution/profit-targets/index.html \
+                      trade-setup-execution/risk-to-reward/index.html \
+                      trade-setup-execution/position-sizing/index.html \
+                      trade-setup-execution/trade-management/index.html \
+                      trade-setup-execution/backtesting/index.html \
+                      trade-setup-execution/trading-journal/index.html \
+                      trade-setup-execution/performance-review/index.html \
+                      options-trading/index.html \
+                      options-trading/options-contract-fundamentals/index.html \
+                      options-trading/calls-and-puts/index.html \
+                      options-trading/moneyness/index.html \
+                      options-trading/option-premium/index.html \
+                      options-trading/option-chain-and-liquidity/index.html \
+                      options-trading/expiration-and-time-decay/index.html \
+                      options-trading/implied-volatility/index.html \
+                      options-trading/delta-and-gamma/index.html \
+                      options-trading/theta-and-vega/index.html \
+                      options-trading/long-calls-and-long-puts/index.html \
+                      options-trading/covered-calls/index.html \
+                      options-trading/cash-secured-puts/index.html \
+                      options-trading/vertical-debit-spreads/index.html \
+                      options-trading/vertical-credit-spreads/index.html \
+                      options-trading/exercise-assignment-and-expiration/index.html \
+                      options-trading/options-trade-planning/index.html \
+                      technical-indicators/index.html \
+                      technical-indicators/technical-indicator-fundamentals/index.html \
+                      technical-indicators/moving-averages/index.html \
+                      technical-indicators/moving-average-crossovers/index.html \
+                      technical-indicators/relative-strength-index/index.html \
+                      technical-indicators/stochastic-oscillator/index.html \
+                      technical-indicators/macd/index.html \
+                      technical-indicators/average-directional-index/index.html \
+                      technical-indicators/average-true-range/index.html \
+                      technical-indicators/bollinger-bands/index.html \
+                      technical-indicators/keltner-channels/index.html \
+                      technical-indicators/donchian-channels/index.html \
+                      technical-indicators/rate-of-change-and-momentum/index.html \
+                      technical-indicators/indicator-divergence/index.html \
+                      technical-indicators/combining-indicators/index.html \
+                      technical-indicators/indicator-selection-by-market-regime/index.html \
+                      technical-indicators/indicator-based-trading-rules/index.html \
+                      volume-and-order-flow/index.html \
+                      volume-and-order-flow/volume-fundamentals/index.html \
+                      volume-and-order-flow/price-volume-relationships/index.html \
+                      volume-and-order-flow/relative-volume-and-volume-spikes/index.html \
+                      volume-and-order-flow/volume-confirmation/index.html \
+                      volume-and-order-flow/on-balance-volume/index.html \
+                      volume-and-order-flow/accumulation-distribution-and-chaikin-money-flow/index.html \
+                      volume-and-order-flow/volume-weighted-average-price/index.html \
+                      volume-and-order-flow/anchored-volume-weighted-average-price/index.html \
+                      volume-and-order-flow/volume-profile/index.html \
+                      volume-and-order-flow/value-area-poc-hvn-lvn/index.html \
+                      volume-and-order-flow/bid-ask-spread-and-order-types/index.html \
+                      volume-and-order-flow/time-and-sales/index.html \
+                      volume-and-order-flow/footprint-charts-and-bid-ask-delta/index.html \
+                      volume-and-order-flow/cumulative-volume-delta/index.html \
+                      volume-and-order-flow/order-book-and-market-depth/index.html \
+                      volume-and-order-flow/volume-and-order-flow-trading-rules/index.html \
+                      trading-risk-management/index.html \
+                      trading-risk-management/risk-management-fundamentals/index.html \
+                      trading-risk-management/account-risk-and-risk-budget/index.html \
+                      trading-risk-management/risk-per-trade/index.html \
+                      trading-risk-management/stop-loss-and-structural-invalidation/index.html \
+                      trading-risk-management/position-sizing/index.html \
+                      trading-risk-management/reward-to-risk-and-r-multiples/index.html \
+                      trading-risk-management/win-rate-average-win-loss-and-expectancy/index.html \
+                      trading-risk-management/losing-streaks-and-drawdown/index.html \
+                      trading-risk-management/risk-of-ruin/index.html \
+                      trading-risk-management/volatility-and-atr-based-risk/index.html \
+                      trading-risk-management/gap-slippage-liquidity-and-execution-risk/index.html \
+                      trading-risk-management/leverage-and-margin-risk/index.html \
+                      trading-risk-management/correlation-concentration-and-portfolio-exposure/index.html \
+                      trading-risk-management/options-risk-management/index.html \
+                      trading-risk-management/daily-and-weekly-risk-limits/index.html \
+                      trading-risk-management/trading-risk-plan/index.html \
+                      backtesting-and-trading-systems/index.html \
+                      backtesting-and-trading-systems/backtesting-fundamentals/index.html \
+                      backtesting-and-trading-systems/testable-trading-rules-and-hypotheses/index.html \
+                      backtesting-and-trading-systems/historical-data-and-data-quality/index.html \
+                      backtesting-and-trading-systems/survivorship-selection-and-corporate-actions/index.html \
+                      backtesting-and-trading-systems/timeframes-sessions-and-bar-construction/index.html \
+                      backtesting-and-trading-systems/signal-timing-look-ahead-bias-and-data-leakage/index.html \
+                      backtesting-and-trading-systems/trade-execution-simulation/index.html \
+                      backtesting-and-trading-systems/position-sizing-and-portfolio-accounting/index.html \
+                      backtesting-and-trading-systems/transaction-costs-spread-slippage-and-liquidity/index.html \
+                      backtesting-and-trading-systems/trade-log-equity-curve-and-drawdown/index.html \
+                      backtesting-and-trading-systems/performance-metrics-and-expectancy/index.html \
+                      backtesting-and-trading-systems/benchmarking-and-risk-adjusted-performance/index.html \
+                      backtesting-and-trading-systems/in-sample-validation-and-out-of-sample-data/index.html \
+                      backtesting-and-trading-systems/walk-forward-testing/index.html \
+                      backtesting-and-trading-systems/overfitting-sensitivity-monte-carlo-and-stress-testing/index.html \
+                      backtesting-and-trading-systems/trading-system-specification-and-backtest-report/index.html \
+                      algorithmic-and-automated-trading/index.html \
+                      algorithmic-and-automated-trading/algorithmic-and-automated-trading-fundamentals/index.html \
+                      algorithmic-and-automated-trading/trading-system-architecture-and-components/index.html \
+                      algorithmic-and-automated-trading/market-data-ingestion-and-normalization/index.html \
+                      algorithmic-and-automated-trading/time-sessions-events-and-scheduling/index.html \
+                      algorithmic-and-automated-trading/signal-engine-and-strategy-state/index.html \
+                      algorithmic-and-automated-trading/portfolio-position-and-risk-engine/index.html \
+                      algorithmic-and-automated-trading/broker-apis-and-order-lifecycle/index.html \
+                      algorithmic-and-automated-trading/order-management-and-execution/index.html \
+                      algorithmic-and-automated-trading/paper-trading-and-forward-testing/index.html \
+                      algorithmic-and-automated-trading/scanners-alerts-and-human-approval/index.html \
+                      algorithmic-and-automated-trading/reliability-idempotency-retries-and-recovery/index.html \
+                      algorithmic-and-automated-trading/observability-logging-and-auditability/index.html \
+                      algorithmic-and-automated-trading/security-secrets-permissions-and-kill-switches/index.html \
+                      algorithmic-and-automated-trading/deployment-environments-and-configuration/index.html \
+                      algorithmic-and-automated-trading/ai-assisted-and-agentic-trading-workflows/index.html \
+                      algorithmic-and-automated-trading/automated-trading-system-specification-and-production-readiness/index.html \
+                      paths/discrete-math/index.html \
+                      logic-and-proof/index.html \
+                      logic-and-proof/propositions-and-truth-values/index.html \
+                      logic-and-proof/logical-connectives/index.html \
+                      logic-and-proof/truth-tables/index.html \
+                      logic-and-proof/conditional-statements/index.html \
+                      logic-and-proof/logical-equivalence/index.html \
+                      logic-and-proof/tautologies-and-satisfiability/index.html \
+                      logic-and-proof/normal-forms-and-boolean-algebra/index.html \
+                      logic-and-proof/predicates-and-quantifiers/index.html \
+                      logic-and-proof/nested-quantifiers/index.html \
+                      logic-and-proof/negating-quantified-statements/index.html \
+                      logic-and-proof/rules-of-inference/index.html \
+                      logic-and-proof/direct-proof/index.html \
+                      logic-and-proof/contraposition-and-contradiction/index.html \
+                      logic-and-proof/proof-by-cases-and-counterexample/index.html \
+                      sets-relations-functions/index.html \
+                      sets-relations-functions/sets-and-membership/index.html \
+                      sets-relations-functions/subsets-and-power-sets/index.html \
+                      sets-relations-functions/set-operations/index.html \
+                      sets-relations-functions/set-identities/index.html \
+                      sets-relations-functions/cartesian-products-and-tuples/index.html \
+                      sets-relations-functions/binary-relations/index.html \
+                      sets-relations-functions/properties-of-relations/index.html \
+                      sets-relations-functions/equivalence-relations-and-partitions/index.html \
+                      sets-relations-functions/partial-orders/index.html \
+                      sets-relations-functions/functions/index.html \
+                      sets-relations-functions/injective-surjective-bijective/index.html \
+                      sets-relations-functions/composition-and-inverses/index.html \
+                      sets-relations-functions/cardinality-and-countability/index.html \
+                      sets-relations-functions/the-pigeonhole-principle/index.html \
+                      induction-and-recursion/index.html \
+                      induction-and-recursion/the-well-ordering-principle/index.html \
+                      induction-and-recursion/mathematical-induction/index.html \
+                      induction-and-recursion/induction-with-sums-and-products/index.html \
+                      induction-and-recursion/induction-with-inequalities-and-divisibility/index.html \
+                      induction-and-recursion/strong-induction/index.html \
+                      induction-and-recursion/recursive-definitions/index.html \
+                      induction-and-recursion/structural-induction/index.html \
+                      induction-and-recursion/recursive-algorithms/index.html \
+                      induction-and-recursion/recurrence-relations/index.html \
+                      induction-and-recursion/solving-linear-recurrences/index.html \
+                      induction-and-recursion/divide-and-conquer-recurrences/index.html \
+                      induction-and-recursion/loop-invariants-and-correctness/index.html \
+                      combinatorics-and-counting/index.html \
+                      combinatorics-and-counting/sum-and-product-rules/index.html \
+                      combinatorics-and-counting/counting-with-restrictions/index.html \
+                      combinatorics-and-counting/permutations/index.html \
+                      combinatorics-and-counting/combinations/index.html \
+                      combinatorics-and-counting/binomial-coefficients/index.html \
+                      combinatorics-and-counting/the-binomial-theorem/index.html \
+                      combinatorics-and-counting/permutations-with-repetition/index.html \
+                      combinatorics-and-counting/combinations-with-repetition/index.html \
+                      combinatorics-and-counting/inclusion-exclusion/index.html \
+                      combinatorics-and-counting/derangements/index.html \
+                      combinatorics-and-counting/generalized-pigeonhole/index.html \
+                      combinatorics-and-counting/generating-functions/index.html \
+                      combinatorics-and-counting/combinatorial-proof/index.html \
+                      combinatorics-and-counting/choosing-a-counting-method/index.html \
+                      discrete-probability/index.html \
+                      discrete-probability/sample-spaces-and-events/index.html \
+                      discrete-probability/computing-probabilities/index.html \
+                      discrete-probability/probability-axioms/index.html \
+                      discrete-probability/conditional-probability/index.html \
+                      discrete-probability/independence/index.html \
+                      discrete-probability/bayes-theorem/index.html \
+                      discrete-probability/random-variables/index.html \
+                      discrete-probability/expected-value/index.html \
+                      discrete-probability/linearity-of-expectation/index.html \
+                      discrete-probability/variance/index.html \
+                      discrete-probability/binomial-distribution/index.html \
+                      discrete-probability/geometric-distribution/index.html \
+                      number-theory-and-cryptography/index.html \
+                      number-theory-and-cryptography/divisibility-and-the-division-algorithm/index.html \
+                      number-theory-and-cryptography/primes-and-factorisation/index.html \
+                      number-theory-and-cryptography/the-sieve-of-eratosthenes/index.html \
+                      number-theory-and-cryptography/greatest-common-divisor/index.html \
+                      number-theory-and-cryptography/the-euclidean-algorithm/index.html \
+                      number-theory-and-cryptography/bezout-and-modular-inverses/index.html \
+                      number-theory-and-cryptography/modular-arithmetic/index.html \
+                      number-theory-and-cryptography/modular-exponentiation/index.html \
+                      number-theory-and-cryptography/linear-congruences/index.html \
+                      number-theory-and-cryptography/chinese-remainder-theorem/index.html \
+                      number-theory-and-cryptography/fermat-and-euler/index.html \
+                      number-theory-and-cryptography/hashing-and-pseudorandom-numbers/index.html \
+                      number-theory-and-cryptography/classical-ciphers/index.html \
+                      number-theory-and-cryptography/rsa-encryption/index.html \
+                      graphs-and-trees/index.html \
+                      graphs-and-trees/graphs-and-graph-models/index.html \
+                      graphs-and-trees/degree-and-the-handshake-theorem/index.html \
+                      graphs-and-trees/graph-representations/index.html \
+                      graphs-and-trees/paths-and-connectivity/index.html \
+                      graphs-and-trees/graph-isomorphism/index.html \
+                      graphs-and-trees/bipartite-graphs/index.html \
+                      graphs-and-trees/euler-and-hamilton/index.html \
+                      graphs-and-trees/graph-traversal/index.html \
+                      graphs-and-trees/shortest-paths/index.html \
+                      graphs-and-trees/trees/index.html \
+                      graphs-and-trees/tree-traversals/index.html \
+                      graphs-and-trees/spanning-trees/index.html \
+                      graphs-and-trees/graph-colouring/index.html \
+                      graphs-and-trees/planar-graphs/index.html \
+                      algorithms-and-complexity/index.html \
+                      algorithms-and-complexity/algorithms-and-pseudocode/index.html \
+                      algorithms-and-complexity/correctness-and-termination/index.html \
+                      algorithms-and-complexity/growth-of-functions/index.html \
+                      algorithms-and-complexity/big-o-notation/index.html \
+                      algorithms-and-complexity/analysing-iterative-algorithms/index.html \
+                      algorithms-and-complexity/searching-and-sorting/index.html \
+                      algorithms-and-complexity/divide-and-conquer/index.html \
+                      algorithms-and-complexity/recursion-trees-and-amortised-analysis/index.html \
+                      algorithms-and-complexity/greedy-algorithms/index.html \
+                      algorithms-and-complexity/dynamic-programming/index.html \
+                      algorithms-and-complexity/complexity-classes/index.html \
+                      algorithms-and-complexity/decidability-and-the-halting-problem/index.html \
+                      paths/algebra/index.html \
+                      algebra-foundations/index.html \
+                      algebra-foundations/real-numbers-and-the-number-line/index.html \
+                      algebra-foundations/properties-of-the-real-numbers/index.html \
+                      algebra-foundations/order-of-operations/index.html \
+                      algebra-foundations/absolute-value/index.html \
+                      algebra-foundations/integer-exponents/index.html \
+                      algebra-foundations/scientific-notation/index.html \
+                      algebra-foundations/roots-and-radicals/index.html \
+                      algebra-foundations/rational-exponents/index.html \
+                      algebra-foundations/algebraic-expressions-and-terms/index.html \
+                      algebra-foundations/the-distributive-law/index.html \
+                      algebra-foundations/combining-like-terms/index.html \
+                      algebra-foundations/evaluating-expressions/index.html \
+                      algebra-foundations/translating-words-into-algebra/index.html \
+                      linear-equations-and-inequalities/index.html \
+                      linear-equations-and-inequalities/what-it-means-to-solve-an-equation/index.html \
+                      linear-equations-and-inequalities/one-and-two-step-equations/index.html \
+                      linear-equations-and-inequalities/variables-on-both-sides/index.html \
+                      linear-equations-and-inequalities/equations-with-fractions/index.html \
+                      linear-equations-and-inequalities/literal-equations-and-formulas/index.html \
+                      linear-equations-and-inequalities/identities-and-contradictions/index.html \
+                      linear-equations-and-inequalities/ratio-proportion-and-percent/index.html \
+                      linear-equations-and-inequalities/modelling-with-linear-equations/index.html \
+                      linear-equations-and-inequalities/linear-inequalities/index.html \
+                      linear-equations-and-inequalities/compound-inequalities/index.html \
+                      linear-equations-and-inequalities/absolute-value-equations/index.html \
+                      linear-equations-and-inequalities/absolute-value-inequalities/index.html \
+                      linear-equations-and-inequalities/interval-and-set-builder-notation/index.html \
+                      lines-functions-and-graphs/index.html \
+                      lines-functions-and-graphs/the-coordinate-plane/index.html \
+                      lines-functions-and-graphs/graphing-a-linear-equation/index.html \
+                      lines-functions-and-graphs/slope/index.html \
+                      lines-functions-and-graphs/slope-intercept-form/index.html \
+                      lines-functions-and-graphs/point-slope-and-standard-form/index.html \
+                      lines-functions-and-graphs/parallel-and-perpendicular-lines/index.html \
+                      lines-functions-and-graphs/what-a-function-is/index.html \
+                      lines-functions-and-graphs/function-notation/index.html \
+                      lines-functions-and-graphs/domain-and-range/index.html \
+                      lines-functions-and-graphs/piecewise-functions/index.html \
+                      lines-functions-and-graphs/transformations-of-graphs/index.html \
+                      lines-functions-and-graphs/composition-of-functions/index.html \
+                      lines-functions-and-graphs/inverse-functions/index.html \
+                      lines-functions-and-graphs/linear-inequalities-in-two-variables/index.html \
+                      polynomials-and-factoring/index.html \
+                      polynomials-and-factoring/polynomials-degree-and-standard-form/index.html \
+                      polynomials-and-factoring/adding-and-subtracting-polynomials/index.html \
+                      polynomials-and-factoring/multiplying-polynomials/index.html \
+                      polynomials-and-factoring/special-products/index.html \
+                      polynomials-and-factoring/factoring-out-the-greatest-common-factor/index.html \
+                      polynomials-and-factoring/factoring-by-grouping/index.html \
+                      polynomials-and-factoring/factoring-simple-trinomials/index.html \
+                      polynomials-and-factoring/the-ac-method/index.html \
+                      polynomials-and-factoring/factoring-special-forms/index.html \
+                      polynomials-and-factoring/polynomial-long-division/index.html \
+                      polynomials-and-factoring/synthetic-division-and-the-remainder-theorem/index.html \
+                      polynomials-and-factoring/the-factor-theorem-and-rational-roots/index.html \
+                      polynomials-and-factoring/graphs-of-polynomial-functions/index.html \
+                      rational-and-radical-expressions/index.html \
+                      rational-and-radical-expressions/rational-expressions-and-their-domains/index.html \
+                      rational-and-radical-expressions/simplifying-rational-expressions/index.html \
+                      rational-and-radical-expressions/multiplying-and-dividing-rational-expressions/index.html \
+                      rational-and-radical-expressions/adding-and-subtracting-rational-expressions/index.html \
+                      rational-and-radical-expressions/complex-fractions/index.html \
+                      rational-and-radical-expressions/solving-rational-equations/index.html \
+                      rational-and-radical-expressions/graphs-and-asymptotes/index.html \
+                      rational-and-radical-expressions/simplifying-radical-expressions/index.html \
+                      rational-and-radical-expressions/operations-with-radicals/index.html \
+                      rational-and-radical-expressions/rationalizing-denominators/index.html \
+                      rational-and-radical-expressions/solving-radical-equations/index.html \
+                      rational-and-radical-expressions/radical-functions-and-their-graphs/index.html \
+                      quadratics-and-complex-numbers/index.html \
+                      quadratics-and-complex-numbers/quadratic-equations-and-the-zero-product-property/index.html \
+                      quadratics-and-complex-numbers/solving-by-factoring/index.html \
+                      quadratics-and-complex-numbers/the-square-root-property/index.html \
+                      quadratics-and-complex-numbers/completing-the-square/index.html \
+                      quadratics-and-complex-numbers/the-quadratic-formula/index.html \
+                      quadratics-and-complex-numbers/the-discriminant/index.html \
+                      quadratics-and-complex-numbers/complex-numbers/index.html \
+                      quadratics-and-complex-numbers/operations-with-complex-numbers/index.html \
+                      quadratics-and-complex-numbers/complex-roots-of-quadratics/index.html \
+                      quadratics-and-complex-numbers/graphs-of-quadratic-functions/index.html \
+                      quadratics-and-complex-numbers/vertex-form-and-the-axis-of-symmetry/index.html \
+                      quadratics-and-complex-numbers/maximum-and-minimum-problems/index.html \
+                      quadratics-and-complex-numbers/quadratic-inequalities/index.html \
+                      quadratics-and-complex-numbers/equations-reducible-to-quadratic-form/index.html \
+                      exponential-and-logarithmic-functions/index.html \
+                      exponential-and-logarithmic-functions/exponential-functions/index.html \
+                      exponential-and-logarithmic-functions/growth-and-decay/index.html \
+                      exponential-and-logarithmic-functions/the-number-e/index.html \
+                      exponential-and-logarithmic-functions/what-a-logarithm-is/index.html \
+                      exponential-and-logarithmic-functions/logarithmic-functions-and-their-graphs/index.html \
+                      exponential-and-logarithmic-functions/the-laws-of-logarithms/index.html \
+                      exponential-and-logarithmic-functions/common-and-natural-logarithms/index.html \
+                      exponential-and-logarithmic-functions/change-of-base/index.html \
+                      exponential-and-logarithmic-functions/solving-exponential-equations/index.html \
+                      exponential-and-logarithmic-functions/solving-logarithmic-equations/index.html \
+                      exponential-and-logarithmic-functions/compound-interest-and-continuous-growth/index.html \
+                      exponential-and-logarithmic-functions/logarithmic-scales/index.html \
+                      systems-and-matrices/index.html \
+                      systems-and-matrices/systems-of-two-linear-equations/index.html \
+                      systems-and-matrices/solving-by-substitution/index.html \
+                      systems-and-matrices/solving-by-elimination/index.html \
+                      systems-and-matrices/systems-in-three-variables/index.html \
+                      systems-and-matrices/matrices-and-row-operations/index.html \
+                      systems-and-matrices/gaussian-elimination/index.html \
+                      systems-and-matrices/matrix-arithmetic/index.html \
+                      systems-and-matrices/determinants-and-cramers-rule/index.html \
+                      systems-and-matrices/inverse-matrices/index.html \
+                      systems-and-matrices/systems-of-inequalities-and-linear-programming/index.html \
+                      sequences-and-series/index.html \
+                      sequences-and-series/sequences-and-recursion/index.html \
+                      sequences-and-series/sigma-notation/index.html \
+                      sequences-and-series/arithmetic-sequences-and-series/index.html \
+                      sequences-and-series/geometric-sequences-and-series/index.html \
+                      sequences-and-series/partial-sums-and-telescoping/index.html \
+                      sequences-and-series/infinite-geometric-series/index.html \
+                      sequences-and-series/repeating-decimals-as-series/index.html \
+                      sequences-and-series/annuities-and-accumulated-payments/index.html \
+                      sequences-and-series/pascals-triangle/index.html \
+                      sequences-and-series/the-binomial-theorem/index.html \
+                      sequences-and-series/the-general-term-of-an-expansion/index.html \
+                      oauth2/spa/callback/index.html \
+                      progress/index.html ; do
+            pages=$((pages + 1))
+            if [ ! -f "$WEB_ROOT/$page" ]; then
+              echo "::error file=$WEB_ROOT::missing $WEB_ROOT/$page — the published URL space is incomplete"
+              missing=1
+            fi
+          done
+          # Published, and not pages. Course 2's lesson 14 exports the journal
+          # shape and its lesson 15 imports it; course 3's lesson 16 exports the
+          # trade plan shape; course 4's lesson 16 exports the indicator rule
+          # shape; course 5's lesson 16 exports the volume and order flow rule
+          # shape; course 6's lesson 16 exports the trading risk plan shape; and
+          # course 7's lesson 16 exports the trading system specification shape;
+          # and course 8's lesson 16 exports the automated trading system shape.
+          # Each course home links to its file, so each is a live URL
+          # whose absence is a 404 like any other. Each asset is listed here
+          # explicitly rather than folded into the page loop above: a page check
+          # that also accepts JSON is a page check that proves nothing. The eighth
+          # asset is not a schema: it is the capstone's dataset, published so the
+          # analysis on those two pages can be checked rather than believed.
+          for asset in trade-setup-execution/trade-journal-schema.json \
+                       options-trading/options-trade-plan-schema.json \
+                       technical-indicators/indicator-rule-schema.json \
+                       volume-and-order-flow/volume-order-flow-rule-schema.json \
+                       trading-risk-management/trading-risk-plan-schema.json \
+                       backtesting-and-trading-systems/trading-system-specification-schema.json \
+                       algorithmic-and-automated-trading/automated-trading-system-schema.json \
+                       paths/trading/iren-analysis-2026-08-16/iren-analysis-data.json ; do
+            if [ ! -f "$WEB_ROOT/$asset" ]; then
+              echo "::error file=$WEB_ROOT::missing $WEB_ROOT/$asset — a published asset is missing"
+              missing=1
+            elif ! python3 -c "import json,sys; json.load(open(sys.argv[1]))" "$WEB_ROOT/$asset"; then
+              echo "::error file=$WEB_ROOT/$asset::published JSON asset does not parse"
+              missing=1
+            fi
+          done
+          [ "$missing" -eq 0 ] || exit 1
+          echo "Published URL space: $pages/369 pages plus 8 assets present under $WEB_ROOT."
+
+      - name: The exact-arithmetic core is correct
+        run: |
+          set -euo pipefail
+          # labcheck.js below proves every lab RUNS. It cannot prove the numbers
+          # are right: a lab that confidently reports the wrong roots passes it,
+          # and passes every markup assertion in tests/ too. Every algebra page
+          # promises its reader that each figure is computed from the stated
+          # definition and that the arithmetic is exact; this is the step that
+          # makes that promise checkable. It tests the JavaScript that ships,
+          # extracted from the module that holds it, so there is no second copy
+          # to drift.
+          if ! command -v node > /dev/null; then
+            echo "::error::node is required to check the published arithmetic and is not on PATH."
+            exit 1
+          fi
+          node scripts/mathcheck.js
+
+      - name: The progress page's numbers agree with each other
+        run: |
+          set -euo pipefail
+          # /progress/ is built almost entirely by script, so the Python suite --
+          # which reads the STATIC file -- cannot see one number it shows. A ring
+          # reading 40%, a stats row reading 12, and a subject meter reading 5 are
+          # all plausible markup and none of them is checked by anything else.
+          # This runs the shipped script against a stub DOM and asserts the views
+          # agree: the per-subject meters must sum to the headline, a mark for a
+          # retired lesson must not inflate the totals, and a finished library
+          # must read 100 rather than 99.
+          if ! command -v node > /dev/null; then
+            echo "::error::node is required to check the progress arithmetic and is not on PATH."
+            exit 1
+          fi
+          node scripts/progresscheck.js
+
+      - name: Lesson feedback records, ticks and exports correctly
+        run: |
+          set -euo pipefail
+          # The recommendation panel is built almost entirely by script, so the
+          # Python suite -- which reads the static file -- cannot see one of its
+          # behaviours. Three things here are checked NOWHERE else: the store
+          # (only exercised by clicking), the Markdown export (generated text no
+          # page renders), and escaping, because the list is the first place on
+          # this site where text a person typed is put back into the page.
+          if ! command -v node > /dev/null; then
+            echo "::error::node is required to check the feedback feature and is not on PATH."
+            exit 1
+          fi
+          node scripts/feedbackcheck.js
+
+      - name: Every generated lab executes
+        run: |
+          set -euo pipefail
+          # WHY THIS STEP EXISTS. Nothing else in this pipeline runs the
+          # JavaScript the site publishes. The suite asserts markup; the
+          # self-containment step asserts no page reaches the network; neither
+          # notices a lab that throws on its first redraw and ships a blank
+          # panel, which looks like a styling problem and passes every other
+          # check here. scripts/labcheck.js executes each generated page in a
+          # minimal DOM and fails if a lab throws, never assigns
+          # window.redrawLab, or breaks on one of its own control values.
+          #
+          # --generated is the list scripts/build_paths.py writes as it builds.
+          # It is not a way of avoiding awkward results: the trading path's
+          # widgets use DOM features that shim deliberately does not implement,
+          # so running them here would report facts about the harness as defects
+          # in pages that shipped working. See the header of labcheck.js.
+          if ! command -v node > /dev/null; then
+            echo "::error::node is required to execute the published labs and is not on PATH."
+            exit 1
+          fi
+          if [ ! -s scripts/generated-pages.txt ]; then
+            echo "::error file=scripts/generated-pages.txt::the generated-page manifest is missing or empty; run scripts/build_paths.py"
+            exit 1
+          fi
+          manifest=$(grep -c . scripts/generated-pages.txt)
+          echo "Executing $manifest generated page(s)."
+          node scripts/labcheck.js --generated
+
+      - name: HTML is well-formed
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import pathlib, sys
+          from html.parser import HTMLParser
+
+          VOID = {"area","base","br","col","embed","hr","img","input","link",
+                  "meta","param","source","track","wbr"}
+          # Elements whose end tag HTML5 allows to be omitted. They may be
+          # implicitly closed by a following sibling or an ancestor's end tag.
+          OPTIONAL_END = {"p","li","dt","dd","option","optgroup","thead","tbody",
+                          "tfoot","tr","td","th","rt","rp","colgroup","html",
+                          "head","body"}
+
+          class Checker(HTMLParser):
+              def __init__(self, path):
+                  super().__init__(convert_charrefs=True)
+                  self.path = path
+                  self.stack = []
+                  self.errors = []
+                  self.ids = {}
+                  self.saw_doctype = False
+                  self.counts = {}
+
+              def err(self, msg):
+                  line, col = self.getpos()
+                  self.errors.append((line, col, msg))
+
+              def handle_decl(self, decl):
+                  if decl.strip().lower().startswith("doctype"):
+                      self.saw_doctype = True
+                      if decl.strip().lower() != "doctype html":
+                          self.err("non-HTML5 doctype: <!%s>" % decl)
+
+              def handle_starttag(self, tag, attrs):
+                  self.counts[tag] = self.counts.get(tag, 0) + 1
+                  seen = set()
+                  for name, value in attrs:
+                      if name in seen:
+                          self.err("duplicate attribute %r on <%s>" % (name, tag))
+                      seen.add(name)
+                      if name == "id" and value:
+                          if value in self.ids:
+                              self.err("duplicate id %r (first seen on line %d)"
+                                       % (value, self.ids[value]))
+                          else:
+                              self.ids[value] = self.getpos()[0]
+                  if tag in VOID:
+                      return
+                  # Implicitly close optional-end siblings, e.g. <li>a<li>b.
+                  while self.stack and self.stack[-1][0] in OPTIONAL_END and (
+                          self.stack[-1][0] == tag or
+                          (self.stack[-1][0] == "p" and tag in
+                           {"p","div","section","article","ul","ol","table",
+                            "pre","blockquote","h1","h2","h3","h4","h5","h6",
+                            "figure","form","hr","details","fieldset","header",
+                            "footer","nav","main","aside","dl"})):
+                      self.stack.pop()
+                  self.stack.append((tag, self.getpos()[0]))
+
+              def handle_startendtag(self, tag, attrs):
+                  self.handle_starttag(tag, attrs)
+                  if tag not in VOID and self.stack and self.stack[-1][0] == tag:
+                      self.stack.pop()
+
+              def handle_endtag(self, tag):
+                  if tag in VOID:
+                      self.err("end tag </%s> for a void element" % tag)
+                      return
+                  if tag not in [t for t, _ in self.stack]:
+                      self.err("stray end tag </%s>" % tag)
+                      return
+                  while self.stack:
+                      top, opened = self.stack.pop()
+                      if top == tag:
+                          break
+                      if top not in OPTIONAL_END:
+                          self.err("</%s> closes <%s> opened on line %d"
+                                   % (tag, top, opened))
+
+              def finish(self):
+                  for tag, opened in self.stack:
+                      if tag not in OPTIONAL_END:
+                          self.errors.append((opened, 0, "unclosed <%s>" % tag))
+                  if not self.saw_doctype:
+                      self.errors.append((1, 0, "missing <!doctype html>"))
+                  for required in ("html", "head", "body", "title"):
+                      if self.counts.get(required, 0) != 1:
+                          self.errors.append(
+                              (1, 0, "expected exactly one <%s>, found %d"
+                               % (required, self.counts.get(required, 0))))
+                  return self.errors
+
+          failures = 0
+          files = sorted(pathlib.Path("site").rglob("*.html"))
+          if not files:
+              print("::error::No HTML found under site/.")
+              sys.exit(1)
+          for path in files:
+              checker = Checker(path)
+              checker.feed(path.read_text(encoding="utf-8"))
+              checker.close()
+              errors = checker.finish()
+              for line, col, msg in errors:
+                  print("::error file=%s,line=%d::%s" % (path, line, msg))
+              failures += len(errors)
+              print("%s: %d element(s) checked, %d error(s)"
+                    % (path, sum(checker.counts.values()), len(errors)))
+          sys.exit(1 if failures else 0)
+          PY
+
+      - name: Self-containment invariant
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import pathlib, re, sys
+          from html.parser import HTMLParser
+
+          # INVARIANT: a page under site/ must render completely with zero
+          # network requests beyond the document itself. No remote subresource,
+          # no <script src>, no remote <link>, no @import, no fetch/XHR.
+          #
+          # Three narrow, reviewed exceptions exist and nothing else is allowed:
+          SELF_ORIGIN = "https://learn.geterdone.io"
+          # 1. Plain navigation links. An <a href> starts no request until the
+          #    reader clicks, so it cannot break offline self-containment, but
+          #    every origin here is a deliberate review decision. Adding one is
+          #    a code change, not an exception granted at runtime.
+          # Outbound <a href> origins that have been REVIEWED. A link navigates
+          # and loads nothing, so it does not break self-containment -- but a new
+          # origin must still be a deliberate decision, not something that drifts
+          # in with a lesson. Reviewed 2026-08-15: both are authoritative,
+          # non-commercial options-education sources cited by lab 07, and all
+          # three deep paths were confirmed to return HTTP 200.
+          #   optionseducation.org -- Options Industry Council
+          #   finra.org            -- Financial Industry Regulatory Authority
+          # Reviewed 2026-08-15, again, for course 3 (Options Trading): both are
+          # primary sources -- a federal regulator and the listing exchange
+          # itself -- rather than a brokerage selling the product the lessons
+          # teach, which is why they are accepted where a broker's education
+          # page would not be. Every linked path was confirmed to return HTTP 200.
+          #   investor.gov -- U.S. Securities and Exchange Commission, investor education
+          #   cboe.com     -- Cboe Global Markets, the options exchange
+          # Reviewed 2026-08-16 for course 5 (Volume and Order Flow). Both are
+          # primary sources for what the course teaches -- a futures exchange's
+          # own education material and a listing exchange's glossary -- rather
+          # than a vendor selling order-flow software, which is why they are
+          # accepted where a platform's marketing page would not be. Verification
+          # is NOT equal for the two, and the difference is recorded rather than
+          # smoothed over:
+          #   nasdaq.com   -- Nasdaq, the listing exchange's own glossary. The
+          #                   origin answered HTTP 200 when it was checked at
+          #                   intake.
+          #   cmegroup.com -- CME Group, the futures exchange's own education
+          #                   material. REACHABILITY NOT VERIFIED. The host
+          #                   answers 403 to every automated request, including a
+          #                   request for its own root, which is WAF bot-blocking
+          #                   rather than a dead link -- so the four deep paths
+          #                   course 5 cites could not be confirmed from an
+          #                   automated environment, and no other check was made.
+          #                   They are allowed on the strength of the ORIGIN
+          #                   being a primary source, and remain unchecked as
+          #                   paths until someone opens them in a browser. Do not
+          #                   let a later reader infer they were verified.
+          # Reviewed 2026-08-16 for course 8 (Algorithmic and Automated
+          # Trading), the last course on the path. Six origins are added here:
+          # ONE regulator (sec.gov), FOUR projects that define the thing the
+          # lesson teaches (OWASP, Docker, Kubernetes, OpenTelemetry) and ONE
+          # broker's own API documentation (docs.alpaca.markets), cited as an
+          # example of what an order API looks like, never as a recommendation
+          # of that broker; no linked page sells software the course teaches you
+          # to build. Verification is NOT equal across them, and the difference
+          # is recorded rather than smoothed over:
+          #   cheatsheetseries.owasp.org -- OWASP Secrets Management Cheat Sheet.
+          #                   Answered HTTP 200 when checked at intake.
+          #   docs.alpaca.markets -- a broker's own API documentation: paper
+          #                   trading, streaming market data, working with
+          #                   orders. Answered HTTP 200 at intake.
+          #   docs.docker.com -- build best practices. HTTP 200 at intake.
+          #   kubernetes.io   -- pod liveness/readiness probes. HTTP 200.
+          #   opentelemetry.io -- traces, metrics and logs. HTTP 200.
+          #   sec.gov         -- U.S. Securities and Exchange Commission, the
+          #                   Rule 15c3-5 market-access small-entity compliance
+          #                   guide. REACHABILITY NOT VERIFIED. The host answers
+          #                   403 to automated requests, exactly as cmegroup.com
+          #                   does, so the ONE deep path course 8 cites could not
+          #                   be confirmed from this environment and no other
+          #                   check was made in its place. It is allowed on the
+          #                   strength of the ORIGIN being the primary source --
+          #                   the regulator publishing its own rule -- and the
+          #                   path remains unchecked until someone opens it in a
+          #                   browser. Do not let a later reader infer it was
+          #                   verified. (investor.gov, allowed above, is the
+          #                   SEC's investor-education site and is a different
+          #                   host with a different result.)
+          # finra.org was already allowed above and course 8 links it again, for
+          # Regulatory Notice 15-09; no new decision was needed for that origin.
+          #
+          # https://geterdone.io was reviewed and allowed while the footer
+          # linked to it. It is REMOVED as of the paths layer: the apex is a
+          # separate live site this project does not control, the library's own
+          # home is https://learn.geterdone.io, and every footer names that.
+          # tests/test_site_invariants.py TestFooterSiteIdentity enforces the
+          # same rule against the files on disk.
+          ALLOWED_LINK_ORIGINS = (SELF_ORIGIN,
+                                  "https://www.optionseducation.org",
+                                  "https://www.finra.org",
+                                  "https://www.investor.gov",
+                                  "https://www.cboe.com",
+                                  "https://www.nasdaq.com",
+                                  "https://www.cmegroup.com",
+                                  "https://cheatsheetseries.owasp.org",
+                                  "https://docs.alpaca.markets",
+                                  "https://docs.docker.com",
+                                  "https://kubernetes.io",
+                                  "https://opentelemetry.io",
+                                  "https://www.sec.gov")
+          # The dated real-data capstone cites its DATA SOURCES -- StockAnalysis,
+          # WSJ, the issuer's investor page, GlobeNewswire and TradingView -- and
+          # none of them is here, deliberately. Its pages and its published
+          # dataset name each provider as text (host and path, no scheme), so a
+          # reader can trace any figure to the series it came from without the
+          # tree carrying a single absolute URL. Nothing links out, so nothing
+          # needed reviewing: an origin in this list with no link behind it is
+          # policy surface that widens the text scrub for no page at all.
+          # 2. Schema and namespace IDENTIFIERS. These name a dialect; nothing
+          #    dereferences them. The w3.org URIs are required by inline SVG and
+          #    document.createElementNS. The json-schema.org URI is the "$schema"
+          #    dialect identifier of the published trade-journal-schema.json:
+          #    JSON Schema keys the dialect by URI and validators never fetch it.
+          #    Reviewed 2026-08-15. Each entry is matched as an EXACT string, so
+          #    this list allows those identifiers and nothing else on those hosts.
+          NAMESPACE_URIS = ("http://www.w3.org/2000/svg",
+                            "http://www.w3.org/1999/xlink",
+                            "http://www.w3.org/1999/xhtml",
+                            "http://www.w3.org/2000/xmlns/",
+                            "https://json-schema.org/draft/2020-12/schema")
+          # 3. Same-origin metadata URLs in <link rel=canonical|alternate> and
+          #    og:url/twitter:url, which describe the page rather than load it.
+          METADATA_LINK_RELS = {"canonical", "alternate"}
+          METADATA_META_KEYS = {"og:url", "twitter:url"}
+
+          MARKUP_SUFFIXES = {".html", ".htm", ".svg", ".xhtml"}
+          # Published data assets: inspectable source-of-truth files that are served but
+          # never executed or rendered as markup.
+          DATA_ASSET_SUFFIXES = {".json"}
+          TEXT_SUFFIXES = MARKUP_SUFFIXES | {".css", ".js", ".mjs", ".json",
+                                             ".xml", ".txt", ".md", ".webmanifest"}
+          REMOTE = re.compile(r'^\s*(?:https?:)?//', re.I)
+          ANY_URL = re.compile(r'https?://', re.I)
+          # The two CODE rules, and the four places they are applied. A page's
+          # readable copy is NOT code: course 8 cites a broker's "WebSocket Market
+          # Data" documentation by name, and a scanner that reads that sentence as
+          # a WebSocket call reports a defect the page does not have -- worse, it
+          # teaches the next author to rename a reference instead of fixing
+          # anything. So each rule is applied where the thing it forbids could
+          # actually execute:
+          #   * a pure-code file (.js, .css, .json ...) is scanned whole, as before;
+          #   * inside <script>, the runtime-network rule;
+          #   * inside <style>, the @import rule;
+          #   * in prose and comments, neither -- only the external-URL sweep,
+          #     which is unchanged and still applies everywhere.
+          # Coverage is not reduced by this: inline on* handlers and javascript:
+          # URLs are the other two places markup can execute code, and they are
+          # scanned explicitly below, where NOTHING scanned them before -- an
+          # HTMLParser never delivers an attribute value to handle_data, so
+          # onclick="fetch('/x')" passed this step until now. scripts/smoke.py
+          # scopes the same rule to <script> the same way, against the SERVED
+          # body; the two verdicts must not drift.
+          AT_IMPORT_RULE = ("AT_IMPORT", re.compile(r'@import', re.I), "CSS @import")
+          NETWORK_API_RULE = ("NETWORK_API", re.compile(
+              r'\bfetch\s*\(|\bXMLHttpRequest\b|\bWebSocket\b|\bEventSource\b'
+              r'|\bsendBeacon\b|\bimportScripts\b|\bnavigator\.serviceWorker\b'
+              r'|\bimport\s*\(', re.I),
+           "runtime network API")
+          TEXT_RULES = [AT_IMPORT_RULE, NETWORK_API_RULE]
+          SCRIPT_RULES = [NETWORK_API_RULE]
+          STYLE_RULES = [AT_IMPORT_RULE]
+          PROSE_RULES = []
+
+          violations = []
+          notices = []
+
+          def origin_allowed(url, allowed):
+              return any(url == o or url.startswith(o + "/") or url.startswith(o + "?")
+                         or url.startswith(o + "#") for o in allowed)
+
+          def scan_text(path, line, text, rules=TEXT_RULES):
+              # Namespace identifiers and reviewed navigation origins are the
+              # only absolute URLs allowed to survive in text, CSS, or script.
+              scrubbed = text
+              for uri in NAMESPACE_URIS:
+                  scrubbed = scrubbed.replace(uri, "")
+              for origin in ALLOWED_LINK_ORIGINS:
+                  scrubbed = scrubbed.replace(origin, "")
+              # A published DATA asset may carry absolute URLs as DATA. The IREN dataset
+              # cites where each number came from, and a citation with its scheme stripped
+              # is a worse citation. This is a scoping correction, not a relaxation: the
+              # rule exists to stop a page LOADING a third party, and a string in a .json
+              # file loads nothing. The invariant is preserved by the companion check
+              # below, which fails if any page gains a way to fetch such a URL. Markup
+              # keeps the rule in full -- see MARKUP_SUFFIXES.
+              if path.suffix.lower() not in DATA_ASSET_SUFFIXES:
+                  for m in ANY_URL.finditer(scrubbed):
+                      offset = line + scrubbed.count("\n", 0, m.start())
+                      violations.append((path, offset, "EXTERNAL_URL",
+                                         "absolute http(s) URL in text/script/style"))
+              for rule, pattern, label in rules:
+                  for m in pattern.finditer(text):
+                      offset = line + text.count("\n", 0, m.start())
+                      violations.append((path, offset, rule, label))
+
+          class Scanner(HTMLParser):
+              # Elements that never enclose anything, so they never open a scope.
+              VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input",
+                      "link", "meta", "param", "source", "track", "wbr"}
+
+              def __init__(self, path):
+                  super().__init__(convert_charrefs=True)
+                  self.path = path
+                  self.stack = []
+
+              def bad(self, rule, detail):
+                  violations.append((self.path, self.getpos()[0], rule, detail))
+
+              def handle_starttag(self, tag, attrs):
+                  self.inspect(tag, attrs)
+                  if tag not in self.VOID:
+                      self.stack.append(tag)
+
+              def handle_startendtag(self, tag, attrs):
+                  self.inspect(tag, attrs)
+
+              def handle_endtag(self, tag):
+                  if tag in self.stack:
+                      while self.stack and self.stack.pop() != tag:
+                          pass
+
+              def inspect(self, tag, attrs):
+                  attrs = [(k.lower(), (v or "").strip()) for k, v in attrs]
+                  values = dict(attrs)
+                  rel = values.get("rel", "").lower()
+                  meta_key = (values.get("property") or values.get("name") or "").lower()
+                  for name, value in attrs:
+                      if not value:
+                          continue
+                      # The two places an ATTRIBUTE holds executable code. An
+                      # HTMLParser never routes an attribute value through
+                      # handle_data, so nothing scanned these before.
+                      if name.startswith("on") or value.lower().startswith("javascript:"):
+                          scan_text(self.path, self.getpos()[0], value, SCRIPT_RULES)
+                      if name == "xmlns" or name.startswith("xmlns:"):
+                          if value not in NAMESPACE_URIS:
+                              self.bad("EXTERNAL_URL", "unknown namespace URI %r" % value)
+                          continue
+                      candidates = ([c.strip().split(" ")[0] for c in value.split(",")]
+                                    if name == "srcset" else [value])
+                      for url in candidates:
+                          if not url or not REMOTE.match(url):
+                              continue
+                          if tag == "script" and name == "src":
+                              self.bad("SCRIPT_SRC", "<script src> is forbidden; inline the JavaScript")
+                          elif tag in ("a", "area") and name == "href":
+                              if origin_allowed(url, ALLOWED_LINK_ORIGINS):
+                                  notices.append((self.path, self.getpos()[0], url))
+                              else:
+                                  self.bad("EXTERNAL_LINK",
+                                           "link to unreviewed origin %r (add it to ALLOWED_LINK_ORIGINS only after review)" % url)
+                          elif tag == "link" and name == "href":
+                              if rel in METADATA_LINK_RELS and origin_allowed(url, (SELF_ORIGIN,)):
+                                  continue
+                              self.bad("LINK_REMOTE", "<link rel=%r href=%r> to a remote origin" % (rel, url))
+                          elif tag == "meta" and name == "content":
+                              if meta_key in METADATA_META_KEYS and origin_allowed(url, (SELF_ORIGIN,)):
+                                  continue
+                              self.bad("EXTERNAL_URL", "<meta %s> carries a remote URL %r" % (meta_key, url))
+                          else:
+                              self.bad("EXTERNAL_SUBRESOURCE",
+                                       "<%s %s=%r> would fetch a remote resource" % (tag, name, url))
+
+              def handle_data(self, data):
+                  enclosing = self.stack[-1] if self.stack else None
+                  if enclosing == "script":
+                      rules = SCRIPT_RULES
+                  elif enclosing == "style":
+                      rules = STYLE_RULES
+                  else:
+                      rules = PROSE_RULES
+                  scan_text(self.path, self.getpos()[0], data, rules)
+
+              def handle_comment(self, data):
+                  # A comment executes nothing, so no code rule applies to it --
+                  # which is what lets a page DOCUMENT the anti-pattern it avoids.
+                  # The external-URL sweep still runs.
+                  scan_text(self.path, self.getpos()[0], data, PROSE_RULES)
+
+          # 4. The two SIGN-IN pages. Signing in with Microsoft is a
+          #    conversation with an identity provider and cannot be had
+          #    silently, so these two -- and only these two -- are excused from
+          #    this sweep. The exclusion is a PATH list, not a loosened pattern:
+          #    a lesson that starts calling an identity provider still fails
+          #    here, and the test suite bounds WHERE these two may reach
+          #    (AUTH_ORIGINS) while the container Caddyfile bounds it again in
+          #    the CSP it serves them.
+          AUTH_PAGE_FILES = {
+              pathlib.Path("site/oauth2/spa/callback/index.html"),
+              pathlib.Path("site/progress/index.html"),
+          }
+          files = [p for p in sorted(pathlib.Path("site").rglob("*"))
+                   if p.is_file() and p.suffix.lower() in TEXT_SUFFIXES
+                   and p not in AUTH_PAGE_FILES]
+          if not files:
+              print("::error::No scannable files under site/.")
+              sys.exit(1)
+          for path in files:
+              text = path.read_text(encoding="utf-8", errors="replace")
+              if path.suffix.lower() in MARKUP_SUFFIXES:
+                  scanner = Scanner(path)
+                  scanner.feed(text)
+                  scanner.close()
+              else:
+                  scan_text(path, 1, text)
+
+          for path, line, url in notices:
+              print("::notice file=%s,line=%d::reviewed outbound link: %s" % (path, line, url))
+          for path, line, rule, detail in violations:
+              print("::error file=%s,line=%d::%s: %s" % (path, line, rule, detail))
+          print("Self-containment: %d file(s) scanned, %d violation(s), %d reviewed outbound link(s)."
+                % (len(files), len(violations), len(notices)))
+          sys.exit(1 if violations else 0)
+          PY
+      - name: Internal links resolve
+        env:
+          WEB_ROOT: ${{ steps.webroot.outputs.root }}
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os, pathlib, re, sys
+          from html.parser import HTMLParser
+
+          web_root = pathlib.Path(os.environ["WEB_ROOT"]).resolve()
+          site = pathlib.Path("site").resolve()
+          SKIP_SCHEMES = ("mailto:", "tel:", "data:", "javascript:", "sms:", "blob:")
+
+          class Collector(HTMLParser):
+              def __init__(self):
+                  super().__init__(convert_charrefs=True)
+                  self.links = []   # (attr, value, line)
+                  self.ids = set()
+
+              def handle_starttag(self, tag, attrs):
+                  attrs = dict(attrs)
+                  if attrs.get("id"):
+                      self.ids.add(attrs["id"])
+                  if tag == "a" and attrs.get("name"):
+                      self.ids.add(attrs["name"])
+                  for attr in ("href", "src", "poster", "action", "data"):
+                      value = attrs.get(attr)
+                      if value:
+                          self.links.append((attr, value.strip(), self.getpos()[0]))
+                  if attrs.get("srcset"):
+                      for candidate in attrs["srcset"].split(","):
+                          url = candidate.strip().split(" ")[0]
+                          if url:
+                              self.links.append(("srcset", url, self.getpos()[0]))
+
+              handle_startendtag = handle_starttag
+
+          def parse(path):
+              collector = Collector()
+              collector.feed(path.read_text(encoding="utf-8"))
+              collector.close()
+              return collector
+
+          pages = {p.resolve(): parse(p) for p in sorted(site.rglob("*.html"))}
+          errors = []
+
+          def target_file(path):
+              if path.is_dir():
+                  return path / "index.html"
+              if str(path).endswith("/"):
+                  return pathlib.Path(str(path) + "index.html")
+              return path
+
+          for page, data in pages.items():
+              for attr, value, line in data.links:
+                  if value.lower().startswith(SKIP_SCHEMES) or re.match(r'^[a-z][a-z0-9+.-]*:', value, re.I):
+                      continue  # non-path schemes; remote URLs are already fatal above
+                  url, _, fragment = value.partition("#")
+                  if not url:
+                      if fragment and fragment not in data.ids and fragment != "top":
+                          errors.append((page, line, "fragment #%s not found in this page" % fragment))
+                      continue
+                  url = url.split("?")[0]
+                  base = web_root if url.startswith("/") else page.parent
+                  raw = (base / url.lstrip("/"))
+                  candidate = target_file(pathlib.Path(os.path.normpath(str(raw))))
+                  try:
+                      candidate.relative_to(site)
+                  except ValueError:
+                      errors.append((page, line, "%s=%r escapes site/" % (attr, value)))
+                      continue
+                  if not candidate.exists():
+                      errors.append((page, line, "%s=%r -> missing %s"
+                                     % (attr, value, candidate.relative_to(pathlib.Path.cwd().resolve()))))
+                      continue
+                  if fragment and candidate.suffix == ".html":
+                      other = pages.get(candidate.resolve())
+                      if other is None:
+                          other = parse(candidate)
+                      if fragment not in other.ids and fragment != "top":
+                          errors.append((page, line, "%s=%r -> fragment #%s not found"
+                                         % (attr, value, fragment)))
+
+          for page, line, msg in errors:
+              print("::error file=%s,line=%d::broken internal link: %s"
+                    % (page.relative_to(pathlib.Path.cwd().resolve()), line, msg))
+          print("Link check: %d page(s), %d error(s)." % (len(pages), len(errors)))
+          sys.exit(1 if errors else 0)
+          PY
+
+      - name: Canonical tests
+        run: |
+          set -euo pipefail
+          # The repository's own invariant suite: standard library only, no
+          # install step, no network. It asserts the same properties against the
+          # files on disk that scripts/smoke.py asserts against served responses.
+          if compgen -G "tests/test_*.py" > /dev/null; then
+            python3 -m unittest discover -s tests -v
+          else
+            echo "::warning::No tests/test_*.py found; the invariant suite did not run."
+          fi
+
+  container:
+    name: Container and deployment-input checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Containerfile lint
+        run: |
+          set -euo pipefail
+          if [ ! -f Containerfile.release ]; then
+            echo "::error file=Containerfile.release::Containerfile.release is required; release.yml builds the published image from it (see AGENTS.md)."
+            exit 1
+          fi
+          # hadolint is not preinstalled on GitHub-hosted runners. Use it when a
+          # runner image provides it; never install it from the network here,
+          # because that would make PR CI non-deterministic.
+          if command -v hadolint >/dev/null 2>&1; then
+            hadolint Containerfile.release Containerfile 2>/dev/null || hadolint Containerfile.release
+          else
+            echo "::notice::hadolint not available on this runner; running the built-in Containerfile checks only."
+          fi
+          python3 - <<'PY'
+          import pathlib, re, sys
+
+          errors, warnings = [], []
+          for path in sorted(pathlib.Path(".").glob("Containerfile*")):
+              lines = path.read_text(encoding="utf-8").splitlines()
+              has_user, has_expose, has_from = False, False, False
+              for number, line in enumerate(lines, start=1):
+                  stripped = line.strip()
+                  if not stripped or stripped.startswith("#"):
+                      continue
+                  head = stripped.split(None, 1)[0].upper()
+                  if head == "FROM":
+                      has_from = True
+                      image = stripped.split(None, 1)[1].split(" AS ")[0].split(" as ")[0].strip()
+                      if "__BASE_IMAGE_DIGEST__" in image:
+                          warnings.append((path, number,
+                                           "base image digest is still the __BASE_IMAGE_DIGEST__ placeholder; a human must pin a verified digest before release"))
+                      elif "@sha256:" not in image:
+                          errors.append((path, number,
+                                         "FROM %s is not digest-pinned (@sha256:...)" % image))
+                      elif not re.search(r'@sha256:[0-9a-f]{64}$', image):
+                          errors.append((path, number, "malformed image digest: %s" % image))
+                  elif head == "USER":
+                      value = stripped.split(None, 1)[1].strip().strip('"')
+                      if value in ("0", "root", "0:0"):
+                          errors.append((path, number, "USER must not be root"))
+                      else:
+                          has_user = True
+                  elif head == "EXPOSE":
+                      has_expose = True
+                  elif head == "ADD" and re.search(r'\bhttps?://', stripped):
+                      errors.append((path, number, "ADD from a URL is forbidden"))
+                  if re.search(r'\b(curl|wget)\b[^|]*\|\s*(ba)?sh', stripped):
+                      errors.append((path, number, "piping a download into a shell is forbidden"))
+                  if re.search(r'(?i)\b(password|passwd|secret|api[_-]?key|token)\s*=\s*\S', stripped) \
+                     and "__" not in stripped:
+                      errors.append((path, number, "possible embedded credential"))
+              if not has_from:
+                  errors.append((path, 1, "no FROM instruction"))
+              if not has_user:
+                  errors.append((path, 1, "no non-root USER instruction"))
+              if not has_expose:
+                  warnings.append((path, 1, "no EXPOSE instruction"))
+              if not any(l.strip().upper().startswith("HEALTHCHECK") for l in lines):
+                  warnings.append((path, 1, "no HEALTHCHECK; the platform requires a working /healthz"))
+
+          for path, number, msg in warnings:
+              print("::warning file=%s,line=%d::%s" % (path, number, msg))
+          for path, number, msg in errors:
+              print("::error file=%s,line=%d::%s" % (path, number, msg))
+          sys.exit(1 if errors else 0)
+          PY
+
+      - name: Deployment resources are allocated consistently
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import ipaddress, json, pathlib, re, sys
+
+          # THIS GATE CHANGED SHAPE WHEN THE RESOURCES WERE ALLOCATED.
+          #
+          # It used to assert that every port and subnet field still held its
+          # unallocated token, because choosing them is a human decision proven
+          # against live host state. That decision has now been made and proven:
+          # loopback 8082 (free per `ss -ltn` on the host, with 8080 left to the
+          # pixelbattle-landing reservation) and 10.89.4.0/24 (non-overlapping
+          # per `podman network inspect`), landed in the platform-ops registry
+          # reservation for slug learn-geterdone.
+          #
+          # The gate's PURPOSE is unchanged: nobody may quietly write a port or a
+          # CIDR into a deployment input. What changed is the correct value. So
+          # instead of "must still be a token" it now asks:
+          #   1. CONSISTENCY - every port literal in a deployment input equals the
+          #      one allocated port. This app publishes 127.0.0.1:<loopback>:<internal>
+          #      straight through, so a second integer anywhere means the container
+          #      binds a port the host does not reserve. That is exactly how a
+          #      hardcoded 8080 - a port another app had already claimed - once
+          #      reached a committed contract.
+          #   2. RESERVED - any CIDR present must not collide with a network that
+          #      is already taken. Overlap, not equality: 10.89.2.0/25 and
+          #      10.89.0.0/16 are the same collision as 10.89.2.0/24 and neither is
+          #      that string. ipaddress does the real containment test.
+          #   3. SOURCE OF TRUTH - release/contract.json still carries real values
+          #      and no leftover token, since release.yml renders every artifact
+          #      from it.
+          CONTRACT = pathlib.Path("release/contract.json")
+          contract = json.loads(CONTRACT.read_text(encoding="utf-8"))
+          network = contract.get("network", {})
+          PORT = network.get("loopback_port")
+          SUBNET = network.get("subnet")
+          errors = []
+          if not (isinstance(PORT, int) and not isinstance(PORT, bool) and 1024 <= PORT <= 65535):
+              errors.append((CONTRACT, 0, "network.loopback_port is not an allocated port: %r" % (PORT,)))
+          if network.get("internal_port") != PORT:
+              errors.append((CONTRACT, 0, "internal_port %r != loopback_port %r; this app binds the "
+                             "integer it publishes" % (network.get("internal_port"), PORT)))
+          try:
+              ALLOCATED = ipaddress.ip_network(SUBNET)
+          except Exception:
+              ALLOCATED = None
+              errors.append((CONTRACT, 0, "network.subnet is not an allocated CIDR: %r" % (SUBNET,)))
+
+          SCOPE = ["deploy", "release", "platform"]
+          NAMES = ("compose.yaml", "compose.yml", "compose.template.yaml",
+                   "compose.production.yaml", "Containerfile", "Containerfile.release")
+          # Documentation is not configuration; several files deliberately NAME a
+          # forbidden subnet or a taken port so a human cannot pick one by
+          # accident, and failing the build on that prose would teach people to
+          # delete the warning instead of the value.
+          DOC_KEYS = {"description", "title", "comment", "note", "notes",
+                      "examples", "rationale"}
+          KEY_LINE = re.compile(r'^-?\s*"?(\$?[A-Za-z_][A-Za-z0-9_-]*)"?\s*:')
+          PORT_PATTERNS = [
+              (re.compile(r'127\.0\.0\.1:(\d+):(\d+)'), "loopback publish mapping"),
+              (re.compile(r'"?loopback_port"?\s*[:=]\s*"?(\d+)'), "loopback_port"),
+              (re.compile(r'"?internal_port"?\s*[:=]\s*"?(\d+)'), "internal_port"),
+              (re.compile(r'^\s*:(\d+)\s*\{'), "Caddy site address"),
+              (re.compile(r'^\s*EXPOSE\s+(\d+)'), "EXPOSE"),
+              (re.compile(r'127\.0\.0\.1:(\d+)/'), "loopback probe URL"),
+          ]
+          RESERVED = [
+              ("10.89.2.0/24", "platform-private-edge (live baseline)"),
+              ("10.88.0.0/16", "the Podman default network"),
+              ("10.89.0.0/24", "hoa-meetings"),
+              ("10.89.1.0/24", "cyberpunk-sky-raid"),
+              ("10.89.3.0/24", "the pixelbattle-landing reservation"),
+          ]
+          RESERVED = [(ipaddress.ip_network(c), o) for c, o in RESERVED]
+          # The schema DEFINES the token shape and the example ILLUSTRATES it;
+          # neither is a rendered deployment input, and release.yml refuses to
+          # stage the example as a release. Only real inputs must carry the
+          # allocated value.
+          # Rendered by release.yml from the contract at build time. These must
+          # KEEP their token; the render step fails if it is gone.
+          RENDER_INPUTS = {
+              pathlib.Path("deploy/Caddyfile"),
+              pathlib.Path("Containerfile.release"),
+              pathlib.Path("compose.template.yaml"),
+          }
+          CIDR_TOKEN = re.compile(r'(?<![\w.])((?:\d{1,3}\.){3}\d{1,3}/\d{1,2})(?![\w.])')
+
+          targets = []
+          for name in NAMES:
+              targets.extend(pathlib.Path(".").glob(name))
+          for directory in SCOPE:
+              base = pathlib.Path(directory)
+              if base.is_dir():
+                  targets.extend(p for p in base.rglob("*") if p.is_file())
+
+          def configuration_lines(path, text):
+              doc_indent = None
+              for number, raw in enumerate(text.splitlines(), start=1):
+                  stripped, indent = raw.strip(), len(raw) - len(raw.lstrip())
+                  if doc_indent is not None:
+                      if not stripped or indent > doc_indent:
+                          continue
+                      doc_indent = None
+                  if not stripped or stripped.startswith(("#", "//")):
+                      continue
+                  match = KEY_LINE.match(stripped)
+                  if match and match.group(1).lower().lstrip("$") in DOC_KEYS:
+                      doc_indent = indent
+                      continue
+                  if path.suffix.lower() != ".json":
+                      stripped = stripped.split(" #", 1)[0].split("\t#", 1)[0].strip()
+                  if stripped:
+                      yield number, stripped
+
+          for path in sorted(set(targets)):
+              # Markdown under a scanned directory is PROSE, never configuration.
+              # The DOC_KEYS escape above only covers a value under a YAML or
+              # JSON key, so a briefing file that writes "never 10.89.2.0/24" in
+              # a sentence failed this step -- which is the exact outcome the
+              # comment above says to avoid, because it teaches people to delete
+              # the warning rather than the value. No render input is markdown;
+              # RENDER_INPUTS is an explicit list and is checked separately.
+              if path.suffix.lower() in {".md", ".markdown"}:
+                  continue
+              try:
+                  text = path.read_text(encoding="utf-8")
+              except (UnicodeDecodeError, OSError):
+                  continue
+              for number, stripped in configuration_lines(path, text):
+                  # A RENDER INPUT must KEEP its token. release.yml substitutes
+                  # it from the contract at build time and fails loudly when
+                  # there is nothing to substitute -- "the deployment inputs and
+                  # this workflow have drifted apart". Committing the integer
+                  # into a template is exactly that drift: it removes the render
+                  # step's only chance to prove template and contract agree.
+                  for pattern, what in PORT_PATTERNS:
+                      m = pattern.search(stripped)
+                      if not m:
+                          continue
+                      for group in m.groups():
+                          if path in RENDER_INPUTS:
+                              errors.append((path, number,
+                                             "%s carries the literal port %s; a render input must keep "
+                                             "__LOOPBACK_PORT__ so release.yml renders it from the "
+                                             "contract" % (what, group)))
+                          elif int(group) != PORT:
+                              errors.append((path, number,
+                                             "%s uses port %s; the allocated port is %d and this app "
+                                             "binds the integer it publishes" % (what, group, PORT)))
+                  for token in CIDR_TOKEN.findall(stripped):
+                      try:
+                          candidate = ipaddress.ip_network(token, strict=False)
+                      except ValueError:
+                          continue
+                      if ALLOCATED is not None and candidate == ALLOCATED:
+                          continue
+                      for reserved, owner in RESERVED:
+                          if candidate.overlaps(reserved):
+                              errors.append((path, number,
+                                             "%s overlaps %s, owned by %s" % (token, reserved, owner)))
+
+          for path in sorted(RENDER_INPUTS):
+              if not path.is_file():
+                  errors.append((path, 0, "render input is missing"))
+              elif "__LOOPBACK_PORT__" not in path.read_text(encoding="utf-8"):
+                  errors.append((path, 0, "render input no longer carries __LOOPBACK_PORT__; "
+                                          "release.yml would have nothing to render"))
+
+          if errors:
+              for path, number, message in errors:
+                  print("::error file=%s,line=%s::%s" % (path, number or 1, message))
+              sys.exit(1)
+          print("Contract allocates loopback %d and subnet %s; every render input still "
+                "carries its token." % (PORT, SUBNET))
+          PY
+
+      - name: Release contract documents validate against the release schema
+        run: |
+          set -euo pipefail
+          # Nothing used to validate any release contract, which is exactly how a
+          # document that could never satisfy release/contract.schema.json (a
+          # top-level `workflow` key against additionalProperties:false, and no
+          # `invocation` object at all) survived in the release workflow. The same
+          # standard-library checker runs here against every committed contract
+          # document and there against the emitted one, so the schema is exercised
+          # on every pull request rather than only during a release.
+          python3 scripts/validate_release_contract.py \
+            --schema release/contract.schema.json \
+            --github \
+            release/contract.json \
+            release/contract.example.json
+
+      - name: No credential-shaped files are tracked
+        run: |
+          set -euo pipefail
+          if git ls-files | grep -Ei '(^|/)\.env($|\.)|\.(pem|key|p12|pfx|jks|keystore)$'; then
+            echo "::error::Credential-shaped files are tracked in Git. Remove them and rotate anything exposed."
+            exit 1
+          fi
+          echo "No credential-shaped files tracked."
