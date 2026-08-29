@@ -43,8 +43,8 @@ LESSONS = [
                      "is substituted. Predicates may have several variables: `Q(x, y)`.")),
             ("def", ("Domain of discourse",
                      "The <strong>domain</strong> is the set of values the variables range "
-                     "over. It is part of the statement: `∀x (x² ≥ 0)` is true over the "
-                     "reals and false over the complex numbers.")),
+                     "over. It is part of the statement: `∀x (x² ≥ x)` is true over the "
+                     "integers and false over the reals, where `x = ½` refutes it.")),
             ("def", ("Universal quantifier",
                      "`∀x P(x)` (\"for all `x`, `P(x)`\") is true when `P(c)` is true for "
                      "every `c` in the domain, and false as soon as one `c` makes it false.")),
@@ -86,7 +86,12 @@ LESSONS = [
             "preset": "le",
             "panel_title": "A predicate you can edit",
             "panel_intro": "The grid IS the predicate: cell `(x, y)` says whether "
-                           "`P(x, y)` holds. Every verdict is recomputed by walking it.",
+                           "`P(x, y)` holds, and every verdict is recomputed by walking it. "
+                           "Read only the first and last lines of the verdict table for "
+                           "now: `∀x ∀y` is this lesson's `∀` applied to every pair and "
+                           "`∃x ∃y` is its `∃`. One empty cell is enough to break the "
+                           "first; one full cell is all the second needs. The four mixed "
+                           "lines are lesson 9's, and they are the reason it exists.",
         }),
         "steps_title": "Translating into quantifiers",
         "steps_intro": "Domain first, predicate second, quantifier last.",
@@ -133,13 +138,15 @@ LESSONS = [
              "why": "Vacuously true: there is no `x` to serve as a counterexample. "
                     "Symmetrically `∃x P(x)` is false over the empty domain."},
             {"q": "How do you refute `∀x P(x)`?",
-             "a": ["Show `P(x)` fails for every `x`",
+             "a": ["Show that nobody has proved it",
                    "Exhibit one `c` in the domain with `P(c)` false",
                    "Show `∃x ¬P(x)` is false",
                    "Build a truth table"],
              "c": 1,
              "why": "One counterexample is a complete refutation of a universal claim. "
-                    "Showing it fails for every `x` proves something stronger than needed."},
+                    "That nobody has proved it says nothing about its value (lesson 1); "
+                    "showing `∃x ¬P(x)` false would PROVE it, not refute it; and a truth "
+                    "table has no rows to offer over an infinite domain."},
             {"q": "\"Some student passed\" is correctly written as:",
              "a": ["`∃x (Student(x) → Passed(x))`",
                    "`∀x (Student(x) → Passed(x))`",
@@ -780,10 +787,16 @@ LESSONS = [
         ],
         "lab": ("induction", {
             "statement": "div6",
-            "panel_title": "Check the claim you are about to prove",
-            "panel_intro": "Before proving `n³ − n` is divisible by 6, look at it. The lab "
-                           "confirms it for the `n` you can see; the proof is what covers "
-                           "the rest, and this lesson is about writing that proof.",
+            "panel_title": "Check a claim before you try to prove it",
+            "panel_intro": "`n³ − n` is divisible by 6 for every `n` the slider reaches, and "
+                           "the table is evidence about those `n` and nothing more. Try the "
+                           "direct proof after this lesson: `n³ − n = (n − 1) n (n + 1)`, "
+                           "and the attempt stalls at \"one of three consecutive integers "
+                           "is a multiple of 3\", which needs a split into cases. A stall "
+                           "like that is diagnostic &mdash; lesson 13 is about reading it "
+                           "&mdash; and lesson 14 finishes this claim. Ignore the "
+                           "\"inductive step\" line under the table for now: it is course "
+                           "3's vocabulary.",
         }),
         "steps_title": "Writing a direct proof",
         "steps_intro": "The first two steps are where proofs are won or lost.",
@@ -1175,7 +1188,9 @@ LESSONS = [
             "panel_title": "Two false statements to find",
             "panel_intro": "Two entries in the list are false and pass every check a "
                            "careful person would run. Push the slider until each breaks, "
-                           "and note how far it went first.",
+                           "and note how far it went first. The \"inductive step\" line "
+                           "under the table is course 3's answer to the problem this page "
+                           "poses; read it as a preview.",
         }),
         "steps_title": "Cases and counterexamples",
         "steps_intro": "Coverage for cases; a single instance for a counterexample.",
@@ -1251,12 +1266,18 @@ LESSONS = [
              "for a universal claim &mdash; it is not evidence of the right kind at all. "
              "Course 3 supplies what is."),
         ],
-        "standard": ("Finish when you can state, for any claim, what would refute it.",
+        "standard": ("Finish when you can state, for any claim, what would refute it, "
+                     "and prove one claim by cases.",
                      "That single habit &mdash; asking what a counterexample would look "
                      "like before trying to prove anything &mdash; is what this course "
                      "was for. It tells you whether to hunt for a proof or for a "
                      "counterexample, and it is the mechanical negation of lesson 10 put "
-                     "to work."),
+                     "to work. Then prove the claim lesson 12's lab showed you: for every "
+                     "integer `n`, `n³ − n` is divisible by 3. Write "
+                     "`n³ − n = (n − 1) n (n + 1)`, split into `n = 3k`, `n = 3k + 1` and "
+                     "`n = 3k + 2`, and say in each case which factor is the multiple of "
+                     "3. Divisibility by 6 adds the parity of this lesson's theorem and a "
+                     "fact about 2 and 3 that course 6 proves."),
         "note": "Course 3 supplies the technique this lesson leaves missing: induction "
                 "proves a statement for every natural number by proving one implication "
                 "rather than infinitely many cases. It is the answer to \"checking is not "

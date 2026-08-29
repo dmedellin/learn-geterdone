@@ -58,9 +58,14 @@ COURSE = {
         "Use the labs adversarially. Most of them let you type your own formula or edit "
         "the predicate. The fastest way to understand a claim is to spend two minutes "
         "trying to make it false and finding out you cannot.",
-        "Write the proofs out. The last four lessons each end with a claim to prove "
-        "yourself. Reading a proof and producing one are different skills, and only the "
-        "second transfers to the rest of the path.",
+        "Write the proofs out. Lesson 11 ends with an argument to check, and lessons 12 "
+        "to 14 each end with a claim to prove yourself. Reading a proof and producing one "
+        "are different skills, and only the second transfers to the rest of the path.",
+        "Do not be put off by the continuity and convergence definitions in lessons 9 "
+        "and 10. They are there because they are the hardest quantifier strings most "
+        "people ever meet, and the point of those lessons is that you can read and "
+        "negate them mechanically without knowing what they mean. Nothing on this path "
+        "needs the calculus.",
     ],
     "not_covered": [
         "Formal proof systems. This course teaches proof as mathematicians write it "

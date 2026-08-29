@@ -43,7 +43,7 @@ LESSONS = [
                      "A <strong>proposition</strong> is a declarative sentence that is "
                      "either true or false, but not both. Its <strong>truth value</strong> "
                      "is `T` or `F`.")),
-            ("p", "Three kinds of sentence fail this definition, and each fails for its "
+            ("p", "Four kinds of sentence fail this definition, and each fails for its "
                   "own reason."),
             ("ul", [
                 "<strong>Not declarative.</strong> \"What time is it?\" and \"Close the "
@@ -54,6 +54,9 @@ LESSONS = [
                 "<strong>Self-referentially paradoxical.</strong> \"This sentence is "
                 "false\" cannot be true (it would then be false) and cannot be false (it "
                 "would then be true). No truth value can be assigned consistently.",
+                "<strong>Vague.</strong> \"He is tall\" has no boundary on which to be "
+                "true or false. That is a different failure from not knowing the value, "
+                "and the paragraph after next is about the difference.",
             ]),
             ("p", "The third exclusion is not a technicality. It is the reason logic is "
                   "built on a restricted class of sentences rather than on English: the "
@@ -390,8 +393,8 @@ LESSONS = [
                   "course 8 returns to it by name."),
         ],
         "lab": ("truth_table", {
-            "formulas": ["~(p & q)", "~p | ~q", "p -> q", "~p | q", "p & (q | r)",
-                         "(p & q) | (p & r)", "(p | q) & r", "p | (q & r)"],
+            "formulas": ["~(p & q)", "~p | ~q", "~p | (q & r)", "(p | q) & ~(q & r)",
+                         "p & (q | r)", "(p & q) | (p & r)", "(p | q) & r", "(p ^ q) & ~r"],
             "compare_with": "~p | ~q",
             "panel_title": "Build any table",
             "panel_intro": "Every subexpression gets its own column, evaluated inside "
@@ -415,25 +418,29 @@ LESSONS = [
              "&mdash; the vocabulary of lesson 6."),
         ],
         "worked": {
-            "title": "`p → (q ∨ r)`, in full",
-            "intro": ["Three variables, so eight rows, and two subexpression columns."],
+            "title": "`¬p ∨ (q ∧ r)`, in full",
+            "intro": ["Three variables, so eight rows, and two subexpression columns: `¬p` "
+                      "and `q ∧ r`, then the disjunction of the two."],
             "lines": [
-                "p  q  r  |  q∨r  |  p → (q∨r)",
-                "-------------------------------",
-                "T  T  T  |   T   |     T",
-                "T  T  F  |   T   |     T",
-                "T  F  T  |   T   |     T",
-                "T  F  F  |   F   |     F   ← the only false row",
-                "F  T  T  |   T   |     T",
-                "F  T  F  |   T   |     T",
-                "F  F  T  |   T   |     T",
-                "F  F  F  |   F   |     T   ← false hypothesis, true conditional",
+                "p  q  r  |  ¬p   q∧r  |  ¬p ∨ (q∧r)",
+                "---------------------------------------",
+                "T  T  T  |  F     T   |      T",
+                "T  T  F  |  F     F   |      F   ← p true, q∧r false",
+                "T  F  T  |  F     F   |      F",
+                "T  F  F  |  F     F   |      F",
+                "F  T  T  |  T     T   |      T",
+                "F  T  F  |  T     F   |      T   ← ¬p alone carries it",
+                "F  F  T  |  T     F   |      T",
+                "F  F  F  |  T     F   |      T",
             ],
             "after": [
-                "Two rows deserve attention. Row 4 is the only way to make a conditional "
-                "false: true hypothesis, false conclusion. Row 8 is the one that surprises "
-                "people &mdash; `p` is false, so the conditional is true regardless of "
-                "what `q ∨ r` does. Lesson 4 explains why that convention is the right one."
+                "Read the shape of the last column. When `p` is false, `¬p` is true and "
+                "the disjunction is true whatever `q` and `r` do &mdash; four rows settled "
+                "by one column. When `p` is true everything rests on `q ∧ r`, and only the "
+                "row where both hold survives. Keep this column: lesson 4 introduces a "
+                "connective, `→`, whose table is exactly this one, and the rows that "
+                "surprise people there are the four you have just filled in without "
+                "surprise."
             ],
         },
         "quiz_title": "Reading and building tables",
@@ -473,9 +480,9 @@ LESSONS = [
         ],
         "standard": ("Finish when you can build a three-variable table without hesitating "
                      "over the row pattern.",
-                     "Take `(p → q) ∧ (q → r)` and produce all eight rows with the two "
-                     "conditionals as separate columns. If the row pattern is automatic, "
-                     "the rest of this course is bookkeeping."),
+                     "Take `(p ∨ q) ∧ ¬(q ∧ r)` and produce all eight rows with `p ∨ q`, "
+                     "`q ∧ r` and `¬(q ∧ r)` as separate columns. If the row pattern is "
+                     "automatic, the rest of this course is bookkeeping."),
         "note": "The lab's subexpression columns are generated from the parsed formula, "
                 "so they appear in evaluation order rather than in an order someone chose. "
                 "That is also why an ill-formed formula is rejected rather than guessed at.",
@@ -630,7 +637,7 @@ LESSONS = [
                     "two English phrases point opposite ways."},
         ],
         "mistakes": [
-            ("Affirming the converse",
+            ("Using the converse as if it were the original",
              "From `p → q` and `q`, nothing follows about `p`. This is the error behind "
              "most bad reasoning from evidence, and lesson 11 names it as a fallacy."),
             ("Finding vacuous truth absurd and rejecting it",
@@ -643,10 +650,11 @@ LESSONS = [
         ],
         "standard": ("Finish when you can write all three relatives of a conditional and "
                      "say which is equivalent, without a table.",
-                     "Given \"if a function is differentiable then it is continuous\", "
+                     "Given \"if `n` is a multiple of 10 then `n` is a multiple of 5\", "
                      "produce the converse, inverse and contrapositive, and identify "
-                     "which are true. The habit of forming the contrapositive is what "
-                     "lesson 13 turns into a proof technique."),
+                     "which are true &mdash; one integer settles the two that are not. "
+                     "The habit of forming the contrapositive is what lesson 13 turns "
+                     "into a proof technique."),
         "note": "`p → q ≡ ¬p ∨ q` is worth memorising: it converts every conditional into "
                 "a disjunction and is how conditionals are eliminated when a formula is "
                 "put into the normal forms of lesson 7.",
@@ -738,7 +746,9 @@ LESSONS = [
             "panel_title": "Prove or refute an equivalence",
             "panel_intro": "In compare mode the lab highlights any row that separates the "
                            "two formulas. No highlighted row means equivalent; one is a "
-                           "complete disproof.",
+                           "complete disproof. Then set A to `~(p & q)` and B to "
+                           "`~p & ~q` &mdash; the error lesson 2 warned about &mdash; and "
+                           "read the two rows that separate them.",
         }),
         "steps_title": "Proving an equivalence",
         "steps_intro": "Two routes. Choose by the number of variables.",
@@ -782,10 +792,13 @@ LESSONS = [
              "a": ["Show they have different connectives",
                    "Show they differ in at least half the rows",
                    "Exhibit one assignment where their values differ",
-                   "Show `A` is a tautology and `B` is not"],
+                   "Show that `A` and `B` are both contingent"],
              "c": 2,
              "why": "Equivalence requires agreement in every row, so one disagreeing row "
-                    "refutes it completely. Nothing more is needed or helps."},
+                    "refutes it completely. Different connectives prove nothing (`p → q` "
+                    "and `¬p ∨ q`), a count of rows is beside the point, and two "
+                    "contingent formulas can still agree everywhere &mdash; `p` and "
+                    "`p ∧ (p ∨ q)` are both contingent and equivalent."},
             {"q": "`¬(p → q)` simplifies to:",
              "a": ["`¬p → ¬q`", "`p ∧ ¬q`", "`¬p ∨ q`", "`q → p`"],
              "c": 1,
@@ -866,9 +879,9 @@ LESSONS = [
                      "`A ≡ B` if and only if `A ↔ B` is a tautology. Lesson 5's whole "
                      "subject is therefore a special case of this lesson's.")),
             ("p", "Deciding satisfiability by truth table takes `2ⁿ` rows. For a formula "
-                  "with 100 variables &mdash; small by the standards of real applications "
-                  "&mdash; that is more rows than there are atoms in the observable "
-                  "universe, and no faster general method is known."),
+                  "with 300 variables &mdash; small by the standards of real applications "
+                  "&mdash; that is `2³⁰⁰` rows, more than there are atoms in the "
+                  "observable universe, and no faster general method is known."),
             ("thm", ("SAT is NP-complete (Cook, 1971)",
                      "The problem of deciding whether a propositional formula is "
                      "satisfiable was the first problem shown NP-complete. Course 8 "
@@ -952,6 +965,14 @@ LESSONS = [
              "why": "It is perfectly decidable &mdash; just exponentially so by the "
                     "obvious method. Undecidability is a different phenomenon, and course "
                     "8 lesson 12 meets it."},
+            {"q": "Which assignment shows that `(p ∨ q) → (p ∧ q)` is not a tautology?",
+             "a": ["`p = T, q = T`", "`p = T, q = F`", "`p = F, q = F`",
+                   "None &mdash; it is a tautology"],
+             "c": 1,
+             "why": "Assume the conditional false: `p ∨ q` true and `p ∧ q` false, so "
+                    "exactly one of `p`, `q` holds. `p = T, q = F` is such a row (so is "
+                    "its mirror). At `T, T` and at `F, F` the two sides agree, the "
+                    "conditional is true, and neither row refutes anything."},
         ],
         "mistakes": [
             ("Confusing satisfiable with true",
@@ -1129,6 +1150,14 @@ LESSONS = [
                     "is a clean constraint the solver propagates. Note satisfiability of "
                     "a DNF <em>is</em> trivial &mdash; check one term &mdash; but "
                     "converting to DNF can blow up exponentially."},
+            {"q": "A formula in `p`, `q` is false in exactly one row, `p = T, q = F`. Its canonical CNF is:",
+             "a": ["`p ∨ ¬q`", "`¬p ∨ q`", "`p ∧ ¬q`", "`¬p ∧ q`"],
+             "c": 1,
+             "why": "One false row, so one clause, and the clause must be FALSE exactly "
+                    "there: each literal is negated relative to the row, giving `¬p ∨ q`. "
+                    "`p ∨ ¬q` has the polarity backwards and is false at `F, T` instead; "
+                    "`p ∧ ¬q` is the DNF term that is TRUE only in that row &mdash; the "
+                    "right row with the wrong job; `¬p ∧ q` is a term for a different row."},
         ],
         "mistakes": [
             ("Getting the polarity backwards in CNF",
@@ -1136,9 +1165,9 @@ LESSONS = [
              "NEGATIVE literal. Reversing this produces a formula false in all the wrong "
              "places."),
             ("Assuming the canonical form is minimal",
-             "The canonical DNF of a formula true in seven of eight rows has seven terms; "
-             "an equivalent one-term formula may exist. Canonical and small are different "
-             "goals."),
+             "The canonical DNF of a formula true in seven of eight rows has seven terms "
+             "of three literals each. The same formula is `¬p ∨ ¬q ∨ ¬r` &mdash; its one "
+             "false row, ruled out by one clause. Canonical and small are different goals."),
             ("Believing conversion is always cheap",
              "Converting CNF to DNF can multiply the size exponentially. That the two "
              "forms always exist says nothing about the cost of getting between them."),
