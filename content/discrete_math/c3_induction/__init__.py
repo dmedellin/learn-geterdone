@@ -27,8 +27,8 @@ COURSE = {
     "assumes_short": "Courses 1–2",
     "assumes_long": "proof technique and set notation",
     "outcomes_intro": (
-        "By the end you can prove a statement about every natural number, and solve "
-        "the recurrences course 8 will produce."
+        "By the end you can prove a statement about every natural number, solve the "
+        "recurrences course 8 will produce, and prove an algorithm does what it claims."
     ),
     "outcomes": [
         ("Write a correct induction proof",
@@ -43,6 +43,11 @@ COURSE = {
         ("Solve a recurrence",
          "Linear homogeneous by characteristic roots, nonhomogeneous by a particular "
          "solution, and divide-and-conquer by the master theorem."),
+        ("Prove an algorithm correct",
+         "Termination by a quantity that strictly decreases and is bounded below, and "
+         "correctness by strong induction on the input for a recursion or by an "
+         "invariant for a loop &mdash; the two obligations of lessons 8 and 12, neither "
+         "of which is worth anything alone."),
     ],
     "syllabus_intro": (
         "Lessons 1 to 5 are induction, 6 to 8 recursion, 9 to 11 recurrences, and 12 "
@@ -53,7 +58,8 @@ COURSE = {
         "inductive hypothesis was used. A step that never invokes `P(k)` is not an "
         "induction proof, however true its conclusion.",
         "Spend real time in lesson 1's lab. Two of its statements are false and survive "
-        "dozens of checks; meeting them is the reason this course exists.",
+        "dozens of checks; meeting them is the reason this course exists. Lessons 2 and "
+        "5 name them, so look before then.",
         "Do the recurrence arithmetic by hand once per lesson before using the lab. "
         "The lab compares your closed form against the iteration, which is only useful "
         "if you produced a closed form to compare.",
@@ -61,7 +67,7 @@ COURSE = {
     "not_covered": [
         "Transfinite induction and induction over ordinals. Everything here is "
         "induction over `ℕ` or over a well-founded recursive structure.",
-        "Generating functions as a recurrence-solving technique. Course 4 lesson 13 "
+        "Generating functions as a recurrence-solving technique. Course 4 lesson 12 "
         "introduces them for counting; using them to solve recurrences is a natural "
         "next step this path does not take.",
         "Formal verification tools. Lesson 12 writes loop invariants as mathematics, "

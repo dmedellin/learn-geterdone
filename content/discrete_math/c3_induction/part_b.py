@@ -149,14 +149,18 @@ LESSONS = [
              "c": 1,
              "why": "Base clauses give base cases and recursive clauses give inductive "
                     "steps. Skipping one leaves a family of objects unproved."},
-            {"q": "For a tree `node(v, L, R)`, the inductive hypothesis is:",
+            {"q": "In a structural induction over binary trees, the inductive hypothesis "
+                  "for `node(v, L, R)` is:",
              "a": ["the claim for `L` only",
                    "the claim for the whole tree",
                    "the claim for both `L` and `R`",
-                   "the claim for trees of smaller height"],
+                   "the claim for the root value `v`"],
              "c": 2,
              "why": "The object is built from both subtrees, so both are available as "
-                    "hypotheses &mdash; and the proof will generally need both."},
+                    "hypotheses &mdash; and the proof will generally need both. `L` alone "
+                    "leaves `R` unproved, which is the second mistake below; the whole tree "
+                    "is what is to be proved; and `v` is a value, not a tree, so the claim "
+                    "says nothing about it."},
             {"q": "Structural induction is valid because:",
              "a": ["it is an axiom",
                    "every object is built from a base in finitely many steps",
@@ -287,7 +291,12 @@ LESSONS = [
             "panel_title": "Binary search, counted",
             "panel_intro": "The comparison counts are produced by running both searches. "
                            "The binary column matches `⌊log₂n⌋ + 1` exactly, which is the "
-                           "termination argument turned into a bound.",
+                           "termination argument turned into a bound: at `n = 32` the "
+                           "counted worst cases are 32 and 6. The array the lab searches "
+                           "is sorted, which is what the correctness half of the proof "
+                           "needs and the termination half does not &mdash; on unsorted "
+                           "data the count would be the same and the answer wrong, which "
+                           "is the third quiz question.",
         }),
         "steps_title": "Proving a recursive algorithm correct",
         "steps_intro": "Termination first, then correctness assuming the calls.",
@@ -373,8 +382,9 @@ LESSONS = [
         "standard": ("Finish when you can discharge both obligations in a paragraph.",
                      "Write a recursive algorithm computing the `n`th Fibonacci number, "
                      "prove it terminates and prove it correct. Then count the calls it "
-                     "makes: the naive version makes exponentially many, which lesson 11 "
-                     "and course 8 both return to."),
+                     "makes: the naive version makes exponentially many &mdash; about `φⁿ`, "
+                     "the root lesson 10 finds for this recurrence &mdash; and course 8 "
+                     "lesson 10 returns to fix that."),
         "note": "The naive recursive Fibonacci makes about `1.6ⁿ` calls because it "
                 "recomputes the same subproblems repeatedly. Storing results &mdash; "
                 "memoisation &mdash; drops it to `n` calls, and that observation is the "
@@ -474,7 +484,12 @@ LESSONS = [
             "panel_title": "Set up, unroll, compare",
             "panel_intro": "Each preset shows the recurrence unrolled beside its closed "
                            "form. The note under the status line explains where the closed "
-                           "form came from &mdash; which is lessons 10 and 11.",
+                           "form came from &mdash; which is lessons 10 and 11. The Tower of "
+                           "Hanoi here starts at `a₀ = 0` rather than the lesson's `H₁ = 1` "
+                           "and agrees from `a₁` on. Then select `aₙ = aₙ₋₁ + n`: it "
+                           "unrolls to 0, 1, 3, 6, 10, 15, the triangular numbers, and its "
+                           "closed form is lesson 3's first identity arrived at from the "
+                           "other direction.",
         }),
         "steps_title": "Setting up a recurrence",
         "steps_intro": "Find the last decision; everything before it is a smaller instance.",
@@ -531,7 +546,8 @@ LESSONS = [
              "a": ["One", "Two", "Three", "It depends on the coefficients"],
              "c": 2,
              "why": "The recurrence reaches back three places, so the first three terms "
-                    "must be supplied before it can compute anything."},
+                    "must be supplied before it can compute anything. The coefficients "
+                    "change the values it computes, never how many it needs."},
             {"q": "In deriving a counting recurrence, splitting by the last character requires:",
              "a": ["the classes to be equal in size",
                    "the classes to be exhaustive and non-overlapping",
@@ -617,6 +633,15 @@ LESSONS = [
                   "conditions. Substituting `n rⁿ` into the recurrence and using "
                   "`c₁ = 2r`, `c₂ = −r²` (which is what a repeated root means) confirms it "
                   "is also a solution."),
+            ("example", ("A repeated root, solved",
+                         "`aₙ = 4aₙ₋₁ − 4aₙ₋₂`, `a₀ = 1`, `a₁ = 4`. Characteristic "
+                         "`r² − 4r + 4 = (r − 2)² = 0`, so `aₙ = (A + Bn)2ⁿ`. From "
+                         "`a₀ = 1`: `A = 1`. From `a₁ = 4`: `(1 + B) · 2 = 4`, so `B = 1`, "
+                         "and `aₙ = (n + 1)2ⁿ`. Check at `a₂`, which the fitting did not "
+                         "use: formula `3 · 4 = 12`; recurrence `4 · 4 − 4 · 1 = 12`. Had "
+                         "the `n` been forgotten, `A·2ⁿ + B·2ⁿ` is one constant `C·2ⁿ`, "
+                         "and `a₀` demands `C = 1` while `a₁` demands `C = 2` &mdash; the "
+                         "contradiction is how the missing factor announces itself.")),
             ("example", ("Fibonacci, solved",
                          "`Fₙ = Fₙ₋₁ + Fₙ₋₂` gives `r² = r + 1`, so `r = (1 ± √5)/2`. "
                          "Writing `φ` and `ψ` for the two roots, `Fₙ = Aφⁿ + Bψⁿ`. From "
@@ -653,7 +678,13 @@ LESSONS = [
             "panel_title": "Roots, and the solution they build",
             "panel_intro": "Each preset shows its characteristic equation and the "
                            "constants fitted to the initial conditions. The iterated "
-                           "column and the closed-form column are computed independently.",
+                           "column and the closed-form column are computed independently. "
+                           "The default is the worked example below, `A = −2`, `B = 3`. "
+                           "Then select the repeated root `4aₙ₋₁ − 4aₙ₋₂`: the closed form "
+                           "reads `(A + Bn)·2ⁿ` with `A = 1`, `B = 1`, the example above. "
+                           "The triangular preset `aₙ = aₙ₋₁ + n` is the collision row of "
+                           "the table: the only root is 1 and `f(n) = n` is a polynomial, "
+                           "so the particular solution is quadratic, `n(n+1)/2`.",
         }),
         "steps_title": "Solving a linear recurrence",
         "steps_intro": "Homogeneous part first, then a particular solution, then fit.",
@@ -704,7 +735,10 @@ LESSONS = [
                    "`r² = 4r + 4`"],
              "c": 0,
              "why": "`(r − 2)² = 0`, a repeated root, so the general solution is "
-                    "`(A + Bn)2ⁿ` rather than `A·2ⁿ + B·2ⁿ`."},
+                    "`(A + Bn)2ⁿ` rather than `A·2ⁿ + B·2ⁿ`. `r² = 4r + 4` is the equation "
+                    "of `aₙ = 4aₙ₋₁ + 4aₙ₋₂`, the sign of `c₂` lost; `r² + 4r − 4 = 0` "
+                    "belongs to `aₙ = −4aₙ₋₁ + 4aₙ₋₂`; and `r = 4` is the first-order "
+                    "`aₙ = 4aₙ₋₁`."},
             {"q": "Why does a repeated root need the extra factor of `n`?",
              "a": ["To make the sequence grow faster",
                    "One root gives only one free constant, and two initial conditions need two",
@@ -717,7 +751,9 @@ LESSONS = [
              "a": ["`A`", "`A·2ⁿ`", "`A n 2ⁿ`", "`An + B`"],
              "c": 1,
              "why": "`f(n) = 2ⁿ` and 2 is not a root (the only root is 3), so `A·2ⁿ` works "
-                    "without modification. The `n` factor is needed only on collision."},
+                    "without modification; substituting gives `2A = 3A + 2`, `A = −2`. "
+                    "`A n 2ⁿ` is the guess for `aₙ = 2aₙ₋₁ + 2ⁿ`, where 2 is the root; "
+                    "`An + B` matches a linear forcing term and `A` a constant one."},
         ],
         "mistakes": [
             ("Forgetting the `n` on a repeated root",
@@ -754,9 +790,9 @@ LESSONS = [
         ),
         "key": [
             "T(n) = a T(n/b) + nᵈ",
-            "log_b a < d   ⟹  T(n) = Θ(nᵈ)              root dominates",
-            "log_b a = d   ⟹  T(n) = Θ(nᵈ log n)        every level equal",
-            "log_b a > d   ⟹  T(n) = Θ(n^{log_b a})     leaves dominate",
+            "case 1   log_b a < d   ⟹  T(n) = Θ(nᵈ)              root dominates",
+            "case 2   log_b a = d   ⟹  T(n) = Θ(nᵈ log n)        every level equal",
+            "case 3   log_b a > d   ⟹  T(n) = Θ(n^{log_b a})     leaves dominate",
         ],
         "key_label": "One comparison, three cases",
         "concepts_intro": (
@@ -796,10 +832,22 @@ LESSONS = [
                   "depends entirely on whether that ratio is less than, equal to, or "
                   "greater than 1, and `a/bᵈ` compared with 1 is `log_b a` compared with "
                   "`d`. That is the whole theorem."),
+            ("def", ("The Θ notation, as much as is needed here",
+                     "`T(n) = Θ(g(n))` means `T(n)` is trapped between two positive "
+                     "constant multiples of `g(n)` for all large enough `n`: "
+                     "`c₁ g(n) ≤ T(n) ≤ c₂ g(n)` once `n` is past some threshold. It names "
+                     "a growth rate and discards the constants. Course 8 lesson 4 makes "
+                     "this precise and works with it; here it is only the shape of the "
+                     "answer the theorem reports.")),
             ("thm", ("Master theorem (polynomial form)",
                      "Let `T(n) = aT(n/b) + Θ(nᵈ)` with `a ≥ 1`, `b &gt; 1`, `d ≥ 0`. Then "
                      "`T(n) = Θ(nᵈ)` if `log_b a &lt; d`; `T(n) = Θ(nᵈ log n)` if "
                      "`log_b a = d`; and `T(n) = Θ(n^{log_b a})` if `log_b a &gt; d`.")),
+            ("p", "The cases are numbered here in the order of the comparison &mdash; "
+                  "less, equal, greater &mdash; so case 1 is the root dominating and case "
+                  "3 the leaves, and the lab below and course 8 use the same numbering. "
+                  "Some texts number them the other way round. When there is any doubt, "
+                  "name a case by what dominates rather than by its number."),
             ("example", ("Merge sort",
                          "`T(n) = 2T(n/2) + n`: `a = 2`, `b = 2`, `d = 1`, `log₂2 = 1 = d`. "
                          "Balanced case, so `Θ(n log n)`. Every level does `n` units of "
@@ -829,7 +877,11 @@ LESSONS = [
             "mode": "master",
             "panel_title": "The three cases, tabulated",
             "panel_intro": "Each row computes `log_b a` and compares it with `d`. The case "
-                           "is decided by that one comparison and nothing else.",
+                           "is decided by that one comparison and nothing else, and the "
+                           "lab numbers the cases as this lesson does: 1 root, 2 balanced, "
+                           "3 leaves. The last row, `a = 2`, `b = 4`, `d = 1`, has "
+                           "`log₄ 2 = 0.5 &lt; 1` and is the standard's case: "
+                           "`3T(n/4) + n` has `log₄ 3 ≈ 0.79` and lands in the same one.",
         }),
         "steps_title": "Applying the master theorem",
         "steps_intro": "Read off `a`, `b`, `d`, then compare.",
@@ -875,7 +927,9 @@ LESSONS = [
              "a": ["Case 1, `Θ(n)`", "Case 2, `Θ(n log n)`",
                    "Case 3, `Θ(n²)`", "The theorem does not apply"],
              "c": 2,
-             "why": "`log₂4 = 2 &gt; 1 = d`, so the leaves dominate and `T(n) = Θ(n²)`."},
+             "why": "`log₂4 = 2 &gt; 1 = d`, so the leaves dominate and `T(n) = Θ(n²)`. "
+                    "`Θ(n)` would need `log₂4 &lt; 1` and the balanced case would need "
+                    "equality; the theorem does apply, since `f(n) = n¹` is a polynomial."},
             {"q": "In the balanced case, why does `log n` appear?",
              "a": ["Because the input is halved",
                    "Because every level does the same work and there are `log_b n` levels",
@@ -898,7 +952,9 @@ LESSONS = [
              "`a` counts subproblems, `b` is the shrink factor. `T(n) = 2T(n/3) + n` has "
              "`a = 2`, `b = 3`, and swapping them gives the wrong case."),
             ("Applying the polynomial form to a non-polynomial `f`",
-             "`f(n) = n log n` falls between cases 2 and 3 and needs the general statement. "
+             "`f(n) = n log n` falls between the balanced case and the case where the root "
+             "dominates &mdash; it outgrows `n^{log_b a}` but not by a power of `n` &mdash; "
+             "and needs the general statement. "
              "Forcing it into the version here gives a wrong answer."),
             ("Reading `Θ` as a statement about real running time",
              "It describes asymptotic growth. An algorithm with a better exponent and a "
@@ -1021,9 +1077,16 @@ LESSONS = [
         "lab": ("algorithm", {
             "mode": "sort", "n": 20,
             "panel_title": "Insertion sort, counted",
-            "panel_intro": "The insertion sort column is the one that varies with the "
-                           "data: its inner loop stops early on nearly sorted input. Bubble "
-                           "sort's count does not depend on the data at all.",
+            "panel_intro": "This lab counts comparisons, which is course 8's question and "
+                           "not a proof of anything &mdash; a wrong sort could make exactly "
+                           "as many. What it does show is the inner `while` loop of the "
+                           "insertion sort above stopping at the gap: at `n = 20` on the "
+                           "lab's fixed shuffle, bubble sort makes `190 = 20 · 19 / 2` "
+                           "comparisons, insertion sort 112 and merge sort 66, and only the "
+                           "middle figure would change on a different permutation. The "
+                           "invariant is indifferent to it: `A[0..j]` is sorted and holds "
+                           "the same elements however many comparisons the inner loop took "
+                           "to find the gap.",
         }),
         "steps_title": "Proving a loop correct",
         "steps_intro": "State the invariant before writing anything else.",
@@ -1095,7 +1158,9 @@ LESSONS = [
                    "the invariant holds initially"],
              "c": 1,
              "why": "Termination is a separate obligation. A partially correct loop that "
-                    "never exits is of no use."},
+                    "never exits is of no use. \"Correct on some inputs\" is the everyday "
+                    "reading the term exists to displace: partial refers to the missing "
+                    "termination proof, not to a subset of inputs."},
         ],
         "mistakes": [
             ("An invariant too weak to give the postcondition",
