@@ -33,6 +33,8 @@ const LOGIC_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'logic.py');
 const logicSrc = fs.readFileSync(LOGIC_SOURCE, 'utf8');
 const COUNTING_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'counting.py');
 const countingSrc = fs.readFileSync(COUNTING_SOURCE, 'utf8');
+const PROB_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'probability.py');
+const probSrc = fs.readFileSync(PROB_SOURCE, 'utf8');
 
 /* Each block is  NAME = r"""..."""  in the Python module. */
 function blockFrom(text, name, where) {
@@ -43,6 +45,7 @@ function blockFrom(text, name, where) {
 function block(name) { return blockFrom(src, name, SOURCE); }
 function logicBlock(name) { return blockFrom(logicSrc, name, LOGIC_SOURCE); }
 function countingBlock(name) { return blockFrom(countingSrc, name, COUNTING_SOURCE); }
+function probBlock(name) { return blockFrom(probSrc, name, PROB_SOURCE); }
 
 let fails = 0;
 function eq(got, want, label) {
@@ -393,6 +396,75 @@ console.log('counting in BigInt (course 4 labs)');
   eq(ratioDigits(1n, 3n, 4), '0.3333', 'ratioDigits pads and truncates correctly');
   eq(ratioDigits(0n, 1n, 7), '0.0000000', 'ratioDigits at zero');
   eq(ratioDigits(1n, 2n, 3), '0.500', 'ratioDigits at one half');
+}
+
+// ---------------------------------------------------------- probability
+console.log('probability as exact fractions and summed distributions (course 5 labs)');
+{
+  /* The course-5 footer promises every probability is an exact fraction from
+     the enumerated sample space, and that the distributions are summed term by
+     term and compared with the closed forms. The functions below are the
+     shipped ones, extracted from probability.py. The geometric case is the one
+     that failed: a sum stopped at thirty terms reads 5.848 against a closed
+     form of 6 at p = 1/6, and the lab printed both side by side. */
+  eval(probBlock('FRACTION_JS') + probBlock('DIST_JS') + probBlock('BAYES_JS'));
+
+  eq(frac(6, 36).text, '1/6', '6/36 reduces to 1/6');
+  eq(frac(0, 15).text, '0', 'an empty event is 0, not 0/15');
+  eq(frac(15, 15).text, '1', 'the whole space is 1');
+  eq(frac(3, 0).text, 'undefined', 'conditioning on an empty event is undefined');
+  eq(pct(frac(1, 6)), '16.67%', 'pct rounds to two places');
+  eq(frac(18 * 6, 36 * 36).text, '1/12', 'P(A)·P(B) for first-even and sum-7, the lesson-5 pair');
+
+  eq(comb(52, 5), 2598960, 'C(52,5) in doubles is still exact');
+  eq(comb(20, 5), 15504, 'C(20,5)');
+
+  const bin = binomialPmf(20, 0.25), mb = moments(bin.ks, bin.probs);
+  near(bin.probs[5], 0.2023311518569244, 1e-12, 'P(X = 5) at n = 20, p = 1/4 (lesson 11 worked example)');
+  near(mb.E, 5, 1e-12, 'E[X] summed = np = 5');
+  near(mb.V, 3.75, 1e-12, 'Var(X) summed = np(1-p) = 3.75');
+  near(mb.total, 1, 1e-12, 'the binomial sums to 1');
+  near(bin.probs.slice(10).reduce((s, x) => s + x, 0), 0.01386441694376117, 1e-12, 'P(X >= 10) = 0.0139');
+  const bin10 = binomialPmf(10, 0.5);
+  near(bin10.probs[5], 0.24609375, 1e-15, 'P(exactly 5 heads in 10) = 252/1024');
+  near(moments(bin10.ks, bin10.probs).E, 5, 1e-12, 'E[X] = 5 at n = 10, p = 1/2 (lesson 9 preset)');
+
+  const K = geometricTerms(1 / 6);
+  eq(K > 30, true, 'the geometric sum runs past the thirty drawn bars');
+  eq(Math.pow(5 / 6, K) < 1e-15, true, 'and stops only when the tail is below 1e-15');
+  const geo = geometricPmf(1 / 6, K), mg = moments(geo.ks, geo.probs);
+  near(geo.probs[0], 1 / 6, 1e-15, 'P(X = 1) = 1/6, the mode');
+  near(geo.probs[5], 0.06697959533607682, 1e-15, 'P(X = 6) = (5/6)^5 / 6');
+  near(mg.E, 6, 1e-9, 'E[X] summed = 1/p = 6 (lesson 12 worked example)');
+  near(mg.V, 30, 1e-6, 'Var(X) summed = (1-p)/p^2 = 30');
+  near(mg.total, 1, 1e-12, 'the geometric sums to 1');
+  near(moments(geo.ks.slice(0, 30), geo.probs.slice(0, 30)).E, 5.848342071608853, 1e-9,
+       'thirty terms alone give 5.848 -- the figure the lab used to print beside 6');
+  const geo12 = geometricPmf(1 / 12, geometricTerms(1 / 12)), mg12 = moments(geo12.ks, geo12.probs);
+  near(mg12.E, 12, 1e-9, 'E[X] = 12 at the smallest p the slider allows');
+  near(mg12.V, 132, 1e-6, 'Var(X) = 132 there');
+
+  const uni = uniformPmf(6), mu = moments(uni.ks, uni.probs);
+  near(mu.E, 3.5, 1e-12, 'a fair die: E[X] = 3.5 (lesson 8 preset)');
+  near(mu.V, 35 / 12, 1e-12, 'a fair die: Var(X) = 35/12 (lesson 10)');
+  const dice = diceSumPmf(), md = moments(dice.ks, dice.probs);
+  eq(dice.probs.map((x) => Math.round(x * 36)).join(','), '1,2,3,4,5,6,5,4,3,2,1', 'the triangle over 36 (lesson 7 table)');
+  near(md.E, 7, 1e-12, 'sum of two dice: E[X] = 7');
+  near(md.V, 35 / 6, 1e-12, 'sum of two dice: Var(X) = 35/6, the lesson-10 worked example by another route');
+
+  const cells = bayesCounts(1000000, 1000, 99, 5);
+  eq([cells.D, cells.TP, cells.FN, cells.H, cells.FP, cells.TN].join(','), '1000,990,10,999000,49950,949050',
+     'the four cells at 1 in 1000, 99%, 5%');
+  eq(cells.posterior.text, '11/566', 'P(D|+) = 990/50940 = 11/566');
+  near(cells.posterior.dec, 0.019434628975265017, 1e-15, 'about 2%, the lesson-6 answer');
+  near(cells.npv.dec, 949050 / 949060, 1e-15, 'P(no D | -) from the same cells');
+  eq(bayesCounts(1000000, 300000, 99, 5).posterior.text, '297/332', 'the worked example: prior 0.30 gives 297/332 = 0.895');
+  eq(bayesCounts(1000000, 20000, 95, 10).posterior.text, '19/117', 'the standard: 2%, 95%, 10% gives 19/117');
+  const rare = bayesCounts(1000000, 100, 99, 1);
+  eq(rare.FP / rare.TP, 101, 'concept 3: 1 in 10 000 at a 1% false-positive rate is about 100 false positives per true one');
+  eq(grp(50940), '50 940', 'digit grouping');
+  eq(dec(990, 1000000), '0.00099', 'decimals are printed without trailing zeros');
+  eq(dec(99, 100), '0.99', 'and a percentage as its decimal');
 }
 
 if (fails) {

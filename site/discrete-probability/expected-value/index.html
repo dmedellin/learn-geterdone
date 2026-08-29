@@ -1168,7 +1168,7 @@ E[aX + b] = a·E[X] + b</div>
         </article>
         <aside class="card side-panel" aria-live="polite">
           <h3>Summed, then compared</h3>
-          <p><span class="math">E[X]</span> is computed by summing <span class="math">k·P(X = k)</span> down the table, and shown beside the closed form. The dashed line marks it on the distribution &mdash; often between two bars.</p>
+          <p>The lab opens on the fair die &mdash; Uniform on <span class="math">1 … 6</span> &mdash; and sums the <span class="math">k·P(X = k)</span> column: <span class="math">1/6 + 2/6 + ⋯ + 6/6 = 3.5000</span>, the <span class="math">E[X] summed</span> figure, beside the closed form <span class="math">(n + 1)/2 = 7/2</span>. There is no 3.5 in the <span class="math">k</span> column, and the dashed line falls between the bars for 3 and 4: the lesson's first caution, visible. The <span class="math">Var(X)</span> figure is lesson 10's. Then switch to the sum of two fair dice: <span class="math">7.0000</span>, this time a value the sum can take, because being attainable is a property of the distribution and not of expectation.</p>
         <div class="field">
           <label for="dsKind">Distribution</label>
           <select id="dsKind">
@@ -1322,7 +1322,7 @@ average approaches the expectation — which is lesson 10&#x27;s subject.</div><
         + '. Your completion ticks can follow you to another device.');
       a.classList.add('is-in');
     }());
-  var QUIZ = [{"q": "<span class=\"math\">E[X]<\/span> for a fair six-sided die is:", "a": ["3", "3.5", "4", "6"], "c": 1, "why": "<span class=\"math\">(1+2+3+4+5+6)/6 = 3.5<\/span>. It is not a value the die can show, which is normal for an average."}, {"q": "<span class=\"math\">E[X] = 2.7<\/span>. What does that tell you about the most likely value?", "a": ["It is 3", "It is 2.7", "Nothing directly", "It is 2 or 3"], "c": 2, "why": "The mean and the mode are different summaries. A distribution with mean 2.7 can easily have its highest probability at 1."}, {"q": "<span class=\"math\">E[X\u00b2]<\/span> versus <span class=\"math\">(E[X])\u00b2<\/span>:", "a": ["always equal", "<span class=\"math\">E[X\u00b2] \u2265 (E[X])\u00b2<\/span>", "<span class=\"math\">E[X\u00b2] \u2264 (E[X])\u00b2<\/span>", "unrelated"], "c": 1, "why": "Their difference is the variance, which is non-negative. That is exactly lesson 10's computational formula."}];
+  var QUIZ = [{"q": "<span class=\"math\">E[X]<\/span> for a fair six-sided die is:", "a": ["3", "3.5", "4", "6"], "c": 1, "why": "<span class=\"math\">(1+2+3+4+5+6)/6 = 3.5<\/span>, not a value the die can show, which is normal for an average. <span class=\"math\">3<\/span> and <span class=\"math\">4<\/span> are the two faces the mean lies between, and <span class=\"math\">6<\/span> is the largest value &mdash; an average of equally weighted values is their midpoint, never an endpoint."}, {"q": "<span class=\"math\">E[X] = 2.7<\/span>. What does that tell you about the most likely value?", "a": ["It is 3", "It is 2.7", "Nothing directly", "It is 2 or 3"], "c": 2, "why": "The mean and the mode are different summaries. A distribution with mean 2.7 can easily have its highest probability at 1; <span class=\"math\">2.7<\/span> itself may not be a value at all; and \"2 or 3\" assumes the mass sits near the mean, which lesson 12's geometric distribution (mean 6, mode 1) refutes."}, {"q": "<span class=\"math\">E[X\u00b2]<\/span> versus <span class=\"math\">(E[X])\u00b2<\/span>:", "a": ["always equal", "<span class=\"math\">E[X\u00b2] \u2265 (E[X])\u00b2<\/span>", "<span class=\"math\">E[X\u00b2] \u2264 (E[X])\u00b2<\/span>", "unrelated"], "c": 1, "why": "Their difference is the variance, which is non-negative &mdash; exactly lesson 10's computational formula. They are equal only for a constant <span class=\"math\">X<\/span>; the fair die's <span class=\"math\">91/6<\/span> against <span class=\"math\">12.25<\/span> rules out <span class=\"math\">\u2264<\/span>; and they are anything but unrelated &mdash; the gap is the single most useful number about spread."}];
 
   (function () {
 
@@ -1338,17 +1338,60 @@ average approaches the expectation — which is lesson 10&#x27;s subject.</div><
   }
   function pct(f) { return isNaN(f.dec) ? '—' : (100 * f.dec).toFixed(2) + '%'; }
 
-  var kindSel = document.getElementById('dsKind'), nS = document.getElementById('dsN'), pS = document.getElementById('dsP');
-  var plot = document.getElementById('dsPlot'), table = document.getElementById('dsTable');
-  var status = document.getElementById('dsStatus');
-  var title = document.getElementById('dsTitle'), sub = document.getElementById('dsSub');
-
   function comb(n, r) {
     if (r < 0 || r > n) return 0;
     var out = 1;
     for (var i = 0; i < r; i += 1) out = out * (n - i) / (i + 1);
     return Math.round(out);
   }
+
+  /* The four mass functions, each as {ks, probs}. They are what the lab sums
+     over; the closed forms are printed beside the sums and never used to
+     compute them. */
+  function binomialPmf(n, p) {
+    var ks = [], probs = [];
+    for (var k = 0; k <= n; k += 1) { ks.push(k); probs.push(comb(n, k) * Math.pow(p, k) * Math.pow(1 - p, n - k)); }
+    return { ks: ks, probs: probs };
+  }
+  /* The geometric has infinite support. Summing thirty terms and comparing
+     with 1/p is not a comparison: at p = 1/6 the first thirty carry 5.848 of
+     the mean's 6, and the lab used to print both and let the reader wonder.
+     The sum now runs until the remaining tail (1-p)^K is below 1e-15, which
+     is closer than the digits shown; the bars and the table still stop early,
+     and the status line says so. */
+  function geometricTerms(p) {
+    var q = 1 - p, tail = q, K = 1;
+    while (tail >= 1e-15 && K < 4000) { tail *= q; K += 1; }
+    return Math.max(30, K);
+  }
+  function geometricPmf(p, terms) {
+    var ks = [], probs = [];
+    for (var k = 1; k <= terms; k += 1) { ks.push(k); probs.push(Math.pow(1 - p, k - 1) * p); }
+    return { ks: ks, probs: probs };
+  }
+  function uniformPmf(n) {
+    var ks = [], probs = [];
+    for (var k = 1; k <= n; k += 1) { ks.push(k); probs.push(1 / n); }
+    return { ks: ks, probs: probs };
+  }
+  function diceSumPmf() {
+    var ks = [], probs = [];
+    for (var s = 2; s <= 12; s += 1) { ks.push(s); probs.push((6 - Math.abs(7 - s)) / 36); }
+    return { ks: ks, probs: probs };
+  }
+  /* E[X] and Var(X) from the DEFINITION: Σ k·P(X = k), Σ k²·P(X = k), and
+     E[X²] − E[X]², term by term. */
+  function moments(ks, probs) {
+    var E = 0, E2 = 0, total = 0;
+    for (var i = 0; i < ks.length; i += 1) { E += ks[i] * probs[i]; E2 += ks[i] * ks[i] * probs[i]; total += probs[i]; }
+    return { E: E, E2: E2, V: E2 - E * E, total: total };
+  }
+
+  var kindSel = document.getElementById('dsKind'), nS = document.getElementById('dsN'), pS = document.getElementById('dsP');
+  var plot = document.getElementById('dsPlot'), table = document.getElementById('dsTable');
+  var status = document.getElementById('dsStatus');
+  var title = document.getElementById('dsTitle'), sub = document.getElementById('dsSub');
+  var DRAWN = 30, LISTED = 21;
 
   function redraw() {
     var kind = kindSel.value, n = +nS.value, pn = +pS.value, p = pn / 12;
@@ -1361,13 +1404,10 @@ average approaches the expectation — which is lesson 10&#x27;s subject.</div><
     document.getElementById('dsNWrap').hidden = kind === 'dice';
     document.getElementById('dsPWrap').hidden = kind === 'uniform' || kind === 'dice';
 
-    var ks = [], probs = [], formulaE = '', formulaV = '', name = '', note = '';
+    var pmf, formulaE = '', formulaV = '', name = '', note = '', omitted = '';
     if (kind === 'binomial') {
       name = 'Binomial(n = ' + n + ', p = ' + pn + '/12)';
-      for (var k = 0; k <= n; k += 1) {
-        ks.push(k);
-        probs.push(comb(n, k) * Math.pow(p, k) * Math.pow(1 - p, n - k));
-      }
+      pmf = binomialPmf(n, p);
       formulaE = 'np = ' + n + '·' + pn + '/12 = ' + frac(n * pn, 12).text;
       formulaV = 'np(1−p) = ' + (n * p * (1 - p)).toFixed(4);
       note = 'The binomial counts SUCCESSES in a fixed number of independent trials. Its expectation is n·p '
@@ -1375,80 +1415,80 @@ average approaches the expectation — which is lesson 10&#x27;s subject.</div><
         + 'and expectation adds even when the indicators are not independent.';
     } else if (kind === 'geometric') {
       name = 'Geometric(p = ' + pn + '/12)';
-      var tail = 1;
-      for (var k2 = 1; k2 <= 30; k2 += 1) {
-        ks.push(k2);
-        probs.push(Math.pow(1 - p, k2 - 1) * p);
-      }
+      var terms = geometricTerms(p);
+      pmf = geometricPmf(p, terms);
       formulaE = '1/p = 12/' + pn + ' = ' + frac(12, pn).text + ' ≈ ' + (1 / p).toFixed(4);
       formulaV = '(1−p)/p² = ' + ((1 - p) / (p * p)).toFixed(4);
       note = 'The geometric counts TRIALS UNTIL the first success. Its expectation 1/p is the memorable one: '
         + 'a 1-in-6 event takes 6 trials on average — but the distribution is heavily skewed, so "on average 6" '
-        + 'is not "usually about 6". The table below is truncated at 30; the true support is infinite.';
+        + 'is not "usually about 6".';
+      omitted = ' The support is infinite: the bars stop at k = ' + DRAWN + ' and the table at k = ' + LISTED
+        + ', and P(X > ' + DRAWN + ') = (1−p)^' + DRAWN + ' = ' + (100 * Math.pow(1 - p, DRAWN)).toFixed(3)
+        + '% lies beyond the last bar. The sums run to k = ' + terms + ', where the tail is below 10⁻¹⁵, '
+        + 'which is why the summed E[X] agrees with 1/p to every digit shown.';
     } else if (kind === 'uniform') {
       name = 'Uniform on 1 … ' + n;
-      for (var k3 = 1; k3 <= n; k3 += 1) { ks.push(k3); probs.push(1 / n); }
+      pmf = uniformPmf(n);
       formulaE = '(n+1)/2 = ' + frac(n + 1, 2).text;
       formulaV = '(n²−1)/12 = ' + ((n * n - 1) / 12).toFixed(4);
       note = 'Every value equally likely. The expectation is the midpoint, which is the one case where '
         + '"average" and "typical" coincide.';
     } else {
       name = 'Sum of two fair dice';
-      for (var s = 2; s <= 12; s += 1) {
-        ks.push(s);
-        probs.push((6 - Math.abs(7 - s)) / 36);
-      }
+      pmf = diceSumPmf();
       formulaE = '7 (by symmetry, or 3.5 + 3.5 by linearity)';
       formulaV = '35/6 ≈ 5.8333';
       note = 'Not uniform, even though each die is: there are six ways to make 7 and one to make 2. '
         + 'The expectation 7 follows from linearity — E[X+Y] = E[X] + E[Y] — without touching this distribution at all.';
     }
+    var ks = pmf.ks, probs = pmf.probs;
 
     /* E and Var from the DEFINITION, summed term by term. */
-    var E = 0, E2 = 0, total = 0;
-    for (var i = 0; i < ks.length; i += 1) { E += ks[i] * probs[i]; E2 += ks[i] * ks[i] * probs[i]; total += probs[i]; }
-    var V = E2 - E * E;
+    var m = moments(ks, probs), E = m.E, V = m.V, total = m.total;
 
     document.getElementById('dsE').textContent = E.toFixed(4);
     document.getElementById('dsEF').textContent = formulaE;
     document.getElementById('dsV').textContent = V.toFixed(4);
 
-    var maxP = Math.max.apply(null, probs) || 1;
-    var w = 520 / ks.length, s2 = '';
-    for (var j = 0; j < ks.length; j += 1) {
+    var drawN = Math.min(ks.length, DRAWN);
+    var maxP = Math.max.apply(null, probs.slice(0, drawN)) || 1;
+    var w = 520 / drawN, s2 = '';
+    for (var j = 0; j < drawN; j += 1) {
       var h = (probs[j] / maxP) * 165;
       s2 += '<rect x="' + (j * w + 2) + '" y="' + (185 - h) + '" width="' + Math.max(2, w - 4) + '" height="' + h
         + '" rx="2" fill="var(--cyan)" opacity="0.82" />';
-      if (ks.length <= 21) {
+      if (drawN <= 21) {
         s2 += '<text x="' + (j * w + w / 2) + '" y="203" text-anchor="middle" font-size="9" fill="var(--muted)">' + ks[j] + '</text>';
       }
     }
-    var ex = ((E - ks[0]) / (ks[ks.length - 1] - ks[0] || 1)) * (520 - w) + w / 2;
+    var ex = ((E - ks[0]) / (ks[drawN - 1] - ks[0] || 1)) * (520 - w) + w / 2;
     s2 += '<line x1="' + ex + '" y1="8" x2="' + ex + '" y2="185" stroke="var(--amber)" stroke-width="2" stroke-dasharray="5 4" />';
     s2 += '<text x="' + Math.min(ex + 6, 470) + '" y="18" font-size="10" fill="var(--amber)" font-weight="700">E[X] = ' + E.toFixed(3) + '</text>';
     s2 += '<line x1="0" y1="185" x2="520" y2="185" stroke="var(--line-strong)" stroke-width="1" />';
     plot.innerHTML = s2;
 
     var rows = '';
-    for (var t = 0; t < Math.min(ks.length, 14); t += 1) {
+    for (var t = 0; t < Math.min(ks.length, LISTED); t += 1) {
       rows += '<tr><td>' + ks[t] + '</td><td>' + probs[t].toFixed(6) + '</td><td>' + (100 * probs[t]).toFixed(3) + '%</td><td>'
         + (ks[t] * probs[t]).toFixed(6) + '</td></tr>';
     }
     table.innerHTML = '<thead><tr><th>k</th><th>P(X = k)</th><th>%</th><th>k·P(X = k)</th></tr></thead><tbody>'
-      + rows + '<tr class="focus"><td>Σ</td><td>' + total.toFixed(6) + '</td><td>' + (100 * total).toFixed(2)
+      + rows + '<tr class="focus"><td>Σ' + (ks.length > LISTED ? ' (all ' + ks.length + ' terms)' : '') + '</td><td>' + total.toFixed(6) + '</td><td>' + (100 * total).toFixed(2)
       + '%</td><td>' + E.toFixed(6) + '</td></tr></tbody>';
 
     title.textContent = name;
     sub.textContent = 'E[X] and Var(X) summed from the definition';
     status.innerHTML = '<strong>Summed from the definition: E[X] = ' + E.toFixed(4) + '.</strong> '
       + 'The closed form says ' + formulaE + ', and Var(X) = E[X²] − E[X]² = ' + V.toFixed(4)
-      + ' against ' + formulaV + '. ' + note
+      + ' against ' + formulaV + '. ' + note + omitted
       + (total < 0.999 ? ' The probabilities shown sum to ' + total.toFixed(4) + ' because the table is truncated.' : '');
   }
 
   [kindSel, nS, pS].forEach(function (el) { el.addEventListener('input', redraw); });
   kindSel.addEventListener('change', redraw);
-  kindSel.value = "binomial";
+  kindSel.value = "uniform";
+  nS.value = '6';
+  pS.value = '6';
   redraw();
   window.redrawLab = redraw;
   })();

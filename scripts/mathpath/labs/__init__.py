@@ -43,6 +43,7 @@ REGISTRY = {
     "graph": graph.graph_lab,
     "probability": probability.probability_lab,
     "distribution": probability.distribution_lab,
+    "bayes": probability.bayes_lab,
     "algorithm": algorithms.algorithm_lab,
 
     # The algebra path. Its labs share the exact-arithmetic core in

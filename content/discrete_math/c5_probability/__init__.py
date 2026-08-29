@@ -26,8 +26,9 @@ COURSE = {
     "assumes_short": "Courses 1–4",
     "assumes_long": "counting, sets and functions",
     "outcomes_intro": (
-        "By the end you can compute a probability exactly, condition correctly, and "
-        "say what an expectation does and does not tell you."
+        "By the end you can compute a probability exactly, condition correctly, say "
+        "what an expectation does and does not tell you, and build a distribution from "
+        "its sample space &mdash; or bypass it with indicators."
     ),
     "outcomes": [
         ("Compute a probability from a sample space",
@@ -42,6 +43,11 @@ COURSE = {
         ("Compute expectation and variance",
          "From the definition, and by linearity &mdash; which holds whether or not the "
          "variables are independent, and is the most useful fact in the course."),
+        ("Build a distribution, decompose a count, and tell the two distributions apart",
+         "Write `P(X = k)` from the sample space and check it sums to 1; split a count "
+         "into indicators before reaching for a distribution; check the three binomial "
+         "assumptions; and know that fixed trials is binomial and a fixed target is "
+         "geometric."),
     ],
     "syllabus_intro": (
         "Lessons 1 to 3 set up the model, 4 to 6 are conditioning, and 7 to 12 are "
@@ -52,9 +58,12 @@ COURSE = {
         "obvious. Most probability errors are errors about what the outcomes are.",
         "Use the probability lab's outcome list. Every probability on this course is a "
         "count divided by a count, and seeing the outcomes highlighted makes "
-        "conditioning concrete rather than formal.",
+        "conditioning concrete rather than formal. From lesson 7 the distribution lab "
+        "opens on each lesson's own worked example, so the numbers on the page are the "
+        "numbers in the lab.",
         "Do the Bayes calculation by frequencies as well as by the formula. The two "
-        "agree, and the frequency version is the one that makes the answer believable.",
+        "agree, and the frequency version is the one that makes the answer believable. "
+        "Lesson 6's lab does both on a million people, with every cell a whole number.",
     ],
     "not_covered": [
         "Continuous probability: densities, the normal distribution, and anything "
