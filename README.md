@@ -947,35 +947,45 @@ The normative rules live in `dmedellin/platform-ops`
 
 ## STATUS
 
-**Deployed on GitHub Pages.** `https://learn.geterdone.io/` serves this `site/`
-tree — the site index, the trading path page, all eight course homes, all 118
-lessons, the seven published schemas (trade journal, options trade plan,
+**Live on the Hetzner container platform.** `https://learn.geterdone.io/` is served
+by Caddy from an immutable GHCR digest, deployed through `platform-ops` and recorded
+in its app registry under the slug `learn-geterdone`. The published tree is this
+`site/` directory: the subject-agnostic site index, three path pages, 25 course
+homes, 336 lessons, the seven published schemas (trade journal, options trade plan,
 indicator rule, volume and order flow rule, trading risk plan, trading system
-specification, and automated trading system), and the dated real-data capstone
-with its dataset — from the `pages.yml` workflow. 359 pages and 8 assets; the
-trading path is complete at eight courses, the capstone is a worked example and
-not a ninth, and nothing in the library is announced without a page behind it.
+specification, and automated trading system), the dated real-data capstone with its
+dataset, `/progress/` and the sign-in redirect target. 369 pages and 8 assets; the
+trading path is complete at eight courses, the capstone is a worked example and not
+a ninth, and nothing in the library is announced without a page behind it.
 
-**The Hetzner container path remains UNBUILT.** No image of this repository has
-ever been built, deployed, or accepted on that platform. As of 2026-08-15, all of
-the following are still open:
+Platform onboarding is **built and active**, not pending:
 
-- **Platform onboarding is unbuilt.** The Hetzner host has no registry entry for
-  `learn-geterdone`, no self-hosted repository-scoped runner, and no
-  installed deploy wrapper for this app. Nothing has been installed on any host.
-- **The loopback port and app subnet are UNALLOCATED.** They appear throughout as
-  the literal placeholders `__LOOPBACK_PORT__` and `__APP_SUBNET__`. Allocation is
-  an explicit human decision plus a live host preflight and is deliberately not
-  automated.
-- **No edge route exists** for `learn.geterdone.io` on that host. DNS for the
-  subdomain points at GitHub Pages; nothing points at Hetzner, and creating a
-  route there is a separate reviewed transaction, not a release.
-- **The release deploy job is inert** (`if: false` in `release.yml`) and depends
-  on a self-hosted runner that does not exist and a human-approved `production`
-  environment that has not been created.
-- **No container acceptance has occurred.** No image build, container deployment,
-  container smoke run, or SRE acceptance for this repository has ever run. Any
-  statement to the contrary is wrong.
+- **The registry entry exists** and is `deployment_state: active`, owned by
+  `platform-ops/apps/registry.yaml`.
+- **The loopback port and app subnet are ALLOCATED** — 8082 and `10.89.4.0/24`,
+  allocated against a live host preflight. The `__LOOPBACK_PORT__` and
+  `__APP_SUBNET__` tokens survive only in templates and in the proposed-entry
+  example, which is what those files are for.
+- **An edge route exists** for `learn.geterdone.io` on that host, with its own Caddy
+  fragment. DNS for the subdomain resolves to the Hetzner host, not to GitHub Pages.
+- **Container acceptance has occurred** repeatedly. Each release is cut over by
+  digest and smoke-tested against production — the most recent runs recorded 386
+  checks passed, 0 failed, with all seven neighbour hostnames verified 200.
+
+Two things genuinely remain open, and they are the reason this repository begins
+with fresh history:
+
+- **The self-hosted runner is registered to the PREDECESSOR repository**
+  (`dmedellin/market-structure-lab`). Until a runner is registered for
+  `dmedellin/learn-geterdone` with the `learn-geterdone` label, the deploy job here
+  has nowhere to run. Registering it is a host mutation and an explicit human step.
+- **The release deploy job is inert** (`if: false` in `release.yml`), pending that
+  runner and a human-approved `production` environment. Build and publish-by-digest
+  DO run and are green; only the deploy step is held.
+
+`pages.yml` is a **secondary, optional** delivery path and is not how production is
+served. It requires the repository to be public with Settings > Pages > Source set
+to "GitHub Actions"; while that is unset the workflow fails fast and changes nothing.
 
 ## License
 
