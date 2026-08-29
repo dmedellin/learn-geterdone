@@ -26,7 +26,8 @@ COURSE = {
     "assumes_long": "proof, sets, relations and counting",
     "outcomes_intro": (
         "By the end you can model a problem as a graph, run the standard algorithms, "
-        "and know which questions have easy criteria and which do not."
+        "recognise a tree and rule out planarity by counting, and know which "
+        "questions have easy criteria and which do not."
     ),
     "outcomes": [
         ("Read and build the representations",
@@ -41,10 +42,14 @@ COURSE = {
         ("Tell easy problems from hard ones",
          "Euler circuits are decided in one pass; Hamilton circuits are NP-complete. The "
          "problems look alike and are not."),
+        ("Recognise a tree, and rule out planarity by counting",
+         "Any two of connected, acyclic and `n − 1` edges give the third; the three "
+         "traversal orders from a drawing; and `E ≤ 3V − 6` or `E ≤ 2V − 4` settling "
+         "non-planarity before any drawing is attempted."),
     ],
     "syllabus_intro": (
-        "Lessons 1 to 5 are the basics, 6 to 10 are traversals and paths, 11 to 13 are "
-        "trees, and 14 is planarity."
+        "Lessons 1 to 3 are the basics, 4 to 6 the structure of a graph, 7 to 9 "
+        "traversals and paths, 10 to 12 trees, and 13 and 14 colouring and planarity."
     ),
     "how_to": [
         "Use the workbench adversarially. Every theorem here is a claim about all "
@@ -52,6 +57,11 @@ COURSE = {
         "build a counterexample.",
         "Draw the small cases. Graph theory is one of the few parts of mathematics where "
         "the picture is the object, and most of these proofs were found by drawing.",
+        "Where a lesson has a worked example that fits, its lab opens on it: the preset "
+        "\"This lesson's example\" is that graph, with the lesson's own weights where it "
+        "has them, and the panel quotes the figures you should see before you change "
+        "anything. Lessons 9 and 12 carry weights; lesson 4 names the bridges, lesson 11 "
+        "prints all four traversal orders, and lesson 14 runs the planarity counts.",
         "Notice which criteria are one-pass checks and which are searches. That "
         "distinction is what course 8 formalises, and it is visible here first.",
     ],

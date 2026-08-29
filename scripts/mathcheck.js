@@ -37,6 +37,8 @@ const PROB_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'probability.py');
 const probSrc = fs.readFileSync(PROB_SOURCE, 'utf8');
 const NUMBER_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'number.py');
 const numberSrc = fs.readFileSync(NUMBER_SOURCE, 'utf8');
+const GRAPH_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'graph.py');
+const graphSrc = fs.readFileSync(GRAPH_SOURCE, 'utf8');
 
 /* Each block is  NAME = r"""..."""  in the Python module. */
 function blockFrom(text, name, where) {
@@ -49,6 +51,7 @@ function logicBlock(name) { return blockFrom(logicSrc, name, LOGIC_SOURCE); }
 function countingBlock(name) { return blockFrom(countingSrc, name, COUNTING_SOURCE); }
 function probBlock(name) { return blockFrom(probSrc, name, PROB_SOURCE); }
 function numberBlock(name) { return blockFrom(numberSrc, name, NUMBER_SOURCE); }
+function graphBlock(name) { return blockFrom(graphSrc, name, GRAPH_SOURCE); }
 
 let fails = 0;
 function eq(got, want, label) {
@@ -603,6 +606,172 @@ console.log('number theory in BigInt (course 6 labs)');
   const af13 = affineMap(13n, 0n, 26n);
   eq(af13.distinct + ',' + af13.inv, '2,null', 'a = 13 gives two outputs and no inverse');
   eq(affineMap(2n, 5n, 26n).distinct, 13, 'an even multiplier gives thirteen outputs');
+}
+
+// ---------------------------------------------------------------- graphs
+console.log('graph algorithms (course 7 workbench)');
+{
+  /* Every course-7 lesson renders through one workbench, and the panels quote
+     what it prints at their presets: distances, visit orders, Kruskal's
+     decisions, the clique bound, the planarity counts. The functions below
+     are the shipped ones, extracted from graph.py. The case that motivated
+     this section: lesson 8's panel promised that BFS and DFS draw different
+     trees on a preset that was itself a tree, and nothing could have said so. */
+  eval(graphBlock('GRAPH_JS'));
+  const L = (a) => a.map((v) => v + 1).join(' ');
+  const S = (a) => '{' + L(a) + '}';
+  const tree = (parent) => parent.map((p, v) => (p === -1 ? null : (p + 1) + '-' + (v + 1))).filter(Boolean).join(',');
+  function load(preset, n) { N = n; useLessonWeights = false; A = PRESETS[preset](n); }
+  function custom(n, list) { LESSON = lessonFrom(list); useLessonWeights = true; N = n; A = PRESETS.lesson(n); }
+  const degs = () => { const d = []; for (let v = 0; v < N; v += 1) d.push(degree(v)); return d.join(''); };
+
+  load('complete', 5);
+  eq(edges().length, 10, 'K5 has 10 edges (lesson 1 preset)');
+  eq(degs(), '44444', 'every degree 4');
+  load('bipartite', 6);
+  eq(edges().length + ',' + degs(), '9,333333', 'K_{3,3}: 9 edges, every degree 3');
+  load('cycle', 6);
+  eq(edges().length + ',' + degs(), '6,222222', 'C6: 6 edges, every degree 2');
+
+  custom(8, [[1, 2], [1, 3], [1, 5], [2, 4], [2, 6], [3, 4], [3, 7], [4, 8], [5, 6], [5, 7], [6, 8], [7, 8]]);
+  eq(degs() + ',' + edges().length, '33333333,12', 'Q3 (lesson 2 preset): eight vertices of degree 3, twelve edges');
+  eq(twoColour().conflict, null, 'and Q3 is bipartite');
+  eq(hamilton().circuit !== null, true, 'and has a Hamilton circuit');
+
+  load('cycle', 4);
+  eq(JSON.stringify(matrixPower(2)), '[[2,0,2,0],[0,2,0,2],[2,0,2,0],[0,2,0,2]]', 'A² of C4 (lesson 3 worked example)');
+  eq(matrixPower(3)[0][3] + ',' + triangles(), '4,0', 'A³[1][4] = 4 and no triangle');
+  load('petersen', 6);
+  eq(triangles() + ',' + edges().length, '2,7', 'two triangles joined: 2 triangles, 7 edges');
+
+  custom(7, [[1, 2], [2, 3], [3, 1], [3, 4], [5, 6]]);
+  eq(componentsOf().map(S).join(' '), '{1 2 3 4} {5 6} {7}', 'lesson 4 worked example: three components');
+  {
+    const c = cuts();
+    eq(c.bridges.map((b) => L(b.edge)).join(','), '3 4,5 6', 'bridges 3–4 and 5–6');
+    eq(L(c.cutVertices), '3', 'the one cut vertex is 3');
+    eq(c.bridges[0].sides.map(S).join(' '), '{1 2 3} {4}', 'removing 3–4 separates {1, 2, 3} from {4}');
+    eq(componentsOf(2).length, 4, 'deleting vertex 3 leaves four components');
+  }
+  load('tree', 7);
+  eq(cuts().bridges.length + ',' + L(cuts().cutVertices), '6,1 2 3', 'on the tree preset every edge is a bridge and every internal vertex a cut vertex');
+  load('cycle', 6);
+  eq(cuts().bridges.length + ',' + cuts().cutVertices.length, '0,0', 'a cycle has no bridge and no cut vertex');
+
+  custom(6, [[1, 2], [2, 3], [3, 1], [4, 5], [5, 6], [6, 4]]);
+  eq(degs() + ',' + componentsOf().length, '222222,2', 'two disjoint triangles (lesson 5 preset): 2-regular, two components');
+  load('cycle', 6);
+  eq(degs() + ',' + componentsOf().length, '222222,1', 'C6: the same degrees, one component');
+
+  load('cycle', 6);
+  eq(twoColour().colour.join(''), '010101', 'C6 two-coloured by parity: X = {1, 3, 5}');
+  load('cycle', 5);
+  eq(L(twoColour().conflict), '3 4', 'C5: the conflict is at vertices 3 and 4 (lesson 6 worked example)');
+  load('cycle', 6); link(A, 0, 2);
+  eq(twoColour().conflict !== null, true, 'C6 plus the chord 1–3 is not bipartite');
+  load('cycle', 6); link(A, 0, 3);
+  eq(twoColour().conflict, null, 'C6 plus the chord 1–4 still is');
+
+  load('cycle', 6);
+  eq(L(hamilton().circuit), '1 2 3 4 5 6', 'C6 has a Hamilton circuit (lesson 7 preset)');
+  A[0][1] = 0; A[1][0] = 0;
+  eq(degs().split('').map((d, i) => (d % 2 ? i + 1 : null)).filter(Boolean).join(','), '1,2', 'minus 1–2: the odd vertices are 1 and 2');
+  eq(L(hamilton().path) + '|' + hamilton().circuit, '1 6 5 4 3 2|null', 'a Hamilton path and no circuit');
+
+  custom(6, [[1, 2], [1, 3], [2, 4], [3, 4], [4, 5], [5, 6]]);
+  {
+    const b = bfs(0), d = dfs(0);
+    eq(b.dist.join(' '), '0 1 1 2 3 4', 'lesson 8 worked example: BFS distances');
+    eq(L(b.order), '1 2 3 4 5 6', 'BFS order');
+    eq(tree(b.parent), '1-2,1-3,2-4,4-5,5-6', 'BFS tree edges');
+    eq(L(d.order), '1 2 4 3 5 6', 'DFS order');
+    eq(tree(d.parent), '1-2,4-3,2-4,4-5,5-6', 'DFS tree edges: 4–3 is a tree edge, so 3–1 is the back edge');
+  }
+  load('tree', 7);
+  eq(tree(bfs(0).parent) === tree(dfs(0).parent), true, 'on a tree BFS and DFS draw the same tree');
+
+  custom(4, [[1, 2, 10], [1, 3, 3], [3, 2, 2], [2, 4, 1], [3, 4, 9]]);
+  eq(weight(0, 1) + ',' + weight(1, 2), '10,2', 'the lesson preset carries its own weights');
+  {
+    const r = dijkstra(0);
+    eq(r.dist.join(' '), '0 5 3 6', 'lesson 9 worked example: s = 0, a = 5, b = 3, t = 6');
+    let v = 3; const route = []; while (v !== -1) { route.unshift(v); v = r.parent[v]; }
+    eq(L(route), '1 3 2 4', 'route s → b → a → t');
+    eq(bfs(0).dist[3], 2, 'against a fewest-edge distance of 2');
+  }
+  useLessonWeights = false;
+  eq(weight(0, 1), 5, 'off the lesson preset the formula weight returns');
+  load('complete', 6);
+  eq(dijkstra(0).dist[5] + ',' + bfs(0).dist[5], '3,1', 'on K6 the cheapest route 1 → 6 is the direct edge');
+
+  custom(6, [[1, 2], [2, 3], [3, 1], [4, 5], [5, 6]]);
+  eq(componentsOf().length + ',' + edges().length + ',' + (edges().length === N - componentsOf().length), '2,5,false',
+     'lesson 10 graph C: two components, five edges, not acyclic');
+  load('path', 6);
+  eq(componentsOf().length + ',' + edges().length + ',' + degs(), '1,5,122221', 'graph A is a path with leaves 1 and 6');
+
+  load('tree', 7);
+  {
+    const o = rootedOrders(0);
+    eq(L(o.pre), '1 2 4 5 3 6 7', 'preorder on the tree preset (lesson 11)');
+    eq(L(o.ino), '4 2 5 1 6 3 7', 'inorder');
+    eq(L(o.post), '4 5 2 6 7 3 1', 'postorder');
+    eq(L(o.level), '1 2 3 4 5 6 7', 'level order');
+    eq(o.treeEdges + ',' + o.reached, '6,7', 'six tree edges reach all seven');
+  }
+  load('star', 7);
+  eq(rootedOrders(0).ino + ',' + (rootedOrders(0).tooMany + 1), 'null,1', 'on a star inorder is undefined and vertex 1 is why');
+  load('cycle', 5);
+  eq(L(rootedOrders(0).pre) + ',' + rootedOrders(0).treeEdges, '1 2 3 4 5,4', 'on C5 the orders are those of the DFS spanning tree, one edge left out');
+
+  custom(5, [[1, 2, 1], [2, 3, 2], [3, 4, 3], [4, 5, 4], [1, 5, 5], [1, 3, 6], [2, 4, 7]]);
+  {
+    const k = kruskal();
+    eq(k.total + ',' + k.chosen.length, '10,4', 'lesson 12 worked example: total 10, four edges');
+    eq(k.considered.map((c) => L(c[0].slice(0, 2)) + (c[1] ? '+' : '-')).join(','), '1 2+,2 3+,3 4+,4 5+,1 5-,1 3-,2 4-',
+       'AB, BC, CD, DE taken; AE, AC, BD rejected, in weight order');
+    eq(dijkstra(0).dist[4], 5, 'Dijkstra 1 → 5 on the same graph is the rejected edge of weight 5');
+  }
+  load('complete', 6);
+  eq(kruskal().total + ',' + kruskal().chosen.length, '12,5', 'Kruskal on K6 with the formula weights');
+  load('petersen', 6); A[0][3] = 0; A[3][0] = 0;
+  eq(kruskal().chosen.length, 4, 'a disconnected graph gives a spanning forest with n − c edges');
+
+  custom(5, [[1, 2], [1, 3], [2, 3], [2, 4], [3, 4], [4, 5]]);
+  eq(greedyColour().join(''), '01201', 'lesson 13 worked example: greedy colours 1, 2, 3, 1, 2');
+  eq(cliqueNumber().size + ',' + S(cliqueNumber().vertices), '3,{1 2 3}', 'clique number 3 on the triangle');
+  eq(Math.max(...degs().split('').map(Number)), 3, 'Δ = 3, so the greedy bound is 4');
+  custom(6, [[1, 4], [1, 6], [3, 2], [3, 6], [5, 2], [5, 4]]);
+  eq(Math.max(...greedyColour()) + 1 + ',' + twoColour().conflict + ',' + cliqueNumber().size, '3,null,2',
+     'the bipartite trap: greedy uses three colours on a bipartite graph');
+  load('cycle', 5);
+  eq(Math.max(...greedyColour()) + 1 + ',' + cliqueNumber().size, '3,2', 'C5: greedy 3, clique 2, the odd cycle supplies the third');
+
+  load('complete', 5);
+  {
+    const p = planarity();
+    eq(p.verdict + ',' + p.E + ',' + p.bound, 'bound,10,9', 'K5: 10 > 3·5 − 6 = 9 (lesson 14 preset)');
+  }
+  load('bipartite', 6);
+  {
+    const p = planarity();
+    eq(p.verdict + ',' + p.triangles + ',' + p.bound + ',' + p.bound2, 'bound2,0,12,8', 'K_{3,3}: passes 12, triangle-free, fails 8');
+  }
+  load('complete', 4);
+  eq(planarity().verdict + ',' + planarity().E + ',' + planarity().bound, 'planar,6,6', 'K4: 6 ≤ 6 and planar');
+  load('petersen', 6);
+  eq(planarity().verdict, 'planar', 'seven edges: no subdivision of K5 or K_{3,3} fits');
+  custom(8, [[1, 2], [1, 3], [1, 4], [1, 5], [2, 3], [2, 4], [2, 5], [3, 4], [3, 5], [4, 5]]);
+  eq(planarity().verdict + ',' + S(planarity().k5), 'k5,{1 2 3 4 5}', 'K5 on eight vertices passes both bounds and is caught as a subgraph');
+  custom(7, [[1, 4], [1, 5], [1, 6], [2, 4], [2, 5], [2, 6], [3, 4], [3, 5], [3, 6]]);
+  {
+    const p = planarity();
+    eq(p.verdict + ',' + S(p.k33.left) + ',' + S(p.k33.right), 'k33,{1 2 3},{4 5 6}', 'K_{3,3} plus an isolated vertex passes 10 and is caught as a subgraph');
+  }
+  custom(7, [[1, 4], [1, 5], [1, 6], [2, 4], [2, 5], [2, 6], [3, 4], [3, 5], [3, 7], [7, 6]]);
+  eq(planarity().verdict, 'open', 'a subdivided K_{3,3} passes the bounds, has no K_{3,3} subgraph, and is reported open, not planar');
+  load('cycle', 4); link(A, 0, 2); link(A, 1, 3);
+  eq(planarity().verdict + ',' + planarity().triangles, 'planar,4', 'K4 built by hand: four triangles, planar');
 }
 
 if (fails) {
