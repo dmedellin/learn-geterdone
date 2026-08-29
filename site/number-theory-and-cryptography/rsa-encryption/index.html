@@ -1179,7 +1179,7 @@ decrypt:        2790^2753 mod 3233 =   65        ✓</div><h3>What the security 
         </article>
         <aside class="card side-panel" aria-live="polite">
           <h3>Generate, use, break</h3>
-          <p>The default primes are the textbook ones. Change them and watch the key change; then read the last paragraph of the status line, where the lab factors <span class="math">n</span> and recovers <span class="math">d</span>.</p>
+          <p>The default primes are the textbook ones: <span class="math">n = 3233</span>, <span class="math">d = 2753</span>, and 65 encrypts to 2790 and back. Set <span class="math">p = 11</span>, <span class="math">q = 13</span>, <span class="math">e = 7</span>, <span class="math">m = 9</span> and the lab prints the worked example's <span class="math">c = 48</span> from the definitions rather than from this page. Change the primes and watch the key change; then read the last paragraph of the status line, where the lab factors <span class="math">n</span> and recovers <span class="math">d</span>.</p>
         <div class="field">
           <label for="rsaP">p (prime)</label>
           <input id="rsaP" type="number" value="61" />
@@ -1206,7 +1206,7 @@ decrypt:        2790^2753 mod 3233 =   65        ✓</div><h3>What the security 
     </section>
     <section class="section" id="process">
       <div class="section-head"><div><p class="kicker">Method</p><h2>Using RSA</h2></div><p>Each step is a theorem from this course.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Choose two distinct primes and multiply</h3><p><span class="math">n = pq</span>. They must be distinct, or <span class="math">φ(n) = p(p−1)</span> rather than <span class="math">(p−1)²</span> and <span class="math">n</span> is a square, trivially factorable.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute <span class="math">φ(n) = (p−1)(q−1)</span></h3><p>Multiplicativity of <span class="math">φ</span> from lesson 11. This value must never be published.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Choose <span class="math">e</span> coprime to <span class="math">φ(n)</span> and invert it</h3><p><span class="math">gcd(e, φ(n)) = 1</span> by lesson 4, and <span class="math">d = e⁻¹ mod φ(n)</span> by lesson 6. 65537 is the usual choice of <span class="math">e</span>.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Exponentiate to encrypt and decrypt</h3><p>By lesson 8's square and multiply, which is what makes 2048-bit exponents practical.</p></article></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Choose two distinct primes and multiply</h3><p><span class="math">n = pq</span>. They must be distinct, or <span class="math">φ(n) = p(p−1)</span> rather than <span class="math">(p−1)²</span> and <span class="math">n</span> is a square, trivially factorable.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute <span class="math">φ(n) = (p−1)(q−1)</span></h3><p>Multiplicativity of <span class="math">φ</span> from lesson 11. This value must never be published.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Choose <span class="math">e</span> coprime to <span class="math">φ(n)</span> and invert it</h3><p><span class="math">gcd(e, φ(n)) = 1</span> by lesson 4, and <span class="math">d = e⁻¹ mod φ(n)</span> by lesson 6. <span class="math">e</span> need not be prime, only coprime; 65537 is the usual choice because a prime is coprime to <span class="math">φ(n)</span> unless it divides it, one check, and <span class="math">2¹⁶ + 1</span> has two set bits, so <span class="math">m^e</span> costs sixteen squarings and one multiplication.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Exponentiate to encrypt and decrypt</h3><p>By lesson 8's square and multiply, which is what makes 2048-bit exponents practical.</p></article></div>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1229,16 +1229,16 @@ d = 7⁻¹ mod 120:
 encrypt m = 9:    9^7 mod 143
     9² = 81      9⁴ = 81² = 6561 ≡ 126      (mod 143)
     9^7 = 9⁴·9²·9 ≡ 126·81·9
-    126·81 = 10206 ≡ 48;   48·9 = 432 ≡ 3   (mod 143)
-    c = 3
+    126·81 = 10206 = 71·143 + 53 ≡ 53;   53·9 = 477 ≡ 48   (mod 143)
+    c = 48
 
-decrypt:  3^103 mod 143 = 9                              ✓</div><p>The public key <span class="math">(143, 7)</span> is enough to encrypt and useless for decrypting &mdash; unless you factor 143, which takes one division by 11. That is the whole security story, and the only thing that changes at 2048 bits is how long that division takes.</p></article>
+decrypt:  48^103 mod 143 = 9      (103 = 1100111₂, lesson 8)     ✓</div><p>The public key <span class="math">(143, 7)</span> is enough to encrypt and useless for decrypting &mdash; unless you factor 143, which takes one division by 11. That is the whole security story, and the only thing that changes at 2048 bits is how long that division takes.</p></article>
       </div>
     </section>
     <section class="section">
       <div class="grid-2">
         <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Publishing or leaking <span class="math">φ(n)</span></strong><span>With <span class="math">n</span> it gives <span class="math">p + q</span> and hence the factorisation. It is as sensitive as the primes themselves.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Using equal or close primes</strong><span><span class="math">p = q</span> makes <span class="math">n</span> a perfect square. Primes that are close make Fermat's factorisation method succeed quickly.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Deploying textbook RSA</strong><span>It is deterministic and malleable. Real systems randomise with OAEP padding, and the mathematics on this page is not the whole system.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Completion standard</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can generate a key and say what each step assumes.</strong><p>Build a key from <span class="math">p = 17</span>, <span class="math">q = 23</span>, encrypt a small message, decrypt it, and then factor <span class="math">n</span> to recover <span class="math">d</span>. Doing the attack yourself is what makes the security argument concrete rather than asserted.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> This course ends where cryptographic engineering begins. Padding schemes, key management, side-channel resistance and protocol design are all essential and none of them is number theory. What number theory supplies is the core operation and an honest account of what it does and does not guarantee.</div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Completion standard</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can generate a key and say what each step assumes.</strong><p>Build a key from <span class="math">p = 17</span>, <span class="math">q = 23</span>, encrypt a small message, decrypt it, and then factor <span class="math">n</span> to recover <span class="math">d</span>. With <span class="math">e = 3</span> you should find <span class="math">n = 391</span>, <span class="math">φ(n) = 352</span> and <span class="math">d = 235</span>. Doing the attack yourself is what makes the security argument concrete rather than asserted.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> This course ends where cryptographic engineering begins. Padding schemes, key management, side-channel resistance and protocol design are all essential and none of them is number theory. What number theory supplies is the core operation and an honest account of what it does and does not guarantee.</div></article>
       </div>
     </section>
     </main>
@@ -1336,14 +1336,19 @@ decrypt:  3^103 mod 143 = 9                              ✓</div><p>The public 
         + '. Your completion ticks can follow you to another device.');
       a.classList.add('is-in');
     }());
-  var QUIZ = [{"q": "In RSA, which value must remain secret?", "a": ["<span class=\"math\">n<\/span>", "<span class=\"math\">e<\/span>", "<span class=\"math\">\u03c6(n)<\/span>", "the ciphertext"], "c": 2, "why": "<span class=\"math\">n<\/span> and <span class=\"math\">e<\/span> are public. Knowing <span class=\"math\">\u03c6(n)<\/span> together with <span class=\"math\">n<\/span> yields <span class=\"math\">p<\/span> and <span class=\"math\">q<\/span> immediately, so it is as secret as the factorisation."}, {"q": "RSA decryption works because of:", "a": ["the Chinese remainder theorem alone", "Euler's theorem: <span class=\"math\">ed \u2261 1 (mod \u03c6(n))<\/span> gives <span class=\"math\">m^{ed} \u2261 m<\/span>", "the sieve of Eratosthenes", "B\u00e9zout's identity alone"], "c": 1, "why": "Euler is the core, with B\u00e9zout supplying <span class=\"math\">d<\/span> and the Chinese remainder theorem covering the case <span class=\"math\">gcd(m, n) \u2260 1<\/span>."}, {"q": "RSA's security rests on:", "a": ["a proof that factoring is hard", "the belief that factoring large numbers is hard \u2014 which is unproved", "the secrecy of the algorithm", "the size of the message"], "c": 1, "why": "No hardness proof exists, and it is also unproved that breaking RSA requires factoring. Both are assumptions."}];
+  var QUIZ = [{"q": "In RSA, which value must remain secret?", "a": ["<span class=\"math\">n<\/span>", "<span class=\"math\">e<\/span>", "<span class=\"math\">\u03c6(n)<\/span>", "the ciphertext"], "c": 2, "why": "<span class=\"math\">n<\/span> and <span class=\"math\">e<\/span> are public by design, and the ciphertext is what the eavesdropper sees. Knowing <span class=\"math\">\u03c6(n)<\/span> together with <span class=\"math\">n<\/span> yields <span class=\"math\">p + q<\/span> and hence <span class=\"math\">p<\/span> and <span class=\"math\">q<\/span> immediately, so it is as secret as the factorisation."}, {"q": "RSA decryption works because of:", "a": ["the Chinese remainder theorem alone", "Euler's theorem: <span class=\"math\">ed \u2261 1 (mod \u03c6(n))<\/span> gives <span class=\"math\">m^{ed} \u2261 m<\/span>", "the sieve of Eratosthenes", "B\u00e9zout's identity alone"], "c": 1, "why": "Euler is the core, with B\u00e9zout supplying <span class=\"math\">d<\/span> and the Chinese remainder theorem covering the case <span class=\"math\">gcd(m, n) \u2260 1<\/span>. Neither alone is enough: the CRT gives no reason for <span class=\"math\">m^{ed} \u2261 m<\/span> modulo <span class=\"math\">p<\/span>, and B\u00e9zout only produces <span class=\"math\">d<\/span>. The sieve plays no part at any size that matters."}, {"q": "RSA's security rests on:", "a": ["a proof that factoring is hard", "the belief that factoring large numbers is hard \u2014 which is unproved", "the secrecy of the algorithm", "the size of the message"], "c": 1, "why": "No hardness proof exists, and it is also unproved that breaking RSA requires factoring; both are assumptions. The algorithm is public &mdash; a system whose security needs a secret method has none &mdash; and the message size is a constraint, <span class=\"math\">m &lt; n<\/span>, not a source of security."}];
 
   (function () {
 
   /* Everything here is BigInt. Modular exponentiation with 4-digit moduli
      already overflows exact double arithmetic, and a cryptography lab that
      silently rounded would produce ciphertext that does not decrypt -- with no
-     sign that arithmetic rather than the method was at fault. */
+     sign that arithmetic rather than the method was at fault.
+
+     The functions below are the arithmetic; the modes further down only
+     display it. scripts/mathcheck.js extracts this block and executes it,
+     which is the only check in the repository that can tell a wrong gcd from
+     a right one. */
   function bgcd(a, b) { a = a < 0n ? -a : a; b = b < 0n ? -b : b; while (b) { var t = a % b; a = b; b = t; } return a; }
   function egcd(a, b) {
     /* Returns [g, x, y] with a*x + b*y = g. The coefficients are what make
@@ -1357,6 +1362,24 @@ decrypt:  3^103 mod 143 = 9                              ✓</div><p>The public 
     }
     return [old_r, old_s, old_t];
   }
+  function egcdTrace(a, b) {
+    /* The same algorithm on |a| and |b|, keeping every row. On each row
+       r = |a|*s + |b|*t holds -- that is the loop invariant, and it is why the
+       last nonzero row IS Bezout's identity with no back-substitution. The
+       signs of the coefficients are restored at the end so the identity is
+       stated for the inputs as typed. */
+    var A = a < 0n ? -a : a, B = b < 0n ? -b : b;
+    var rows = [{ r: A, q: null, s: 1n, t: 0n }, { r: B, q: null, s: 0n, t: 1n }];
+    var old_r = A, r = B, old_s = 1n, s = 0n, old_t = 0n, t = 1n;
+    while (r !== 0n && rows.length < 400) {
+      var q = old_r / r;
+      var nr = old_r - q * r, ns = old_s - q * s, nt = old_t - q * t;
+      old_r = r; r = nr; old_s = s; s = ns; old_t = t; t = nt;
+      rows.push({ r: r, q: q, s: s, t: t });
+    }
+    var sa = a < 0n ? -1n : 1n, sb = b < 0n ? -1n : 1n;
+    return { rows: rows, g: old_r, x: old_s * sa, y: old_t * sb };
+  }
   function modpow(base, exp, mod) {
     var result = 1n; base %= mod;
     if (base < 0n) base += mod;
@@ -1366,6 +1389,19 @@ decrypt:  3^103 mod 143 = 9                              ✓</div><p>The public 
       exp >>= 1n;
     }
     return result;
+  }
+  function modpowTrace(base, exp, mod, limit) {
+    /* Square and multiply, one row per bit of the exponent. The count is what
+       the loop actually did: one squaring per row except the last (whose
+       square is never used) and one multiplication per set bit. */
+    var rows = [], b = ((base % mod) + mod) % mod, e = exp, result = 1n, bit = 0, mults = 0;
+    while (e > 0n && bit < limit) {
+      var use = (e & 1n) === 1n;
+      if (use) { result = result * b % mod; mults += 1; }
+      rows.push({ bit: bit, use: use, power: b, result: use ? result : null });
+      b = b * b % mod; e >>= 1n; bit += 1;
+    }
+    return { rows: rows, result: result, squarings: rows.length ? rows.length - 1 : 0, mults: mults, complete: e === 0n };
   }
   function modinv(a, m) {
     var e = egcd(((a % m) + m) % m, m);
@@ -1378,10 +1414,86 @@ decrypt:  3^103 mod 143 = 9                              ✓</div><p>The public 
     for (var d = 3n; d * d <= n; d += 2n) if (n % d === 0n) return false;
     return true;
   }
+  function factorize(n) {
+    /* Trial division, the lesson-2 method: [[p, e], ...] with p increasing.
+       Stops at sqrt(remaining), which is the bound lesson 2 proves. */
+    var out = [], left = n < 0n ? -n : n;
+    if (left < 2n) return out;
+    for (var d = 2n; d * d <= left; d += (d === 2n ? 1n : 2n)) {
+      var e = 0n;
+      while (left % d === 0n) { left /= d; e += 1n; }
+      if (e > 0n) out.push([d, e]);
+    }
+    if (left > 1n) out.push([left, 1n]);
+    return out;
+  }
+  function totient(n) {
+    /* phi(n) = n * prod (1 - 1/p), computed as n / p * (p - 1) per prime so
+       every intermediate is an integer. This is lesson 11's formula, not a
+       count over 1..n, so it costs sqrt(n) rather than n. */
+    var phi = n;
+    factorize(n).forEach(function (pe) { phi = phi / pe[0] * (pe[0] - 1n); });
+    return phi;
+  }
+  function divisorCount(n) {
+    var c = 1n;
+    factorize(n).forEach(function (pe) { c *= pe[1] + 1n; });
+    return c;
+  }
+  function crtPair(a1, m1, a2, m2) {
+    /* x = a1 (mod m1), x = a2 (mod m2) for ANY positive moduli. Coprime
+       moduli are the theorem. Otherwise the system is consistent exactly
+       when a1 = a2 (mod gcd), and then the solution is unique modulo the
+       LCM, not the product -- which is what lesson 10's "coprimality is not
+       optional" section says and what its lab must be able to show. */
+    var g = bgcd(m1, m2), l = m1 / g * m2;
+    var r1 = ((a1 % m1) + m1) % m1, r2 = ((a2 % m2) + m2) % m2;
+    var diff = r2 - r1;
+    if (((diff % g) + g) % g !== 0n) return { g: g, lcm: l, r1: r1, r2: r2, x: null };
+    var m2g = m2 / g, inv = modinv((m1 / g) % m2g, m2g);
+    var k = inv === null ? 0n : ((((diff / g) % m2g) + m2g) % m2g) * inv % m2g;
+    var x = ((r1 + m1 * k) % l + l) % l;
+    return { g: g, lcm: l, r1: r1, r2: r2, x: x };
+  }
+  function lcgRun(a, c, m, seed, limit) {
+    /* Iterate x -> (a x + c) mod m until a value repeats or `limit` values
+       have been produced. `start` is the index the repeated value first
+       appeared at, so the period is seq.length - start and the values before
+       `start` are a tail the cycle never returns to. */
+    var seen = {}, seq = [], x = ((seed % m) + m) % m, i = 0;
+    while (!(x.toString() in seen) && i < limit) {
+      seen[x.toString()] = i; seq.push(x);
+      x = ((a * x + c) % m + m) % m; i += 1;
+    }
+    var start = (x.toString() in seen) ? seen[x.toString()] : -1;
+    return { seq: seq, next: x, start: start, period: start < 0 ? -1 : seq.length - start };
+  }
+  function hullDobell(a, c, m) {
+    /* The three conditions of the Hull-Dobell theorem, in the lesson's order:
+       gcd(c, m) = 1; every prime dividing m divides a - 1; 4 | m implies 4 | a - 1. */
+    var ps = factorize(m).map(function (pe) { return pe[0]; });
+    return [bgcd(c, m) === 1n,
+            ps.every(function (p) { return ((a - 1n) % p + p) % p === 0n; }),
+            m % 4n !== 0n || ((a - 1n) % 4n + 4n) % 4n === 0n];
+  }
+  function affineMap(a, b, m) {
+    /* x -> (a x + b) mod m on 0..m-1, with the number of distinct images.
+       Injective exactly when gcd(a, m) = 1, which is when `inv` exists. */
+    var out = [], images = {};
+    for (var x = 0n; x < m; x += 1n) {
+      var y = (((a * x + b) % m) + m) % m;
+      out.push(y); images[y.toString()] = 1;
+    }
+    return { map: out, distinct: Object.keys(images).length, inv: modinv(a, m) };
+  }
 
   var pIn = document.getElementById('rsaP'), qIn = document.getElementById('rsaQ');
   var eIn = document.getElementById('rsaE'), mIn = document.getElementById('rsaM');
   var out = document.getElementById('rsaOut'), status = document.getElementById('rsaStatus');
+  /* Above this the attack below -- trial division to sqrt(n) -- takes seconds
+     rather than microseconds, and a reader who typed a 12-digit prime would
+     freeze the page for hours. Refusing says why, which is lesson 14's point. */
+  var PRIME_LIMIT = 10000000n;
 
   function redraw() {
     var p, q, e, m;
@@ -1390,6 +1502,14 @@ decrypt:  3^103 mod 143 = 9                              ✓</div><p>The public 
       e = BigInt(eIn.value || '0'); m = BigInt(mIn.value || '0');
     } catch (err) { status.textContent = 'Enter whole numbers.'; return; }
 
+    if (p > PRIME_LIMIT || q > PRIME_LIMIT || p < 0n || q < 0n) {
+      out.innerHTML = '';
+      status.innerHTML = '<strong>Keep both primes below 10<sup>7</sup>.</strong> The attack at the end of this lab is trial '
+        + 'division up to √n, which finishes in under a second at that size and would take days at 10<sup>15</sup> and '
+        + 'longer than the universe at 1024 bits. That climb is the whole security argument; freezing the page does not '
+        + 'demonstrate it any better.';
+      return;
+    }
     if (!isPrimeBig(p) || !isPrimeBig(q)) {
       out.innerHTML = '';
       status.innerHTML = '<strong>p and q must both be prime.</strong> '
@@ -1404,11 +1524,11 @@ decrypt:  3^103 mod 143 = 9                              ✓</div><p>The public 
       return;
     }
     var n = p * q, phi = (p - 1n) * (q - 1n);
-    if (bgcd(e, phi) !== 1n) {
+    if (e < 2n || bgcd(e, phi) !== 1n) {
       out.innerHTML = '';
-      status.innerHTML = '<strong>e = ' + e + ' is not coprime to φ(n) = ' + phi + '</strong> (their gcd is '
-        + bgcd(e, phi) + '), so e has no inverse mod φ(n) and no decryption exponent exists. '
-        + 'Try 17, or any prime that does not divide ' + phi + '.';
+      status.innerHTML = '<strong>e = ' + e + ' is not a valid public exponent' + (e < 2n ? ': it must exceed 1.' : ' — it is not coprime to φ(n) = ' + phi + '</strong> (their gcd is '
+        + bgcd(e, phi) + '), so e has no inverse mod φ(n) and no decryption exponent exists. ')
+        + 'Try 17, or 65537, or any number coprime to ' + phi + ' — e does not have to be prime, only coprime to φ(n).';
       return;
     }
     var d = modinv(e, phi);

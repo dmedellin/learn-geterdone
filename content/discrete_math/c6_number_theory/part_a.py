@@ -59,7 +59,7 @@ LESSONS = [
             ("proof", [
                 "<strong>Existence.</strong> Let `S = {a − qb : q ∈ ℤ, a − qb ≥ 0}`. It is "
                 "nonempty (take `q` very negative) and consists of non-negative integers, "
-                "so by well-ordering it has a least element `r = a − qb`.",
+                "so by well-ordering (course 3 lesson 1) it has a least element `r = a − qb`.",
                 "If `r ≥ b` then `r − b = a − (q+1)b` is in `S` and smaller than `r`, "
                 "contradicting minimality. So `0 ≤ r &lt; b`.",
                 "<strong>Uniqueness.</strong> If `a = qb + r = q'b + r'` with both "
@@ -84,11 +84,14 @@ LESSONS = [
                      "algorithm, so `0 ≤ a mod b &lt; b` always.")),
         ],
         "lab": ("number", {
-            "mode": "div",
+            "mode": "div", "a": -7, "b": 3,
             "panel_title": "The division algorithm",
-            "panel_intro": "Try a negative `a`. The remainder stays non-negative, which is "
-                           "the theorem's requirement and the reason modular arithmetic is "
-                           "well defined.",
+            "panel_intro": "The preset is the lesson's `−7` divided by 3: `q = −3`, `r = 2`, "
+                           "and the check line reads `−3·3 + 2 = −7`. Change `a` to `−8` and "
+                           "then `−9` and watch `q` stay at `−3` while `r` runs through 1 and "
+                           "0 &mdash; the remainder never goes negative, which is the "
+                           "theorem's requirement and the reason modular arithmetic is well "
+                           "defined.",
         }),
         "steps_title": "Working with divisibility",
         "steps_intro": "Replace the statement by the equation it abbreviates.",
@@ -106,25 +109,29 @@ LESSONS = [
         ],
         "worked": {
             "title": "Divisibility by 3, from the digits",
-            "intro": ["Why the digit-sum test works."],
+            "intro": ["Why the digit-sum test works, using nothing but this lesson's property."],
             "lines": [
-                "Write n in base 10:   n = Σ dᵢ · 10ⁱ",
+                "Write n in base 10:   n = d_k·10^k + … + d₁·10 + d₀",
                 "",
-                "Note 10 = 9 + 1, so 10ⁱ = (9+1)ⁱ leaves remainder 1 on division by 3:",
-                "   10ⁱ ≡ 1 (mod 3)      for every i ≥ 0",
+                "Each 10ⁱ − 1 is a string of nines:   9, 99, 999, …  = 9·1, 9·11, 9·111, …",
+                "so   3 | (10ⁱ − 1)   for every i ≥ 1      (and 10⁰ − 1 = 0)",
                 "",
-                "Therefore  n ≡ Σ dᵢ · 1 = Σ dᵢ  (mod 3)",
+                "n − (d_k + … + d₀)  =  Σ dᵢ · (10ⁱ − 1)",
+                "                    =  a linear combination of multiples of 3",
+                "                    ⟹  3 | (n − digit sum)",
                 "",
-                "So 3 | n  ⟺  3 divides the digit sum.",
+                "So  3 | n  ⟺  3 | digit sum,    by   d | a and d | b  ⟹  d | (a ± b)",
                 "",
-                "Example:  4 728  →  4+7+2+8 = 21  →  2+1 = 3   ⟹ divisible by 3",
+                "Example:  4 728  →  4+7+2+8 = 21  →  3 | 21   ⟹  3 | 4728",
                 "Check:    4728 = 3 × 1576                        ✓",
             ],
             "after": [
-                "The same argument gives the test for 9, since `10ⁱ ≡ 1 (mod 9)` too. For "
-                "11 the powers alternate &mdash; `10ⁱ ≡ (−1)ⁱ` &mdash; which is why that "
-                "test uses an alternating digit sum. The notation used here is lesson 7's, "
-                "arriving early because it makes the argument short."
+                "The whole argument is the linear-combination property used twice: once to "
+                "see that `Σ dᵢ(10ⁱ − 1)` is a multiple of 3, and once to pass divisibility "
+                "between `n` and its digit sum, whose difference that sum is. Nine divides "
+                "every `10ⁱ − 1` too, so the same test works for 9. Lesson 7 will give the "
+                "argument a notation &mdash; `10ⁱ ≡ 1 (mod 3)` &mdash; that makes it one "
+                "line, and will handle 11, where `10ⁱ − (−1)ⁱ` is the multiple."
             ],
         },
         "quiz_title": "Divisibility",
@@ -132,20 +139,28 @@ LESSONS = [
             {"q": "What is `−17 mod 5`?",
              "a": ["`−2`", "3", "2", "`−17`"],
              "c": 1,
-             "why": "`−17 = (−4)(5) + 3` with `0 ≤ 3 &lt; 5`. The remainder is never "
-                    "negative, so `−2` is not an answer the theorem permits."},
+             "why": "`−17 = (−4)(5) + 3` with `0 ≤ 3 &lt; 5`. `−2` is what a language "
+                    "whose `%` rounds toward zero returns: `−17 = (−3)(5) − 2` is a true "
+                    "equation with a remainder the theorem forbids. 2 is `17 mod 5`, the "
+                    "sign dropped. `−17` is `a` itself, which is the remainder only when "
+                    "`0 ≤ a &lt; b`."},
             {"q": "`d | a` and `d | b`. What follows?",
-             "a": ["`d | ab` only", "`d | (a + b)` and `d | (a − b)`",
-                   "`d = 1`", "`a = b`"],
+             "a": ["`ab | d`", "`d | (a + b)` and `d | (a − b)`",
+                   "`d = gcd(a, b)`", "`a | b`"],
              "c": 1,
              "why": "Both are instances of `d | (ax + by)`, the linear-combination "
-                    "property, with `(x,y) = (1,1)` and `(1,−1)`."},
+                    "property, with `(x,y) = (1,1)` and `(1,−1)`. The others all fail at "
+                    "`d = 1`, `a = 4`, `b = 6`: `24 ∤ 1`; the gcd is 2, not 1 &mdash; a "
+                    "common divisor need not be the greatest; and `4 ∤ 6`."},
             {"q": "The division algorithm guarantees:",
              "a": ["`r` exists", "`r` exists and is unique, with `0 ≤ r &lt; b`",
                    "`b | a`", "`q` is positive"],
              "c": 1,
-             "why": "Existence and uniqueness together. Uniqueness is what makes `mod` a "
-                    "function rather than a relation."},
+             "why": "Existence and uniqueness together, with the range that makes "
+                    "uniqueness true; that is what makes `mod` a function rather than a "
+                    "relation. Existence alone would leave `−7 = (−2)(3) − 1` and "
+                    "`(−3)(3) + 2` both admissible. `b | a` is the special case `r = 0`, "
+                    "and `q` is negative whenever `a` is negative and `b` positive."},
         ],
         "mistakes": [
             ("Allowing a negative remainder",
@@ -213,7 +228,7 @@ LESSONS = [
                      "Every integer `n &gt; 1` can be written as a product of primes, and "
                      "the factorisation is unique up to the order of the factors.")),
             ("proof", [
-                "<strong>Existence</strong>, by strong induction. If `n` is prime it is a "
+                "<strong>Existence</strong>, by strong induction (course 3 lesson 5). If `n` is prime it is a "
                 "product of one prime. Otherwise `n = ab` with `1 &lt; a, b &lt; n`, and by "
                 "the inductive hypothesis both factor into primes; concatenating the two "
                 "factorisations gives one for `n`.",
@@ -258,11 +273,13 @@ LESSONS = [
                   "prime."),
         ],
         "lab": ("number", {
-            "mode": "factor",
+            "mode": "factor", "a": 360,
             "panel_title": "Factorisation, step by step",
-            "panel_intro": "Trial division from 2 upward, stopping at `√n`. The divisor "
-                           "count comes from the exponents, which is the fundamental "
-                           "theorem being used rather than quoted.",
+            "panel_intro": "The preset is the worked example: trial division from 2 upward "
+                           "reads `360 = 2^3 · 3^2 · 5` with 24 in the divisors corner, from "
+                           "`(3+1)(2+1)(1+1)`. Enter 2520 and predict 48 before the page "
+                           "says so. The divisor count comes from the exponents, which is "
+                           "the fundamental theorem being used rather than quoted.",
         }),
         "steps_title": "Factoring and testing",
         "steps_intro": "Small primes first, stop at the square root.",
@@ -309,21 +326,29 @@ LESSONS = [
                    "It has no divisors",
                    "It is composite"],
              "c": 1,
-             "why": "Allowing 1 would let any factorisation be padded with 1s. The "
-                    "definition is chosen to make the fundamental theorem clean."},
+             "why": "Allowing 1 would let any factorisation be padded with 1s, and the "
+                    "theorem would need a qualification. \"Too small\" is not a "
+                    "mathematical reason &mdash; 2 is prime. 1 does have a divisor, itself, "
+                    "so \"no divisors\" is false. And composite means a nontrivial "
+                    "factorisation, which 1 also lacks: it is neither, by decision."},
             {"q": "To test whether 149 is prime, you must divide by primes up to:",
              "a": ["74", "12", "149", "50"],
              "c": 1,
-             "why": "`√149 ≈ 12.2`, so the primes 2, 3, 5, 7, 11 suffice. A composite has a "
-                    "factor at most its square root."},
+             "why": "`√149 ≈ 12.2`, so the primes 2, 3, 5, 7, 11 suffice &mdash; none "
+                    "divides 149, so it is prime. 74 is `149/2`, the largest proper divisor "
+                    "a number could have, but a composite has a factor at most its square "
+                    "root, so the search stops far earlier; 50 is arbitrary; 149 is "
+                    "testing every candidate, which the bound exists to avoid."},
             {"q": "In Euclid's proof, `N = p₁⋯p_k + 1` is:",
              "a": ["always prime",
                    "not necessarily prime, but it has a prime factor not on the list",
                    "always composite",
                    "equal to the next prime"],
              "c": 1,
-             "why": "`2·3·5·7·11·13 + 1 = 30031 = 59 · 509`. The proof produces a new "
-                    "prime, not necessarily `N` itself."},
+             "why": "`2·3·5·7·11·13 + 1 = 30031 = 59 · 509`, so `N` is not always prime; "
+                    "`2·3 + 1 = 7` shows it is not always composite either; and 7 is not "
+                    "the next prime after 3 &mdash; 5 is. The proof produces a new prime, "
+                    "not necessarily `N` itself."},
         ],
         "mistakes": [
             ("Calling 1 prime",
@@ -435,11 +460,13 @@ LESSONS = [
                   "Miller&ndash;Rabin, which decide primality without producing factors."),
         ],
         "lab": ("number", {
-            "mode": "sieve",
+            "mode": "sieve", "a": 100,
             "panel_title": "Sieving, with provenance",
-            "panel_intro": "Every crossed-out number records which prime removed it. Hover "
-                           "one and see the smallest prime factor &mdash; and note nothing "
-                           "beyond `√N` ever removes anything new.",
+            "panel_intro": "The preset sieves to 100 and finds 25 primes. Every crossed-out "
+                           "number records which prime removed it: hover 91, the composite "
+                           "most often mistaken for a prime, and see 7. Set `N` to 30 to "
+                           "reproduce the worked example's ten survivors &mdash; and note "
+                           "nothing beyond `√N` ever removes anything new.",
         }),
         "steps_title": "Running the sieve",
         "steps_intro": "One pass per prime, starting at its square.",
@@ -481,20 +508,26 @@ LESSONS = [
              "a": ["97", "50", "7", "10"],
              "c": 2,
              "why": "`√100 = 10`, so passes are needed for primes up to 10: 2, 3, 5, 7. "
-                    "Anything surviving those is prime."},
+                    "10 is the bound but not a prime, and it is already crossed out when "
+                    "the loop reaches it; 50 is `n/2`, a bound that would waste forty "
+                    "passes; 97 is the largest prime below 100, and it survives without a "
+                    "pass of its own. Anything surviving the four passes is prime."},
             {"q": "Why does the inner loop start at `p²`?",
              "a": ["To save memory",
                    "Multiples of `p` below `p²` have a smaller prime factor and are already crossed out",
                    "`p²` is prime",
                    "It is required for correctness"],
              "c": 1,
-             "why": "Correctness is unaffected &mdash; starting at `2p` also works. Starting "
-                    "at `p²` avoids repeating work."},
+             "why": "Correctness is unaffected &mdash; starting at `2p` also works, so it "
+                    "is not required; starting at `p²` avoids repeating work. Memory is "
+                    "the same either way, one mark per number; and `p²` is never prime."},
             {"q": "The sieve costs approximately:",
              "a": ["`n²`", "`n log log n`", "`n!`", "`2ⁿ`"],
              "c": 1,
              "why": "`n Σ_{p ≤ √n} 1/p`, and the sum of prime reciprocals grows like "
-                    "`log log`. Very nearly linear in practice."},
+                    "`log log`: very nearly linear in practice. `n²` would be testing "
+                    "every pair of numbers; `n!` and `2ⁿ` are the costs of enumerating "
+                    "permutations and subsets, and the sieve enumerates neither."},
         ],
         "mistakes": [
             ("Sieving past `√n`",
@@ -590,7 +623,9 @@ LESSONS = [
                   "lesson 5 is the reason this one is easy."),
             ("def", ("Coprime",
                      "`a` and `b` are <strong>coprime</strong> (relatively prime) when "
-                     "`gcd(a,b) = 1`: they share no prime factor. A set is "
+                     "`gcd(a,b) = 1`: they share no prime factor. Neither number need "
+                     "be prime &mdash; 8 and 9 are coprime and both are composite; "
+                     "coprimality is a property of the pair. A set is "
                      "<strong>pairwise coprime</strong> when every two of its members are.")),
             ("thm", ("Consecutive integers are coprime",
                      "`gcd(n, n+1) = 1` for every `n`.")),
@@ -600,11 +635,12 @@ LESSONS = [
             ]),
         ],
         "lab": ("number", {
-            "mode": "euclid",
+            "mode": "euclid", "a": 264, "b": 84,
             "panel_title": "gcd without factoring",
-            "panel_intro": "Enter two large numbers. The algorithm finds the gcd in a "
-                           "handful of divisions, having factored neither &mdash; which is "
-                           "the point of lesson 5.",
+            "panel_intro": "The preset is the worked example: `gcd(264, 84) = 12` in two "
+                           "divisions, the algorithm having factored neither. Then enter "
+                           "two eight-digit numbers and count the rows &mdash; a handful, "
+                           "which is the point of lesson 5.",
         }),
         "steps_title": "Computing gcd and lcm",
         "steps_intro": "Euclid for the gcd; the identity for the lcm.",
@@ -651,20 +687,27 @@ LESSONS = [
             {"q": "`gcd(12, 18)` equals:",
              "a": ["2", "3", "6", "36"],
              "c": 2,
-             "why": "`12 = 2²·3` and `18 = 2·3²`, so the gcd takes `2¹·3¹ = 6`."},
+             "why": "`12 = 2²·3` and `18 = 2·3²`, so the gcd takes the smaller exponent "
+                    "of each: `2·3 = 6`. 36 is the lcm, from the larger exponents; 2 and 3 "
+                    "are common divisors but not the greatest."},
             {"q": "`gcd(a,b) = 4` and `lcm(a,b) = 60`. What is `ab`?",
              "a": ["64", "240", "15", "cannot be determined"],
              "c": 1,
-             "why": "`gcd · lcm = |ab| = 240`. The identity determines the product but not "
-                    "`a` and `b` individually."},
+             "why": "`gcd · lcm = |ab| = 240`. 64 is `4³` and 15 is `60/4`, neither of "
+                    "which the identity mentions. It IS determined, but only the product: "
+                    "`(4, 60)` and `(12, 20)` both have gcd 4 and lcm 60, so `ab` is known "
+                    "while `a` and `b` are not."},
             {"q": "Why is factorisation a poor method for computing gcds?",
              "a": ["It gives the wrong answer",
                    "Factoring large numbers is computationally hard, while Euclid's algorithm is fast",
                    "It only works for primes",
                    "It requires a computer"],
              "c": 1,
-             "why": "The formula is correct. Euclid computes gcds of 100-digit numbers "
-                    "instantly; factoring them is beyond any known method."},
+             "why": "The formula is correct, so the first option is wrong; it works "
+                    "for any integers, not only primes; and no method here needs a "
+                    "computer &mdash; Euclid on 1071 and 462 is three lines by hand. "
+                    "Euclid computes gcds of 100-digit numbers instantly; factoring them "
+                    "is beyond any known method."},
         ],
         "mistakes": [
             ("Computing gcds by factoring",
@@ -782,11 +825,13 @@ LESSONS = [
                   "asymptotically for the general case."),
         ],
         "lab": ("number", {
-            "mode": "euclid",
+            "mode": "euclid", "a": 1071, "b": 462,
             "panel_title": "Every division, shown",
-            "panel_intro": "Try `a = 89`, `b = 55` &mdash; consecutive Fibonacci numbers, "
-                           "the worst case, where every quotient is 1. Then try two "
-                           "numbers ten times larger and count the steps.",
+            "panel_intro": "The preset is the worked example: three rows to `gcd = 21`. "
+                           "Try `a = 89`, `b = 55` &mdash; consecutive Fibonacci numbers, "
+                           "the worst case, nine rows with every quotient 1. Then try 890 "
+                           "and 550: the same nine rows, because scaling both inputs "
+                           "leaves every quotient unchanged.",
         }),
         "steps_title": "Running the algorithm",
         "steps_intro": "Divide, keep the remainder, repeat.",
@@ -833,18 +878,26 @@ LESSONS = [
                    "it is an axiom"],
              "c": 1,
              "why": "Any common divisor of `a` and `b` divides `a − qb = r`, and "
-                    "conversely. Same divisor set, same greatest element."},
+                    "conversely: same divisor set, same greatest element. That remainders "
+                    "are smaller, and that `a mod b &lt; b`, is why the algorithm "
+                    "terminates, not why it is correct; and nothing here is an axiom "
+                    "&mdash; the identity has a two-line proof."},
             {"q": "The worst case for the algorithm is:",
              "a": ["two primes", "consecutive Fibonacci numbers",
                    "powers of 2", "equal numbers"],
              "c": 1,
-             "why": "Every quotient is 1, which is the slowest possible progress. "
-                    "`gcd(F_{n+1}, F_n)` takes `n − 1` steps."},
+             "why": "Every quotient is 1, which is the slowest possible progress: "
+                    "`gcd(F_{n+1}, F_n)` takes `n − 1` steps. Two primes can be fast "
+                    "(`gcd(7, 3)`: `7 = 2·3 + 1`, then `3 = 3·1`, two steps); powers of 2 "
+                    "finish in one step, the smaller dividing the larger; equal numbers "
+                    "finish in one."},
             {"q": "The number of steps grows like:",
              "a": ["`√a`", "`log a`", "`a`", "`a²`"],
              "c": 1,
              "why": "Two iterations at least halve the larger argument, so the count is "
-                    "logarithmic in the input."},
+                    "logarithmic in the input. `√a` is the cost of trial division to the "
+                    "root; `a` would be subtracting rather than dividing; `a²` would be "
+                    "comparing every pair of candidate divisors."},
         ],
         "mistakes": [
             ("Stopping at the wrong point",
@@ -859,7 +912,8 @@ LESSONS = [
         ],
         "standard": ("Finish when you can predict the step count.",
                      "Run the algorithm on `gcd(144, 89)` and count the divisions before "
-                     "starting. Consecutive Fibonacci numbers give the maximum, and knowing "
+                     "starting: `144 = F₁₂` and `89 = F₁₁`, so the body's rule names the "
+                     "number. Consecutive Fibonacci numbers give the maximum, and knowing "
                      "that in advance is the analysis working."),
         "note": "Lesson 6 runs the same divisions backwards to produce Bézout's "
                 "coefficients, which is where modular inverses come from &mdash; and "
@@ -908,7 +962,8 @@ LESSONS = [
                      "integer expressible in that form.")),
             ("proof", [
                 "Let `S = {ax + by : x, y ∈ ℤ, ax + by &gt; 0}`, which is nonempty (it "
-                "contains `|a|`). By well-ordering it has a least element `d = ax₀ + by₀`.",
+                "contains `|a|`). By well-ordering (course 3 lesson 1) it has a least "
+                "element `d = ax₀ + by₀`.",
                 "Divide: `a = qd + r` with `0 ≤ r &lt; d`. Then "
                 "`r = a − qd = a(1 − qx₀) + b(−qy₀)`, which is of the required form. Since "
                 "`0 ≤ r &lt; d` and `d` is the smallest positive such value, `r = 0`, so "
@@ -935,7 +990,10 @@ LESSONS = [
                 "So  1071·(−3) + 462·(7) = 21 = gcd.        ✓",
             ]),
             ("p", "The iterative form maintains the coefficients as it goes and avoids the "
-                  "back-substitution entirely; it is what the lab runs and what every "
+                  "back-substitution entirely: alongside each remainder `r` it keeps `s` "
+                  "and `t` with `r = as + bt`, updating all three by the same "
+                  "\"subtract `q` times the row above\" step. It is what the lab runs, "
+                  "row by row with the identity checked on every line, and what every "
                   "implementation uses."),
             ("thm", ("Modular inverses",
                      "`a` has an inverse modulo `m` &mdash; an `x` with `ax ≡ 1 (mod m)` "
@@ -965,11 +1023,15 @@ LESSONS = [
                   "course has the deepest justification."),
         ],
         "lab": ("number", {
-            "mode": "bezout",
+            "mode": "bezout", "a": 17, "b": 3120,
             "panel_title": "The coefficients, computed",
-            "panel_intro": "The lab prints `x` and `y` with the identity verified. Try "
-                           "coprime inputs and note that `x` is then the inverse of `a` "
-                           "modulo `b`.",
+            "panel_intro": "The preset is the worked example. The table is the extended "
+                           "algorithm run forward, every row keeping `r = 17s + 3120t` "
+                           "true, so the back-substitution done by hand above never "
+                           "happens; the highlighted row reads `1 = 17·(−367) + 3120·2`. "
+                           "Because the gcd is 1 the status line reduces `−367` to 2753, "
+                           "the inverse of 17 modulo 3120 and lesson 14's private "
+                           "exponent. Enter 1071 and 462 for the body's `(−3, 7)`.",
         }),
         "steps_title": "Finding Bézout coefficients",
         "steps_intro": "Forward for the gcd, backward for the coefficients.",
@@ -1017,7 +1079,10 @@ LESSONS = [
              "a": ["`a &lt; m`", "`gcd(a, m) = 1`", "`m` is prime", "`a` is prime"],
              "c": 1,
              "why": "Bézout gives `ax + my = 1` exactly when the gcd is 1, and reducing "
-                    "mod `m` makes `x` the inverse."},
+                    "mod `m` makes `x` the inverse. `a &lt; m` is not enough: 2 has no "
+                    "inverse modulo 4. A prime `m` is sufficient but not necessary: 5 is "
+                    "invertible modulo 12. A prime `a` is neither: 3 has no inverse "
+                    "modulo 6."},
             {"q": "Bézout's identity says `gcd(a,b)` is:",
              "a": ["the product of `a` and `b`",
                    "expressible as `ax + by` for some integers `x, y`",
@@ -1025,15 +1090,21 @@ LESSONS = [
                    "the smallest of `a` and `b`"],
              "c": 1,
              "why": "And it is the smallest positive such combination, which is how the "
-                    "proof identifies it."},
+                    "proof identifies it. The product `ab` is a multiple of the gcd, not "
+                    "the gcd; \"always 1\" is coprimality, a special case; and "
+                    "`gcd(4, 6) = 2` is smaller than both inputs, so the minimum of the "
+                    "two is wrong as well."},
             {"q": "Euclid's lemma is needed to prove:",
              "a": ["the division algorithm",
                    "uniqueness of prime factorisation",
                    "that there are infinitely many primes",
                    "the sieve is correct"],
              "c": 1,
-             "why": "Existence of a factorisation is straightforward induction; uniqueness "
-                    "needs the lemma, which needs Bézout."},
+             "why": "Existence of a factorisation is straightforward strong induction; "
+                    "uniqueness needs the lemma, which needs Bézout. The division "
+                    "algorithm rests on well-ordering alone; Euclid's infinitude proof "
+                    "uses only the linear-combination property; the sieve's correctness "
+                    "uses lesson 2's trial-division bound."},
         ],
         "mistakes": [
             ("Leaving a negative inverse unreduced",
@@ -1143,11 +1214,13 @@ LESSONS = [
                          "digit errors, though not a transposition.")),
         ],
         "lab": ("number", {
-            "mode": "modtable",
+            "mode": "modtable", "m": 12,
             "panel_title": "The tables",
-            "panel_intro": "Compare a prime modulus with a composite one. In the prime "
-                           "case every nonzero row of the multiplication table is a "
-                           "permutation; in the composite case some rows contain zeros.",
+            "panel_intro": "The preset is `ℤ_12`, the quiz's modulus. In the × table the "
+                           "rows for 1, 5, 7 and 11 are permutations of `0 … 11`; the row "
+                           "for 4 reads `0, 4, 8` over and over, and `4 · 3 = 0` with "
+                           "neither factor zero. Set `m = 7` and every nonzero row becomes "
+                           "a permutation &mdash; the field the body describes.",
         }),
         "steps_title": "Computing modulo `m`",
         "steps_intro": "Reduce early and often.",
@@ -1188,20 +1261,29 @@ LESSONS = [
         },
         "quiz_title": "Modular arithmetic",
         "quiz": [
-            {"q": "`17 ≡ ? (mod 5)`",
+            {"q": "`17 mod 5` equals:",
              "a": ["3", "2", "12", "17"],
              "c": 1,
-             "why": "`17 = 3·5 + 2`, so `17 ≡ 2 (mod 5)`."},
+             "why": "`17 = 3·5 + 2`, so `17 mod 5 = 2`. 3 is the quotient. 12 and 17 are "
+                    "both congruent to 17 modulo 5 &mdash; true congruences &mdash; but "
+                    "`mod` names the one representative in `[0, 5)`, and neither is it."},
             {"q": "`6a ≡ 6b (mod 9)`. Can you conclude `a ≡ b (mod 9)`?",
              "a": ["Yes", "No, because `gcd(6, 9) = 3 ≠ 1`",
                    "Only if `a` and `b` are positive", "Only if 9 is prime"],
              "c": 1,
-             "why": "Cancellation needs the factor coprime to the modulus. Here "
-                    "`6·1 ≡ 6·4 (mod 9)` while `1 ≢ 4`."},
+             "why": "Cancellation needs the factor coprime to the modulus, and "
+                    "`gcd(6, 9) = 3`: here `6·1 ≡ 6·4 (mod 9)` while `1 ≢ 4`. Positivity "
+                    "is irrelevant &mdash; that counterexample uses positive numbers "
+                    "&mdash; and 9 is not prime; even for a prime modulus the rule is "
+                    "coprimality, which every nonzero factor then happens to satisfy. "
+                    "What cancelling by 6 does give is `a ≡ b (mod 3)`."},
             {"q": "In `ℤ_12`, which elements have multiplicative inverses?",
              "a": ["all of them", "the primes", "1, 5, 7, 11", "only 1"],
              "c": 2,
-             "why": "Exactly those coprime to 12, and there are `φ(12) = 4` of them."},
+             "why": "Exactly those coprime to 12, and there are `φ(12) = 4` of them. "
+                    "\"All\" fails at 2, since `2x` is even and never 1 modulo 12; "
+                    "\"the primes\" includes 2 and 3 and omits 1; \"only 1\" omits 5, "
+                    "whose inverse is itself (`25 ≡ 1`)."},
         ],
         "mistakes": [
             ("Cancelling a common factor without checking the gcd",

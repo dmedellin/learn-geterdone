@@ -35,6 +35,8 @@ const COUNTING_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'counting.py');
 const countingSrc = fs.readFileSync(COUNTING_SOURCE, 'utf8');
 const PROB_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'probability.py');
 const probSrc = fs.readFileSync(PROB_SOURCE, 'utf8');
+const NUMBER_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'number.py');
+const numberSrc = fs.readFileSync(NUMBER_SOURCE, 'utf8');
 
 /* Each block is  NAME = r"""..."""  in the Python module. */
 function blockFrom(text, name, where) {
@@ -46,6 +48,7 @@ function block(name) { return blockFrom(src, name, SOURCE); }
 function logicBlock(name) { return blockFrom(logicSrc, name, LOGIC_SOURCE); }
 function countingBlock(name) { return blockFrom(countingSrc, name, COUNTING_SOURCE); }
 function probBlock(name) { return blockFrom(probSrc, name, PROB_SOURCE); }
+function numberBlock(name) { return blockFrom(numberSrc, name, NUMBER_SOURCE); }
 
 let fails = 0;
 function eq(got, want, label) {
@@ -465,6 +468,141 @@ console.log('probability as exact fractions and summed distributions (course 5 l
   eq(grp(50940), '50 940', 'digit grouping');
   eq(dec(990, 1000000), '0.00099', 'decimals are printed without trailing zeros');
   eq(dec(99, 100), '0.99', 'and a percentage as its decimal');
+}
+
+// -------------------------------------------------------- number theory
+console.log('number theory in BigInt (course 6 labs)');
+{
+  /* The course-6 footer promises exact big-integer arithmetic, and lesson 14
+     promises that the key the lab generates decrypts and is then recovered by
+     factoring. The functions below are the shipped ones, extracted from
+     number.py. The case that motivated this section: the lesson-14 worked
+     example printed c = 3 for 9^7 mod 143 while the lab under it printed 48;
+     the lab was right, and nothing checked either. */
+  eval(numberBlock('NT_JS'));
+
+  eq(bgcd(1071n, 462n), 21n, 'gcd(1071, 462) = 21 (lesson 5 worked example)');
+  eq(bgcd(264n, 84n), 12n, 'gcd(264, 84) = 12 (lesson 4 worked example)');
+  eq(bgcd(-12n, 18n), 6n, 'gcd ignores sign');
+  eq(bgcd(17n, 0n), 17n, 'gcd(a, 0) = a, the base case');
+  eq(egcd(1071n, 462n).join(','), '21,-3,7', '1071·(−3) + 462·7 = 21 (lesson 6 body)');
+  eq(egcd(17n, 3120n).join(','), '1,-367,2', '17·(−367) + 3120·2 = 1 (lesson 6 worked example)');
+  const tr = egcdTrace(17n, 3120n);
+  eq(tr.g + ',' + tr.x + ',' + tr.y, '1,-367,2', 'the trace ends where egcd does');
+  eq(tr.rows.every((r) => 17n * r.s + 3120n * r.t === r.r), true, 'r = a·s + b·t holds on every row of the trace');
+  eq(tr.rows.map((r) => r.r).join(','), '17,3120,17,9,8,1,0', 'the remainders are the worked example\'s 9, 8, 1, 0');
+  const trn = egcdTrace(-1071n, 462n);
+  eq(-1071n * trn.x + 462n * trn.y, trn.g, 'a negative input keeps the identity true as typed');
+  eq(modinv(17n, 3120n), 2753n, '17⁻¹ mod 3120 = 2753, the RSA private exponent');
+  eq(modinv(7n, 26n), 15n, '7⁻¹ mod 26 = 15 (lesson 9 example, lesson 6 standard)');
+  eq(modinv(5n, 26n), 21n, '5⁻¹ mod 26 = 21 (lesson 13 example)');
+  eq(modinv(15n, 26n), 7n, '15⁻¹ mod 26 = 7 (lesson 13 worked example)');
+  eq(modinv(6n, 9n), null, 'no inverse when the gcd is not 1');
+  eq(modinv(2n, 4n), null, '2 has no inverse mod 4');
+  eq(modinv(-367n, 3120n), 17n, 'the inverse of −367 ≡ 2753 is 17: a negative representative is reduced first');
+
+  eq(modpow(7n, 128n, 13n), 3n, '7^128 mod 13 = 3 (lesson 8 body)');
+  eq(modpow(3n, 200n, 50n), 1n, '3^200 mod 50 = 1 (lesson 8 worked example)');
+  eq(modpow(5n, 117n, 19n), 1n, '5^117 mod 19 (lesson 8 standard)');
+  eq(modpow(7n, 100n, 10n), 1n, '7^100 ends in 1 (lesson 7 worked example)');
+  eq(modpow(7n, 1000n, 13n), 9n, '7^1000 mod 13 = 9 (lesson 11 body)');
+  eq(modpow(3n, 1234567n, 100n), 87n, '3^1234567 mod 100 = 87 (lesson 11 worked example)');
+  eq(modpow(2n, 1000000n, 77n), 23n, '2^1000000 mod 77 (lesson 11 standard) equals 2^40 mod 77');
+  eq(modpow(2n, 40n, 77n), 23n, 'because the exponent reduces modulo φ(77) = 60');
+  eq(modpow(2n, 10n, 7n), 2n, '2^10 mod 7 = 2, not the 1 that reducing the exponent mod 7 gives (lesson 11 mistake 1)');
+  eq(modpow(-7n, 3n, 10n), 7n, 'a negative base is reduced into [0, m) first');
+  eq(modpow(65n, 17n, 3233n), 2790n, '65^17 mod 3233 = 2790 (the textbook key)');
+  eq(modpow(2790n, 2753n, 3233n), 65n, 'and 2790^2753 mod 3233 = 65 decrypts it');
+  eq(modpow(9n, 7n, 143n), 48n, '9^7 mod 143 = 48 — the lesson-14 worked example, which once said 3');
+  eq(modpow(48n, 103n, 143n), 9n, 'and 48^103 mod 143 = 9 decrypts it');
+  eq(modpow(3n, 103n, 143n), 16n, 'the old ciphertext 3 would not have decrypted to 9');
+  const mt = modpowTrace(7n, 128n, 13n, 64);
+  eq(mt.result, 3n, 'the trace reaches the same answer as modpow');
+  eq(mt.rows.length + ',' + mt.squarings + ',' + mt.mults, '8,7,1', '7^128: eight rows, seven squarings, one multiplication');
+  eq(mt.rows.map((r) => r.power).join(','), '7,10,9,3,9,3,9,3', 'the powers 7, 10, 9, 3, 9, 3, 9, 3 the body lists');
+  const mt2 = modpowTrace(3n, 200n, 50n, 64);
+  eq(mt2.rows.map((r) => r.power).join(','), '3,9,31,11,21,41,31,11', 'the worked example\'s column: 3, 9, 31, 11, 21, 41, 31, 11');
+  eq(mt2.rows.map((r) => (r.use ? 1 : 0)).join(''), '00010011', 'set bits at positions 3, 6 and 7');
+  eq(mt2.squarings + ',' + mt2.mults + ',' + mt2.result, '7,3,1', 'seven squarings, three multiplications, result 1');
+  eq(modpowTrace(5n, 117n, 19n, 64).squarings + ',' + modpowTrace(5n, 117n, 19n, 64).mults, '6,5', '5^117: six squarings, five set bits');
+  eq(modpowTrace(7n, 2n ** 100n, 13n, 64).complete, false, 'a 101-bit exponent is reported as truncated at 64 rows');
+
+  eq(isPrimeBig(2n), true, '2 is prime');
+  eq(isPrimeBig(1n), false, '1 is not prime');
+  eq(isPrimeBig(101n), true, '101 is prime (lesson 2: four divisions)');
+  eq(isPrimeBig(149n), true, '149 is prime (lesson 2 quiz)');
+  eq(isPrimeBig(561n), false, '561, a Carmichael number, is composite');
+  eq(isPrimeBig(30031n), false, '2·3·5·7·11·13 + 1 is composite');
+  eq(factorize(360n).map((pe) => pe.join('^')).join(','), '2^3,3^2,5^1', '360 = 2³·3²·5 (lesson 2 worked example)');
+  eq(divisorCount(360n), 24n, '360 has 24 divisors');
+  eq(divisorCount(2520n), 48n, '2520 has 48 divisors (lesson 2 standard)');
+  eq(factorize(30031n).map((pe) => pe[0]).join(','), '59,509', '30031 = 59 · 509');
+  eq(factorize(1071n).map((pe) => pe.join('^')).join(','), '3^2,7^1,17^1', '1071 = 3²·7·17');
+  eq(factorize(1n).length, 0, '1 has no prime factors');
+  eq(factorize(97n).map((pe) => pe.join('^')).join(','), '97^1', 'a prime is its own factorisation');
+  eq(totient(7n), 6n, 'φ(7) = 6');
+  eq(totient(9n), 6n, 'φ(9) = 6');
+  eq(totient(12n), 4n, 'φ(12) = 4');
+  eq(totient(15n), 8n, 'φ(15) = 8 (lesson 11 quiz)');
+  eq(totient(35n), 24n, 'φ(35) = 24');
+  eq(totient(100n), 40n, 'φ(100) = 40 (lesson 11 worked example)');
+  eq(totient(77n), 60n, 'φ(77) = 60 (lesson 11 standard)');
+  eq(totient(3120n), 768n, 'φ(3120) = 768');
+  eq(totient(26n), 12n, 'φ(26) = 12, the affine multipliers');
+  eq(totient(1n), 1n, 'φ(1) = 1');
+  eq(modpow(7n, totient(13n), 13n), 1n, 'Fermat at the lesson-11 preset: 7^12 ≡ 1 (mod 13)');
+  eq(modpow(2n, totient(4n), 4n), 0n, '2^φ(4) ≡ 0 (mod 4): the theorem needs a coprime base');
+
+  const sun = crtPair(2n, 3n, 3n, 5n);
+  eq(sun.x + ' mod ' + sun.lcm, '8 mod 15', 'x ≡ 2 (3), x ≡ 3 (5) gives 8 mod 15 (lesson 10 preset)');
+  const sun2 = crtPair(8n, 15n, 2n, 7n);
+  eq(sun2.x + ' mod ' + sun2.lcm, '23 mod 105', 'then with x ≡ 2 (7): Sun Tzu\'s 23 mod 105');
+  const std = crtPair(crtPair(1n, 5n, 2n, 7n).x, 35n, 3n, 9n);
+  eq(std.x + ' mod ' + std.lcm, '156 mod 315', 'the lesson-10 standard: 156 mod 315');
+  const bad = crtPair(1n, 4n, 2n, 6n);
+  eq(bad.x === null && bad.g === 2n, true, 'x ≡ 1 (4), x ≡ 2 (6) is inconsistent modulo gcd 2');
+  const ok = crtPair(1n, 4n, 3n, 6n);
+  eq(ok.x + ' mod ' + ok.lcm, '9 mod 12', 'x ≡ 1 (4), x ≡ 3 (6) is 9 modulo the lcm 12, not 24');
+  eq(crtPair(1n, 2n, 3n, 4n).x, 3n, 'one modulus dividing the other');
+  eq(crtPair(-1n, 4n, 5n, 6n).x, 11n, 'negative remainders are reduced first');
+  {
+    /* The construction the lab displays for coprime moduli must agree with the
+       general solver: Σ aᵢMᵢyᵢ mod M. */
+    const M = 15n, t1 = 2n * 5n * modinv(5n, 3n) % M, t2 = 3n * 3n * modinv(3n, 5n) % M;
+    eq((t1 + t2) % M, sun.x, 'the displayed construction agrees with crtPair');
+  }
+
+  const g1 = lcgRun(5n, 3n, 8n, 0n, 9);
+  eq(g1.seq.join(','), '0,3,2,5,4,7,6,1', 'a = 5, c = 3, m = 8 from 0: the lesson-12 body sequence');
+  eq(g1.start + ',' + g1.period, '0,8', 'full period 8');
+  const g2 = lcgRun(4n, 3n, 8n, 0n, 9);
+  eq(g2.seq.join(',') + ' then ' + g2.next, '0,3,7 then 7', 'a = 4 collapses: 0, 3, 7, 7, …');
+  eq(g2.start + ',' + g2.period, '2,1', 'period 1 after a tail of 2');
+  const g3 = lcgRun(5n, 3n, 16n, 1n, 17);
+  eq(g3.seq.join(','), '1,8,11,10,5,12,15,14,9,0,3,2,13,4,7,6', 'the worked example\'s good generator at m = 16');
+  eq(g3.period, 16, 'period 16 — every value once');
+  const g4 = lcgRun(6n, 3n, 16n, 1n, 17);
+  eq(g4.seq.join(',') + ' then ' + g4.next + ',' + g4.period, '1,9 then 9,1', 'a = 6: 1, 9, 9, 9, … period 1');
+  eq(hullDobell(5n, 3n, 16n).join(','), 'true,true,true', 'Hull–Dobell passes for (5, 3, 16)');
+  eq(hullDobell(6n, 3n, 16n).join(','), 'true,false,false', 'and (6, 3, 16) fails the second and third: 2 ∤ 5 and 4 ∤ 5');
+  eq(hullDobell(4n, 3n, 8n).join(','), 'true,false,false', '(4, 3, 8): a − 1 = 3 is divisible by neither 2 nor 4');
+  eq(hullDobell(21n, 1n, 100n).join(','), 'true,true,true', '(21, 1, 100) passes: a full-period generator for the standard');
+  eq(lcgRun(21n, 1n, 100n, 0n, 101).period, 100, 'and it does have period 100');
+  eq(hullDobell(5n, 3n, 7n).join(','), 'true,false,true', 'm = 7: the third condition is vacuous, the second fails');
+  eq(lcgRun(5n, 3n, 7n, 0n, 8).period + ',' + lcgRun(5n, 3n, 7n, 1n, 8).period, '6,1',
+     'so the period depends on the seed: 6 from 0, and 1 from the fixed point 1');
+
+  const af = affineMap(5n, 8n, 26n);
+  eq(af.map[7], 17n, 'H = 7 → 17 = R under (5, 8) (lesson 13 body)');
+  eq(af.distinct + ',' + af.inv, '26,21', 'all 26 letters distinct, a⁻¹ = 21');
+  eq((((17n - 8n) * 21n) % 26n + 26n) % 26n, 7n, 'D(17) = 21·(17 − 8) ≡ 7 = H');
+  const af2 = affineMap(15n, 9n, 26n);
+  eq(af2.map[4] + ',' + af2.map[19], '17,8', 'the recovered key (15, 9) sends E → R and T → I (lesson 13 worked example)');
+  const af3 = affineMap(3n, 24n, 26n);
+  eq(af3.map[4] + ',' + af3.map[19], '10,3', 'the standard\'s key (3, 24) sends E → K and T → D');
+  const af13 = affineMap(13n, 0n, 26n);
+  eq(af13.distinct + ',' + af13.inv, '2,null', 'a = 13 gives two outputs and no inverse');
+  eq(affineMap(2n, 5n, 26n).distinct, 13, 'an even multiplier gives thirteen outputs');
 }
 
 if (fails) {
