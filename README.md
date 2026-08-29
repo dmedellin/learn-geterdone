@@ -323,7 +323,7 @@ versioned system specification with a backtest report.
 
 | # | Lesson | What it does |
 | --- | --- | --- |
-| 01 | Backtesting Fundamentals | Use historical data to simulate a defined strategy, separate assumptions from results, and understand what a backtest can and cannot establish. |
+| 01 | Backtesting Fundamentals | Use historical data to simulate a defined strategy, separate assumptions from results, and state what a backtest can and cannot establish. |
 | 02 | Testable Trading Rules and Hypotheses | Convert a market idea into deterministic entry, exit, sizing, and invalidation rules that produce the same decision from the same data. |
 | 03 | Historical Data and Data Quality | Detect missing bars, duplicates, stale values, timestamp errors, and price outliers before they create false signals or distorted returns. |
 | 04 | Survivorship, Selection, and Corporate Actions | Build a point-in-time universe, include failed and delisted instruments, and adjust splits and distributions without using information learned later. |
