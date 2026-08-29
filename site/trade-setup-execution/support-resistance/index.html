@@ -1551,7 +1551,7 @@ textarea { font: inherit; }
     <section class="section">
       <div class="grid-2">
         <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Drawing a level at every pivot</strong><span>Too many levels remove prioritization and make every outcome appear predictable.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating a wick as a confirmed breakout</strong><span>Require the close and subsequent acceptance rules defined in your plan.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Ignoring role reversal</strong><span>A broken resistance zone can become support, and broken support can become resistance.</span></div></div><div class="lesson-row"><div class="num">4</div><div><strong>Using low-timeframe noise for high-timeframe decisions</strong><span>Match the importance and width of a zone to the analysis timeframe.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Completion standard</h3><div class="callout"><div class="mark">✓</div><div><strong>Finish the lesson when you can explain the rule before the chart resolves.</strong><p>Repeat the exercise until your decision, invalidation, and risk remain consistent without using hindsight.</p></div></div><div class="note" style="margin-top:12px;"><strong>Scope:</strong> This lesson teaches process and measurement. It does not provide live market data, personalized recommendations, or trade signals.</div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Completion standard</h3><div class="callout"><div class="mark">✓</div><div><strong>Finish when you can place both zones from the repeated reactions alone.</strong><p>On each tab, pass the evaluation before pressing Reveal reference, and classify an interaction as rejection, acceptance, sweep or role reversal from its description in the drill.</p></div></div><div class="note" style="margin-top:12px;"><strong>Scope:</strong> This lesson teaches process and measurement. It does not provide live market data, personalized recommendations, or trade signals.</div></article>
       </div>
     </section>
 
@@ -2043,8 +2043,13 @@ function setupQuiz(config) {
       if (item.dataset.answer === q.answer) item.classList.add("correct");
       else if (item === button) item.classList.add("incorrect");
     });
+    // Feedback is keyed to the answer that was chosen. A distractor names a
+    // specific misconception, and restating the rule does not answer it, so a
+    // choice may carry its own `why`; the question's explanation is the fallback.
+    const chosen = q.choices.find(choice => choice.value === button.dataset.answer);
+    const why = (chosen && chosen.why) || q.explanation;
     feedback.className = `feedback ${ok ? "good" : "bad"}`;
-    feedback.innerHTML = `<strong>${ok ? "Correct." : "Not quite."}</strong> ${q.explanation}`;
+    feedback.innerHTML = `<strong>${ok ? "Correct." : "Not quite."}</strong> ${why}`;
     next.disabled = false;
     score.textContent = `Score ${correct} / ${index + 1}`;
   });
@@ -2124,8 +2129,8 @@ function drawBarChart(svg, items, options = {}) {
 
 const zoneScenarios = {
   range:{title:"Established range",closes:[101,103,105.5,107.0,105.2,102.7,100.4,99.2,101.3,103.8,106.2,107.4,105.0,102.2,99.7,101.4,104.2,106.8],support:99.5,resistance:107.0},
-  roleReversal:{title:"Former resistance becomes support",closes:[98,99.6,101.2,102.8,101.7,103.1,102.2,103.4,105.6,107.2,106.5,105.4,104.8,105.6,107.5,109.2,110.4],support:104.8,resistance:110.2},
-  downtrend:{title:"Resistance in a downtrend",closes:[110,108.7,109.4,107.1,105.8,106.7,104.4,103.1,104.0,101.8,100.7,101.5,99.4,97.8,98.7,96.5],support:96.5,resistance:104.0}
+  roleReversal:{title:"Former resistance becomes support",closes:[98,99.6,101.2,102.8,101.7,103.1,102.2,103.4,105.6,107.2,106.5,105.4,103.6,104.4,105.8,106.9,106.4],support:103.3,resistance:107.0},
+  downtrend:{title:"Resistance in a downtrend",closes:[110,108.7,109.4,107.1,105.8,106.7,104.4,103.1,104.0,101.2,100.4,101.7,99.6,101.5,98.2,97.8,98.9,97.6,98.4],support:97.7,resistance:101.6}
 };
 
 // Participation reading. Two separate claims, rendered as two labelled
@@ -2138,22 +2143,22 @@ function renderReading(id, r) {
     + "<div><strong>What this is normally read as</strong>" + r.participation + "</div>");
 }
 
-// Parallel to zoneScenarios. Deliberately silent on two declared levels that
-// the candles do not support: roleReversal.resistance (110.2 has no prior
-// reaction in the series) and downtrend.support (96.5 is the final close and
-// is never tested twice). A reading of either would be invented.
+// Parallel to zoneScenarios. Every reference level the evaluator scores
+// against is backed by at least two reactions in the closes, and each reading
+// names them: a drill that scored against a level the chart did not support
+// would be teaching the reader to invent one.
 const zoneReadings = {
   range: {
     structure: "Price has turned down twice from the same upper area — 107.0 and 107.4 — and turned back up twice from the same lower area — 99.2 and 99.7. It is rising into that upper area again.",
     participation: "Repeated reactions at the same two prices are normally read as both sides acting consistently in the same places: sellers meeting advances near the top, buyers meeting declines near the bottom. That describes what has already repeated — the next test is not obliged to behave like the last two, and a close well beyond either edge ends the reading."
   },
   roleReversal: {
-    structure: "Three attempts stall between 102.8 and 103.4. Price then closes above that area and stays above it, and the pullback that follows stops at 104.8 rather than returning below the old cap.",
-    participation: "The standard reading of that sequence is role reversal: the price that used to stop advances is now where declines stop instead. Only the behaviour has changed, not the price — which is why a close back below the old cap would end the reading."
+    structure: "Three attempts stall between 102.8 and 103.4. Price then closes above that area, runs to 107.2, and the pullback that follows stops at 103.6 — on the old cap, not below it. The next advance stalls at 106.9, under the 107.2 high.",
+    participation: "The standard reading of that sequence is role reversal: the price that used to stop advances is now where a decline stopped instead. Only the behaviour has changed, not the price — which is why a close back below the old cap would end the reading. The 107.2 and 106.9 pair is the other zone this chart supports: two advances have ended there, and the second ended lower than the first."
   },
   downtrend: {
-    structure: "Every rally stops lower than the one before it — 109.4, 106.7, 104.0, 101.5, 98.7 — and each decline closes below the previous low.",
-    participation: "Read the usual way, this says sellers keep acting at lower and lower prices while buyers step in only after price has already fallen further; the 104.0 area is simply one of those caps, drawn because it is the one this chart marks, not a shelf the whole series respects. A close above the last lower high would break the sequence and end the reading."
+    structure: "Every rally stops lower than the one before it — 109.4, 106.7, 104.0, 101.7, 101.5, 98.9 — and each decline closes below the previous low. The last two declines, 97.8 and 97.6, are the first pair to stop at about the same price.",
+    participation: "Read the usual way, this says sellers keep acting at lower and lower prices while buyers step in only after price has already fallen further. The cap that matters now is the most recent one, 101.7 and 101.5, where two rallies in a row were turned back; the caps above it are history. The 97.8 and 97.6 pair is support only in the weak sense that it has held twice in a falling market — enough to draw, not enough to buy. A close above the last lower high would break the sequence and end the reading."
   }
 };
 
@@ -2200,10 +2205,10 @@ document.getElementById("evaluateZones").addEventListener("click",()=>{
 });
 
 setupQuiz({promptId:"zoneQuizPrompt",choicesId:"zoneQuizChoices",feedbackId:"zoneQuizFeedback",scoreId:"zoneQuizScore",nextId:"zoneQuizNext",questions:[
- {prompt:"Price closes above resistance, holds above it for several candles, then retests it from above.",choices:[{value:"rejection",label:"Resistance rejection"},{value:"breakout",label:"Breakout and role reversal"},{value:"sweep",label:"Liquidity sweep only"},{value:"mid",label:"Range midpoint"}],answer:"breakout",explanation:"Acceptance above the zone followed by a successful retest supports a breakout and potential role reversal."},
- {prompt:"Price wicks above resistance but closes back inside the range on the same candle.",choices:[{value:"accepted",label:"Confirmed acceptance"},{value:"sweep",label:"Possible sweep / failed breakout"},{value:"support",label:"New support confirmed"},{value:"trend",label:"Trend continuation confirmed"}],answer:"sweep",explanation:"Trading beyond a zone is not enough. Closing back inside suggests rejection or a sweep rather than acceptance."},
- {prompt:"A prior resistance area breaks and later repeatedly supports pullbacks.",choices:[{value:"role",label:"Role reversal"},{value:"random",label:"Random midpoint"},{value:"invalid",label:"Invalid level"},{value:"target",label:"Automatic final target"}],answer:"role",explanation:"Former resistance can become support after price accepts above it."},
- {prompt:"Why should support and resistance usually be represented as zones?",choices:[{value:"exact",label:"Markets always reverse at exact prices"},{value:"cluster",label:"Orders and reactions cluster across an area"},{value:"hide",label:"It hides incorrect analysis"},{value:"more",label:"It creates more trading signals"}],answer:"cluster",explanation:"Different participants act at nearby prices, and volatility creates a reaction area rather than a guaranteed exact tick."}
+ {prompt:"Price closes above resistance, holds above it for several candles, then retests it from above.",choices:[{value:"rejection",label:"Resistance rejection",why:"A rejection would close back inside. This closed above, stayed above for several candles, and then held when it came back — the opposite of being rejected."},{value:"breakout",label:"Breakout and role reversal"},{value:"sweep",label:"Liquidity sweep only",why:"A sweep trades through and closes back inside on the same candle or the next. Several closes above, then a successful retest, is acceptance — the thing a sweep is not."},{value:"mid",label:"Range midpoint",why:"Price is at the old resistance, not in the middle of anything. The description is of a level being retested from the far side, which is where role reversal is decided."}],answer:"breakout",explanation:"Acceptance above the zone followed by a successful retest supports a breakout and potential role reversal."},
+ {prompt:"Price wicks above resistance but closes back inside the range on the same candle.",choices:[{value:"accepted",label:"Confirmed acceptance",why:"Acceptance needs a close beyond the zone and trading that stays there. A wick through with the close back inside is the one pattern that rules acceptance out."},{value:"sweep",label:"Possible sweep / failed breakout"},{value:"support",label:"New support confirmed",why:"Resistance can only become support once price has closed above it and held there. This candle never closed above it at all."},{value:"trend",label:"Trend continuation confirmed",why:"Nothing continued: the candle probed above the range and came straight back. One wick beyond a boundary is the weakest evidence on the chart, not a confirmation of anything."}],answer:"sweep",explanation:"Trading beyond a zone is not enough. Closing back inside suggests rejection or a sweep rather than acceptance."},
+ {prompt:"A prior resistance area breaks and later repeatedly supports pullbacks.",choices:[{value:"role",label:"Role reversal"},{value:"random",label:"Random midpoint",why:"A midpoint has no reactions at it. This area stopped advances before the break and has stopped pullbacks since — repeated reactions are what make it a level."},{value:"invalid",label:"Invalid level",why:"A level that has produced reactions on both sides is the most validated level a chart can offer. Breaking did not invalidate it; it changed which side reacts there."},{value:"target",label:"Automatic final target",why:"A level where pullbacks keep holding is a floor under the move, not the ceiling above it. Targets come from the next opposing zone, and nothing about this one is final."}],answer:"role",explanation:"Former resistance can become support after price accepts above it."},
+ {prompt:"Why should support and resistance usually be represented as zones?",choices:[{value:"exact",label:"Markets always reverse at exact prices",why:"Look at the range tab: the turns came at 107.0 and 107.4, at 99.2 and 99.7. Close, never identical — which is exactly why a zone and not a line."},{value:"cluster",label:"Orders and reactions cluster across an area"},{value:"hide",label:"It hides incorrect analysis",why:"A zone drawn wide enough to catch anything would hide bad analysis, and that is the failure mode, not the purpose. The width should match the spread of the reactions, no more."},{value:"more",label:"It creates more trading signals",why:"Zones exist to prioritise fewer, better-evidenced areas. More signals is what drawing a line at every pivot produces — the first mistake this lesson names."}],answer:"cluster",explanation:"Different participants act at nearby prices, and volatility creates a reaction area rather than a guaranteed exact tick."}
 ]});
 window.repaintLesson = renderZones;
 renderZones();

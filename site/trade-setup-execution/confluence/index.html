@@ -1506,7 +1506,7 @@ textarea { font: inherit; }
       
 <div class="lab-layout">
   <article class="card chart-card">
-    <div class="chart-toolbar"><div class="chart-title"><strong id="confluenceTitle">Trend pullback at support</strong><span>Select evidence that is genuinely relevant to the setup</span></div><div class="tab-row" id="confluenceTabs"><button class="tab active" data-scenario="pullback" type="button">Pullback</button><button class="tab" data-scenario="breakout" type="button">Breakout</button><button class="tab" data-scenario="weak" type="button">Weak setup</button><button class="tab" data-scenario="redundant" type="button">Indicator overlap</button></div></div>
+    <div class="chart-toolbar"><div class="chart-title"><strong id="confluenceTitle">Trend pullback at support</strong><span>Select the evidence this chart shows or states — nothing it does not</span></div><div class="tab-row" id="confluenceTabs"><button class="tab active" data-scenario="pullback" type="button">Pullback</button><button class="tab" data-scenario="breakout" type="button">Breakout</button><button class="tab" data-scenario="weak" type="button">Weak setup</button><button class="tab" data-scenario="redundant" type="button">Indicator overlap</button></div></div>
     <div class="chart-wrap"><svg id="confluenceChart" class="market-chart" aria-label="Confluence scenario chart"></svg><div class="chart-tooltip"></div></div>
     <div class="reading-strip" id="confluenceReading" aria-live="polite"></div>
     <div class="chart-legend"><span class="legend-item"><span class="legend-dot green"></span>Context / structure</span><span class="legend-item"><span class="legend-dot amber"></span>Location</span><span class="legend-item"><span class="legend-dot purple"></span>Trigger</span></div>
@@ -1529,7 +1529,7 @@ textarea { font: inherit; }
          change, which announces nothing; the banner carries the result. -->
     <div class="stack" aria-live="polite">
       <div class="progress-track"><div class="progress-fill" id="confluenceMeter"></div></div>
-      <div class="status-banner" id="confluenceStatus"><strong>No evaluation yet.</strong> Select only evidence visible in the scenario.</div>
+      <div class="status-banner" id="confluenceStatus"><strong>No evaluation yet.</strong> Select only evidence the scenario shows or states.</div>
     </div>
   </aside>
 </div>
@@ -1551,7 +1551,7 @@ textarea { font: inherit; }
     <section class="section">
       <div class="grid-2">
         <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Counting correlated indicators separately</strong><span>Three trend indicators rarely provide three independent reasons.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Adding evidence after entry</strong><span>Post-entry justification prevents honest review of the original decision.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Ignoring a failed core condition</strong><span>Extra indicators cannot compensate for invalid structure or insufficient room.</span></div></div><div class="lesson-row"><div class="num">4</div><div><strong>Requiring every factor on every setup</strong><span>Different setups need different evidence; over-filtering can make rules untestable.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Completion standard</h3><div class="callout"><div class="mark">✓</div><div><strong>Finish the lesson when you can explain the rule before the chart resolves.</strong><p>Repeat the exercise until your decision, invalidation, and risk remain consistent without using hindsight.</p></div></div><div class="note" style="margin-top:12px;"><strong>Scope:</strong> This lesson teaches process and measurement. It does not provide live market data, personalized recommendations, or trade signals.</div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Completion standard</h3><div class="callout"><div class="mark">✓</div><div><strong>Finish when you can tick exactly the evidence a tab shows or states.</strong><p>On all four tabs: count correlated indicators as one reason, claim nothing the chart does not show, and give the decision the scenario expects — including wait and no trade.</p></div></div><div class="note" style="margin-top:12px;"><strong>Scope:</strong> This lesson teaches process and measurement. It does not provide live market data, personalized recommendations, or trade signals.</div></article>
       </div>
     </section>
 
@@ -2043,8 +2043,13 @@ function setupQuiz(config) {
       if (item.dataset.answer === q.answer) item.classList.add("correct");
       else if (item === button) item.classList.add("incorrect");
     });
+    // Feedback is keyed to the answer that was chosen. A distractor names a
+    // specific misconception, and restating the rule does not answer it, so a
+    // choice may carry its own `why`; the question's explanation is the fallback.
+    const chosen = q.choices.find(choice => choice.value === button.dataset.answer);
+    const why = (chosen && chosen.why) || q.explanation;
     feedback.className = `feedback ${ok ? "good" : "bad"}`;
-    feedback.innerHTML = `<strong>${ok ? "Correct." : "Not quite."}</strong> ${q.explanation}`;
+    feedback.innerHTML = `<strong>${ok ? "Correct." : "Not quite."}</strong> ${why}`;
     next.disabled = false;
     score.textContent = `Score ${correct} / ${index + 1}`;
   });
@@ -2126,8 +2131,8 @@ const confluenceFactors={
  htf:{bucket:"context",label:"Higher-timeframe structure"},location:{bucket:"location",label:"Key location"},trigger:{bucket:"trigger",label:"Entry confirmation"},volume:{bucket:"participation",label:"Volume"},relative:{bucket:"participation",label:"Relative strength / weakness"},ma20:{bucket:"trendIndicator",label:"20 MA"},ma50:{bucket:"trendIndicator",label:"50 MA"},rsi:{bucket:"momentumIndicator",label:"RSI"}
 };
 const confluenceScenarios={
- pullback:{title:"Trend pullback at support",closes:[100,102,104,103.2,106,108,107.4,110.5,112,111,109.5,108.4,109.1,110.6,112.2,113.5],levels:[{value:108.2,label:"Prior breakout support",tone:"amber"}],annotations:[{index:7,value:110.5,label:"Bullish structure",tone:"green"},{index:11,value:108.4,label:"Location",tone:"amber",position:"below"},{index:14,value:112.2,label:"Trigger",tone:"purple"}],relevant:["htf","location","trigger","relative"],decision:"trade"},
- breakout:{title:"Range breakout with participation",closes:[100,102,104.5,103.4,105.8,104.2,106.0,103.8,105.7,104.6,106.2,107.6,109.5,110.2,111.8],levels:[{value:106.3,label:"Range high",tone:"amber"}],annotations:[{index:11,value:107.6,label:"Close outside",tone:"purple"},{index:12,value:109.5,label:"Volume expansion",tone:"blue"}],relevant:["location","trigger","volume","relative"],decision:"trade"},
+ pullback:{title:"Trend pullback at support",closes:[100,102,104,103.2,106,108,107.4,110.5,112,111,109.5,108.4,109.1,110.6,112.2,113.5],levels:[{value:108.2,label:"Prior breakout support",tone:"amber"}],annotations:[{index:7,value:110.5,label:"Bullish structure",tone:"green"},{index:11,value:108.4,label:"Location",tone:"amber",position:"below"},{index:14,value:112.2,label:"Trigger",tone:"purple"}],relevant:["htf","location","trigger"],decision:"trade"},
+ breakout:{title:"Range breakout with participation",closes:[100,102,104.5,103.4,105.8,104.2,106.0,103.8,105.7,104.6,106.2,107.6,109.5,110.2,111.8],levels:[{value:106.3,label:"Range high",tone:"amber"}],annotations:[{index:11,value:107.6,label:"Close outside",tone:"purple"},{index:12,value:109.5,label:"Volume expansion",tone:"blue"}],relevant:["location","trigger","volume"],decision:"trade"},
  weak:{title:"Mid-range signal without location",closes:[100,101.8,103.2,104.4,103.1,101.9,100.8,102.0,103.6,104.0,102.7,102.1,103.0,103.4],levels:[{value:99.0,label:"Range low",tone:"green"},{value:106.0,label:"Range high",tone:"red"}],annotations:[{index:13,value:103.4,label:"Mid-range",tone:"amber"}],relevant:[],decision:"noTrade"},
  redundant:{title:"Multiple indicators measuring trend",closes:[98,99.5,101.0,102.4,103.6,104.9,106.1,107.2,108.4,109.5,110.4,111.0],levels:[],annotations:[{index:10,value:110.4,label:"Price above several MAs",tone:"cyan"}],relevant:["htf"],decision:"wait"}
 };
@@ -2142,10 +2147,13 @@ function renderReading(id, r) {
     + "<div><strong>What this is normally read as</strong>" + r.participation + "</div>");
 }
 
-// Parallel to confluenceScenarios. Note: the breakout tab annotates a volume
-// expansion but carries no volumes array, so no volume evidence is claimed
-// here; the redundant tab has no corrective swing at all, so no pullback
-// reading is claimed for it either.
+// Parallel to confluenceScenarios. The relevant set of each scenario is
+// limited to what its chart SHOWS or its annotations STATE: the breakout tab
+// states a volume expansion (no volumes are plotted, so it is a premise the
+// reader is told, not one they can see), and nothing on any tab shows a
+// benchmark, so relative strength is never a required answer. A drill that
+// penalised the reader for omitting evidence it never gave them would be
+// teaching them to claim what they cannot see.
 const confluenceReadings = {
   pullback: {
     structure: "Higher highs at 108, 112 and 113.5, with higher lows at 103.2 and 107.4. The correction from 112 ends at 108.4, on the 108.2 breakout level, and price then makes a new high.",
@@ -2153,7 +2161,7 @@ const confluenceReadings = {
   },
   breakout: {
     structure: "Price works up into the 106.3 range high over eleven candles, spending the later ones between 103.4 and 106.2, then closes above it at 107.6 — and the three closes after that stay above.",
-    participation: "The usual interpretation is that a price which had capped every advance stopped doing so, and that repeated closes outside are acceptance rather than a single probe. The volume label on this chart is a premise of the exercise — no volume is plotted here — so the evidence you claim and the evidence you can see have to be kept apart. A close back inside the range ends the reading."
+    participation: "The usual interpretation is that a price which had capped every advance stopped doing so, and that repeated closes outside are acceptance rather than a single probe. The volume label on this chart is a premise of the exercise — no volume is plotted here — so it counts as evidence because the scenario states it, and for no other reason; nothing states relative strength, so nothing lets you claim it. A close back inside the range ends the reading."
   },
   weak: {
     structure: "Price swings between 100.0 and 104.4 and finishes at 103.4. Neither the 99.0 range low nor the 106.0 range high is reached.",
@@ -2168,7 +2176,7 @@ const confluenceReadings = {
 let confluenceKey="pullback";let confluenceDecision="wait";
 function selectedFactors(){return [...document.querySelectorAll("#factorGrid input:checked")].map(x=>x.value);}
 function renderConfluence(){const s=confluenceScenarios[confluenceKey];drawCandles(document.getElementById("confluenceChart"),candlesFromCloses(s.closes,{},30+Object.keys(confluenceScenarios).indexOf(confluenceKey)),{levels:s.levels,annotations:s.annotations,includeValues:s.levels.map(l=>l.value)});setText("confluenceTitle",s.title);renderReading("confluenceReading",confluenceReadings[confluenceKey]);}
-function clearConfluence(){document.querySelectorAll("#factorGrid input").forEach(x=>{x.checked=false;x.closest(".factor").classList.remove("selected","redundant");});confluenceDecision="wait";document.querySelectorAll("#confluenceDecision [data-value]").forEach(b=>b.classList.toggle("active",b.dataset.value==="wait"));document.getElementById("confluenceMeter").style.width="0%";const st=document.getElementById("confluenceStatus");st.className="status-banner";st.innerHTML="<strong>No evaluation yet.</strong> Select only evidence visible in the scenario.";}
+function clearConfluence(){document.querySelectorAll("#factorGrid input").forEach(x=>{x.checked=false;x.closest(".factor").classList.remove("selected","redundant");});confluenceDecision="wait";document.querySelectorAll("#confluenceDecision [data-value]").forEach(b=>b.classList.toggle("active",b.dataset.value==="wait"));document.getElementById("confluenceMeter").style.width="0%";const st=document.getElementById("confluenceStatus");st.className="status-banner";st.innerHTML="<strong>No evaluation yet.</strong> Select only evidence the scenario shows or states.";}
 document.getElementById("factorGrid").addEventListener("change",event=>{const f=event.target.closest(".factor");if(f)f.classList.toggle("selected",event.target.checked);});
 bindSegment("confluenceDecision",value=>{confluenceDecision=value;});
 document.getElementById("confluenceTabs").addEventListener("click",event=>{const b=event.target.closest("[data-scenario]");if(!b)return;document.querySelectorAll("#confluenceTabs .tab").forEach(x=>x.classList.toggle("active",x===b));confluenceKey=b.dataset.scenario;clearConfluence();renderConfluence();});
@@ -2176,15 +2184,15 @@ document.getElementById("evaluateConfluence").addEventListener("click",()=>{
  const s=confluenceScenarios[confluenceKey];const selected=selectedFactors();const relevant=new Set(s.relevant);const correct=selected.filter(x=>relevant.has(x));const extras=selected.filter(x=>!relevant.has(x));const selectedBuckets=new Set(correct.map(x=>confluenceFactors[x].bucket));
  const indicatorSelections=selected.filter(x=>["ma20","ma50","rsi"].includes(x));document.querySelectorAll("#factorGrid .factor").forEach(f=>f.classList.remove("redundant"));if(indicatorSelections.length>1)indicatorSelections.forEach(x=>document.querySelector(`#factorGrid input[value="${x}"]`).closest(".factor").classList.add("redundant"));
  const completeness=s.relevant.length?correct.length/s.relevant.length:extras.length===0?1:0;const penalty=Math.min(.5,extras.length*.12+(indicatorSelections.length>1?(indicatorSelections.length-1)*.12:0));const score=Math.max(0,Math.round((completeness-penalty)*100));document.getElementById("confluenceMeter").style.width=`${score}%`;
- const decisionOk=confluenceDecision===s.decision;const status=document.getElementById("confluenceStatus");const pass=score>=80&&decisionOk;status.className=`status-banner ${pass?"good":score>=55?"warn":"bad"}`;
+ const decisionOk=confluenceDecision===s.decision;const status=document.getElementById("confluenceStatus");const pass=score>=80&&decisionOk&&extras.length===0;status.className=`status-banner ${pass?"good":score>=55?"warn":"bad"}`;
  const missing=s.relevant.filter(x=>!selected.includes(x)).map(x=>confluenceFactors[x].label);const extraNames=extras.map(x=>confluenceFactors[x].label);
- status.innerHTML=pass?`<strong>Relevant and sufficiently independent.</strong> The decision also matches the scenario.`:`<strong>Evidence score ${score}%.</strong> ${missing.length?`Missing: ${missing.join(", ")}. `:""}${extraNames.length?`Unsupported or redundant: ${extraNames.join(", ")}. `:""}Expected decision: ${s.decision}.`;
+ status.innerHTML=pass?`<strong>Relevant and sufficiently independent.</strong> The decision also matches the scenario.`:score>=80&&decisionOk?`<strong>Relevant, but over-claimed.</strong> ${extraNames.join(", ")} ${extraNames.length>1?"are":"is"} not shown or stated on this chart. A claim that cannot be checked is not confluence — drop it and evaluate again.`:`<strong>Evidence score ${score}%.</strong> ${missing.length?`Missing: ${missing.join(", ")}. `:""}${extraNames.length?`Unsupported or redundant: ${extraNames.join(", ")}. `:""}Expected decision: ${s.decision}.`;
 });
 setupQuiz({promptId:"confluenceQuizPrompt",choicesId:"confluenceQuizChoices",feedbackId:"confluenceQuizFeedback",scoreId:"confluenceQuizScore",nextId:"confluenceQuizNext",questions:[
- {prompt:"Which set provides the most independent evidence for a bullish pullback?",choices:[{value:"a",label:"20 MA + 50 MA + 200 MA"},{value:"b",label:"Bullish structure + support + local trigger"},{value:"c",label:"RSI + stochastic + MACD"},{value:"d",label:"Three bullish social-media opinions"}],answer:"b",explanation:"Structure, location, and trigger answer different questions. The other groups mostly repeat one category or add non-market evidence."},
- {prompt:"Price is above three moving averages. How many independent context categories does that usually represent?",choices:[{value:"one",label:"Mostly one trend category"},{value:"three",label:"Exactly three"},{value:"six",label:"Six because slopes also count"},{value:"zero",label:"Always zero"}],answer:"one",explanation:"Different moving averages can add nuance, but they are highly correlated measurements of price trend."},
- {prompt:"A setup has excellent confluence but structural resistance is immediately above entry. What should happen?",choices:[{value:"force",label:"Force a target through resistance"},{value:"size",label:"Increase size"},{value:"skip",label:"Reassess or skip because room is limited"},{value:"hide",label:"Remove resistance from the chart"}],answer:"skip",explanation:"Confluence does not repair poor location or insufficient room to the next opposing level."},
- {prompt:"What is the purpose of confluence?",choices:[{value:"certainty",label:"Create certainty"},{value:"evidence",label:"Combine relevant independent evidence"},{value:"signals",label:"Maximize the number of signals"},{value:"retro",label:"Explain every outcome afterward"}],answer:"evidence",explanation:"Confluence increases evidential quality; it does not make a trade certain."}
+ {prompt:"Which set provides the most independent evidence for a bullish pullback?",choices:[{value:"a",label:"20 MA + 50 MA + 200 MA",why:"Three averages of the same closes agree with each other by construction. That set answers one question — is price trending — three times, and never asks about location or a trigger."},{value:"b",label:"Bullish structure + support + local trigger"},{value:"c",label:"RSI + stochastic + MACD",why:"Three momentum oscillators are three transforms of the same price series. They are one category, and it is not even one of the four this lesson uses."},{value:"d",label:"Three bullish social-media opinions",why:"Opinions are not market evidence, and three of them are usually one opinion repeated. Nothing in that set can be checked on the chart afterwards."}],answer:"b",explanation:"Structure, location, and trigger answer different questions. The other groups mostly repeat one category or add non-market evidence."},
+ {prompt:"Price is above three moving averages. How many independent context categories does that usually represent?",choices:[{value:"one",label:"Mostly one trend category"},{value:"three",label:"Exactly three",why:"They are three lines, not three facts. Each is an average of the same closes over a different window, so when price rises they all end up below it together — one observation about trend, restated."},{value:"six",label:"Six because slopes also count",why:"Slope is derived from the same average, which is derived from the same closes. Counting derivatives of one input as separate evidence is the overlap this lesson warns about, multiplied."},{value:"zero",label:"Always zero",why:"Trend is real context and moving averages do describe it — the point is only that several of them describe it once. Count the category, and count it one time."}],answer:"one",explanation:"Different moving averages can add nuance, but they are highly correlated measurements of price trend."},
+ {prompt:"A setup has excellent confluence but structural resistance is immediately above entry. What should happen?",choices:[{value:"force",label:"Force a target through resistance",why:"A target drawn past a level that has already stopped price is a target chosen for its ratio, not its structure. Confluence at the entry says nothing about whether price can get there."},{value:"size",label:"Increase size",why:"Size follows the stop distance and the risk budget, never the strength of the evidence. More evidence with no room is still a trade with nowhere to go."},{value:"skip",label:"Reassess or skip because room is limited"},{value:"hide",label:"Remove resistance from the chart",why:"The level is still there whether it is drawn or not. Deleting it from the chart deletes the one fact that makes the trade poor — which is why the trade would still be poor."}],answer:"skip",explanation:"Confluence does not repair poor location or insufficient room to the next opposing level."},
+ {prompt:"What is the purpose of confluence?",choices:[{value:"certainty",label:"Create certainty",why:"No amount of agreeing evidence removes the need for an invalidation price. Confluence raises the quality of a decision that can still be wrong; it cannot make it right."},{value:"evidence",label:"Combine relevant independent evidence"},{value:"signals",label:"Maximize the number of signals",why:"Requiring more independent evidence produces fewer trades, not more. A method that generates more signals is usually one that has started counting the same evidence twice."},{value:"retro",label:"Explain every outcome afterward",why:"Evidence added after the entry cannot be tested, because it was chosen knowing the outcome. Confluence is assessed before the trade, and the second mistake this lesson names is doing it after."}],answer:"evidence",explanation:"Confluence increases evidential quality; it does not make a trade certain."}
 ]});
 window.repaintLesson = renderConfluence;
 clearConfluence();renderConfluence();
