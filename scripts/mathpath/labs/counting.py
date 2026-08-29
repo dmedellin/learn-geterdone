@@ -408,3 +408,175 @@ def inclusion_exclusion(cfg):
         ),
         script=script,
     )
+
+
+DERANGE_JS = r"""
+  /* Derangements three ways. The formula is the alternating sum the lesson
+     derives from inclusion and exclusion; the recurrence is the lesson's
+     second derivation; the listing walks every permutation of 1..n and keeps
+     the ones with no fixed point, which is the definition. All three are
+     exact, and the lab shows them side by side because agreement between
+     independent routes is the only reason to trust any of them. */
+  function derangeTerms(n) {
+    var rows = [], running = 0n;
+    for (var k = 0; k <= n; k += 1) {
+      var term = comb(n, k) * fact(n - k) * (k % 2 ? -1n : 1n);
+      running += term;
+      rows.push({ k: k, c: comb(n, k), f: fact(n - k), term: term, running: running });
+    }
+    return rows;
+  }
+  function derangeFormula(n) { var rows = derangeTerms(n); return rows[rows.length - 1].running; }
+  function derangeRec(n) {
+    if (n === 0) return 1n;
+    if (n === 1) return 0n;
+    var a = 1n, b = 0n;
+    for (var i = 2; i <= n; i += 1) { var next = BigInt(i - 1) * (b + a); a = b; b = next; }
+    return b;
+  }
+  function derangeList(n) {
+    /* Every permutation of 1..n, written as a string, kept when no position
+       holds its own number. Only called when n! is small enough to walk. */
+    var out = [];
+    function go(prefix, used) {
+      var pos = prefix.length;
+      if (pos === n) {
+        for (var i = 0; i < n; i += 1) if (prefix[i] === i + 1) return;
+        out.push(prefix.join(''));
+        return;
+      }
+      for (var v = 1; v <= n; v += 1) {
+        if (used[v]) continue;
+        used[v] = true; prefix.push(v); go(prefix, used); prefix.pop(); used[v] = false;
+      }
+    }
+    go([], []);
+    return out;
+  }
+  function derangeBrute(n) { return BigInt(derangeList(n).length); }
+  function ratioDigits(num, den, places) {
+    /* num/den as a decimal string rounded to `places` digits, in integers. */
+    var scale = 10n ** BigInt(places);
+    var q = (num * scale * 10n / den + 5n) / 10n;
+    var s = q.toString();
+    while (s.length <= places) s = '0' + s;
+    return s.slice(0, s.length - places) + '.' + s.slice(s.length - places);
+  }
+"""
+
+
+def derangement_lab(cfg):
+    """Derangements: the alternating sum, the recurrence and the list, agreeing.
+
+    Lesson 10 derives D_n twice -- by inclusion and exclusion and by a case
+    split on where element 1 goes -- and states that D_n / n! settles at 1/e
+    almost at once. The lab computes all of it at the n the reader sets: the
+    alternating sum term by term with its running total, the recurrence, and
+    for small n the actual derangements listed and counted, so the three
+    routes can be seen to agree. Nothing is precomputed; the only constant is
+    1/e, which is what the ratio is compared against.
+    """
+    markup = """      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Derangements of n objects</strong><span>D<sub>n</sub> by the alternating sum, by the recurrence, and by listing</span></div>
+        <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>added</span><span class="tone-red"><i class="legend-swatch"></i>subtracted</span></div>
+      </div>
+      <div class="lab-stage">
+        <div class="table-wrap"><table class="tt" id="drTable"></table></div>
+        <div id="drList" class="small-copy" style="margin-top:10px;"></div>
+      </div>
+      <div class="status-banner" id="drStatus" style="margin-top:12px;"></div>"""
+    controls = """        <div>
+          <div class="range-row"><label class="small-copy" for="drN">n (objects, each with one forbidden place)</label><span class="range-value" id="drNOut">6</span></div>
+          <input id="drN" type="range" min="1" max="12" value="6" />
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>By the formula</span><strong id="drFormula">&mdash;</strong></div>
+          <div class="kpi"><span>By the recurrence</span><strong id="drRec">&mdash;</strong></div>
+          <div class="kpi"><span>By listing</span><strong id="drBrute">&mdash;</strong></div>
+          <div class="kpi"><span>D<sub>n</sub> / n!</span><strong id="drRatio">&mdash;</strong></div>
+        </div>"""
+
+    script = BIGINT_JS + DERANGE_JS + r"""
+  var nS = document.getElementById('drN');
+  var table = document.getElementById('drTable'), list = document.getElementById('drList');
+  var status = document.getElementById('drStatus');
+  var LIST_MAX = 8;   /* 8! = 40 320 permutations to walk; 9! is 362 880 */
+  var CHIP_MAX = 5;   /* D_5 = 44 chips is readable; D_6 = 265 is not */
+
+  function redraw() {
+    var n = +nS.value;
+    document.getElementById('drNOut').textContent = n;
+    var rows = derangeTerms(n);
+    var h = '<thead><tr><th>k</th><th>C(n,k)</th><th>(n−k)!</th><th>sign</th><th>term</th><th>running total</th></tr></thead><tbody>';
+    rows.forEach(function (r) {
+      var neg = r.k % 2 === 1;
+      h += '<tr><td>' + r.k + '</td><td>' + group(r.c) + '</td><td>' + group(r.f) + '</td><td class="'
+        + (neg ? 'f' : 't') + '">' + (neg ? '−' : '+') + '</td><td>' + group(neg ? -r.term : r.term)
+        + '</td><td>' + group(r.running) + '</td></tr>';
+    });
+    table.innerHTML = h + '</tbody></table>';
+
+    var formula = derangeFormula(n), rec = derangeRec(n), total = fact(n);
+    document.getElementById('drFormula').textContent = group(formula);
+    document.getElementById('drRec').textContent = group(rec);
+    var ratio = ratioDigits(formula, total, 7);
+    var eInv = (1 / Math.E).toFixed(7);
+    document.getElementById('drRatio').textContent = ratio;
+
+    var agree = formula === rec, listed = null;
+    if (n <= LIST_MAX) {
+      var items = derangeList(n);
+      listed = BigInt(items.length);
+      document.getElementById('drBrute').textContent = group(listed);
+      agree = agree && listed === formula;
+      if (n <= CHIP_MAX) {
+        list.innerHTML = items.length
+          ? '<strong>All ' + items.length + ' derangements of 1…' + n + ':</strong> '
+            + items.map(function (s) { return '<span class="chip">' + s + '</span>'; }).join('')
+          : '<strong>No derangements of a single object:</strong> it has nowhere else to go, so D<sub>1</sub> = 0.';
+      } else {
+        list.innerHTML = '<span class="tone-muted">The ' + group(listed) + ' derangements were walked and counted but are too many to print; '
+          + 'set n ≤ ' + CHIP_MAX + ' to see them.</span>';
+      }
+    } else {
+      document.getElementById('drBrute').textContent = 'n! = ' + group(total);
+      list.innerHTML = '<span class="tone-muted">' + group(total) + ' permutations are too many to walk here. The formula and the '
+        + 'recurrence are still exact: both are computed in big integers.</span>';
+    }
+
+    var nearest = Math.round(Number(total) / Math.E);
+    var swing = rows.length > 2
+      ? 'The running total starts at n! = ' + group(total) + ' (every permutation), falls below the answer, rises above it, and closes in &mdash; that is what alternating means. '
+      : '';
+    if (agree) {
+      status.innerHTML = (listed === null
+          ? 'The formula and the recurrence agree on <strong>D<sub>' + n + '</sub> = ' + group(formula) + '</strong>. '
+          : 'Formula, recurrence and the list all give <strong>D<sub>' + n + '</sub> = ' + group(formula) + '</strong>. ')
+        + swing
+        + 'D<sub>' + n + '</sub>/' + n + '! = <strong>' + ratio + '</strong> against 1/e ≈ ' + eInv
+        + (ratio.slice(0, 6) === eInv.slice(0, 6) ? ' &mdash; equal to four places' : ' &mdash; not yet equal to four places')
+        + '; the nearest integer to ' + n + '!/e is ' + group(nearest) + ', which is D<sub>' + n + '</sub>.';
+    } else {
+      status.innerHTML = '<span class="tone-red">The routes disagree (' + group(formula) + ', ' + group(rec)
+        + (listed === null ? '' : ', ' + group(listed)) + ').</span>';
+    }
+  }
+
+  nS.addEventListener('input', redraw);
+  nS.value = """ + str(cfg.get("n", 6)) + r""";
+  redraw();
+  window.redrawLab = redraw;
+"""
+    return Lab(
+        title="Derangements",
+        subtitle="Three routes to one number",
+        markup=markup,
+        controls=controls,
+        panel_title=cfg.get("panel_title", "Set n"),
+        panel_intro=cfg.get(
+            "panel_intro",
+            "The alternating sum is built term by term; the recurrence and the "
+            "listing are the checks on it.",
+        ),
+        script=script,
+    )

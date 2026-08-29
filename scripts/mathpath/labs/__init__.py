@@ -35,6 +35,7 @@ REGISTRY = {
     "counting": counting.counting_lab,
     "pascal": counting.pascal_lab,
     "inclusion_exclusion": counting.inclusion_exclusion,
+    "derangement": counting.derangement_lab,
     "induction": induction.induction_lab,
     "recurrence": induction.recurrence_lab,
     "number": number.number_lab,

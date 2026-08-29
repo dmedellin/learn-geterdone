@@ -26,8 +26,9 @@ COURSE = {
     "assumes_short": "Courses 1–3",
     "assumes_long": "sets, functions and induction",
     "outcomes_intro": (
-        "By the end you can choose the right rule, justify the choice, and check the "
-        "answer against a small enumeration."
+        "By the end you can choose the right rule, justify the choice, check the "
+        "answer against a small enumeration, and invent the classification or the "
+        "factor when no rule applies directly."
     ),
     "outcomes": [
         ("Pick the right one of four rules",
@@ -42,6 +43,10 @@ COURSE = {
         ("Prove an identity by counting",
          "Count one set two ways and conclude the two expressions are equal &mdash; "
          "shorter and more informative than the algebra."),
+        ("Invent the classification, or the factor",
+         "Choose the boxes so that `⌈n/k⌉` forces the conclusion, and write the "
+         "factor that encodes each constraint so a generating function answers for "
+         "every `n` at once."),
     ],
     "syllabus_intro": (
         "Lessons 1 to 4 are the basic rules, 5 to 8 the binomial coefficients and "

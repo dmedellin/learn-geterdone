@@ -87,9 +87,11 @@ LESSONS = [
         "lab": ("counting", {
             "n": 3, "r": 5, "rule": "cr",
             "panel_title": "All four rules at once",
-            "panel_intro": "The CR row is this lesson. The enumeration lists the actual "
-                           "multisets, which is what makes `C(n+r−1, r)` believable rather "
-                           "than memorised.",
+            "panel_intro": "The CR row is this lesson: at `n = 3`, `r = 5` it reads "
+                           "`C(7, 5) = 21`, and the enumeration lists the 21 multisets, which "
+                           "is what makes the formula believable rather than memorised. The "
+                           "doughnut selection `** | | ***` is the chip `aaccc`; a chip with "
+                           "no `b` is a row with nothing between its bars.",
         }),
         "steps_title": "Recognising a stars-and-bars problem",
         "steps_intro": "Look for identical items distributed among distinct types.",
@@ -135,18 +137,25 @@ LESSONS = [
             {"q": "How many ways to choose 4 items from 3 types with repetition?",
              "a": ["12", "15", "81", "24"],
              "c": 1,
-             "why": "`C(3 + 4 − 1, 4) = C(6,4) = 15`. Four stars and two bars, arranged in "
-                    "`C(6,4)` ways."},
+             "why": "`C(3 + 4 − 1, 4) = C(6,4) = 15`: four stars and two bars, arranged in "
+                    "`C(6,4)` ways. `81 = 3⁴` is ordered with repetition, `24 = 4!` orders "
+                    "the items, and `12 = 3 · 4` is a product of the two parameters that "
+                    "counts nothing."},
             {"q": "How many bars does a stars-and-bars diagram with `n` types use?",
              "a": ["`n`", "`n − 1`", "`n + 1`", "`r`"],
              "c": 1,
              "why": "The bars sit between the groups, so `n` groups need `n − 1` "
-                    "separators. Using `n` is the standard error."},
+                    "separators. Using `n` is the standard error and gives `C(n + r, r)`; "
+                    "`n + 1` would fence the row at both ends for no reason; and `r` is "
+                    "the number of stars."},
             {"q": "Solutions of `x₁ + x₂ + x₃ = 10` with each `xᵢ ≥ 1`:",
              "a": ["`C(12,10)`", "`C(9,2) = 36`", "`C(10,3)`", "`3¹⁰`"],
              "c": 1,
-             "why": "`C(r−1, n−1) = C(9,2) = 36`. Equivalently, give each variable 1 and "
-                    "distribute the remaining 7 freely."},
+             "why": "`C(r−1, n−1) = C(9,2) = 36`; equivalently, give each variable 1 and "
+                    "distribute the remaining 7 freely. `C(12,10) = 66` is the count with "
+                    "`xᵢ ≥ 0`, which admits solutions like `(10, 0, 0)`; `C(10,3)` chooses "
+                    "three of the ten units, which is not a solution; `3¹⁰` assigns each "
+                    "unit a variable and counts every ordering separately."},
         ],
         "mistakes": [
             ("Using `n` bars instead of `n − 1`",
@@ -240,6 +249,12 @@ LESSONS = [
                          "`1000 − (500 + 333 + 200) + (166 + 100 + 66) − 33 = 266`. Each "
                          "term is a floor division: `⌊1000/6⌋ = 166` counts the multiples "
                          "of both 2 and 3.")),
+            ("p", "That intersection term is `⌊N/6⌋` because 2 and 3 are coprime. In "
+                  "general the multiples of both `a` and `b` are the multiples of "
+                  "`lcm(a, b)`, not of `ab`: of `1, …, 100`, the numbers divisible by "
+                  "both 4 and 6 are the multiples of 12, `⌊100/12⌋ = 8` of them, and "
+                  "`⌊100/24⌋ = 4` undercounts. The lab computes every intersection "
+                  "through the lcm for exactly this reason."),
             ("thm", ("Euler's totient",
                      "The count of integers in `1, …, n` coprime to `n` is "
                      "`φ(n) = n·Π(1 − 1/p)` over the distinct primes `p` dividing `n`. "
@@ -256,9 +271,12 @@ LESSONS = [
         "lab": ("inclusion_exclusion", {
             "panel_title": "Both routes to the same number",
             "panel_intro": "The table builds the alternating sum term by term while the "
-                           "right-hand count walks 1 to N one integer at a time. They must "
-                           "agree, and watching the running total shows where the naive sum "
-                           "goes wrong.",
+                           "right-hand count walks 1 to N one integer at a time. At the "
+                           "shipped `N = 100` with 2, 3 and 5 both routes give 74, the naive "
+                           "sum `50 + 33 + 20 = 103` is over by 29, and `100 − 74 = 26` are "
+                           "divisible by none &mdash; the example above at `N = 1000` gave "
+                           "266. Set `b = 4` to see an intersection that is `⌊N/4⌋`, the "
+                           "lcm of 2 and 4, and not `⌊N/8⌋`.",
         }),
         "steps_title": "Applying inclusion and exclusion",
         "steps_intro": "Define the sets so the intersections are easy.",
@@ -304,16 +322,19 @@ LESSONS = [
         "quiz_title": "Inclusion and exclusion",
         "quiz": [
             {"q": "`|A| = 20`, `|B| = 15`, `|A ∩ B| = 6`. What is `|A ∪ B|`?",
-             "a": ["35", "29", "41", "26"],
+             "a": ["35", "29", "41", "23"],
              "c": 1,
              "why": "`20 + 15 − 6 = 29`. The six shared elements were counted twice by the "
-                    "naive sum."},
+                    "naive sum `35`; `41` adds the overlap instead of subtracting it; `23` "
+                    "subtracts it twice, removing the shared elements altogether."},
             {"q": "In the three-set formula, the triple intersection is:",
              "a": ["subtracted", "added", "ignored", "counted twice"],
              "c": 1,
              "why": "Added back. Elements in all three were counted three times, then "
                     "subtracted three times by the pairs, leaving zero &mdash; so one "
-                    "addition restores them."},
+                    "addition restores them. Subtracting it would leave those elements at "
+                    "`−1`, ignoring it leaves them at 0, and counting it twice puts them "
+                    "at 2; only `+1` makes every element count once."},
             {"q": "Inclusion and exclusion is usually applied to:",
              "a": ["the union directly",
                    "the complement — the objects with none of the properties",
@@ -321,7 +342,11 @@ LESSONS = [
                    "the power set"],
              "c": 1,
              "why": "Derangements, surjections and totients are all \"none of the bad "
-                    "properties\" counts, computed as total minus the union of the bad sets."},
+                    "properties\" counts, computed as total minus the union of the bad "
+                    "sets. The union form is the same principle before the subtraction "
+                    "from the total; the intersections are the inputs to the formula, not "
+                    "its target; and the power set is only where the index subsets come "
+                    "from."},
         ],
         "mistakes": [
             ("Getting the sign pattern wrong",
@@ -400,7 +425,7 @@ LESSONS = [
                 "n     1    2    3    4     5      6       7        8",
                 "n!    1    2    6   24   120    720    5040    40320",
                 "Dₙ    0    1    2    9    44    265    1854    14833",
-                "Dₙ/n!  0  .500 .333 .375 .3667 .36806 .367857 .3678792",
+                "Dₙ/n!  0  .500 .333 .375 .3667 .36806 .367857 .3678819",
                 "1/e ≈ 0.3678794412",
             ]),
             ("p", "The convergence is startlingly quick because the series for `1/e` "
@@ -427,15 +452,22 @@ LESSONS = [
                   "genuine check, and both are worth having."),
             ("example", ("The hat-check problem",
                          "`n` people check hats and receive them back at random. The "
-                         "probability nobody gets their own is `Dₙ/n!`, which for `n ≥ 5` "
-                         "is 0.3679 to four places whatever `n` is. Course 5 makes the "
-                         "division into a probability statement.")),
+                         "probability nobody gets their own is `Dₙ/n!`, which for `n ≥ 7` "
+                         "is 0.3679 to four places whatever `n` is &mdash; at `n = 5` it is "
+                         "still 0.3667 and at 6 it is 0.3681. Course 5 makes the division "
+                         "into a probability statement.")),
         ],
-        "lab": ("inclusion_exclusion", {
-            "panel_title": "The correction, term by term",
-            "panel_intro": "Derangements are this alternating structure applied to fixed "
-                           "points. Watch the running total swing above and below the "
-                           "answer before settling &mdash; that is what alternating means.",
+        "lab": ("derangement", {
+            "n": 6,
+            "panel_title": "Three routes to Dₙ",
+            "panel_intro": "The table is the alternating sum of the proof above, term by "
+                           "term, at the `n` you set; the recurrence and the listed "
+                           "permutations are the two checks on it. At `n = 6` the running "
+                           "total reads `720, 0, 360, 240, 270, 264, 265` &mdash; above the "
+                           "answer, below it, and closing in, which is what alternating "
+                           "means &mdash; and all three routes give 265. Set `n = 4` to see "
+                           "the nine derangements themselves, and step `n` up to watch "
+                           "`Dₙ/n!` reach 0.3679 at `n = 7` and stay there.",
         }),
         "steps_title": "Using derangements",
         "steps_intro": "Recognise the \"nothing in its own place\" shape.",
@@ -481,18 +513,26 @@ LESSONS = [
             {"q": "`D₄` equals:",
              "a": ["6", "9", "12", "24"],
              "c": 1,
-             "why": "`4!(1 − 1 + 1/2 − 1/6 + 1/24) = 24 · 9/24 = 9`. The recurrence gives "
-                    "the same: `3(D₃ + D₂) = 3(2 + 1) = 9`."},
+             "why": "`4!(1 − 1 + 1/2 − 1/6 + 1/24) = 24 · 9/24 = 9`; the recurrence gives "
+                    "the same, `3(D₃ + D₂) = 3(2 + 1) = 9`. `24` is `4!`, every "
+                    "permutation; `6` is `3!`, which fixes one element and permutes the "
+                    "rest; `12` is half of `4!`, which is not what the alternating sum "
+                    "settles on."},
             {"q": "As `n` grows, `Dₙ/n!` approaches:",
              "a": ["0", "1/2", "`1/e ≈ 0.3679`", "1"],
              "c": 2,
              "why": "The sum is the alternating series for `e⁻¹`, and it converges so fast "
-                    "that four decimal places are correct by `n = 7`."},
+                    "that four decimal places are correct by `n = 7`. `0` is the everyday "
+                    "guess &mdash; more people, less chance that nobody is matched &mdash; "
+                    "and it is wrong because the extra people also bring extra ways to be "
+                    "mismatched; `1/2` is `D₂/2!` only; `1` would mean nearly every "
+                    "permutation is a derangement."},
             {"q": "Permutations of 5 elements with exactly one fixed point:",
              "a": ["`D₅`", "`C(5,1)·D₄ = 45`", "`5!`", "`D₄`"],
              "c": 1,
              "why": "Choose which element is fixed (5 ways) and derange the other four "
-                    "(`D₄ = 9`)."},
+                    "(`D₄ = 9`). `D₅ = 44` is no fixed point at all; `D₄` alone forgets "
+                    "to choose which element stays; `5!` is every permutation."},
         ],
         "mistakes": [
             ("Forgetting `D₀ = 1`",
@@ -607,11 +647,16 @@ LESSONS = [
                   "demanded `R(6,6)` we should attack them instead."),
         ],
         "lab": ("counting", {
-            "n": 12, "r": 3, "rule": "c",
-            "panel_title": "Objects and boxes",
-            "panel_intro": "Pigeonhole arguments are about ratios rather than "
-                           "enumerations, but the counts here are the size of the object "
-                           "sets those arguments range over.",
+            "n": 6, "r": 3, "rule": "c",
+            "panel_title": "The triangles the theorem is about",
+            "panel_intro": "At `n = 6`, `r = 3` the list is the 20 triples among six "
+                           "people &mdash; the candidate triangles in the proof of "
+                           "`R(3,3) = 6`. Set `r = 2` for the 15 pairs, each of which is "
+                           "coloured acquaintance or stranger; the theorem says that however "
+                           "the 15 are coloured, one of the 20 triples is a single colour. "
+                           "At `n = 5` there are 10 triples and 10 pairs, and the five-cycle "
+                           "colours the pairs so that no triple is. A count is not the "
+                           "argument, but it is the object the argument ranges over.",
         }),
         "steps_title": "Constructing a pigeonhole argument",
         "steps_intro": "Objects are usually given; boxes are invented.",
@@ -630,7 +675,7 @@ LESSONS = [
              "classification was the wrong one."),
         ],
         "worked": {
-            "title": "A subset summing to a multiple of `n`",
+            "title": "A block summing to a multiple of `n`",
             "intro": ["Given any `n` integers, some consecutive block sums to a multiple of `n`."],
             "lines": [
                 "Let a₁, …, aₙ be the integers and define the partial sums",
@@ -658,8 +703,9 @@ LESSONS = [
             {"q": "50 objects into 7 boxes. Some box holds at least:",
              "a": ["7", "8", "6", "9"],
              "c": 1,
-             "why": "`⌈50/7⌉ = ⌈7.14⌉ = 8`. Rounding down would give the weaker and "
-                    "still-true claim of 7."},
+             "why": "`⌈50/7⌉ = ⌈7.14⌉ = 8`. Rounding down gives 7, a weaker claim that is "
+                    "still true; 6 is weaker again; and 9 is false &mdash; seven boxes "
+                    "holding 8, 7, 7, 7, 7, 7, 7 account for all 50 with no box at 9."},
             {"q": "In the Erdős&ndash;Szekeres proof, the boxes are:",
              "a": ["the numbers themselves",
                    "pairs (longest increasing, longest decreasing) ending at each position",
@@ -667,7 +713,10 @@ LESSONS = [
                    "the parities"],
              "c": 1,
              "why": "`n²` such pairs and `n² + 1` positions, so two positions share a pair "
-                    "&mdash; which the proof then shows is impossible."},
+                    "&mdash; which the proof then shows is impossible. The numbers and the "
+                    "positions are the objects, not the boxes; and parity gives only two "
+                    "boxes, which forces two positions to share a parity and proves "
+                    "nothing about monotone runs."},
             {"q": "`R(3,3) = 6` means:",
              "a": ["six people always contain three mutual acquaintances",
                    "six is the smallest number forcing three mutual acquaintances or three mutual strangers",
@@ -676,7 +725,9 @@ LESSONS = [
              "c": 1,
              "why": "Six always forces one or the other, and five does not &mdash; the "
                     "five-cycle construction is a counterexample. Both halves are needed "
-                    "for equality."},
+                    "for equality. The first option states only half of the conclusion "
+                    "and none of the minimality; there are infinitely many Ramsey "
+                    "numbers, almost all unknown; and `R(4,4)` is 18, not 8."},
         ],
         "mistakes": [
             ("Rounding the bound down",
@@ -764,9 +815,11 @@ LESSONS = [
             ("example", ("A restricted selection",
                          "How many ways to choose 10 items from 4 types with at most 3 of "
                          "each? Each type contributes `1 + x + x² + x³`, so the answer is "
-                         "`[x¹⁰](1 + x + x² + x³)⁴`. Expanding gives 4. Inclusion and "
-                         "exclusion would also work; the generating function encodes the "
-                         "constraint directly.")),
+                         "`[x¹⁰](1 + x + x² + x³)⁴`. Expanding gives 10. Check it another "
+                         "way: a selection is short of the maximum `12` by `2`, spread over "
+                         "four types, and lesson 8 counts those spreads as `C(5, 2) = 10`. "
+                         "Inclusion and exclusion would also work; the generating function "
+                         "encodes the constraint directly.")),
             ("h3", "Solving a recurrence"),
             ("p", "Generating functions solve recurrences by turning them into equations. "
                   "For `aₙ = 3aₙ₋₁` with `a₀ = 1`, write `G(x) = Σ aₙxⁿ`. Multiplying the "
@@ -783,11 +836,16 @@ LESSONS = [
                      "on finitely many coefficients of the factors.")),
         ],
         "lab": ("counting", {
-            "n": 4, "r": 10, "rule": "cr",
+            "n": 4, "r": 6, "rule": "cr",
             "panel_title": "The count a generating function encodes",
-            "panel_intro": "The CR row is `[xʳ] 1/(1−x)ⁿ`. The generating function packs "
-                           "every `r` at once into one expression, which is what makes "
-                           "constraints easy to attach.",
+            "panel_intro": "The CR row is `[xʳ] 1/(1−x)ⁿ`: at `n = 4`, `r = 6` it is "
+                           "`C(9, 6) = 84`, and all 84 multisets are listed. Attach the "
+                           "constraint \"at most 3 of each\" and the factor becomes "
+                           "`1 + x + x² + x³`; its coefficient of `x⁶` is 44. Count the "
+                           "chips that use some letter four or more times: there are 40 of "
+                           "them, `4 · C(5, 2)`, and `84 − 40 = 44`. The generating function "
+                           "packs every `r` at once into one expression, which is what makes "
+                           "a constraint like that easy to attach.",
         }),
         "steps_title": "Using a generating function",
         "steps_intro": "One factor per source of choice.",
@@ -838,7 +896,8 @@ LESSONS = [
              "a": ["`1, 1, 1, 1, …`", "`1, 2, 3, 4, …`", "`1, 0, 0, 0, …`", "`2ⁿ`"],
              "c": 0,
              "why": "`1/(1−x) = 1 + x + x² + ⋯`, all coefficients 1. `1/(1−x)²` gives "
-                    "`1, 2, 3, 4, …`."},
+                    "`1, 2, 3, 4, …`; the series `1, 0, 0, 0, …` is the constant 1; and "
+                    "`2ⁿ` is generated by `1/(1−2x)`."},
             {"q": "Multiplying two generating functions corresponds to:",
              "a": ["adding the sequences",
                    "combining independent selections from the two sources",
@@ -847,12 +906,15 @@ LESSONS = [
              "c": 1,
              "why": "The coefficient of `xᵏ` in the product sums over all splits of `k` "
                     "between the two sources &mdash; the product rule and the sum rule "
-                    "together."},
+                    "together. Adding the sequences is adding the series, not multiplying; "
+                    "differentiation shifts and scales coefficients, a different "
+                    "operation; and \"nothing combinatorial\" is the opposite of the point."},
             {"q": "Which factor encodes \"at most 2 of this type\"?",
              "a": ["`1/(1−x)`", "`1 + x + x²`", "`x²`", "`1/(1−x²)`"],
              "c": 1,
-             "why": "One term per allowed quantity: zero, one or two. `1/(1−x²)` would "
-                    "encode \"any even number\"."},
+             "why": "One term per allowed quantity: zero, one or two. `1/(1−x)` allows any "
+                    "number; `x²` allows exactly two and nothing else; and `1/(1−x²)` "
+                    "encodes \"any even number\"."},
         ],
         "mistakes": [
             ("Worrying about convergence",
@@ -929,6 +991,12 @@ LESSONS = [
                          "`C(m+n,r) = Σ_k C(m,k)C(n,r−k)`: count `r`-subsets of a set split "
                          "into groups of `m` and `n`, classified by how many come from the "
                          "first group.")),
+            ("p", "Vandermonde with `m = n = r` reads `C(2n, n) = Σ_k C(n,k)·C(n,n−k)`, and "
+                  "the symmetry `C(n,n−k) = C(n,k)` turns it into `Σ_k C(n,k)² = C(2n,n)`: "
+                  "the `n`-subsets of a `2n`-set, classified by how many come from the "
+                  "first half. The square is two halves of the same size making the same "
+                  "kind of choice. An identity that looks as if it needs algebra is often "
+                  "a known double count in disguise, and recognising which is the skill."),
             ("h3", "Bijective proof"),
             ("thm", ("The method",
                      "To prove `|A| = |B|`, construct an explicit bijection `f : A → B`. "
@@ -966,8 +1034,11 @@ LESSONS = [
             "identity": "hockey", "n": 6, "k": 2,
             "panel_title": "An identity with a counting proof",
             "panel_intro": "The hockey stick is proved by classifying `(k+1)`-subsets by "
-                           "their largest element. The lab checks the arithmetic; the "
-                           "classification is the proof.",
+                           "their largest element. At `n = 6`, `k = 2` the highlighted "
+                           "column reads `1 + 3 + 6 + 10 + 15 = 35 = C(7, 3)`: the "
+                           "3-subsets of `{1, …, 7}` whose largest element is 3, 4, 5, 6 "
+                           "or 7. The lab checks the arithmetic; the classification is the "
+                           "proof.",
         }),
         "steps_title": "Constructing a combinatorial proof",
         "steps_intro": "Name the objects before anything else.",
@@ -1018,7 +1089,9 @@ LESSONS = [
                    "induction"],
              "c": 1,
              "why": "One set has one size, so two correct counts of it must agree. Two "
-                    "different sets would need a bijection instead."},
+                    "different sets would need a bijection instead; an algebraic identity "
+                    "is what the proof establishes, not what it uses; and induction is "
+                    "the technique this lesson exists to replace."},
             {"q": "To prove `|A| = |B|` bijectively you must:",
              "a": ["show both are finite",
                    "give an explicit map and argue it is injective and surjective",
@@ -1026,14 +1099,19 @@ LESSONS = [
                    "show `A ⊆ B`"],
              "c": 1,
              "why": "A described correspondence is not a proof until both directions are "
-                    "argued. Producing the inverse map is the usual way."},
+                    "argued, and producing the inverse map is the usual way. Finiteness "
+                    "is assumed, not the argument; counting both is a different proof, and "
+                    "one that leaves the reason unexplained; and `A ⊆ B` gives "
+                    "`|A| ≤ |B|` only."},
             {"q": "`Σ_v deg(v) = 2|E|` is proved by counting:",
              "a": ["vertices", "edges",
                    "incidences — pairs of a vertex and an edge meeting it",
                    "paths"],
              "c": 2,
              "why": "By vertex each contributes its degree; by edge each contributes 2. "
-                    "The incidences are the set counted twice."},
+                    "The incidences are the set counted twice: counting vertices alone "
+                    "gives `|V|`, counting edges alone gives `|E|`, and paths are not in "
+                    "the identity at all."},
         ],
         "mistakes": [
             ("Not saying what the objects are",
@@ -1047,10 +1125,15 @@ LESSONS = [
              "and its inverse."),
         ],
         "standard": ("Finish when you prefer the counting proof.",
-                     "Prove `Σ_k C(n,k)² = C(2n,n)` by counting the `n`-subsets of a "
-                     "`2n`-set split into two halves. The classification is by how many "
-                     "come from the first half, and the square arises from the symmetry "
-                     "`C(n,k) = C(n,n−k)`."),
+                     "Two proofs, one of each kind. First, lesson 6 obtained "
+                     "`Σ_k 2ᵏ·C(n,k) = 3ⁿ` by substitution; prove it by double counting "
+                     "instead, and say what a single object being counted is &mdash; a "
+                     "pair `A ⊆ B ⊆ S`, or a function from `S` to a three-element set; "
+                     "either works. Second, prove that the `k`-subsets of `{1, …, n}` "
+                     "containing no two consecutive integers number `C(n − k + 1, k)`, "
+                     "by a bijection: subtract `i − 1` from the `i`th smallest element, "
+                     "write down the inverse, and check the map at `n = 5`, `k = 2`, "
+                     "where both sides are 6."),
         "note": "Some identities have no known combinatorial proof, which is a genuine "
                 "open kind of question: finding a bijection where only algebra is known is "
                 "an active research activity, because the bijection carries information the "
@@ -1198,7 +1281,9 @@ LESSONS = [
              "a": ["`P(10,4)`", "`C(10,4)`", "`C(13,10)` — stars and bars", "`4¹⁰`"],
              "c": 2,
              "why": "Identical items into distinct types, repetition allowed and order "
-                    "irrelevant: `C(n + r − 1, r) = C(13, 10) = 286`."},
+                    "irrelevant: `C(n + r − 1, r) = C(13, 10) = 286`. `4¹⁰` would be right "
+                    "if the balls were distinguishable; `C(10,4)` chooses four balls, which "
+                    "is not a distribution; `P(10,4)` orders them as well."},
             {"q": "The most common error in this course is:",
              "a": ["arithmetic slips",
                    "a correct calculation of the wrong quantity",
@@ -1207,7 +1292,9 @@ LESSONS = [
              "c": 1,
              "why": "Misclassifying order or repetition produces a fluent, confident and "
                     "wrong answer. That is why the classification is stated first and the "
-                    "answer is checked on a small case."},
+                    "answer is checked on a small case. Arithmetic slips are caught by "
+                    "re-reading; calculators and large factorials are not errors at all, "
+                    "and the lab handles `52!` exactly."},
             {"q": "The single most useful check is:",
              "a": ["re-reading the arithmetic",
                    "enumerating a small instance and comparing",
@@ -1215,7 +1302,9 @@ LESSONS = [
                    "using a bigger example"],
              "c": 1,
              "why": "A list is ground truth. It catches classification errors, which "
-                    "rechecking the arithmetic never will."},
+                    "rechecking the arithmetic never will; the parity of the answer means "
+                    "nothing; and a bigger example is harder to check and no more likely "
+                    "to expose the wrong quantity."},
         ],
         "mistakes": [
             ("Computing before classifying",
@@ -1229,8 +1318,12 @@ LESSONS = [
              "evaluate."),
         ],
         "standard": ("Finish when classification precedes computation automatically.",
-                     "Take any five counting problems, write the classification for each "
-                     "before computing anything, and then verify one of them two ways. That "
+                     "Five problems from this course, without looking back: the 4-digit "
+                     "PINs, the podium from ten runners, the 5-card hands, five doughnuts "
+                     "from three kinds, and the arrangements of BANANA. For each, write "
+                     "the two answers &mdash; order? repetition? &mdash; and the rule they "
+                     "select before computing anything; they should land on four different "
+                     "rules and one multiset. Then verify the doughnuts by listing. That "
                      "sequence &mdash; classify, compute, check &mdash; is the whole course."),
         "note": "Course 5 turns these counts into probabilities by dividing by the size of "
                 "the sample space, so every classification error here becomes a wrong "

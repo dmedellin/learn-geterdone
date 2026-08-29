@@ -84,9 +84,12 @@ LESSONS = [
         "lab": ("counting", {
             "n": 5, "r": 3, "rule": "pr",
             "panel_title": "The product rule, enumerated",
-            "panel_intro": "The `nʳ` row is the product rule applied `r` times. The list "
-                           "below shows every selection, so the formula can be checked "
-                           "rather than trusted.",
+            "panel_intro": "The `nʳ` row is the product rule applied `r` times: at `n = 5`, "
+                           "`r = 3` the list below holds all 125 strings, so the formula can "
+                           "be checked rather than trusted. The sum rule is in the list too. "
+                           "It is printed in alphabetical order, so the 25 strings beginning "
+                           "`a` come first, then the 25 beginning `b`, and so on: five "
+                           "disjoint cases of `5 · 5 = 25` each, added, is 125 again.",
         }),
         "steps_title": "Choosing a rule",
         "steps_intro": "Ask two questions before writing any arithmetic.",
@@ -130,21 +133,29 @@ LESSONS = [
             {"q": "A menu has 4 starters and 5 mains. How many two-course meals?",
              "a": ["9", "20", "10", "45"],
              "c": 1,
-             "why": "Two successive choices, so the product rule: `4 · 5 = 20`. Adding "
-                    "would answer \"how many single dishes are available\"."},
+             "why": "Two successive choices, so the product rule: `4 · 5 = 20`. `9` is "
+                    "`4 + 5`, the sum rule, which answers \"how many dishes are on the "
+                    "menu\"; `10` halves the product as if a meal were an unordered pair, "
+                    "but a starter and a main are not interchangeable; `45` is `9 · 5`, a "
+                    "product of the sum, which counts nothing."},
             {"q": "The sum rule requires:",
              "a": ["the sets to be the same size",
                    "the sets to be disjoint",
                    "the sets to be finite and ordered",
                    "nothing"],
              "c": 1,
-             "why": "Overlap is counted twice. When the sets are not disjoint the "
-                    "inclusion&ndash;exclusion principle of lesson 9 is the correct rule."},
+             "why": "Overlap is counted twice, so the sets must be disjoint; when they are "
+                    "not, lesson 9's inclusion&ndash;exclusion is the correct rule. Nothing "
+                    "else is required: the sets may differ in size, they need no order, and "
+                    "\"nothing\" is the answer that double-counts."},
             {"q": "How many 3-digit strings over `{0,…,9}` contain at least one 5?",
              "a": ["100", "271", "300", "243"],
              "c": 1,
-             "why": "`10³ − 9³ = 1000 − 729 = 271`. Counting directly needs cases for one, "
-                    "two and three fives, and they must not overlap."},
+             "why": "`10³ − 9³ = 1000 − 729 = 271`. `300` is the tempting direct count "
+                    "&mdash; a 5 in position 1, 2 or 3, 100 strings each, added &mdash; and "
+                    "it is wrong because `155` lies in two of those cases and `555` in all "
+                    "three. `100` is the strings with a 5 in one fixed position, and "
+                    "`243 = 3⁵` counts nothing here."},
         ],
         "mistakes": [
             ("Adding when the cases overlap",
@@ -222,10 +233,11 @@ LESSONS = [
                          "the second count is 9 and not 8 &mdash; 0 becomes available "
                          "exactly because it was excluded from the first position.")),
             ("p", "Where two restrictions genuinely interact, cases are unavoidable. "
-                  "Count the strings of length 4 over `{a, b, c}` with at least two `a`s: "
-                  "split by the number of `a`s &mdash; exactly two, exactly three, exactly "
-                  "four &mdash; count each, and add. The cases are disjoint because a "
-                  "string has one definite number of `a`s."),
+                  "To count the strings of length 4 over `{a, b, c}` with at least two "
+                  "`a`s, split by the number of `a`s &mdash; exactly two, exactly three, "
+                  "exactly four &mdash; count each, and add. The cases are disjoint "
+                  "because a string has one definite number of `a`s. The worked example "
+                  "below does it, and then does it again by complement."),
             ("h3", "Complement"),
             ("example", ("At least one repeat",
                          "How many 5-digit PINs have at least one repeated digit? All PINs: "
@@ -270,28 +282,36 @@ LESSONS = [
              "that disagrees with a list is wrong."),
         ],
         "worked": {
-            "title": "Committees with a constraint",
-            "intro": ["From 6 women and 5 men, choose a committee of 4 with at least one of each."],
+            "title": "At least two a's, two ways",
+            "intro": ["How many strings of length 4 over `{a, b, c}` have at least two `a`s?"],
             "lines": [
-                "Total committees of 4 from 11 people:      C(11,4) = 330",
+                "All strings:  3⁴ = 81",
                 "",
-                "COMPLEMENT: the committees that FAIL the condition are the",
-                "all-women and all-men ones.",
+                "BY CASES on the number of a's — disjoint, because a string has",
+                "one definite number of them.",
                 "",
-                "   all women:   C(6,4) = 15",
-                "   all men:     C(5,4) =  5",
-                "   these are disjoint (a committee of 4 cannot be both)",
+                "   exactly two:   which two positions hold the a's?",
+                "                  12  13  14  23  24  34   — six choices",
+                "                  the other two positions: 2 · 2 = 4 (b or c each)",
+                "                  6 · 4 = 24",
+                "   exactly three: which position is NOT an a?  4 choices,",
+                "                  and that position is b or c:  4 · 2 = 8",
+                "   exactly four:  aaaa                             1",
                 "",
-                "   330 − 15 − 5 = 310",
+                "   24 + 8 + 1 = 33",
                 "",
-                "CHECK BY CASES: 1W3M + 2W2M + 3W1M",
-                "   C(6,1)C(5,3) + C(6,2)C(5,2) + C(6,3)C(5,1)",
-                " = 6·10 + 15·10 + 20·5  =  60 + 150 + 100  =  310         agree",
+                "BY COMPLEMENT: the strings that FAIL have zero or one a.",
+                "   no a:         2⁴ = 16",
+                "   exactly one:  4 positions · 2³ = 32",
+                "   81 − 16 − 32 = 33                                    agree",
             ],
             "after": [
-                "Two independent routes to 310. That agreement is the real check: a single "
-                "method producing a plausible number is not evidence that the classification "
-                "was right, and the case method is where a missing case would show up."
+                "Two independent routes to 33. That agreement is the real check: a single "
+                "method producing a plausible number is not evidence that the "
+                "classification was right, and the case method is where a missing case "
+                "would show up. The six position pairs were listed by hand; lesson 4 "
+                "gives them a name and a formula, `C(4, 2) = 6`, and from then on they "
+                "need not be listed."
             ],
         },
         "quiz_title": "Restrictions",
@@ -300,17 +320,24 @@ LESSONS = [
              "a": ["5040", "4536", "10000", "9000"],
              "c": 1,
              "why": "First digit nonzero: 9 choices. Second: 9 (anything but the first, "
-                    "and 0 is now allowed). Then 8, then 7. `9 · 9 · 8 · 7 = 4536`."},
+                    "and 0 is now allowed). Then 8, then 7. `9 · 9 · 8 · 7 = 4536`. "
+                    "`5040 = 10 · 9 · 8 · 7` lets the number start with 0; `9000` drops "
+                    "the distinctness; `10000` drops both."},
             {"q": "\"At least one\" conditions are usually counted by:",
              "a": ["listing cases", "the complement", "the product rule", "induction"],
              "c": 1,
              "why": "The complement is \"none\", which is a single unrestricted count. "
-                    "Direct cases overlap and multiply quickly."},
+                    "Listing cases works, but they multiply quickly and must be kept "
+                    "disjoint; the product rule alone counts the unrestricted total, not "
+                    "the strings that satisfy the condition; induction proves claims and "
+                    "counts nothing."},
             {"q": "Two counting cases overlap. The result is:",
              "a": ["an undercount", "an over-count", "correct", "undefined"],
              "c": 1,
              "why": "Objects in both cases are counted twice, so the total is too large. "
-                    "A missing case would undercount."},
+                    "A missing case is the opposite error, an undercount; the answer is not "
+                    "\"correct\" merely because every object was counted; and it is a "
+                    "definite wrong number rather than undefined."},
         ],
         "mistakes": [
             ("Ignoring the leading-digit restriction",
@@ -324,8 +351,11 @@ LESSONS = [
              "the restriction is removed."),
         ],
         "standard": ("Finish when you check a restricted count two ways.",
-                     "Count the 5-letter strings over `{a,…,e}` containing at least one "
-                     "`a`, by complement and by cases on the number of `a`s. If the two "
+                     "Count the 4-digit numbers (leading digit nonzero) that contain at "
+                     "least one 7, by complement and by cases on the position of the "
+                     "<em>first</em> 7 &mdash; a classification that is disjoint and "
+                     "exhaustive because every such number has exactly one first 7. "
+                     "Constrain the leading digit first in every case. If the two totals "
                      "agree you have both the arithmetic and the classification right."),
         "note": "The instinct to count what you want directly is usually the expensive "
                 "one. Complementary counting, and later inclusion and exclusion, both "
@@ -400,6 +430,11 @@ LESSONS = [
                 "Equivalently: fix one object's position to break the rotational symmetry, "
                 "and arrange the remaining `n−1` freely.",
             ]),
+            ("p", "The division is legitimate only because rotations were declared "
+                  "identical. If the chairs are numbered, rotating everyone one seat along "
+                  "produces a different seating, nothing is identified, and the count is "
+                  "`n!`. Say which situation you are in before dividing; the question "
+                  "decides it, not the shape of the table."),
             ("p", "The division-by-symmetry argument is the pattern to remember: when "
                   "several arrangements are considered the same, count them all and divide "
                   "by the size of the equivalence class. That is course 2's equivalence "
@@ -411,16 +446,20 @@ LESSONS = [
                 " 20! =  2 432 902 008 176 640 000",
                 " 52! ≈ 8.07 × 10⁶⁷",
             ]),
-            ("p", "`52!` exceeds the number of atoms in the Milky Way. Any algorithm that "
-                  "examines all permutations of a modest input is not slow &mdash; it is "
-                  "impossible, and course 8 lesson 11 gives that observation a name."),
+            ("p", "`52!` is about `10¹⁸` times the number of atoms in the Earth, which is "
+                  "roughly `10⁵⁰`. Any algorithm that examines all permutations of a modest "
+                  "input is not slow &mdash; it is impossible, and course 8 lesson 11 gives "
+                  "that observation a name."),
         ],
         "lab": ("counting", {
             "n": 5, "r": 3, "rule": "p",
             "panel_title": "Permutations, listed",
-            "panel_intro": "The P row is highlighted. Raise `n` past 20 and the "
-                           "enumeration stops while the count stays exact &mdash; it is "
-                           "computed in big integers, not floating point.",
+            "panel_intro": "The P row is highlighted and its 60 arrangements are listed. "
+                           "Raise `n` to 9 and the list stops &mdash; `P(9, 3) = 504` is "
+                           "past the 400 the lab will print &mdash; while the count stays "
+                           "exact. At `n = 24`, `r = 12` the P row reads "
+                           "`24!/12! = 1 295 295 050 649 600`, computed in big integers "
+                           "rather than as a floating-point approximation.",
         }),
         "steps_title": "Counting arrangements",
         "steps_intro": "Confirm order matters before reaching for the formula.",
@@ -451,8 +490,8 @@ LESSONS = [
                 "",
                 "With the two apart:  5040 − 1440 = 3600",
                 "",
-                "Check: 1440 / 5040 = 2/7, and indeed with 7 other seats adjacent",
-                "to a fixed person, 2 of them are next to that person.",
+                "Check: 1440 / 5040 = 2/7.  Fix one of the pair; the other has",
+                "7 seats to choose from, and exactly 2 of them are beside the first.",
             ],
             "after": [
                 "The block trick &mdash; glue constrained objects together, count, then "
@@ -466,19 +505,24 @@ LESSONS = [
             {"q": "`P(7, 3)` equals:",
              "a": ["21", "35", "210", "5040"],
              "c": 2,
-             "why": "`7 · 6 · 5 = 210`. Three factors, starting at 7. `C(7,3) = 35` is the "
-                    "unordered count."},
+             "why": "`7 · 6 · 5 = 210`: three factors, starting at 7. `35` is `C(7,3)`, "
+                    "the unordered count, and `21` is `C(7,2)`; `5040` is `7!`, which "
+                    "arranges all seven rather than three of them."},
             {"q": "Why is `0! = 1`?",
              "a": ["By convention, and it makes `P(n,n) = n!` come out right",
                    "Because 0 has one factor", "It is undefined", "Because `1! = 1`"],
              "c": 0,
              "why": "It is the empty product, and it removes special cases from every "
-                    "formula in this course &mdash; `C(n,0) = 1` depends on it too."},
+                    "formula in this course &mdash; `C(n,0) = 1` depends on it too. 0 has "
+                    "no factors, not one; the value is defined, not undefined; and "
+                    "`1! = 1` is a separate fact that would hold whatever `0!` was."},
             {"q": "Five people around a round table can be seated in:",
              "a": ["`5! = 120` ways", "`4! = 24` ways", "`5⁵` ways", "`P(5,5)/5!` ways"],
              "c": 1,
              "why": "Rotations are the same arrangement, so divide `5!` by 5, giving "
-                    "`4! = 24`. Equivalently, fix one person and arrange the other four."},
+                    "`4! = 24`; equivalently, fix one person and arrange the other four. "
+                    "`5! = 120` is right only if the chairs are numbered; `5⁵` lets a "
+                    "person sit in several chairs at once; `P(5,5)/5!` is 1."},
         ],
         "mistakes": [
             ("Using `P` when order does not matter",
@@ -588,9 +632,11 @@ LESSONS = [
         "lab": ("counting", {
             "n": 6, "r": 3, "rule": "c",
             "panel_title": "Combinations, listed",
-            "panel_intro": "Compare the C row with the P row above it: the ratio is "
-                           "exactly `r!`, which is the derivation of the formula made "
-                           "visible.",
+            "panel_intro": "Compare the C row with the P row above it: at `n = 6`, `r = 3` "
+                           "they read 20 and 120, and the ratio is exactly `r! = 6` "
+                           "&mdash; the derivation of the formula made visible. The 20 "
+                           "listed are the subsets; each appears six times over in the P "
+                           "list, once per ordering.",
         }),
         "steps_title": "Recognising a combination",
         "steps_intro": "Order and repetition, in that order.",
@@ -634,21 +680,27 @@ LESSONS = [
             {"q": "`C(10, 3)` equals:",
              "a": ["30", "120", "720", "1000"],
              "c": 1,
-             "why": "`10·9·8 / 3! = 720/6 = 120`. The 720 is `P(10,3)`, which counts each "
-                    "subset six times."},
-            {"q": "Why is `C(n, r) = C(n, n−r)`?",
-             "a": ["The formula is symmetric",
-                   "Choosing which `r` to include is choosing which `n−r` to exclude — a bijection",
-                   "Both equal `2ⁿ`",
-                   "It is only true for even `n`"],
+             "why": "`10·9·8 / 3! = 720/6 = 120`. The `720` is `P(10,3)`, which counts "
+                    "each subset six times; `30` is `10 · 3`, a product of the wrong two "
+                    "numbers; `1000` is `10³`, ordered with repetition."},
+            {"q": "Which of these is a bijective proof that `C(n, r) = C(n, n−r)`?",
+             "a": ["`n!/(r!(n−r)!)` is unchanged when `r` and `n−r` are swapped",
+                   "Send each `r`-subset to its complement; the map is its own inverse",
+                   "Both sides are entries in the same row of Pascal's triangle",
+                   "Both sides are at most `2ⁿ`"],
              "c": 1,
-             "why": "The complement map is a bijection between the two collections. The "
-                    "algebraic symmetry is a consequence, not the reason."},
+             "why": "A bijective proof names a map between the two collections and argues "
+                    "it is invertible, and complementation is that map. Swapping `r` and "
+                    "`n−r` in the formula is a valid algebraic proof but not a bijective "
+                    "one; sharing a row is what is to be explained, not an explanation; "
+                    "and a common upper bound proves nothing about equality."},
             {"q": "How many 5-card hands can be dealt from 52 cards?",
              "a": ["`P(52,5)`", "`C(52,5) = 2 598 960`", "`52⁵`", "`5! · C(52,5)`"],
              "c": 1,
              "why": "A hand is a set of cards; the order they were dealt in is not part of "
-                    "the hand. `P(52,5)` counts each hand `5! = 120` times."},
+                    "the hand. `P(52,5)` counts each hand `5! = 120` times, and "
+                    "`5! · C(52,5)` is the same number by another name; `52⁵` deals the "
+                    "same card up to five times."},
         ],
         "mistakes": [
             ("Using `C` where order matters",
@@ -661,11 +713,13 @@ LESSONS = [
              "`C(30,28)` is `C(30,2) = 435`, which is two multiplications rather than "
              "twenty-eight."),
         ],
-        "standard": ("Finish when you can state, for any counting problem, whether order "
-                     "and repetition matter.",
-                     "Take five problems from anywhere in this lesson and classify each "
-                     "before computing. The classification is the part that transfers; the "
-                     "arithmetic is not."),
+        "standard": ("Finish when you can combine `C` with cases and with the complement.",
+                     "Count the 5-card hands that contain at least two aces, by cases "
+                     "(exactly two, three or four aces) and by complement (all hands minus "
+                     "those with no ace minus those with exactly one). Each case is a "
+                     "product `C(4, k) · C(48, 5 − k)`; say why the two choices in it are "
+                     "independent, and why the cases are disjoint. The two totals must "
+                     "agree, and the poker example above fixes the magnitude."),
         "note": "`C(n, r)` is also written `binom(n, r)` and called a binomial coefficient, "
                 "because lesson 6 shows it is the coefficient of `x^r y^{n−r}` in "
                 "`(x + y)ⁿ`. The two facts &mdash; counting subsets and expanding a power "
@@ -767,8 +821,11 @@ LESSONS = [
             "identity": "rule", "n": 6, "k": 2,
             "panel_title": "Highlight and check",
             "panel_intro": "The lab highlights the terms of the selected identity and adds "
-                           "them up, comparing the total against what the identity claims. "
-                           "The picture and the arithmetic are shown together.",
+                           "them up, comparing the total against what the identity claims: "
+                           "at `n = 6`, `k = 2` Pascal's rule reads `5 + 10 = 15`, the two "
+                           "parents above `C(6, 2)`. Select the hockey stick to watch the "
+                           "column `C(k, k), …, C(n, k)` sum to the entry below and to the "
+                           "right of its last term.",
         }),
         "steps_title": "Proving a binomial identity by counting",
         "steps_intro": "Find a set both sides count.",
@@ -812,19 +869,23 @@ LESSONS = [
         },
         "quiz_title": "Binomial coefficients",
         "quiz": [
-            {"q": "Pascal's rule is proved by:",
-             "a": ["algebra with factorials",
-                   "splitting the `k`-subsets by whether they contain a fixed element",
-                   "induction on `k`",
-                   "the binomial theorem"],
+            {"q": "The counting proof of Pascal's rule classifies the `k`-subsets of an `n`-set by:",
+             "a": ["their size",
+                   "whether they contain one fixed element",
+                   "their largest element",
+                   "whether `k` is even"],
              "c": 1,
-             "why": "That case split gives the two terms directly. The algebraic "
-                    "verification works but explains nothing."},
+             "why": "In or out of the fixed element: `C(n−1, k−1)` subsets contain it and "
+                    "`C(n−1, k)` do not. All the subsets have the same size `k`, so size "
+                    "separates nothing; classifying by largest element is the hockey-stick "
+                    "proof and produces a sum of `n − k + 1` terms, not two; and the "
+                    "parity of `k` is a property of the question, not of a subset."},
             {"q": "Row 6 of Pascal's triangle sums to:",
              "a": ["36", "64", "12", "720"],
              "c": 1,
              "why": "`2⁶ = 64`. The row counts the subsets of a six-element set, grouped "
-                    "by size."},
+                    "by size. `36` is `6²`, `12` is `2 · 6` and `720` is `6!`; none of "
+                    "them counts subsets."},
             {"q": "The alternating sum `Σ_k (−1)^k C(n,k)` is 0 for `n ≥ 1` because:",
              "a": ["the row is symmetric",
                    "the even-sized and odd-sized subsets are matched by a bijection",
@@ -832,9 +893,13 @@ LESSONS = [
                    "the row sums to `2ⁿ`"],
              "c": 1,
              "why": "Adding or removing a fixed element pairs each subset with one of "
-                    "opposite parity. Symmetry alone would not give it &mdash; odd rows are "
-                    "symmetric too and their alternating sum is 0 for the same bijective "
-                    "reason."},
+                    "opposite parity. Symmetry is not enough: for odd `n` it pairs "
+                    "`C(n,k)` with `C(n,n−k)` of opposite parity and does cancel the sum, "
+                    "but for even `n` the paired entries have the same parity, nothing "
+                    "cancels, and the sum is still 0 &mdash; the bijection is the reason "
+                    "in both cases. `C(n,k)` is not always even (every row starts with 1), "
+                    "and the row sum `2ⁿ` is the same row with all signs positive, a "
+                    "different quantity."},
         ],
         "mistakes": [
             ("Proving identities algebraically by default",
@@ -847,12 +912,14 @@ LESSONS = [
              "The bijection needs an element to add or remove. With none, the sum is 1."),
         ],
         "standard": ("Finish when you can prove an identity by counting one set twice.",
-                     "Prove `C(n,k)·C(k,j) = C(n,j)·C(n−j,k−j)` by counting the ways to "
-                     "choose a `k`-subset and then a `j`-subset of it. Both sides count "
-                     "the same pairs, in different orders."),
+                     "Prove `C(2n, 2) = 2·C(n, 2) + n²` by counting the pairs drawn from "
+                     "`2n` objects split into two halves of `n`: classify a pair by how "
+                     "many of its members come from the first half. Say why the three "
+                     "classes are disjoint and exhaustive, and check the identity at "
+                     "`n = 3`, where the left side is 15."),
         "note": "Pascal's triangle mod 2 reproduces the Sierpiński triangle, because "
                 "`C(n,k)` is odd exactly when the binary digits of `k` are a subset of "
-                "those of `n` &mdash; Kummer's theorem. Course 6's modular arithmetic is "
+                "those of `n` &mdash; Lucas's theorem, read modulo 2. Course 6's modular arithmetic is "
                 "what makes that statement precise.",
     },
     # ---------------------------------------------------------------- 06
@@ -938,8 +1005,11 @@ LESSONS = [
             "identity": "row", "n": 5, "k": 2,
             "panel_title": "Row sums and the expansion",
             "panel_intro": "The expansion of `(x + y)ⁿ` is printed below the controls, with "
-                           "coefficients taken from the triangle. Selecting the row-sum "
-                           "identity highlights exactly the terms that add to `2ⁿ`.",
+                           "coefficients taken from the triangle: at `n = 5` they are "
+                           "`1, 5, 10, 10, 5, 1`. The row-sum identity highlights exactly "
+                           "those six and adds them to `32 = 2⁵`, which is the substitution "
+                           "`x = y = 1` done by hand; select the alternating sum to see "
+                           "`x = 1, y = −1` cancel the same row to 0.",
         }),
         "steps_title": "Using the theorem",
         "steps_intro": "Write the general term first.",
@@ -983,18 +1053,24 @@ LESSONS = [
              "a": ["5", "10", "20", "15"],
              "c": 1,
              "why": "`C(5,2) = 10` &mdash; the number of ways to choose which two of the "
-                    "five factors supply the `y`."},
+                    "five factors supply the `y`. `5` is `C(5,1)`, the coefficient of "
+                    "`x⁴y`; `20` is `2 · 10`, double-counting the choice; `15` is "
+                    "`C(6,2)`, from the wrong row."},
             {"q": "Substituting `x = y = 1` gives:",
              "a": ["`Σ C(n,k) = 2ⁿ`", "`Σ (−1)^k C(n,k) = 0`",
                    "`C(n,0) = 1`", "nothing useful"],
              "c": 0,
              "why": "Both sides become numbers: the left is `2ⁿ` and the right is the sum "
-                    "of the row. The row-sum identity falls out."},
+                    "of the row. The alternating sum needs `y = −1`; `C(n,0) = 1` is one "
+                    "term of the row, not the whole substitution; and an identity about "
+                    "every row of the triangle is not \"nothing useful\"."},
             {"q": "In `(3x − y)⁷`, the coefficient of `x⁴y³` is:",
              "a": ["`C(7,3)·3⁴`", "`−C(7,3)·3⁴`", "`C(7,4)·3³`", "`−C(7,4)`"],
              "c": 1,
              "why": "`C(7,3)(3x)⁴(−y)³ = C(7,3)·81·(−1)·x⁴y³`. The odd power of `−y` "
-                    "carries the minus sign."},
+                    "carries the minus sign, which the first option drops. `C(7,4)` equals "
+                    "`C(7,3)`, so the third option's error is `3³` for `3⁴`, the constant "
+                    "raised to the wrong power; the last drops the constant entirely."},
         ],
         "mistakes": [
             ("Forgetting the constants inside the parentheses",
@@ -1102,9 +1178,14 @@ LESSONS = [
         "lab": ("counting", {
             "n": 4, "r": 3, "rule": "pr",
             "panel_title": "Repetition allowed",
-            "panel_intro": "The `nʳ` row is ordered selection with repetition. Compare it "
-                           "with the `P` row directly below: the gap is exactly the "
-                           "selections that reuse an object.",
+            "panel_intro": "The `nʳ` row is ordered selection with repetition: at `n = 4`, "
+                           "`r = 3` all 64 strings are listed. Compare it with the P row "
+                           "directly below, 24: the gap of 40 is exactly the strings that "
+                           "reuse a letter. The multiset formula is in the list too. Find "
+                           "`aab`, `aba` and `baa` &mdash; the `3!/2! = 3` arrangements of "
+                           "one multiset &mdash; and the 64 splits as 4 (one letter three "
+                           "times) + 36 (`4 · 3` multisets like `{a, a, b}`, three "
+                           "arrangements each) + 24 (all distinct, the P row).",
         }),
         "steps_title": "Counting with repetition",
         "steps_intro": "Decide which of the two situations you are in.",
@@ -1151,12 +1232,17 @@ LESSONS = [
              "a": ["12", "24", "81", "64"],
              "c": 2,
              "why": "`3⁴ = 81`. Repetition is allowed and order matters, so each of four "
-                    "positions has three independent options."},
+                    "positions has three independent options. `64 = 4³` has the base and "
+                    "the exponent swapped &mdash; the standard slip, four letters of a "
+                    "three-letter alphabet; `24 = 4!` and `12 = 3 · 4` forbid repetition "
+                    "or multiply the wrong pair."},
             {"q": "How many distinguishable arrangements does BOOKKEEPER have? (B,O,O,K,K,E,E,P,E,R)",
              "a": ["`10!`", "`10!/(2!·2!·3!)`", "`10!/(2!·3!)`", "`10!/4!`"],
              "c": 1,
-             "why": "Two O, two K, three E, and the rest single. Divide by the factorial "
-                    "of each repetition count."},
+             "why": "Two O, two K, three E, and the rest single: divide by the factorial "
+                    "of each repetition count. `10!/(2!·3!)` has lost one of the two "
+                    "repeated pairs; `10!/4!` treats the four letters that repeat as one "
+                    "kind; `10!` distinguishes copies that are identical."},
             {"q": "Why does arranging a multiset divide by factorials?",
              "a": ["To keep the answer an integer",
                    "Each distinguishable arrangement was counted once per permutation of the identical copies",
@@ -1164,7 +1250,10 @@ LESSONS = [
                    "It is a convention"],
              "c": 1,
              "why": "Labelling the copies makes all `n!` arrangements distinct; removing "
-                    "the labels collapses each group of `n₁!⋯n_k!` into one."},
+                    "the labels collapses each group of `n₁!⋯n_k!` into one. That the "
+                    "answer is an integer is a consequence, not the reason; \"because the "
+                    "objects are ordered\" would argue for not dividing; and it is a "
+                    "theorem, not a convention."},
         ],
         "mistakes": [
             ("Confusing the two situations",

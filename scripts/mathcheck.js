@@ -31,6 +31,8 @@ const SOURCE = path.join(__dirname, 'mathpath', 'labs', 'algebra_core.py');
 const src = fs.readFileSync(SOURCE, 'utf8');
 const LOGIC_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'logic.py');
 const logicSrc = fs.readFileSync(LOGIC_SOURCE, 'utf8');
+const COUNTING_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'counting.py');
+const countingSrc = fs.readFileSync(COUNTING_SOURCE, 'utf8');
 
 /* Each block is  NAME = r"""..."""  in the Python module. */
 function blockFrom(text, name, where) {
@@ -40,6 +42,7 @@ function blockFrom(text, name, where) {
 }
 function block(name) { return blockFrom(src, name, SOURCE); }
 function logicBlock(name) { return blockFrom(logicSrc, name, LOGIC_SOURCE); }
+function countingBlock(name) { return blockFrom(countingSrc, name, COUNTING_SOURCE); }
 
 let fails = 0;
 function eq(got, want, label) {
@@ -350,6 +353,46 @@ eval(logicBlock('QUANT_EVAL_JS'));
                        qForallYExistsX(leC, 4), qExistsXForallY(leC, 4), qExistsExists(leC, 4)];
   eq(leCVerdicts.filter((r) => r.v).map((r) => r.why).join(';'),
      'x = 2, y = 1 works', 'complemented order preset: only exists-exists survives');
+}
+
+// ------------------------------------------------------------- counting
+console.log('counting in BigInt (course 4 labs)');
+{
+  /* The course-4 labs promise the reader that every count is exact and that
+     the derangement lab's three routes agree. The functions below are the
+     shipped ones, extracted from counting.py; a wrong comb() would reach
+     every page that lists selections, and a wrong derangeTerms() would ship a
+     table that confidently disagrees with the lesson above it. */
+  eval(countingBlock('BIGINT_JS') + countingBlock('DERANGE_JS'));
+
+  eq(fact(0), 1n, '0! = 1');
+  eq(fact(20), 2432902008176640000n, '20! exactly');
+  eq(perm(10, 3), 720n, 'P(10,3) = 720');
+  eq(perm(24, 12), 1295295050649600n, 'P(24,12), the largest P the lab can show');
+  eq(perm(3, 5), 0n, 'P(n, r) with r > n is 0');
+  eq(comb(52, 5), 2598960n, 'C(52,5) = 2 598 960');
+  eq(comb(35, 12), 834451800n, 'C(35,12), the largest C(n+r-1, r) the lab can show');
+  eq(comb(7, 5), 21n, 'C(7,5) = 21: five doughnuts from three kinds');
+  eq(comb(6, 2), comb(5, 1) + comb(5, 2), "Pascal's rule at the lesson-5 preset");
+  eq(comb(4, 7), 0n, 'C(n, r) with r > n is 0');
+  eq(group(1295295050649600n), '1 295 295 050 649 600', 'digit grouping');
+
+  const D = [1n, 0n, 1n, 2n, 9n, 44n, 265n, 1854n, 14833n, 133496n];
+  for (let n = 0; n < D.length; n += 1) {
+    eq(derangeFormula(n), D[n], 'D_' + n + ' by the alternating sum');
+    eq(derangeRec(n), D[n], 'D_' + n + ' by the recurrence');
+    if (n <= 8) eq(derangeBrute(n), D[n], 'D_' + n + ' by listing');
+  }
+  eq(derangeFormula(12), 176214841n, 'D_12, the largest n the slider allows');
+  eq(derangeList(4).sort().join(','), '2143,2341,2413,3142,3412,3421,4123,4312,4321', 'the nine derangements of 1..4');
+  const rows6 = derangeTerms(6).map((r) => r.running.toString()).join(',');
+  eq(rows6, '720,0,360,240,270,264,265', 'the running total at n = 6 swings and settles on 265');
+  eq(ratioDigits(265n, 720n, 7), '0.3680556', 'D_6/6! to seven places, rounded');
+  eq(ratioDigits(1854n, 5040n, 7), '0.3678571', 'D_7/7! to seven places');
+  eq(ratioDigits(14833n, 40320n, 7), '0.3678819', 'D_8/8! to seven places (the lesson table row)');
+  eq(ratioDigits(1n, 3n, 4), '0.3333', 'ratioDigits pads and truncates correctly');
+  eq(ratioDigits(0n, 1n, 7), '0.0000000', 'ratioDigits at zero');
+  eq(ratioDigits(1n, 2n, 3), '0.500', 'ratioDigits at one half');
 }
 
 if (fails) {
