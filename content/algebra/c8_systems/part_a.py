@@ -6,7 +6,7 @@ LESSONS = [
         "slug": "systems-of-two-linear-equations",
         "title": "Systems of Two Linear Equations",
         "module": "Systems",
-        "one_line": "Two lines, and the three things they can do.",
+        "one_line": "Classify two lines as meeting once, never or everywhere, then verify a candidate in both equations.",
         "summary": (
             "A system asks which pairs satisfy several equations at once, and a "
             "solution has to satisfy every one of them. Two lines cross once, never, "
@@ -16,7 +16,6 @@ LESSONS = [
             "one solution      the lines cross once     consistent, independent",
             "no solution       parallel and distinct    inconsistent",
             "infinitely many   one line written twice   consistent, dependent",
-            "a₁b₂ − a₂b₁ ≠ 0   ⟺   the first case, exactly one solution",
         ],
         "key_label": "Three cases, and nothing else",
         "concepts_intro": (
@@ -87,12 +86,13 @@ LESSONS = [
                 "",
                 "same slope, different intercept   →   parallel, distinct   →   none",
             ]),
-            ("p", "There is a test that skips the rearranging. For `a₁x + b₁y = c₁` and "
-                  "`a₂x + b₂y = c₂`, the system has exactly one solution precisely when "
-                  "`a₁b₂ − a₂b₁ ≠ 0`. When that number is zero the lines are parallel, "
-                  "and comparing the constants settles which of the two remaining cases "
-                  "you are in. Lesson 8 gives this number its name: it is the "
-                  "determinant."),
+            ("p", "Vertical lines do not have slopes, so slope-intercept form is not "
+                  "always the right comparison. In standard form, ask whether one "
+                  "equation's two variable coefficients are a common multiple of the "
+                  "other's. If not, the lines cross once. If they are, the constants "
+                  "decide whether the equations are the same multiple or a "
+                  "contradiction. Lesson 8 packages that coefficient comparison into "
+                  "one number, the determinant."),
             ("example", ("The same line, written twice",
                          "`x − 2y = 4` and `−3x + 6y = −12`. The second equation is "
                          "`−3` times the first, so every pair satisfying one satisfies "
@@ -163,6 +163,11 @@ LESSONS = [
                 "line, and it has to be written as a line &mdash; either as the equation "
                 "`x − 2y = 4` or in the parameter form `(2t + 4, t)`. \"Infinitely "
                 "many\" on its own says how many and not which.",
+                "Faded rehearsal: classify `x = 3` with `2x + y = 7`. The first line "
+                "is vertical, so do not force a slope comparison: substitute its "
+                "fixed `x` into the other equation, finish the ordered pair, and check "
+                "it in both originals. Then change the second equation to `2x = 8` "
+                "and explain the different classification before doing any solving.",
             ],
         },
         "quiz_title": "Systems and their solutions",
@@ -221,15 +226,15 @@ LESSONS = [
         "note": "The three cases survive every enlargement of the problem. Lesson 4 has "
                 "three variables and the same three answers; lesson 6 reads them "
                 "straight off a row-reduced matrix without any geometry at all. The "
-                "single number that separates the first case from the other two, "
-                "`a₁b₂ − a₂b₁`, is the subject of lesson 8.",
+                "determinant in lesson 8 will compress the coefficient comparison into "
+                "a single test for the first case.",
     },
     # ---------------------------------------------------------------- 02
     {
         "slug": "solving-by-substitution",
         "title": "Solving by Substitution",
         "module": "Systems",
-        "one_line": "Replacing one unknown with an expression in the other.",
+        "one_line": "Choose an efficient isolation, solve by substitution, and diagnose a contradiction or identity.",
         "summary": (
             "Solve one equation for one unknown, put that expression into the other "
             "equation, and a system in two variables becomes an equation in one. The "
@@ -398,6 +403,10 @@ LESSONS = [
                 "Isolating `x` from the first equation instead is legitimate and gives "
                 "`x = (4 + 2y)/5`. The same pair comes out. The fifths are the price of "
                 "ignoring the coefficient of `1` sitting in the other equation.",
+                "Faded rehearsal: solve `4x − y = 11` and `2x + 3y = 9`. The cheap "
+                "first move is supplied: isolate `y` from the first equation. Put the "
+                "whole expression into the second in brackets, finish the pair, and "
+                "use both original equations &mdash; not a derived one &mdash; for the check.",
             ],
         },
         "quiz_title": "Substitution",
@@ -462,7 +471,7 @@ LESSONS = [
         "slug": "solving-by-elimination",
         "title": "Solving by Elimination",
         "module": "Systems",
-        "one_line": "Adding equations to make an unknown disappear.",
+        "one_line": "Choose the cheaper variable, eliminate it reversibly, and classify what remains.",
         "summary": (
             "Adding one equation to another is legal, and if the multiples are chosen "
             "so that the coefficients of one variable are opposites, that variable "
@@ -635,6 +644,10 @@ LESSONS = [
                 "The `16` on the right of the doubled equation is the entry most often "
                 "left behind. Multiplying an equation means multiplying the constant "
                 "too, and a check in both originals catches the omission immediately.",
+                "Faded rehearsal: solve `4x + 3y = 1` and `2x − 3y = 11`. The "
+                "multipliers have already been chosen: both are `1`, so add the "
+                "aligned equations. Finish the remaining coordinate, check the pair "
+                "in both originals, and say why eliminating `x` would cost more work.",
             ],
         },
         "quiz_title": "Elimination",
@@ -698,7 +711,7 @@ LESSONS = [
         "slug": "systems-in-three-variables",
         "title": "Systems in Three Variables",
         "module": "Systems",
-        "one_line": "Three planes, and elimination done twice.",
+        "one_line": "Plan two eliminations of the same variable, solve the reduced system, and verify the triple.",
         "summary": (
             "A solution is now an ordered triple, and each equation describes a plane. "
             "The method is elimination used twice: remove one variable from two "
@@ -864,6 +877,11 @@ LESSONS = [
                 "sum, `y` from `A`, `x` from `E1`. Substituting into `E2` or `E3` "
                 "instead is equally valid and slightly more arithmetic; what matters is "
                 "that all three are used for the final check.",
+                "Faded rehearsal: for `x + y + z = 4`, `2x − y + z = 1`, "
+                "`−x + 3y + 2z = 9`, the plan is supplied: form `E2 − 2E1` and "
+                "`E3 + E1`, so `x` leaves both new equations. Carry out those two "
+                "combinations, solve the resulting system, and test the triple in all "
+                "three originals.",
             ],
         },
         "quiz_title": "Three variables",
@@ -928,7 +946,7 @@ LESSONS = [
         "slug": "matrices-and-row-operations",
         "title": "Matrices and Row Operations",
         "module": "Matrices",
-        "one_line": "The same elimination, with the letters removed.",
+        "one_line": "Translate a system to an augmented matrix and apply one reversible row operation at a time.",
         "summary": (
             "An augmented matrix is a system with the variable names deleted: one row "
             "per equation, one column per variable, one column for the constants. The "
@@ -1093,7 +1111,12 @@ LESSONS = [
                 "reports a wrong triple.",
                 "Notice what the two operations achieved: the first column below the top "
                 "row is now zero. That is `x` eliminated, and it is the first column "
-                "rather than the first variable only because of where it was written."
+                "rather than the first variable only because of where it was written.",
+                "Faded rehearsal: write the augmented matrix for `2x − z = 5`, "
+                "`y + 3z = −1`, `x + 2y = 4` in the column order `x, y, z`. The "
+                "first row begins `2  0  −1`; supply every remaining zero and constant, "
+                "then perform `R1 − 2R3 → R1` on the whole row and translate the new "
+                "first row back into an equation.",
             ],
         },
         "quiz_title": "Matrices and row operations",
@@ -1155,7 +1178,7 @@ LESSONS = [
         "slug": "gaussian-elimination",
         "title": "Gaussian Elimination",
         "module": "Matrices",
-        "one_line": "Row reduction to echelon form, mechanically.",
+        "one_line": "Reduce an augmented matrix in exact fractions and classify its solution set from pivots.",
         "summary": (
             "Row reduction drives any augmented matrix into one shape, working a "
             "column at a time from the left. The procedure never has to guess which "
@@ -1340,6 +1363,11 @@ LESSONS = [
                 "reading was available three stages earlier, the moment the third row "
                 "read `0 0 6 | 18`: three pivots for three variables, and no row of "
                 "zeros.",
+                "Faded rehearsal: begin with rows `1  2  −1 | 3`, `0  1  4 | 2`, "
+                "`0  0  0 | 0`. The first pivot is already in place. Clear the `2` "
+                "above the second pivot, name the free variable before assigning it a "
+                "parameter, and write the full family of solutions rather than one "
+                "convenient triple.",
             ],
         },
         "quiz_title": "Row reduction",
@@ -1404,12 +1432,12 @@ LESSONS = [
     # ---------------------------------------------------------------- 07
     {
         "slug": "matrix-arithmetic",
-        "title": "Matrix Arithmetic",
+        "title": "Matrix Products",
         "module": "Matrices",
-        "one_line": "Addition, scalar multiples, and the product that is not elementwise.",
+        "one_line": "Decide whether a matrix product exists, state its size, and compute each row-column entry.",
         "summary": (
-            "Matrices of the same size add entry by entry and scale entry by entry, "
-            "which is the easy half. The product is not entrywise: the entry in row `i` "
+            "Addition and scaling are a short entrywise warm-up. The product is the "
+            "new operation: the entry in row `i` "
             "and column `j` of `AB` is built from the whole of row `i` and the whole of "
             "column `j`, and the order of the factors changes the answer."
         ),
@@ -1438,8 +1466,8 @@ LESSONS = [
              "and even when both are `n × n` they are usually different matrices. Every "
              "rearrangement that quietly used commutativity has to be re-earned here."),
         ],
-        "read_title": "Adding, scaling and multiplying matrices",
-        "read_intro": "Two operations that behave, one that does not, and the familiar laws that stop holding.",
+        "read_title": "Matrix products, after an entrywise warm-up",
+        "read_intro": "Addition and scaling in brief, then the shape rule, row-column products and the order of the factors.",
         "body": [
             ("def", ("Size and equality",
                      "An `m × n` matrix has `m` rows and `n` columns. Two matrices are "
@@ -1508,33 +1536,12 @@ LESSONS = [
                 "                 2(1) − 1(2) + 3(3)  =   9    ✓",
                 "                −1(1) + 2(2) + 4(3)  =  15    ✓",
             ]),
-            ("thm", ("What survives, and what does not",
-                     "Matrix multiplication is associative, `(AB)C = A(BC)`, and "
-                     "distributes over addition on both sides: `A(B + C) = AB + AC` and "
-                     "`(A + B)C = AC + BC`. Scalars pull out: `k(AB) = (kA)B = A(kB)`.",
-                     "Commutativity fails. `AB` and `BA` need not be equal, need not "
-                     "have the same size, and need not both exist. Nothing in the "
-                     "notation warns you, so the order must be preserved in every step "
-                     "of every rearrangement.")),
-            ("def", ("Identity matrix",
-                     "`Iₙ` is the `n × n` matrix with `1` in every position on the main "
-                     "diagonal and `0` everywhere else. It satisfies `IA = A` and "
-                     "`AI = A` whenever the sizes allow, which is what makes it the "
-                     "matrix analogue of the number `1`.")),
-            ("example", ("A product of two nonzero matrices that is zero",
-                         "Let `P` have rows `(1, 1)` and `(1, 1)`, and let `Q` have "
-                         "rows `(1, −1)` and `(−1, 1)`. Each entry of `PQ` is either "
-                         "`1(1) + 1(−1)` or `1(−1) + 1(1)`, so all four are `0` and "
-                         "`PQ` is the zero matrix while neither factor is zero.",
-                         "The zero-product property that solves every quadratic in "
-                         "course 6 is a fact about numbers. It does not hold here, and "
-                         "no argument that depends on it may be used on matrices.")),
-            ("p", "Cancellation fails for the same reason. From `AB = AC` you may not "
-                  "conclude `B = C`: with `A` having rows `(1, 0)` and `(0, 0)`, `B` "
-                  "having rows `(1, 2)` and `(3, 4)`, and `C` having rows `(1, 2)` and "
-                  "`(9, 9)`, both products have rows `(1, 2)` and `(0, 0)` while `B` "
-                  "and `C` are plainly different. Lesson 9 says exactly which matrices "
-                  "may be cancelled, and why most may not."),
+            ("p", "Even when both products exist, order must be preserved: `AB` and "
+                  "`BA` can have different sizes or different entries. The arithmetic "
+                  "lesson here is deliberately narrow &mdash; decide existence, state "
+                  "the output size, and build each entry from the named row and column. "
+                  "Lesson 9 introduces the identity and inverse when a system needs a "
+                  "matrix operation to be undone."),
         ],
         "lab": ("matrix", {
             "mode": "arith",
@@ -1595,6 +1602,11 @@ LESSONS = [
                 "Neither product is the entrywise one, which would have been `0`, `2`, "
                 "`3`, `0`. That matrix is not `AB`, is not `BA`, and answers no question "
                 "asked in this course.",
+                "Faded rehearsal: let `C` be `2 × 3` with rows `(1, 0, −2)` and "
+                "`(3, 1, 4)`, and let `D` be `3 × 1` with column `(2, −1, 5)`. The "
+                "shape decision is supplied: `CD` exists and is `2 × 1`. Compute its "
+                "two entries by naming each row of `C` against the column of `D`, then "
+                "explain from the dimensions why `DC` does not exist.",
             ],
         },
         "quiz_title": "Matrix arithmetic",
@@ -1618,27 +1630,29 @@ LESSONS = [
                     "which is what using the first row instead of the second gives; "
                     "`21` is the entrywise product `3 × 7`; `15` is the first of the "
                     "two products with the second forgotten."},
-            {"q": "`AB` is the zero matrix. What follows?",
-             "a": ["`A = 0` or `B = 0`",
-                   "Nothing: two nonzero matrices can have a zero product",
-                   "`A` and `B` have the same size",
-                   "`BA` is the zero matrix as well"],
+            {"q": "`A` and `B` are both `2 × 2`, so `AB` and `BA` both exist and have "
+                  "the same size. What follows?",
+             "a": ["`AB = BA`",
+                   "The products may still have different entries",
+                   "Both products are found entry by entry",
+                   "One of the products must be undefined"],
              "c": 1,
-             "why": "The matrix with rows `(1, 1)`, `(1, 1)` times the matrix with rows "
-                    "`(1, −1)`, `(−1, 1)` is zero with neither factor zero. `BA` need "
-                    "not vanish either: for `A` with rows `(1, 0)`, `(0, 0)` and `B` "
-                    "with rows `(0, 0)`, `(1, 0)`, `AB` is zero and `BA` is not."},
+             "why": "Matching square sizes guarantee that both products exist and say "
+                    "nothing about equality. In the worked example, `AB` has rows "
+                    "`(2, 1)`, `(4, 3)` while `BA` has rows `(3, 4)`, `(1, 2)`. "
+                    "Entrywise multiplication is a different operation, and neither "
+                    "product is undefined here."},
         ],
         "mistakes": [
             ("Multiplying entry by entry",
              "The matrix of products of matching entries is a real operation with real "
              "uses, and it is not `AB`. For the two matrices in the worked example it "
              "would give `0`, `2`, `3`, `0`, which is neither product."),
-            ("Cancelling a matrix from both sides",
-             "`AB = AC` does not give `B = C`, because `A` may destroy the difference "
-             "between `B` and `C`. Cancellation is legal only for the matrices lesson 9 "
-             "identifies, and assuming it earlier produces answers that survive every "
-             "check except a numerical one."),
+            ("Putting a correct number in the wrong position",
+             "An entry is named before it is computed: row `i` of the left matrix "
+             "against column `j` of the right. Using the right row with the wrong "
+             "column can produce impeccable arithmetic in a matrix that answers a "
+             "different product."),
             ("Assuming AB exists because BA does",
              "A `3 × 2` times a `2 × 5` is fine; the same two matrices in the other "
              "order pair `5` against `3` and there is no product at all. Write the two "
@@ -1650,10 +1664,11 @@ LESSONS = [
                      "many entries you owe, and it is the habit that makes `Ax = b` in "
                      "lesson 9 read as one equation rather than as three."),
         "note": "Writing a system as `Ax = b` invites the obvious move: divide by `A`. "
-                "There is no division of matrices, but there is sometimes a matrix "
-                "`A⁻¹` with `A⁻¹A = I`, and then `x = A⁻¹b`. Lesson 8 produces the "
+                "There is no division of matrices, but there is sometimes a matrix that "
+                "undoes multiplication by `A`. Lesson 8 produces the "
                 "single number that decides whether such a matrix exists, and lesson 9 "
-                "constructs it by row reduction &mdash; which is the reason this course "
-                "did lesson 6 first.",
+                "defines it as `A⁻¹`, constructs it by row reduction, and turns the "
+                "system into `x = A⁻¹b` &mdash; which is the reason this course did "
+                "lesson 6 first.",
     },
 ]

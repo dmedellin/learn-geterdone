@@ -425,10 +425,10 @@ ALGEBRA_PATH_PAGE = "/paths/algebra/"
 
 ALGEBRA_COURSE_1_HOME = "/algebra-foundations/"
 ALGEBRA_COURSE_1_LESSONS = (
-    "real-numbers-and-the-number-line", "properties-of-the-real-numbers",
-    "order-of-operations", "absolute-value", "integer-exponents",
-    "scientific-notation", "roots-and-radicals", "rational-exponents",
-    "algebraic-expressions-and-terms", "the-distributive-law",
+    "real-numbers-and-the-number-line", "order-of-operations",
+    "algebraic-expressions-and-terms", "properties-of-the-real-numbers",
+    "absolute-value", "integer-exponents", "scientific-notation",
+    "roots-and-radicals", "rational-exponents", "the-distributive-law",
     "combining-like-terms", "evaluating-expressions",
     "translating-words-into-algebra",
 )
@@ -448,10 +448,10 @@ ALGEBRA_COURSE_3_HOME = "/lines-functions-and-graphs/"
 ALGEBRA_COURSE_3_LESSONS = (
     "the-coordinate-plane", "graphing-a-linear-equation", "slope",
     "slope-intercept-form", "point-slope-and-standard-form",
-    "parallel-and-perpendicular-lines", "what-a-function-is",
-    "function-notation", "domain-and-range", "piecewise-functions",
+    "parallel-and-perpendicular-lines", "linear-inequalities-in-two-variables",
+    "what-a-function-is", "function-notation", "domain-and-range", "piecewise-functions",
     "transformations-of-graphs", "composition-of-functions",
-    "inverse-functions", "linear-inequalities-in-two-variables",
+    "inverse-functions",
 )
 
 ALGEBRA_COURSE_4_HOME = "/polynomials-and-factoring/"

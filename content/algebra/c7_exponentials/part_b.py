@@ -6,18 +6,17 @@ LESSONS = [
         "slug": "common-and-natural-logarithms",
         "title": "Common and Natural Logarithms",
         "module": "Logarithms",
-        "one_line": "Base 10 and base e, and the notation for each.",
+        "one_line": "Identify the base behind log or ln and use the matching inverse identity.",
         "summary": (
             "Two bases are used often enough to get their own notation: `log x` means "
-            "base 10 and `ln x` means base `e`. Neither is a new function &mdash; both "
-            "are the logarithm of lesson 4 &mdash; but the abbreviations mean different "
-            "things in different subjects, and the split of `log(a · 10^k)` into an "
-            "exact integer and an irrational remainder is worth doing once by hand."
+            "base 10 and `ln x` means base `e`. Neither is a new function. The skill "
+            "is to expose the hidden base, use a matching inverse exactly when one is "
+            "present, and bracket any decimal before a calculator rounds it."
         ),
         "key": [
             "log x  =  log_10(x)      the common logarithm",
             "ln x   =  log_e(x)       the natural logarithm,  e = 2.71828…",
-            "log 4500 = log(4.5 · 10^3) = 3 + 0.6532…    integer + remainder",
+            "log(10^k) = k          ln(e^k) = k          exact inverse pairs",
             "ln x = ln 10 · log x ≈ 2.302585 · log x     one constant apart",
         ],
         "key_label": "Two abbreviations, one definition",
@@ -32,19 +31,20 @@ LESSONS = [
              "usually means base `e`; in a complexity bound it usually means base 2. "
              "The symbol does not carry its base, the subject does, and the convention "
              "is arbitrary."),
-            ("ln is the logarithm of the compounding base",
+            ("ln is the direct inverse of the compounding base",
              "`ln x` means `log_e(x)`, with `e = 2.71828…` produced in lesson 3 by "
-             "compounding faster and faster. Anything written with `e` &mdash; "
-             "`A = P · e^(rt)` in lesson 11, every continuous decay &mdash; is undone "
-             "by `ln` and by nothing else."),
-            ("The integer part of a common logarithm is free",
-             "`log(4.5 · 10^3) = 3 + log 4.5`. The `3` is exact and comes from the "
-             "power of ten; the remainder lies in `[0, 1)` and is the part that cannot "
-             "be written down exactly. That split is why a printed logarithm table "
-             "needed only the digits from `1.00` to `9.99`."),
+             "compounding faster and faster. It removes an `e`-power in one inverse "
+             "step: `ln(e^u) = u`. Any legal logarithm could be applied to an equation "
+             "containing `e^u`; `ln` is the matched and simplest choice, not the only "
+             "legal one."),
+            ("Estimate from the base before asking for digits",
+             "`10^3 &lt; 4500 &lt; 10^4` puts `log 4500` between `3` and `4`. "
+             "Likewise `e² &lt; 10 &lt; e³` puts `ln 10` between `2` and `3`. A bracket "
+             "catches the wrong base, a dropped sign and an implausible decimal before "
+             "the keys can make the mistake look precise."),
         ],
         "read_title": "Two named bases",
-        "read_intro": "The definitions, the identities they inherit, and the one piece of arithmetic worth doing by hand.",
+        "read_intro": "The definitions, the inverse identities they inherit, and how to choose and check the useful one.",
         "body": [
             ("def", ("Common logarithm",
                      "`log x`, written with no base, means `log_10(x)`: the exponent to "
@@ -71,97 +71,100 @@ LESSONS = [
                   "holds for every real `k` because `10^k` is positive whatever `k` is. "
                   "`10^(log x) = x` needs `x &gt; 0` first, because otherwise `log x` "
                   "does not exist to be exponentiated."),
-            ("h3", "The integer part and the remainder"),
-            ("p", "Write a positive number in scientific notation as `a · 10^k` with "
-                  "`1 ≤ a &lt; 10` and `k` an integer. The product law of lesson 6 then "
-                  "splits its common logarithm into two pieces: `log(a · 10^k) = "
-                  "log a + k`. The `k` is an exact integer. The `log a` lies between `0` "
-                  "and `1`, and for a rational `a` other than `1` it is irrational, so it "
-                  "is a decimal that has been rounded and should be labelled as such."),
-            ("p", "The two pieces have names that survive from the era of printed tables. "
-                  "`k` is the <strong>characteristic</strong> and `log a` is the "
-                  "<strong>mantissa</strong>. A table listed mantissas only: every number "
-                  "with the digits `45` shares one, and the power of ten was supplied by "
-                  "the reader."),
-            ("example", ("Three numbers, one mantissa",
-                         "`log 4.5 ≈ 0.6532`. Then `log 45 ≈ 1.6532`, `log 4500 ≈ 3.6532` "
-                         "and `log 450000 ≈ 5.6532`. Only the characteristic moved, "
-                         "because only the power of ten changed.")),
-            ("p", "Below `1` the arithmetic stops being cosmetic. "
-                  "`log 0.00045 = log(4.5 · 10^−4) = −4 + 0.6532 = −3.3468`, and the "
-                  "digits `6532` are nowhere in the answer. Tables wrote such a value as "
-                  "a negative characteristic with a positive mantissa kept separate, "
-                  "precisely so that the shared `0.6532` stayed visible."),
-            ("p", "One use of the characteristic outlives the tables. The number of "
-                  "digits in a positive integer `N` is `⌊log N⌋ + 1`, where the brackets "
-                  "mean round down to an integer. So `2^100` has "
-                  "`⌊100 · log 2⌋ + 1 = ⌊30.103⌋ + 1 = 31` digits &mdash; a fact about a "
-                  "31-digit number obtained without writing any of it down."),
+            ("h3", "Match the inverse before computing"),
+            ("p", "When the power and the logarithm use the same base, they undo one "
+                  "another exactly: `log(10^k) = k` and `ln(e^k) = k`. Cross the "
+                  "bases and there is no cancellation: `log(e^k) = k·log e` and "
+                  "`ln(10^k) = k·ln 10`. The expressions are still exact, but a "
+                  "constant scale factor remains."),
+            ("example", ("One equation, two legal logarithms",
+                         "From `e^x = 12`, taking `ln` gives `x = ln 12` in one step. "
+                         "Taking a common logarithm is also legal: "
+                         "`x·log e = log 12`, so `x = log 12 / log e`. Change of base "
+                         "in lesson 8 proves those exact expressions are equal. `ln` "
+                         "is the shorter route because its base matches the power, not "
+                         "because every other logarithm is forbidden.")),
+            ("h3", "Estimate before asking for a decimal"),
+            ("p", "The base supplies a free bracket. Since "
+                  "`10^3 &lt; 4500 &lt; 10^4`, `3 &lt; log 4500 &lt; 4`. Since "
+                  "`e² &lt; 10 &lt; e³`, `2 &lt; ln 10 &lt; 3`. A decimal outside the "
+                  "right interval used the wrong base, lost a sign or was entered "
+                  "incorrectly. The bracket does not compute the answer; it checks "
+                  "what a calculator returns."),
+            ("p", "For a common logarithm, scientific notation makes that bracket "
+                  "visible: if `x = a·10^k` with `1 ≤ a &lt; 10`, then "
+                  "`log x = k + log a` and `k ≤ log x &lt; k + 1`. The attached lab "
+                  "shows this exact power-of-ten part beside the rounded remainder as "
+                  "an estimation aid. No table terminology or separate algorithm is "
+                  "needed."),
             ("thm", ("The two logarithms are proportional",
                      "For every `x &gt; 0`, `ln x = ln 10 · log x`, and `ln 10 ≈ 2.302585`.",
                      "So the natural logarithm of a number is always about `2.3` times "
                      "its common logarithm: `log 500 ≈ 2.6990` and `ln 500 ≈ 6.2146`. "
                      "Lesson 8 shows that every pair of bases is related by a constant of "
                      "exactly this kind, and derives it in two lines.")),
-            ("p", "That proportionality is also the practical reason the two abbreviations "
-                  "are enough. A calculator offers `log` and `ln` and no other base; "
-                  "everything else is computed from one of them."),
+            ("p", "That proportionality is also the practical reason the two keys are "
+                  "enough. A standard scientific calculator offers `log` and `ln`; "
+                  "lesson 8 computes every other base from either one."),
         ],
         "lab": ("logarithm", {
             "mode": "common",
-            "panel_title": "The exact part and the rounded part",
-            "panel_intro": "Enter a number and watch its common logarithm split: the "
-                           "power of ten is found as an integer and is exact, and what "
-                           "remains is printed as a rounding and says so. The base-e "
-                           "column beside it is the same number needing a different "
-                           "exponent.",
+            "panel_title": "Two hidden bases, one argument",
+            "panel_intro": "Enter a positive number and compare the exponents needed "
+                           "by base `10` and base `e`. The power-of-ten bracket is exact "
+                           "and checks the common-log decimal; every rounded value says "
+                           "where it was rounded.",
         }),
-        "steps_title": "Reading a common logarithm off a number",
-        "steps_intro": "Four steps, and the first one decides the only exact digit in the answer.",
+        "steps_title": "Using log and ln deliberately",
+        "steps_intro": "Four decisions: expose the base, check the domain, look for exact cancellation, then estimate.",
         "steps": [
-            ("Write the number in scientific notation",
-             "`a · 10^k` with `1 ≤ a &lt; 10` and `k` an integer. This is what fixes the "
-             "characteristic; a number written as `45 · 10^2` gives the wrong one."),
-            ("Take the logarithm of each factor",
-             "`log(a · 10^k) = log a + log(10^k) = log a + k`, by the product law and "
-             "then by the definition. The second term needs no computation at all."),
-            ("Get the mantissa from a table or a calculator",
-             "`0 ≤ log a &lt; 1` always, because `1 ≤ a &lt; 10`. For a rational `a` "
-             "other than `1` this value is irrational, so whatever you write is rounded "
-             "and the number of places should be stated."),
-            ("Add, keeping the characteristic's sign on the characteristic",
-             "For `a · 10^−4` the sum is `−4 + (mantissa)`, not `−(4 + mantissa)`. The "
-             "printed decimal will not show the mantissa's digits, and that is correct."),
+            ("Expose the hidden base",
+             "Rewrite `log x` as `log_10(x)` and `ln x` as `log_e(x)`. The symbol alone "
+             "does not carry a universal convention, so state the course or context "
+             "when a bare `log` could be ambiguous."),
+            ("Check the argument before using an identity",
+             "Both functions require a positive argument. `ln(e^u)` is always legal "
+             "because `e^u &gt; 0`; `e^(ln x)` requires `x &gt; 0` before `ln x` exists."),
+            ("Look for a matching inverse pair",
+             "Use `log(10^k) = k` or `ln(e^k) = k` exactly. If the bases do not match, "
+             "keep the scale factor: `log(e^k) = k·log e`, not `k`."),
+            ("Bracket first and round once",
+             "Compare the argument with nearby powers of the actual base. Then compute "
+             "if a decimal is required, carry the exact logarithmic expression through "
+             "later work, and state the number of places rounded."),
         ],
         "worked": {
-            "title": "One mantissa, three numbers",
+            "title": "Matched bases, crossed bases, and a bracket",
             "intro": [
-                "`log 4.5 = 0.6532` to four places. Every number whose digits are `45` "
-                "shares that value; only the power of ten changes.",
+                "First expose the base. Exact inverse pairs cancel; crossed bases keep "
+                "a factor; an unmatched number is bracketed before it is rounded.",
             ],
             "lines": [
-                "log 45      = log(4.5 · 10^1)  =   1 + 0.6532  =   1.6532",
-                "log 4500    = log(4.5 · 10^3)  =   3 + 0.6532  =   3.6532",
-                "log 0.00045 = log(4.5 · 10^−4) =  −4 + 0.6532  =  −3.3468",
-                "                                  ↑      ↑",
-                "                                  |      mantissa: rounded, in [0, 1)",
-                "                                  characteristic: an exact integer",
+                "log(10^−4) = log_10(10^−4) = −4                 exact",
+                "ln(e^(3/2)) = log_e(e^(3/2)) = 3/2             exact",
                 "",
-                "check the last line:   10^−4 < 0.00045 < 10^−3",
-                "                       so the logarithm lies between −4 and −3   ✓",
+                "log(e²) = 2·log e                              exact, not 2",
+                "ln(10³) = 3·ln 10                             exact, not 3",
+                "",
+                "estimate ln 10:",
+                "  e² ≈ 7.389 < 10 < 20.086 ≈ e³",
+                "  so 2 < ln 10 < 3                            bracket first",
+                "  ln 10 ≈ 2.302585                            rounded to six places",
             ],
             "after": [
-                "The third line is the one to slow down on. Adding a positive mantissa to "
-                "a negative characteristic gives `−3.3468`, and none of the digits "
-                "`6532` appear in it. Read too quickly, the answer looks like a "
-                "different mantissa, which is exactly why tables kept the two pieces "
-                "apart instead of adding them.",
-                "The bracket at the bottom is the check that costs nothing. Any number "
-                "between `10^−4` and `10^−3` has a common logarithm between `−4` and "
-                "`−3`, so an answer of `−4.6532` can be rejected before the "
-                "arithmetic is looked at. It does not catch everything: `−3.6532` "
-                "does lie between `−4` and `−3`, and only the addition "
-                "`−4 + 0.6532 = −3.3468` rules that one out.",
+                "The first two lines cancel because the bases match. The next two do "
+                "not: `log` asks for a power of `10`, not a power of `e`, and `ln` asks "
+                "for a power of `e`, not a power of `10`. Leaving `log e` and `ln 10` "
+                "visible is the exact answer, not unfinished work.",
+                "The bracket is a check on the decimal rather than a way to manufacture "
+                "it. An answer such as `1.000000` for `ln 10` would reveal a false "
+                "cancellation immediately, while the calculator would otherwise print "
+                "that wrong input with perfect confidence.",
+                "For a faded named-base pass, annotate the bases in `log(10^−6)`, "
+                "`ln(e^(5/2))` and `log(e³)`. The first move is supplied: write each "
+                "bare name as `log_10` or `log_e`. Evaluate the matching pairs exactly, "
+                "leave the crossed pair in an exact form, and bracket it using nearby "
+                "powers of `10`. Check each result by reading it as an exponent.",
             ],
         },
         "quiz_title": "Which base, and what value",
@@ -180,16 +183,14 @@ LESSONS = [
                     "Nothing is computed and nothing is rounded. `7e` multiplies where "
                     "the identity cancels, and `ln 7 ≈ 1.9459` is the logarithm of the "
                     "exponent rather than the exponent itself."},
-            {"q": "Given `log 4.5 ≈ 0.6532`, what is `log 0.00045`?",
-             "a": ["`−3.6532`", "`−3.3468`", "`−4.6532`", "`3.3468`"],
-             "c": 1,
-             "why": "`0.00045 = 4.5 · 10^−4`, so the value is `−4 + 0.6532 = −3.3468`. "
-                    "`−4.6532` subtracts the mantissa instead of adding it; `−3.6532` "
-                    "writes the mantissa's digits after the point of the answer; "
-                    "`3.3468` drops the sign of the characteristic. The bracket "
-                    "`10^−4 &lt; 0.00045 &lt; 10^−3` rejects `−4.6532` and "
-                    "`3.3468` outright; `−3.6532` lies between `−4` and `−3` and "
-                    "survives the bracket, so only the addition rules it out."},
+            {"q": "From `e^x = 12`, which line isolates `x` most directly?",
+             "a": ["`x = ln 12`", "`x = log 12`", "`x = 12/e`", "`x = e^12`"],
+             "c": 0,
+             "why": "`ln` is base `e`, so `ln(e^x) = x` and the answer is exactly "
+                    "`ln 12`. A common logarithm is legal only with the scale factor: "
+                    "it gives `x = log 12 / log e`, not `log 12`. Dividing by the base "
+                    "treats an exponent as a coefficient, while `e^12` applies the "
+                    "inverse in the wrong direction."},
         ],
         "mistakes": [
             ("Assuming a bare log means base 10 everywhere",
@@ -202,18 +203,16 @@ LESSONS = [
              "unchanged: `ln(MN) = ln M + ln N`, `ln(M^p) = p · ln M`. There is no "
              "second set of laws to learn, and the invented ones are invented for `ln` "
              "too."),
-            ("Splitting a logarithm below 1 into the wrong two pieces",
-             "`log 0.00045` is `−4 + 0.6532`. It is not `−4 − 0.6532` and not "
-             "`−(4 + 0.6532)`. The mantissa is non-negative by construction, since "
-             "`1 ≤ a &lt; 10` forces `0 ≤ log a &lt; 1`; only the characteristic can "
-             "be negative."),
+            ("Cancelling powers across different bases",
+             "`ln(e^x) = x` and `log(10^x) = x` are matched inverse pairs. "
+             "`log(e^x) = x·log e`, not `x`; `ln(10^x) = x·ln 10`, not `x`. Write "
+             "the hidden base once and the false cancellation becomes visible."),
         ],
-        "standard": ("Finish when you can say what base a bare log has, and give the exact part of one.",
-                     "Given `log 6.3 ≈ 0.7993`, you should be able to write "
-                     "`log 63000 ≈ 4.7993` and `log 0.0000063 ≈ −5.2007` without a "
-                     "calculator, and say which digits of each are exact and which "
-                     "are a rounding. Producing the decimal without knowing which half "
-                     "is which is the habit this lesson is trying to break."),
+        "standard": ("Finish when the hidden base determines your first move.",
+                     "Given `log(10^u)`, `ln(e^u)`, `log(e^u)` and `ln(10^u)`, you "
+                     "should cancel only the two matched pairs, keep the scale factor "
+                     "on the crossed pairs, and bracket any requested decimal between "
+                     "powers of the correct base before computing it."),
         "note": "The constant `2.302585…` relating `ln` and `log` is not a special fact "
                 "about `10` and `e`. Every pair of legal bases is related by a constant "
                 "of the same shape, and the next lesson produces it from the definition "
@@ -224,7 +223,7 @@ LESSONS = [
         "slug": "change-of-base",
         "title": "Change of Base",
         "module": "Logarithms",
-        "one_line": "Computing a logarithm in any base from one you have.",
+        "one_line": "Evaluate unfamiliar-base logarithms exactly or by a checked change of base.",
         "summary": (
             "A calculator offers two bases and there are infinitely many. One identity "
             "closes the gap: `log_b(x) = log_c(x) / log_c(b)` for any base `c` you can "
@@ -376,6 +375,12 @@ LESSONS = [
                 "turns `40` into `5` &mdash; and `log 8` is the logarithm of a quotient "
                 "rather than a quotient of logarithms. The bracket at the top rejects "
                 "both without any arithmetic: neither lies between `2` and `3`.",
+                "For a faded change of base, take `log_9(50)`. The supplied first "
+                "move is the bracket `9^1 &lt; 50 &lt; 9²`, so the result must lie "
+                "between `1` and `2`. Complete `ln 50 / ___`, round only the final "
+                "quotient, and use the bracket to reject the reversed fraction. Then "
+                "state why changing the helper from `ln` to `log` cannot change the "
+                "answer.",
             ],
         },
         "quiz_title": "Changing base",
@@ -438,7 +443,7 @@ LESSONS = [
         "slug": "solving-exponential-equations",
         "title": "Solving Exponential Equations",
         "module": "Solving",
-        "one_line": "Taking a logarithm of both sides to bring the variable down.",
+        "one_line": "Choose matching powers or logarithms, solve, and reject impossible exponential equations.",
         "summary": (
             "Two methods and one decision. If both sides can be written as powers of the "
             "same base, match the exponents and the answer is exact. If they cannot, "
@@ -611,6 +616,11 @@ LESSONS = [
                 "of that quotient to six places, and it is not the answer &mdash; if the "
                 "value feeds into anything else, carry the quotient and round once, at "
                 "the end.",
+                "For a faded solve, use `4·3^(2x − 1) − 1 = 35`. The isolation is "
+                "supplied: `3^(2x − 1) = 9`. Decide whether a logarithm is still "
+                "needed, finish the exact solution, and substitute it into the "
+                "original equation including the coefficient and subtraction. Name "
+                "the feature of `9` that makes your chosen method the shorter one.",
             ],
         },
         "quiz_title": "Solving for an exponent",
@@ -676,7 +686,7 @@ LESSONS = [
         "slug": "solving-logarithmic-equations",
         "title": "Solving Logarithmic Equations",
         "module": "Solving",
-        "one_line": "Condensing, exponentiating, and checking the domain.",
+        "one_line": "State the original domain, solve a logarithmic equation, and reject extraneous candidates.",
         "summary": (
             "Condense to a single logarithm, convert to exponential form, solve, and then "
             "test every candidate in the original equation. That last step is not "
@@ -839,6 +849,12 @@ LESSONS = [
                 "questions, and only the second one is the domain condition: the "
                 "reading's `x = −3/2` is a negative candidate that passes it and is a "
                 "genuine solution.",
+                "For a faded domain-and-solve pass, use "
+                "`log_2(x − 1) + log_2(x − 3) = 3`. The supplied first line is the "
+                "original domain `x &gt; 3`. Condense, convert, factor, and test both "
+                "candidates in the original two arguments. Your final line must name "
+                "which argument rejects any discarded candidate, not merely call the "
+                "candidate negative.",
             ],
         },
         "quiz_title": "Candidates and survivors",
@@ -907,7 +923,7 @@ LESSONS = [
         "slug": "compound-interest-and-continuous-growth",
         "title": "Compound Interest and Continuous Growth",
         "module": "Applications",
-        "one_line": "Where the two exponential formulas come from.",
+        "one_line": "Build periodic or continuous growth models from rates, periods and units.",
         "summary": (
             "Two formulas that look like conventions until they are built. "
             "`A = P(1 + r/n)^(nt)` is one multiplication repeated `nt` times, and "
@@ -1038,9 +1054,10 @@ LESSONS = [
              "product. Quarterly for five years is `20` periods &mdash; not `5`, and "
              "not `4`."),
             ("Build the base, then raise it once",
-             "Compute `1 + r/n` exactly if you can: `1 + 0.06/4 = 1.015` is exact, while "
-             "`1 + 0.05/12` is not. Rounding the base before raising it to the `120`th "
-             "power moves the error up into the dollars."),
+             "Keep `1 + r/n` exact if you can: `1 + 0.06/4 = 1.015`, while "
+             "`1 + 0.05/12 = 1 + 1/240` should stay in that exact form rather than "
+             "be replaced by a truncated decimal. Rounding the base before raising it "
+             "to the `120`th power moves the error up into the dollars."),
             ("Compare accounts by effective annual rate",
              "`(1 + r/n)^n − 1` for periodic compounding, `e^r − 1` for continuous. Two "
              "nominal rates quoted at different frequencies cannot be compared as they "
@@ -1074,6 +1091,13 @@ LESSONS = [
                 "The effective rate is what makes the account comparable with anything "
                 "else. A flat `6.1%` paid once a year sounds better than `6%`, and it is "
                 "not: `6%` compounded quarterly earns `6.1364%` a year.",
+                "For a faded model, take `$1500` at a nominal `4.8%` compounded "
+                "monthly for two years. The period rate `0.048/12` and period count "
+                "`24` are supplied. Assemble the periodic formula without truncating "
+                "the base, compute once at the end, and compare it with the continuous "
+                "expression `1500·e^(0.048·2)`. Check that both exceed the simple-"
+                "interest amount and that the periodic value stays below the "
+                "continuous ceiling.",
             ],
         },
         "quiz_title": "Rates, periods and limits",
@@ -1095,16 +1119,17 @@ LESSONS = [
                     "Doubling `$100` and doubling `$100` million take the same time, "
                     "which is the property that defines exponential growth. At "
                     "`r = 0.05` it is `ln 2 / 0.05 ≈ 13.86` years, whatever the balance."},
-            {"q": "On `$1000` at `5%` for `10` years, which gain is larger: yearly to monthly compounding, or monthly to continuous?",
-             "a": ["Yearly to monthly, by about `$16`",
-                   "Monthly to continuous, by about `$16`",
-                   "The two gains are equal",
-                   "Monthly to continuous, since continuous growth is unbounded"],
-             "c": 0,
-             "why": "Yearly pays `1628.89`, monthly `1647.01`, continuous `1648.72`. The "
-                    "first step gains `$18.11` and the second `$1.71`, a difference of "
-                    "about `$16.40`. The sequence increases with `n` but is bounded above "
-                    "by the continuous value, so the returns to frequency shrink."},
+            {"q": "Account A quotes `4.8%` compounded quarterly. Account B quotes `4.9%` compounded yearly. Which comparison answers which earns more in one year?",
+             "a": ["Compare `4.8` with `4.9` directly",
+                   "Compare `(1 + 0.048/4)^4 − 1` with `0.049`",
+                   "Compare `0.048/4` with `0.049`",
+                   "Compare `e^0.048` with `e^0.049` because every account compounds continuously"],
+             "c": 1,
+             "why": "Account A's effective annual rate is `(1 + 0.048/4)^4 − 1`; "
+                    "Account B's once-yearly effective rate is its quoted decimal "
+                    "`0.049`. Comparing `4.8` and `4.9` ignores frequency, comparing a "
+                    "quarterly rate with an annual rate mixes units, and replacing both "
+                    "contracts by continuous growth changes the accounts being compared."},
         ],
         "mistakes": [
             ("Entering the rate as a percent",
@@ -1139,7 +1164,7 @@ LESSONS = [
         "slug": "logarithmic-scales",
         "title": "Logarithmic Scales",
         "module": "Applications",
-        "one_line": "Why decibels, pH and magnitude are logarithms.",
+        "one_line": "Convert differences on a logarithmic scale into ratios of the underlying quantities.",
         "summary": (
             "Decibels, pH and earthquake magnitude are one construction used three "
             "times: report the logarithm of a ratio instead of the ratio. Equal steps on "
@@ -1312,6 +1337,11 @@ LESSONS = [
                 "the scale. Ten identical sources are exactly ten decibels up. The "
                 "quantities double and decuple; the readings, which are logarithms, add "
                 "`log 2` and `log 10` worth of steps.",
+                "For a faded scale comparison, take a sound level rising from `72` dB "
+                "to `92` dB. The difference `20` and multiplier `k = 10` are supplied. "
+                "Finish `I₂/I₁ = 10^(20/10)`, report the result as an intensity factor, "
+                "and explain why neither `20` nor `92/72` answers the question. Check "
+                "the direction: the larger reading must represent the larger intensity.",
             ],
         },
         "quiz_title": "Steps and factors",

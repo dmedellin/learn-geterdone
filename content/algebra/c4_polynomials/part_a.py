@@ -6,7 +6,7 @@ LESSONS = [
         "slug": "polynomials-degree-and-standard-form",
         "title": "Polynomials, Degree and Standard Form",
         "module": "Polynomial arithmetic",
-        "one_line": "What counts as a polynomial, and what does not.",
+        "one_line": "Classify an expression, standardise it, and report its degree and leading coefficient.",
         "summary": (
             "A polynomial is a finite sum of terms, each a number times a whole-number "
             "power of the variable. Establish which expressions qualify, why `1/x` and "
@@ -137,7 +137,13 @@ LESSONS = [
                 "power on the page is 3 and the leading coefficient looks like `−3`. "
                 "Neither reading survives combining like terms, and combining like terms "
                 "is not optional &mdash; it is how you find out what the polynomial "
-                "actually is."
+                "actually is.",
+                "For a faded pass, start `6 − 4x³ + 2x − x³` with the supplied decision: "
+                "every exponent is a whole number, so it is a polynomial. Combine and order "
+                "the terms yourself, then name the degree, leading coefficient and term count. "
+                "Check against `−5x³ + 2x + 6`: degree `3`, leading coefficient `−5`, "
+                "three terms. If you wrote `−3x³`, you combined coefficients as though the "
+                "second cubic term were positive."
             ],
         },
         "quiz_title": "Polynomial or not",
@@ -153,12 +159,12 @@ LESSONS = [
              "c": 1,
              "why": "The `x³` terms cancel, leaving `4x² + 7`. Degree is read after "
                     "combining like terms, not from the longest-looking term on the page."},
-            {"q": "`−2x³ + 5x + 8` is in standard form. What is its leading coefficient?",
-             "a": ["8", "5", "3", "−2"],
+            {"q": "Put `7 − 4x⁵ + x²` in standard form. What is its leading coefficient?",
+             "a": ["7", "1", "5", "−4"],
              "c": 3,
-             "why": "The leading coefficient belongs to the highest-degree term, which is "
-                    "`−2x³`. The sign is part of it. `8` is the constant term and `3` is "
-                    "the degree, not a coefficient at all."},
+             "why": "Standard form begins `−4x⁵ + x² + 7`, so the leading coefficient "
+                    "is `−4`, sign included. `7` is the constant, `1` is the coefficient "
+                    "of `x²`, and `5` is the degree rather than a coefficient."},
         ],
         "mistakes": [
             ("Reading the degree off the first term written",
@@ -189,7 +195,7 @@ LESSONS = [
         "slug": "adding-and-subtracting-polynomials",
         "title": "Adding and Subtracting Polynomials",
         "module": "Polynomial arithmetic",
-        "one_line": "Like terms combine; everything else stays where it is.",
+        "one_line": "Add or subtract by aligning like powers and distributing every subtraction sign.",
         "summary": (
             "Addition collects like terms, and the licence to do it is the distributive "
             "law read backwards. Subtraction is the same operation after the minus sign "
@@ -320,6 +326,11 @@ LESSONS = [
                 "Check any result by substituting a number into the original and into the "
                 "answer. At `x = 1` the original is `7 − (−6) = 13`, and the answer is "
                 "`3 + 2 + 8 = 13`. One substitution catches nearly every sign error.",
+                "For a faded subtraction, begin `(3x³ − 2x + 4) − (−x³ + 5x − 6)` "
+                "with the supplied negation `+x³ − 5x + 6`. Collect the three powers and "
+                "check at `x = 1`. You should obtain `4x³ − 7x + 10`; the original and "
+                "answer both give `7` at `x = 1`. A middle term of `+3x` means the `5x` "
+                "was not negated."
             ],
         },
         "quiz_title": "Collect and subtract",
@@ -327,8 +338,9 @@ LESSONS = [
             {"q": "Simplify `(2x³ + x) + (x³ − 4x + 5)`.",
              "a": ["`3x³ − 3x + 5`", "`3x⁶ − 3x + 5`", "`2x³ − 3x + 5`", "`3x³ + 5x + 5`"],
              "c": 0,
-             "why": "`2x³ + x³ = 3x³` &mdash; the coefficients add and the exponent is "
-                    "untouched, because `axⁿ + bxⁿ = (a + b)xⁿ`. Then `x − 4x = −3x`."},
+             "why": "`2x³ + x³ = 3x³` and `x − 4x = −3x`, so the first answer is "
+                    "right. `3x⁶` adds exponents during addition; `2x³ − 3x + 5` drops "
+                    "the second cubic; and `+5x` treats `−4x` as positive."},
             {"q": "Simplify `(x² + 2x − 1) − (3x² − 2x + 4)`.",
              "a": ["`−2x² + 4x − 5`", "`−2x² + 4x + 3`", "`−2x² + 0x + 3`", "`4x² + 4x − 5`"],
              "c": 0,
@@ -370,7 +382,7 @@ LESSONS = [
         "slug": "multiplying-polynomials",
         "title": "Multiplying Polynomials",
         "module": "Polynomial arithmetic",
-        "one_line": "Every term times every term, then collect.",
+        "one_line": "Predict, distribute every term across every term, collect, and verify the product.",
         "summary": (
             "One rule covers every polynomial product: distribute until no brackets "
             "remain. FOIL is that rule applied to two binomials and is not worth "
@@ -508,16 +520,21 @@ LESSONS = [
                 "always just the product of the two constant terms, another free check.",
                 "At `x = 1`: the factors give `(2 − 3)(1 + 4 − 5) = (−1)(0) = 0`, and the "
                 "answer gives `2 + 5 − 22 + 15 = 0`. Agreement.",
+                "For a faded product, take `(x + 2)(2x² − x + 3)`. The supplied "
+                "prediction is degree `3`, leading term `2x³`, and `2 × 3 = 6` partial "
+                "products. Write those six products, collect, and test `x = 1`. The result "
+                "is `2x³ + 3x² + x + 6`, and both forms give `12`; a missing `x²` term "
+                "means one of the two middle products was skipped."
             ],
         },
         "quiz_title": "Products",
         "quiz": [
-            {"q": "Simplify `(3x²)(4x⁵)`.",
-             "a": ["`12x¹⁰`", "`12x⁷`", "`7x⁷`", "`12x³`"],
+            {"q": "Simplify `(−2x³)(5x⁴)`.",
+             "a": ["`−10x¹²`", "`−10x⁷`", "`3x⁷`", "`10x⁷`"],
              "c": 1,
-             "why": "Coefficients multiply: `3 × 4 = 12`. Exponents add: `2 + 5 = 7`. "
-                    "Multiplying the exponents gives `x¹⁰` and is the standard confusion; "
-                    "adding the coefficients gives `7x⁷`."},
+             "why": "Coefficients multiply to `−10` and exponents add to `7`. "
+                    "`−10x¹²` multiplies the exponents, `3x⁷` adds the coefficients, and "
+                    "`10x⁷` loses the negative sign."},
             {"q": "Expand `(3x + 2)(2x − 5)`.",
              "a": ["`6x² − 10`", "`6x² − 11x − 10`", "`6x² + 11x − 10`", "`6x² − 19x − 10`"],
              "c": 1,
@@ -558,7 +575,7 @@ LESSONS = [
         "slug": "special-products",
         "title": "Special Products",
         "module": "Polynomial arithmetic",
-        "one_line": "Four patterns worth recognising instead of expanding.",
+        "one_line": "Recognise and expand the square, conjugate, and cube product patterns.",
         "summary": (
             "The difference of squares, the two square-of-a-binomial forms and the cube "
             "patterns are ordinary products of lesson 3. They are singled out because "
@@ -691,6 +708,10 @@ LESSONS = [
                 "Line 4 is worth expanding by hand once, to watch the four middle terms "
                 "annihilate each other. After that you can use it as a pattern with a "
                 "clear conscience.",
+                "For a faded pattern check, identify `a = 3x` and `b = 2` in `(3x + 2)²`. "
+                "The outer terms are supplied: `9x²` and `4`. Recover the middle term, "
+                "then test `x = 1`. The expansion is `9x² + 12x + 4`, and both forms give "
+                "`25`; `9x² + 6x + 4` uses `ab` where the identity requires `2ab`."
             ],
         },
         "quiz_title": "Patterns",
@@ -726,7 +747,7 @@ LESSONS = [
             ("Expecting `a² + ab + b²` to be a perfect square",
              "It is not: the square has `2ab`. The trinomial in the cube patterns is "
              "deliberately not a perfect square, and treating it as one sends you looking "
-             "for a factorisation that is not there."),
+             "for a perfect-square factorisation that is not there."),
         ],
         "standard": ("Finish when you produce `9x² − 25` without writing a middle term at all.",
                      "Recognition should be immediate in both directions: given "
@@ -735,15 +756,15 @@ LESSONS = [
                      "into a method."),
         "note": "These five identities are the only things in the course worth committing "
                 "to memory, and even they can be re-derived in a line. Everything else "
-                "&mdash; every factorisation from here on &mdash; is produced by a search "
-                "you can carry out, not by a fact you must recall.",
+                "is either another recognised identity or a finite search you can carry "
+                "out, not an inspired guess you must somehow recall.",
     },
     # ---------------------------------------------------------------- 05
     {
         "slug": "factoring-out-the-greatest-common-factor",
         "title": "Factoring Out the Greatest Common Factor",
         "module": "Factoring",
-        "one_line": "The first move on every factoring problem, without exception.",
+        "one_line": "Find the integer-coefficient GCF, factor it out, and expand to check every term.",
         "summary": (
             "Factoring is the distributive law read right to left. The greatest common "
             "factor is what every term shares &mdash; the gcd of the coefficients and the "
@@ -790,12 +811,17 @@ LESSONS = [
             ("p", "The licence is the distributive law, `ab + ac = a(b + c)`, used from "
                   "right to left. Nothing else is happening, and nothing else is needed."),
             ("def", ("Greatest common factor",
-                     "The <strong>GCF</strong> of a set of terms is the largest monomial "
+                     "For terms with integer coefficients, the <strong>GCF</strong> is the largest monomial "
                      "that divides all of them. Its coefficient is the greatest common "
                      "divisor of the coefficients, and each variable appears to the "
                      "<em>lowest</em> power with which it appears in every term.",
                      "A variable that is missing from even one term is missing from the "
                      "GCF entirely.")),
+            ("p", "The integer-coefficient convention matters. Over the rational numbers any "
+                  "nonzero rational can be moved in or out of a product, so there is no useful "
+                  "largest numerical factor without first normalising the coefficients. Problems "
+                  "in this course use integer coefficients for the GCF decision; exact fractional "
+                  "coefficients can first be cleared by a common denominator."),
             ("p", "Take `12x⁴y − 18x³y² + 6x³y`. The coefficients are `12`, `18`, `6`, "
                   "whose gcd is `6`. Every term has an `x`, to powers `4`, `3`, `3`, so "
                   "`x³` is shared. Every term has a `y`, to powers `1`, `2`, `1`, so `y` "
@@ -833,14 +859,15 @@ LESSONS = [
             ("example", ("A factor that is not common",
                          "In `6x³ + 9x² + 4x` the coefficients `6`, `9`, `4` have gcd `1`, "
                          "and although two terms carry `x²` the third has only `x`. The GCF "
-                         "is `x`, giving `x(6x² + 9x + 4)` &mdash; and no more. Seeing "
-                         "`6` and `9` and pulling out a `3` would leave `4/3`, which is "
-                         "not a polynomial coefficient the technique allows.")),
+                         "is `x`, giving `x(6x² + 9x + 4)` &mdash; and no more. Pulling "
+                         "out `3x` would leave `2x² + 3x + 4/3`; that equality is true, "
+                         "but `3` is not the integer GCF because it does not divide the "
+                         "coefficient `4`.")),
         ],
         "lab": ("factoring", {
             "mode": "gcf",
             "panel_title": "The decision list starts here",
-            "panel_intro": "Type any polynomial. The lab computes the gcd of the "
+            "panel_intro": "Type a polynomial with integer coefficients. The lab computes the gcd of the "
                            "coefficients and the lowest power of each variable, shows the "
                            "GCF it found, and expands the result back to prove it.",
         }),
@@ -888,6 +915,11 @@ LESSONS = [
                 "Had the `y` been missing from any single term, the GCF would have been "
                 "`6x³` and the bracket would have carried the `y`s instead. The poorest "
                 "term always decides.",
+                "For a faded pass, start `−18x⁴ + 30x³ − 12x²` with the supplied choice "
+                "to take the negative out so the bracket begins positive. Find the numerical "
+                "gcd and lowest power of `x`, divide all three terms, then expand. The result "
+                "is `−6x²(3x² − 5x + 2)`; a bracket with only two terms has dropped the "
+                "quotient `2` from the final term."
             ],
         },
         "quiz_title": "Common factors",
@@ -919,17 +951,15 @@ LESSONS = [
              "A variable or number must divide <em>every</em> term, and the two cases "
              "fail differently. Pulling `x²` out of `6x³ + 9x² + 4x` leaves "
              "`6x + 9 + 4x⁻¹`, whose negative exponent makes the bracket not a "
-             "polynomial. Pulling a `3` out of the same polynomial leaves "
-             "`2x³ + 3x² + (4/3)x`, which <em>is</em> a polynomial &mdash; "
-             "coefficients may be any numbers &mdash; so the signal there is narrower: "
-             "the `4/3` is a coefficient outside the integers, which is not one the "
-             "technique allows."),
+             "polynomial. Pulling a `3` out is an algebraically true rational rescaling, "
+             "but not an integer GCF: `3` does not divide the coefficient `4`, and the "
+             "resulting `4/3` shows that the integer-coefficient normalisation was left."),
             ("Stopping at a common factor that is not the greatest",
              "`12x² + 18x = 2x(6x + 9)` leaves a `3` inside. Always look at the bracket "
              "after the step and ask whether it still has something in common."),
         ],
         "standard": ("Finish when the GCF is automatic and the bracket is always checked.",
-                     "Given any polynomial you should take the GCF out without thinking "
+                     "Given any integer-coefficient polynomial you should take the GCF out without thinking "
                      "about it, keep the term count right, and then look at what remains "
                      "and ask which technique comes next. Lessons 6 to 9 all begin from "
                      "the bracket this step produces."),
@@ -943,7 +973,7 @@ LESSONS = [
         "slug": "factoring-by-grouping",
         "title": "Factoring by Grouping",
         "module": "Factoring",
-        "one_line": "Four terms, two pairs, one shared bracket.",
+        "one_line": "Test all pairings of four terms, extract a shared bracket, and keep factoring.",
         "summary": (
             "With four terms and no common factor, split into pairs, take the GCF out of "
             "each, and hope the same binomial is left behind. What makes the method work "
@@ -1068,7 +1098,7 @@ LESSONS = [
                 "        3x²(2x − 3) + 2(2x − 3)",
                 "        (2x − 3)(3x² + 2)",
                 "",
-                "    3x² + 2 has no real roots, so this is complete.",
+                "    3x² + 2 is positive for every real x, so it has no real linear factor.",
             ],
             "after": [
                 "In A, factoring `+4` out of the second pair would have given "
@@ -1077,6 +1107,11 @@ LESSONS = [
                 "In B the second factor `3x² + 2` cannot be factored over the reals "
                 "&mdash; it is positive for every `x`, so it has no root and therefore no "
                 "linear factor. Recognising when to stop is part of the technique.",
+                "For a faded grouping, begin `2x³ + 4x² − 8x − 16` with the supplied "
+                "first move `2(x³ + 2x² − 4x − 8)`. Pair the four terms, choose the sign "
+                "of the second GCF, and factor every piece. The complete result is "
+                "`2(x + 2)²(x − 2)`; stopping at `2(x + 2)(x² − 4)` leaves a difference "
+                "of squares unfactored."
             ],
         },
         "quiz_title": "Grouping",
@@ -1130,7 +1165,7 @@ LESSONS = [
         "slug": "factoring-simple-trinomials",
         "title": "Factoring Simple Trinomials",
         "module": "Factoring",
-        "one_line": "Two numbers with the right product and the right sum.",
+        "one_line": "Exhaust the product-sum pairs for x² + bx + c and defend either result.",
         "summary": (
             "For `x² + bx + c` the whole problem reduces to finding two integers whose "
             "product is `c` and whose sum is `b`. The candidate list is finite, so the "
@@ -1157,10 +1192,10 @@ LESSONS = [
              "`p` must divide `c`, and a nonzero integer has finitely many divisors. List "
              "the divisor pairs, check the sums, and you have either found the answer or "
              "shown there is none."),
-            ("\"It does not factor\" is a result, not a surrender",
+            ("\"It does not factor over the rationals\" is a result, not a surrender",
              "`x² + x + 1` has divisor pairs `(1, 1)` and `(−1, −1)`, with sums `2` and "
-             "`−2`. Neither is `1`, so no integer factorisation exists. That is a proved "
-             "statement, and it is the correct final answer."),
+             "`−2`. Neither is `1`, so no rational factorisation exists. That is a proved "
+             "statement, with its number system named, and it is the correct final answer."),
         ],
         "read_title": "Product and sum",
         "read_intro": "Where the two conditions come from, how the signs narrow the search, and when to stop.",
@@ -1235,7 +1270,7 @@ LESSONS = [
             ("Write the factors and expand to check; if the list is empty, say so",
              "The pair `p`, `q` gives `(x + p)(x + q)`, and expanding must return the "
              "original. If no pair summed to `b`, the answer is that it does not factor "
-             "over the integers."),
+             "over the rationals."),
         ],
         "worked": {
             "title": "Two searches that succeed, one that does not",
@@ -1257,7 +1292,7 @@ LESSONS = [
                 "",
                 "C.  x² + x + 1         c > 0, b > 0  →  both positive",
                 "        (1)(1)      sum   2      only pair; 2 ≠ 1",
-                "    answer  does not factor over the integers",
+                "    answer  does not factor over the rationals",
             ],
             "after": [
                 "In B the pair `(−3, 5)` has the larger number positive, matching `b = +2`, "
@@ -1267,6 +1302,11 @@ LESSONS = [
                 "because the list ran out, and an exhausted list is a proof. Compare "
                 "`x² + 2x + 1`, where the pair `(1, 1)` sums to `2` and the answer is "
                 "`(x + 1)²`.",
+                "For a faded search, take `x² − 2x − 24`. The supplied sign decision is "
+                "that the pair has opposite signs and the larger absolute value is negative. "
+                "List the positive divisor pairs of `24`, assign signs, and expand your result. "
+                "The pair is `4` and `−6`, so the answer is `(x + 4)(x − 6)`; choosing "
+                "`−4` and `6` gives the right product but the wrong middle coefficient."
             ],
         },
         "quiz_title": "Product and sum",
@@ -1287,7 +1327,7 @@ LESSONS = [
                     "`4 + (−5) = −1`."},
             {"q": "`x² + 3x + 5` &mdash; what is the correct conclusion?",
              "a": ["`(x + 1)(x + 5)`",
-                   "The divisor pairs of 5 give sums 6 and −6, so it does not factor over the integers",
+                   "The divisor pairs of 5 give sums 6 and −6, so it does not factor over the rationals",
                    "It needs a fractional pair such as `(x + 3/2)(x + 10/3)`",
                    "The search cannot be completed"],
              "c": 1,
@@ -1306,7 +1346,7 @@ LESSONS = [
              "source of near-miss answers."),
             ("Treating an unsuccessful search as an unfinished one",
              "When every divisor pair has been tested and none works, the trinomial does "
-             "not factor over the integers. Writing that is the complete answer; hunting "
+             "not factor over the rationals. Writing that is the complete answer; hunting "
              "for a cleverer pair is not."),
         ],
         "standard": ("Finish when you can factor by search and defend a negative result.",

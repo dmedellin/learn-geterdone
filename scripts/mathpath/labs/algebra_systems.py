@@ -2749,12 +2749,13 @@ SEQ_PRESETS = {
         {"label": "a1 and d both negative", "a1": "-2", "d": "-7", "n": "10"},
     ],
     "geometric": [
-        {"label": "r = 1/2: the infinite sum converges", "a1": "1", "r": "1/2", "n": "10"},
-        {"label": "r = 2: the terms run away", "a1": "1", "r": "2", "n": "10"},
-        {"label": "r = -1/2: alternating, and still convergent", "a1": "1", "r": "-1/2", "n": "10"},
-        {"label": "r = 1: the sum formula divides by 1 - r, which is 0", "a1": "4", "r": "1", "n": "10"},
-        {"label": "r = -1: the partial sums oscillate and never settle", "a1": "3", "r": "-1", "n": "10"},
+        {"label": "r = 1/2: shrinking terms and finite partial sums", "a1": "1", "r": "1/2", "n": "10"},
+        {"label": "r = 2: growing terms still have exact finite sums", "a1": "1", "r": "2", "n": "10"},
+        {"label": "r = -1/2: alternating signs in a finite sum", "a1": "1", "r": "-1/2", "n": "10"},
+        {"label": "r = 1: n a1 replaces the formula that divides by 1 - r", "a1": "4", "r": "1", "n": "10"},
+        {"label": "r = -1: the finite sums alternate, and each is defined", "a1": "3", "r": "-1", "n": "10"},
         {"label": "r = 2/3 with a fractional first term", "a1": "9/4", "r": "2/3", "n": "10"},
+        {"label": "r = 0: one nonzero term followed by zeros", "a1": "7", "r": "0", "n": "10"},
     ],
     "binomial": [
         {"label": "(x + 1)^5", "bin": "x + 1", "pow": "5"},
@@ -2850,7 +2851,7 @@ SEQ_TITLES = {
     "arithmetic": ("Arithmetic sequences and their sums",
                    "The nth term and the sum, each computed twice and compared"),
     "geometric": ("Geometric sequences and their sums",
-                  "Partial sums against the formula, and what happens when |r| is not below 1"),
+                  "The nth term and each finite partial sum computed from the definition and by formula"),
     "binomial": ("The binomial theorem",
                  "Pascal's triangle against the C(n, k) formula, against multiplying it out"),
     "sigma": ("Sigma notation, expanded",
@@ -3186,8 +3187,8 @@ SEQ_SCRIPT = r"""
       fail('<strong>' + (a1 === null ? 'The first term' : 'The common ratio') + ' "'
         + esc(a1 === null ? inA1.value : inR.value) + '" is not a number I can use.</strong> '
         + 'Both boxes take a whole number or a fraction. The ratio is the interesting one: try '
-        + '<code>1/2</code>, then <code>2</code>, then <code>1</code>, and watch the infinite sum '
-        + 'go from a number to nothing to a division by zero.');
+        + '<code>1/2</code>, then <code>2</code>, then <code>1</code>, and compare shrinking, '
+        + 'growing and constant terms over the same finite stopping place.');
       return;
     }
     var N = termcount(), terms = [null], sums = [null], run = R0;
@@ -3197,12 +3198,6 @@ SEQ_SCRIPT = r"""
       sums.push(run);
     }
     var one = Requ(r, R1);
-    var absLess = Rcmp(Rabs(r), R1) < 0;
-    /* |r| < 1 is sufficient for the series to converge, not necessary: if the
-       first term is 0 then every term is 0 and every partial sum is 0, whatever
-       r does. Without this the page would print a table of zeros and then tell
-       the reader those partial sums run away without bound. */
-    var trivial = Rzero(a1) && !absLess;
     var body = [];
     for (var t = 1; t <= N; t += 1) {
       var byFormula = Rmul(a1, Rpow(r, t - 1));
@@ -3217,43 +3212,6 @@ SEQ_SCRIPT = r"""
     var an = Rmul(a1, Rpow(r, N - 1));
     var sumA = sums[N];
     var sumB = one ? Rmul(R(BigInt(N)), a1) : Rdiv(Rmul(a1, Rsub(R1, Rpow(r, N))), Rsub(R1, r));
-    var limit = absLess ? Rdiv(a1, Rsub(R1, r)) : (trivial ? R0 : null);
-
-    var infinite, tail;
-    if (trivial) {
-      infinite = 'every term is 0, so every partial sum is 0 and the infinite sum is 0. |r| = '
-        + Rtext(Rabs(r)) + ' is not below 1, and that condition exists to make r^n shrink &mdash; '
-        + 'but a1 r^(n-1) is already 0 whatever r^(n-1) does, so there is nothing left for it to '
-        + 'do. This is the one geometric sequence that converges for every ratio.';
-      tail = 'Every term is 0 whatever r does, so the partial sums are 0, 0, 0, ... and they settle '
-        + 'immediately rather than running away. |r| &lt; 1 is a sufficient condition for '
-        + 'convergence and not a necessary one, and a1 = 0 is the case that shows the difference.';
-    } else if (absLess) {
-      infinite = 'r^n shrinks towards 0 as n grows, so a1(1 - r^n)/(1 - r) closes in on a1/(1 - r) = '
-        + Rtext(limit) + '. Rounded, that limit is ' + approx(limit, 6) + ' &mdash; a rounding of the '
-        + 'exact value, printed so you can place it on the graph.';
-    } else if (one) {
-      infinite = 'the sum formula divides by 1 - r, and 1 - r is 0. There is nothing to fix here: '
-        + 'every term is ' + Rtext(a1) + ', the partial sums are ' + Rtext(a1) + ', ' + Rtext(Rmul(R(2n), a1))
-        + ', ' + Rtext(Rmul(R(3n), a1)) + ', ... and they do not approach anything. The formula does '
-        + 'not merely fail to apply &mdash; the quantity it names does not exist.';
-    } else if (Requ(r, R(-1n))) {
-      infinite = 'the partial sums are ' + Rtext(a1) + ', 0, ' + Rtext(a1) + ', 0, ... for ever. They '
-        + 'do not grow and they do not settle, so there is no infinite sum. |r| = 1 exactly, and 1 is '
-        + 'not less than 1.';
-      tail = 'The partial sums alternate between ' + Rtext(a1) + ' and 0 for ever: they do not run '
-        + 'away, and they still do not approach anything. "Diverges" covers both behaviours, which '
-        + 'is why the condition is |r| below 1 rather than "the terms get smaller".';
-    } else {
-      infinite = '|r| = ' + Rtext(Rabs(r)) + ', which is at least 1, so r^n does not shrink and the '
-        + 'partial sums run away without bound. The formula a1/(1 - r) would still hand back a '
-        + 'number here, ' + Rtext(Rdiv(a1, Rsub(R1, r))) + ', and that number is meaningless: it is '
-        + 'what you get by using a formula outside the condition it was derived under.';
-      tail = 'r^n grows instead of shrinking, so the partial sums run away without bound. Notice '
-        + 'that a1/(1 - r) still evaluates &mdash; to ' + Rtext(Rdiv(a1, Rsub(R1, r))) + ' &mdash; '
-        + 'and that the number it produces means nothing at all: it comes from a derivation that '
-        + 'assumed r^n was heading for 0.';
-    }
 
     work.innerHTML =
       steps('The sequence, as defined', [
@@ -3264,7 +3222,7 @@ SEQ_SCRIPT = r"""
       + table('Every term and every partial sum, computed both ways',
         ['', 'term, by multiplying', 'term, by a1 r^(n-1)', 'sum, by adding them up',
          one ? 'sum, by n a1' : 'sum, by a1(1 - r^n)/(1 - r)', 'agree?'], body)
-      + steps('At n = ' + N + ', and beyond', [
+      + steps('At the finite stopping place n = ' + N, [
         ['the nth term by stepping', Rtext(terms[N])],
         ['the nth term by formula', Rtext(a1) + ' x ' + Rterm(r) + '^' + (N - 1) + ' = ' + Rtext(an)],
         ['these agree?', agreechip(Requ(terms[N], an))],
@@ -3272,56 +3230,46 @@ SEQ_SCRIPT = r"""
         ['the sum by the formula', Rtext(sumB) + (one ? '  (the r = 1 case, where the usual formula '
           + 'divides by zero and n a1 takes its place)' : '')],
         ['these agree?', agreechip(Requ(sumA, sumB))],
-        ['and the infinite sum?', infinite],
       ]);
 
-    /* Partial sums against n, with the limit drawn where there is one. */
+    /* The finite partial sums against n. Convergence is deliberately absent:
+       the separate infinite mode owns that question after partial sums have
+       been introduced as a sequence. */
     var ys = [];
     for (var s = 1; s <= N; s += 1) ys.push(Rnum(sums[s]));
-    if (limit !== null) ys.push(Rnum(limit));
     var lo = Math.min.apply(null, ys), hi = Math.max.apply(null, ys);
     if (!isFinite(lo) || !isFinite(hi) || lo === hi) { lo = lo - 1; hi = hi + 1; }
     var pad = Math.max(0.5, (hi - lo) * 0.16);
     var plot = Plot(svg, { xmin: 0, xmax: N + 1, ymin: lo - pad, ymax: hi + pad });
     plot.frame();
-    if (limit !== null) plot.hline(Rnum(limit), 'plot-asym', 'a1/(1 - r) = ' + Rtext(limit));
     for (var g = 1; g < N; g += 1) {
       plot.segment(g, Rnum(sums[g]), g + 1, Rnum(sums[g + 1]), 'plot-aux');
     }
     for (var h = 1; h <= N; h += 1) plot.point(h, Rnum(sums[h]), 'plot-point');
-    plot.describe('The first ' + N + ' partial sums plotted against n'
-      + (limit === null ? ', with no limit to draw because |r| is at least 1'
-                        : ', with the limit ' + Rtext(limit) + ' drawn as a horizontal line') + '.');
+    plot.describe('The first ' + N + ' finite partial sums plotted against their stopping place n.');
 
     setkpi('a(' + N + ')', Rtext(an), 'sum to ' + N, Rtext(sumA),
-           'infinite sum', limit === null ? 'does not exist' : Rtext(limit));
+           'checks', Requ(terms[N], an) && Requ(sumA, sumB) ? 'all passed' : 'FAILED');
 
-    if (trivial) {
-      status.innerHTML = '<strong>a1 = 0, so every term is 0 and the infinite sum is 0.</strong> '
-        + tail;
-    } else if (absLess) {
-      status.innerHTML = '<strong>|r| = ' + Rtext(Rabs(r)) + ' is below 1, so the infinite sum is '
-        + Rtext(limit) + '.</strong> The graph shows the partial sums walking towards that line and '
-        + 'never crossing it. Every partial sum above was computed twice, once by adding the terms '
-        + 'up and once by the formula, and they agree exactly &mdash; which matters here more than '
-        + 'anywhere else on this page, because a1(1 - r^n)/(1 - r) with r = ' + Rtext(r) + ' and n = '
-        + N + ' is a fraction over ' + String(Rpow(r, N).d) + ', and a decimal would have run out of '
-        + 'room to tell the last few partial sums apart.';
-    } else if (one) {
-      status.innerHTML = '<strong>r = 1: the sum formula divides by zero, so it says nothing here.</strong> '
-        + 'The sequence is ' + Rtext(a1) + ', ' + Rtext(a1) + ', ' + Rtext(a1) + ', ... and the sum of '
-        + N + ' of them is ' + Rtext(sumA) + ' &mdash; which the table computed by adding the terms '
-        + 'up, and again by n a1, the formula that takes over when the usual one has a zero in its '
-        + 'denominator. The partial sums climb a straight line on the graph and never level off. '
-        + 'This is not a gap in the theory: a1(1 - r^n)/(1 - r) was derived by dividing by 1 - r, '
-        + 'and that step was never available when r is 1.';
+    if (one) {
+      status.innerHTML = '<strong>At n = ' + N + ', the term is ' + Rtext(an)
+        + ' and the finite sum is ' + Rtext(sumA) + '.</strong> Here r = 1, so every term equals a1. '
+        + 'The usual geometric formula divides by 1 - r = 0 and says nothing; direct addition and '
+        + 'n a1 both give the displayed sum. This is a special formula for a perfectly ordinary '
+        + 'finite sum, not a convergence decision.';
+    } else if (Rzero(r)) {
+      status.innerHTML = '<strong>At n = ' + N + ', the term is 0 and the finite sum is '
+        + Rtext(sumA) + '.</strong> With r = 0 the sequence is ' + Rtext(a1)
+        + ', 0, 0, ... . The quotient 0/0 cannot diagnose the later terms, but the multiplicative '
+        + 'definition does: every term is 0 times the previous one. Direct addition and '
+        + 'a1(1 - r^n)/(1 - r) agree exactly.';
     } else {
-      status.innerHTML = '<strong>|r| = ' + Rtext(Rabs(r)) + ', which is not below 1, so there is no '
-        + 'infinite sum.</strong> ' + tail
-        + ' The finite sums in the table are all perfectly real numbers and every one of them was '
-        + 'checked against the formula; it is only the limit that does not exist. That distinction '
-        + '&mdash; a formula for every finite n, no limit as n grows &mdash; is the whole content of '
-        + 'the condition |r| &lt; 1.';
+      status.innerHTML = '<strong>At n = ' + N + ', the term is ' + Rtext(an)
+        + ' and the finite sum is ' + Rtext(sumA) + '.</strong> Every term was computed by repeated '
+        + 'multiplication and by a1 r^(n-1); every partial sum was computed by addition and by '
+        + 'a1(1 - r^n)/(1 - r). The two routes agree exactly. Whether the plotted finite sums '
+        + 'approach a number as n keeps changing is a later question, not a condition on the '
+        + 'finite calculation completed here.';
     }
   }
 
@@ -4571,7 +4519,7 @@ SEQ_SCRIPT = r"""
       paintArith();
     } else if (MODE === 'geometric') {
       titleOut.textContent = 'a1 = ' + String(inA1.value) + ',  r = ' + String(inR.value);
-      subOut.textContent = 'the first ' + termcount() + ' terms, their sum, and the limit';
+      subOut.textContent = 'the first ' + termcount() + ' terms and their finite sums, each checked twice';
       paintGeom();
     } else if (MODE === 'binomial') {
       titleOut.textContent = '(' + String(inBin.value) + ')^' + String(selPow.value);
@@ -4674,9 +4622,11 @@ def sequence_lab(cfg):
     assert it, and this is the difference between showing a reader the formula
     works and telling them it does.
 
-    It is also what lets `geometric` demonstrate rather than warn: the sum
-    formula divides by 1 - r, so at r = 1 there is nothing to print, and the
-    column that added the terms up carries on quite happily beside the gap.
+    It is also what lets `geometric` demonstrate rather than warn: the finite
+    sum formula divides by 1 - r, so at r = 1 there is nothing to print from
+    that formula, while the column that added the terms and the direct n a1
+    calculation carry on beside the gap. Convergence belongs to the separate
+    `infinite` mode, after partial sums have been defined as a sequence.
 
     The seven series modes added when this became its own course each pay that
     same price. Two of them are worth naming because the second computation is
@@ -4728,8 +4678,8 @@ def sequence_lab(cfg):
                   '<span class="tone-red"><i class="legend-swatch"></i>where they differ</span>',
         "arithmetic": '<span class="tone-cyan"><i class="legend-swatch"></i>done the long way</span>'
                       '<span class="tone-purple"><i class="legend-swatch"></i>done by formula</span>',
-        "geometric": '<span class="tone-cyan"><i class="legend-swatch"></i>the partial sums</span>'
-                     '<span class="tone-red"><i class="legend-swatch"></i>the limit, where there is one</span>',
+        "geometric": '<span class="tone-cyan"><i class="legend-swatch"></i>successive finite sums</span>'
+                     '<span class="tone-purple"><i class="legend-swatch"></i>the closed-form check</span>',
         "binomial": "<span class=\"tone-cyan\"><i class=\"legend-swatch\"></i>Pascal's triangle</span>"
                     '<span class="tone-purple"><i class="legend-swatch"></i>the C(n, k) formula</span>'
                     '<span class="tone-green"><i class="legend-swatch"></i>multiplied out</span>',

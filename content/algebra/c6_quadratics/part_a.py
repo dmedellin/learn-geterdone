@@ -6,7 +6,7 @@ LESSONS = [
         "slug": "quadratic-equations-and-the-zero-product-property",
         "title": "Quadratic Equations and the Zero Product Property",
         "module": "Solving quadratics",
-        "one_line": "Why a product being zero is the whole method.",
+        "one_line": "Classify a quadratic and split only a product equal to zero.",
         "summary": (
             "A quadratic equation is one that can be written `ax² + bx + c = 0` with "
             "`a ≠ 0`. Every method in this course ends at the same place: a product "
@@ -174,6 +174,12 @@ LESSONS = [
                 "it threw it away and expanded. That looks wasteful and is not, because "
                 "the factorisation you need is the one whose product is zero, not the "
                 "one you happened to be given.",
+                "For a faded zero-product pass, solve `5(x - 2)(2x + 1) = 0`. The "
+                "supplied decision is that the hypothesis is already met: the product "
+                "equals zero. Decide which factor contributes no solution, solve the "
+                "other two and check both values in the original. Compare with "
+                "`x = 2` and `x = -1/2`; if `5` appeared as a third answer, a constant "
+                "factor was treated as though it contained `x`.",
             ],
         },
         "quiz_title": "Products and zeros",
@@ -243,7 +249,7 @@ LESSONS = [
         "slug": "solving-by-factoring",
         "title": "Solving by Factoring",
         "module": "Solving quadratics",
-        "one_line": "The quickest method, when it applies.",
+        "one_line": "Recognise when factoring is efficient, then find and check every root.",
         "summary": (
             "With a zero on one side and a factorisation on the other, the zero product "
             "property finishes the job in a line. All the work is in the factoring, "
@@ -422,6 +428,12 @@ LESSONS = [
                 "twice returns the same number twice. Lesson 10 shows what this looks "
                 "like on a graph: a curve that touches the x-axis instead of crossing "
                 "it.",
+                "For a faded AC-method solve, take `12x² - 11x - 5 = 0`. The supplied "
+                "search target is product `-60` and sum `-11`; use `-15` and `4` to "
+                "split the middle term. Group, solve both linear factors and check the "
+                "two values in the original. You should reach `x = 5/4` and "
+                "`x = -1/3`; an inverted fraction identifies the factor-solving step "
+                "that needs repair.",
             ],
         },
         "quiz_title": "Factor and split",
@@ -485,7 +497,7 @@ LESSONS = [
         "slug": "the-square-root-property",
         "title": "The Square Root Property",
         "module": "Solving quadratics",
-        "one_line": "Two roots, and the plus-or-minus that is not optional.",
+        "one_line": "Isolate a square, take both roots and simplify them exactly.",
         "summary": (
             "If `x² = k` with `k` positive there are two solutions, `√k` and `-√k`. The "
             "symbol `√k` names one number, the non-negative one; the second solution "
@@ -588,10 +600,11 @@ LESSONS = [
                          "`x² + 9 = 0` gives `x² = -9`, and no real number squares to a "
                          "negative. The complete and honest answer at this point in the "
                          "course is \"no real solution\".",
-                         "Lesson 7 introduces a number whose square is `-1`, and lesson "
-                         "9 solves the quadratics this lesson had to set aside. The "
-                         "answer here becomes `x = 3i` or `x = -3i`, which is again a "
-                         "pair, and again produced by this property.")),
+                         "Lesson 7 introduces the number system needed to continue, and "
+                         "lesson 9 solves the quadratics this lesson has to set aside. "
+                         "The answer there is again a pair produced by this property; "
+                         "no unexplained symbol is needed to finish the real-number "
+                         "work here.")),
         ],
         "lab": ("quadratic", {
             "mode": "sqrt",
@@ -658,6 +671,11 @@ LESSONS = [
                 "`-x` and its solutions must be negatives of one another. In B and C the "
                 "square is shifted, and the pair is symmetric about `4` and about `-3` "
                 "instead. Lesson 11 gives that centre a name.",
+                "For a faded shifted-square solve, take `3(x - 2)² = 14`. The supplied "
+                "first line is `(x - 2)² = 14/3`. Take both roots, rationalize and "
+                "simplify before solving for `x`, then check by showing the shift "
+                "squares back to `14/3`. Compare with `x = 2 ± √42/3`; a pair centred "
+                "at `-2` signals that the shift was moved in the wrong direction.",
             ],
         },
         "quiz_title": "Roots, both of them",
@@ -721,7 +739,7 @@ LESSONS = [
         "slug": "completing-the-square",
         "title": "Completing the Square",
         "module": "Solving quadratics",
-        "one_line": "Turning any quadratic into a perfect square plus a constant.",
+        "one_line": "Complete a square in exact arithmetic and solve the resulting equation.",
         "summary": (
             "Adding the square of half the coefficient of `x` turns `x² + bx` into a "
             "perfect square. That one move converts any quadratic into a form the square "
@@ -774,8 +792,9 @@ LESSONS = [
                   "`x² + 6x + 9` is a perfect square and equals `(x + 3)²`. The sign "
                   "looks after itself: for `x² - 5x` half of `-5` is `-5/2`, its square "
                   "is `25/4`, which is positive, and the minus survives inside the "
-                  "bracket as `(x - 5/2)²`. The constant added is always positive, "
-                  "because it is a square."),
+                  "bracket as `(x - 5/2)²`. The constant added is always non-negative, "
+                  "because it is a square; it is `0` only when the linear coefficient "
+                  "is already `0`."),
             ("h3", "Solving an equation"),
             ("math", [
                 "x² + 6x - 7 = 0",
@@ -905,6 +924,12 @@ LESSONS = [
                 "real number squares to a negative, so there is nothing further to try. "
                 "The method reported the absence of a real solution; it did not fail to "
                 "find one.",
+                "For a faded non-monic completion, solve `3x² + 6x - 1 = 0`. The "
+                "supplied first move is to divide every term by `3`; after moving the "
+                "constant, decide what completes `x² + 2x`. Finish in exact form and "
+                "check the completed square. Compare with `x = -1 ± 2√3/3`; adding "
+                "`9` instead of `1` means the coefficient was completed before the "
+                "division by `a`.",
             ],
         },
         "quiz_title": "Completing the square",
@@ -964,7 +989,7 @@ LESSONS = [
         "slug": "the-quadratic-formula",
         "title": "The Quadratic Formula",
         "module": "Solving quadratics",
-        "one_line": "Completing the square once, in general, and keeping the result.",
+        "one_line": "Derive the quadratic formula, substitute signed coefficients and reduce both roots.",
         "summary": (
             "Completing the square on `ax² + bx + c = 0` with letters instead of numbers "
             "produces one formula that solves every quadratic. Deriving it once is worth "
@@ -1088,11 +1113,12 @@ LESSONS = [
         ],
         "lab": ("quadratic", {
             "mode": "formula",
-            "panel_title": "Coefficients in, exact roots out",
+            "panel_title": "Coefficients in, exact real roots out",
             "panel_intro": "Set `a`, `b` and `c` and watch the substitution happen with "
                            "every sign shown. The lab keeps the answer as an exact "
-                           "radical and then reduces it, so you can see which terms of "
-                           "the numerator the denominator actually divides.",
+                           "radical and then reduces it when real roots exist; a negative "
+                           "discriminant stops at no real solution until complex numbers "
+                           "are defined later in the course.",
         }),
         "steps_title": "Applying the quadratic formula",
         "steps_intro": "The first two steps hold the errors; the last two are arithmetic.",
@@ -1146,6 +1172,12 @@ LESSONS = [
                 "would have produced them in about the same number of lines &mdash; "
                 "which is precisely what the derivation predicts, since the formula is "
                 "that completion, already done.",
+                "For a faded formula pass, solve `3x² + 2x - 7 = 0`. The supplied "
+                "coefficient line is `a = 3`, `b = 2`, `c = -7`. Compute `D` with the "
+                "sign of `c` visible, substitute, simplify the radical and divide the "
+                "whole numerator. Check against `x = (-1 ± √22)/3`; a denominator of "
+                "`6` left in the final form means the common factor in the numerator "
+                "was not removed.",
             ],
         },
         "quiz_title": "Coefficients and roots",
@@ -1204,7 +1236,7 @@ LESSONS = [
         "slug": "the-discriminant",
         "title": "The Discriminant",
         "module": "Solving quadratics",
-        "one_line": "Counting the solutions before finding them.",
+        "one_line": "Use the discriminant and equation shape to predict roots and choose a method.",
         "summary": (
             "`b² - 4ac` is the quantity under the radical in the quadratic formula, and "
             "its sign decides how many real solutions there are: two, one or none. "
@@ -1323,8 +1355,9 @@ LESSONS = [
             "panel_title": "The sign, before the solving",
             "panel_intro": "Move the coefficients and watch `D` change sign. The lab "
                            "names the case, says whether `D` is a perfect square, and "
-                           "only then shows the solutions &mdash; so the prediction can "
-                           "be made before the answer appears.",
+                           "only then shows the real solutions or explains why real work "
+                           "stops &mdash; so the prediction can be made before an answer "
+                           "appears.",
         }),
         "steps_title": "Using the discriminant first",
         "steps_intro": "One line of arithmetic, then a decision about which method to use.",
@@ -1371,11 +1404,19 @@ LESSONS = [
                 "divisors of `1` would have been tried and would have failed, and "
                 "`D = 12` says in advance that it must: `12` is not a perfect square, so "
                 "no rational factorisation exists. One line replaced a search.",
-                "D was settled by a single subtraction. Lesson 9 supplies the method "
-                "that finishes it, and the two non-real solutions are `-1/2 ± (√3/2)i`. "
-                "Nothing in this lesson changes when they arrive &mdash; `D &lt; 0` will "
-                "still mean \"no real solution\", which is why the word <em>real</em> is "
-                "worth writing now.",
+                "D was settled by a single subtraction. Lessons 7 to 9 supply the "
+                "numbers and method that continue beyond the reals. Nothing in this "
+                "lesson changes when those roots arrive &mdash; `D &lt; 0` will still "
+                "mean \"no real solution\", which is why the word <em>real</em> is worth "
+                "writing now.",
+                "For a faded method-choice pass, classify these before doing any full "
+                "solution: `x² - 11x + 24 = 0`, `5x² - 45 = 0`, "
+                "`x² + 8x = 3`, and `2x² + x + 4 = 0`. The supplied cues are, in "
+                "order, an integer factor pair, no linear term, an expression one "
+                "constant away from a square, and a negative discriminant. Choose "
+                "factoring, the square root property, completing the square, and "
+                "stopping at no real solution respectively; then solve the first "
+                "three and use substitution to check the roots.",
             ],
         },
         "quiz_title": "Counting before solving",
@@ -1405,6 +1446,21 @@ LESSONS = [
                     "`5` and `2`, with `(x - 5)(x - 2)` as the factorisation. The two "
                     "solutions are `3` apart, not `9`: the gap is `√D/|a|`, and "
                     "confusing `D` with its root is the error the first option names."},
+            {"q": "Which plan uses the shortest justified method for each equation: "
+                  "`x² - 9 = 0`; `x² + 7x + 12 = 0`; `x² + 6x = 2`; "
+                  "`2x² + x + 5 = 0`?",
+             "a": ["Square root; factor; complete the square; compute `D` and stop with no real solution",
+                   "Factor all four, because every quadratic factors over the integers",
+                   "Use the formula on all four, because a method that always works is always shortest",
+                   "Complete the square; square root; factor; divide by `x`"],
+             "c": 0,
+             "why": "The first has no linear term, the second has the integer factors "
+                    "`(x + 3)(x + 4)`, and the third is one added constant away from "
+                    "`(x + 3)²`. The fourth has `D = 1 - 40 = -39`, so at this point "
+                    "the complete real-number answer is no real solution. The second "
+                    "choice assumes integer factors always exist; the third confuses "
+                    "universality with efficiency; the last assigns methods without "
+                    "checking their hypotheses and would delete `x = 0` by division."},
         ],
         "mistakes": [
             ("Dropping the sign in -4ac",
@@ -1435,7 +1491,7 @@ LESSONS = [
         "slug": "complex-numbers",
         "title": "Complex Numbers",
         "module": "Complex numbers",
-        "one_line": "Defining i, and what a complex number is.",
+        "one_line": "Convert negative square roots to i and identify both parts of a complex number.",
         "summary": (
             "`x² = -1` has no real solution, so a number `i` with `i² = -1` is defined "
             "and joined to the reals. A complex number is `a + bi` with `a` and `b` "
@@ -1615,6 +1671,12 @@ LESSONS = [
                 "complex numbers, and they are negatives of one another, exactly as "
                 "`x² = 49` had two real ones. Lesson 9 shows that the pairing is not a "
                 "coincidence.",
+                "For a faded standard-form pass, simplify `(8 + √(-32))/4`. The "
+                "supplied first move is `√(-32) = i√32`; simplify that radical and "
+                "divide both numerator terms. You should reach `2 + √2 i`, with real "
+                "part `2` and imaginary part `√2`. If the imaginary part is reported "
+                "as `√2 i`, revisit the definition: the part is the real coefficient "
+                "of `i`.",
             ],
         },
         "quiz_title": "i and standard form",

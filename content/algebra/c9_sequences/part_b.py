@@ -6,7 +6,7 @@ LESSONS = [
         "slug": "repeating-decimals-as-series",
         "title": "Repeating Decimals as Series",
         "module": "Infinite series",
-        "one_line": "Why 0.999... is 1, settled by the sum formula.",
+        "one_line": "Convert a repeating decimal to a fraction and defend why its partial sums name that exact value.",
         "summary": (
             "A decimal expansion is a series: `0.d₁d₂d₃…` is shorthand for "
             "`d₁/10 + d₂/100 + d₃/1000 + …` . When a block of digits repeats, that "
@@ -221,6 +221,12 @@ LESSONS = [
                 "the reason this decimal repeats at all &mdash; a denominator carrying "
                 "any prime other than `2` and `5` cannot be written over a power of "
                 "ten.",
+                "For a faded conversion, use `0.18333…`. The supplied split is the "
+                "fixed head `18/100` plus a tail whose first term is `3/1000` and whose "
+                "ratio is `1/10`. Sum the tail, add the head, reduce the fraction, and "
+                "then reproduce the result by shifting and subtracting. Long-divide "
+                "your fraction far enough to recover the fixed digits and repeat before "
+                "opening the quiz.",
             ],
         },
         "quiz_title": "Decimals and fractions",
@@ -293,7 +299,7 @@ LESSONS = [
         "slug": "annuities-and-accumulated-payments",
         "title": "Annuities and Accumulated Payments",
         "module": "Applications",
-        "one_line": "A stream of payments is a geometric series.",
+        "one_line": "Place an ordinary annuity on a timeline and compute its accumulated, present or perpetual value.",
         "summary": (
             "Equal payments made at equal intervals, each earning interest for a "
             "different length of time, accumulate to a geometric series with "
@@ -502,6 +508,12 @@ LESSONS = [
                 "`6715.61`, which is the answer to the annuity-due question &mdash; "
                 "payments at the start of each year &mdash; and is exactly `11/10` "
                 "times this one.",
+                "For a faded present-value pass, value three end-of-year payments of "
+                "`200` today at `25%` per year. The supplied timeline decision is to "
+                "discount, so the first term is `200/(5/4)` and the ratio is `4/5`. "
+                "Add the three discounted payments and use the finite geometric formula "
+                "as a second computation. Check that the result is below the undiscounted "
+                "total of `600` before opening the quiz.",
             ],
         },
         "quiz_title": "Streams of payments",
@@ -580,7 +592,7 @@ LESSONS = [
         "slug": "pascals-triangle",
         "title": "Pascal's Triangle",
         "module": "The binomial theorem",
-        "one_line": "Each entry the sum of the two above it, and what that counts.",
+        "one_line": "Construct and check a row of Pascal's triangle, then interpret one entry as a choice count.",
         "summary": (
             "Start with a single `1` and make every entry the sum of the two above it. "
             "The rows that come out are the coefficients of `(a + b)ⁿ`, and each entry "
@@ -688,7 +700,7 @@ LESSONS = [
                   "from one of the two entries above it. A route of `n` steps that "
                   "lands at position `k` went right `k` times, so the routes are "
                   "another way of choosing which `k` of the `n` steps go right."),
-            ("h3", "Patterns in the array"),
+            ("h3", "Two structural checks"),
             ("p", "Row `n` adds up to `2ⁿ`. The reason is the delegation table above: "
                   "sorting all the subsets of an `n`-element set by size counts each "
                   "subset exactly once, and a set of `n` things has `2ⁿ` subsets, one "
@@ -701,30 +713,6 @@ LESSONS = [
                   "settles that case; for even `n` the cancellation is real but the "
                   "clean reason for it is the binomial theorem with `a = 1` and "
                   "`b = -1`, which is the next lesson."),
-            ("math", [
-                "reading down the diagonals",
-                "",
-                "k = 0     1   1   1   1   1   1   1",
-                "k = 1     1   2   3   4   5   6         the counting numbers",
-                "k = 2     1   3   6  10  15  21         the triangular numbers",
-                "k = 3     1   4  10  20  35             not 1, 4, 9, 16",
-            ]),
-            ("example", ("Adding down a diagonal",
-                         "`1 + 3 + 6 + 10 + 15 = 35`, and `35` is `C(7,3)`, one row "
-                         "below and one place to the right of the `15`. It follows from "
-                         "applying the building rule over and over: "
-                         "`C(7,3) = C(6,2) + C(6,3)`, then `C(6,3) = C(5,2) + C(5,3)`, "
-                         "and so on until the last piece is `C(3,3) = 1`. Splitting "
-                         "`35` as `15 + 10 + 6 + 3 + 1` is that chain written out.")),
-            ("example", ("The rows are the powers of 11",
-                         "`11⁰ = 1`, `11¹ = 11`, `11² = 121`, `11³ = 1331`, "
-                         "`11⁴ = 14641`. Row 5 is `1, 5, 10, 10, 5, 1`, and carrying the "
-                         "two-digit entries turns that into `161051`, which is `11⁵`. "
-                         "The pattern does not break at row 5; the digit-by-digit "
-                         "reading of it does. `11ⁿ` is `(10 + 1)ⁿ`, so the row is the "
-                         "list of coefficients of the powers of ten, and coefficients "
-                         "above `9` have to be carried like any other column of "
-                         "addition.")),
             ("p", "The entries grow quickly: `C(20,10) = 184756`, and reaching it by "
                   "addition means building twenty rows, one hundred and ninety "
                   "additions. That is the argument for a formula, and it is what the next "
@@ -800,6 +788,11 @@ LESSONS = [
                 "The connection is the argument above: the delegations of size `3` from "
                 "`8` either include a particular person or do not, which is the same "
                 "split that built the row.",
+                "For a faded row construction, start from the completed row 8 above and "
+                "build row 9. The supplied edge entries are the two `1`s; every interior "
+                "entry is still yours. Use symmetry to check the row, add it to compare "
+                "with `2⁹`, and read `C(9,4)` as a sentence about choosing four people "
+                "from nine before opening the quiz.",
             ],
         },
         "quiz_title": "Rows, entries and counts",
@@ -840,12 +833,11 @@ LESSONS = [
              "nearest numbers on the page. The edge `1`s are not an exception bolted "
              "on: there is only one entry above them, and the missing neighbour counts "
              "as `0`."),
-            ("Assuming a diagonal continues the way it started",
-             "The `k = 3` diagonal begins `1, 4, 10` and the next entry is `20`, not "
-             "`16`; it is not the squares, though its first two terms match them. This "
-             "is the same warning as the chord-and-regions sequence at the start of the "
-             "course: the building rule decides what comes next, and a guessed pattern "
-             "does not."),
+            ("Treating the 2ⁿ row total as a complete check",
+             "A row with two compensating errors can still add to `2ⁿ`. The total is a "
+             "necessary check, not a proof of every entry. Verify that the row is "
+             "symmetric and that each interior number is the sum of its two parents; "
+             "those local checks expose an error the total can hide."),
         ],
         "standard": ("Finish when you can extend the triangle five rows and check each one as you go.",
                      "You should be able to produce row 8 from row 5 without error, "
@@ -862,8 +854,8 @@ LESSONS = [
     {
         "slug": "the-binomial-theorem",
         "title": "The Binomial Theorem",
-        "module": "Sequences",
-        "one_line": "Expanding (a+b)^n without multiplying it out.",
+        "module": "The binomial theorem",
+        "one_line": "Expand a signed binomial power from its coefficients and verify the complete result by substitution.",
         "summary": (
             "Multiplying out `(a + b)ⁿ` means expanding `2ⁿ` products and collecting "
             "them. The binomial theorem writes the answer down directly: the "
@@ -941,7 +933,7 @@ LESSONS = [
                          "a shortcut for the lazy: `9!` is `362880`, and there is no "
                          "reason to write it down.")),
             ("thm", ("The binomial theorem",
-                     "For any numbers `a`, `b` and any positive integer `n`, "
+                     "For any numbers `a`, `b` and any nonnegative integer `n`, "
                      "`(a + b)ⁿ = Σ C(n,k) aⁿ⁻ᵏ bᵏ`, the sum running over `k` from `0` "
                      "to `n`. Written out, that is "
                      "`aⁿ + C(n,1)aⁿ⁻¹b + C(n,2)aⁿ⁻²b² + … + C(n,n-1)abⁿ⁻¹ + bⁿ`.")),
@@ -958,10 +950,6 @@ LESSONS = [
                   "sum-of-the-two-above rule stated in symbols. The triangle is also "
                   "symmetric, because `C(n,k) = C(n,n-k)`: choosing `k` brackets to "
                   "give `b` is the same act as choosing the other `n - k` to give `a`."),
-            ("p", "The theorem also gives one term on its own, which is where it earns "
-                  "its keep. The term containing `x⁵` in `(x + 2)⁸` has `a = x`, so "
-                  "`8 - k = 5` and `k = 3`, making it `C(8,3)x⁵2³ = 56·8·x⁵ = 448x⁵`. "
-                  "No other term of that expansion had to be computed."),
             ("example", ("The signs of (a - b)⁴",
                          "`(a - b)⁴ = a⁴ - 4a³b + 6a²b² - 4ab³ + b⁴`. The coefficients "
                          "are row 4 unchanged; the signs come from `(-b)ᵏ`, so terms "
@@ -977,9 +965,10 @@ LESSONS = [
             "mode": "binomial",
             "panel_title": "One row at a time",
             "panel_intro": "Build Pascal's triangle row by row and expand any "
-                           "`(a + b)ⁿ` beside it. Ask the lab for a single term of a "
-                           "large expansion and check it against `C(n,k)` computed by "
-                           "hand.",
+                           "`(a + b)ⁿ` beside it. The lab computes each coefficient from "
+                           "factorials and by Pascal addition, then multiplies the whole "
+                           "binomial out independently so a missing term or sign cannot "
+                           "hide behind one method.",
         }),
         "steps_title": "Expanding a binomial power",
         "steps_intro": "Four steps. The third is the one that decides whether the signs come out right.",
@@ -1033,29 +1022,40 @@ LESSONS = [
                 "symmetric even though row 4 is. The symmetry belongs to `C(n,k)`; "
                 "`(2x)` and `(-3)` are different sizes, and the powers of each pull the "
                 "numbers out of balance.",
+                "For a faded expansion, take `(x - 2)⁵`. The supplied setup is "
+                "`a = x`, `b = -2`, `n = 5`, with row 5 coefficients "
+                "`1, 5, 10, 10, 5, 1`. Write all six unsimplified terms before "
+                "collecting their signs and powers, then substitute `x = 1` into both "
+                "the original bracket and your complete expansion before opening the quiz.",
             ],
         },
-        "quiz_title": "Coefficients and terms",
+        "quiz_title": "Coefficients and complete expansions",
         "quiz": [
-            {"q": "What is the coefficient of `x³` in the expansion of `(x + 2)⁵`?",
-             "a": ["`10`", "`32`", "`40`", "`80`"],
-             "c": 2,
-             "why": "`a = x`, so `x³` needs `5 - k = 3`, giving `k = 2`, and the "
-                    "coefficient is `C(5,2)·2² = 10·4 = 40`. `10` is `C(5,2)` with the "
-                    "`2²` forgotten; `80` uses `k = 3`, which is the term in `x²`."},
+            {"q": "Which is the complete expansion of `(x - 2)³`?",
+             "a": ["`x³ - 6x² + 12x - 8`",
+                   "`x³ - 6x² - 12x - 8`",
+                   "`x³ - 2x² + 4x - 8`",
+                   "`x³ - 8`"],
+             "c": 0,
+             "why": "Row 3 is `1, 3, 3, 1`, and `b = -2`, so the four terms are "
+                    "`x³`, `3x²(-2)`, `3x(-2)²`, `(-2)³`. The second choice makes the "
+                    "even power negative. The third uses powers of `-2` but drops both "
+                    "middle binomial coefficients. The fourth incorrectly applies the "
+                    "difference-of-cubes pattern to a power of a difference."},
             {"q": "How many terms does the expansion of `(a + b)¹²` have, after collecting?",
              "a": ["`12`", "`13`", "`14`", "`24`"],
              "c": 1,
              "why": "One term for each `k` from `0` to `12`, which is `13` values. The "
                     "count is `n + 1`, and `12` is the answer you get by counting the "
                     "exponent instead of the terms."},
-            {"q": "In the expansion of `(a + b)⁹`, which term contains `b⁴`?",
-             "a": ["`36a⁵b⁴`", "`84a⁵b⁴`", "`126a⁵b⁴`", "`126a⁴b⁵`"],
-             "c": 2,
-             "why": "`k = 4`, so the coefficient is `C(9,4) = 126` and the power of `a` "
-                    "is `9 - 4 = 5`. `84` is `C(9,3)` and `36` is `C(9,2)`, the "
-                    "off-by-one and off-by-two; the last choice has the right "
-                    "coefficient with the exponents swapped."},
+            {"q": "What is `C(10,3)`?",
+             "a": ["`30`", "`120`", "`720`", "`3628800`"],
+             "c": 1,
+             "why": "Cancel before multiplying: "
+                    "`C(10,3) = (10·9·8)/(3·2·1) = 720/6 = 120`. `30` divides the "
+                    "product `10·9·8` by `4!` instead of `3!`. `720` is the uncancelled "
+                    "numerator, and `3628800` is `10!`, which counts ordered lists of "
+                    "all ten objects rather than choices of three."},
         ],
         "mistakes": [
             ("Raising only part of a term to the power",
@@ -1067,18 +1067,20 @@ LESSONS = [
              "`(a - b)⁴` is `+b⁴`. Expansions of odd powers end negative and even "
              "powers end positive, and guessing rather than computing `(-b)ᵏ` gets one "
              "of those two cases wrong."),
-            ("Confusing \"the k-th term\" with \"the term containing bᵏ\"",
-             "The term containing `bᵏ` is the `(k + 1)`-th, because `k` starts at `0` "
-             "while the counting of terms starts at `1`. Say which of the two you mean, "
-             "and prefer to describe a term by the power it contains."),
+            ("Dropping the middle terms as though a power distributes over addition",
+             "`(a + b)ⁿ` is not `aⁿ + bⁿ` when `n &gt; 1`. The missing products are "
+             "exactly what the binomial coefficients count. Substituting `a = b = 1` "
+             "exposes the error immediately: the left side is `2ⁿ`, while the two-term "
+             "shortcut gives only `2`."),
         ],
-        "standard": ("Finish when you can write one term of a large expansion without writing the rest.",
+        "standard": ("Finish when you can build a complete expansion from counts rather than remembered patterns.",
                      "You should be able to produce row 6 of Pascal's triangle from "
-                     "row 5, expand `(2x - 3)⁴` correctly including signs, and pick out "
-                     "the term in `x⁵` of `(x + 2)⁸` in a single line. The `x = 1` check "
-                     "should be automatic."),
-        "note": "This is the last new idea of the course &mdash; lesson 11 turns it "
-                "into a way of picking a single term out of an expansion &mdash; and "
+                     "row 5, compute a binomial coefficient by cancelling factorials, "
+                     "and expand `(2x - 3)⁴` correctly including signs. For a complete "
+                     "expansion, the `x = 1` check should be automatic."),
+        "note": "This theorem is the last new identity of the course. Lesson 11 "
+                "specialises it into a method for picking a single term out of an "
+                "expansion without writing the rest, and "
                 "it ends where counting begins: `C(n,k)` was defined here as a formula and used "
                 "as a count, and the Combinatorics and Counting course on the Discrete "
                 "Mathematics path takes it up as a subject in its own right. The "
@@ -1093,7 +1095,7 @@ LESSONS = [
         "slug": "the-general-term-of-an-expansion",
         "title": "The General Term of an Expansion",
         "module": "The binomial theorem",
-        "one_line": "Picking one term out of an expansion without writing the rest.",
+        "one_line": "Isolate a requested term by solving for k, or prove that the expansion contains no such term.",
         "summary": (
             "Most questions about an expansion want one term of it: the term in `x⁵`, "
             "the constant term, the middle term. The general term `C(n,k)aⁿ⁻ᵏbᵏ` "
@@ -1282,6 +1284,12 @@ LESSONS = [
                 "Two adjacent terms happening to agree in size is a coincidence of this "
                 "expansion, and it is a good reason to pin `k` by the exponent rather "
                 "than by recognising a number.",
+                "For a faded single-term pass, find the constant term of "
+                "`(x³ - 2/x)⁸`. The supplied identification is `a = x³`, `b = -2/x`, "
+                "`n = 8`. Write the general term, collect both contributions to the "
+                "power of `x`, solve the resulting equation for `k`, and check that "
+                "`k` is a whole number in range. Recompute the final exponent from the "
+                "two powered factors separately before opening the quiz.",
             ],
         },
         "quiz_title": "Single terms",

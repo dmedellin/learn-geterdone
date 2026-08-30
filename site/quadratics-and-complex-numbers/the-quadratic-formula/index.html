@@ -1181,8 +1181,8 @@ x =  ---------  =  ----------  =  -2 ± √3       divide BOTH terms by 2
       <div class="status-banner" id="qdStatus" style="margin-top:12px;"></div>
         </article>
         <aside class="card side-panel" aria-live="polite">
-          <h3>Coefficients in, exact roots out</h3>
-          <p>Set <span class="math">a</span>, <span class="math">b</span> and <span class="math">c</span> and watch the substitution happen with every sign shown. The lab keeps the answer as an exact radical and then reduces it, so you can see which terms of the numerator the denominator actually divides.</p>
+          <h3>Coefficients in, exact real roots out</h3>
+          <p>Set <span class="math">a</span>, <span class="math">b</span> and <span class="math">c</span> and watch the substitution happen with every sign shown. The lab keeps the answer as an exact radical and then reduces it when real roots exist; a negative discriminant stops at no real solution until complex numbers are defined later in the course.</p>
         <div class="field">
           <label for="qdPreset">Quadratic</label>
           <select id="qdPreset"><option value="1|-2|-4">x^2 - 2x - 4</option><option value="3|-6|2">3x^2 - 6x + 2</option><option value="1|1|-1">x^2 + x - 1</option><option value="2|3|-4">2x^2 + 3x - 4</option><option value="1|-6|13">x^2 - 6x + 13</option></select>
@@ -1239,7 +1239,7 @@ C.  -x² + 5x - 6 = 0             a = -1,  b = 5,   c = -6
         b² - 4ac = 25 - 4(-1)(-6) = 25 - 24 = 1
         x = (-5 ± 1) / (-2)
         x = (-4)/(-2) = 2       or     x = (-6)/(-2) = 3
-    check   -(4) + 10 - 6 = 0        -(9) + 15 - 6 = 0</div><p>In C the term <span class="math">-4ac</span> was <span class="math">-4(-1)(-6)</span>, a product of three negative factors and therefore negative: <span class="math">-24</span>. That single sign is the difference between <span class="math">b² - 4ac = 1</span> and <span class="math">b² - 4ac = 49</span>, and between the answers <span class="math">2</span> and <span class="math">3</span> and the answers <span class="math">-1</span> and <span class="math">6</span>.</p><p>B is the case the formula exists for. <span class="math">x² + 4x + 1</span> has no integer factorisation, the answers are irrational, and completing the square would have produced them in about the same number of lines &mdash; which is precisely what the derivation predicts, since the formula is that completion, already done.</p></article>
+    check   -(4) + 10 - 6 = 0        -(9) + 15 - 6 = 0</div><p>In C the term <span class="math">-4ac</span> was <span class="math">-4(-1)(-6)</span>, a product of three negative factors and therefore negative: <span class="math">-24</span>. That single sign is the difference between <span class="math">b² - 4ac = 1</span> and <span class="math">b² - 4ac = 49</span>, and between the answers <span class="math">2</span> and <span class="math">3</span> and the answers <span class="math">-1</span> and <span class="math">6</span>.</p><p>B is the case the formula exists for. <span class="math">x² + 4x + 1</span> has no integer factorisation, the answers are irrational, and completing the square would have produced them in about the same number of lines &mdash; which is precisely what the derivation predicts, since the formula is that completion, already done.</p><p>For a faded formula pass, solve <span class="math">3x² + 2x - 7 = 0</span>. The supplied coefficient line is <span class="math">a = 3</span>, <span class="math">b = 2</span>, <span class="math">c = -7</span>. Compute <span class="math">D</span> with the sign of <span class="math">c</span> visible, substitute, simplify the radical and divide the whole numerator. Check against <span class="math">x = (-1 ± √22)/3</span>; a denominator of <span class="math">6</span> left in the final form means the common factor in the numerator was not removed.</p></article>
       </div>
     </section>
     <section class="section">
@@ -1284,7 +1284,7 @@ C.  -x² + 5x - 6 = 0             a = -1,  b = 5,   c = -6
     </section>
 
     <footer class="footer">
-      <p><strong>Quadratics and Complex Numbers.</strong> Every quadratic on this course is solved by all four methods at once, in exact arithmetic, and the four answers are compared on screen &mdash; they agree because they are computed independently. Roots, vertex and axis are marked on the parabola using the same numbers printed beside it.</p>
+      <p><strong>Quadratics and Complex Numbers.</strong> The quadratic lab tests all four solution methods independently on every redraw. A method that does not apply says why; completing the square and the formula always finish and their exact answers agree. Roots, vertex and axis are marked on the parabola using the same numbers printed beside it.</p>
       <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure is computed in your browser from the stated definition, and a step that gives the right answer here is not thereby a valid rule.</p>
       <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
     </footer>
@@ -1902,6 +1902,11 @@ C.  -x² + 5x - 6 = 0             a = -1,  b = 5,   c = -6
   }
 
   var MODE = 'formula', QUARTIC = false;
+  /* Lessons 3-6 classify a negative discriminant as "no real solution" before
+     lesson 7 defines i. The same lab serves later graphing lessons, where the
+     complex pair is legitimate retrieval, so presentation follows lesson order
+     even though the exact-arithmetic core can already compute both cases. */
+  var SHOW_COMPLEX = ['graph', 'vertex', 'optimise', 'reducible'].indexOf(MODE) >= 0;
   var preset = document.getElementById('qdPreset');
   var inA = document.getElementById('qdA'), inB = document.getElementById('qdB'), inC = document.getElementById('qdC');
   var work = document.getElementById('qdWork'), status = document.getElementById('qdStatus');
@@ -1939,7 +1944,9 @@ C.  -x² + 5x - 6 = 0             a = -1,  b = 5,   c = -6
     var rhs = Rdiv(Rneg(c), a);
     if (Rsign(rhs) < 0) {
       var im = Rsurd(Rneg(rhs));
-      return { ok: true, text: 'x^2 = ' + Rtext(rhs) + ', and no real number squares to a negative: x = +-' + surdtext(im) + 'i' };
+      return { ok: true, text: SHOW_COMPLEX
+        ? 'x^2 = ' + Rtext(rhs) + ', so x = +-' + surdtext(im) + 'i'
+        : 'x^2 = ' + Rtext(rhs) + ', and no real number squares to a negative; complex roots begin in lesson 7' };
     }
     var s = Rsurd(rhs);
     return { ok: true, text: 'x^2 = ' + Rtext(rhs) + ', so x = +-' + surdtext(s) };
@@ -1969,9 +1976,15 @@ C.  -x² + 5x - 6 = 0             a = -1,  b = 5,   c = -6
     var answer;
     if (Rsign(rhs) < 0) {
       var im = Rsurd(Rneg(rhs));
-      answer = 'x = ' + pmtext(Rneg(half), im, true);
-      lines.push(row('take the square root',
-                     Ptext([half, R1]) + ' = +-' + surdtext(im) + 'i'));
+      if (SHOW_COMPLEX) {
+        answer = 'x = ' + pmtext(Rneg(half), im, true);
+        lines.push(row('take the square root',
+                       Ptext([half, R1]) + ' = +-' + surdtext(im) + 'i'));
+      } else {
+        answer = 'no real solution';
+        lines.push(row('read the negative right-hand side',
+                       'no real number has square ' + Rtext(rhs) + '; complex roots begin in lesson 7'));
+      }
     } else {
       var s = Rsurd(rhs);
       answer = 'x = ' + pmtext(Rneg(half), s);
@@ -1989,7 +2002,9 @@ C.  -x² + 5x - 6 = 0             a = -1,  b = 5,   c = -6
     lines.push(row('substitute', 'x = (-(' + Rtext(b) + ') +- sqrt((' + Rtext(b) + ')^2 - 4(' + Rtext(a) + ')(' + Rtext(c) + '))) / (2 * ' + Rtext(a) + ')'));
     lines.push(row('the discriminant', 'b^2 - 4ac = ' + Rtext(Rmul(b, b)) + ' - ' + Rtext(Rmul(R(4n), Rmul(a, c))) + ' = ' + Rtext(r.disc)));
     if (r.kind === 'complex') {
-      lines.push(row('negative, so no real root', 'x = ' + pmtext(r.p, r.s, true)));
+      lines.push(row('negative, so no real root', SHOW_COMPLEX
+        ? 'x = ' + pmtext(r.p, r.s, true)
+        : 'stop here; complex roots begin in lesson 7'));
     } else if (r.kind === 'double') {
       lines.push(row('zero, so one repeated root', 'x = ' + Rtext(r.p)));
     } else {
@@ -2106,7 +2121,8 @@ C.  -x² + 5x - 6 = 0             a = -1,  b = 5,   c = -6
       row('factoring', fac.ok ? fac.roots.map(function (x) { return 'x = ' + Rtext(x); }).join(',   ') : '<span class="tone-muted">' + fac.text + '</span>'),
       row('square root property', sqp.ok ? sqp.text : '<span class="tone-muted">' + sqp.text + '</span>'),
       row('completing the square', comp.answer),
-      row('the formula', r.kind === 'complex' ? 'x = ' + pmtext(r.p, r.s, true)
+      row('the formula', r.kind === 'complex' ? (SHOW_COMPLEX
+          ? 'x = ' + pmtext(r.p, r.s, true) : 'no real solution; complex roots begin in lesson 7')
           : (r.kind === 'double' ? 'x = ' + Rtext(r.p) : 'x = ' + pmtext(r.p, r.s))),
     ]));
 
@@ -2135,9 +2151,10 @@ C.  -x² + 5x - 6 = 0             a = -1,  b = 5,   c = -6
     var msg;
     if (r.kind === 'complex') {
       msg = '<strong>The discriminant is ' + Rtext(r.disc) + ', which is negative.</strong> '
-        + 'The parabola above never meets the x-axis, and the two solutions are the conjugate '
-        + 'pair x = ' + pmtext(r.p, r.s, true) + '. Those are not "no solutions" &mdash; they are '
-        + 'two solutions that are not real numbers.';
+        + 'The parabola above never meets the x-axis. ' + (SHOW_COMPLEX
+          ? 'The two solutions are the conjugate pair x = ' + pmtext(r.p, r.s, true)
+            + '. Those are not "no solutions" &mdash; they are two solutions that are not real numbers.'
+          : 'There is no real solution; lesson 7 introduces the number system needed to continue.');
     } else if (r.kind === 'double') {
       msg = '<strong>The discriminant is exactly 0.</strong> The formula gives one value, '
         + 'x = ' + Rtext(r.p) + ', and the parabola touches the axis there without crossing. '

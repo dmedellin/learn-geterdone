@@ -21,22 +21,33 @@ COURSE = {
     "assumes_short": "Courses 1–6",
     "assumes_long": "exponents, inverse functions, and graphing",
     "outcomes_intro": (
-        "By the end you can solve for a variable in an exponent, and read a logarithmic scale for what it is."
+        "By the end you can model constant-ratio change, use logarithms as inverse "
+        "functions, solve both kinds of equation, and convert a logarithmic-scale "
+        "difference into the factor it represents."
     ),
     "outcomes": [
-        ("Read an exponential graph",
-         "Identify growth from decay by the base alone, find the horizontal asymptote, and say why the curve never reaches it."),
-        ("Define a logarithm correctly",
-         "State `log_b(x)` as the exponent that produces `x`, convert between the two forms instantly, and evaluate one without a calculator when you can."),
-        ("Apply the three laws",
-         "Expand and condense logarithmic expressions, and avoid the two invented laws that catch everyone &mdash; `log(M + N)` and `log M / log N`."),
-        ("Solve both kinds of equation",
-         "Take a logarithm of both sides to bring a variable down, exponentiate to undo a logarithm, and check every answer against the domain."),
+        ("Model exponential change",
+         "Classify a formula or equally spaced table, translate a fixed percentage "
+         "into a multiplier, and state the starting value, direction and asymptote."),
+        ("Use logarithms as inverses",
+         "Convert between `b^y = x` and `log_b(x) = y`, identify the bases hidden by "
+         "`log` and `ln`, and evaluate exact values before rounding."),
+        ("Transform logarithmic expressions",
+         "Expand or condense with the three laws, preserve the domain, and use change "
+         "of base with the argument in the numerator and the original base in the "
+         "denominator."),
+        ("Solve and interpret",
+         "Choose matching powers or logarithms, test logarithmic candidates in the "
+         "original domain, build a compounding model, and turn a log-scale difference "
+         "into a ratio."),
     ],
     "syllabus_intro": (
         "Lessons 1 to 3 are exponential functions and `e`; 4 to 8 define the logarithm and its laws; 9 to 12 solve and apply."
     ),
     "how_to": [
+        "After each complete worked example, cover its answer and do the faded "
+        "rehearsal before the quiz. The first strategic move is supplied; the "
+        "remaining algebra, interpretation and check are yours.",
         "Say the definition out loud until it is automatic: a logarithm is an exponent. Almost every error in this course is a step taken without that sentence in mind.",
         "Check the domain of every solution to a logarithmic equation. `log(x - 5)` has nothing to say about `x = 2`, and the algebra will happily produce it.",
         "Use the log-scale lesson on numbers you know. The distance from 1 to 10 being the same as 10 to 100 is either obvious or wrong-feeling, and it is worth being the first.",

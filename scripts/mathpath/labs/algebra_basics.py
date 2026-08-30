@@ -853,7 +853,7 @@ EXPR_BODY["property"] = r"""
         + 'answer.';
     }
     msg += ' A search finding nothing is evidence and not proof: the claims that survive it are the '
-      + 'field axioms and their consequences, and those are proved once, for every number at once.';
+      + 'field axioms, which are stated for every real at once, and their consequences, which are proved from them.';
     status.innerHTML = msg;
   }
 """
@@ -2479,8 +2479,8 @@ PW_BODY["scientific"] = r"""
 
   var TEN = R(10n);
   /* Normalising is done by moving the point, exactly, and counting the moves.
-     No logarithm and no rounding: 45.6 and 0.004 both land in [1, 10) and the
-     exponent absorbs every move. */
+     No logarithm and no rounding: the MAGNITUDES of 45.6 and 0.004 both land
+     in [1, 10), and the exponent absorbs every move. */
   function normalise(m, e) {
     if (Rzero(m)) return { m: R0, e: 0, moves: 0 };
     var moves = 0, guard = 0;
@@ -2579,7 +2579,7 @@ PW_BODY["scientific"] = r"""
       var plain = plaindec(valueOf(raw, pw));
       inputRows.push(tr([
         tdl(sciText(raw, pw)), tdl(sciText(nn.m, nn.e)),
-        tdl(nn.moves === 0 ? 'already between 1 and 10' :
+        tdl(nn.moves === 0 ? 'its magnitude is already between 1 and 10' :
           (nn.moves > 0 ? 'the point moved ' + nn.moves + ' place(s) left, so the power went up by ' + nn.moves
                         : 'the point moved ' + (-nn.moves) + ' place(s) right, so the power went down by ' + (-nn.moves))),
         tdl(plain === null ? 'a fraction with no terminating decimal: ' + Rtext(valueOf(raw, pw)) : plain),
@@ -2600,10 +2600,10 @@ PW_BODY["scientific"] = r"""
     var steps = result.steps.map(function (pair) { return step(pair[0], pair[1]); });
     steps.push(step('collect', sciText(result.m, result.e)));
     if (final.moves !== 0) {
-      steps.push(step('normalise the answer', mtext(result.m) + ' is not between 1 and 10, so move the point again: '
+      steps.push(step('normalise the answer', 'the magnitude of ' + mtext(result.m) + ' is not between 1 and 10, so move the point again: '
         + sciText(final.m, final.e)));
     } else {
-      steps.push(step('already normalised', mtext(final.m) + ' is between 1 and 10, so nothing more to do'));
+      steps.push(step('already normalised', 'the magnitude of ' + mtext(final.m) + ' is between 1 and 10, so nothing more to do'));
     }
 
     /* The same calculation on the plain numbers, as a check. The scientific
@@ -2651,7 +2651,7 @@ PW_BODY["scientific"] = r"""
         + ', because a power of ten is just a factor and the exponent laws apply to it like any other base.';
     }
     if (final.moves !== 0) {
-      msg += ' The answer needed normalising again afterwards &mdash; ' + mtext(result.m)
+      msg += ' The answer needed normalising again afterwards &mdash; the magnitude of ' + mtext(result.m)
         + ' is outside 1 to 10 &mdash; which is where a power of ten gets gained or lost if the '
         + 'step is skipped.';
     }
@@ -3121,8 +3121,8 @@ SR_HINTS = {
 
 SR_PANEL = {
     "simplify": ("Choose a radicand and an index",
-                 "The radicand is factorised into primes, and each prime leaves in complete "
-                 "groups of the index. Everything below is derived from that one factorisation."),
+                 "The radicand is factorised into primes, and every complete group of the "
+                 "index sends one factor outside. Everything below is derived from that one factorisation."),
     "rational": ("Choose a base and an exponent p/q",
                  "The same power is worked out twice: the root taken first, and the power taken "
                  "first. On one of the presets the two do not agree, and that is not a bug."),

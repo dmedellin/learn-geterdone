@@ -1,7 +1,7 @@
-"""Course 1, lessons 01-07 — the real number system, its properties, and integer exponents through radicals."""
+"""Course 1 records for the real number system, its properties, and exponents through radicals."""
 
 LESSONS = [
-    # ---------------------------------------------------------------- 01
+    # ------------------------------------------ real-numbers-and-the-number-line
     {
         "slug": "real-numbers-and-the-number-line",
         "title": "Real Numbers and the Number Line",
@@ -75,20 +75,17 @@ LESSONS = [
                   "`0.333` is a different number, and a smaller one, because it is "
                   "`333/1000`. Throughout this course the fraction is the number and the "
                   "decimal is a report on it."),
-            ("thm", ("There is no rational number whose square is 2",
-                     "No integers `p` and `q` with `q ≠ 0` satisfy `(p/q)² = 2`.")),
-            ("proof", [
-                "Suppose `(p/q)² = 2`, with the fraction already reduced so that `p` and "
-                "`q` share no common factor. Multiplying by `q²` gives `p² = 2q²`, so "
-                "`p²` is even.",
-                "If `p` were odd, say `p = 2k + 1`, then `p² = 4k² + 4k + 1`, which is "
-                "odd. So `p` is even: write `p = 2m`.",
-                "Then `4m² = 2q²`, so `q² = 2m²`, and by the same argument `q` is even "
-                "too. But `p` and `q` share no common factor, and we have just shown they "
-                "share the factor 2. The supposition cannot hold.",
-            ]),
-            ("p", "So the rationals have gaps, and the line does not. That gap is the "
-                  "whole reason the real numbers are needed."),
+            ("thm", ("Whole-number square roots",
+                     "The square root of a positive whole number is a whole number when "
+                     "the radicand is a perfect square, and is irrational otherwise. "
+                     "Thus `√9 = 3`, while `√2` and `√10` are irrational.")),
+            ("p", "The proof of that theorem uses prime factorisation and a contradiction; "
+                  "neither is a prerequisite for this course. The act required here is "
+                  "the usable test: look for a whole number whose square is the radicand. "
+                  "Lesson 8 supplies the factor method used to simplify a root after the "
+                  "classification is made."),
+            ("p", "The rationals therefore have gaps, and the line does not. That gap is "
+                  "the whole reason the real numbers are needed."),
             ("h3", "The line"),
             ("p", "Fix a point for `0` and a length for `1`. Every real number then "
                   "corresponds to exactly one point, and every point to exactly one real "
@@ -170,6 +167,11 @@ LESSONS = [
                 "and `√2` correctly because both are positive. Applied to `−5/4` and "
                 "`−1.2` it would give `25/16 &gt; 36/25` and suggest the wrong order, so "
                 "the negatives were handled by the denominator instead.",
+                "Now fade the support: order `−7/6`, `−1.1`, `3/4` and `√3`. Start only "
+                "with `−1.1 = −11/10`, then finish the two comparisons yourself before "
+                "checking: `−7/6 &lt; −1.1 &lt; 3/4 &lt; √3`. If the first pair reverses, the "
+                "minus signs were ordered by their digits; if the last pair is uncertain, "
+                "square the two positive numbers.",
             ],
         },
         "quiz_title": "Which number, and where",
@@ -202,7 +204,7 @@ LESSONS = [
              "a report on a number, and a comparison decided by a report is a guess."),
             ("Assuming a radical sign means irrational",
              "`√9 = 3` and `√(4/9) = 2/3`, both rational. The root is irrational only "
-             "when the radicand is not a perfect square of a rational, which is lesson 7's "
+             "when the radicand is not a perfect square of a rational, which is lesson 8's "
              "subject."),
             ("Ordering negatives by their digits",
              "`5/4` is larger than `1.2`, and `−5/4` is <em>smaller</em> than `−1.2`. "
@@ -210,26 +212,27 @@ LESSONS = [
              "reverses with it."),
         ],
         "standard": ("Finish when you can order a mixed list of fractions, decimals and roots without a calculator.",
-                     "Given `−5/4`, `0.6`, `2/3` and `√2` you should reach for a common "
-                     "denominator or for squaring, not for a decimal expansion, and you "
-                     "should be able to say which entries are rational and why. That habit "
-                     "is what makes lesson 7 &mdash; where `√72` becomes `6√2` &mdash; an "
+                     "Classify and order `−9/8`, `−1.12`, `5/6`, `0.84` and `√3`, writing "
+                     "the exact comparison used for each close pair. Reach for a common "
+                     "denominator or for squaring, not for a decimal expansion. That habit "
+                     "is what makes lesson 8 &mdash; where `√72` becomes `6√2` &mdash; an "
                      "exact calculation rather than an approximate one."),
-        "note": "The line reappears twice on this course. Lesson 4 measures distance along "
+        "note": "The line reappears twice on this course. Lesson 5 measures distance along "
                 "it, which is what absolute value is, and course 3 crosses two copies of "
                 "it to get the coordinate plane. Nothing about it is decorative: `a &lt; b` "
                 "means one point is left of another, and every inequality you solve in "
                 "course 2 is a statement about a stretch of this line.",
     },
-    # ---------------------------------------------------------------- 02
+    # ---------------------------------------------- properties-of-the-real-numbers
     {
         "slug": "properties-of-the-real-numbers",
         "title": "Properties of the Real Numbers",
         "module": "The number system",
         "one_line": "Commutativity, associativity, distribution, identities, inverses.",
         "summary": (
-            "Five properties are all the licence you have to rearrange an expression, and "
-            "everything later in this path is one of them applied to a longer expression. "
+            "Five kinds of permission &mdash; commutativity, associativity, distribution, "
+            "identities and inverses &mdash; are all the licence you have to rearrange an expression. "
+            "Everything later in this path is one of them applied to a longer expression. "
             "Subtraction and division have none of them, and that omission is where most "
             "sign errors come from."
         ),
@@ -261,7 +264,7 @@ LESSONS = [
              "rewritten, every property applies again."),
         ],
         "read_title": "The rules you are permitted to use",
-        "read_intro": "Five properties, stated and not proved, and then the ones people invent because they look similar.",
+        "read_intro": "Five kinds of property, stated precisely, and then the ones people invent because they look similar.",
         "body": [
             ("p", "These properties are assumed. This course states them and uses them; "
                   "building the real numbers so that they hold is a different subject. "
@@ -348,7 +351,9 @@ LESSONS = [
             "panel_intro": "Enter values for `a`, `b` and `c`. Every claim in the list is "
                            "evaluated on your three numbers and then searched over 512 "
                            "further triples for a counterexample. Some of the claims are "
-                           "not laws, and the lab has not been told which.",
+                           "not laws, and the lab has not been told which. Predict one row "
+                           "before changing the values; the last column then diagnoses a "
+                           "rule that only happened to work on your first choice.",
         }),
         "steps_title": "Justifying a rearrangement",
         "steps_intro": "The goal is not the answer. It is being able to say why each line follows from the one above.",
@@ -396,6 +401,10 @@ LESSONS = [
                 "the answer is `11 − 8 = 3`. Agreement at one value does not prove the two "
                 "expressions are equal everywhere &mdash; the named steps do that &mdash; "
                 "but disagreement would have proved they are not.",
+                "For a faded rehearsal, start `4 − 3(y − 2)` by rewriting it as "
+                "`4 + (−3)(y + (−2))`. Finish one change per line and name each change. "
+                "The result is `10 − 3y`; `−2 − 3y` means the two negative factors in the "
+                "constant term were multiplied as though only one were negative.",
             ],
         },
         "quiz_title": "Name the property",
@@ -442,17 +451,16 @@ LESSONS = [
              "others in the next two courses."),
         ],
         "standard": ("Finish when you can name the property behind every line of a rearrangement.",
-                     "Take a short simplification and annotate it, one property per line, "
-                     "with \"arithmetic\" allowed as a label for the steps that are just "
-                     "numbers. When you meet an unfamiliar manipulation later, this is the "
-                     "test you apply to it: which of the five is that, and if it is none "
-                     "of them, why is it allowed?"),
+                     "Simplify `7 − 4(2 − z)` and annotate it, one property per line, with "
+                     "\"arithmetic\" allowed for steps that are just numbers. Then disprove "
+                     "`1/(a + b) = 1/a + 1/b` with values for which every denominator is "
+                     "defined. If a line has no property name, it is the line to inspect."),
         "note": "Lesson 10 does nothing but the distributive property, at length, and "
                 "lesson 11 does it backwards. It is worth being fluent here first, because "
                 "an error made in a property is invisible &mdash; the result still looks "
                 "like algebra, and only substituting a number reveals it.",
     },
-    # ---------------------------------------------------------------- 03
+    # ---------------------------------------------------------- order-of-operations
     {
         "slug": "order-of-operations",
         "title": "Order of Operations",
@@ -554,8 +562,9 @@ LESSONS = [
             "panel_intro": "Type an expression in numbers only. The lab builds the queue of "
                            "pending operations before evaluating anything and names the "
                            "rule behind each step, then shows what a straight left-to-right "
-                           "reading would have given, so you can see which expressions the "
-                           "convention actually decides.",
+                           "reading would have given. Before selecting the second preset, "
+                           "write its first operation down; the queue gives immediate "
+                           "feedback on the exact level you misread.",
         }),
         "steps_title": "Evaluating an expression",
         "steps_intro": "Rewrite the whole expression after each step. Working in your head across two levels is where the value gets lost.",
@@ -606,31 +615,34 @@ LESSONS = [
                 "Had the expression read `20 − 2 · 5 − 8² / 6 + 1`, the base of the "
                 "exponent would be `8` and nothing else, and the answer would be different. "
                 "Read the brackets before you read anything else.",
+                "Now do one with most of the guidance removed: `18 / 3 / 2 + (−2)²`. "
+                "Write only the next operation on each line. The queue gives `18 / 3 = 6`, "
+                "then `6 / 2 = 3`, and the answer is `7`. An answer of `12` grouped the "
+                "division from the right; an answer of `−1` also lost the brackets around "
+                "the negative base.",
             ],
         },
         "quiz_title": "One value each",
         "quiz": [
-            {"q": "Evaluate `8 − 3 + 2`.",
-             "a": ["`3`", "`7`", "`13`", "`−3`"],
+            {"q": "Evaluate `18 / 3 / 2`.",
+             "a": ["`12`", "`3`", "`108`", "`6`"],
              "c": 1,
-             "why": "Addition and subtraction share a level, so this is `(8 − 3) + 2 = 7`. "
-                    "`3` comes from doing the addition first, `8 − (3 + 2)`. `13` comes "
-                    "from reading the minus as a plus, and `−3` from reordering across the "
-                    "minus sign as `3 + 2 − 8`."},
-            {"q": "Evaluate `−4²`.",
-             "a": ["`16`", "`−16`", "`−8`", "`8`"],
+             "why": "Multiplication and division share one level, so read from the left: "
+                    "`18 / 3 = 6`, then `6 / 2 = 3`. `12` is `18 / (3/2)`, grouped from "
+                    "the right; `108` turns both division signs into multiplication; `6` "
+                    "stops after the first operation."},
+            {"q": "Evaluate `−5²`.",
+             "a": ["`25`", "`−25`", "`−10`", "`10`"],
              "c": 1,
-             "why": "The exponent applies to `4` alone, so this is `−(4²) = −16`. `16` is "
-                    "the value of `(−4)²`, which is a different expression. `−8` and `8` "
-                    "come from reading the exponent as \"times two\" rather than as a "
-                    "square."},
-            {"q": "Evaluate `2 + 12 / 2 · 3`.",
-             "a": ["`20`", "`4`", "`21`", "`7/3`"],
+             "why": "The exponent applies to `5` alone, so this is `−(5²) = −25`. `25` is "
+                    "the value of `(−5)²`, which is a different expression. `−10` and `10` "
+                    "read the exponent as \"times two\" instead of a square."},
+            {"q": "Evaluate `2 + 18 / 3 · 2`.",
+             "a": ["`14`", "`5`", "`16`", "`10/3`"],
              "c": 0,
-             "why": "Level 3 first, left to right: `12 / 2 = 6`, then `6 · 3 = 18`, then "
-                    "`2 + 18 = 20`. `4` comes from doing the multiplication before the "
-                    "division, `12 / (2 · 3)`. `21` comes from adding first. `7/3` comes "
-                    "from reading the whole thing as one fraction, `(2 + 12) / (2 · 3)`."},
+             "why": "Level 3 first, left to right: `18 / 3 = 6`, then `6 · 2 = 12`, then "
+                    "`2 + 12 = 14`. `5` does the multiplication before the division; `16` "
+                    "adds first; `10/3` treats the whole string as one fraction."},
         ],
         "mistakes": [
             ("Trusting an acronym over the two-level rule",
@@ -647,17 +659,18 @@ LESSONS = [
              "the typed line does."),
         ],
         "standard": ("Finish when your value and a calculator's value agree on the awkward expressions, not just the easy ones.",
-                     "Test yourself on `−4²`, `24 / 4 / 2`, `8 − 3 + 2` and any expression "
-                     "with a fraction bar in it. Those four shapes account for nearly every "
-                     "arithmetic disagreement in the rest of the path, and each one is "
-                     "settled by the convention rather than by opinion."),
+                     "Evaluate `−6² + 24 / 3 / 2`, `(−6)² + 24 / (3/2)`, and a fraction "
+                     "whose numerator and denominator each contain a sum. Rewrite the whole "
+                     "expression after every operation and label the invisible grouping made "
+                     "by the fraction bar. These shapes account for nearly every arithmetic "
+                     "disagreement later in the path."),
         "note": "This convention is why a polynomial can be written `3x² + 5x + 7` with no "
                 "brackets at all: the exponent level binds before the multiplication level, "
                 "which binds before the addition level, so the expression reads as "
                 "`(3 · x²) + (5 · x) + 7` without being told to. Every notation you meet "
                 "later is built on top of it.",
     },
-    # ---------------------------------------------------------------- 04
+    # -------------------------------------------------------------- absolute-value
     {
         "slug": "absolute-value",
         "title": "Absolute Value",
@@ -764,7 +777,9 @@ LESSONS = [
             "panel_intro": "Set `a`, `b` and `c`. The lab applies the two-case definition "
                            "to your `a` and highlights the case that fires, measures the "
                            "distance from `a` to `b`, and solves `|x − a| = c`. Make `c` "
-                           "negative and watch the solution count fall to zero.",
+                           "negative and predict the solution count before reading the "
+                           "table. The `√(a²)` check is a preview of lesson 8; the two-case "
+                           "definition and the distance are the work to retrieve here.",
         }),
         "steps_title": "Working with an absolute value",
         "steps_intro": "Decide the sign of what is inside the bars. Everything else follows from that.",
@@ -776,7 +791,7 @@ LESSONS = [
             ("Apply the case that fires",
              "If the contents are `≥ 0`, drop the bars. If they are `&lt; 0`, drop the "
              "bars and negate the whole contents &mdash; every term of them, which is the "
-             "distributive law from lesson 2."),
+             "distributive law from lesson 4."),
             ("For an equation, check the right-hand side first, then split",
              "If it is negative, there are no solutions and you are finished. If it is "
              "zero, there is one. If it is positive, write the two equations: contents "
@@ -816,6 +831,11 @@ LESSONS = [
                 "&mdash; no point is at distance `−3` from anything &mdash; and the "
                 "definition agrees, since `|x − 4| ≥ 0` for every `x`. Writing \"no "
                 "solution\" is the finished answer.",
+                "Fade the case table now. With `a = −6` and `b = 1`, decide which line of "
+                "the definition fires and find the distance before opening the matching "
+                "lab preset: `|−6| = −(−6) = 6` and `|−6 − 1| = 7`. A negative first "
+                "answer reads `−x` as a negative number; a distance of `5` subtracts the "
+                "magnitudes instead of measuring between the two points.",
             ],
         },
         "quiz_title": "Bars and distance",
@@ -858,17 +878,17 @@ LESSONS = [
              "false version looks plausible."),
         ],
         "standard": ("Finish when both cases of the definition are automatic and \"no solution\" is an answer you will write.",
-                     "You should be able to evaluate `|3 − 10|` without pausing, say what "
-                     "`|x − 4| = 3` means before solving it, and reject `|2x − 1| = −4` on "
-                     "sight. Course 2 spends two lessons on absolute value equations and "
-                     "inequalities, and both of them assume this one is finished."),
+                     "Evaluate `|−8|`, `−|−8|` and `|−3 − 5|` from the definition; then "
+                     "mark the points described by `|x + 3| = 4` using distance alone and "
+                     "reject `|2x − 1| = −4` on sight. Course 2 later supplies the general "
+                     "equation method; it assumes the meaning of the bars is automatic."),
         "note": "The two-case shape returns in course 3 as a piecewise function &mdash; "
-                "`|x|` is the standard first example of one &mdash; and again in lesson 7 "
-                "here, where `√(x²)` turns out to be `|x|` rather than `x`. The reason is "
+                "`|x|` is the standard first example of one &mdash; and again in lesson 8 "
+                "here, where `√(x²)` is `|x|` rather than `x`. The reason is "
                 "the same both times: a formula that has to work for inputs of either sign "
                 "needs a branch.",
     },
-    # ---------------------------------------------------------------- 05
+    # ------------------------------------------------------------ integer-exponents
     {
         "slug": "integer-exponents",
         "title": "Integer Exponents",
@@ -980,7 +1000,9 @@ LESSONS = [
                            "the law itself and once by writing all the powers out as "
                            "products and multiplying the factors one at a time, so the two "
                            "columns agree only when the law is real. The last row of the "
-                           "summary is not a law, and it is on the list to be caught.",
+                           "summary is not a law. Predict whether it survives before "
+                           "changing `a` or `b`; a counterexample diagnoses an invented "
+                           "distribution rule rather than an arithmetic slip.",
         }),
         "steps_title": "Simplifying a power expression",
         "steps_intro": "Outermost first, then one base at a time, then the negatives. Changing that order is what produces stray factors.",
@@ -1032,13 +1054,17 @@ LESSONS = [
                 "Four exponent arithmetics decided the whole thing: `3 · (−2) = −6` and "
                 "`(−2)(−2) = 4` inside the first bracket, then `−6 + (−1) = −7` and "
                 "`4 + 3 = 7`. Every one of them is signed integer addition or "
-                "multiplication, which is why the bracket-and-sign care of lesson 3 "
+                "multiplication, which is why the bracket-and-sign care of lesson 2 "
                 "matters here.",
                 "Check at `x = 2` and `y = 3`. The first bracket is "
                 "`2 · 8 · (1/9) = 16/9`, and `(16/9)⁻² = 81/256`. The second factor is "
                 "`4 · (1/2) · 27 = 54`. Their product is `4374/256`, which reduces to "
                 "`2187/128`. And `y⁷/x⁷` is `2187/128`. Agreement at one pair of values is "
                 "not a proof, but a disagreement would have been decisive.",
+                "For the faded pass, simplify `(3x⁻²)²x⁵` with `x ≠ 0`. Keep the exponent "
+                "arithmetic visible: the bracket gives `9x⁻⁴`, then `−4 + 5 = 1`, so the "
+                "answer is `9x`. An answer of `9x⁹` added before applying the outer power; "
+                "`3x` forgot that the outer square also applies to the coefficient.",
             ],
         },
         "quiz_title": "Powers",
@@ -1079,18 +1105,17 @@ LESSONS = [
              "value is negative."),
         ],
         "standard": ("Finish when you can produce x⁰ = 1 from the quotient law instead of recalling it.",
-                     "The test is not whether you know the value but whether you can say "
-                     "why it has to be that value and where the condition `x ≠ 0` comes "
-                     "from. Lesson 8 asks the same question about `x^(1/n)` and answers it "
-                     "the same way, so the argument is worth having in hand rather than the "
-                     "conclusion."),
-        "note": "Lesson 6 uses these laws on powers of ten and nothing else, which makes "
-                "them concrete. Lesson 8 pushes the exponent out of the integers "
+                     "Derive `x⁰ = 1` from a quotient, explain where `x ≠ 0` enters, and "
+                     "simplify `(2a⁻³b²)² · 3ab⁻¹` with restrictions stated. The test is "
+                     "whether each addition or multiplication of exponents can be tied to "
+                     "one law, not whether the final expression looks compact."),
+        "note": "Lesson 7 uses these laws on powers of ten and nothing else, which makes "
+                "them concrete. Lesson 9 pushes the exponent out of the integers "
                 "altogether: if `x^(1/2) · x^(1/2)` is to equal `x¹`, then `x^(1/2)` has no "
                 "choice but to be a square root. Every extension of the exponent on this "
                 "path is made by that same argument.",
     },
-    # ---------------------------------------------------------------- 06
+    # ---------------------------------------------------------- scientific-notation
     {
         "slug": "scientific-notation",
         "title": "Scientific Notation",
@@ -1110,7 +1135,7 @@ LESSONS = [
         ],
         "key_label": "One form, and the arithmetic it makes easy",
         "concepts_intro": (
-            "This is the exponent laws of lesson 5, applied to one base, plus a rule about "
+            "This is the exponent laws of lesson 6, applied to one base, plus a rule about "
             "where the decimal point goes."
         ),
         "concepts": [
@@ -1120,8 +1145,10 @@ LESSONS = [
              "exponents tie &mdash; which is why `8.9 × 10⁻⁵` is smaller than "
              "`1.2 × 10⁻⁴` despite the larger-looking front."),
             ("The exponent counts places, and its sign says which way",
-             "A positive exponent moves the point right and makes the number bigger; a "
-             "negative one moves it left. \"`n` zeros\" is a description that works only "
+             "A positive exponent moves the point right and increases the magnitude; a "
+             "negative one moves it left and decreases the magnitude. For a negative "
+             "mantissa that means farther from or nearer to zero, not larger or smaller "
+             "in the number-line order. \"`n` zeros\" is a description that works only "
              "when the mantissa is a single digit, and it fails on `9.3 × 10⁵`, which is "
              "`930000`."),
             ("Multiplying is easy, adding is not",
@@ -1154,12 +1181,13 @@ LESSONS = [
                 "93000    →  9.3      point moved 4 places left       9.3 × 10⁴",
                 "0.00072  →  7.2      point moved 4 places right      7.2 × 10⁻⁴",
             ]),
-            ("p", "Then check the sign against the size of the number rather than against "
-                  "your count: anything bigger than `1` has `n ≥ 0`, and anything strictly "
-                  "between `0` and `1` has `n &lt; 0`. That single check catches a reversed "
-                  "sign every time, and a reversed sign is the error of the lesson."),
+            ("p", "Then check the sign against the magnitude rather than against your "
+                  "count: a number with absolute value at least `1` has `n ≥ 0`, and a "
+                  "nonzero number with absolute value below `1` has `n &lt; 0`. That wording "
+                  "also covers negative values such as `−93000`, whose exponent is positive "
+                  "although the number itself is less than `1`."),
             ("h3", "Multiplying and dividing"),
-            ("p", "Mantissas multiply, exponents add &mdash; the product law of lesson 5 "
+            ("p", "Mantissas multiply, exponents add &mdash; the product law of lesson 6 "
                   "with base `10`. For division, mantissas divide and exponents subtract."),
             ("math", [
                 "(3 × 10⁸)(2 × 10⁻³)      =  (3·2) × 10⁸⁺⁽⁻³⁾   =  6 × 10⁵",
@@ -1196,7 +1224,9 @@ LESSONS = [
                            "operation. Both inputs are normalised first &mdash; `45.6` and "
                            "`0.004` are accepted and corrected &mdash; and the result is "
                            "checked against the same calculation performed on the plain "
-                           "numbers.",
+                           "numbers. Predict the new exponent before changing an operation; "
+                           "the normalisation line identifies whether the mantissa or the "
+                           "power-of-ten arithmetic caused a mismatch.",
         }),
         "steps_title": "Putting a number into the form",
         "steps_intro": "Four moves, and the fourth is the one that catches a reversed sign.",
@@ -1211,9 +1241,9 @@ LESSONS = [
              "The count is the size of the exponent. Four places in both examples above, "
              "in opposite directions."),
             ("Fix the sign by the size of the number",
-             "Bigger than `1` means a positive exponent, between `0` and `1` means a "
-             "negative one. Then confirm the mantissa satisfies `1 ≤ |a| &lt; 10`, which "
-             "is the only condition the form imposes."),
+             "Absolute value at least `1` means a non-negative exponent; nonzero absolute "
+             "value below `1` means a negative one. Then confirm the mantissa satisfies "
+             "`1 ≤ |a| &lt; 10`, which is the condition the form imposes."),
         ],
         "worked": {
             "title": "A product and a quotient, both renormalised",
@@ -1247,6 +1277,10 @@ LESSONS = [
                 "Neither `32 × 10⁻³` nor `0.25 × 10⁻⁴` is a wrong answer to the arithmetic. "
                 "They are the right numbers in the wrong form, and the distinction is worth "
                 "keeping: the form is a convention about presentation, and the value is not.",
+                "Fade the arithmetic with `(2.5 × 10⁻³)(4 × 10⁶)`. Multiplying the "
+                "mantissas and adding exponents first gives `10 × 10³`; only then "
+                "normalise to `1 × 10⁴`. `10 × 10³` has the right value but not the "
+                "required form, while `1 × 10³` moved the point without paying for it.",
             ],
         },
         "quiz_title": "Form and arithmetic",
@@ -1290,18 +1324,17 @@ LESSONS = [
              "across."),
         ],
         "standard": ("Finish when the sign of the exponent is decided by the size of the number, not by your count.",
-                     "Convert in both directions without hesitating, multiply and divide by "
-                     "handling mantissas and exponents separately, and renormalise a result "
-                     "in either direction. The reflex worth building is the last one: look "
-                     "at the answer, ask whether the mantissa lies in `[1, 10)`, and fix it "
-                     "by moving the exponent."),
+                     "Write `−0.000083` and `−720000` in scientific notation, then multiply "
+                     "and divide them by handling mantissas and exponents separately. Use "
+                     "magnitude, not signed order, to justify each exponent, and check that "
+                     "the final mantissa satisfies `1 ≤ |a| &lt; 10`."),
         "note": "The split into a mantissa and an exponent is exactly what a calculator "
                 "shows as `6.02E23`, and it is the reason logarithms in course 7 turn "
                 "multiplication into addition: the exponent of a number in this form is "
                 "very nearly its base-10 logarithm, and adding exponents is what you did "
                 "here every time you multiplied.",
     },
-    # ---------------------------------------------------------------- 07
+    # ------------------------------------------------------------ roots-and-radicals
     {
         "slug": "roots-and-radicals",
         "title": "Roots and Radicals",
@@ -1375,7 +1408,7 @@ LESSONS = [
                 "x =  5:   √(5²)    =  √25  =  5  =  |5|",
                 "x = −5:   √((−5)²) =  √25  =  5  =  |−5|",
             ]),
-            ("p", "The correct statement is `√(x²) = |x|`, which is lesson 4's two-case "
+            ("p", "The correct statement is `√(x²) = |x|`, which is lesson 5's two-case "
                   "definition arriving from a different direction. For an odd index no "
                   "absolute value is needed: the cube root of `x³` is `x` for every real "
                   "`x`, because a cube keeps the sign."),
@@ -1389,10 +1422,15 @@ LESSONS = [
                      "reason they must be here.",
                      "There is no corresponding rule for a sum. `√(9 + 16) = √25 = 5`, "
                      "while `√9 + √16 = 7`. The radical sign brackets everything under it, "
-                     "exactly as lesson 3 said.")),
+                     "exactly as lesson 2 said.")),
             ("p", "To simplify, factor the radicand into primes and take out each prime in "
                   "complete groups of the index &mdash; pairs for a square root, triples "
                   "for a cube root:"),
+            ("p", "If prime factorisation is not already automatic, use repeated division: "
+                  "divide by the smallest prime that works until the quotient is `1`. For "
+                  "`72` the quotients are `36, 18, 9, 3, 1`, so the divisors were "
+                  "`2, 2, 2, 3, 3` and `72 = 2³ · 3²`. This is a procedure, not a factor "
+                  "you are expected to spot."),
             ("math", [
                 "√72  =  √(2³ · 3²)  =  √(2² · 3² · 2)  =  2 · 3 · √2  =  6√2",
                 "",
@@ -1401,9 +1439,11 @@ LESSONS = [
                 "the 3rd root of 54  =  the 3rd root of (3³ · 2)  =  3 · (3rd root of 2)",
             ]),
             ("p", "Fractions come apart the same way: `√(18/25) = √18 / √25 = 3√2 / 5`. "
-                  "When the denominator is not a perfect square the root stays below the "
-                  "bar &mdash; `√(1/2) = 1/√2` &mdash; and clearing it is rationalising, "
-                  "which course 5 covers."),
+                  "When the denominator is not a perfect square, `√(1/2) = 1/√2`; the "
+                  "numerical standard form clears that radical by multiplying top and "
+                  "bottom by `√2`, giving `√2/2`. The lab performs this numerical step. "
+                  "Course 5 teaches the general rationalising method for variable and "
+                  "multi-term denominators."),
             ("example", ("Which of these are real",
                          "`√16 = 4`. `√(−16)` has no real value. The 3rd root of `−27` is "
                          "`−3`, because `(−3)³ = −27`. The 4th root of `81` is `3`, because "
@@ -1416,7 +1456,8 @@ LESSONS = [
             "panel_intro": "Set a radicand and an index. The radicand is factorised into "
                            "primes and each prime leaves the root in complete groups of the "
                            "index, so what comes out and what has to stay are both visible. "
-                           "Try `sqrt(-9)` and read what it reports.",
+                           "Predict those two columns before changing the preset. Enter `−9` "
+                           "as the radicand with index 2 to retrieve the even-index restriction.",
         }),
         "steps_title": "Simplifying a radical",
         "steps_intro": "Check that the thing exists before working on it. That order saves a page of algebra now and again.",
@@ -1434,9 +1475,10 @@ LESSONS = [
              "under a cube root sends one copy outside. Anything that cannot fill a group "
              "stays in."),
             ("Check what is left, and check the value",
-             "No prime under the sign should appear to the index or higher, and no fraction "
-             "should be left under it. Then raise your answer to the index and confirm you "
-             "get the radicand back."),
+             "No prime under the sign should appear to the index or higher. A denominator "
+             "that is already a perfect power comes out directly; otherwise the numerical "
+             "standard form may clear its remaining radical as in `√(1/2) = √2/2`. Then "
+             "raise your answer to the index and confirm you recover the radicand."),
         ],
         "worked": {
             "title": "Three radicals, one method",
@@ -1469,8 +1511,13 @@ LESSONS = [
                 "of the definition.",
                 "Line 2 keeps the minus sign outside the radical throughout, which is the "
                 "tidy way to handle an odd index over a negative radicand. Line 3 leaves no "
-                "root below the bar because `25` is a perfect square; had the denominator "
-                "been `24`, the answer would need the rationalising step of course 5.",
+                "root below the bar because `25` is a perfect square. A non-square numerical "
+                "denominator uses the clearing step shown by the lab's `sqrt(1/2)` preset; "
+                "course 5 generalises it to variable and multi-term denominators.",
+                "Now leave one line for yourself: `√108`. Repeated division gives "
+                "`108 = 2² · 3³`; take one `2` and one `3` out, then stop because a single "
+                "`3` remains. The result is `6√3`. `6√9` failed to remove a complete pair, "
+                "while `18√3` took the square itself outside instead of its root.",
             ],
         },
         "quiz_title": "Roots",
@@ -1512,13 +1559,12 @@ LESSONS = [
              "`x` &mdash; and that is exactly why the even case is forgotten."),
         ],
         "standard": ("Finish when you can say whether a radical has a real value before you try to simplify it.",
-                     "Given a radical, the first two things you should produce are the "
-                     "parity of the index and the sign of the radicand, and only then a "
-                     "factorisation. You should also be able to state, without hesitating, "
-                     "that `√9` is `3` and that `x² = 9` has two solutions, and say why "
-                     "those are not in conflict."),
-        "note": "Lesson 8 gives the radical a second notation: `x^(1/n)`. That is not a new "
-                "idea but a forced one &mdash; if the exponent laws of lesson 5 are to hold "
+                     "Decide first whether the 4th root of `−81` is real; then simplify "
+                     "`√180` and the cube root of `−250` from prime factorisations, raising "
+                     "each answer back as a check. Also state why `√9` is `3` while "
+                     "`x² = 9` has two solutions."),
+        "note": "Lesson 9 gives the radical a second notation: `x^(1/n)`. That is not a new "
+                "idea but a forced one &mdash; if the exponent laws of lesson 6 are to hold "
                 "for fractional exponents, then `(x^(1/2))²` must be `x¹`, and `x^(1/2)` "
                 "has no choice but to be the square root. Every restriction stated here, "
                 "including the even-index one, travels with it.",

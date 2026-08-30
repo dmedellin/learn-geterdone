@@ -6,7 +6,7 @@ LESSONS = [
         "slug": "rational-expressions-and-their-domains",
         "title": "Rational Expressions and Their Domains",
         "module": "Rational expressions",
-        "one_line": "The values a denominator forbids, found before anything is simplified.",
+        "one_line": "Factor the original denominator and state every excluded real value before simplifying.",
         "summary": (
             "A rational expression is one polynomial over another, and it means "
             "nothing at all where the bottom is zero. Those excluded values come "
@@ -56,10 +56,10 @@ LESSONS = [
                      "real numbers `x` for which `Q(x) ≠ 0`. A number `c` with `Q(c) = 0` "
                      "is an <strong>excluded value</strong>: the expression assigns "
                      "nothing to it.")),
-            ("p", "Finding the domain is therefore a factoring problem and nothing else. "
-                  "Factor the denominator, set each factor to zero, and collect the "
-                  "solutions. This is the first of many places in this course where an "
-                  "unfactored denominator hides the answer."),
+            ("p", "For the denominators this course asks you to solve, finding the domain "
+                  "starts as a factoring problem. Factor the denominator, set each factor "
+                  "to zero, and collect the real solutions. This is the first of many "
+                  "places in this course where an unfactored denominator hides the answer."),
             ("example", ("Two exclusions",
                          "For `(x + 1)/(x² − x − 6)`, factor the bottom: "
                          "`x² − x − 6 = (x − 3)(x + 2)`. It is zero when `x = 3` and when "
@@ -89,9 +89,9 @@ LESSONS = [
         "lab": ("rationalfn", {
             "mode": "domain",
             "panel_title": "Where the expression stops existing",
-            "panel_intro": "Type a denominator and watch the excluded values appear as "
-                           "you factor it. The lab factors over the rationals and "
-                           "reports every zero exactly.",
+            "panel_intro": "Type a rational expression and watch the original denominator's "
+                           "zeros become excluded values before anything cancels. Rational "
+                           "roots and irrational quadratic roots are reported exactly.",
         }),
         "steps_title": "Finding the domain",
         "steps_intro": "Four steps, and the first one is not optional.",
@@ -132,7 +132,12 @@ LESSONS = [
                 "The last line is the one students skip. `x = −1` makes the "
                 "<em>numerator</em> zero, and a beginner who has learned \"zero is a "
                 "problem\" excludes it. It is not a problem: `0/(−4) = 0`, an ordinary "
-                "value at an ordinary point of the domain."
+                "value at an ordinary point of the domain.",
+                "For a faded domain pass, take `(2x − 1)/(x² + x − 12)`. The supplied "
+                "factorisation is `x² + x − 12 = (x + 4)(x − 3)`. Write the domain, "
+                "then decide whether the numerator's zero at `x = 1/2` is allowed. Check "
+                "against `x ≠ −4, 3`, with `1/2` retained. If you excluded `1/2`, you "
+                "tested both levels instead of asking only where division fails."
             ],
         },
         "quiz_title": "Domain first",
@@ -143,24 +148,25 @@ LESSONS = [
                    "All real x with x ≠ 16",
                    "All real x"],
              "c": 1,
-             "why": "`x² − 16 = (x − 4)(x + 4)`, which is zero at `4` and at `−4`. The "
-                    "numerator's zero at `x = 5` excludes nothing &mdash; the expression "
-                    "is defined there and equals `0`."},
+             "why": "`x² − 16 = (x − 4)(x + 4)`, so `4` and `−4` are excluded. Choosing "
+                    "`5` tests the numerator instead of the denominator; choosing `16` "
+                    "copies a constant without solving `x² = 16`; choosing all reals "
+                    "never tested the denominator."},
             {"q": "`(x² − 4)/(x − 2)` at `x = 2` is:",
              "a": ["4", "0", "Undefined", "Equal to 1, since the numerator and "
                    "denominator both vanish"],
              "c": 2,
-             "why": "Substituting gives `0/0`, which names no number. The expression "
-                    "equals `x + 2` at every other value, and `x + 2` equals `4` at "
-                    "`x = 2` &mdash; but that is a different expression with a larger "
-                    "domain."},
+             "why": "Substituting gives `0/0`, which names no number. `4` comes from "
+                    "substituting into the reduced formula, `0` treats `0/0` like an "
+                    "ordinary zero numerator, and `1` misuses the rule `n/n = 1` where "
+                    "`n = 0`. All three ignore the original denominator."},
             {"q": "Which denominator excludes exactly one value?",
              "a": ["`(x + 3)²`", "`x² − 9`", "`x² + 9`", "`x(x − 3)`"],
              "c": 0,
-             "why": "`(x + 3)²` is zero only at `x = −3`; repeating a factor does not "
-                    "repeat the exclusion. `x² − 9` excludes two values, `x(x − 3)` "
-                    "excludes two, and `x² + 9` is never zero for real `x`, so it "
-                    "excludes none."},
+             "why": "`(x + 3)²` is zero only at `x = −3`; multiplicity does not create "
+                    "a second value. `x² − 9` and `x(x − 3)` each have two distinct real "
+                    "zeros, while `x² + 9` has none. The question counts distinct excluded "
+                    "inputs, not repeated factors."},
         ],
         "mistakes": [
             ("Excluding the values that make the numerator zero",
@@ -180,17 +186,18 @@ LESSONS = [
                      "line, from the factored denominator, without simplifying first. If "
                      "your habit is to simplify and then look for trouble, you will lose "
                      "an exclusion in lesson 2 and an extraneous root in lesson 6."),
-        "note": "The lab factors the denominator over the rationals and lists the "
-                "excluded values exactly, as fractions where they are fractions. It "
-                "will not report `x ≠ 0.333` for `3x − 1`; that root is `1/3`, and a "
-                "domain stated in decimals is a domain stated wrongly.",
+        "note": "The lab names rational zeros as exact fractions and irrational zeros of "
+                "quadratic factors as exact surds. For a higher-degree factor with no "
+                "rational zero it says that the remaining real zeros are unnamed rather "
+                "than pretending the domain is larger than it is; `3x − 1`, for example, "
+                "excludes the exact value `1/3`, never a rounded `0.333`.",
     },
     # ---------------------------------------------------------------- 02
     {
         "slug": "simplifying-rational-expressions",
         "title": "Simplifying Rational Expressions",
         "module": "Rational expressions",
-        "one_line": "Cancel factors, never terms, and keep the domain you started with.",
+        "one_line": "Factor both levels, cancel only shared factors, and retain every original exclusion.",
         "summary": (
             "One rule does all the work: a factor common to the top and the bottom may "
             "be removed. A term may not. The difference between those two words is the "
@@ -315,7 +322,13 @@ LESSONS = [
                 "The final line is the reason the exclusion is written twice. The "
                 "reduced form is defined at `x = 3` and gives a perfectly reasonable "
                 "number there, so nothing about `6/7` announces that it should not "
-                "exist. Only the condition you carried tells you."
+                "exist. Only the condition you carried tells you.",
+                "For a faded cancellation, simplify `(x² − 16)/(x² + x − 20)`. The "
+                "supplied first move is to factor before cancelling and record the "
+                "original denominator's zeros. Complete both factorisations, cancel one "
+                "factor and check at `x = 0`. Compare with `(x + 4)/(x + 5)`, "
+                "`x ≠ 4, −5`; if `4` disappeared from your restrictions, you read the "
+                "domain from the reduced formula."
             ],
         },
         "quiz_title": "Factor or term",
@@ -326,28 +339,27 @@ LESSONS = [
                    "`−1`",
                    "It is already in lowest terms"],
              "c": 0,
-             "why": "The top is `(x − 5)(x + 5)` and the bottom is `(x − 5)²`. One factor "
-                    "of `x − 5` cancels, leaving `(x + 5)/(x − 5)`. The denominator was "
-                    "zero only at `x = 5`, so that is the single exclusion."},
+             "why": "The top is `(x − 5)(x + 5)` and the bottom is `(x − 5)²`; cancelling "
+                    "one copy leaves `(x + 5)/(x − 5)`, with `x ≠ 5`. Reversing the "
+                    "fraction cancels in the wrong direction, `−1` treats the two factors "
+                    "as opposites, and 'already lowest' stops before factoring."},
             {"q": "Which of these is a legal cancellation?",
              "a": ["`(x + 4)/4 = x`",
                    "`(x² + 1)/x = x + 1`",
                    "`(5(x − 1))/(7(x − 1)) = 5/7`, for `x ≠ 1`",
                    "`(x + 6)/(x + 3) = 2`"],
              "c": 2,
-             "why": "Only the third has `x − 1` as a genuine factor of both parts. The "
-                    "others cancel across a `+`, which the fundamental principle never "
-                    "permits &mdash; test the last one at `x = 0`: `6/3 = 2` is true "
-                    "there and false at `x = 1`, where it gives `7/4`."},
+             "why": "Only the third removes a whole factor `x − 1` from both levels. The "
+                    "first cancels a `4` that is only a term upstairs; the second turns "
+                    "`1/x` into `1`; the fourth mistakes one lucky value (`x = 0`) for an "
+                    "identity and fails at `x = 1`."},
             {"q": "`(2 − x)/(x − 2)` equals:",
              "a": ["`1`", "`−1`", "`0`", "`−1/(x − 2)`"],
              "c": 1,
-             "why": "`2 − x = −(x − 2)`, so the quotient is `−1` for every `x ≠ 2`. "
-                    "Numerator and denominator are opposites, not equals; the sign is "
-                    "the whole content of the answer. `−1/(x − 2)` is a cancellation "
-                    "carried out on one line only: the `x − 2` is struck out of the "
-                    "numerator and left standing in the denominator, and a factor "
-                    "removed from one line has not been cancelled."},
+             "why": "`2 − x = −(x − 2)`, so the quotient is `−1` for `x ≠ 2`. Choosing "
+                    "`1` loses the opposite sign; choosing `0` treats a vanishing numerator "
+                    "at the excluded point as the value everywhere; `−1/(x − 2)` removes "
+                    "the factor from only the numerator rather than from both levels."},
         ],
         "mistakes": [
             ("Cancelling a term because it appears on both lines",
@@ -379,7 +391,7 @@ LESSONS = [
         "slug": "multiplying-and-dividing-rational-expressions",
         "title": "Multiplying and Dividing Rational Expressions",
         "module": "Rational expressions",
-        "one_line": "Multiply straight across, divide by flipping, and factor before either.",
+        "one_line": "Rewrite division as a product, cancel factors, and account for all three sources of exclusions.",
         "summary": (
             "Multiplication of algebraic fractions is exactly multiplication of "
             "numerical ones, and division is multiplication by the reciprocal. The only "
@@ -500,7 +512,14 @@ LESSONS = [
                 "Both `x − 2` and one `x + 3` cancelled, and with them went every trace "
                 "of why `2` is not allowed. `(x + 2)/(x + 3)` evaluated at `x = 2` gives "
                 "`4/5`, a number the original division cannot produce, because at "
-                "`x = 2` it asks you to divide by `0`."
+                "`x = 2` it asks you to divide by `0`.",
+                "For a faded quotient, simplify `(x² − 1)/(x² + 3x + 2) ÷ "
+                "(x − 1)/(x + 2)`. The supplied first move is to flip the divisor and "
+                "immediately add `x ≠ 1` to the exclusions. Factor, cancel and record the "
+                "two original denominator zeros yourself. The result is `1`, with "
+                "`x ≠ −2, −1, 1`; missing `1` means the divisor's numerator was never "
+                "checked, while missing `−1` means a cancelled original factor erased its "
+                "restriction."
             ],
         },
         "quiz_title": "Across, or flipped",
@@ -508,18 +527,18 @@ LESSONS = [
             {"q": "`(x/3) ÷ (x/5)` equals, for `x ≠ 0`:",
              "a": ["`x²/15`", "`5/3`", "`3/5`", "`5x/3`"],
              "c": 1,
-             "why": "Flip the divisor: `(x/3)·(5/x) = (5x)/(3x) = 5/3`. The `x` cancels "
-                    "as a genuine common factor. The exclusion `x ≠ 0` comes from the "
-                    "divisor being zero there, and nothing in `5/3` records it."},
+             "why": "Flip the divisor: `(x/3)·(5/x) = 5/3`, with `x ≠ 0`. `x²/15` "
+                    "multiplies instead of dividing, `3/5` flips the wrong fraction, and "
+                    "`5x/3` fails to cancel the shared `x`."},
             {"q": "`(x + 1)/(x + 4) ÷ (x − 7)/(x + 4)` simplifies to `(x + 1)/(x − 7)`. "
                   "Which exclusion is no longer visible in that answer?",
              "a": ["`x = −4`", "`x = 7`", "`x = −1`", "`x = 4`"],
              "c": 0,
-             "why": "Both original denominators are `x + 4`, so `x = −4` is excluded; "
-                    "that factor cancels and the answer says nothing about it. `x = 7` "
-                    "is excluded too &mdash; the divisor is zero there &mdash; but it "
-                    "survives as the denominator of the answer, so that one still "
-                    "announces itself."},
+             "why": "`x = −4` is excluded by both original denominators and its factor "
+                    "cancels, so the answer hides it. `x = 7` is also excluded because "
+                    "the divisor is zero, but it remains visible in the new denominator. "
+                    "`−1` zeros a numerator without breaking the division, and `4` comes "
+                    "from dropping the sign on `x + 4`."},
             {"q": "Before multiplying `((x² − 1)/(x + 3)) · ((x + 3)/(x − 1))`, the "
                   "efficient first move is:",
              "a": ["Expand both numerators",
@@ -527,10 +546,10 @@ LESSONS = [
                    "Factor `x² − 1` as `(x − 1)(x + 1)` and cancel",
                    "Cross-multiply"],
              "c": 2,
-             "why": "Factoring exposes `x − 1` and `x + 3` as common factors, and the "
-                    "product collapses to `x + 1` in one step. A common denominator is "
-                    "for addition, and cross-multiplication is for equations &mdash; "
-                    "this is neither."},
+             "why": "Factoring exposes `x − 1` and `x + 3`, so both cancel and the "
+                    "product becomes `x + 1`. Expanding hides those factors, a common "
+                    "denominator belongs to addition, and cross-multiplication belongs to "
+                    "an equation; none is the efficient first move for this product."},
         ],
         "mistakes": [
             ("Forgetting that the divisor may be zero",
@@ -558,7 +577,7 @@ LESSONS = [
         "slug": "adding-and-subtracting-rational-expressions",
         "title": "Adding and Subtracting Rational Expressions",
         "module": "Rational expressions",
-        "one_line": "A common denominator built from factors, and a minus sign that reaches every term.",
+        "one_line": "Build the least common denominator from factors and combine every numerator term with its sign intact.",
         "summary": (
             "Fractions can only be added when they are counted in the same units, so "
             "the work is all in the denominator. Building the least one is a factoring "
@@ -684,7 +703,13 @@ LESSONS = [
                 "Note that `6 − x` shares no factor with the denominator, so the answer "
                 "is already in lowest terms. Note also that it is <em>not</em> `−1` "
                 "times something familiar: `6 − x` and `x − 3` are not opposites, and "
-                "the sign trick from lesson 2 does not apply here."
+                "the sign trick from lesson 2 does not apply here.",
+                "For a faded subtraction, take `2/(x² − x − 6) − 1/(x − 3)`. "
+                "The supplied factorisation is `x² − x − 6 = (x − 3)(x + 2)`, "
+                "which is also the LCD. Rebuild the second fraction, bracket its new "
+                "numerator and finish. Check against `−x/[(x − 3)(x + 2)]`, with "
+                "`x ≠ 3, −2`; a numerator of `4 − x` reveals that the minus sign did "
+                "not reach the `+2`."
             ],
         },
         "quiz_title": "Denominators and signs",
@@ -695,26 +720,27 @@ LESSONS = [
                    "`(x − 2)(x + 2)`",
                    "`(x + 2)²`"],
              "c": 0,
-             "why": "The denominators factor as `(x − 2)(x + 2)` and `(x + 2)²`. The "
-                    "distinct factors are `x − 2` and `x + 2`, and the highest power of "
-                    "`x + 2` is `2`. The product of the denominators is a common "
-                    "denominator but carries an extra `x + 2`."},
+             "why": "The factors are `(x − 2)(x + 2)` and `(x + 2)²`, so the LCD is "
+                    "`(x − 2)(x + 2)²`. The full product carries an unnecessary third "
+                    "copy of `x + 2`; the third choice omits the required square; the "
+                    "fourth omits `x − 2` and is not divisible by the first denominator."},
             {"q": "`3/x − (x + 1)/x` equals:",
              "a": ["`(2 − x)/x`", "`(4 + x)/x`", "`(3 − x + 1)/x`", "`(2 + x)/x`"],
              "c": 0,
-             "why": "The numerator is `3 − (x + 1) = 3 − x − 1 = 2 − x`. Subtracting only "
-                    "the `x` and leaving `+1` alone gives `(4 − x)/x`, which is the "
-                    "standard error &mdash; the minus applies to the whole of `x + 1`."},
+             "why": "`3 − (x + 1) = 3 − x − 1 = 2 − x`. The third choice leaves the "
+                    "brackets undistributed, the second changes subtraction to addition, "
+                    "and the fourth keeps the `x` positive. Each loses the minus on one "
+                    "or both terms of the second numerator."},
             {"q": "Is `a/c + b/d = (a + b)/(c + d)` ever a valid rule?",
              "a": ["Yes, whenever `c` and `d` are non-zero",
                    "Yes, it is how fractions are added",
                    "No, and `1/2 + 1/2` refutes it at once",
                    "Only when `c = d`"],
              "c": 2,
-             "why": "`1/2 + 1/2 = 1`, while the proposed rule gives `2/4 = 1/2`. Adding "
-                    "denominators is not an operation on fractions at all; the "
-                    "denominator names the unit being counted, and the unit does not "
-                    "change when you count more of them."},
+             "why": "`1/2 + 1/2 = 1`, while the proposed rule gives `2/4 = 1/2`, so the "
+                    "rule fails even with equal nonzero denominators. Thus both 'always' "
+                    "choices and 'only when `c = d`' are false; denominators name units "
+                    "and are not added when the counts are combined."},
         ],
         "mistakes": [
             ("Subtracting only the first term of the numerator",
@@ -744,7 +770,7 @@ LESSONS = [
         "slug": "complex-fractions",
         "title": "Complex Fractions",
         "module": "Rational expressions",
-        "one_line": "A fraction whose parts are themselves fractions, cleared two different ways.",
+        "one_line": "Clear a complex fraction by two methods and preserve restrictions from every level.",
         "summary": (
             "Nothing new is needed here &mdash; only lessons 3 and 4 applied in one of "
             "two orders. The second order, multiplying through by the LCD of the small "
@@ -867,27 +893,35 @@ LESSONS = [
             "after": [
                 "The answer is a single small fraction with no memory of where it came "
                 "from. Nothing in `−1/(3x)` suggests that `x = 3` is forbidden, and it "
-                "is: at `x = 3` the original asks you to divide by `0`."
+                "is: at `x = 3` the original asks you to divide by `0`.",
+                "For a faded two-method check, simplify `(1/x + 1/2)/(1/x − 1/2)`. "
+                "The supplied LCD of the small denominators is `2x`. First multiply the "
+                "whole top and bottom by it; then restart by combining each half and "
+                "dividing. Both routes should give `(x + 2)/(2 − x)`, with `x ≠ 0, 2`. "
+                "If `2` is missing, you checked the small denominators but never asked "
+                "when the entire lower half equals zero."
             ],
         },
         "quiz_title": "Clearing the small fractions",
         "quiz": [
-            {"q": "By what should you multiply top and bottom to clear "
-                  "`(1/2 + 1/x)/(1/4 − 1/x)`?",
-             "a": ["`x`", "`4x`", "`2x`", "`8x`"],
-             "c": 1,
-             "why": "The small denominators are `2`, `x` and `4`. Their LCD is `4x`, "
-                    "which every one of them divides. Multiplying by `2x` would leave "
-                    "the `1/4` as a half, and `8x` works but drags a factor of `2` "
-                    "through the rest of the problem."},
+            {"q": "Simplify `(1/x + 1/4)/(1/x − 1/4)` and retain every restriction.",
+             "a": ["`(x + 4)/(4 − x)`, with `x ≠ 0, 4`",
+                   "`(x + 4)/(x − 4)`, with `x ≠ 0, 4`",
+                   "`(x + 4)/(4 − x)`, with `x ≠ 0`",
+                   "`1`, with `x ≠ 0, 4`"],
+             "c": 0,
+             "why": "Multiplying both halves by `4x` gives `(4 + x)/(4 − x)`. The "
+                    "second choice loses the denominator's sign, the third forgets that "
+                    "the lower half is zero at `x = 4`, and `1` cancels unlike sums as "
+                    "though numerator and denominator were equal factors."},
             {"q": "`(1/x + 1/y)/(1/x − 1/y)` simplifies to `(y + x)/(y − x)`. Which "
                   "restriction does NOT come from a denominator of the original?",
              "a": ["`x ≠ 0`", "`y ≠ 0`", "`x ≠ y`", "All three come from denominators"],
              "c": 2,
-             "why": "`x ≠ 0` and `y ≠ 0` come from the small fractions. `x ≠ y` comes "
-                    "from the lower half `1/x − 1/y` being zero when `x = y` &mdash; you "
-                    "would be dividing by zero, even though no single denominator "
-                    "vanishes."},
+             "why": "`x ≠ 0` and `y ≠ 0` come from the displayed small denominators. "
+                    "`x ≠ y` is the only choice arising from the entire lower half being "
+                    "zero: with nonzero `x` and `y`, `1/x − 1/y = 0` exactly when "
+                    "`x = y`. Thus 'all three' confuses two different sources."},
             {"q": "Why may you multiply the numerator and denominator of a complex "
                   "fraction by the same expression?",
              "a": ["Because multiplying an equation by anything is allowed",
@@ -895,10 +929,10 @@ LESSONS = [
                    "Because the fractions cancel anyway",
                    "Because it is the same as adding `M` to both parts"],
              "c": 1,
-             "why": "It is the fundamental principle of lesson 2. The condition `M ≠ 0` "
-                    "matters: it is why the values that make the LCD zero must be "
-                    "excluded rather than quietly used. And this is an expression, not "
-                    "an equation &mdash; there are no two sides here."},
+             "why": "`(AM)/(BM) = A/B` where `M ≠ 0`, because `M/M = 1`. The first "
+                    "choice invokes an equation although there are no two sides; the "
+                    "third assumes the desired cancellation instead of licensing it; the "
+                    "fourth adds rather than multiplies and changes the value."},
         ],
         "mistakes": [
             ("Multiplying only part of the numerator by the LCD",
@@ -927,7 +961,7 @@ LESSONS = [
         "slug": "solving-rational-equations",
         "title": "Solving Rational Equations",
         "module": "Rational equations",
-        "one_line": "Clear the denominators, solve, then test every candidate in the original equation.",
+        "one_line": "Clear denominators, solve the resulting linear or factorable quadratic equation, and check every candidate in the original.",
         "summary": (
             "Multiplying an equation by the LCD turns it into a polynomial equation you "
             "can already solve. That step is legal and it is not reversible, so it can "
@@ -948,7 +982,8 @@ LESSONS = [
         "concepts": [
             ("Clearing denominators is the whole method",
              "Multiply every term on both sides by the LCD. The denominators cancel and "
-             "you are left with a linear or quadratic equation from courses 2 and 6."),
+             "you are left with a linear equation from course 2 or a factorable quadratic "
+             "from course 4."),
             ("The step only runs one way",
              "If `A = B` then `A·M = B·M`, for any `M` at all. The converse needs "
              "`M ≠ 0`, because `A·0 = B·0` holds for every `A` and `B`. So solutions of "
@@ -1023,8 +1058,9 @@ LESSONS = [
              "Every term on both sides, including terms that are not fractions. Bracket "
              "each numerator as you go, exactly as in lesson 4."),
             ("Solve the polynomial equation",
-             "Linear, or quadratic by factoring or the formula. This part uses nothing "
-             "from this course."),
+             "Use course 2 for a linear result and course 4 factoring for the quadratics "
+             "chosen in this course. The quadratic formula arrives in course 6 and is "
+             "not required here."),
             ("Test every candidate in the original",
              "Any candidate on the exclusion list is extraneous and is discarded. State "
              "the surviving solution set, which may be empty."),
@@ -1061,6 +1097,12 @@ LESSONS = [
                 "Course 5 does this twice: lesson 11 squares both sides of a radical "
                 "equation, which is legal in the same one-way manner and produces "
                 "extraneous roots for the same structural reason.",
+                "For a faded solve, take `1/(x − 1) + 1/(x + 1) = "
+                "(x² − x + 2)/(x² − 1)`. The supplied LCD is `(x − 1)(x + 1)` and "
+                "the exclusions are `x ≠ −1, 1`. Clear every term, factor the resulting "
+                "quadratic and check both candidates in the original. You should reach "
+                "candidates `1` and `2`, discard `1`, and keep solution set `{2}`. If "
+                "both survived, you checked only the cleared quadratic.",
             ],
         },
         "quiz_title": "Candidates and solutions",
@@ -1069,28 +1111,31 @@ LESSONS = [
                   "`x = 4`. The solution set is:",
              "a": ["`{4}`", "The empty set", "`{0}`", "All real numbers"],
              "c": 1,
-             "why": "`x = 4` makes the denominator `x − 4` zero, so it is an excluded "
-                    "value and the candidate is extraneous. With no candidates left the "
-                    "equation has no solution, which is a complete and correct answer."},
+             "why": "`x = 4` is the only candidate and makes `x − 4 = 0`, so it is "
+                    "extraneous and the solution set is empty. `{4}` stops before the "
+                    "domain check, `{0}` mistakes the cleared `0 = 0` mechanism for a "
+                    "solution, and 'all reals' confuses one failed candidate with an identity."},
             {"q": "Why can clearing denominators introduce a false solution?",
              "a": ["Because the arithmetic gets harder",
                    "Because you multiplied by an expression that is zero at that value",
                    "Because quadratics always have two roots",
                    "Because the LCD was not the least one"],
              "c": 1,
-             "why": "`AM = BM` gives back `A = B` only when `M ≠ 0`. At an excluded "
-                    "value the LCD is zero, the cleared equation holds automatically, "
-                    "and the original may say nothing of the kind."},
+             "why": "`AM = BM` implies `A = B` only when `M ≠ 0`; an excluded value "
+                    "makes the LCD zero and can satisfy the cleared equation automatically. "
+                    "Harder arithmetic and having two quadratic roots do not cause the "
+                    "logical leak, and using a nonleast common denominator changes the "
+                    "work but not this condition."},
             {"q": "Where should a candidate be substituted to check it?",
              "a": ["Into the cleared polynomial equation",
                    "Into the original rational equation",
                    "Into either &mdash; they have the same solutions",
                    "Into the LCD"],
              "c": 1,
-             "why": "Every candidate satisfies the cleared equation by construction, so "
-                    "that test always passes and tells you nothing. Only the original "
-                    "can reject an extraneous root, because only the original has the "
-                    "denominators that exclude it."},
+             "why": "Every candidate already satisfies the cleared polynomial, so that "
+                    "choice cannot detect anything. The LCD is not an equation to test, "
+                    "and 'either' wrongly assumes reversible equivalence. Only the "
+                    "original still contains the denominators that can reject a candidate."},
         ],
         "mistakes": [
             ("Skipping the check because the algebra looked clean",

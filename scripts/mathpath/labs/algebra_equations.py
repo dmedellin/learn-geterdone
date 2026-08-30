@@ -555,7 +555,7 @@ EQ_FIELDS = {
     "absolute": (["eqIns", "eqRhs"], 0),
 }
 
-EQ_PLOT_MODES = ("check", "solve", "sides", "type", "model", "absolute")
+EQ_PLOT_MODES = ("solve", "sides", "type", "model", "absolute")
 
 
 def _field(input_id, label, value, label_id=""):
@@ -737,10 +737,7 @@ EQ_JS = r"""
     if (!Rs.ok) return trouble(Rs.msg);
     titleEl.textContent = L.src + ' = ' + Rs.src;
 
-    var solved = (Pdeg(L.poly) <= 1 && Pdeg(Rs.poly) <= 1)
-      ? traceLinear(L.poly, Rs.poly, V, '=', true) : null;
     var cand = parseR(val('eqCand'));
-    var fL = polyFn(L.poly), fR = polyFn(Rs.poly);
 
     if (cand === null) {
       subEl.textContent = 'the value to test is not a number';
@@ -749,7 +746,6 @@ EQ_JS = r"""
         trow('right side', '<code>' + Etext(Rs.node) + '</code>')
       ]);
       kpi('eqKA', '--'); kpi('eqKB', '--'); kpi('eqKC', '--');
-      drawSides(fL, fR, [], 'the two sides of ' + L.src + ' = ' + Rs.src + ', drawn as graphs');
       return say('<strong>The value to test has to be a number.</strong> Whole numbers, fractions such as '
         + '<code>-3/2</code> and decimals such as <code>0.333</code> all work. The decimal is read exactly, '
         + 'as 333/1000, which is the point of one of the presets.');
@@ -761,21 +757,7 @@ EQ_JS = r"""
     kpi('eqKB', res.rv === undefined ? '--' : Rtext(res.rv));
     kpi('eqKC', res.ok ? 'yes' : 'no');
 
-    var neighbours = [Rsub(cand, R1), cand, Radd(cand, R1), R0];
-    if (solved && solved.kind === 'unique') neighbours.push(solved.value);
-    var blocks = [
-      ttable('Substituting the value into the equation', res.rows),
-      sampleGrid('The same test on other values', L, Rs, neighbours, V)
-    ];
-    workEl.innerHTML = blocks.join('');
-
-    var marks = [{ x: Rnum(cand), y: res.lv === undefined ? 0 : Rnum(res.lv), label: 'left at ' + Rtext(cand) }];
-    if (res.rv !== undefined) marks.push({ x: Rnum(cand), y: Rnum(res.rv), label: 'right at ' + Rtext(cand), cls: 'plot-point vertex' });
-    if (solved && solved.kind === 'unique') {
-      var yv = Rnum(Peval(L.poly, solved.value));
-      marks.push({ x: Rnum(solved.value), y: yv, label: 'they meet', cls: 'plot-point root' });
-    }
-    drawSides(fL, fR, marks, 'the two sides drawn as graphs, with the tested value marked on each');
+    workEl.innerHTML = ttable('Substituting the chosen value into the equation', res.rows);
 
     var msg;
     if (res.ok) {
@@ -785,14 +767,7 @@ EQ_JS = r"""
     } else {
       msg = '<strong>' + Rtext(cand) + ' is not a solution.</strong> The left side is ' + Rtext(res.lv)
         + ' and the right is ' + Rtext(res.rv) + ', a gap of ' + Rtext(Rabs(Rsub(res.lv, res.rv)))
-        + ' &mdash; visible above as the distance between the two graphs at ' + V + ' = ' + Rdec(cand, 4) + '.';
-    }
-    if (solved && solved.kind === 'unique') {
-      msg += ' Exactly one value balances this equation, and it is ' + V + ' = ' + Rtext(solved.value) + '.';
-    } else if (solved && solved.kind === 'all') {
-      msg += ' Every value balances this one: the two sides are the same expression written two ways.';
-    } else if (solved) {
-      msg += ' No value balances this one, so no candidate you try can ever pass.';
+        + '. This verdict concerns the value you chose; it does not reveal which other values may work.';
     }
     say(msg);
   };
@@ -2043,7 +2018,7 @@ INEQ_FIELDS = {
 }
 
 INEQ_KPIS = {
-    "linear": [("solution", "iqKA"), ("interval", "iqKB"), ("sign reversed?", "iqKC")],
+    "linear": [("solution", "iqKA"), ("set shape", "iqKB"), ("sign reversed?", "iqKC")],
     "compound": [("first", "iqKA"), ("second", "iqKB"), ("combined", "iqKC")],
     "absolute": [("case 1", "iqKA"), ("case 2", "iqKB"), ("combined", "iqKC")],
     "notation": [("interval", "iqKA"), ("what it is", "iqKB"), ("test value", "iqKC")],
@@ -2120,6 +2095,16 @@ INEQ_JS = r"""
     ];
   }
 
+  /* Before the notation lesson, an inequality, words and the number-line
+     drawing are the representations the reader has actually been taught. */
+  function preNotationRows(set, v) {
+    return [
+      trow('as an inequality', '<code>' + setIneq(set, v) + '</code>'),
+      trow('in words', setWords(set, v)),
+      trow('on the number line', 'drawn below from the same boundary and endpoint decision')
+    ];
+  }
+
   /* The test that catches a reversed sign. Each value is put into the statement
      the reader typed AND looked up in the computed set; the two columns have to
      agree, and the lab says so loudly if they ever do not. */
@@ -2191,23 +2176,23 @@ INEQ_JS = r"""
     workEl.innerHTML = [
       ttable('Each step, and what it did to both sides',
         [trow('as typed', '<code>' + typed + '</code>')].concat(traceRows(tr, typed))),
-      ttable('The answer, written four ways', notationRows(set, V)),
+      ttable('The answer, in the forms taught so far', preNotationRows(set, V)),
       test.html
     ].join('');
     kpi('iqKA', tr.kind === 'unique' ? V + ' ' + relText(tr.rel) + ' ' + Rtext(tr.value)
       : (tr.kind === 'all' ? 'every ' + V : 'no ' + V));
-    kpi('iqKB', setText(set));
+    kpi('iqKB', setWords(set, V));
     kpi('iqKC', tr.flipped ? 'yes' : 'no');
-    subEl.innerHTML = setText(set);
+    subEl.innerHTML = setIneq(set, V);
 
     var win = lineWindow(set, [0]);
-    drawSet(el('iqLine'), set, win, 'the solution set on the number line: ' + setText(set));
+    drawSet(el('iqLine'), set, win, 'the solution set on the number line: ' + setIneq(set, V));
 
     var msg;
     if (tr.kind === 'all') {
       msg = '<strong>Every real number works.</strong> The ' + V + ' terms cancelled and left '
         + tr.constText + ', which is true whatever ' + V + ' is. The solution set is the whole line, '
-        + 'written (-inf, inf).';
+        + 'with every point shaded.';
     } else if (tr.kind === 'none') {
       msg = '<strong>No number works.</strong> The ' + V + ' terms cancelled and left ' + tr.constText
         + ', which is false whatever ' + V + ' is. The solution set is empty, and an empty set is an '
@@ -2271,23 +2256,23 @@ INEQ_JS = r"""
       ttable('The second statement, solved',
         [trow('as typed', '<code>' + t2 + '</code>')].concat(traceRows(b.tr, t2))),
       ttable('Putting them together', [
-        trow('the first set', '<code>' + setText(a.set) + '</code>'),
-        trow('the second set', '<code>' + setText(b.set) + '</code>'),
+        trow('the first set', '<code>' + setIneq(a.set, V) + '</code>'),
+        trow('the second set', '<code>' + setIneq(b.set, V) + '</code>'),
         trow(conn === 'and' ? 'and: the numbers in BOTH' : 'or: the numbers in EITHER',
-          '<code>' + setText(result) + '</code>'),
-        trow('in set-builder notation', '<code>' + setBuilder(result, V) + '</code>')
+          '<code>' + setIneq(result, V) + '</code>'),
+        trow('in words', setWords(result, V))
       ]),
       test.html
     ].join('');
-    kpi('iqKA', setText(a.set));
-    kpi('iqKB', setText(b.set));
-    kpi('iqKC', setText(result));
-    subEl.innerHTML = setText(result);
+    kpi('iqKA', setIneq(a.set, V));
+    kpi('iqKB', setIneq(b.set, V));
+    kpi('iqKC', setIneq(result, V));
+    subEl.innerHTML = setIneq(result, V);
 
     var win = lineWindow(setUnion(a.set, b.set), [0]);
-    drawSet(el('iqLineA'), a.set, win, 'the first statement: ' + setText(a.set));
-    drawSet(el('iqLineB'), b.set, win, 'the second statement: ' + setText(b.set));
-    drawSet(el('iqLine'), result, win, 'the combined set: ' + setText(result));
+    drawSet(el('iqLineA'), a.set, win, 'the first statement: ' + setIneq(a.set, V));
+    drawSet(el('iqLineB'), b.set, win, 'the second statement: ' + setIneq(b.set, V));
+    drawSet(el('iqLine'), result, win, 'the combined set: ' + setIneq(result, V));
 
     var msg;
     if (!result.length) {
@@ -2306,7 +2291,7 @@ INEQ_JS = r"""
         + '"' + V + ' &ge; 3 and ' + V + ' &le; 3" is how ' + V + ' = 3 is written when it arrives as '
         + 'two inequalities.';
     } else {
-      msg = '<strong>' + setText(result) + '</strong> is the answer, and the three number lines above '
+      msg = '<strong>' + setIneq(result, V) + '</strong> is the answer, and the three number lines above '
         + 'show how it was built: the first statement, the second, and '
         + (conn === 'and' ? 'the part they have in common.' : 'everything either one covers.')
         + ' With <code>' + conn + '</code>, a number belongs to the answer when it is in '
@@ -2370,21 +2355,22 @@ INEQ_JS += r"""
             + Ptext(negRhs, V) + '</code>')
       ]),
       ttable('Case 1: ' + Ptext(ins.poly, V) + ' ' + relText(op) + ' ' + Ptext(rhs.poly, V),
-        traceRows(a.tr).concat([trow('as a set', '<code>' + setText(a.set) + '</code>')])),
+        traceRows(a.tr).concat([trow('as an inequality', '<code>' + setIneq(a.set, V) + '</code>')])),
       ttable('Case 2: ' + Ptext(ins.poly, V) + ' ' + relText(relSwap(op)) + ' ' + Ptext(negRhs, V),
-        traceRows(b.tr).concat([trow('as a set', '<code>' + setText(b.set) + '</code>')])),
+        traceRows(b.tr).concat([trow('as an inequality', '<code>' + setIneq(b.set, V) + '</code>')])),
       ttable(less ? 'The two cases, intersected' : 'The two cases, unioned',
-        [trow(less ? 'both at once' : 'either one', '<code>' + setText(set) + '</code>')]
-          .concat(notationRows(set, V))),
+        [trow(less ? 'both at once' : 'either one', '<code>' + setIneq(set, V) + '</code>'),
+         trow('in words', setWords(set, V)),
+         trow('on the number line', 'drawn below from the same cases and endpoints')]),
       test.html
     ].join('');
-    kpi('iqKA', setText(a.set));
-    kpi('iqKB', setText(b.set));
-    kpi('iqKC', setText(set));
-    subEl.innerHTML = setText(set);
+    kpi('iqKA', setIneq(a.set, V));
+    kpi('iqKB', setIneq(b.set, V));
+    kpi('iqKC', setIneq(set, V));
+    subEl.innerHTML = setIneq(set, V);
 
     var win = lineWindow(set.length ? set : setUnion(a.set, b.set), [0]);
-    drawSet(el('iqLine'), set, win, 'the solution set: ' + setText(set));
+    drawSet(el('iqLine'), set, win, 'the solution set: ' + setIneq(set, V));
 
     /* The V and the level it is compared with, drawn from the same polynomials. */
     var svg = el('iqPlot');
@@ -2429,14 +2415,14 @@ INEQ_JS += r"""
         + 'Only zero is at distance zero from zero, so a statement of the form |A| &le; 0 collapses to '
         + 'A = 0. The band has closed up to a point.';
     } else if (less) {
-      msg = '<strong>' + setText(set) + ': one band.</strong> Less-than gives a single interval because '
+      msg = '<strong>' + setIneq(set, V) + ': one band.</strong> Less-than gives a single stretch because '
         + 'the two conditions have to hold together, and the answer is their overlap. The common mistake '
         + 'is to write it as two separate pieces joined by "or", which would claim every number outside '
         + 'the band as well.';
     } else {
       var chain = (set.length === 2 && set[0].hi !== null && set[1].lo !== null)
         ? Rtext(set[1].lo) + ' &lt; ' + V + ' &lt; ' + Rtext(set[0].hi) : null;
-      msg = '<strong>' + setText(set) + ': two rays.</strong> Greater-than gives two pieces because a '
+      msg = '<strong>' + setIneq(set, V) + ': two rays.</strong> Greater-than gives two pieces because a '
         + 'number can be far from zero in either direction, and it only has to manage one of them. '
         + (chain
           ? 'Squeezing the answer into a chain would give <code>' + chain + '</code>, which no number '

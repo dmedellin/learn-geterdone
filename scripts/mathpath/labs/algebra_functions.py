@@ -1250,6 +1250,24 @@ def grapher_lab(cfg):
                 '        </div>\n'
                 '        <p class="small-copy" id="grHint" style="margin:0;">' + GRAPHER_HINTS[mode] + '</p>\n')
 
+    # The three grapher modes inline one function, including branches they do
+    # not execute. Keep the already-reviewed plane and radical page bytes
+    # stable while Course 4 replaces the polynomial branch's later-course
+    # discriminant explanation.
+    polynomial_empty_search = (r"""        msg = '<strong>No rational zero exists, and the search proves it rather than assuming it.</strong> '
+          + 'Every candidate p/q with p dividing ' + Rtext(c0) + ' and q dividing ' + Rtext(lead)
+          + ' was substituted, and none gave 0. A rational-root search alone does not say whether '
+          + 'a non-rational zero is real or complex; Course 6 supplies the quadratic methods that '
+          + 'make that later distinction. The evaluated curve above is a picture, not a replacement '
+          + 'for that argument.';""" if mode == "polynomial" else r"""        msg = '<strong>No rational zero exists, and the search proves it rather than assuming it.</strong> '
+          + 'Every candidate p/q with p dividing ' + Rtext(c0) + ' and q dividing ' + Rtext(lead)
+          + ' was substituted, and none gave 0. '
+          + (fact.rest.length && Pdeg(fact.rest) === 2 && Rsign(quadroots(fact.rest[2], fact.rest[1], fact.rest[0]).disc) < 0
+             ? 'The discriminant of what is left is negative, so this polynomial has no real zero at all &mdash; '
+               + 'which is why the curve above never reaches the axis.'
+             : 'The curve may still cross the axis at an irrational value; a rational root search says '
+               + 'nothing about those.');""")
+
     script = BASE_JS + SHARED_JS + r"""
   var MODE = '""" + mode + r"""';
   var preset = document.getElementById('grPreset');
@@ -1522,14 +1540,7 @@ def grapher_lab(cfg):
         + vrows.join('') + '</tbody></table></div>');
 
       if (!zeros.length) {
-        msg = '<strong>No rational zero exists, and the search proves it rather than assuming it.</strong> '
-          + 'Every candidate p/q with p dividing ' + Rtext(c0) + ' and q dividing ' + Rtext(lead)
-          + ' was substituted, and none gave 0. '
-          + (fact.rest.length && Pdeg(fact.rest) === 2 && Rsign(quadroots(fact.rest[2], fact.rest[1], fact.rest[0]).disc) < 0
-             ? 'The discriminant of what is left is negative, so this polynomial has no real zero at all &mdash; '
-               + 'which is why the curve above never reaches the axis.'
-             : 'The curve may still cross the axis at an irrational value; a rational root search says '
-               + 'nothing about those.');
+""" + polynomial_empty_search + r"""
       } else {
         var pieces = zeros.map(function (z) {
           return 'x = ' + Rtext(z.r) + (z.mult > 1 ? ' (' + z.mult + ' times)' : '');

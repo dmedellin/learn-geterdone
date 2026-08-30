@@ -1,11 +1,12 @@
-"""Course 6: the quadratic, solved four ways at once.
+"""Course 6: four quadratic methods tested on the same coefficients.
 
-The design decision worth stating: this lab solves EVERY quadratic by all four
-methods on every redraw, independently, and prints the four answers together.
-They agree because they were computed separately, not because one was copied
-into the others. A reader who has just been told that completing the square and
-the formula are the same thing can watch them be the same thing on a quadratic
-they chose.
+The design decision worth stating: this lab runs all four methods on every
+redraw, independently, and prints their results together. Factoring and the
+square root property say when they do not apply; completing the square and the
+formula always finish. Their agreement is meaningful because one answer was not
+copied into another. A reader who has just been told that completing the square
+and the formula are the same procedure can watch them agree on a quadratic they
+chose.
 
 The parabola is drawn by evaluating the function, and the roots, vertex and axis
 marked on it are the exact values printed beside it -- so the picture cannot
@@ -112,6 +113,11 @@ def quadratic_lab(cfg):
 
     script = RATIONAL_JS + POLY_JS + SURD_JS + PLOT_JS + r"""
   var MODE = '""" + mode + r"""', QUARTIC = """ + quartic + r""";
+  /* Lessons 3-6 classify a negative discriminant as "no real solution" before
+     lesson 7 defines i. The same lab serves later graphing lessons, where the
+     complex pair is legitimate retrieval, so presentation follows lesson order
+     even though the exact-arithmetic core can already compute both cases. */
+  var SHOW_COMPLEX = ['graph', 'vertex', 'optimise', 'reducible'].indexOf(MODE) >= 0;
   var preset = document.getElementById('qdPreset');
   var inA = document.getElementById('qdA'), inB = document.getElementById('qdB'), inC = document.getElementById('qdC');
   var work = document.getElementById('qdWork'), status = document.getElementById('qdStatus');
@@ -149,7 +155,9 @@ def quadratic_lab(cfg):
     var rhs = Rdiv(Rneg(c), a);
     if (Rsign(rhs) < 0) {
       var im = Rsurd(Rneg(rhs));
-      return { ok: true, text: 'x^2 = ' + Rtext(rhs) + ', and no real number squares to a negative: x = +-' + surdtext(im) + 'i' };
+      return { ok: true, text: SHOW_COMPLEX
+        ? 'x^2 = ' + Rtext(rhs) + ', so x = +-' + surdtext(im) + 'i'
+        : 'x^2 = ' + Rtext(rhs) + ', and no real number squares to a negative; complex roots begin in lesson 7' };
     }
     var s = Rsurd(rhs);
     return { ok: true, text: 'x^2 = ' + Rtext(rhs) + ', so x = +-' + surdtext(s) };
@@ -179,9 +187,15 @@ def quadratic_lab(cfg):
     var answer;
     if (Rsign(rhs) < 0) {
       var im = Rsurd(Rneg(rhs));
-      answer = 'x = ' + pmtext(Rneg(half), im, true);
-      lines.push(row('take the square root',
-                     Ptext([half, R1]) + ' = +-' + surdtext(im) + 'i'));
+      if (SHOW_COMPLEX) {
+        answer = 'x = ' + pmtext(Rneg(half), im, true);
+        lines.push(row('take the square root',
+                       Ptext([half, R1]) + ' = +-' + surdtext(im) + 'i'));
+      } else {
+        answer = 'no real solution';
+        lines.push(row('read the negative right-hand side',
+                       'no real number has square ' + Rtext(rhs) + '; complex roots begin in lesson 7'));
+      }
     } else {
       var s = Rsurd(rhs);
       answer = 'x = ' + pmtext(Rneg(half), s);
@@ -199,7 +213,9 @@ def quadratic_lab(cfg):
     lines.push(row('substitute', 'x = (-(' + Rtext(b) + ') +- sqrt((' + Rtext(b) + ')^2 - 4(' + Rtext(a) + ')(' + Rtext(c) + '))) / (2 * ' + Rtext(a) + ')'));
     lines.push(row('the discriminant', 'b^2 - 4ac = ' + Rtext(Rmul(b, b)) + ' - ' + Rtext(Rmul(R(4n), Rmul(a, c))) + ' = ' + Rtext(r.disc)));
     if (r.kind === 'complex') {
-      lines.push(row('negative, so no real root', 'x = ' + pmtext(r.p, r.s, true)));
+      lines.push(row('negative, so no real root', SHOW_COMPLEX
+        ? 'x = ' + pmtext(r.p, r.s, true)
+        : 'stop here; complex roots begin in lesson 7'));
     } else if (r.kind === 'double') {
       lines.push(row('zero, so one repeated root', 'x = ' + Rtext(r.p)));
     } else {
@@ -316,7 +332,8 @@ def quadratic_lab(cfg):
       row('factoring', fac.ok ? fac.roots.map(function (x) { return 'x = ' + Rtext(x); }).join(',   ') : '<span class="tone-muted">' + fac.text + '</span>'),
       row('square root property', sqp.ok ? sqp.text : '<span class="tone-muted">' + sqp.text + '</span>'),
       row('completing the square', comp.answer),
-      row('the formula', r.kind === 'complex' ? 'x = ' + pmtext(r.p, r.s, true)
+      row('the formula', r.kind === 'complex' ? (SHOW_COMPLEX
+          ? 'x = ' + pmtext(r.p, r.s, true) : 'no real solution; complex roots begin in lesson 7')
           : (r.kind === 'double' ? 'x = ' + Rtext(r.p) : 'x = ' + pmtext(r.p, r.s))),
     ]));
 
@@ -345,9 +362,10 @@ def quadratic_lab(cfg):
     var msg;
     if (r.kind === 'complex') {
       msg = '<strong>The discriminant is ' + Rtext(r.disc) + ', which is negative.</strong> '
-        + 'The parabola above never meets the x-axis, and the two solutions are the conjugate '
-        + 'pair x = ' + pmtext(r.p, r.s, true) + '. Those are not "no solutions" &mdash; they are '
-        + 'two solutions that are not real numbers.';
+        + 'The parabola above never meets the x-axis. ' + (SHOW_COMPLEX
+          ? 'The two solutions are the conjugate pair x = ' + pmtext(r.p, r.s, true)
+            + '. Those are not "no solutions" &mdash; they are two solutions that are not real numbers.'
+          : 'There is no real solution; lesson 7 introduces the number system needed to continue.');
     } else if (r.kind === 'double') {
       msg = '<strong>The discriminant is exactly 0.</strong> The formula gives one value, '
         + 'x = ' + Rtext(r.p) + ', and the parabola touches the axis there without crossing. '

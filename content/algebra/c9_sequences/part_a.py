@@ -6,18 +6,18 @@ LESSONS = [
         "slug": "sequences-and-recursion",
         "title": "Sequences and Recursion",
         "module": "Sequences",
-        "one_line": "A function on the positive integers, defined two ways.",
+        "one_line": "Generate a sequence from either definition and diagnose what an incomplete recursion is missing.",
         "summary": (
-            "A sequence is a function whose inputs are the positive integers: a first "
-            "term, a second term, and no last one. It can be given by a formula for the "
-            "n-th term, or by a starting value and a rule for the next one, and the two "
-            "forms are not interchangeable."
+            "A sequence is a function whose inputs are the positive integers, or the "
+            "first finitely many of them: a first term, a second term, and perhaps a "
+            "last one. It can be given by a formula for the n-th term, or by starting "
+            "values and a rule for later ones, and the two forms answer different questions."
         ),
         "key": [
             "a₁, a₂, a₃, …        aₙ is the n-th term; n is an index, not a value",
             "explicit    aₙ = 5·2ⁿ⁻¹         give it n, it gives you the term",
             "recursive   a₁ = 5,             each term from the one before",
-            "            aₙ = 2aₙ₋₁          both parts are required",
+            "            aₙ = 2aₙ₋₁, n ≥ 2  both parts are required",
         ],
         "key_label": "One sequence, two ways to define it",
         "concepts_intro": (
@@ -25,11 +25,11 @@ LESSONS = [
             "itself is a function, and functions were course 3."
         ),
         "concepts": [
-            ("A sequence is a function on the positive integers",
+            ("A sequence is a function on integer positions",
              "`aₙ` is `f(n)` written differently: hand it `4` and it returns the fourth "
-             "term. The domain is `1, 2, 3, …` rather than an interval, so the graph is "
-             "a row of separate dots rather than a curve. Nothing about one input "
-             "giving one output has changed."),
+             "term. An infinite sequence has domain `1, 2, 3, …`; a finite sequence "
+             "ending at position `N` has domain `1, 2, …, N`. Either graph is a row of "
+             "separate dots rather than a curve, and one input still gives one output."),
             ("Explicit hands you any term; recursive makes you walk",
              "From `aₙ = 5·2ⁿ⁻¹` you get `a₃₀` in one line. From `a₁ = 5`, "
              "`aₙ = 2aₙ₋₁` you get `a₃₀` after computing the twenty-nine terms before "
@@ -46,7 +46,8 @@ LESSONS = [
         "body": [
             ("def", ("Sequence",
                      "A <strong>sequence</strong> is a function whose domain is the "
-                     "positive integers. Its outputs are its <strong>terms</strong>, "
+                     "positive integers or a finite initial segment `1, 2, …, N` of "
+                     "them. Its outputs are its <strong>terms</strong>, "
                      "written `a₁, a₂, a₃, …`, and `aₙ` is the <strong>n-th term</strong> "
                      "or general term. A sequence that stops is <strong>finite</strong>; "
                      "one that does not is <strong>infinite</strong>.")),
@@ -71,13 +72,14 @@ LESSONS = [
                      "terms. Both parts are needed. The recurrence alone does not "
                      "identify a sequence.")),
             ("p", "That last sentence is the one to take seriously. The rule "
-                  "`aₙ = 2aₙ₋₁` is satisfied by `5, 10, 20, 40, …`, by "
+                  "`aₙ = 2aₙ₋₁` for `n ≥ 2` is satisfied by `5, 10, 20, 40, …`, by "
                   "`3, 6, 12, 24, …` and by `0, 0, 0, …` . It says how to move, not "
                   "where to start, and a definition missing its initial term is not "
                   "incomplete in a small way &mdash; it names infinitely many "
                   "different sequences."),
             ("example", ("The same sequence, both ways",
-                         "`a₁ = 5` with `aₙ = 2aₙ₋₁` gives `5, 10, 20, 40, 80, …` . So "
+                         "`a₁ = 5` with `aₙ = 2aₙ₋₁` for `n ≥ 2` gives "
+                         "`5, 10, 20, 40, 80, …` . So "
                          "does `aₙ = 5·2ⁿ⁻¹`, because doubling `n - 1` times from `5` "
                          "is what that formula does. Lesson 4 shows this is the "
                          "general shape of a geometric sequence.")),
@@ -167,6 +169,12 @@ LESSONS = [
                 "`aₖ₊₁ = 2(2ᵏ⁺¹ - 1) + 1 = 2ᵏ⁺² - 1`, so that the formula, once true "
                 "anywhere, is true for ever after. That is induction, and it is the "
                 "Discrete Mathematics path's business rather than this one's.",
+                "For a faded conversion, take `b₁ = 2` and `bₙ = 3bₙ₋₁ + 2` for "
+                "`n ≥ 2`. The supplied first move is to compute `b₁ + 1` and "
+                "`b₂ + 1` rather than the terms alone. Generate through `b₅`, propose "
+                "a closed form, predict `b₆`, and check that prediction against the "
+                "recursion. State exactly which positions your check covers before "
+                "opening the quiz.",
             ],
         },
         "quiz_title": "Terms and definitions",
@@ -225,7 +233,7 @@ LESSONS = [
         "slug": "sigma-notation",
         "title": "Sigma Notation",
         "module": "Sequences",
-        "one_line": "Writing a sum without writing every term, and shifting the index.",
+        "one_line": "Expand, encode and re-index a finite sum without changing any of its terms.",
         "summary": (
             "Sigma notation stores a sum as two separate things: a rule for the terms "
             "and a range for the index. Reading one means expanding it, and writing one "
@@ -426,6 +434,11 @@ LESSONS = [
                 "summand without changing which numbers come out. The check did not "
                 "establish that; it established that this particular shift was carried "
                 "out correctly.",
+                "For a faded re-indexing, use `Σ (4k + 1)` from `k = 3` to `k = 7`. "
+                "The supplied count is `7 - 3 + 1 = 5`, and the substitution for a "
+                "range beginning at `j = 1` is `k = j + 2`. Finish the new summand and "
+                "upper limit, expand both forms, and verify their first term, last term "
+                "and total independently before opening the quiz.",
             ],
         },
         "quiz_title": "Reading, writing and shifting",
@@ -489,7 +502,7 @@ LESSONS = [
         "slug": "arithmetic-sequences-and-series",
         "title": "Arithmetic Sequences and Series",
         "module": "Sequences",
-        "one_line": "A constant difference, and Gauss's trick for the sum.",
+        "one_line": "Classify an arithmetic sequence, compute a requested term or sum, and justify the sum by pairing.",
         "summary": (
             "An arithmetic sequence adds the same number to get from each term to the "
             "next. That one fact gives a formula for the n-th term, and a pairing "
@@ -653,6 +666,11 @@ LESSONS = [
                 "term\" is one term of the list; \"the sum of the first 20 terms\" adds "
                 "all twenty. Reading the question twice is cheaper than computing the "
                 "wrong one correctly.",
+                "For a faded arithmetic pass, use `18, 13, 8, 3, …`. The supplied "
+                "classification evidence is `13 - 18 = 8 - 13 = -5`. Find `a₁₅` and "
+                "`S₁₅`, then check the sum as fifteen times the average of the first "
+                "and fifteenth terms. Keep the negative difference visible in every "
+                "substitution before opening the quiz.",
             ],
         },
         "quiz_title": "Terms and sums",
@@ -711,61 +729,70 @@ LESSONS = [
         "slug": "geometric-sequences-and-series",
         "title": "Geometric Sequences and Series",
         "module": "Sequences",
-        "one_line": "A constant ratio, and a sum that can be infinite.",
+        "one_line": "Classify a geometric sequence and compute any requested term or finite sum, including the r = 1 case.",
         "summary": (
             "A geometric sequence multiplies by the same number at every step. The n-th "
-            "term is `a₁rⁿ⁻¹`, and the sum of `n` terms comes from one line of algebra. "
-            "When `|r| &lt; 1`, all infinitely many terms add up to a finite number."
+            "term is `a₁rⁿ⁻¹`, and the sum of any finite number of terms comes from one "
+            "line of cancellation. The exceptional ratio `r = 1` has a simpler sum, "
+            "and zero terms or a zero ratio are handled by the same multiplicative definition."
         ),
         "key": [
-            "r = aₙ₊₁/aₙ          the same number for every n",
+            "aₙ₊₁ = r aₙ          divide to find r only when aₙ ≠ 0",
             "aₙ = a₁rⁿ⁻¹                        n - 1 multiplications",
             "Sₙ = a₁(1 - rⁿ)/(1 - r)            needs r ≠ 1",
-            "S∞ = a₁/(1 - r)                    only when |r| < 1",
+            "r = 1: Sₙ = na₁        r = 0: a₁, 0, 0, … and Sₙ = a₁",
         ],
-        "key_label": "Two formulas, and the condition on the third",
+        "key_label": "A term formula, a finite-sum formula, and its edge cases",
         "concepts_intro": (
-            "The first two formulas are the arithmetic ones with multiplication in "
-            "place of addition. The third is genuinely new and it comes with a "
-            "condition that is not decoration."
+            "The formulas are the arithmetic ones with multiplication in place of "
+            "addition. The cancellation has one excluded denominator, and that case "
+            "is evaluated directly rather than discarded."
         ),
         "concepts": [
-            ("The ratio is a quotient, not a difference",
-             "`r = a₂/a₁`, checked against `a₃/a₂` and `a₄/a₃`. Reaching for a "
+            ("For nonzero terms, find the multiplier by division",
+             "`r = a₂/a₁`, checked against `a₃/a₂` and `a₄/a₃`, whenever those "
+             "denominators are nonzero. Reaching for a "
              "subtraction here is the reflex left over from lesson 3: `3, 6, 12, 24` "
              "has differences `3, 6, 12` and ratios `2, 2, 2`, and only the second list "
-             "being constant makes it geometric."),
+             "being constant makes it geometric. If zeros appear, check the "
+             "multiplication `aₙ₊₁ = raₙ` directly instead."),
             ("`rⁿ⁻¹`, for the same reason as `(n - 1)d`",
              "`a₁` has been multiplied by `r` no times, `a₂` once, `aₙ` exactly "
              "`n - 1` times. The exponent counts steps, and `a₁rⁿ` is the term after "
              "the one you wanted."),
-            ("`|r| < 1` is a condition, not a formality",
-             "Outside it the expression `a₁/(1 - r)` still produces a number, and that "
-             "number is not the sum of anything. For `2 + 6 + 18 + …` it produces `-1`: "
-             "a negative value for a series of positive terms, which is what applying a "
-             "formula outside its range looks like."),
+            ("Finite sums do not require `|r| < 1`",
+             "The cancellation formula works for a growing or alternating sequence as "
+             "long as `r ≠ 1`. When `r = 1`, every term is `a₁` and direct counting gives "
+             "`Sₙ = na₁`. When `r = 0`, the sequence is `a₁, 0, 0, …` and the usual "
+             "formula works without a special case. Convergence is lesson 6's question."),
         ],
-        "read_title": "Constant ratio, finite sums, and infinite ones",
-        "read_intro": "The n-th term, the sum of n terms by a cancelling trick, and the one case where infinitely many terms have a total.",
+        "read_title": "Constant multiplication, terms, and finite sums",
+        "read_intro": "The n-th term, the sum of n terms by cancellation, and the edge cases a quotient-only definition would miss.",
         "body": [
             ("def", ("Geometric sequence",
-                     "A sequence in which the ratio of consecutive terms is the same "
-                     "throughout. That number is the <strong>common ratio</strong> `r`, "
-                     "and the recursive definition is `aₙ = r·aₙ₋₁` with a first term "
-                     "`a₁`. Neither `a₁` nor `r` may be `0`, or the ratios stop being "
-                     "defined.")),
+                     "A sequence with a first term `a₁` and a constant multiplier "
+                     "`r`, called the <strong>common ratio</strong>, such that "
+                     "`aₙ = r·aₙ₋₁` for `n ≥ 2`. Equivalently, "
+                     "`aₙ = a₁rⁿ⁻¹`. When consecutive terms in the denominator are "
+                     "nonzero, dividing `aₙ₊₁/aₙ` is the quickest way to find and "
+                     "check `r`; the multiplicative definition still makes sense when "
+                     "a term or `r` is zero.")),
             ("p", "`3, 6, 12, 24, …` has `r = 2`. `81, 27, 9, 3, …` has `r = 1/3` and "
                   "shrinks. `5, -10, 20, -40, …` has `r = -2`, and a negative ratio is "
                   "how a sequence alternates in sign: odd-numbered terms keep the sign "
-                  "of `a₁` and even-numbered ones flip it."),
+                  "of `a₁` and even-numbered ones flip it. `7, 0, 0, …` has `r = 0`; "
+                  "after the first step the quotient `0/0` is unavailable, but every "
+                  "term still equals zero times the one before it."),
             ("thm", ("The n-th term of a geometric sequence",
                      "`aₙ = a₁rⁿ⁻¹` for every `n ≥ 1`. Getting from `a₁` to `aₙ` is "
                      "`n - 1` multiplications by `r`, exactly as getting there in an "
                      "arithmetic sequence was `n - 1` additions of `d`.")),
-            ("p", "Plotted, the terms lie on an exponential curve rather than a line: "
-                  "`a₁rⁿ⁻¹` is course 7's `a·bˣ` sampled at the integers. `|r| &gt; 1` "
-                  "gives growth, `|r| &lt; 1` gives decay, `r &lt; 0` makes the sign "
-                  "alternate, and `r = 1` gives a constant sequence."),
+            ("p", "For `r &gt; 0`, the plotted terms lie on an exponential curve: "
+                  "`a₁rⁿ⁻¹` is course 7's `a·bˣ` sampled at the integers. For "
+                  "`r &lt; 0`, no real exponential curve has that negative base; the "
+                  "magnitudes follow `|a₁||r|ⁿ⁻¹` while the signs alternate. "
+                  "`|r| &gt; 1` grows in magnitude, `0 &lt; |r| &lt; 1` decays in magnitude, "
+                  "`r = 1` is constant, and `r = 0` becomes zero after the first term."),
             ("def", ("Geometric series",
                      "The sum of the terms of a geometric sequence. `Sₙ` denotes the "
                      "sum of the first `n` terms, `a₁ + a₁r + … + a₁rⁿ⁻¹`.")),
@@ -783,43 +810,26 @@ LESSONS = [
                 "requires `r ≠ 1`, which is precisely the case the theorem handles "
                 "separately, and there the sum is `na₁` by inspection.",
             ]),
-            ("h3", "Adding infinitely many terms"),
-            ("p", "Take `4 + 2 + 1 + 1/2 + 1/4 + …` , with `a₁ = 4` and `r = 1/2`. The "
-                  "partial sums are `4, 6, 7, 7.5, 7.75, 7.875, …` . They increase, "
-                  "they never reach `8`, and they get as close to `8` as you please. "
-                  "The formula shows why: `Sₙ = 4(1 - (1/2)ⁿ)/(1/2) = 8(1 - (1/2)ⁿ)`, "
-                  "and `(1/2)ⁿ` is being driven toward zero."),
-            ("p", "How small is `rⁿ` really? For `r = 1/2` and `n = 20` it is "
-                  "`1/1048576`. That is what \"the `rⁿ` term stops mattering\" means "
-                  "concretely: the partial sum differs from `8` by eight millionths at "
-                  "the twentieth term, and by less at every term after it."),
-            ("thm", ("The sum of an infinite geometric series",
-                     "If `|r| &lt; 1`, the partial sums approach the single number "
-                     "`a₁/(1 - r)`, and can be brought as close to it as desired by "
-                     "taking enough terms. That number is written `S∞` and is called "
-                     "the sum of the series.",
-                     "If `|r| ≥ 1` there is no sum. The terms do not shrink toward "
-                     "zero, so the partial sums cannot settle: for `|r| &gt; 1` they "
-                     "grow without bound, for `r = 1` they are `na₁`, and for `r = -1` "
-                     "they alternate between `a₁` and `0` for ever.")),
-            ("example", ("0.999… is exactly 1",
-                         "The decimal `0.999…` means "
-                         "`9/10 + 9/100 + 9/1000 + …` , a geometric series with "
-                         "`a₁ = 9/10` and `r = 1/10`. Since `|r| &lt; 1`, "
-                         "`S∞ = (9/10)/(1 - 1/10) = (9/10)/(9/10) = 1`. The two "
-                         "notations name the same number; there is no gap for anything "
-                         "to sit in.")),
+            ("p", "Two edge cases are checks on the derivation rather than exceptions "
+                  "to the sequence. If `r = 0`, the formula gives "
+                  "`Sₙ = a₁(1 - 0ⁿ)/(1 - 0) = a₁`, matching `a₁ + 0 + … + 0`. If "
+                  "`r = 1`, the line `Sₙ(1 - r) = a₁(1 - rⁿ)` reduces to `0 = 0` and "
+                  "contains no sum information, so direct counting supplies "
+                  "`Sₙ = na₁`. Whether a sequence of finite sums approaches a number "
+                  "as `n` grows is a different question, taken up after partial sums "
+                  "have been made into a sequence of their own."),
         ],
         "lab": ("sequence", {
             "mode": "geometric",
-            "panel_title": "Partial sums, and where they go",
-            "panel_intro": "Set `a₁` and `r` and the lab plots the partial sums against "
-                           "the value `a₁/(1 - r)`. Push `r` past `1` and watch the "
-                           "partial sums leave the line behind while the formula keeps "
-                           "returning a number.",
+            "panel_title": "Terms and finite sums, twice",
+            "panel_intro": "Set `a₁`, `r` and a finite term count. The lab builds every "
+                           "term by multiplying, adds the partial sums one term at a "
+                           "time, and compares both columns with `a₁rⁿ⁻¹` and the finite "
+                           "sum formula. Try `r = 1` and `r = 0` to see which formula "
+                           "needs a separate line and which does not.",
         }),
         "steps_title": "Answering a question about a geometric sequence",
-        "steps_intro": "Four steps, and the fourth begins with a test rather than a formula.",
+        "steps_intro": "Four steps. None of them asks whether an infinite sum exists; this lesson's stopping place is finite.",
         "steps": [
             ("Confirm the ratio is constant",
              "Divide at least twice: `a₂/a₁` and `a₃/a₂`. Write `r` as an exact "
@@ -832,16 +842,16 @@ LESSONS = [
             ("Use Sₙ = a₁(1 - rⁿ)/(1 - r) for a finite sum",
              "Both `1 - rⁿ` and `1 - r` may be negative; a negative divided by a "
              "negative is what makes a growing series come out positive."),
-            ("For an infinite sum, test |r| < 1 before anything else",
-             "If `|r| ≥ 1` the answer is that the series has no sum, and that is a "
-             "complete answer. Only if the test passes does `S∞ = a₁/(1 - r)` mean "
-             "anything."),
+            ("Handle r = 1 directly, then check the finite sum",
+             "When `r = 1`, use `Sₙ = na₁` instead of dividing by `1 - r`. In every "
+             "case add the first few terms and compare their size and sign with the "
+             "closed form; a finite sum is valid whether the terms shrink or grow."),
         ],
         "worked": {
-            "title": "The 10th term and the sums of 3, 6, 12, 24, …",
+            "title": "The 10th term and finite sum of 3, 6, 12, 24, …",
             "intro": [
-                "One sequence, three questions: a term, a finite sum, and whether the "
-                "whole series adds up to anything."
+                "One sequence, two questions: a distant term and a finite sum, each "
+                "checked against the terms generated by the definition."
             ],
             "lines": [
                 "ratios   6/3 = 2     12/6 = 2     24/12 = 2",
@@ -854,22 +864,18 @@ LESSONS = [
                 "",
                 "check by adding the ten terms",
                 "3 + 6 + 12 + 24 + 48 + 96 + 192 + 384 + 768 + 1536 = 3069    ✓",
-                "",
-                "an infinite sum?    |r| = 2, and 2 ≥ 1, so there is none.",
-                "the partial sums    3, 9, 21, 45, 93, 189, …  grow without bound",
-                "the formula anyway  a₁/(1 - r) = 3/(1 - 2) = -3",
             ],
             "after": [
-                "That last line is the trap this lesson exists to set off in advance. "
-                "`-3` is a perfectly good number and it is not the sum of "
-                "`3 + 6 + 12 + …` , which has no sum: every partial sum is positive and "
-                "each is larger than the last. The formula was derived for `|r| &lt; 1` "
-                "and it returns nonsense politely, without any error message.",
                 "The check by hand is worth doing once. Ten terms added directly agree "
                 "with the formula exactly, which verifies this one instance &mdash; "
                 "`a₁ = 3`, `r = 2`, `n = 10`. What makes the formula true for every "
                 "`a₁`, every `r ≠ 1` and every `n` is the `Sₙ - rSₙ` cancellation, "
                 "not the check.",
+                "For a faded geometric pass, use `81, -27, 9, -3, …`. The supplied "
+                "classification evidence is `(-27)/81 = 9/(-27) = -1/3`. Find `a₈` "
+                "and `S₈` from the closed forms, then generate and add the eight terms "
+                "directly as an independent check. Settle the sign of each power before "
+                "multiplying its magnitude, then open the quiz.",
             ],
         },
         "quiz_title": "Ratios and sums",
@@ -880,56 +886,59 @@ LESSONS = [
              "why": "`r = -2`, so `a₇ = 5(-2)⁶ = 5(64) = 320`. `-320` treats an even "
                     "power of a negative as negative; `-640` uses the exponent `7` "
                     "instead of `6`, and it is `a₈`; `640` makes both errors at once."},
-            {"q": "What is the sum of the infinite series `6 + 4 + 8/3 + 16/9 + …` ?",
-             "a": ["`3`", "`9`", "`18`", "It has no sum"],
+            {"q": "What is the sum of the first six terms of `2, 6, 18, 54, …` ?",
+             "a": ["`242`", "`486`", "`728`", "`-1`"],
              "c": 2,
-             "why": "`r = 4/6 = 2/3` and `|r| &lt; 1`, so "
-                    "`S∞ = 6/(1 - 2/3) = 6/(1/3) = 18`. `3` is `1/(1 - r)` with `a₁` "
-                    "left out; `9` is `a₁/r`."},
-            {"q": "Does `2 + 6 + 18 + 54 + …` have a sum?",
-             "a": ["Yes: `a₁/(1 - r) = 2/(1 - 3) = -1`",
-                   "Yes: `2/(3 - 1) = 1`",
-                   "No: `|r| = 3 ≥ 1`, and the partial sums grow without bound",
-                   "No: a series of infinitely many positive terms cannot total a finite number"],
-             "c": 2,
-             "why": "The first two apply the formula where it does not hold, and the "
-                    "second also flips the denominator to avoid the negative answer the "
-                    "first produced. The fourth is contradicted by "
-                    "`4 + 2 + 1 + … = 8`, where infinitely many positive terms do have "
-                    "a finite total."},
+             "why": "Here `a₁ = 2`, `r = 3` and `n = 6`, so "
+                    "`S₆ = 2(1 - 3⁶)/(1 - 3) = 728`. `242` is `S₅`, one term short. "
+                    "`486` is `a₆`, the last term rather than the total. `-1` is what "
+                    "the unrelated expression `a₁/(1 - r)` returns; finite sums use "
+                    "the `rⁿ` term and are valid when `r` is greater than `1`."},
+            {"q": "Which statement correctly describes `7, 0, 0, 0, …` ?",
+             "a": ["It is not geometric because `0/0` is undefined",
+                   "It is geometric with `r = 0`, and every finite partial sum is `7`",
+                   "It is geometric with `r = 1`, and `Sₙ = 7n`",
+                   "It is geometric with `r = 0`, and every finite partial sum is `0`"],
+             "c": 1,
+             "why": "Each term after the first is `0` times the preceding term, so the "
+                    "multiplicative definition gives `r = 0`; the terms sum to `7`. "
+                    "The quotient `0/0` is unavailable after the first zero, but a "
+                    "quotient is a diagnostic for nonzero terms rather than the "
+                    "definition. `r = 1` would keep every term equal to `7`, and the "
+                    "last choice drops the first term from every sum."},
         ],
         "mistakes": [
-            ("Using `S∞ = a₁/(1 - r)` without testing `|r| < 1`",
-             "The formula answers whether or not it applies, and it answers wrongly "
-             "when it does not. The symptom to watch for is a negative sum for a series "
-             "of positive terms, but a wrong positive answer is just as easy to produce "
-             "and shows nothing on its face."),
+            ("Forcing r = 1 into a formula that divides by 1 - r",
+             "When every term is `a₁`, the finite sum is `na₁`. Substituting `r = 1` "
+             "into `a₁(1 - rⁿ)/(1 - r)` gives `0/0`, which is the trace of the division "
+             "used in the derivation, not evidence that the finite sum is undefined."),
             ("Writing `a₁rⁿ` for the n-th term",
              "That is `aₙ₊₁`, so every answer is one step too far and off by a factor "
              "of `r`. The same check as in lesson 3 applies: your formula must return "
              "`a₁` when `n = 1`."),
-            ("Finding `r` by subtracting, or checking only one ratio",
+            ("Finding `r` by subtracting, or treating a quotient as the definition",
              "`2, 4, 6` and `2, 4, 8` both begin with a difference of `2` and a ratio "
-             "of `2`, and the third term decides which family each belongs to. Two "
-             "ratios are the minimum test, and three is better."),
+             "of `2`, and the third term decides which family each belongs to. For "
+             "nonzero terms, check at least two ratios. For `7, 0, 0, …`, the later "
+             "quotient is undefined but multiplying every term by `r = 0` still "
+             "generates the next one, which is the definition that decides the case."),
         ],
-        "standard": ("Finish when the |r| < 1 test happens before the formula, every time.",
-                     "You should be able to find `r`, produce any term, sum any number "
-                     "of terms, and answer \"is there an infinite sum\" with a reason "
-                     "rather than a formula. Reproducing the `Sₙ - rSₙ` cancellation "
-                     "should take three lines and no hesitation."),
-        "note": "The `0.999…` example generalises: every repeating decimal is a "
-                "terminating decimal plus a geometric series with `|r| &lt; 1`, so "
-                "every repeating decimal is a fraction. Course 1 asserted that when it "
-                "sorted the real numbers into rational and irrational; this is the argument behind the assertion, "
-                "and it needed an infinite sum to state.",
+        "standard": ("Finish when multiplication, not subtraction or a memorised quotient, decides the family.",
+                     "You should be able to find or verify `r`, produce any term, sum "
+                     "any finite number of terms, handle `r = 0` and `r = 1` correctly, "
+                     "and reproduce the `Sₙ - rSₙ` cancellation in three lines. No "
+                     "convergence claim belongs in the answer yet."),
+        "note": "A finite formula still contains `n`, so changing the stopping place "
+                "produces a new number. Lesson 5 treats `S₁, S₂, S₃, …` as a sequence "
+                "in its own right; only after that does lesson 6 ask whether the "
+                "sequence approaches a number when the stopping place keeps moving.",
     },
     # ---------------------------------------------------------------- 05
     {
         "slug": "partial-sums-and-telescoping",
         "title": "Partial Sums and Telescoping",
         "module": "Arithmetic and geometric",
-        "one_line": "The sequence of sums, and the ones that collapse.",
+        "one_line": "Recover terms from partial sums and collapse a telescoping sum only after verifying its split.",
         "summary": (
             "Stopping a series at every possible place produces one number for each "
             "stopping place, and those numbers form a sequence of their own. Subtracting "
@@ -1058,9 +1067,9 @@ LESSONS = [
                   "more that works: with `bₖ = (k - 1)²`, `bₖ₊₁ - bₖ` is "
                   "`k² - (k - 1)² = 2k - 1`, so the first `n` odd numbers sum to "
                   "`bₙ₊₁ - b₁ = n² - 0 = n²` &mdash; a second derivation of a result "
-                  "lesson 3 reached by pairing. Strictly, every series telescopes: "
-                  "`bₖ = -Sₖ₋₁` satisfies `bₖ - bₖ₊₁ = aₖ` for any sequence at all. It "
-                  "is no help, because it requires the sums you were trying to find."),
+                  "lesson 3 reached by pairing. A useful telescope has to reveal the "
+                  "sum from a `bₖ` that can be found without already knowing the partial "
+                  "sums; manufacturing one from the unknown answer would explain nothing."),
         ],
         "lab": ("sequence", {
             "mode": "partial",
@@ -1133,6 +1142,11 @@ LESSONS = [
                 "The partial sums `1/2, 2/3, 3/4, 4/5, …` climb and every one is below "
                 "`1`. Whether they add up to `1` is the next lesson's question, and "
                 "having `n/(n + 1)` in closed form is what makes it answerable.",
+                "For a faded telescope, sum `2/((2k - 1)(2k + 1))` from `k = 1` to "
+                "`k = 5`. The supplied split is "
+                "`1/(2k - 1) - 1/(2k + 1)`. Recombine it first, write all five "
+                "brackets, identify the two survivors, and compare the collapsed value "
+                "with the five fractions added directly before opening the quiz.",
             ],
         },
         "quiz_title": "Sums, terms and cancellations",
@@ -1202,23 +1216,24 @@ LESSONS = [
         "slug": "infinite-geometric-series",
         "title": "Infinite Geometric Series",
         "module": "Infinite series",
-        "one_line": "When adding forever gives a finite answer, and when it does not.",
+        "one_line": "Decide whether a geometric series converges and quantify the exact gap after a stated number of terms.",
         "summary": (
             "The sum of an infinite series is a definition, not a longer addition: it is "
             "the number the partial sums approach, and a series with no such number has "
-            "no sum. For a geometric series the whole question reduces to the size of "
-            "`rⁿ`, which settles it completely and in one line."
+            "no sum. For a nonzero geometric series the whole question reduces to the "
+            "size of `rⁿ`; the all-zero series is the transparent exception that has "
+            "sum `0` for any chosen multiplier."
         ),
         "key": [
             "S∞      the number S₁, S₂, S₃, … approaches, if there is one",
             "Sₙ = a₁/(1 - r) - [a₁/(1 - r)]rⁿ      the only n sits on the r",
-            "|r| < 1     rⁿ is driven to 0, so S∞ = a₁/(1 - r)",
-            "|r| ≥ 1     no sum: the partial sums never settle on a number",
+            "a₁ ≠ 0, |r| < 1     rⁿ → 0, so S∞ = a₁/(1 - r)",
+            "a₁ ≠ 0, |r| ≥ 1     no sum       a₁ = 0: S∞ = 0",
         ],
-        "key_label": "What S∞ means, and the one condition on it",
+        "key_label": "What S∞ means, the ratio condition, and the zero exception",
         "concepts_intro": (
-            "The formula was already stated in lesson 4. What was not stated is what the "
-            "word \"sum\" means once the list of terms has no end."
+            "Lesson 4 supplied a formula for every finite stopping place. This lesson "
+            "asks whether the resulting sequence of finite sums approaches one number."
         ),
         "concepts": [
             ("The sum of an infinite series is defined, not performed",
@@ -1227,11 +1242,12 @@ LESSONS = [
              "approaches nothing, the series has no sum and the expression naming it "
              "names nothing. Almost everything that sounds paradoxical here comes from "
              "reading the `+ …` as an instruction to be carried out."),
-            ("`|r| < 1` is a statement about `rⁿ` and nothing else",
+            ("For a nonzero series, `|r| < 1` is a statement about `rⁿ`",
              "Write `Sₙ = a₁/(1 - r) - [a₁/(1 - r)]rⁿ`. The first piece does not depend "
              "on `n` at all, and the second is that same constant times `rⁿ`. So the "
              "entire question is whether `rⁿ` is driven to `0`, and for `|r| &lt; 1` it "
-             "is, at a rate you can compute."),
+             "is, at a rate you can compute. If `a₁ = 0`, every term and partial sum is "
+             "already `0`, so no condition on a chosen multiplier is needed."),
             ("Approaching is a quantitative claim",
              "For `4 + 2 + 1 + 1/2 + …` the gap is exact: `8 - Sₙ = 8(1/2)ⁿ`. Getting "
              "within `1/1000` of `8` takes `13` terms and no fewer, since "
@@ -1239,7 +1255,7 @@ LESSONS = [
              "distance you name has a term count attached."),
         ],
         "read_title": "Partial sums, limits, and the geometric case settled",
-        "read_intro": "What an infinite sum is defined to be, why `|r| &lt; 1` is the whole condition, and the three ways it fails on the other side.",
+        "read_intro": "What an infinite sum is defined to be, why `|r| &lt; 1` settles every nonzero geometric series, and the zero exception.",
         "body": [
             ("p", "Lesson 5 made `S₁, S₂, S₃, …` a sequence in its own right. This "
                   "lesson asks one question about that sequence, and the answer to it is "
@@ -1257,8 +1273,9 @@ LESSONS = [
             ("p", "The sum of a convergent series is also written `Σ aₖ` with `k` "
                   "running from `1` to `∞`. Writing the symbol does not bring the number "
                   "into existence: for a divergent series it is notation with nothing "
-                  "behind it. Lesson 4's `2 + 6 + 18 + …` is the case in point &mdash; a "
-                  "formula that returns `-1`, and a series with no sum."),
+                  "behind it. For `2 + 6 + 18 + …`, the expression "
+                  "`a₁/(1 - r)` returns `-1`; the partial sums run away, so that number "
+                  "is not a sum and the expression was used without a licence."),
             ("math", [
                 "Sₙ  =  a₁(1 - rⁿ)/(1 - r)                        r ≠ 1",
                 "",
@@ -1275,25 +1292,24 @@ LESSONS = [
                 "so Sₙ closes in on a₁/(1 - r), and the gap is that constant times rⁿ",
             ]),
             ("thm", ("The geometric series, settled",
-                     "Let `a₁ ≠ 0`. The series `a₁ + a₁r + a₁r² + …` converges if and "
-                     "only if `|r| &lt; 1`, and in that case `S∞ = a₁/(1 - r)`.",
-                     "`a₁ ≠ 0` is not an extra condition. Lesson 4's definition already "
-                     "excludes `a₁ = 0` and `r = 0`, because with either of them a "
-                     "ratio of consecutive terms is `0/0` and there is no `r` to "
-                     "compare with `1`. So the theorem decides every geometric series "
-                     "this course admits.")),
+                     "If `a₁ ≠ 0`, the series `a₁ + a₁r + a₁r² + …` converges if and "
+                     "only if `|r| &lt; 1`, and then `S∞ = a₁/(1 - r)`. If `a₁ = 0`, "
+                     "every term and every partial sum is `0`, so the series converges "
+                     "to `0` for any chosen `r`.",
+                     "The case `r = 0` needs no exclusion. With `a₁ ≠ 0` it gives "
+                     "`a₁, 0, 0, …`, and the formula returns `a₁`; with `a₁ = 0` it is "
+                     "the all-zero case.")),
             ("proof", [
-                "Take `r ≠ 1`, so that `Sₙ = a₁/(1 - r) - [a₁/(1 - r)]rⁿ`. Only `rⁿ` "
-                "depends on `n`.",
-                "Suppose `0 &lt; |r| &lt; 1`, and write `|r| = 1/(1 + h)` with "
-                "`h &gt; 0`. Multiplying out `(1 + h)ⁿ` gives `1 + nh` together with "
-                "further terms, all positive, so `(1 + h)ⁿ ≥ 1 + nh` and "
-                "`|r|ⁿ ≤ 1/(1 + nh)`. Name any distance `d &gt; 0`: every `n` beyond "
-                "`(1/d - 1)/h` puts `|r|ⁿ` below `d`, and it stays below for every "
-                "larger `n`. So `rⁿ` is driven to `0`, the second piece of `Sₙ` with it, "
-                "and the partial sums converge to `a₁/(1 - r)`. There is no separate "
-                "case `r = 0` to treat: the definition excludes it, so `|r| &lt; 1` and "
-                "`0 &lt; |r| &lt; 1` describe the same series here.",
+                "If `a₁ = 0`, the recurrence multiplies `0` at every step and the "
+                "partial sums are `0, 0, 0, …`, which already proves the stated exception. "
+                "Now take `a₁ ≠ 0`.",
+                "For `r = 0`, the partial sums are `a₁, a₁, a₁, …`, so they converge to "
+                "`a₁ = a₁/(1 - 0)`. For `0 &lt; |r| &lt; 1`, Course 7's exponential-decay "
+                "result says the positive sequence `|r|ⁿ` approaches `0`. Since "
+                "`|rⁿ| = |r|ⁿ`, the signed power `rⁿ` does too, alternating when "
+                "`r &lt; 0`. In "
+                "`Sₙ = a₁/(1 - r) - [a₁/(1 - r)]rⁿ`, the second piece therefore "
+                "approaches `0`, leaving `a₁/(1 - r)`.",
                 "Suppose instead `|r| &gt; 1`. Then `|aₙ| = |a₁||r|ⁿ⁻¹` grows without "
                 "bound, and by lesson 5 the gap between consecutive partial sums is "
                 "`aₙ`. Partial sums moving further and further apart cannot be settling "
@@ -1353,16 +1369,17 @@ LESSONS = [
                            "Set `r = 3/2` or `r = -1` and it refuses to name a sum at all.",
         }),
         "steps_title": "Deciding an infinite geometric series",
-        "steps_intro": "The first step is a test, and when it fails, \"there is no sum\" is the complete answer rather than a failure to finish.",
+        "steps_intro": "Check the transparent zero case first; every other geometric series is decided by the size of its multiplier.",
         "steps": [
-            ("Confirm it is geometric and find r exactly",
-             "Divide consecutive terms at least twice and check the quotients agree. "
-             "Write `r` as a fraction: `(2/3)ⁿ` is exact and `(0.667)ⁿ` is not, and the "
-             "difference compounds with every power."),
-            ("Compare |r| with 1 before writing any formula",
+            ("Check the all-zero exception; otherwise find r exactly",
+             "If `a₁ = 0` and every later term is `0`, every partial sum is already `0` "
+             "and the sum is `0`. Otherwise divide consecutive nonzero terms at least "
+             "twice, or verify the multiplier directly when a zero appears. Write `r` "
+             "as an exact fraction, not a rounded decimal."),
+            ("For a nonzero series, compare |r| with 1 before any formula",
              "If `|r| ≥ 1` there is no sum and `a₁/(1 - r)` must not be written down "
-             "at all: it returns a number regardless, and that number is not the sum of "
-             "anything. Only `|r| &lt; 1` licenses the next step."),
+             "as one: it returns a number whenever `r ≠ 1`, and that number has no "
+             "meaning here. Only `|r| &lt; 1` licenses the next step."),
             ("Identify a₁ as the first term of the series you were given",
              "If the series starts at `k = 0`, or the first few terms were peeled off "
              "and handled separately, `a₁` is the first term of what remains. The "
@@ -1414,6 +1431,11 @@ LESSONS = [
                 "`S₁ = 1/2` overshoots, `S₂ = 1/4` undershoots, and `1/3` stays caught "
                 "between consecutive partial sums for ever. Step 4's check has to be "
                 "read in the form matching the sign of `r`.",
+                "For a faded convergence pass, use `3 - 1 + 1/3 - 1/9 + …`. The "
+                "supplied ratio is `r = -1/3`, so `|r| < 1` licenses a sum. Compute "
+                "`S∞`, add the first four terms to obtain `S₄`, and derive the exact "
+                "signed gap `S∞ - S₄` from the closed form. Check that its sign matches "
+                "which side of the limit `S₄` lies on before opening the quiz.",
             ],
         },
         "quiz_title": "Convergence, and what the number means",
@@ -1467,7 +1489,8 @@ LESSONS = [
         ],
         "standard": ("Finish when |r| < 1 is a question about rⁿ and S∞ is a question about a sequence.",
                      "You should be able to say what `S∞` means without using the word "
-                     "\"add\", decide any geometric series in a line, compute how many "
+                     "\"add\", dispatch the all-zero exception, decide any other "
+                     "geometric series in a line, compute how many "
                      "terms bring a partial sum within a stated distance of the limit, "
                      "and name what goes wrong in each of the three divergent cases "
                      "`|r| &gt; 1`, `r = 1` and `r = -1`."),

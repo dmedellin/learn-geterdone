@@ -1213,7 +1213,7 @@ base e:    ln 40    / ln 5    = 3.688879 / 1.609438 ≈ 2.292030
 base 2:    log_2(40)/ log_2(5)= 5.321928 / 2.321928 ≈ 2.292030
 
 the reversed quotient:  log 5 / log 40 ≈ 0.436295   = log_40(5)
-the invented law:       log(40/5) = log 8 ≈ 0.903090</div><p>The three quotients agree to every digit shown, which is what the theorem promises: the helper base cancels out of the answer. All six logarithms on those three lines are irrational, and every decimal here is rounded to six places.</p><p>The last two lines are not near-misses, they are answers to different questions. <span class="math">log_40(5)</span> is the reciprocal &mdash; the exponent that turns <span class="math">40</span> into <span class="math">5</span> &mdash; and <span class="math">log 8</span> is the logarithm of a quotient rather than a quotient of logarithms. The bracket at the top rejects both without any arithmetic: neither lies between <span class="math">2</span> and <span class="math">3</span>.</p></article>
+the invented law:       log(40/5) = log 8 ≈ 0.903090</div><p>The three quotients agree to every digit shown, which is what the theorem promises: the helper base cancels out of the answer. All six logarithms on those three lines are irrational, and every decimal here is rounded to six places.</p><p>The last two lines are not near-misses, they are answers to different questions. <span class="math">log_40(5)</span> is the reciprocal &mdash; the exponent that turns <span class="math">40</span> into <span class="math">5</span> &mdash; and <span class="math">log 8</span> is the logarithm of a quotient rather than a quotient of logarithms. The bracket at the top rejects both without any arithmetic: neither lies between <span class="math">2</span> and <span class="math">3</span>.</p><p>For a faded change of base, take <span class="math">log_9(50)</span>. The supplied first move is the bracket <span class="math">9^1 &lt; 50 &lt; 9²</span>, so the result must lie between <span class="math">1</span> and <span class="math">2</span>. Complete <span class="math">ln 50 / ___</span>, round only the final quotient, and use the bracket to reject the reversed fraction. Then state why changing the helper from <span class="math">ln</span> to <span class="math">log</span> cannot change the answer.</p></article>
       </div>
     </section>
     <section class="section">
@@ -2534,7 +2534,7 @@ the invented law:       log(40/5) = log 8 ≈ 0.903090</div><p>The three quotien
       plot0.describe('y = log_10(x) and y = ln(x), both stopping at x = 0, which is where the '
         + 'requested value lies.');
       work.innerHTML = steps('what happens at x = ' + Rtext(x), [
-        ['the characteristic', 'there is none. The characteristic is the k with 10^k &le; x, and '
+        ['the power-of-ten bracket', 'there is none. The bracket needs a k with 10^k &le; x, and '
           + 'no power of ten is zero or negative, so the search has nothing to return.'],
         ['what a calculator does', 'it prints an error, or -Infinity for zero. -Infinity is not a '
           + 'number and not an answer: it is the machine reporting that log_10(x) falls without '
@@ -2550,8 +2550,8 @@ the invented law:       log(40/5) = log 8 ≈ 0.903090</div><p>The three quotien
       return;
     }
 
-    /* The characteristic is found by comparing x with powers of ten. That part
-       is exact; the mantissa is the part that is not. */
+    /* The power-of-ten exponent is found by exact comparison. The remaining
+       logarithm is the part that needs rounding. */
     var br = bracketexp(R(10n), x);
     if (br === null) {
       fail('<strong>That number is too far from 1 for this lab to bracket.</strong> The search '
@@ -2565,18 +2565,18 @@ the invented law:       log(40/5) = log 8 ≈ 0.903090</div><p>The three quotien
     var mantlog = Math.log(Rfloat(mant)) / Math.LN10;
     var exactly = Requ(mant, R1);
 
-    work.innerHTML = ttable('the two parts of a common logarithm',
+    work.innerHTML = ttable('two named bases, checked by powers of ten',
       ['part', 'value', 'where it comes from', 'arithmetic'], [
         trow([rowhead('x in scientific notation'), cell(Rshow(mant) + ' &times; 10^' + k),
           cell('10^' + k + ' = ' + Rshow(br.low) + ' &le; ' + Rtext(x) + ' &lt; '
             + Rshow(br.high) + ' = 10^' + (k + 1)), cell(chip('exact', 'ok'))]),
-        trow([rowhead('characteristic'), cell(String(k)),
-          cell('the whole number part: how many powers of ten fit inside x'), cell(chip('exact', 'ok'))]),
-        trow([rowhead('mantissa'), cell(exactly ? '0' : '&asymp;&nbsp;' + mantlog.toFixed(8)),
+        trow([rowhead('power-of-ten exponent'), cell(String(k)),
+          cell('the k in 10^k &le; x &lt; 10^(k+1)'), cell(chip('exact', 'ok'))]),
+        trow([rowhead('remaining common log'), cell(exactly ? '0' : '&asymp;&nbsp;' + mantlog.toFixed(8)),
           cell('log_10(' + Rshow(mant) + '), a number in [0, 1)'),
           cell(exactly ? chip('exact', 'ok') : chip('irrational', 'hi'))]),
         trow([rowhead('log_10(x)'), cell(exactly ? String(k) : '&asymp;&nbsp;' + log10.toFixed(8)),
-          cell('characteristic + mantissa = ' + k + (exactly ? '' : ' + ' + mantlog.toFixed(8))),
+          cell('power-of-ten exponent + remainder = ' + k + (exactly ? '' : ' + ' + mantlog.toFixed(8))),
           cell(exactly ? chip('exact', 'ok') : chip('rounded', 'no'))]),
         trow([rowhead('ln(x)'), cell('&asymp;&nbsp;' + ln.toFixed(8)),
           cell('log_10(x) &times; ln(10) = ' + log10.toFixed(8) + ' &times; ' + Math.LN10.toFixed(8)
@@ -2586,19 +2586,17 @@ the invented law:       log(40/5) = log 8 ≈ 0.903090</div><p>The three quotien
           cell('log_10(x) / log_10(2) &asymp; ' + (log10 / (Math.LN2 / Math.LN10)).toFixed(8)),
           cell(chip('rounded', 'no'))])
       ])
-      + steps('why this split is the whole history of the subject', [
-        ['ten times x has the same mantissa', 'x = ' + Rtext(x) + ' and 10x = ' + Rtext(Rmul(x, R(10n)))
-          + ' differ by exactly 1 in the characteristic and not at all in the mantissa, because '
-          + 'log_10(10x) = log_10(10) + log_10(x) = 1 + log_10(x). A table of logarithms therefore '
-          + 'only ever had to list mantissas for numbers between 1 and 10; the reader supplied the '
-          + 'characteristic by looking at the number.'],
-        ['what is exact here', 'the characteristic ' + k + ' and the scientific-notation form '
+      + steps('what the bracket checks', [
+        ['ten times x raises the common logarithm by one', 'x = ' + Rtext(x) + ' and 10x = ' + Rtext(Rmul(x, R(10n)))
+          + ' differ by exactly 1 because log_10(10x) = log_10(10) + log_10(x) '
+          + '= 1 + log_10(x). The base predicts the change before either decimal is computed.'],
+        ['what is exact here', 'the power-of-ten exponent ' + k + ' and the scientific-notation form '
           + Rshow(mant) + ' &times; 10^' + k + '. Both came from comparing fractions with powers of '
           + 'ten, which is multiplication and nothing else.'],
         ['what is not', exactly
-          ? 'nothing, on this x: the mantissa is 0 because x is exactly a power of ten, so '
+          ? 'nothing, on this x: the remainder is 0 because x is exactly a power of ten, so '
             + 'log_10(x) = ' + k + ' with no rounding anywhere.'
-          : 'the mantissa. log_10(' + Rshow(mant) + ') is irrational, and every decimal in the '
+          : 'the remaining logarithm. log_10(' + Rshow(mant) + ') is irrational, and every decimal in the '
             + 'last four rows is a rounding of it to 8 places.'],
         ['ln against log', 'the two differ by the constant factor ln(10) &asymp; '
           + Math.LN10.toFixed(8) + '. Which one a formula uses is a matter of convention, and the '
@@ -2621,10 +2619,10 @@ the invented law:       log(40/5) = log 8 ≈ 0.903090</div><p>The three quotien
 
     status.innerHTML = exactly
       ? '<strong>log_10(' + Rtext(x) + ') = ' + k + ' exactly.</strong> x is a whole power of ten, '
-        + 'so the mantissa is zero and there is nothing to round. These are the only arguments for '
+        + 'so the remainder is zero and there is nothing to round. These are the only arguments for '
         + 'which a common logarithm is exact, which is worth remembering when a page prints '
         + 'log_10(2) = 0.3010 without a word about where the rest of the digits went.'
-      : '<strong>The characteristic is ' + k + ' and it is exact; the mantissa is not.</strong> '
+      : '<strong>The power-of-ten exponent is ' + k + ' and it is exact; the remainder is not.</strong> '
         + 'Writing x as ' + Rshow(mant) + ' &times; 10^' + k + ' splits log_10(x) into a whole '
         + 'number anybody can read off and an irrational remainder in [0, 1) that has to be '
         + 'computed. log_10(' + Rtext(x) + ') &asymp; ' + log10.toFixed(8) + ' is that sum, rounded '

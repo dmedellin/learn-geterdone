@@ -6,7 +6,7 @@ LESSONS = [
         "slug": "the-ac-method",
         "title": "The AC Method",
         "module": "Factoring",
-        "one_line": "Factoring ax² + bx + c when a is not 1.",
+        "one_line": "Factor ax² + bx + c by an exhaustive ac pair search followed by grouping.",
         "summary": (
             "When the leading coefficient is not `1`, guessing the two binomials is a "
             "search with too many branches. The AC method replaces the guess with "
@@ -72,17 +72,17 @@ LESSONS = [
                   "produces two brackets that are not identical, you have made an "
                   "arithmetic slip, not discovered a second answer."),
             ("h3", "When there is no pair"),
-            ("thm", ("The integer factorisation criterion",
-                     "For integers `a`, `b`, `c` with `a ≠ 0`, the trinomial "
-                     "`ax² + bx + c` factors as a product of two binomials with integer "
-                     "coefficients exactly when the discriminant `b² - 4ac` is a perfect "
-                     "square.")),
-            ("example", ("2x² + 3x + 4 does not factor",
+            ("thm", ("Why an empty pair list rules out integer brackets",
+                     "If `ax² + bx + c = (rx + s)(tx + u)` with integer coefficients, "
+                     "then `a = rt`, `b = ru + st` and `c = su`. The two middle products "
+                     "`m = ru` and `n = st` therefore satisfy `mn = ac` and `m + n = b`. "
+                     "Any integer-coefficient binomial factorisation must produce a pair "
+                     "on the ac list.")),
+            ("example", ("2x² + 3x + 4 has no integer-binomial factorisation",
                          "`ac = 8`. The positive pairs `1·8` and `2·4` give sums `9` and "
                          "`6`; the negative pairs `(-1)(-8)` and `(-2)(-4)` give `-9` and "
-                         "`-6`. None is `3`, and the search is now complete. The "
-                         "discriminant agrees: `b² - 4ac = 9 - 32 = -23`, which is not a "
-                         "perfect square.")),
+                         "`-6`. None is `3`, and the theorem above shows why the completed "
+                         "list rules out every product of integer-coefficient binomials.")),
             ("p", "Take the common factor out first, always. `12x² + 22x + 6` has `ac = "
                   "72` and a messier pair list, but `12x² + 22x + 6 = 2(6x² + 11x + 3) = "
                   "2(3x + 1)(2x + 3)` reduces it to the example above. Lesson 5 put the "
@@ -142,16 +142,24 @@ LESSONS = [
                 "`3`. Pulling out `3` would give `3(-3x + 2)`, whose bracket does not "
                 "match `3x - 2`, and the grouping would appear to fail. When the two "
                 "brackets differ only by an overall sign, the sign you extracted is "
-                "the thing to fix."
+                "the thing to fix.",
+                "For a faded ac pass, start `6x² - 7x - 20` from the supplied product "
+                "`ac = -120`. Search opposite-sign factor pairs for sum `-7`, split the "
+                "middle term, group, and expand. The pair is `8` and `-15`, giving "
+                "`(2x - 5)(3x + 4)`; using `-8` and `15` preserves the product but "
+                "reverses the middle coefficient."
             ],
         },
         "quiz_title": "Check yourself",
         "quiz": [
-            {"q": "For `10x² + 11x - 6`, which product must the pair of integers have?",
-             "a": ["`11`", "`-6`", "`-60`", "`10`"],
-             "c": 2,
-             "why": "The pair multiplies to `ac = 10 · (-6) = -60` and adds to `b = 11`. "
-                    "The pair is `15` and `-4`."},
+            {"q": "Factor `10x² + 11x - 6`.",
+             "a": ["`(5x - 2)(2x + 3)`", "`(5x + 2)(2x - 3)`",
+                   "`(10x - 3)(x + 2)`", "`(5x - 3)(2x + 2)`"],
+             "c": 0,
+             "why": "`ac = -60`; the pair `15` and `-4` sums to `11`, so grouping gives "
+                    "`(5x - 2)(2x + 3)`. The second option makes the middle coefficient "
+                    "`-11`, the third makes it `17`, and the fourth has constant `-6` "
+                    "but leading coefficient `10` and middle coefficient `4`, not `11`."},
             {"q": "Why may `bx` be replaced by `mx + nx`?",
              "a": ["Because both sides of the equation are changed equally",
                    "Because `m + n = b`, so the two expressions are equal for every `x`",
@@ -188,8 +196,8 @@ LESSONS = [
         "standard": ("Finish when an empty pair list reads as a result rather than a dead end.",
                      "You should be able to factor `6x² - 7x - 20` and `12x² - 17x + 6` "
                      "without hesitation, and to say of `2x² + 3x + 4` that it does not "
-                     "factor over the integers &mdash; naming the completed search or "
-                     "the discriminant as your reason."),
+                     "factor into integer-coefficient binomials &mdash; naming the completed "
+                     "ac pair search as your reason."),
         "note": "The lab prints the whole pair list rather than only the winning pair, "
                 "because the list is the argument. A pair that is simply asserted is a "
                 "guess that happened to work; a list that has been exhausted is a "
@@ -201,7 +209,7 @@ LESSONS = [
         "slug": "factoring-special-forms",
         "title": "Factoring Special Forms",
         "module": "Factoring",
-        "one_line": "Differences of squares, perfect square trinomials, sums and differences of cubes.",
+        "one_line": "Test a polynomial against four special forms, apply a match, and retest every factor.",
         "summary": (
             "Four patterns, recognised rather than derived. Each is one of the special "
             "products of lesson 4 read backwards, and each is worth knowing on sight "
@@ -213,7 +221,7 @@ LESSONS = [
             "a² ± 2ab + b²  =  (a ± b)²",
             "a³ - b³   =  (a - b)(a² + ab + b²)",
             "a³ + b³   =  (a + b)(a² - ab + b²)",
-            "a² + b²   does NOT factor over the reals",
+            "a² + b²   is NOT a difference of squares",
         ],
         "key_label": "Four patterns, and one non-pattern",
         "concepts_intro": (
@@ -221,14 +229,17 @@ LESSONS = [
             "right to left is multiplying; reading them left to right is factoring."
         ),
         "concepts": [
-            ("A pattern matches only if both parts are perfect powers",
+            ("A pattern matches only if both parts are perfect powers in the coefficient system",
              "`9x² - 25` is a difference of squares because `9x²` is `(3x)²` and `25` "
-             "is `5²`. `9x² - 24` is not, because `24` is not the square of anything "
-             "rational. Checking both parts is the whole of the recognition step."),
-            ("The sum of two squares does not factor",
-             "`a² + b²` has no factorisation over the real numbers. This is not a gap "
-             "in your technique; there is nothing to find. Course 6 introduces `i` and "
-             "factors it as `(a + bi)(a - bi)`, which is a different number system."),
+             "is `5²`. Over the rational coefficients used here, `9x² - 24` does not "
+             "match because `24` is not a rational square. Over a larger coefficient "
+             "system the answer can change, so the qualifier is part of the claim."),
+            ("A sum of squares is not the conjugate pattern",
+             "The identity needs `a² - b²`; changing the minus to a plus destroys the "
+             "middle-term cancellation. In particular `x² + b²` with nonzero real `b` "
+             "has no real linear factor because it is always positive. Higher-degree "
+             "sums of square expressions require separate analysis; the plus sign alone "
+             "is not a universal irreducibility test."),
             ("Factor completely means keep going",
              "`x⁴ - 16` is `(x² - 4)(x² + 4)`, and `x² - 4` is itself a difference of "
              "squares. A pattern that applies once may apply again to one of the "
@@ -250,8 +261,9 @@ LESSONS = [
                          "(x²)² - 4² = (x² - 4)(x² + 4) = (x - 2)(x + 2)(x² + 4)`, where "
                          "the last factor is a sum of squares and stops there.")),
             ("p", "There is no difference-of-squares pattern for a sum. `a² + b²` is "
-                  "irreducible over the reals &mdash; for `x² + 4` the discriminant is "
-                  "`0 - 16 = -16`, so no real linear factors exist. Writing "
+                  "not `(a - b)(a + b)`. In the quadratic example `x² + 4`, every "
+                  "real `x` gives `x² + 4 > 0`, so there is no real root and therefore "
+                  "no real linear factor. Writing "
                   "`x² + 4 = (x + 2)(x + 2)` is the single most common invented law in "
                   "this lesson; expanding it gives `x² + 4x + 4`."),
             ("h3", "Perfect square trinomials"),
@@ -272,8 +284,9 @@ LESSONS = [
             ("thm", ("a³ - b³ = (a - b)(a² + ab + b²)   and   a³ + b³ = (a + b)(a² - ab + b²)",
                      "Unlike squares, a SUM of cubes does factor. In both identities the "
                      "linear factor carries the sign of the original and the quadratic "
-                     "factor carries the opposite sign on its middle term; the quadratic "
-                     "never factors further over the reals.")),
+                     "factor carries the opposite sign on its middle term. Retest that "
+                     "factor like every other one; the cube identity alone does not prove "
+                     "that no different pattern applies to it.")),
             ("example", ("8x³ - 27 and 27x³ + 64",
                          "`8x³ - 27 = (2x)³ - 3³ = (2x - 3)(4x² + 6x + 9)`. And "
                          "`27x³ + 64 = (3x)³ + 4³ = (3x + 4)(9x² - 12x + 16)`. Expanding "
@@ -298,9 +311,10 @@ LESSONS = [
              "`2x² - 50` is not a difference of squares as written, because `2x²` is "
              "not a perfect square. As `2(x² - 25)` it is, giving `2(x - 5)(x + 5)`."),
             ("Two terms: try squares, then cubes",
-             "A difference of squares factors; a sum of squares does not. Both a sum "
-             "and a difference of cubes factor. Check that each term really is a "
-             "perfect square or cube before claiming the pattern."),
+             "A difference of rational perfect squares matches the conjugate identity; "
+             "a sum of squares does not match that identity and needs a separate "
+             "factorability argument. Both a sum and a difference of rational perfect "
+             "cubes match their cube identities. Check the powers before naming a pattern."),
             ("Three terms: test the middle term",
              "If the outer terms are perfect squares, compute twice the product of "
              "their roots. If that equals the middle term, it is a perfect square "
@@ -331,41 +345,48 @@ LESSONS = [
                 "calculation. That `(x - 2)(x + 2)(x² + 4)` multiplies back to `x⁴ - 16` "
                 "is checked by expanding. That `x² + 4` cannot be factored further is a "
                 "separate claim, and its justification is that a sum of squares has no "
-                "real factorisation &mdash; not that no factorisation came to mind."
+                "real linear factor because it stays positive &mdash; not that no "
+                "factorisation came to mind.",
+                "For a faded special-form pass, start `16x⁴ - 81` with the supplied "
+                "recognition `(4x²)² - 9²`. Apply the pattern, retest both factors over "
+                "the rationals, and expand to check. The complete result is "
+                "`(2x - 3)(2x + 3)(4x² + 9)`; stopping at `(4x² - 9)(4x² + 9)` "
+                "misses the second difference of squares."
             ],
         },
         "quiz_title": "Check yourself",
         "quiz": [
-            {"q": "Which of these does NOT factor over the real numbers?",
-             "a": ["`x³ + 8`", "`x² - 8`", "`x² + 9`", "`4x² - 9`"],
+            {"q": "Which expression is a sum of squares, so the difference-of-squares identity does not apply?",
+             "a": ["`x³ + 8`", "`x² - 9`", "`x² + 9`", "`4x² - 9`"],
              "c": 2,
-             "why": "`x² + 9` is a sum of squares. A sum of CUBES does factor, which is "
-                    "why `x³ + 8 = (x + 2)(x² - 2x + 4)`."},
-            {"q": "Is `x² + 10x + 25` a perfect square trinomial?",
-             "a": ["No, because the middle term is positive",
-                   "Yes, it is `(x + 5)²`",
-                   "No, because `25` is not twice `5`",
-                   "Yes, it is `(x + 25)²`"],
-             "c": 1,
-             "why": "`x² = (x)²`, `25 = 5²`, and `2 · x · 5 = 10x` matches the middle "
-                    "term exactly."},
-            {"q": "Factor `27x³ + 64`.",
-             "a": ["`(3x + 4)(9x² - 12x + 16)`", "`(3x + 4)(9x² + 12x + 16)`",
-                   "`(3x - 4)(9x² + 12x + 16)`", "`(3x + 4)³`"],
+             "why": "`x² + 9` has a plus between two squares, so the conjugate identity "
+                    "does not apply. `x² - 9` and `4x² - 9` are differences of squares; "
+                    "`x³ + 8` is a sum of cubes, a different plus-sign pattern that does factor."},
+            {"q": "Factor `4x² - 20x + 25`.",
+             "a": ["`(2x - 5)²`", "`(2x + 5)²`", "`(4x - 5)²`", "`(2x - 5)(2x + 5)`"],
              "c": 0,
-             "why": "For `a³ + b³` with `a = 3x` and `b = 4`, the binomial takes the "
-                    "plus sign and the trinomial's middle term takes the minus: "
-                    "`a² - ab + b² = 9x² - 12x + 16`."},
+             "why": "The correct answer is `(2x - 5)²`: its middle term is "
+                    "`-2(2x)(5) = -20x`. `(2x + 5)²` has `+20x`; `(4x - 5)²` "
+                    "starts with `16x²`; and the conjugate product loses the middle term "
+                    "entirely. "},
+            {"q": "Factor `8x³ + 125`.",
+             "a": ["`(2x + 5)(4x² - 10x + 25)`", "`(2x + 5)(4x² + 10x + 25)`",
+                   "`(2x - 5)(4x² + 10x + 25)`", "`(2x + 5)³`"],
+             "c": 0,
+             "why": "For a sum of cubes the binomial keeps the plus and the trinomial "
+                    "takes `-ab`, giving `(2x + 5)(4x² - 10x + 25)`. The second option "
+                    "uses the difference-of-cubes sign, the third changes the original "
+                    "sum to a difference, and a binomial cube would have four terms."},
         ],
         "mistakes": [
             ("Factoring a sum of squares",
-             "`x² + 4` is irreducible over the reals, and `(x + 2)²` is `x² + 4x + 4`. "
-             "The habit is picked up from the difference of squares, where the pattern "
-             "is real, and it survives because nobody expands the answer."),
+             "`x² + 4` has no real linear factor because it is positive for every real "
+             "`x`, and `(x + 2)²` is `x² + 4x + 4`. The false habit is copied from the "
+             "difference-of-squares identity and survives when the answer is not expanded."),
             ("Skipping the middle-term test",
              "`4x² + 10x + 25` has perfect square outer terms, but `2 · 2x · 5 = 20x`, "
-             "not `10x`. It is not `(2x + 5)²`, and in fact `b² - 4ac = 100 - 400` is "
-             "negative, so it does not factor at all."),
+             "not `10x`. It is not `(2x + 5)²`; a failed perfect-square test sends the "
+             "expression back to the ac search rather than licensing a guessed square."),
             ("Putting the wrong signs in the cubes trinomial",
              "The trinomial's last term is `+b²` in both identities. If you have "
              "written `(a - b)(a² + ab - b²)`, expand it: the `a³` and `b³` will not "
@@ -374,20 +395,21 @@ LESSONS = [
         "standard": ("Finish when you can refuse a sum of squares as confidently as you accept a difference.",
                      "Given `9x² - 25`, `x² + 12x + 36`, `8x³ - 27` and `x² + 16` you "
                      "should factor the first three on sight and say of the fourth that "
-                     "it does not factor over the reals, without treating that as a "
-                     "failure to spot something."),
+                     "the conjugate pattern does not apply; because it stays positive, it "
+                     "also has no real linear factor. Neither conclusion is a failure to spot something."),
         "note": "These patterns matter beyond factoring. Course 5 cancels a difference "
                 "of squares out of a rational expression on almost every page, and "
                 "course 6 returns to `a² + b²` once `i` exists and factors it properly. "
-                "What is true here is that it does not factor over the REALS, and that "
-                "qualifier is the whole content of the claim.",
+                "This lesson factors over rational coefficients unless it explicitly says "
+                "otherwise. Course 6 enlarges the coefficient system; naming the system is "
+                "part of every claim that a factor does or does not exist.",
     },
     # ---------------------------------------------------------------- 10
     {
         "slug": "polynomial-long-division",
         "title": "Polynomial Long Division",
         "module": "Division and roots",
-        "one_line": "Dividing by any polynomial, and what the remainder means.",
+        "one_line": "Divide by any nonzero polynomial, stop by degree, and verify f = dq + r.",
         "summary": (
             "The long division you learned for integers, performed on polynomials. It "
             "works for a divisor of any degree, it always terminates, and it produces "
@@ -524,7 +546,12 @@ LESSONS = [
                 "from the same rule.",
                 "The check is mechanical: expand `(x² - x + 2)(2x² - x - 5)` to get "
                 "`2x⁴ - 3x³ + 3x - 10`, then add `2x + 9` to get `2x⁴ - 3x³ + 5x - 1`. "
-                "That is the original dividend, so the quotient and remainder are right."
+                "That is the original dividend, so the quotient and remainder are right.",
+                "For a faded division, write `x³ - 5x + 6` as `x³ + 0x² - 5x + 6` "
+                "and divide by `x² + x - 2`. The first quotient term `x` is supplied. "
+                "Finish the multiply-subtract loop and verify the identity. You should get "
+                "`q = x - 1`, `r = -2x + 4`; a remainder containing `x²` means you "
+                "stopped before its degree fell below the divisor's."
             ],
         },
         "quiz_title": "Check yourself",
@@ -540,14 +567,14 @@ LESSONS = [
              "c": 0,
              "why": "A zero remainder means `f = dq` exactly, so `d` divides `f`. This "
                     "is the observation lesson 12 turns into the factor theorem."},
-            {"q": "Why write `+ 0x²` in the dividend?",
-             "a": ["It changes the value of the polynomial",
-                   "It keeps the columns aligned so each subtraction uses like terms",
-                   "The algorithm requires all coefficients to be non-zero",
-                   "It increases the degree of the dividend"],
-             "c": 1,
-             "why": "`0x²` adds nothing to the polynomial. It reserves the column, so "
-                    "the terms being subtracted line up with the terms they belong to."},
+            {"q": "Divide `x³ - 4x² + x + 6` by `x - 2`. What is the result?",
+             "a": ["`x² - 2x - 3`, remainder `0`", "`x² + 2x - 3`, remainder `0`",
+                   "`x² - 2x + 3`, remainder `12`", "`x² - 4x + 1`, remainder `6`"],
+             "c": 0,
+             "why": "Long division gives `x² - 2x - 3` and remainder `0`; multiplying "
+                    "by `x - 2` recovers the dividend. The second loses the subtraction "
+                    "sign, the third changes both the constant and remainder, and the "
+                    "fourth merely copies dividend coefficients without running division."},
         ],
         "mistakes": [
             ("Subtracting only the first term of the product",
@@ -578,7 +605,7 @@ LESSONS = [
         "slug": "synthetic-division-and-the-remainder-theorem",
         "title": "Synthetic Division and the Remainder Theorem",
         "module": "Division and roots",
-        "one_line": "A shorthand for dividing by x - c, and what the remainder equals.",
+        "one_line": "Use synthetic division for x - c and verify that its last entry equals f(c).",
         "summary": (
             "When the divisor is `x - c`, the long division of lesson 10 repeats the "
             "same three symbols on every line and can be compressed to one row of "
@@ -714,7 +741,12 @@ LESSONS = [
                 "The two checks available here are different in kind. Expanding "
                 "`(x - 3)(2x² + x + 6) + 11` confirms the whole division. Evaluating "
                 "`f(3)` confirms only the remainder &mdash; but it is one line, and a "
-                "wrong remainder almost always means a wrong row above it."
+                "wrong remainder almost always means a wrong row above it.",
+                "For a faded row, divide `x³ - 4x² + x + 6` by `x - 2`. The supplied "
+                "setup is `2 │ 1  -4  1  6`. Complete the multiply-add row, name the "
+                "quotient, and check the last entry with `f(2)`. The bottom row is "
+                "`1, -2, -3, 0`, so `q = x² - 2x - 3` and the remainder is `0`; "
+                "using `-2` as `c` computes a different division."
             ],
         },
         "quiz_title": "Check yourself",
@@ -730,11 +762,14 @@ LESSONS = [
              "c": 1,
              "why": "By the remainder theorem the last number is `f(2)`. A zero "
                     "remainder means `f = (x - 2)q` exactly."},
-            {"q": "Which divisor can NOT be handled by synthetic division as written?",
-             "a": ["`x - 1`", "`x + 7`", "`x² - 4`", "`x - 1/2`"],
-             "c": 2,
-             "why": "The method needs a monic divisor of degree one. `x² - 4` has "
-                    "degree two, so it needs long division."},
+            {"q": "Synthetic division of `2x³ + x² - 8x - 4` by `x + 2` gives which result?",
+             "a": ["`2x² - 3x - 2`, remainder `0`", "`2x² + 5x + 2`, remainder `0`",
+                   "`2x² - 3x - 2`, remainder `-8`", "`2x² + x - 8`, remainder `-4`"],
+             "c": 0,
+             "why": "Use `c = -2`: the bottom row is `2, -3, -2, 0`, giving the first "
+                    "answer. The second uses `c = +2`, the third reads the same quotient "
+                    "but invents a remainder, and the fourth mistakes the input coefficients "
+                    "for quotient coefficients."},
         ],
         "mistakes": [
             ("Using the sign printed in the divisor",
@@ -765,7 +800,7 @@ LESSONS = [
         "slug": "the-factor-theorem-and-rational-roots",
         "title": "The Factor Theorem and Rational Roots",
         "module": "Division and roots",
-        "one_line": "Turning a root into a factor, and generating every candidate root.",
+        "one_line": "Generate every rational-root candidate, test it exactly, divide out hits, and state the scope of an empty search.",
         "summary": (
             "The factor theorem converts a question about values into a question about "
             "factors. The rational root theorem then supplies a finite list of "
@@ -883,7 +918,9 @@ LESSONS = [
              "quotient immediately. `f(c) = 0` means `(x - c)` is a factor."),
             ("Repeat on the quotient, and stop at degree 2",
              "The quotient is one degree lower; search it the same way. Once it is a "
-             "quadratic, factor it or use the discriminant &mdash; no list needed."),
+             "quadratic, use the pair or ac method already taught. If those searches are "
+             "empty, record that no rational linear factor remains; Course 6 classifies "
+             "its irrational or complex roots."),
         ],
         "worked": {
             "title": "Factoring 2x³ - 3x² - 8x - 3",
@@ -922,7 +959,12 @@ LESSONS = [
                 "Every root that appeared is on the original list: `-1`, `-1/2` and `3` "
                 "are all of the form `p/q` with `p` dividing `-3` and `q` dividing `2`. "
                 "That is the theorem doing what it promised, and it is worth checking "
-                "once to believe it."
+                "once to believe it.",
+                "For a faded rational-root search, take `2x³ - 3x² - 5x + 6`. Build the "
+                "candidate list, with the supplied first test `f(1) = 0`; divide by "
+                "`x - 1`, then factor the quotient by the ac method. The complete result "
+                "is `(x - 1)(2x + 3)(x - 2)`. If your quotient is `2x² + x - 6`, "
+                "the synthetic addition under the `-3` coefficient used the wrong sign."
             ],
         },
         "quiz_title": "Check yourself",
@@ -959,9 +1001,10 @@ LESSONS = [
              "`±1, ±2, ±1/3, ±2/3` &mdash; eight candidates, of which only `-1` "
              "happens to be a root &mdash; and miss the actual root `-1/2` entirely."),
             ("Continuing to test candidates after the degree drops to two",
-             "Once the quotient is a quadratic, factor it or apply the discriminant. "
+             "Once the quotient is a quadratic, use the pair or ac method from lessons 7 and 8. "
              "Further candidate testing can only rediscover what those methods give "
-             "directly, and it can miss irrational roots that the quadratic has."),
+             "directly, and an empty rational search must not be inflated into a claim "
+             "that the quadratic has no real or complex roots."),
         ],
         "standard": ("Finish when a complete search that finds nothing reads as a proof.",
                      "You should factor `2x³ - 3x² - 8x - 3` down to three linear "
@@ -979,7 +1022,7 @@ LESSONS = [
         "slug": "graphs-of-polynomial-functions",
         "title": "Graphs of Polynomial Functions",
         "module": "Polynomial graphs",
-        "one_line": "Reading end behaviour, roots and multiplicity off the factored form.",
+        "one_line": "Sketch end behaviour and axis crossings from degree, leading sign, roots, and multiplicities.",
         "summary": (
             "The factored form answers the questions a graph asks. Degree and leading "
             "coefficient fix what happens at the far ends; each factor fixes where the "
@@ -992,7 +1035,7 @@ LESSONS = [
             "even degree, a > 0   both ends rise",
             "odd multiplicity     the curve CROSSES the axis",
             "even multiplicity    the curve TOUCHES and turns back",
-            "degree n:  at most n roots,  at most n - 1 turning points",
+            "degree n:  root multiplicities add to at most n",
         ],
         "key_label": "What the factored form tells you",
         "concepts_intro": (
@@ -1008,19 +1051,19 @@ LESSONS = [
              "A factor `(x - c)` appearing an odd number of times gives a sign change "
              "at `c`, so the curve crosses. An even number of times gives no sign "
              "change, so the curve touches the axis and turns back."),
-            ("Degree bounds the shape",
-             "A degree-`n` polynomial has at most `n` roots and at most `n - 1` "
-             "turning points. A sketch with more of either is wrong before any "
-             "arithmetic is checked."),
+            ("Degree bounds the root count",
+             "A degree-`n` polynomial has at most `n` roots counted with multiplicity. "
+             "The multiplicities written beside the axis must therefore add to at most "
+             "`n`; exceeding the degree proves that a factor or multiplicity was misread."),
         ],
         "read_title": "Sketching from the factored form",
         "read_intro": "Four deductions, in the order that makes each one easy.",
         "body": [
             ("p", "Polynomial graphs are continuous and smooth &mdash; no jumps, no "
-                  "corners, no asymptotes. Everything that distinguishes one from "
-                  "another is the degree, the leading coefficient, and the roots with "
-                  "their multiplicities, all of which are visible in the factored "
-                  "form."),
+                  "corners, no asymptotes. Degree, leading coefficient, real roots and "
+                  "multiplicities determine the end directions and what happens at the "
+                  "axis. They do not locate every turning point, so the result here is a "
+                  "qualitative sketch rather than an exact plot."),
             ("h3", "End behaviour"),
             ("thm", ("The leading term governs the ends",
                      "For `f(x) = aₙxⁿ + …` the behaviour as `x → ±∞` matches that of "
@@ -1054,24 +1097,29 @@ LESSONS = [
                   "at `1` without crossing, falls back below, and crosses at `3` on "
                   "its way up. Sample values confirm it: `f(-3) = 96`, `f(0) = -6`, "
                   "`f(2) = -4`, `f(4) = 54`."),
-            ("h3", "Turning points and intercepts"),
-            ("p", "A degree-`n` polynomial has at most `n - 1` turning points, so the "
-                  "quartic above has at most three &mdash; and it needs all three: one "
-                  "between `-2` and `1`, one at `1` itself, and one between `1` and "
-                  "`3`. The y-intercept is always `f(0)`, which is the constant term "
-                  "in standard form and the product of the constants in factored form."),
-            ("p", "This course finds turning points only where a factor forces one, as "
-                  "at the touch above. Locating the others exactly needs calculus, and "
-                  "course 6 handles the one case algebra can do on its own: the vertex "
-                  "of a parabola."),
+            ("h3", "Intercepts and the limits of the sketch"),
+            ("p", "The y-intercept is always `f(0)`, which is the constant term in "
+                  "standard form and the product of the constants in factored form. It "
+                  "anchors the sign intervals to one exact point away from the roots."),
+            ("p", "A touch forces a local turn at its even-multiplicity root, but these "
+                  "data do not locate any other turning points. Exact turning-point "
+                  "locations require calculus; Course 6 handles the one case algebra can "
+                  "do on its own, the vertex of a parabola. Draw a qualitative sketch "
+                  "here and let the evaluated lab supply the metric picture."),
         ],
         "lab": ("grapher", {
             "mode": "polynomial",
-            "panel_title": "Change a multiplicity, watch the axis",
-            "panel_intro": "Enter the roots and their multiplicities. The lab plots "
-                           "the polynomial by evaluating it, and marks each root as a "
-                           "crossing or a touch. Raise a multiplicity from `1` to `2` "
-                           "and watch the crossing become a turn.",
+            "presets": [
+                ("(x + 2)(x - 1)^2(x - 3)   (worked example)", "(x + 2)(x - 1)^2(x - 3)"),
+                ("-(x + 1)^2(x - 2)   (faded rehearsal)", "-(x + 1)^2(x - 2)"),
+                ("x^3 - x   (three simple crossings)", "x^3 - x"),
+                ("x^3 - 3x + 2   (one repeated root)", "x^3 - 3x + 2"),
+            ],
+            "panel_title": "Change a factor, watch the axis",
+            "panel_intro": "Type a polynomial, in factored or expanded form. The lab "
+                           "searches its rational zeros, divides to find each multiplicity, "
+                           "and marks the resulting crossing or touch. Change `(x - 1)^2` "
+                           "to `(x - 1)^3` and compare the sign on either side.",
         }),
         "steps_title": "Sketching a polynomial",
         "steps_intro": "Ends first, then the axis, then the one point you should always plot.",
@@ -1087,9 +1135,10 @@ LESSONS = [
              "Odd multiplicity crosses; even multiplicity touches and turns. Write "
              "the multiplicity next to each root before drawing anything."),
             ("Plot the y-intercept and join up",
-             "Compute `f(0)`. Then draw the only smooth curve consistent with the "
-             "ends, the crossings and that point &mdash; using at most `n - 1` "
-             "turning points."),
+             "Compute `f(0)`. Then draw a smooth qualitative curve consistent with the "
+             "ends, crossings, touches and that point. Do not invent an exact location "
+             "for an unforced turn; the lab's "
+             "evaluated plot is the metric picture."),
         ],
         "worked": {
             "title": "Sketching f(x) = (x + 2)(x - 1)²(x - 3)",
@@ -1116,7 +1165,7 @@ LESSONS = [
                 "                 1 < x <  3   -        f( 2) =  -4",
                 "                     x >  3   +        f( 4) =  54",
                 "",
-                "at most 4 roots (3 distinct), at most 3 turning points",
+                "multiplicities:  1 + 2 + 1 = 4, exactly the degree",
             ],
             "after": [
                 "The sign row is the check that the multiplicities were read "
@@ -1126,7 +1175,13 @@ LESSONS = [
                 "Note that the multiplicities sum to `4`, the degree. Counted with "
                 "multiplicity there are four roots here; counted as distinct points on "
                 "the axis there are three. Both statements are true and they are not "
-                "the same statement."
+                "the same statement.",
+                "For a faded sketch, use `g(x) = -(x + 1)²(x - 2)`. The supplied first "
+                "reading is degree `3` with negative leading coefficient, so the left end "
+                "rises and the right end falls. Mark the roots and multiplicities, find "
+                "`g(0)`, and sketch before opening the lab. The curve touches at `-1`, "
+                "crosses at `2`, and has y-intercept `2`; crossing at `-1` means the "
+                "even multiplicity was treated as odd."
             ],
         },
         "quiz_title": "Check yourself",
@@ -1144,10 +1199,12 @@ LESSONS = [
              "c": 1,
              "why": "The multiplicity of `-1` is `2`, which is even, so `(x + 1)²` does "
                     "not change sign there and the curve turns back."},
-            {"q": "What is the greatest number of turning points a degree-6 polynomial can have?",
-             "a": ["`4`", "`5`", "`6`", "`7`"],
-             "c": 1,
-             "why": "At most `n - 1` turning points for degree `n`, so at most `5`."},
+            {"q": "What is the y-intercept of `h(x) = (x + 2)(x - 1)²`?",
+             "a": ["`-2`", "`0`", "`2`", "`4`"],
+             "c": 2,
+             "why": "Set `x = 0`: `h(0) = (2)(-1)² = 2`. `-2` forgets that the "
+                    "square is positive, `0` mistakes a root for the y-intercept, and "
+                    "`4` squares the first factor as well."},
         ],
         "mistakes": [
             ("Deciding the ends from the constant term or the number of roots",
@@ -1158,10 +1215,10 @@ LESSONS = [
              "A squared factor touches and turns. Treating `(x - 1)²` as a crossing "
              "gives a curve on the wrong side of the axis for the whole interval that "
              "follows, and the sign check will catch it."),
-            ("Sketching more turning points than the degree allows",
-             "A cubic cannot wiggle three times. If your curve needs four turning "
-             "points to reach all the marked roots, one of the multiplicities has been "
-             "misread."),
+            ("Pretending the qualitative data locate every turn",
+             "The ends, roots, multiplicities and y-intercept constrain a sketch; they "
+             "do not give exact x-coordinates for unforced turning points. A neat-looking "
+             "curve is not a calculation, which is why the evaluated lab remains a check."),
         ],
         "standard": ("Finish when you can sketch from the factored form without plotting points.",
                      "Given `f(x) = (x + 2)(x - 1)²(x - 3)` you should produce the "
