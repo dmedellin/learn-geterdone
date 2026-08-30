@@ -1238,7 +1238,7 @@ C.  4x² - 12x + 9 = 0
         2x - 3 = 0
         x = 3/2                   one solution, counted twice
 
-    check  x = 3/2:   9 - 18 + 9 = 0</div><p>In A the check was carried out on <span class="math">x² + 3x = 10</span>, the equation as given. Checking against <span class="math">x² + 3x - 10 = 0</span> instead would agree with itself even if the subtraction had gone wrong, which is the one thing a check is supposed to catch.</p><p>C has one solution, and nothing was lost in getting there. <span class="math">(2x - 3)²</span> gives the equation <span class="math">2x - 3 = 0</span> twice, and solving the same equation twice returns the same number twice. Lesson 10 shows what this looks like on a graph: a curve that touches the x-axis instead of crossing it.</p></article>
+    check  x = 3/2:   9 - 18 + 9 = 0</div><p>In A the check was carried out on <span class="math">x² + 3x = 10</span>, the equation as given. Checking against <span class="math">x² + 3x - 10 = 0</span> instead would agree with itself even if the subtraction had gone wrong, which is the one thing a check is supposed to catch.</p><p>C has one solution, and nothing was lost in getting there. <span class="math">(2x - 3)²</span> gives the equation <span class="math">2x - 3 = 0</span> twice, and solving the same equation twice returns the same number twice. Lesson 10 shows what this looks like on a graph: a curve that touches the x-axis instead of crossing it.</p><p>For a faded AC-method solve, take <span class="math">12x² - 11x - 5 = 0</span>. The supplied search target is product <span class="math">-60</span> and sum <span class="math">-11</span>; use <span class="math">-15</span> and <span class="math">4</span> to split the middle term. Group, solve both linear factors and check the two values in the original. You should reach <span class="math">x = 5/4</span> and <span class="math">x = -1/3</span>; an inverted fraction identifies the factor-solving step that needs repair.</p></article>
       </div>
     </section>
     <section class="section">
@@ -1283,7 +1283,7 @@ C.  4x² - 12x + 9 = 0
     </section>
 
     <footer class="footer">
-      <p><strong>Quadratics and Complex Numbers.</strong> Every quadratic on this course is solved by all four methods at once, in exact arithmetic, and the four answers are compared on screen &mdash; they agree because they are computed independently. Roots, vertex and axis are marked on the parabola using the same numbers printed beside it.</p>
+      <p><strong>Quadratics and Complex Numbers.</strong> The quadratic lab tests all four solution methods independently on every redraw. A method that does not apply says why; completing the square and the formula always finish and their exact answers agree. Roots, vertex and axis are marked on the parabola using the same numbers printed beside it.</p>
       <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure is computed in your browser from the stated definition, and a step that gives the right answer here is not thereby a valid rule.</p>
       <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
     </footer>
@@ -1901,6 +1901,11 @@ C.  4x² - 12x + 9 = 0
   }
 
   var MODE = 'factor', QUARTIC = false;
+  /* Lessons 3-6 classify a negative discriminant as "no real solution" before
+     lesson 7 defines i. The same lab serves later graphing lessons, where the
+     complex pair is legitimate retrieval, so presentation follows lesson order
+     even though the exact-arithmetic core can already compute both cases. */
+  var SHOW_COMPLEX = ['graph', 'vertex', 'optimise', 'reducible'].indexOf(MODE) >= 0;
   var preset = document.getElementById('qdPreset');
   var inA = document.getElementById('qdA'), inB = document.getElementById('qdB'), inC = document.getElementById('qdC');
   var work = document.getElementById('qdWork'), status = document.getElementById('qdStatus');
@@ -1938,7 +1943,9 @@ C.  4x² - 12x + 9 = 0
     var rhs = Rdiv(Rneg(c), a);
     if (Rsign(rhs) < 0) {
       var im = Rsurd(Rneg(rhs));
-      return { ok: true, text: 'x^2 = ' + Rtext(rhs) + ', and no real number squares to a negative: x = +-' + surdtext(im) + 'i' };
+      return { ok: true, text: SHOW_COMPLEX
+        ? 'x^2 = ' + Rtext(rhs) + ', so x = +-' + surdtext(im) + 'i'
+        : 'x^2 = ' + Rtext(rhs) + ', and no real number squares to a negative; complex roots begin in lesson 7' };
     }
     var s = Rsurd(rhs);
     return { ok: true, text: 'x^2 = ' + Rtext(rhs) + ', so x = +-' + surdtext(s) };
@@ -1968,9 +1975,15 @@ C.  4x² - 12x + 9 = 0
     var answer;
     if (Rsign(rhs) < 0) {
       var im = Rsurd(Rneg(rhs));
-      answer = 'x = ' + pmtext(Rneg(half), im, true);
-      lines.push(row('take the square root',
-                     Ptext([half, R1]) + ' = +-' + surdtext(im) + 'i'));
+      if (SHOW_COMPLEX) {
+        answer = 'x = ' + pmtext(Rneg(half), im, true);
+        lines.push(row('take the square root',
+                       Ptext([half, R1]) + ' = +-' + surdtext(im) + 'i'));
+      } else {
+        answer = 'no real solution';
+        lines.push(row('read the negative right-hand side',
+                       'no real number has square ' + Rtext(rhs) + '; complex roots begin in lesson 7'));
+      }
     } else {
       var s = Rsurd(rhs);
       answer = 'x = ' + pmtext(Rneg(half), s);
@@ -1988,7 +2001,9 @@ C.  4x² - 12x + 9 = 0
     lines.push(row('substitute', 'x = (-(' + Rtext(b) + ') +- sqrt((' + Rtext(b) + ')^2 - 4(' + Rtext(a) + ')(' + Rtext(c) + '))) / (2 * ' + Rtext(a) + ')'));
     lines.push(row('the discriminant', 'b^2 - 4ac = ' + Rtext(Rmul(b, b)) + ' - ' + Rtext(Rmul(R(4n), Rmul(a, c))) + ' = ' + Rtext(r.disc)));
     if (r.kind === 'complex') {
-      lines.push(row('negative, so no real root', 'x = ' + pmtext(r.p, r.s, true)));
+      lines.push(row('negative, so no real root', SHOW_COMPLEX
+        ? 'x = ' + pmtext(r.p, r.s, true)
+        : 'stop here; complex roots begin in lesson 7'));
     } else if (r.kind === 'double') {
       lines.push(row('zero, so one repeated root', 'x = ' + Rtext(r.p)));
     } else {
@@ -2105,7 +2120,8 @@ C.  4x² - 12x + 9 = 0
       row('factoring', fac.ok ? fac.roots.map(function (x) { return 'x = ' + Rtext(x); }).join(',   ') : '<span class="tone-muted">' + fac.text + '</span>'),
       row('square root property', sqp.ok ? sqp.text : '<span class="tone-muted">' + sqp.text + '</span>'),
       row('completing the square', comp.answer),
-      row('the formula', r.kind === 'complex' ? 'x = ' + pmtext(r.p, r.s, true)
+      row('the formula', r.kind === 'complex' ? (SHOW_COMPLEX
+          ? 'x = ' + pmtext(r.p, r.s, true) : 'no real solution; complex roots begin in lesson 7')
           : (r.kind === 'double' ? 'x = ' + Rtext(r.p) : 'x = ' + pmtext(r.p, r.s))),
     ]));
 
@@ -2134,9 +2150,10 @@ C.  4x² - 12x + 9 = 0
     var msg;
     if (r.kind === 'complex') {
       msg = '<strong>The discriminant is ' + Rtext(r.disc) + ', which is negative.</strong> '
-        + 'The parabola above never meets the x-axis, and the two solutions are the conjugate '
-        + 'pair x = ' + pmtext(r.p, r.s, true) + '. Those are not "no solutions" &mdash; they are '
-        + 'two solutions that are not real numbers.';
+        + 'The parabola above never meets the x-axis. ' + (SHOW_COMPLEX
+          ? 'The two solutions are the conjugate pair x = ' + pmtext(r.p, r.s, true)
+            + '. Those are not "no solutions" &mdash; they are two solutions that are not real numbers.'
+          : 'There is no real solution; lesson 7 introduces the number system needed to continue.');
     } else if (r.kind === 'double') {
       msg = '<strong>The discriminant is exactly 0.</strong> The formula gives one value, '
         + 'x = ' + Rtext(r.p) + ', and the parabola touches the axis there without crossing. '

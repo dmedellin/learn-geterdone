@@ -21,7 +21,9 @@ COURSE = {
     "assumes_short": "Courses 1–5",
     "assumes_long": "factoring and radical simplification",
     "outcomes_intro": (
-        "By the end you can solve any quadratic, know before you start how many real solutions it has, and read its graph off its form."
+        "By the end you can choose and carry out a solution method, classify the roots "
+        "before solving, express non-real roots in complex form, and recover a "
+        "parabola's decisive features from its equation."
     ),
     "outcomes": [
         ("Pick a method deliberately",
@@ -37,6 +39,7 @@ COURSE = {
         "Lessons 1 to 6 solve quadratics and count their solutions; 7 to 9 build the complex numbers; 10 to 14 graph, optimise and extend."
     ),
     "how_to": [
+        "On each lesson, cover the complete worked example before attempting the faded rehearsal beneath it. The rehearsal supplies the first strategic decision but leaves the algebra and check to you; only then use the quiz as independent retrieval.",
         "Complete the square by hand at least five times. It is the one procedure in this course that pays for itself twice &mdash; once as the formula, once as vertex form.",
         "Use the discriminant before you solve, every time. Knowing the answer is a conjugate pair before you start prevents the most common error, which is discarding a negative under the root.",
         "In the graphing lessons, change one coefficient at a time and watch. `a`, `h` and `k` each do exactly one thing, and seeing them separated is worth more than the formula.",
@@ -47,7 +50,10 @@ COURSE = {
         "Conic sections in general. The parabola appears here as the graph of a quadratic function, not as a locus.",
     ],
     "footer_lead": (
-        "Every quadratic on this course is solved by all four methods at once, in exact arithmetic, and the four answers are compared on screen &mdash; they agree because they are computed independently. Roots, vertex and axis are marked on the parabola using the same numbers printed beside it."
+        "The quadratic lab tests all four solution methods independently on every "
+        "redraw. A method that does not apply says why; completing the square and the "
+        "formula always finish and their exact answers agree. Roots, vertex and axis "
+        "are marked on the parabola using the same numbers printed beside it."
     ),
     "lessons": part_a.LESSONS + part_b.LESSONS,
 }

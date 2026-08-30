@@ -6,7 +6,7 @@ LESSONS = [
         "slug": "operations-with-complex-numbers",
         "title": "Operations with Complex Numbers",
         "module": "Complex numbers",
-        "one_line": "Arithmetic, and the conjugate that makes division work.",
+        "one_line": "Compute in a + bi form and use a conjugate to divide.",
         "summary": (
             "Addition and subtraction collect like terms, multiplication is the "
             "distributive law followed by a single substitution, and division is "
@@ -185,6 +185,12 @@ LESSONS = [
                 "The last line is standard form. `(-5 + 14i)/17` is the same number, "
                 "but a real part and an imaginary part cannot be read off it, so it is "
                 "not yet an answer.",
+                "For a faded quotient, put `(5 - 2i)/(1 + i)` in standard form. The "
+                "supplied multiplier is `(1 - i)/(1 - i)`. Expand both products, "
+                "replace `i²`, split the real denominator across both numerator terms "
+                "and multiply your result by `1 + i` as a check. Compare with "
+                "`3/2 - (7/2)i`; an answer of `7/2 - (7/2)i` comes from replacing "
+                "`2i²` by `+2` instead of `-2`.",
             ],
         },
         "quiz_title": "Complex arithmetic",
@@ -246,7 +252,7 @@ LESSONS = [
         "slug": "complex-roots-of-quadratics",
         "title": "Complex Roots of Quadratics",
         "module": "Complex numbers",
-        "one_line": "A negative discriminant, and the pair it produces.",
+        "one_line": "Carry a negative discriminant through the formula and verify the conjugate pair.",
         "summary": (
             "When `b² - 4ac` is negative the quadratic formula still works: the root "
             "of the negative discriminant becomes a multiple of `i`, and the two "
@@ -410,6 +416,12 @@ LESSONS = [
                 "The other solution is `-1/2 - (3/2)i`. Its check is the conjugate of "
                 "the one written out, line for line, so doing it again would confirm "
                 "nothing new.",
+                "For a faded complex-root solve, use `3x² - 6x + 10 = 0`. The supplied "
+                "discriminant is `D = -84`. Convert its root to `2i√21`, reduce the "
+                "whole formula and use the sum and product as independent checks. You "
+                "should reach `x = 1 ± (√21/3)i`, whose sum is `2 = -b/a` and whose "
+                "product is `10/3 = c/a`. A remaining denominator of `6` means the "
+                "common factor `2` was not removed from both numerator terms.",
             ],
         },
         "quiz_title": "Negative discriminants",
@@ -474,7 +486,7 @@ LESSONS = [
         "slug": "graphs-of-quadratic-functions",
         "title": "Graphs of Quadratic Functions",
         "module": "Parabolas",
-        "one_line": "The parabola, its direction, and its intercepts.",
+        "one_line": "Recover a parabola's direction, intercepts, axis and vertex from its equation.",
         "summary": (
             "The graph of `y = ax² + bx + c` is a parabola. The sign of `a` decides "
             "which way it opens, `c` is the y-intercept, the real solutions of "
@@ -648,6 +660,11 @@ LESSONS = [
                 "The point `(1, -9)` is the lowest point of this curve. It is called "
                 "the vertex, and the next lesson gets it straight from the equation "
                 "without solving anything or plotting anything.",
+                "For a faded sketch, analyse `y = -2x² - 4x + 6`. The supplied first "
+                "decision is `a = -2 &lt; 0`, so the curve opens downward. Find both "
+                "intercepts, the axis and the point on it before drawing; then use a "
+                "symmetric pair of values as a check. Compare with x-intercepts "
+                "`-3` and `1`, axis `x = -1`, vertex `(-1, 8)` and y-intercept `(0, 6)`.",
             ],
         },
         "quiz_title": "Reading the graph",
@@ -705,7 +722,7 @@ LESSONS = [
         "slug": "vertex-form-and-the-axis-of-symmetry",
         "title": "Vertex Form and the Axis of Symmetry",
         "module": "Parabolas",
-        "one_line": "Reading the vertex straight off the equation.",
+        "one_line": "Convert to vertex form, read the extreme point and verify it independently.",
         "summary": (
             "`y = a(x - h)² + k` is the same function as `y = ax² + bx + c`, written "
             "so that the vertex `(h, k)` and the axis `x = h` can be read without "
@@ -733,11 +750,12 @@ LESSONS = [
              "`(x + 3)²` is `(x - (-3))²`, so `h = -3` and the axis is `x = -3`. The "
              "form has a minus sign built in, and reading `+3` off the bracket puts "
              "the vertex on the wrong side of the y-axis."),
-            ("A function has one side, so you add and subtract",
-             "In an equation you may add 9 to both sides. A function definition is not "
-             "an equation with two sides to balance: to complete the square in "
-             "`f(x) = x² + 6x + 1` you add 9 and subtract 9 in the same expression, "
-             "leaving its value unchanged at every `x`."),
+            ("Keep the rule unchanged while y stays isolated",
+             "`y = f(x)` is an equation, so balance operations remain legal. But the "
+             "goal here is another expression for the same output with `y` still by "
+             "itself. Complete the square in `f(x) = x² + 6x + 1` by adding `9` and "
+             "subtracting `9` inside the expression; its value then stays unchanged "
+             "at every `x`."),
         ],
         "read_title": "Vertex form",
         "read_intro": "What the form shows, why it shows it, and how to reach it.",
@@ -878,6 +896,12 @@ LESSONS = [
                 "rather than from the vertex form, which is what makes the agreement "
                 "worth something. `a = 1 &gt; 0`, so `-21/4` is the smallest value "
                 "this function takes, and it takes it once.",
+                "For a faded conversion, rewrite `y = 3x² + 12x + 5` in vertex form. "
+                "The supplied first line is `3(x² + 4x) + 5`; complete the square "
+                "inside that bracket and account for the outside `3`. Read the vertex "
+                "and minimum, then check with `h = -b/(2a)` and `f(h)`. Compare with "
+                "`y = 3(x + 2)² - 7` and vertex `(-2, -7)`; a constant of `-3` instead "
+                "of `-7` exposes the missing multiplication by `a`.",
             ],
         },
         "quiz_title": "Vertex form",
@@ -944,7 +968,7 @@ LESSONS = [
         "slug": "maximum-and-minimum-problems",
         "title": "Maximum and Minimum Problems",
         "module": "Parabolas",
-        "one_line": "Optimisation without calculus, using the vertex.",
+        "one_line": "Build a quadratic model, enforce its domain and report the attainable optimum.",
         "summary": (
             "A quantity that depends quadratically on one variable is largest or "
             "smallest at the vertex, and the vertex is `x = -b/(2a)`. The algebra is "
@@ -973,8 +997,10 @@ LESSONS = [
              "different answers, and each is wrong in the other's place."),
             ("The situation restricts the variable",
              "A length is positive, a number of tickets is a whole number, a time "
-             "after launch is not negative. If the vertex is outside the allowed set, "
-             "it is not available, and the optimum sits at an endpoint instead."),
+             "after launch is not negative. If the vertex is unavailable, a closed "
+             "interval requires comparison of its endpoints and a whole-number model "
+             "requires nearby permitted integers. An excluded endpoint may leave a "
+             "bound that is approached but never attained, so an optimum need not exist."),
         ],
         "read_title": "Optimising with the vertex",
         "read_intro": "The theorem, the modelling, and the cases where the vertex is not the answer.",
@@ -1000,7 +1026,8 @@ LESSONS = [
                 "so the optimum is attained at `x = h` and nowhere else.",
                 "For the other direction: with `a &gt; 0`, `f(h) + at²` grows without "
                 "bound as `|t|` grows, so no number is an upper bound for `f` and "
-                "there is no maximum.",
+                "there is no maximum. With `a &lt; 0` the same term decreases without "
+                "bound, so there is no minimum.",
             ]),
             ("h3", "Building the quadratic"),
             ("ol", [
@@ -1083,9 +1110,11 @@ LESSONS = [
              "Lengths are positive, counts are whole numbers, times are not negative. "
              "Write the interval down; it is part of the model, not an afterthought."),
             ("Take x = -b/(2a), test it against the domain, then answer the question",
-             "If the vertex is permitted, it is the answer; if not, the optimum is at "
-             "the nearer endpoint. Then decide whether the question wants the location "
-             "or the value, and give it with units."),
+             "If the vertex is permitted, it is the answer. Otherwise compare the "
+             "permitted endpoints of a closed interval or the permitted integers "
+             "nearest the vertex; if the relevant endpoint is excluded, say when only "
+             "a bound and no attained optimum exists. Then report the requested "
+             "location or value with units."),
         ],
         "worked": {
             "title": "Two numbers with sum 12 and the largest possible product",
@@ -1120,6 +1149,12 @@ LESSONS = [
                 "the axis `x = 6`, so the symmetry of lesson 10 forces equal values "
                 "&mdash; which makes it a cheap check on `h`. If those two came out "
                 "different, `h` would be wrong.",
+                "For a faded rectangle model, a rectangle has perimeter `54 m`. Let "
+                "`x` be one side; the supplied constraint makes the other `27 - x`. "
+                "Write the area function and its physical domain, locate the vertex, "
+                "then answer with both dimensions and area. Compare with a "
+                "`13.5 m` by `13.5 m` square and area `729/4 m²`. Reporting only "
+                "`x = 13.5` leaves both the requested value and its units unanswered.",
             ],
         },
         "quiz_title": "Optimising",
@@ -1183,7 +1218,7 @@ LESSONS = [
         "slug": "quadratic-inequalities",
         "title": "Quadratic Inequalities",
         "module": "Parabolas",
-        "one_line": "Sign analysis, and reading the answer off the graph.",
+        "one_line": "Partition the real line by the roots and justify every included interval.",
         "summary": (
             "To solve `ax² + bx + c &gt; 0`, first solve `ax² + bx + c = 0`. The roots "
             "are the only places the sign can change, so testing one value in each "
@@ -1356,6 +1391,12 @@ LESSONS = [
                 "Had the inequality been `&lt; 0` rather than `≤ 0`, the same three "
                 "lines of work would give `(-2, 3)`. The roots are found once; the "
                 "brackets are chosen afterwards.",
+                "For a faded sign pass, solve `2x² - x - 6 &gt; 0`. The supplied "
+                "factorisation is `(2x + 3)(x - 2)` and the critical values are "
+                "`-3/2` and `2`. Test one number in each interval, write the result as "
+                "a union and decide the endpoints only after the signs are known. "
+                "Compare with `(-∞, -3/2) ∪ (2, ∞)`; square brackets would include "
+                "points where the expression is `0`, not greater than `0`.",
             ],
         },
         "quiz_title": "Solving inequalities",
@@ -1417,7 +1458,7 @@ LESSONS = [
         "slug": "equations-reducible-to-quadratic-form",
         "title": "Equations Reducible to Quadratic Form",
         "module": "Parabolas",
-        "one_line": "Substitution that turns a quartic into a quadratic.",
+        "one_line": "Recognise a repeated inner expression, solve in u and return every valid x.",
         "summary": (
             "If an equation can be written `au² + bu + c = 0` for some expression "
             "`u = f(x)`, the quadratic methods apply to it. Solving for `u` is only "
@@ -1436,10 +1477,11 @@ LESSONS = [
             "everyone forgets."
         ),
         "concepts": [
-            ("Look for one exponent that is twice another",
-             "`x⁴` and `x²`, `x` and `√x`, `x⁻²` and `x⁻¹`, `x⁶` and `x³`. With a "
-             "constant term as well, the equation is a quadratic in the smaller "
-             "power, whatever that power happens to be."),
+            ("Look for one expression and its square",
+             "`x⁴` and `x²`, `x` and `√x`, `x⁻²` and `x⁻¹`, `x⁶` and `x³` are common "
+             "signals because the larger power is the square of the smaller. The more "
+             "general pattern is `a[f(x)]² + b[f(x)] + c`: the repeated object may be "
+             "a whole expression such as `x² - 3`, not merely a power."),
             ("u is a temporary name, not the answer",
              "The substitution renames part of the equation so that a known method "
              "applies. The question was about `x`, so the last step is always the "
@@ -1460,9 +1502,9 @@ LESSONS = [
             ("def", ("Quadratic form",
                      "An equation is in <strong>quadratic form</strong> if it can be "
                      "written `au² + bu + c = 0` with `a ≠ 0`, where `u = f(x)` is "
-                     "some expression in `x`. The test is that one power appearing in "
-                     "the equation is exactly twice another, with nothing else present "
-                     "but a constant.")),
+                     "some expression in `x`. The test is that the same inner expression "
+                     "appears to the first and second powers, with no other dependence "
+                     "on `x`; doubled exponents are one common clue, not the definition.")),
             ("math", [
                 "x⁴ - 5x² + 4 = 0",
                 "                              put  u = x²,  so  x⁴ = (x²)² = u²",
@@ -1545,10 +1587,11 @@ LESSONS = [
         "steps_title": "Solving by substitution",
         "steps_intro": "Four steps, and the fourth is the one the whole lesson exists to insist on.",
         "steps": [
-            ("Check the shape",
-             "Is one exponent exactly twice another, with only a constant besides? "
-             "`x⁶ - 9x³ + 8` qualifies with `6 = 2 · 3`; `x⁴ - 9x³ + 8` does not, and "
-             "no substitution will make it."),
+            ("Check for f(x), its square and a constant",
+             "`x⁶ - 9x³ + 8` qualifies because `x⁶ = (x³)²`; "
+             "`(x² - 3)² - 2(x² - 3) - 8` qualifies because the entire bracket repeats. "
+             "`x⁴ - 9x³ + 8` has neither pattern, and no one-variable quadratic "
+             "substitution will make it one."),
             ("Name the substitution and its restriction",
              "Write `u = x²` or `u = √x` explicitly, and next to it any condition it "
              "forces: `u ≥ 0` for both of those, `x ≠ 0` for `u = 1/x`. Recording it "
@@ -1591,6 +1634,12 @@ LESSONS = [
                 "`u`, which is the only way to test the substitution itself. A degree "
                 "4 equation has at most four real solutions, and this one has four, so "
                 "there is nothing left to find.",
+                "For a faded return journey, solve `2x⁴ - 5x² + 2 = 0` over the reals. "
+                "The supplied substitution is `u = x²` with `u ≥ 0`. Factor the "
+                "quadratic in `u`, send both permitted values back through `x² = u` "
+                "and check one root from each pair in the original quartic. Compare "
+                "with `x = ±√2` and `x = ±√2/2`; returning only the two positive "
+                "values means the square root property lost its `±`.",
             ],
         },
         "quiz_title": "Substitutions",
