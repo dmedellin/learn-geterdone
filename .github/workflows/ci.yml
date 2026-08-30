@@ -1251,10 +1251,18 @@ jobs:
               errors.append((CONTRACT, 0, "network must equal the shared-private-edge production contract: %r" % expected))
 
           inputs = [pathlib.Path("deploy/Caddyfile"), pathlib.Path("Containerfile.release")]
+          placeholder = re.compile(r"__[A-Z][A-Z0-9_]*__")
           for path in inputs:
               text = path.read_text(encoding="utf-8")
               if "__LOOPBACK_PORT__" in text or "__APP_SUBNET__" in text:
                   errors.append((path, 0, "obsolete loopback/subnet placeholder remains in deployment input"))
+              residual = [(number, found)
+                          for number, line in enumerate(text.splitlines(), start=1)
+                          if not line.lstrip().startswith("#")
+                          for found in placeholder.findall(line)
+                          if found != "__GIT_REVISION__"]
+              for number, found in residual:
+                  errors.append((path, number, "unrendered executable placeholder: %s" % found))
           caddy = pathlib.Path("deploy/Caddyfile").read_text(encoding="utf-8")
           containerfile = pathlib.Path("Containerfile.release").read_text(encoding="utf-8")
           if not re.search(r"^:8080\s*\{", caddy, re.M):
