@@ -425,10 +425,10 @@ ALGEBRA_PATH_PAGE = "/paths/algebra/"
 
 ALGEBRA_COURSE_1_HOME = "/algebra-foundations/"
 ALGEBRA_COURSE_1_LESSONS = (
-    "real-numbers-and-the-number-line", "properties-of-the-real-numbers",
-    "order-of-operations", "absolute-value", "integer-exponents",
-    "scientific-notation", "roots-and-radicals", "rational-exponents",
-    "algebraic-expressions-and-terms", "the-distributive-law",
+    "real-numbers-and-the-number-line", "order-of-operations",
+    "algebraic-expressions-and-terms", "properties-of-the-real-numbers",
+    "absolute-value", "integer-exponents", "scientific-notation",
+    "roots-and-radicals", "rational-exponents", "the-distributive-law",
     "combining-like-terms", "evaluating-expressions",
     "translating-words-into-algebra",
 )

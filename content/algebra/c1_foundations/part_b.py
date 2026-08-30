@@ -1,7 +1,7 @@
-"""Course 1, lessons 08-13 — rational exponents, and building expressions out of letters."""
+"""Course 1 records for rational exponents and building expressions out of letters."""
 
 LESSONS = [
-    # ---------------------------------------------------------------- 08
+    # ---------------------------------------------------------- rational-exponents
     {
         "slug": "rational-exponents",
         "title": "Rational Exponents",
@@ -9,7 +9,7 @@ LESSONS = [
         "one_line": "Why x^(1/n) must mean the n-th root if the laws are to hold.",
         "summary": (
             "Nothing so far says what `x^(1/2)` means. Rather than invent a meaning, ask "
-            "which meaning keeps the exponent laws of lesson 5 true &mdash; and there is "
+            "which meaning keeps the exponent laws of lesson 6 true &mdash; and there is "
             "only one. That answer is the n-th root, and everything about rational "
             "exponents follows from it."
         ),
@@ -27,7 +27,7 @@ LESSONS = [
         ),
         "concepts": [
             ("The laws come first, the definition second",
-             "Lesson 5 established `x^m · x^n = x^(m+n)` for whole numbers. If that "
+             "Lesson 6 established `x^m · x^n = x^(m+n)` for whole numbers. If that "
              "sentence is to survive when `m` and `n` are fractions, then `x^(1/n)` "
              "raised to the power `n` has to be `x`. There is nothing left to choose "
              "about it."),
@@ -35,15 +35,16 @@ LESSONS = [
              "`x^(p/q)` is the `q`-th root of `x`, raised to `p` &mdash; and it is also "
              "the `q`-th root of `x^p`. The two routes give the same number, and one of "
              "them usually involves far smaller arithmetic."),
-            ("The base has to be non-negative, and that is not fussiness",
+            ("The base has to be non-negative, and a reciprocal also needs it nonzero",
              "With a negative base the two routes can give different answers, and "
              "rewriting `2/6` as `1/3` changes the result again. The restriction `x ≥ 0` "
-             "is what stops one expression having two values."),
+             "stops one expression having two values; when the exponent is negative the "
+             "stronger condition `x &gt; 0` also prevents division by zero."),
         ],
         "read_title": "What the exponent laws force",
         "read_intro": "One derivation, one definition, and the single restriction the definition needs.",
         "body": [
-            ("p", "Lesson 5 gave the exponent laws for whole-number exponents, and "
+            ("p", "Lesson 6 gave the exponent laws for whole-number exponents, and "
                   "extended them to `0` and to negatives by the same argument each time: "
                   "define the new symbol so that the old law keeps working. `x⁰ = 1` "
                   "because `x^n · x⁰` has to be `x^n`; `x^(−n) = 1/x^n` because "
@@ -61,7 +62,7 @@ LESSONS = [
                 "That sum is `n · (1/n) = 1`, so the product is `x¹ = x`.",
             ]),
             ("p", "So `x^(1/n)` is a number whose `n`-th power is `x`. That is exactly "
-                  "the definition of an `n`-th root of `x`, from lesson 7. The notation "
+                  "the definition of an `n`-th root of `x`, from lesson 8. The notation "
                   "was not chosen to be memorable; it was forced."),
             ("p", "One thing is still open. When `n` is even and `x` is positive there "
                   "are <em>two</em> real numbers whose `n`-th power is `x` &mdash; `2` and "
@@ -77,9 +78,9 @@ LESSONS = [
                      "By the power-of-a-power law this is also `(x^p)^(1/q)`, the `q`-th "
                      "root of `x^p`. Both descriptions name the same number, so you may "
                      "take whichever is easier to compute.",
-                     "For a negative exponent, `x^(−p/q) = 1 / x^(p/q)`, exactly as in "
-                     "lesson 5. The minus sign produces a reciprocal, never a negative "
-                     "number.")),
+                     "For a negative exponent and `x &gt; 0`, `x^(−p/q) = 1 / x^(p/q)`, "
+                     "exactly as in lesson 6. The minus sign produces a reciprocal, never "
+                     "a negative number. At `x = 0` that reciprocal has no value.")),
             ("math", [
                 "8^(2/3)      root first    cube root of 8 = 2,   then 2² = 4",
                 "             power first   8² = 64,              then cube root of 64 = 4",
@@ -107,7 +108,7 @@ LESSONS = [
                   "source, and it costs nothing: when you genuinely want the cube root of "
                   "`−8` you write it as a root, where it is unambiguously `−2`."),
             ("h3", "The laws, unchanged"),
-            ("p", "The payoff is that every law from lesson 5 now applies to fractional "
+            ("p", "The payoff is that every law from lesson 6 now applies to fractional "
                   "exponents with no new cases:"),
             ("math", [
                 "x^(1/2) · x^(1/3)  =  x^(1/2 + 1/3)  =  x^(5/6)",
@@ -127,8 +128,9 @@ LESSONS = [
             "panel_intro": "Choose a base and an exponent `p/q`. The lab takes the root "
                            "first and then the power, and separately the power first and "
                            "then the root, and reports whether the two agree. Run "
-                           "`(−8)^(2/6)` and then `(−8)^(1/3)` to see the restriction "
-                           "earn its place.",
+                           "`(−8)^(2/6)` and predict both routes before `(−8)^(1/3)`; "
+                           "the disagreement identifies a domain error, not a rounding "
+                           "error.",
         }),
         "steps_title": "Evaluating a rational power",
         "steps_intro": "The negative sign and the fraction are handled separately, in this order.",
@@ -139,8 +141,9 @@ LESSONS = [
              "negative."),
             ("Reduce the fraction, then check the base",
              "Put `p/q` in lowest terms. Then confirm the base is not negative &mdash; if "
-             "it is, this notation does not apply and you should be working with a root "
-             "sign instead."),
+             "it is, this course's rational-power notation does not apply and you should "
+             "use a root sign instead. If the exponent is negative, also reject base `0` "
+             "because the reciprocal would divide by zero."),
             ("Take the q-th root first",
              "The `q`-th root of the base, then raise the result to the power `p`. This "
              "is the route that keeps the numbers small: `27^(4/3)` is `3⁴`, not the cube "
@@ -177,26 +180,29 @@ LESSONS = [
                 "evidence: `3⁴` is arithmetic you can do in your head, and `27⁴` is not.",
                 "The two routes agreeing is a check on this particular calculation and "
                 "nothing more. What guarantees they always agree, for `x ≥ 0`, is the "
-                "power-of-a-power law from lesson 5 &mdash; a general statement, proved "
+                "power-of-a-power law from lesson 6 &mdash; a general statement, proved "
                 "there, which these three examples illustrate but do not establish.",
+                "Fade the two-route table for `27^(2/3)`: write only \"cube root first\" "
+                "and finish it yourself. The root is `3` and the square gives `9`. An "
+                "answer of `6` treats the exponent as multiplication; `729` takes the "
+                "power and forgets the root.",
             ],
         },
         "quiz_title": "Roots as exponents",
         "quiz": [
-            {"q": "Evaluate `8^(2/3)`.",
-             "a": ["`2`", "`4`", "`16/3`", "`64`"],
+            {"q": "Evaluate `32^(3/5)`.",
+             "a": ["`6`", "`8`", "`96/5`", "`32768`"],
              "c": 1,
-             "why": "The cube root of `8` is `2`, and `2² = 4`. `2` is the answer you get "
-                    "by taking the root and forgetting the power; `64` is `8²` with the "
-                    "root forgotten; `16/3` is `8 × (2/3)`, which treats the exponent as "
-                    "a multiplier."},
-            {"q": "Evaluate `16^(−3/4)`.",
-             "a": ["`−8`", "`8`", "`1/8`", "`1/64`"],
+             "why": "The fifth root of `32` is `2`, and `2³ = 8`. `6` adds the root and "
+                    "power; `96/5` multiplies `32` by `3/5`; `32768` is `32³` with the "
+                    "fifth root forgotten."},
+            {"q": "Evaluate `81^(−3/4)`.",
+             "a": ["`−27`", "`27`", "`1/27`", "`1/12`"],
              "c": 2,
-             "why": "The minus gives `1 / 16^(3/4)`; the 4th root of `16` is `2`, and "
-                    "`2³ = 8`, so the value is `1/8`. `−8` reads the negative exponent as "
-                    "a negative answer, `8` drops the minus altogether, and `1/64` uses "
-                    "the square root instead of the fourth root."},
+             "why": "The minus gives `1 / 81^(3/4)`; the fourth root of `81` is `3`, "
+                    "and `3³ = 27`, so the value is `1/27`. `−27` reads the exponent's "
+                    "minus as the value's sign, `27` drops it, and `1/12` adds the "
+                    "numerator and denominator instead of taking a root and a power."},
             {"q": "Which fact forces `x^(1/2)` to mean a square root of `x`?",
              "a": ["`x^(1/2) = x/2`, and halving is the inverse of doubling",
                    "`(x^(1/2))² = x^(2·(1/2)) = x¹`, so `x^(1/2)` squares to `x`",
@@ -225,27 +231,25 @@ LESSONS = [
              "negative number, use the root sign."),
         ],
         "standard": ("Finish when you can say why the definition could not have been anything else.",
-                     "Evaluating `16^(−3/4)` without hesitating is the easy half. The "
-                     "other half is being able to answer someone who asks why `x^(1/2)` "
-                     "is a square root rather than half of `x`: because the exponent law "
-                     "leaves no alternative, and the only free choice left is which of "
-                     "the two roots to take."),
+                     "Evaluate `64^(−2/3)` by both routes, state why base `0` would fail "
+                     "with that negative exponent, and answer why `x^(1/2)` is a square "
+                     "root rather than half of `x`: the exponent law leaves no alternative, "
+                     "and convention only chooses which root the notation names."),
         "note": "Every radical you meet from here on can be written as a rational power, "
                 "and it is usually worth doing. Course 5 simplifies expressions like "
                 "`√(x⁵)` by rewriting them as `x^(5/2)` and using the laws you already "
                 "have, rather than by inventing separate rules for radicals.",
     },
-    # ---------------------------------------------------------------- 09
+    # --------------------------------------------- algebraic-expressions-and-terms
     {
         "slug": "algebraic-expressions-and-terms",
-        "title": "Algebraic Expressions and Terms",
+        "title": "Variables, Expressions, and Terms",
         "module": "Building expressions",
         "one_line": "Variables, terms, coefficients, and the anatomy of an expression.",
         "summary": (
-            "An expression is arithmetic with a letter standing in for a number. Before "
-            "any rearranging is possible you have to be able to see its parts: where one "
-            "term ends and the next begins, which sign belongs to which term, and what "
-            "the coefficient of a term actually is."
+            "An expression is arithmetic with a letter standing in for a number. The "
+            "letter is defined before any symbolic rule uses it, then the expression is "
+            "read into terms, signs, coefficients and factors without rearranging it."
         ),
         "key": [
             "3x² − 5x + 7        three terms:   3x²,   −5x,    7",
@@ -261,8 +265,8 @@ LESSONS = [
         "concepts": [
             ("A letter is a number whose value is not being supplied",
              "It is not a new kind of object and it obeys no new rules. Everything in "
-             "lessons 1 to 8 applies to `x` because whatever number `x` is, those "
-             "statements are true of it."),
+             "the arithmetic prerequisite and the reading convention of lesson 2 applies "
+             "to `x`, because whatever number `x` is, those statements remain true."),
             ("Terms are separated by plus and minus signs, at the top level",
              "That is the whole rule for finding them, and it is why brackets matter so "
              "much: a plus sign inside a bracket does not separate terms. `5(x + 2)` is "
@@ -305,10 +309,9 @@ LESSONS = [
                 "        term 3   7",
             ]),
             ("p", "Writing the subtraction as an addition once, as above, is worth the "
-                  "line. It is the reason `3x² − 5x + 7` and `−5x + 7 + 3x²` are the same "
-                  "expression: terms can be reordered because addition is commutative "
-                  "(lesson 2), and that permission covers the negative terms only if the "
-                  "signs travel with them."),
+                  "line. Lesson 4 will license reordering these terms by commutativity of "
+                  "addition. For now the reading skill is narrower: if a term eventually "
+                  "moves, its attached sign must move with it."),
             ("def", ("Coefficient and variable part",
                      "A term that is a number times a product of variables splits into a "
                      "<strong>coefficient</strong> &mdash; the numerical factor, sign "
@@ -330,7 +333,8 @@ LESSONS = [
                   "no top-level `+` or `−` anywhere in it: it is a product of the two "
                   "factors `5` and `(x + 2)`. Multiply it out and you get `5x + 10`, "
                   "which is two terms. Both expressions have the same value for every "
-                  "`x`; they do not have the same number of terms. So \"how many terms\" "
+                  "`x`; lesson 10 proves that with distribution. They do not have the same "
+                  "number of terms. So \"how many terms\" "
                   "is a question about a particular way of writing, and the honest answer "
                   "names the form: one as written, two expanded."),
             ("def", ("Degree",
@@ -340,7 +344,8 @@ LESSONS = [
                      "combined.",
                      "`4xy` has degree `1 + 1 = 2`. A constant term such as `7` has "
                      "degree `0`, since `7 = 7x⁰`.")),
-            ("p", "The qualification about combining matters. In `5x − 5x + 4` the "
+            ("p", "The qualification about combining is a preview of lesson 11. In "
+                  "`5x − 5x + 4` the "
                   "highest degree written on the page is `1`, but the two `x` terms sum "
                   "to `0` and the expression is `4`, of degree `0`. Degree describes the "
                   "expression, not the ink."),
@@ -358,7 +363,9 @@ LESSONS = [
             "panel_intro": "Type an expression and the lab splits it at its top-level `+` "
                            "and `−` signs, naming the coefficient and degree of each term. "
                            "It also expands the expression and counts the terms again, so "
-                           "feed it `5(x + 2)` and watch the two counts differ.",
+                           "feed it `5(x + 2)` and predict the as-written count first. The "
+                           "expanded count previews lesson 10; the degree column previews "
+                           "course 4 and is not part of this lesson's completion standard.",
         }),
         "steps_title": "Reading an expression correctly",
         "steps_intro": "Four passes. Do them in order; the bracket pass changes everything after it.",
@@ -407,6 +414,10 @@ LESSONS = [
                 "The last line shows why degree is read after combining and not before. "
                 "Nothing about `5x − 5x + 4` looks like a constant until the middle step "
                 "is done.",
+                "Fade the table for `−3a²b + 4b − 7`: mark the top-level signs first, then "
+                "supply the entries. It has three terms with coefficients `−3`, `4` and "
+                "`−7`. Calling the first coefficient `3` leaves its sign behind; counting "
+                "`a²` and `b` separately confuses factors with terms.",
             ],
         },
         "quiz_title": "Parts of an expression",
@@ -451,17 +462,16 @@ LESSONS = [
              "three terms, because the leading `−` separates nothing."),
         ],
         "standard": ("Finish when you can point at every term, sign included, without pausing.",
-                     "Given any expression you should be able to say how many terms it "
-                     "has as written, give each coefficient with its sign, and say what "
-                     "changes if the brackets are multiplied out. Lessons 10 to 13 assume "
-                     "all of that is automatic, and every one of them breaks if a sign "
-                     "gets attached to the wrong term."),
+                     "For `−4x²y + y − 2(x + 1)`, name the terms as written, the sign and "
+                     "coefficient of each monomial term, and every factor of the bracketed "
+                     "term. Do not expand it: lesson 10 owns that move. The reading is "
+                     "finished when another reader can point to the same pieces."),
         "note": "The vocabulary here is not decoration. \"Combine like terms\" in lesson "
                 "11, \"cancel a common factor\" in course 5 and \"the leading "
                 "coefficient\" in course 4 are all instructions that name one of these "
                 "parts, and following them requires having found the right part first.",
     },
-    # ---------------------------------------------------------------- 10
+    # --------------------------------------------------------- the-distributive-law
     {
         "slug": "the-distributive-law",
         "title": "The Distributive Law",
@@ -487,7 +497,7 @@ LESSONS = [
         "concepts": [
             ("It is an axiom, not a consequence",
              "Nothing proves `a(b + c) = ab + ac` from the other properties &mdash; it is "
-             "one of the assumed properties of the real numbers, stated in lesson 2. That "
+             "one of the assumed properties of the real numbers, stated in lesson 4. That "
              "is worth knowing, because it means the law is exactly as broad as it is "
              "stated and not one case broader."),
             ("The factor outside reaches every term inside",
@@ -526,7 +536,7 @@ LESSONS = [
                   "a factor of `−1`, and it multiplies <em>every</em> term inside. "
                   "`−(x − 7)` is `−x + 7`; it is not `−x − 7`. Nothing here is being "
                   "remembered &mdash; each sign is computed, and `(−1)(−7) = +7` is a "
-                  "fact from lesson 2."),
+                  "fact from lesson 4."),
             ("p", "The habit worth forming is to write the `−1` in. It costs a symbol and "
                   "converts a sign question into a multiplication, which you can do."),
             ("h3", "More terms, and more factors"),
@@ -576,7 +586,9 @@ LESSONS = [
             "panel_title": "Two factors, every product",
             "panel_intro": "Enter the two factors and the lab multiplies every term of the "
                            "first by every term of the second, in a grid, before collecting. "
-                           "Try `−1` against `x − 7` to see the minus sign reach both terms.",
+                           "Before selecting a new pair, predict the number and signs of the "
+                           "grid entries. A missing cell diagnoses incomplete distribution; "
+                           "a wrong sign diagnoses the multiplication that made it.",
         }),
         "steps_title": "Distributing without losing a sign",
         "steps_intro": "The first two steps exist entirely to make the third one arithmetic rather than memory.",
@@ -623,22 +635,26 @@ LESSONS = [
                 "sign and not enough to establish that two expressions agree everywhere "
                 "&mdash; what establishes that is the law itself, which is why the law is "
                 "stated for all real numbers and the check is called a check.",
+                "Fade two of the products for `−3(2x − 5)`: write `(−3)(2x)` and leave "
+                "the second product blank before finishing. The expansion is `−6x + 15`. "
+                "`−6x − 15` kept the inner sign instead of multiplying it; `−6x − 5` "
+                "also failed to send the outside factor to every term.",
             ],
         },
         "quiz_title": "Distributing",
         "quiz": [
-            {"q": "Expand `−2(x − 5)`.",
-             "a": ["`−2x + 10`", "`−2x − 10`", "`−2x − 5`", "`2x − 10`"],
+            {"q": "Expand `−3(2x − 5)`.",
+             "a": ["`−6x + 15`", "`−6x − 15`", "`−6x − 5`", "`6x − 15`"],
              "c": 0,
-             "why": "`(−2)(x) = −2x` and `(−2)(−5) = +10`. `−2x − 10` keeps the sign of "
-                    "the `−5` instead of multiplying it; `−2x − 5` distributes to the "
-                    "first term only; `2x − 10` loses the minus on the outside factor."},
-            {"q": "Simplify `−(x − 7)`.",
-             "a": ["`−x − 7`", "`x − 7`", "`−x + 7`", "`x + 7`"],
+             "why": "`(−3)(2x) = −6x` and `(−3)(−5) = +15`. `−6x − 15` keeps the sign "
+                    "of `−5` instead of multiplying it; `−6x − 5` reaches the first term "
+                    "only; `6x − 15` loses the outside minus."},
+            {"q": "Simplify `−(2x + 9)`.",
+             "a": ["`−2x + 9`", "`2x − 9`", "`−2x − 9`", "`2x + 9`"],
              "c": 2,
-             "why": "The factor outside is `−1`, and it multiplies both terms: `(−1)(x)` "
-                    "and `(−1)(−7)`. At `x = 1` the original is `−(−6) = 6`, and only "
-                    "`−x + 7` gives `6`. Every other option fails that one test."},
+             "why": "The factor outside is `−1`, and it multiplies both terms: "
+                    "`(−1)(2x) = −2x` and `(−1)(9) = −9`. The other options change one "
+                    "sign, change the wrong sign, or ignore the outside factor entirely."},
             {"q": "Which of these is NOT a correct rearrangement?",
              "a": ["`(x + 6)/2 = x/2 + 3`",
                    "`12/(x + 6) = 12/x + 2`",
@@ -665,9 +681,9 @@ LESSONS = [
              "wrong every time except in special cases such as `b = 0`."),
         ],
         "standard": ("Finish when `−(x − 3)` gives `−x + 3` with no pause and no doubt.",
-                     "You should be able to expand any single bracket with a signed or "
-                     "fractional factor in one step, and to say why a sum in a "
-                     "denominator does not behave like a sum being divided. That "
+                     "Expand `−4(3x − 2y + 5)` and `(2x − 3)(x + 4)`, showing one product "
+                     "for every grid cell. Then use a numerical counterexample to explain "
+                     "why `12/(x + 6)` cannot split although `(x + 6)/2` can. That shape "
                      "distinction is what keeps course 5 from becoming guesswork."),
         "note": "Read the law right to left and it becomes factoring, which is most of "
                 "course 4. Read it left to right with two brackets and it becomes "
@@ -675,7 +691,7 @@ LESSONS = [
                 "is a reasonable argument for spending more time on it than it appears to "
                 "deserve.",
     },
-    # ---------------------------------------------------------------- 11
+    # --------------------------------------------------------- combining-like-terms
     {
         "slug": "combining-like-terms",
         "title": "Combining Like Terms",
@@ -724,7 +740,7 @@ LESSONS = [
                      "Constant terms are all alike, since each has an empty variable "
                      "part.")),
             ("p", "The order in which the letters are written does not affect anything, "
-                  "because multiplication is commutative (lesson 2). `3xy` and `2yx` have "
+                  "because multiplication is commutative (lesson 4). `3xy` and `2yx` have "
                   "the same variable part written two ways, and they are like terms. "
                   "Sorting the letters alphabetically inside every term is a cheap habit "
                   "that makes this visible instead of a judgement call."),
@@ -747,7 +763,7 @@ LESSONS = [
                 "  answer   :   2x + 6y",
             ]),
             ("p", "The `−x` contributes `−1`, not `−0` and not `+1`. This is the "
-                  "invisible coefficient from lesson 9 doing real work: `3 − 1 = 2`, and "
+                  "invisible coefficient from lesson 3 doing real work: `3 − 1 = 2`, and "
                   "a reader who treats `−x` as contributing nothing gets `3x` instead."),
             ("h3", "Four ways two terms fail to be alike"),
             ("ul", [
@@ -781,8 +797,9 @@ LESSONS = [
             "panel_title": "Group the terms by variable part",
             "panel_intro": "The lab sorts the letters inside each term and then groups "
                            "terms whose variable parts match exactly. Enter "
-                           "`3xy + 2yx - xy` and then `5x^2y - 2xy^2` to see a group form "
-                           "and a group refuse to.",
+                           "`3xy + 2yx - xy` and predict the groups before changing to "
+                           "`5x^2y - 2xy^2`. The group labels diagnose whether a coefficient, "
+                           "letter or exponent was used to make the decision.",
         }),
         "steps_title": "Collecting like terms",
         "steps_intro": "Step 1 is skipped more often than it is done, and step 1 is what makes the rest safe.",
@@ -826,6 +843,10 @@ LESSONS = [
                 "The check tests `a = 1, b = 1` only, which is enough to catch a dropped "
                 "term or a wrong sign and is not a proof of equality. What proves it is "
                 "the theorem above, which holds for every value of `a` and `b`.",
+                "For a faded collection, group `6a²b − a²b + 3ab²` without touching the "
+                "coefficients until the groups are marked. Only the first two terms join, "
+                "so the result is `5a²b + 3ab²`. Combining all three means the swapped "
+                "exponents were treated as though their variable parts matched.",
             ],
         },
         "quiz_title": "Alike or not",
@@ -855,7 +876,7 @@ LESSONS = [
         "mistakes": [
             ("Adding the exponents instead of the coefficients",
              "`3x² + 5x² = 8x²`. Exponents add when powers are <em>multiplied</em>, which "
-             "is lesson 5. Adding like terms leaves the variable part exactly as it was, "
+             "is lesson 6. Adding like terms leaves the variable part exactly as it was, "
              "and only the coefficients change."),
             ("Writing `3x + 4y = 7xy`",
              "There is nothing to combine: the variable parts differ, so no common factor "
@@ -867,17 +888,17 @@ LESSONS = [
              "cannot happen."),
         ],
         "standard": ("Finish when you can say instantly whether two terms may be added, and why.",
-                     "Given any expression you should expand, group and collect without "
-                     "losing a sign or an invisible `1`, and be able to justify each "
-                     "combination by naming the distributive law rather than by feel. "
-                     "Course 2 solves equations by collecting on each side, and every "
-                     "error made here survives into the answer there."),
-        "note": "This is the last of the three reading skills. Lesson 9 found the terms, "
+                     "Expand and collect `3(2x − y) − x + 4y − 7`, marking every group by "
+                     "its variable part before adding coefficients. Justify each merge by "
+                     "the distributive law read backwards and explain why an unlike term "
+                     "stays. Course 2 collects on each side of an equation and preserves "
+                     "every sign error made here."),
+        "note": "This is the last of the three reading skills. Lesson 3 found the terms, "
                 "lesson 10 got them out of their brackets, and this lesson decides which "
                 "may be merged. Course 4 does the same three things to polynomials and "
                 "calls it addition.",
     },
-    # ---------------------------------------------------------------- 12
+    # --------------------------------------------------------- evaluating-expressions
     {
         "slug": "evaluating-expressions",
         "title": "Evaluating Expressions",
@@ -885,7 +906,7 @@ LESSONS = [
         "one_line": "Substitution done carefully, brackets and all.",
         "summary": (
             "Evaluating means replacing every occurrence of a letter with the same "
-            "number and then doing arithmetic under the rules of lesson 3. One discipline "
+            "number and then doing arithmetic under the rules of lesson 2. One discipline "
             "removes almost every error: write the substituted value inside brackets, "
             "every time, whether it looks necessary or not."
         ),
@@ -923,7 +944,7 @@ LESSONS = [
                      "To <strong>evaluate</strong> an expression at given values is to "
                      "replace every occurrence of each variable by its value and then "
                      "carry out the arithmetic, using the order of operations from "
-                     "lesson 3.",
+                     "lesson 2.",
                      "The result is a single number, or else a statement that the "
                      "expression has no value there.")),
             ("p", "The discipline: <strong>write the value inside brackets</strong>. Not "
@@ -939,7 +960,7 @@ LESSONS = [
             ]),
             ("p", "The second line is not a slip of the pen; it is a correct evaluation "
                   "of a different string. In `−3²` the exponent binds more tightly than "
-                  "the minus sign, so it means `−(3²)`. Lesson 3 settled that, and "
+                  "the minus sign, so it means `−(3²)`. Lesson 2 settled that, and "
                   "substitution is where the ruling has consequences."),
             ("h3", "The minus sign that is part of the expression"),
             ("p", "Compare two expressions that differ only by brackets. At `x = −3`:"),
@@ -991,7 +1012,9 @@ LESSONS = [
             "panel_intro": "Choose an expression and values for its letters. The lab does "
                            "the substitution twice, bracketing the values in one pass and "
                            "not the other, and shows where the two answers part company. "
-                           "Try `-x^2` at `x = -3`.",
+                           "Predict both substituted strings before choosing `-x^2` at "
+                           "`x = -3`; the first differing string identifies a substitution "
+                           "error before its arithmetic reaches the answer.",
         }),
         "steps_title": "Evaluating an expression",
         "steps_intro": "Four steps, and the first one is the only one that is a habit rather than arithmetic.",
@@ -1005,7 +1028,7 @@ LESSONS = [
              "missing."),
             ("Work out the value under the order of operations",
              "Brackets, then exponents, then multiplication and division left to right, "
-             "then addition and subtraction left to right. Lesson 3 gave the rule; "
+             "then addition and subtraction left to right. Lesson 2 gave the rule; "
              "substitution does not amend it."),
             ("Say so if there is no value",
              "A division by zero, or an even root of a negative number, means the "
@@ -1039,23 +1062,26 @@ LESSONS = [
                 "choice. Which one you are evaluating is decided by the brackets printed "
                 "in the question, and the only way to keep them straight is to carry them "
                 "through the substitution.",
+                "Fade the substitution for `5 − 3x` at `x = −2`: copy it as "
+                "`5 − 3(−2)` and finish from there. The value is `11`. An answer of `−1` "
+                "dropped the substituted sign; `16` treated `3x` as the two-digit number "
+                "`3` followed by `2` before subtracting.",
             ],
         },
         "quiz_title": "Substitution",
         "quiz": [
-            {"q": "Evaluate `−x²` at `x = −3`.",
-             "a": ["`9`", "`−9`", "`6`", "`−6`"],
+            {"q": "Evaluate `3x² + 2x − 1` at `x = −2`.",
+             "a": ["`15`", "`7`", "`−17`", "`3`"],
              "c": 1,
-             "why": "`−x²` means `−(x²)`, so square first: `(−3)² = 9`, then apply the "
-                    "minus, giving `−9`. `9` is the value of `(−x)²`, a different "
-                    "expression; `6` and `−6` come from multiplying by `2` instead of "
-                    "squaring."},
-            {"q": "Evaluate `2x² − 3x + 1` at `x = −1/2`.",
-             "a": ["`0`", "`2`", "`3`", "`7/2`"],
-             "c": 2,
-             "why": "`2(1/4) = 1/2`, `−3(−1/2) = 3/2`, and `1/2 + 3/2 + 1 = 3`. `0` comes "
-                    "from dropping the sign on `−3x`; `2` from reading `(−1/2)²` as "
-                    "`−1/4`; `7/2` from computing `(2x)²` instead of `2x²`."},
+             "why": "Substitution gives `3(−2)² + 2(−2) − 1 = 12 − 4 − 1 = 7`. `15` "
+                    "drops the sign from the linear term; `−17` squares without brackets; "
+                    "`3` treats the exponent as multiplication by two."},
+            {"q": "Evaluate `−2x²` at `x = −3`.",
+             "a": ["`18`", "`−18`", "`−12`", "`36`"],
+             "c": 1,
+             "why": "The coefficient is outside the power: `−2(−3)² = −2 · 9 = −18`. "
+                    "`18` puts the coefficient inside the square's sign change; `−12` "
+                    "reads the exponent as a multiplier; `36` squares `−2x` instead of `x`."},
             {"q": "Evaluate `1/(x − 2)` at `x = 2`.",
              "a": ["`0`", "`1`", "`1/2`", "It has no value: the substitution gives `1/0`"],
              "c": 3,
@@ -1079,18 +1105,17 @@ LESSONS = [
              "correct one."),
         ],
         "standard": ("Finish when the brackets go in without you deciding to put them there.",
-                     "You should be able to evaluate an expression at a negative fraction "
-                     "and get the sign right first time, and to say without hesitating "
-                     "how `−x²` and `(−x)²` differ. Course 3 evaluates expressions "
-                     "thousands of times under the name `f(x)`, and it assumes this is "
-                     "already reflex."),
+                     "Evaluate `4x² − 3xy + y²` at `x = −1/2`, `y = −3`, writing every "
+                     "substitution in brackets and keeping exact fractions. Then explain "
+                     "how `−x²`, `(−x)²` and `−2x²` differ before evaluating any of them. "
+                     "Course 3 repeats this act under the name `f(x)`."),
         "note": "Evaluating at a single value is also the cheapest check you have. If two "
                 "expressions are supposed to be equal and they disagree at one number, "
                 "one of them is wrong &mdash; a complete disproof from one line of "
                 "arithmetic. Agreement at one number is not a proof of anything, which is "
                 "why a check is a check and not a demonstration.",
     },
-    # ---------------------------------------------------------------- 13
+    # ---------------------------------------------- translating-words-into-algebra
     {
         "slug": "translating-words-into-algebra",
         "title": "Translating Words into Algebra",
@@ -1228,8 +1253,9 @@ LESSONS = [
             "panel_title": "Two readings of one phrase",
             "panel_intro": "Choose a phrase and edit the expression in `n` you think it "
                            "means. The lab evaluates your reading and the rival reading at "
-                           "seven values of `n` and reports where they disagree, which is "
-                           "the check worth copying by hand.",
+                           "seven values of `n`. Write the letter definition and predict "
+                           "one separating value before selecting the phrase; the first "
+                           "disagreement diagnoses an order or grouping error.",
         }),
         "steps_title": "Translating a sentence",
         "steps_intro": "The first two steps produce no algebra at all, and skipping them is what goes wrong.",
@@ -1283,24 +1309,26 @@ LESSONS = [
                 "chosen reading correct, because two different expressions can agree at "
                 "one value &mdash; `n − 5` and `5 − n` both give `0` at `n = 5`, which is "
                 "exactly why `n = 5` would have been a bad test for phrase 1.",
+                "Now fade the wording: \"three times the difference of `n` and 4\". The "
+                "packaged quantity is the difference, so the expression is `3(n − 4)`. "
+                "At `n = 6` it gives `6`; `3n − 4` gives `14` and reveals that only the "
+                "first quantity was tripled.",
             ],
         },
         "quiz_title": "English into algebra",
         "quiz": [
-            {"q": "Which expression is \"five less than a number `n`\"?",
-             "a": ["`5 − n`", "`n − 5`", "`5n`", "`n/5`"],
+            {"q": "Which expression is \"seven less than twice a number `n`\"?",
+             "a": ["`7 − 2n`", "`2n − 7`", "`2(n − 7)`", "`n − 14`"],
              "c": 1,
-             "why": "\"Less than\" names the amount subtracted first and the thing "
-                    "subtracted from second. At `n = 8` the phrase means `3`, and only "
-                    "`n − 5` gives it; `5 − n` gives `−3`. The other two translate "
-                    "\"times\" and \"divided by\"."},
-            {"q": "Which expression is \"twice the sum of `n` and 3\"?",
-             "a": ["`2n + 3`", "`2(n + 3)`", "`n + 6`", "`2 + n + 3`"],
+             "why": "Twice the number is `2n`, then seven less is `2n − 7`. `7 − 2n` "
+                    "reverses \"less than\"; `2(n − 7)` doubles the subtraction as well; "
+                    "`n − 14` doubles seven instead of the number."},
+            {"q": "Which expression is \"three times the difference of `n` and 4\"?",
+             "a": ["`3n − 4`", "`3(n − 4)`", "`n − 12`", "`3(n + 4)`"],
              "c": 1,
-             "why": "\"The sum of `n` and 3\" is one quantity, so it takes a bracket, and "
-                    "\"twice\" applies to all of it. At `n = 5` the phrase means `16`; "
-                    "`2n + 3` gives `13`, `n + 6` doubles only the `3`, and `2 + n + 3` "
-                    "reads \"twice\" as \"add two\"."},
+             "why": "The difference `n − 4` is one packaged quantity, so all of it is "
+                    "tripled: `3(n − 4)`. `3n − 4` triples only `n`; `n − 12` triples "
+                    "only `4`; `3(n + 4)` changes the difference to a sum."},
             {"q": "A rectangle is 3 cm longer than it is wide. Its width is `w` cm. Which "
                   "expression is its perimeter, in centimetres?",
              "a": ["`4w + 6`", "`4w + 3`", "`2w + 3`", "`w(w + 3)`"],
@@ -1326,11 +1354,11 @@ LESSONS = [
              "written."),
         ],
         "standard": ("Finish when you write the \"let n be ...\" line without being asked.",
-                     "Given a sentence you should produce a named unknown with units, an "
-                     "expression for every other quantity in terms of it, and a test "
-                     "value that separates your reading from the obvious rival. That is "
-                     "the whole of what course 2 calls setting up a word problem; solving "
-                     "the equation afterwards is the easy half."),
+                     "For a taxi fare with a `$4` fixed charge and `$2.50` per mile, define "
+                     "the unknown with units, write the total for an unknown number of miles, "
+                     "and choose a value that separates it from the common product-of-the-"
+                     "whole-sum error. Then translate \"four less than three times the sum "
+                     "of a number and two\" and test the nearest rival reading."),
         "note": "This is the last lesson of the course, and it is the one that gets used "
                 "first. Course 2 turns these expressions into equations by setting two of "
                 "them equal, and every technique it teaches for solving is worthless if "
