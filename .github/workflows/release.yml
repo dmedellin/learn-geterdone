@@ -132,10 +132,23 @@ jobs:
               if path.name == "Containerfile.release":
                   text = text.replace("__GIT_REVISION__", revision)
                   path.write_text(text, encoding="utf-8")
-              residual = [found for found in PLACEHOLDER.findall(text)
+              # Dockerfile/Caddy comment lines are prose, not executable input.
+              # They deliberately use tokens such as __PLACEHOLDER__ and
+              # __BASE_IMAGE_DIGEST__ to explain the fail-closed policy. Scanning
+              # raw text makes those examples indistinguishable from a live token
+              # and blocks every release before the image build. Keep the retired
+              # loopback/subnet check above raw (they must not appear anywhere),
+              # but scan generic residuals only in executable lines.
+              residual = [(number, found)
+                          for number, line in enumerate(text.splitlines(), start=1)
+                          if not line.lstrip().startswith("#")
+                          for found in PLACEHOLDER.findall(line)
                           if found != "__GIT_REVISION__"]
               if residual:
-                  print("::error::%s has unrendered placeholders: %s" % (path, ", ".join(residual)))
+                  rendered = ", ".join("%s (line %d)" % (found, number)
+                                       for number, found in residual)
+                  print("::error::%s has unrendered executable placeholders: %s" %
+                        (path, rendered))
                   sys.exit(1)
           epoch = os.environ.get("SOURCE_DATE_EPOCH", "").strip()
           if not epoch.isdigit() or int(epoch) < 1700000000:
