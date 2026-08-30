@@ -1237,178 +1237,36 @@ jobs:
         run: |
           set -euo pipefail
           python3 - <<'PY'
-          import ipaddress, json, pathlib, re, sys
+          import json, pathlib, re, sys
 
-          # THIS GATE CHANGED SHAPE WHEN THE RESOURCES WERE ALLOCATED.
-          #
-          # It used to assert that every port and subnet field still held its
-          # unallocated token, because choosing them is a human decision proven
-          # against live host state. That decision has now been made and proven:
-          # loopback 8082 (free per `ss -ltn` on the host, with 8080 left to the
-          # pixelbattle-landing reservation) and 10.89.4.0/24 (non-overlapping
-          # per `podman network inspect`), landed in the platform-ops registry
-          # reservation for slug learn-geterdone.
-          #
-          # The gate's PURPOSE is unchanged: nobody may quietly write a port or a
-          # CIDR into a deployment input. What changed is the correct value. So
-          # instead of "must still be a token" it now asks:
-          #   1. CONSISTENCY - every port literal in a deployment input equals the
-          #      one allocated port. This app publishes 127.0.0.1:<loopback>:<internal>
-          #      straight through, so a second integer anywhere means the container
-          #      binds a port the host does not reserve. That is exactly how a
-          #      hardcoded 8080 - a port another app had already claimed - once
-          #      reached a committed contract.
-          #   2. RESERVED - any CIDR present must not collide with a network that
-          #      is already taken. Overlap, not equality: 10.89.2.0/25 and
-          #      10.89.0.0/16 are the same collision as 10.89.2.0/24 and neither is
-          #      that string. ipaddress does the real containment test.
-          #   3. SOURCE OF TRUTH - release/contract.json still carries real values
-          #      and no leftover token, since release.yml renders every artifact
-          #      from it.
+          # The production host is already onboarded to shared-private-edge.
+          # This gate asserts that repository deployment inputs describe that
+          # fixed contract and do not revive the retired loopback model.
           CONTRACT = pathlib.Path("release/contract.json")
           contract = json.loads(CONTRACT.read_text(encoding="utf-8"))
-          network = contract.get("network", {})
-          PORT = network.get("loopback_port")
-          SUBNET = network.get("subnet")
+          expected = {"class": "shared-private-edge", "internal_port": 8080,
+                      "shared_network": "platform-private-edge", "private_ipv4": "10.89.2.22"}
           errors = []
-          if not (isinstance(PORT, int) and not isinstance(PORT, bool) and 1024 <= PORT <= 65535):
-              errors.append((CONTRACT, 0, "network.loopback_port is not an allocated port: %r" % (PORT,)))
-          if network.get("internal_port") != PORT:
-              errors.append((CONTRACT, 0, "internal_port %r != loopback_port %r; this app binds the "
-                             "integer it publishes" % (network.get("internal_port"), PORT)))
-          try:
-              ALLOCATED = ipaddress.ip_network(SUBNET)
-          except Exception:
-              ALLOCATED = None
-              errors.append((CONTRACT, 0, "network.subnet is not an allocated CIDR: %r" % (SUBNET,)))
+          if contract.get("network") != expected:
+              errors.append((CONTRACT, 0, "network must equal the shared-private-edge production contract: %r" % expected))
 
-          SCOPE = ["deploy", "release", "platform"]
-          NAMES = ("compose.yaml", "compose.yml", "compose.template.yaml",
-                   "compose.production.yaml", "Containerfile", "Containerfile.release")
-          # Documentation is not configuration; several files deliberately NAME a
-          # forbidden subnet or a taken port so a human cannot pick one by
-          # accident, and failing the build on that prose would teach people to
-          # delete the warning instead of the value.
-          DOC_KEYS = {"description", "title", "comment", "note", "notes",
-                      "examples", "rationale"}
-          KEY_LINE = re.compile(r'^-?\s*"?(\$?[A-Za-z_][A-Za-z0-9_-]*)"?\s*:')
-          PORT_PATTERNS = [
-              (re.compile(r'127\.0\.0\.1:(\d+):(\d+)'), "loopback publish mapping"),
-              (re.compile(r'"?loopback_port"?\s*[:=]\s*"?(\d+)'), "loopback_port"),
-              (re.compile(r'"?internal_port"?\s*[:=]\s*"?(\d+)'), "internal_port"),
-              (re.compile(r'^\s*:(\d+)\s*\{'), "Caddy site address"),
-              (re.compile(r'^\s*EXPOSE\s+(\d+)'), "EXPOSE"),
-              (re.compile(r'127\.0\.0\.1:(\d+)/'), "loopback probe URL"),
-          ]
-          RESERVED = [
-              ("10.89.2.0/24", "platform-private-edge (live baseline)"),
-              ("10.88.0.0/16", "the Podman default network"),
-              ("10.89.0.0/24", "hoa-meetings"),
-              ("10.89.1.0/24", "cyberpunk-sky-raid"),
-              ("10.89.3.0/24", "the pixelbattle-landing reservation"),
-          ]
-          RESERVED = [(ipaddress.ip_network(c), o) for c, o in RESERVED]
-          # The schema DEFINES the token shape and the example ILLUSTRATES it;
-          # neither is a rendered deployment input, and release.yml refuses to
-          # stage the example as a release. Only real inputs must carry the
-          # allocated value.
-          # Rendered by release.yml from the contract at build time. These must
-          # KEEP their token; the render step fails if it is gone.
-          RENDER_INPUTS = {
-              pathlib.Path("deploy/Caddyfile"),
-              pathlib.Path("Containerfile.release"),
-              pathlib.Path("compose.template.yaml"),
-          }
-          CIDR_TOKEN = re.compile(r'(?<![\w.])((?:\d{1,3}\.){3}\d{1,3}/\d{1,2})(?![\w.])')
-
-          targets = []
-          for name in NAMES:
-              targets.extend(pathlib.Path(".").glob(name))
-          for directory in SCOPE:
-              base = pathlib.Path(directory)
-              if base.is_dir():
-                  targets.extend(p for p in base.rglob("*") if p.is_file())
-
-          def configuration_lines(path, text):
-              doc_indent = None
-              for number, raw in enumerate(text.splitlines(), start=1):
-                  stripped, indent = raw.strip(), len(raw) - len(raw.lstrip())
-                  if doc_indent is not None:
-                      if not stripped or indent > doc_indent:
-                          continue
-                      doc_indent = None
-                  if not stripped or stripped.startswith(("#", "//")):
-                      continue
-                  match = KEY_LINE.match(stripped)
-                  if match and match.group(1).lower().lstrip("$") in DOC_KEYS:
-                      doc_indent = indent
-                      continue
-                  if path.suffix.lower() != ".json":
-                      stripped = stripped.split(" #", 1)[0].split("\t#", 1)[0].strip()
-                  if stripped:
-                      yield number, stripped
-
-          for path in sorted(set(targets)):
-              # Markdown under a scanned directory is PROSE, never configuration.
-              # The DOC_KEYS escape above only covers a value under a YAML or
-              # JSON key, so a briefing file that writes "never 10.89.2.0/24" in
-              # a sentence failed this step -- which is the exact outcome the
-              # comment above says to avoid, because it teaches people to delete
-              # the warning rather than the value. No render input is markdown;
-              # RENDER_INPUTS is an explicit list and is checked separately.
-              if path.suffix.lower() in {".md", ".markdown"}:
-                  continue
-              try:
-                  text = path.read_text(encoding="utf-8")
-              except (UnicodeDecodeError, OSError):
-                  continue
-              for number, stripped in configuration_lines(path, text):
-                  # A RENDER INPUT must KEEP its token. release.yml substitutes
-                  # it from the contract at build time and fails loudly when
-                  # there is nothing to substitute -- "the deployment inputs and
-                  # this workflow have drifted apart". Committing the integer
-                  # into a template is exactly that drift: it removes the render
-                  # step's only chance to prove template and contract agree.
-                  for pattern, what in PORT_PATTERNS:
-                      m = pattern.search(stripped)
-                      if not m:
-                          continue
-                      for group in m.groups():
-                          if path in RENDER_INPUTS:
-                              errors.append((path, number,
-                                             "%s carries the literal port %s; a render input must keep "
-                                             "__LOOPBACK_PORT__ so release.yml renders it from the "
-                                             "contract" % (what, group)))
-                          elif int(group) != PORT:
-                              errors.append((path, number,
-                                             "%s uses port %s; the allocated port is %d and this app "
-                                             "binds the integer it publishes" % (what, group, PORT)))
-                  for token in CIDR_TOKEN.findall(stripped):
-                      try:
-                          candidate = ipaddress.ip_network(token, strict=False)
-                      except ValueError:
-                          continue
-                      if ALLOCATED is not None and candidate == ALLOCATED:
-                          continue
-                      for reserved, owner in RESERVED:
-                          if candidate.overlaps(reserved):
-                              errors.append((path, number,
-                                             "%s overlaps %s, owned by %s" % (token, reserved, owner)))
-
-          for path in sorted(RENDER_INPUTS):
-              if not path.is_file():
-                  errors.append((path, 0, "render input is missing"))
-              elif "__LOOPBACK_PORT__" not in path.read_text(encoding="utf-8"):
-                  errors.append((path, 0, "render input no longer carries __LOOPBACK_PORT__; "
-                                          "release.yml would have nothing to render"))
+          inputs = [pathlib.Path("deploy/Caddyfile"), pathlib.Path("Containerfile.release")]
+          for path in inputs:
+              text = path.read_text(encoding="utf-8")
+              if "__LOOPBACK_PORT__" in text or "__APP_SUBNET__" in text:
+                  errors.append((path, 0, "obsolete loopback/subnet placeholder remains in deployment input"))
+          caddy = pathlib.Path("deploy/Caddyfile").read_text(encoding="utf-8")
+          containerfile = pathlib.Path("Containerfile.release").read_text(encoding="utf-8")
+          if not re.search(r"^:8080\s*\{", caddy, re.M):
+              errors.append((pathlib.Path("deploy/Caddyfile"), 0, "Caddy must bind shared-edge port 8080"))
+          if "EXPOSE 8080" not in containerfile or "127.0.0.1:8080/healthz" not in containerfile:
+              errors.append((pathlib.Path("Containerfile.release"), 0, "image must expose and healthcheck port 8080"))
 
           if errors:
               for path, number, message in errors:
                   print("::error file=%s,line=%s::%s" % (path, number or 1, message))
               sys.exit(1)
-          print("Contract allocates loopback %d and subnet %s; every render input still "
-                "carries its token." % (PORT, SUBNET))
-          PY
+          print("Shared-private-edge contract verified: platform-private-edge 10.89.2.22:8080.")
 
       - name: Release contract documents validate against the release schema
         run: |

@@ -5,8 +5,8 @@
 #                  https://learn.geterdone.io/<course>/<lesson>/  (lesson)
 #
 # WHY THIS FILE EXISTS
-# The platform serves apps only as containers behind `reverse_proxy 127.0.0.1:<port>`
-# (docs/EDGE_ROUTING_CONTRACT.md §7). There is no host file_server / document root.
+# The platform serves this app through the shared-private-edge network. The host
+# Caddy fragment reverse-proxies 10.89.2.22:8080; there is no host file_server.
 # The site is plain static HTML with no health route, so this config is also the
 # ONLY source of the GET /healthz 200 the deployment contract requires.
 #
@@ -18,16 +18,6 @@
 #   * Nothing below trusts X-Forwarded-*. A static file server makes no security
 #     decision from client-supplied forwarding headers (EDGE_ROUTING_CONTRACT §7.1).
 #
-# UNALLOCATED PLACEHOLDER — __LOOPBACK_PORT__
-#   Port allocation is an explicit human decision plus a live host preflight
-#   (registry `occupied_resources` + `ss -ltnp` on the host). It is deliberately
-#   NOT chosen here and must not be automated or guessed.
-#   Render __LOOPBACK_PORT__ to the SAME integer in all four artifacts before
-#   building: this file, Containerfile.release (EXPOSE + HEALTHCHECK),
-#   compose.template.yaml (both sides of the published mapping), and the
-#   registry entry (network.loopback_port and network.internal_port).
-#   Known-taken on the host today: 2019 caddy-admin, 3000/3001 hoa-web/hoa-api,
-#   8080 proposed by pixelbattle-landing.
 {
 	# Minimal surface: no admin API (it would otherwise listen on :2019 inside
 	# the container), no automatic HTTPS (edge-owned), no config persistence
@@ -66,10 +56,9 @@
 	}
 }
 
-# Bind on all interfaces INSIDE the container namespace. Binding 127.0.0.1 here
-# would break Podman port publishing; host-side loopback-only exposure is done by
-# compose (`ports: 127.0.0.1:__LOOPBACK_PORT__:__LOOPBACK_PORT__`).
-:__LOOPBACK_PORT__ {
+# Bind on all interfaces INSIDE the container namespace. The platform wrapper
+# attaches this container to platform-private-edge at 10.89.2.22:8080.
+:8080 {
 	log {
 		output stdout
 	}
@@ -143,6 +132,16 @@
 		header Cache-Control "no-store"
 		header Content-Type "text/plain; charset=utf-8"
 		respond "ok" 200
+	}
+
+	# The platform wrapper compares this release identity immediately after
+	# cutover. It is generated into /srv by Containerfile.release and must never
+	# be cached by either the app or an intermediary.
+	handle /release.txt {
+		log_skip
+		header Cache-Control "no-store"
+		header Content-Type "text/plain; charset=utf-8"
+		file_server
 	}
 
 	# --- Static site ---

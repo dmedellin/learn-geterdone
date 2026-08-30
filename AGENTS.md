@@ -180,33 +180,42 @@ only as `reverse_proxy 127.0.0.1:<port>` to a container
   those; they are frozen registry fields, and a routine release may not change
   them.
 
-## 4. Port and subnet allocation is forbidden to automate
+## 4. The app is a tenant of the shared edge; it allocates nothing
 
-Loopback port and private subnet allocation is an **explicit human decision**
-validated by a **live host preflight** immediately before onboarding
-(`platform-ops/docs/EDGE_ROUTING_CONTRACT.md` section 5). No script, workflow, or
-agent may pick one.
+This app is deployed by `/usr/local/sbin/platform-deploy-static`, and that wrapper
+decides the runtime topology, not this repository. It renders its own Compose file
+from `/etc/platform/templates/static-compose.yaml`, attaches the container to the
+shared external network `platform-private-edge` at the fixed private address in
+`/etc/platform/apps/learn-geterdone.env`, and writes and owns
+`/etc/caddy/sites.d/learn-geterdone.caddy`. Nothing is published on host loopback.
 
-- Use the literal placeholders `__LOOPBACK_PORT__` and `__APP_SUBNET__` wherever a
-  value is needed. They must be rendered to the same value in every artifact
-  (`deploy/Caddyfile`, `Containerfile.release`, `compose.template.yaml`, and the
-  registry entry) at release time.
-- **Never `10.89.2.0/24`.** The live baseline proves `platform-private-edge` owns
-  it. `platform-ops/deployments/pixelbattle-landing/compose.template.yaml` still
-  carries that subnet; that file is stale — copy its shape, never its values.
-- Registry validation rejects subnet **overlap**, not just equality.
-- CI enforces this: the "Unallocated resources stay unallocated" step fails the
-  build on a hardcoded loopback mapping, `loopback_port`, `internal_port`, or
-  `subnet` in any deployment input file, and on any CIDR that **overlaps** a
-  reserved network (not merely one that equals it). Documentation blocks and
-  comments that name a forbidden value are prose and are skipped on purpose.
+So the two things this repository must get right are **fixed constants**, not
+allocations:
 
-Internal container ports are namespaced and may repeat in general, but this app
-publishes `127.0.0.1:<loopback>:<internal>` straight through: `deploy/Caddyfile`
-binds the port, `Containerfile.release` EXPOSEs it, and the registry entry repeats
-it, so `internal_port` carries the same `__LOOPBACK_PORT__` token and is allocated
-in the same human decision. Do not pin it to a number because "internal ports are
-free" - 8080 is already claimed on this host.
+- **The container listens on `8080`.** `deploy/Caddyfile` binds `:8080` and
+  `Containerfile.release` EXPOSEs and healthchecks it. The shared Compose template
+  probes `http://127.0.0.1:8080/healthz`; a different port is simply not deployable.
+- **`/srv/release.txt` carries the release commit.** `Containerfile.release` takes
+  `ARG RELEASE_SHA` and writes it there, and `release.yml` passes
+  `build-args: RELEASE_SHA=${{ github.sha }}`. The wrapper fetches that file over
+  the private address AND over the public domain and requires both to equal the SHA
+  it was invoked with. It is served `no-store`: a cached copy would let a previous
+  release's marker satisfy the check for the new one.
+
+The old `__LOOPBACK_PORT__` and `__APP_SUBNET__` placeholders are **retired**, and
+`compose.template.yaml` is deleted — the host renders its own. Both CI and the
+release workflow now FAIL if either token reappears in `deploy/Caddyfile` or
+`Containerfile.release`. Do not reintroduce them, and do not re-add a repo-side
+Compose file: two Compose definitions for one app is exactly the disagreement the
+wrapper's `rendered_sha256` check used to guard against.
+
+**Never `10.89.2.0/24` as an app subnet.** That CIDR *is* `platform-private-edge`,
+the network this app joins as a tenant. It belongs in `occupied_resources`, and an
+app that declared it as its own would collide with the network it runs on.
+
+Changing the private IPv4, the shared network, or the domain is a **platform**
+change made in `dmedellin/platform-ops` plus `/etc/platform/apps/learn-geterdone.env`
+on the host — never a workflow edit here.
 
 ## 5. Where authority actually lives
 
@@ -242,9 +251,12 @@ registry.
 - **A hand-written image digest.** If you cannot verify a real digest against a
   registry, write `__BASE_IMAGE_DIGEST__` and stop. A plausible-looking invented
   `sha256:` is worse than an obvious placeholder: it looks verified.
-- An invented loopback port or subnet (see section 4), including "just for now".
-- CI status badges, or any claim that a build, deployment, or acceptance passed.
-  Nothing here has been deployed and no runner exists; write what is true.
+- A loopback port, an app subnet, or a repo-side Compose file (see section 4).
+  The host decides the topology; this repository pins only port 8080.
+- CI status badges, or any claim that a build, deployment, or acceptance passed
+  that you did not watch pass. A self-hosted runner and a `production`
+  environment now exist, so "it deployed" is a checkable claim - check it against
+  the run, the digest, and the live site rather than asserting it.
 - Vendored third-party assets without shipping rights and recorded provenance.
 - Generated build output, `node_modules/`, or anything in `.gitignore`.
 
