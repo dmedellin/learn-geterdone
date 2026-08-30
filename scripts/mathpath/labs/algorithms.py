@@ -2,112 +2,72 @@
 
 from .common import Lab, cfg_literal
 
-
-def algorithm_lab(cfg):
-    """Counts from running the algorithm, not from quoting its complexity class.
-
-    Every operation count in this lab is produced by executing the algorithm on
-    an actual array and incrementing a counter. That is the difference between
-    "merge sort is O(n log n)" as a fact to repeat and as a claim you have
-    watched hold: the measured column and the predicted column sit beside each
-    other, and where they diverge the lab says why.
-    """
-    markup = """      <div class="lab-toolbar">
-        <div class="lab-title"><strong id="alTitle">Algorithms and growth</strong><span id="alSub"></span></div>
-        <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>measured</span><span class="tone-purple"><i class="legend-swatch"></i>predicted</span><span class="tone-amber"><i class="legend-swatch"></i>crossover</span></div>
-      </div>
-      <div class="lab-stage"><svg id="alPlot" viewBox="0 0 520 230" role="img" aria-label="Operation counts plotted against input size."></svg></div>
-      <div class="table-wrap" style="margin-top:12px;"><table class="tt" id="alTable"></table></div>
-      <div class="status-banner" id="alStatus" style="margin-top:12px;"></div>"""
-    controls = """        <div class="field">
-          <label for="alMode">What to examine</label>
-          <select id="alMode">
-            <option value="growth">Growth rates side by side</option>
-            <option value="witness">Is f(n) = O(g(n))? find C and k</option>
-            <option value="search">Linear vs binary search (counted)</option>
-            <option value="sort">Sorting algorithms (counted)</option>
-            <option value="master">Master theorem cases</option>
-            <option value="greedy">Greedy vs dynamic programming</option>
-          </select>
-        </div>
-        <div class="field" id="alFWrap">
-          <label for="alF">f(n)</label>
-          <select id="alF"></select>
-        </div>
-        <div class="field" id="alGWrap">
-          <label for="alG">g(n)</label>
-          <select id="alG"></select>
-        </div>
-        <div id="alNWrap">
-          <div class="range-row"><label class="small-copy" for="alN">n</label><span class="range-value" id="alNOut">16</span></div>
-          <input id="alN" type="range" min="2" max="64" value="16" />
-        </div>
-        <div class="kpi-grid">
-          <div class="kpi"><span id="alK1L">measured</span><strong id="alK1">&mdash;</strong></div>
-          <div class="kpi"><span id="alK2L">predicted</span><strong id="alK2">&mdash;</strong></div>
-        </div>"""
-
-    script = r"""
-  var modeSel = document.getElementById('alMode'), fSel = document.getElementById('alF'), gSel = document.getElementById('alG');
-  var nS = document.getElementById('alN');
-  var plot = document.getElementById('alPlot'), table = document.getElementById('alTable');
-  var status = document.getElementById('alStatus');
-  var title = document.getElementById('alTitle'), sub = document.getElementById('alSub');
-  var k1 = document.getElementById('alK1'), k2 = document.getElementById('alK2');
-  var k1L = document.getElementById('alK1L'), k2L = document.getElementById('alK2L');
-
+# Everything the lab computes, as one block so that scripts/mathcheck.js can
+# execute exactly the JavaScript that ships. It is pure: it touches no element.
+# The DOM code that paints the results follows in algorithm_lab.
+#
+# The witness mode is the one to be careful with. A finite search cannot
+# establish that f is NOT O(g): for any range of n checked, some constant C
+# covers it, and the first version of this lab reported n² = O(n) with C = 100
+# because it stopped at n = 64. The verdict therefore comes from the growth
+# class of each function -- polynomial degree and log power, then exponential,
+# then factorial -- and the search for (C, k) runs only when the relation is
+# true, then confirms the pair it found at n = 10³, 10⁴, 10⁶ and 10⁹.
+ALGO_JS = r"""
+  /* --- the functions the growth and witness modes compare --------------- */
+  /* [label, f, rank]. rank = [tier, degree, log power], compared in that
+     order: tier 0 is n^degree · (log n)^power, tier 1 exponential, tier 2
+     factorial. f = O(g) exactly when rank(f) ≤ rank(g). */
   var FUNCS = [
-    ['1', function (n) { return 1; }],
-    ['log₂ n', function (n) { return Math.log2(n); }],
-    ['n', function (n) { return n; }],
-    ['n log₂ n', function (n) { return n * Math.log2(n); }],
-    ['n²', function (n) { return n * n; }],
-    ['n³', function (n) { return n * n * n; }],
-    ['2ⁿ', function (n) { return Math.pow(2, n); }],
-    ['n!', function (n) { var f = 1; for (var i = 2; i <= n; i += 1) f *= i; return f; }],
-    ['3n² + 5n + 100', function (n) { return 3 * n * n + 5 * n + 100; }],
-    ['100n', function (n) { return 100 * n; }]
+    ['1', function (n) { return 1; }, [0, 0, 0]],
+    ['log₂ n', function (n) { return Math.log2(n); }, [0, 0, 1]],
+    ['n', function (n) { return n; }, [0, 1, 0]],
+    ['n log₂ n', function (n) { return n * Math.log2(n); }, [0, 1, 1]],
+    ['n²', function (n) { return n * n; }, [0, 2, 0]],
+    ['n³', function (n) { return n * n * n; }, [0, 3, 0]],
+    ['2ⁿ', function (n) { return Math.pow(2, n); }, [1, 0, 0]],
+    ['n!', function (n) { var f = 1; for (var i = 2; i <= n; i += 1) f *= i; return f; }, [2, 0, 0]],
+    ['3n² + 5n + 100', function (n) { return 3 * n * n + 5 * n + 100; }, [0, 2, 0]],
+    ['100n', function (n) { return 100 * n; }, [0, 1, 0]]
   ];
-  FUNCS.forEach(function (f, i) {
-    [fSel, gSel].forEach(function (sel) {
-      var o = document.createElement('option');
-      o.value = String(i); o.textContent = f[0];
-      sel.appendChild(o);
-    });
-  });
-  fSel.value = '8'; gSel.value = '4';
-
-  function show(ids) {
-    ['alFWrap', 'alGWrap', 'alNWrap'].forEach(function (id) {
-      document.getElementById(id).hidden = ids.indexOf(id) === -1;
-    });
+  function rankLE(r, s) {
+    for (var i = 0; i < 3; i += 1) { if (r[i] < s[i]) return true; if (r[i] > s[i]) return false; }
+    return true;
   }
-
-  function drawSeries(series, xs, logScale) {
-    var maxY = 0;
-    series.forEach(function (s) { s.values.forEach(function (v) { if (isFinite(v) && v > maxY) maxY = v; }); });
-    if (maxY <= 0) maxY = 1;
-    function y(v) {
-      if (!isFinite(v)) return 6;
-      if (logScale) {
-        var lv = Math.log10(Math.max(v, 1)), lm = Math.log10(Math.max(maxY, 10));
-        return 200 - (lv / lm) * 180;
+  function bigO(fi, gi) { return rankLE(FUNCS[fi][2], FUNCS[gi][2]); }
+  function className(rank) {
+    if (rank[0] === 2) return 'factorial';
+    if (rank[0] === 1) return 'exponential';
+    var d = rank[1], l = rank[2];
+    if (d === 0) return l ? 'logarithmic' : 'constant';
+    var base = d === 1 ? 'linear' : d === 2 ? 'quadratic' : d === 3 ? 'cubic' : 'degree ' + d;
+    return l ? base + ' times a log' : base;
+  }
+  var CHECKPOINTS = [1000, 10000, 1000000, 1000000000];
+  function holdsAt(f, g, C, n) {
+    var fv = f(n), gv = C * g(n);
+    if (!isFinite(fv) && !isFinite(gv)) return true;   /* both overflow: no evidence either way */
+    return fv <= gv + 1e-9;
+  }
+  /* The grid search, run only when bigO says the relation is true. The pair
+     it returns held on every n from k to 4N and at every checkpoint. */
+  function witnessSearch(fi, gi, N) {
+    var f = FUNCS[fi][1], g = FUNCS[gi][1];
+    var Cs = [1, 2, 3, 4, 5, 10, 20, 50, 100, 1000];
+    for (var ci = 0; ci < Cs.length; ci += 1) {
+      for (var k = 1; k <= 40; k += 1) {
+        var ok = true;
+        for (var n = k; n <= 4 * N && ok; n += 1) if (!holdsAt(f, g, Cs[ci], n)) ok = false;
+        for (var c = 0; c < CHECKPOINTS.length && ok; c += 1) if (!holdsAt(f, g, Cs[ci], CHECKPOINTS[c])) ok = false;
+        if (ok) return { C: Cs[ci], k: k };
       }
-      return 200 - (v / maxY) * 180;
     }
-    function x(i) { return 26 + (i / Math.max(1, xs.length - 1)) * 470; }
-    var s = '<line x1="26" y1="200" x2="500" y2="200" stroke="var(--line-strong)" />'
-      + '<line x1="26" y1="14" x2="26" y2="200" stroke="var(--line-strong)" />';
-    series.forEach(function (ser) {
-      var d = ser.values.map(function (v, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(v).toFixed(1); }).join(' ');
-      s += '<path d="' + d + '" fill="none" stroke="' + ser.colour + '" stroke-width="2.4" opacity="0.9" />';
-      s += '<text x="' + (x(ser.values.length - 1) - 6) + '" y="' + Math.max(14, y(ser.values[ser.values.length - 1]) - 6)
-        + '" text-anchor="end" font-size="11" font-weight="700" fill="' + ser.colour + '">' + ser.label + '</text>';
-    });
-    s += '<text x="26" y="216" font-size="10" fill="var(--muted)">n = ' + xs[0] + '</text>';
-    s += '<text x="500" y="216" text-anchor="end" font-size="10" fill="var(--muted)">n = ' + xs[xs.length - 1] + '</text>';
-    if (logScale) s += '<text x="30" y="24" font-size="10" fill="var(--muted)">log scale</text>';
-    plot.innerHTML = s;
+    return null;
+  }
+  function ratioAt(fi, gi, n) {
+    var fv = FUNCS[fi][1](n), gv = FUNCS[gi][1](n);
+    if (!isFinite(fv) || !isFinite(gv) || gv === 0) return null;
+    return fv / gv;
   }
 
   /* --- counted algorithms. Each RUNS and increments a counter. ----------- */
@@ -125,7 +85,6 @@ def algorithm_lab(cfg):
     }
     return a;
   }
-
   function linearSearch(a, target) {
     var c = 0;
     for (var i = 0; i < a.length; i += 1) { c += 1; if (a[i] === target) return c; }
@@ -140,6 +99,11 @@ def algorithm_lab(cfg):
       if (a[mid] < target) lo = mid + 1; else hi = mid - 1;
     }
     return c;
+  }
+  function binaryWorst(n) {
+    var a = makeArray(n, 'sorted'), worst = 0;
+    for (var t = 1; t <= n; t += 1) worst = Math.max(worst, binarySearch(a, t));
+    return worst;
   }
   function bubbleSort(a) {
     var arr = a.slice(), c = 0;
@@ -173,6 +137,70 @@ def algorithm_lab(cfg):
     sort(a.slice());
     return c;
   }
+  function ilog2(n) { var t = 0; while (n >= 2) { n = Math.floor(n / 2); t += 1; } return t; }
+
+  /* Lesson 5's four loop nests, each run with a counter, beside the sum that
+     predicts it. None of them looks at data, so the counts are exact. */
+  function countNests(n) {
+    var A = 0, B = 0, C = 0, D = 0, i, j, k;
+    for (i = 1; i <= n; i += 1) for (j = 1; j <= n; j += 1) for (k = 1; k <= n; k += 1) A += 1;
+    for (i = 1; i <= n; i += 1) for (j = i; j <= n; j += 1) B += 1;
+    for (i = 1; i <= n; i += 1) { j = n; while (j > 1) { j = Math.floor(j / 2); C += 1; } }
+    for (i = 1; i <= n; i += 1) for (j = 1; j <= i; j += 1) for (k = 1; k <= j; k += 1) D += 1;
+    return { A: A, B: B, C: C, D: D,
+      predA: n * n * n, predB: n * (n + 1) / 2, predC: n * ilog2(n), predD: n * (n + 1) * (n + 2) / 6 };
+  }
+
+  /* Lesson 2's worked example: POWER(x, n) by repeated squaring, with the
+     invariant result · base^m = xⁿ evaluated exactly after every iteration. */
+  function powerTrace(x, n) {
+    var X = BigInt(x), target = X ** BigInt(n);
+    var result = BigInt(1), base = X, m = n, rows = [], squarings = 0, mults = 0;
+    rows.push({ step: 0, m: m, result: result, base: base, ok: result * base ** BigInt(m) === target });
+    while (m > 0) {
+      if (m % 2 === 1) { result = result * base; mults += 1; }
+      base = base * base; squarings += 1;
+      m = Math.floor(m / 2);
+      rows.push({ step: rows.length, m: m, result: result, base: base, ok: result * base ** BigInt(m) === target });
+    }
+    return { rows: rows, squarings: squarings, mults: mults, value: result, target: target, naive: n - 1,
+      binary: n.toString(2) };
+  }
+
+  /* Lesson 8's dynamic array: n insertions from capacity 1, every element
+     copied when the array grows. policy: 'double', 'half' (×1.5), 'one' (+1). */
+  function dynamicArray(n, policy) {
+    var cap = 1, size = 0, copies = 0, events = [], worst = 0, worstAt = 1, cumulative = [];
+    for (var i = 1; i <= n; i += 1) {
+      var cost = 1;
+      if (size === cap) {
+        var next = policy === 'one' ? cap + 1 : policy === 'half' ? Math.max(cap + 1, Math.floor(cap * 3 / 2)) : cap * 2;
+        events.push({ at: i, from: cap, to: next, copies: size });
+        copies += size; cost += size; cap = next;
+      }
+      size += 1;
+      if (cost > worst) { worst = cost; worstAt = i; }
+      cumulative.push(copies + i);
+    }
+    return { events: events, copies: copies, total: n + copies, worst: worst, worstAt: worstAt,
+      amortised: (n + copies) / n, cumulative: cumulative, capacity: cap };
+  }
+
+  /* The master theorem, cases numbered as course 3 lesson 11 numbers them:
+     1 root dominates, 2 balanced, 3 leaves dominate. */
+  function masterCase(a, b, d) {
+    var crit = Math.log(a) / Math.log(b);
+    var which = Math.abs(crit - d) < 1e-9 ? 2 : (crit > d ? 3 : 1);
+    function pow(e) { return e === 0 ? '1' : e === 1 ? 'n' : 'n^' + e; }
+    var result;
+    if (which === 1) result = 'Θ(' + pow(d) + ')';
+    else if (which === 2) result = d === 0 ? 'Θ(log n)' : 'Θ(' + pow(d) + ' log n)';
+    else if (Math.abs(crit - Math.round(crit)) < 1e-9) result = 'Θ(' + pow(Math.round(crit)) + ')';
+    else result = 'Θ(n^log_' + b + ' ' + a + ') ≈ Θ(n^' + crit.toFixed(3) + ')';
+    var label = which === 1 ? 'case 1 (a < b^d, the root dominates)'
+      : which === 2 ? 'case 2 (a = b^d, balanced)' : 'case 3 (a > b^d, the leaves dominate)';
+    return { crit: crit, which: which, result: result, label: label };
+  }
 
   /* Coin change: greedy and exact DP, run against each other. */
   function greedyCoins(coins, amount) {
@@ -195,6 +223,182 @@ def algorithm_lab(cfg):
     while (cur > 0 && from[cur] !== -1) { picks.push(from[cur]); cur -= from[cur]; }
     return { count: best[amount], picks: picks, table: best };
   }
+  function greedyFailures(coins, upto) {
+    var out = [];
+    for (var a = 1; a <= upto; a += 1) if (greedyCoins(coins, a).count !== dpCoins(coins, a).count) out.push(a);
+    return out;
+  }
+"""
+
+
+def algorithm_lab(cfg):
+    """Counts from running the algorithm, not from quoting its complexity class.
+
+    Every operation count in this lab is produced by executing the algorithm on
+    an actual array and incrementing a counter. That is the difference between
+    "merge sort is O(n log n)" as a fact to repeat and as a claim you have
+    watched hold: the measured column and the predicted column sit beside each
+    other, and where they diverge the lab says why.
+
+    cfg keys a lesson may set: mode, n, kind (sort input: shuffle, sorted,
+    reverse), f and g (witness functions, by index), abd (master theorem
+    parameters), policy (dynamic array growth: double, half, one), x (the base
+    for the invariant trace).
+    """
+    markup = """      <div class="lab-toolbar">
+        <div class="lab-title"><strong id="alTitle">Algorithms and growth</strong><span id="alSub"></span></div>
+        <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>measured</span><span class="tone-purple"><i class="legend-swatch"></i>predicted</span><span class="tone-amber"><i class="legend-swatch"></i>crossover</span></div>
+      </div>
+      <div class="lab-stage"><svg id="alPlot" viewBox="0 0 520 230" role="img" aria-label="Operation counts plotted against input size."></svg></div>
+      <div class="table-wrap" style="margin-top:12px;"><table class="tt" id="alTable"></table></div>
+      <div class="status-banner" id="alStatus" style="margin-top:12px;"></div>"""
+    controls = """        <div class="field">
+          <label for="alMode">What to examine</label>
+          <select id="alMode">
+            <option value="growth">Growth rates side by side</option>
+            <option value="witness">Is f(n) = O(g(n))? find C and k</option>
+            <option value="invariant">A loop invariant, checked every step</option>
+            <option value="loops">Loop nests (counted)</option>
+            <option value="search">Linear vs binary search (counted)</option>
+            <option value="sort">Sorting algorithms (counted)</option>
+            <option value="master">Master theorem cases</option>
+            <option value="amortised">The dynamic array (amortised)</option>
+            <option value="greedy">Greedy vs dynamic programming</option>
+          </select>
+        </div>
+        <div class="field" id="alFWrap">
+          <label for="alF">f(n)</label>
+          <select id="alF"></select>
+        </div>
+        <div class="field" id="alGWrap">
+          <label for="alG">g(n)</label>
+          <select id="alG"></select>
+        </div>
+        <div class="field" id="alKindWrap">
+          <label for="alKind">Input order</label>
+          <select id="alKind">
+            <option value="shuffle">Shuffled (a fixed permutation)</option>
+            <option value="sorted">Already sorted</option>
+            <option value="reverse">Reversed</option>
+          </select>
+        </div>
+        <div class="field" id="alPolicyWrap">
+          <label for="alPolicy">Growth policy</label>
+          <select id="alPolicy">
+            <option value="double">Double the capacity</option>
+            <option value="half">Grow by a factor of 1.5</option>
+            <option value="one">Grow by one</option>
+          </select>
+        </div>
+        <div id="alABDWrap">
+          <div class="field">
+            <label for="alA">a (subproblems)</label>
+            <input id="alA" type="number" value="4" min="1" />
+          </div>
+          <div class="field">
+            <label for="alB">b (shrink factor)</label>
+            <input id="alB" type="number" value="2" min="2" />
+          </div>
+          <div class="field">
+            <label for="alD">d (combining cost n^d)</label>
+            <input id="alD" type="number" value="1" min="0" />
+          </div>
+        </div>
+        <div id="alNWrap">
+          <div class="range-row"><label class="small-copy" for="alN" id="alNLabel">n</label><span class="range-value" id="alNOut">16</span></div>
+          <input id="alN" type="range" min="2" max="64" value="16" />
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span id="alK1L">measured</span><strong id="alK1">&mdash;</strong></div>
+          <div class="kpi"><span id="alK2L">predicted</span><strong id="alK2">&mdash;</strong></div>
+        </div>"""
+
+    preset = {k: cfg[k] for k in ("mode", "n", "kind", "f", "g", "abd", "policy", "x") if k in cfg}
+
+    script = ALGO_JS + cfg_literal("PRESET", preset) + r"""
+  var modeSel = document.getElementById('alMode'), fSel = document.getElementById('alF'), gSel = document.getElementById('alG');
+  var nS = document.getElementById('alN'), kindSel = document.getElementById('alKind'), policySel = document.getElementById('alPolicy');
+  var aIn = document.getElementById('alA'), bIn = document.getElementById('alB'), dIn = document.getElementById('alD');
+  var plot = document.getElementById('alPlot'), table = document.getElementById('alTable');
+  var status = document.getElementById('alStatus');
+  var title = document.getElementById('alTitle'), sub = document.getElementById('alSub');
+  var k1 = document.getElementById('alK1'), k2 = document.getElementById('alK2');
+  var k1L = document.getElementById('alK1L'), k2L = document.getElementById('alK2L');
+  var nLabel = document.getElementById('alNLabel');
+
+  FUNCS.forEach(function (f, i) {
+    [fSel, gSel].forEach(function (sel) {
+      var o = document.createElement('option');
+      o.value = String(i); o.textContent = f[0];
+      sel.appendChild(o);
+    });
+  });
+  fSel.value = String(PRESET.f !== undefined ? PRESET.f : 8);
+  gSel.value = String(PRESET.g !== undefined ? PRESET.g : 4);
+
+  function show(ids) {
+    ['alFWrap', 'alGWrap', 'alNWrap', 'alKindWrap', 'alABDWrap', 'alPolicyWrap'].forEach(function (id) {
+      document.getElementById(id).hidden = ids.indexOf(id) === -1;
+    });
+  }
+  var SUP = { '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '-': '⁻' };
+  function sup(n) { return String(n).split('').map(function (ch) { return SUP[ch] || ch; }).join(''); }
+  function sci(v) {
+    if (!isFinite(v)) return 'beyond 10³⁰⁸ (overflow)';
+    var e = Math.floor(Math.log10(v)), m = v / Math.pow(10, e);
+    if (m >= 9.95) { m /= 10; e += 1; }
+    return m.toFixed(1) + ' × 10' + sup(e);
+  }
+  function fmt(v) {
+    if (!isFinite(v)) return 'overflow';
+    return v > 1e15 ? sci(v) : Math.round(v).toLocaleString('en-US');
+  }
+  function fmtRatio(v) {
+    if (v === null) return 'overflow';
+    return v >= 1e6 ? sci(v) : (v >= 100 ? Math.round(v).toLocaleString('en-US') : v.toFixed(2));
+  }
+  function humanTime(sec) {
+    if (sec < 1e-6) return 'under a microsecond';
+    if (sec < 1e-3) return Math.round(sec * 1e6) + ' microseconds';
+    if (sec < 1) return Math.round(sec * 1e3) + ' milliseconds';
+    if (sec < 60) return sec.toFixed(1) + ' seconds';
+    if (sec < 3600) return (sec / 60).toFixed(1) + ' minutes';
+    if (sec < 86400) return (sec / 3600).toFixed(1) + ' hours';
+    if (sec < 31557600) return (sec / 86400).toFixed(1) + ' days';
+    var years = sec / 31557600;
+    return (years < 1e6 ? Math.round(years).toLocaleString('en-US') : sci(years)) + ' years';
+  }
+  function big(v) {
+    var s = v.toString();
+    return s.length > 14 ? s.slice(0, 5) + '…' + s.slice(-4) + ' (' + s.length + ' digits)' : s;
+  }
+
+  function drawSeries(series, xs, logScale) {
+    var maxY = 0;
+    series.forEach(function (s) { s.values.forEach(function (v) { if (isFinite(v) && v > maxY) maxY = v; }); });
+    if (maxY <= 0) maxY = 1;
+    function y(v) {
+      if (!isFinite(v)) return 6;
+      if (logScale) {
+        var lv = Math.log10(Math.max(v, 1)), lm = Math.log10(Math.max(maxY, 10));
+        return 200 - (lv / lm) * 180;
+      }
+      return 200 - (v / maxY) * 180;
+    }
+    function x(i) { return 26 + (i / Math.max(1, xs.length - 1)) * 470; }
+    var s = '<line x1="26" y1="200" x2="500" y2="200" stroke="var(--line-strong)" />'
+      + '<line x1="26" y1="14" x2="26" y2="200" stroke="var(--line-strong)" />';
+    series.forEach(function (ser) {
+      var d = ser.values.map(function (v, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(v).toFixed(1); }).join(' ');
+      s += '<path d="' + d + '" fill="none" stroke="' + ser.colour + '" stroke-width="2.4" opacity="0.9" />';
+      s += '<text x="' + (x(ser.values.length - 1) - 6) + '" y="' + Math.max(14, y(ser.values[ser.values.length - 1]) - 6)
+        + '" text-anchor="end" font-size="11" font-weight="700" fill="' + ser.colour + '">' + ser.label + '</text>';
+    });
+    s += '<text x="26" y="216" font-size="10" fill="var(--muted)">n = ' + xs[0] + '</text>';
+    s += '<text x="500" y="216" text-anchor="end" font-size="10" fill="var(--muted)">n = ' + xs[xs.length - 1] + '</text>';
+    if (logScale) s += '<text x="30" y="24" font-size="10" fill="var(--muted)">log scale</text>';
+    plot.innerHTML = s;
+  }
 
   var MODES = {
     growth: function () {
@@ -211,59 +415,134 @@ def algorithm_lab(cfg):
       var rows = '';
       [4, 8, 16, 32, 64].filter(function (n) { return n <= N; }).forEach(function (n) {
         rows += '<tr><td>' + n + '</td>' + picks.map(function (p) {
-          var v = FUNCS[p[0]][1](n);
-          return '<td>' + (v > 1e15 ? v.toExponential(2) : Math.round(v).toLocaleString('en-US')) + '</td>';
+          return '<td>' + fmt(FUNCS[p[0]][1](n)) + '</td>';
         }).join('') + '</tr>';
       });
       table.innerHTML = '<thead><tr><th>n</th>' + picks.map(function (p) { return '<th>' + FUNCS[p[0]][0] + '</th>'; }).join('')
         + '</tr></thead><tbody>' + rows + '</tbody>';
-      k1L.textContent = 'n'; k1.textContent = N;
-      k2L.textContent = '2ⁿ at n'; k2.textContent = Math.pow(2, N) > 1e15 ? Math.pow(2, N).toExponential(2) : Math.pow(2, N).toLocaleString('en-US');
-      status.innerHTML = 'The vertical axis is logarithmic, so a straight line is exponential growth. '
-        + 'At n = 64, n² is ' + (64 * 64).toLocaleString('en-US') + ' and 2ⁿ is about 1.8 × 10¹⁹ — the gap between '
+      var expo = Math.pow(2, N);
+      k1L.textContent = 'n² at n'; k1.textContent = fmt(N * N);
+      k2L.textContent = '2ⁿ at n'; k2.textContent = fmt(expo);
+      status.innerHTML = 'At n = ' + N + ': n² is ' + fmt(N * N) + ' and 2ⁿ is ' + fmt(expo)
+        + '. At a billion operations a second the exponential curve alone takes <strong>' + humanTime(expo / 1e9)
+        + '</strong>. The vertical axis is logarithmic, so a straight line is exponential growth. '
+        + 'At n = 64, n² is ' + (64 * 64).toLocaleString('en-US') + ' and 2ⁿ is about ' + sci(Math.pow(2, 64)) + ' — the gap between '
         + 'polynomial and exponential is not a matter of constants, and no faster machine closes it.';
     },
     witness: function () {
       show(['alFWrap', 'alGWrap', 'alNWrap']);
       title.textContent = 'Big-O by witness';
       sub.textContent = 'f(n) ≤ C·g(n) for all n ≥ k';
-      var f = FUNCS[+fSel.value], g = FUNCS[+gSel.value], N = Math.max(8, +nS.value);
-      /* Search a small grid of C and k for a pair that works on 1..4N. The
-         search is honest: if no pair in the grid works, the lab says the
-         relation looks false rather than inventing a constant. */
-      var found = null;
-      var Cs = [1, 2, 3, 4, 5, 10, 20, 50, 100, 1000];
-      for (var ci = 0; ci < Cs.length && !found; ci += 1) {
-        for (var k = 1; k <= 40 && !found; k += 1) {
-          var ok = true;
-          for (var n = k; n <= 4 * N; n += 1) {
-            if (f[1](n) > Cs[ci] * g[1](n) + 1e-9) { ok = false; break; }
-          }
-          if (ok) found = { C: Cs[ci], k: k };
-        }
-      }
+      var fi = +fSel.value, gi = +gSel.value, f = FUNCS[fi], g = FUNCS[gi], N = Math.max(8, +nS.value);
+      var holds = bigO(fi, gi), found = holds ? witnessSearch(fi, gi, N) : null;
       var xs = [], series = [];
       for (var n2 = 1; n2 <= N; n2 += 1) xs.push(n2);
       series.push({ label: f[0], colour: 'var(--cyan)', values: xs.map(f[1]) });
       series.push({ label: (found ? found.C + '·' : '') + g[0], colour: 'var(--purple)', values: xs.map(function (n) { return (found ? found.C : 1) * g[1](n); }) });
       drawSeries(series, xs, true);
       var rows = '';
-      xs.filter(function (n) { return n <= 12 || n % 4 === 0; }).forEach(function (n) {
-        var fv = f[1](n), gv = (found ? found.C : 1) * g[1](n);
-        rows += '<tr' + (fv <= gv ? '' : ' class="focus"') + '><td>' + n + '</td><td>' + fv.toFixed(2) + '</td><td>'
-          + gv.toFixed(2) + '</td><td class="' + (fv <= gv ? 't' : 'f') + '">' + (fv <= gv ? '≤' : '>') + '</td></tr>';
-      });
-      table.innerHTML = '<thead><tr><th>n</th><th>' + f[0] + '</th><th>' + (found ? found.C + '·' : '') + g[0]
-        + '</th><th></th></tr></thead><tbody>' + rows + '</tbody>';
-      k1L.textContent = 'C'; k1.textContent = found ? found.C : '—';
+      if (found) {
+        xs.filter(function (n) { return n <= 12 || n % 4 === 0; }).forEach(function (n) {
+          var fv = f[1](n), gv = found.C * g[1](n), ok = fv <= gv + 1e-9;
+          rows += '<tr' + (ok ? '' : ' class="focus"') + '><td>' + n + '</td><td>' + fv.toFixed(2) + '</td><td>'
+            + gv.toFixed(2) + '</td><td class="' + (ok ? 't' : 'f') + '">' + (ok ? '≤' : '>') + '</td></tr>';
+        });
+        table.innerHTML = '<thead><tr><th>n</th><th>' + f[0] + '</th><th>' + found.C + '·' + g[0]
+          + '</th><th></th></tr></thead><tbody>' + rows + '</tbody>';
+      } else {
+        [10, 100, 1000, 10000, 1000000].forEach(function (n) {
+          rows += '<tr><td>' + fmt(n) + '</td><td>' + fmt(f[1](n)) + '</td><td>' + fmt(g[1](n)) + '</td><td>'
+            + fmtRatio(ratioAt(fi, gi, n)) + '</td></tr>';
+        });
+        table.innerHTML = '<thead><tr><th>n</th><th>' + f[0] + '</th><th>' + g[0] + '</th><th>f(n) / g(n)</th></tr></thead><tbody>'
+          + rows + '</tbody>';
+      }
+      k1L.textContent = 'C'; k1.textContent = found ? found.C : (holds ? '?' : 'none');
       k2L.textContent = 'k'; k2.textContent = found ? found.k : '—';
-      status.innerHTML = found
-        ? '<strong>' + f[0] + ' = O(' + g[0] + ')</strong>, witnessed by C = ' + found.C + ' and k = ' + found.k
-          + ': for every n ≥ ' + found.k + ', f(n) ≤ ' + found.C + '·g(n). Big-O is an existence claim about such a '
-          + 'pair, and producing one is the whole proof. Note that the first few n may violate it — that is what k is for.'
-        : '<strong>No constant works.</strong> The search tried C up to 1000 and k up to 40 and found no pair holding '
-          + 'through n = ' + (4 * N) + '. That is strong evidence ' + f[0] + ' is NOT O(' + g[0] + ') — a bigger '
-          + 'constant cannot rescue a faster-growing function, because the ratio itself diverges.';
+      if (found) {
+        status.innerHTML = '<strong>' + f[0] + ' = O(' + g[0] + ')</strong>, witnessed by C = ' + found.C + ' and k = ' + found.k
+          + ': for every n ≥ ' + found.k + ', f(n) ≤ ' + found.C + '·g(n). The pair was found by searching a grid of C and k over '
+          + '1 ≤ n ≤ ' + (4 * N) + ' and then checked at n = 10³, 10⁴, 10⁶ and 10⁹; it holds for all larger n because f is '
+          + className(f[2]) + ' and g is ' + className(g[2]) + '. Big-O is an existence claim about such a pair, and producing one '
+          + 'is the whole proof — any valid pair will do, and a larger C usually buys a smaller k. '
+          + (found.k > 1 ? 'The rows above k = ' + found.k + ' are highlighted where the bound fails: that is what k is for.' : '');
+      } else if (holds) {
+        status.innerHTML = '<strong>' + f[0] + ' = O(' + g[0] + ')</strong> by growth class (' + className(f[2]) + ' against '
+          + className(g[2]) + '), but no pair in the grid C ≤ 1000, k ≤ 40 witnesses it on this range.';
+      } else {
+        status.innerHTML = '<strong>' + f[0] + ' ≠ O(' + g[0] + ').</strong> No pair (C, k) exists. The last column is the ratio '
+          + 'f(n) / g(n), and it grows without bound: a witness would force it to stay below C for every n ≥ k, which is the '
+          + 'contradiction the disproof derives. The verdict comes from the growth classes — f is ' + className(f[2])
+          + ' and g is ' + className(g[2]) + ' — not from a search: a search that stopped at n = 64 would report n² = O(n) '
+          + 'with C = 100, which is false from n = 101 on, and no finite range can refute an existence claim about all n.';
+      }
+    },
+    invariant: function () {
+      show(['alNWrap']);
+      var x = PRESET.x || 3, n = +nS.value, t = powerTrace(x, n);
+      title.textContent = 'An invariant, checked at every step';
+      sub.textContent = 'POWER(' + x + ', ' + n + '): result · base^m = ' + x + sup(n);
+      var rows = '';
+      t.rows.forEach(function (r) {
+        rows += '<tr' + (r.m === 0 ? ' class="focus"' : '') + '><td>' + (r.step === 0 ? 'before the loop' : 'after iteration ' + r.step)
+          + '</td><td>' + r.m + '</td><td>' + big(r.result) + '</td><td>' + big(r.base) + '</td><td class="' + (r.ok ? 't' : 'f') + '">'
+          + (r.ok ? '✓' : '✗') + '</td></tr>';
+      });
+      table.innerHTML = '<thead><tr><th></th><th>m</th><th>result</th><th>base</th><th>result · base^m = ' + x + sup(n)
+        + '</th></tr></thead><tbody>' + rows + '</tbody>';
+      var xs = [], naive = [], fast = [];
+      for (var e = 1; e <= Math.max(8, n); e += 1) {
+        var tr = powerTrace(x, e);
+        xs.push(e); naive.push(tr.naive); fast.push(tr.squarings + tr.mults);
+      }
+      drawSeries([
+        { label: 'n − 1 (repeated multiplication)', colour: 'var(--purple)', values: naive },
+        { label: 'squarings + multiplications', colour: 'var(--cyan)', values: fast }
+      ], xs, false);
+      k1L.textContent = 'squarings'; k1.textContent = t.squarings;
+      k2L.textContent = 'multiplications'; k2.textContent = t.mults;
+      var every = t.rows.every(function (r) { return r.ok; });
+      status.innerHTML = (every ? '<strong>The invariant held before the loop and after every one of the ' + t.squarings
+        + ' iterations</strong> — initialisation and maintenance, checked rather than proved. ' : '<strong>The invariant failed.</strong> ')
+        + 'At exit m = 0, so result · base⁰ = result, and the invariant reads result = ' + x + sup(n) + ' = ' + big(t.value)
+        + ': the correctness argument in one line. The loop did ' + t.squarings + ' squarings and ' + t.mults
+        + ' multiplications, one for each 1 in n = ' + t.binary + '₂, against n − 1 = ' + t.naive
+        + ' for repeated multiplication — lesson 1\'s comparison, measured. The final squaring is wasted (m is 0 by then), '
+        + 'which is why course 6 lesson 8 counts bits − 1. What the lab cannot do is prove the invariant for the n it did not '
+        + 'run; the proof is the worked example.';
+    },
+    loops: function () {
+      show(['alNWrap']);
+      title.textContent = 'Loop nests, counted';
+      sub.textContent = 'the four nests of the worked example and the standard, run with a counter';
+      var N = +nS.value, xs = [], A = [], B = [], C = [], D = [], last = null;
+      for (var n = 1; n <= N; n += 1) {
+        var r = countNests(n);
+        xs.push(n); A.push(r.A); B.push(r.B); C.push(r.C); D.push(r.D); last = r;
+      }
+      drawSeries([
+        { label: 'A: n³', colour: 'var(--red)', values: A },
+        { label: 'D: Σ_i Σ_j j', colour: 'var(--amber)', values: D },
+        { label: 'B: Σ (n − i + 1)', colour: 'var(--cyan)', values: B },
+        { label: 'C: n · ⌊log₂ n⌋', colour: 'var(--purple)', values: C }
+      ], xs, true);
+      var rows = '';
+      [4, 8, 16, 32, 64].filter(function (n) { return n <= N; }).forEach(function (n) {
+        var r = countNests(n);
+        rows += '<tr><td>' + n + '</td><td>' + fmt(r.A) + ' / ' + fmt(r.predA) + '</td><td>' + r.B + ' / ' + r.predB
+          + '</td><td>' + r.C + ' / ' + r.predC + '</td><td>' + fmt(r.D) + ' / ' + fmt(r.predD) + '</td></tr>';
+      });
+      table.innerHTML = '<thead><tr><th>n</th><th>A measured / n³</th><th>B measured / n(n+1)/2</th><th>C measured / n⌊log₂n⌋</th>'
+        + '<th>D measured / n(n+1)(n+2)/6</th></tr></thead><tbody>' + rows + '</tbody>';
+      k1L.textContent = 'B measured'; k1.textContent = last.B;
+      k2L.textContent = 'n(n+1)/2'; k2.textContent = last.predB;
+      var exact = last.A === last.predA && last.B === last.predB && last.C === last.predC && last.D === last.predD;
+      status.innerHTML = 'At n = ' + N + ': A ran ' + fmt(last.A) + ' times = n³; B ran ' + last.B + ' = n(n+1)/2, the sum '
+        + 'Σ (n − i + 1) reindexed to Σ m; C ran ' + last.C + ' = n · ⌊log₂ n⌋, because halving reaches 1 in ⌊log₂ n⌋ steps; '
+        + 'D — the standard\'s triple triangular nest, Σ_i Σ_j j — ran ' + fmt(last.D) + ' = n(n+1)(n+2)/6, one sixth of n³ '
+        + 'to leading order. ' + (exact ? '<strong>Every measured column equals its formula exactly</strong>, because none of '
+        + 'these loops looks at data; the formulas are course 3 lesson 3\'s sums.' : 'A measured column disagrees with its formula.')
+        + ' Multiplying B\'s bounds instead of summing would give n² = ' + fmt(N * N) + ', about twice the truth — the first mistake.';
     },
     search: function () {
       show(['alNWrap']);
@@ -274,19 +553,17 @@ def algorithm_lab(cfg):
         var a = makeArray(n, 'sorted');
         xs.push(n);
         lin.push(linearSearch(a, n));
-        var worst = 0;
-        for (var t = 1; t <= n; t += 1) worst = Math.max(worst, binarySearch(a, t));
-        bin.push(worst);
+        bin.push(binaryWorst(n));
       }
       drawSeries([
         { label: 'linear', colour: 'var(--cyan)', values: lin },
         { label: 'binary', colour: 'var(--purple)', values: bin }
       ], xs, false);
       var rows = '';
-      xs.filter(function (n) { return n % Math.max(1, Math.floor(xs.length / 10)) === 0; }).forEach(function (n, i) {
+      xs.filter(function (n) { return n % Math.max(1, Math.floor(xs.length / 10)) === 0; }).forEach(function (n) {
         var idx = xs.indexOf(n);
         rows += '<tr><td>' + n + '</td><td>' + lin[idx] + '</td><td>' + bin[idx] + '</td><td>'
-          + (Math.floor(Math.log2(n)) + 1) + '</td></tr>';
+          + (ilog2(n) + 1) + '</td></tr>';
       });
       table.innerHTML = '<thead><tr><th>n</th><th>linear (worst)</th><th>binary (worst)</th><th>⌊log₂n⌋+1</th></tr></thead><tbody>'
         + rows + '</tbody>';
@@ -296,15 +573,16 @@ def algorithm_lab(cfg):
       status.innerHTML = 'At n = ' + xs[last] + ' the counted worst cases are <strong>' + lin[last]
         + '</strong> and <strong>' + bin[last] + '</strong>. The binary column matches ⌊log₂n⌋+1 exactly, because '
         + 'each comparison halves the remaining range — and that is only available because the array is SORTED. '
-        + 'Sorting first costs O(n log n), so binary search pays for itself only across many searches.';
+        + 'Sorting first costs Θ(n log n), so binary search pays for itself only across many searches.';
     },
     sort: function () {
-      show(['alNWrap']);
+      show(['alNWrap', 'alKindWrap']);
       title.textContent = 'Sorting, comparisons counted';
       sub.textContent = 'the same input through three algorithms';
-      var N = Math.max(4, +nS.value), xs = [], bub = [], ins = [], mer = [], nlogn = [];
+      var N = Math.max(4, +nS.value), kind = kindSel.value || 'shuffle', xs = [], bub = [], ins = [], mer = [], nlogn = [];
+      var kindName = kind === 'sorted' ? 'already-sorted' : kind === 'reverse' ? 'reversed' : 'shuffled';
       for (var n = 2; n <= N; n += 1) {
-        var a = makeArray(n, 'shuffle');
+        var a = makeArray(n, kind);
         xs.push(n);
         bub.push(bubbleSort(a));
         ins.push(insertionSort(a));
@@ -326,18 +604,23 @@ def algorithm_lab(cfg):
       table.innerHTML = '<thead><tr><th>n</th><th>bubble</th><th>insertion</th><th>merge</th><th>n(n−1)/2</th><th>n log₂ n</th></tr></thead><tbody>'
         + rows + '</tbody>';
       var last = xs.length - 1;
+      var insSorted = insertionSort(makeArray(N, 'sorted')), insReverse = insertionSort(makeArray(N, 'reverse'));
       k1L.textContent = 'bubble'; k1.textContent = bub[last];
       k2L.textContent = 'merge'; k2.textContent = mer[last];
-      status.innerHTML = 'At n = ' + xs[last] + ': bubble sort made <strong>' + bub[last] + '</strong> comparisons '
-        + 'and merge sort <strong>' + mer[last] + '</strong>. Bubble sort matches n(n−1)/2 exactly, because its two '
-        + 'loops do not depend on the data at all. Insertion sort does — it is the one whose count changes with the '
-        + 'input, and on nearly-sorted data it beats merge sort, which is why real sort implementations switch to it '
-        + 'for small subarrays.';
+      status.innerHTML = 'At n = ' + xs[last] + ' on ' + kindName + ' input: bubble sort made <strong>' + bub[last] + '</strong> comparisons, '
+        + 'insertion sort <strong>' + ins[last] + '</strong> and merge sort <strong>' + mer[last] + '</strong>. Bubble sort matches '
+        + 'n(n−1)/2 = ' + (N * (N - 1) / 2) + ' whatever the input, because its two loops never look at the data. Insertion sort is the '
+        + 'one whose count is a fact about the data: at this n it makes ' + insSorted + ' comparisons on sorted input and ' + insReverse
+        + ' on reversed input — the same n(n−1)/2 as bubble sort — so "Θ(n²)" is its worst case and "Θ(n)" its best, and an '
+        + 'unqualified bound is ambiguous between them. Merge sort sits below n log₂ n = ' + Math.round(nlogn[last])
+        + ' because merging two runs of length n/2 costs at most n − 1 comparisons, so every level costs less than n.';
     },
     master: function () {
-      show([]);
+      show(['alABDWrap']);
       title.textContent = 'The master theorem';
       sub.textContent = 'T(n) = a·T(n/b) + n^d';
+      var a = +aIn.value, b = +bIn.value, d = +dIn.value;
+      var valid = isFinite(a) && isFinite(b) && isFinite(d) && a >= 1 && b > 1 && d >= 0;
       var cases = [
         [2, 2, 1, 'merge sort'],
         [2, 2, 0, 'binary-tree traversal'],
@@ -348,16 +631,13 @@ def algorithm_lab(cfg):
         [4, 2, 2, 'balanced case'],
         [2, 4, 1, 'a < b^d']
       ];
-      var rows = cases.map(function (c) {
-        var a = c[0], b = c[1], d = c[2];
-        var crit = Math.log(a) / Math.log(b);
-        var which, result;
-        if (Math.abs(crit - d) < 1e-9) { which = 'case 2 (a = b^d)'; result = 'Θ(n^' + d + ' log n)'; }
-        else if (crit > d) { which = 'case 3 (a > b^d)'; result = 'Θ(n^log_' + b + ' ' + a + ') ≈ Θ(n^' + crit.toFixed(3) + ')'; }
-        else { which = 'case 1 (a < b^d)'; result = 'Θ(n^' + d + ')'; }
-        return '<tr><td>' + a + '</td><td>' + b + '</td><td>' + d + '</td><td>' + crit.toFixed(3) + '</td><td>'
-          + which + '</td><td>' + result + '</td><td>' + c[3] + '</td></tr>';
-      }).join('');
+      function row(c, focus) {
+        var m = masterCase(c[0], c[1], c[2]);
+        return '<tr' + (focus ? ' class="focus"' : '') + '><td>' + c[0] + '</td><td>' + c[1] + '</td><td>' + c[2] + '</td><td>'
+          + m.crit.toFixed(3) + '</td><td>' + m.label.replace(/ \(.*\)/, '') + ' (' + (m.which === 1 ? 'a < b^d' : m.which === 2 ? 'a = b^d' : 'a > b^d')
+          + ')</td><td>' + m.result + '</td><td>' + c[3] + '</td></tr>';
+      }
+      var rows = (valid ? row([a, b, d, 'yours'], true) : '') + cases.map(function (c) { return row(c, false); }).join('');
       table.innerHTML = '<thead><tr><th>a</th><th>b</th><th>d</th><th>log_b a</th><th>case</th><th>T(n)</th><th>example</th></tr></thead><tbody>'
         + rows + '</tbody>';
       var xs = [], series = [];
@@ -366,11 +646,75 @@ def algorithm_lab(cfg):
       series.push({ label: 'n^1.585', colour: 'var(--purple)', values: xs.map(function (n) { return Math.pow(n, Math.log2(3)); }) });
       series.push({ label: 'n²', colour: 'var(--red)', values: xs.map(function (n) { return n * n; }) });
       drawSeries(series, xs, true);
-      k1L.textContent = 'compare'; k1.textContent = 'log_b a vs d';
-      k2L.textContent = 'cases'; k2.textContent = '3';
-      status.innerHTML = 'The whole theorem is one comparison: log_b a against d — whether the work at the leaves '
-        + 'or the work at the root dominates. Karatsuba (a = 3, b = 2, d = 1) beats the naive n² only because '
+      if (!valid) {
+        k1L.textContent = 'log_b a'; k1.textContent = '—';
+        k2L.textContent = 'case'; k2.textContent = '—';
+        status.innerHTML = 'The theorem needs a ≥ 1, b > 1 and d ≥ 0. Enter the number of subproblems, the shrink factor and the '
+          + 'exponent of the combining cost.';
+        return;
+      }
+      var m = masterCase(a, b, d);
+      k1L.textContent = 'log_b a'; k1.textContent = m.crit.toFixed(3);
+      k2L.textContent = 'case'; k2.textContent = String(m.which);
+      var advice = m.which === 3
+        ? 'The leaves dominate, and only a reaches them: lowering d — faster combining — leaves the class unchanged (set d = 0 and watch), '
+          + 'while one fewer subproblem changes the exponent (set a = ' + (a - 1) + ').'
+        : m.which === 1
+          ? 'The root dominates: the class is the combining cost n^' + d + ' itself, so fewer subproblems would not change it and only '
+            + 'faster combining would.'
+          : 'Balanced: every level does the same work, and either fewer subproblems or faster combining would remove the log factor.';
+      status.innerHTML = '<strong>Your recurrence T(n) = ' + a + 'T(n/' + b + ') + n^' + d + ':</strong> log_' + b + ' ' + a + ' = '
+        + m.crit.toFixed(3) + ' against d = ' + d + ', ' + m.label + ', so T(n) = ' + m.result + '. ' + advice
+        + ' The whole theorem is one comparison: log_b a against d. Karatsuba (a = 3, b = 2, d = 1) beats the naive n² only because '
         + 'log₂3 ≈ 1.585 &lt; 2; the improvement comes from doing three multiplications instead of four, and nothing else.';
+    },
+    amortised: function () {
+      show(['alNWrap', 'alPolicyWrap']);
+      var n = +nS.value, policy = policySel.value || 'double';
+      var r = dynamicArray(n, policy), r2 = dynamicArray(n, 'double'), r15 = dynamicArray(n, 'half'), r1 = dynamicArray(n, 'one');
+      var policyName = policy === 'one' ? 'growing by one' : policy === 'half' ? 'growing by a factor of 1.5' : 'doubling';
+      title.textContent = 'The dynamic array, counted';
+      sub.textContent = n + ' insertions from capacity 1, ' + policyName;
+      var rows = '';
+      r.events.forEach(function (e) {
+        rows += '<tr><td>insert ' + e.at + '</td><td>' + e.from + ' → ' + e.to + '</td><td>' + e.copies + '</td><td>' + (1 + e.copies) + '</td></tr>';
+      });
+      rows += '<tr class="focus"><td>all ' + n + ' inserts</td><td>final capacity ' + r.capacity + '</td><td>' + r.copies + '</td><td>'
+        + r.total + ' = ' + n + ' + ' + r.copies + '</td></tr>';
+      table.innerHTML = '<thead><tr><th>resize at</th><th>capacity</th><th>elements copied</th><th>cost of that insertion</th></tr></thead><tbody>'
+        + rows + '</tbody>';
+      var xs = [];
+      for (var i = 1; i <= n; i += 1) xs.push(i);
+      drawSeries([
+        { label: 'grow by one', colour: 'var(--red)', values: r1.cumulative },
+        { label: '×1.5', colour: 'var(--amber)', values: r15.cumulative },
+        { label: 'doubling', colour: 'var(--cyan)', values: r2.cumulative },
+        { label: '3n', colour: 'var(--purple)', values: xs.map(function (i) { return 3 * i; }) }
+      ], xs, false);
+      k1L.textContent = 'total cost'; k1.textContent = r.total;
+      k2L.textContent = 'amortised'; k2.textContent = r.amortised.toFixed(2);
+      var detail;
+      if (policy === 'double') {
+        var pow2 = (n & (n - 1)) === 0;
+        detail = 'The copies are 1 + 2 + 4 + ⋯, a geometric series (course 3 lesson 3) that stays under 2n, so the total stays under 3n '
+          + 'whatever n is. ' + (pow2
+            ? 'This n is a power of two, so the last doubling happened at insert ' + (n / 2 + 1) + ' and the copies are n − 1 = ' + r.copies
+              + ': the total is just under 2n. Set n = ' + (n + 1) + ' to see the next doubling push it above 2n and still below 3n — '
+              + 'which is why the theorem says 3 and not 2.'
+            : 'The last doubling was at insert ' + r.events[r.events.length - 1].at + '; the copies are ' + r.copies + ' against n = ' + n
+              + ', under 2n as the series promises, and the total ' + r.total + ' is under 3n = ' + (3 * n) + '.');
+      } else if (policy === 'one') {
+        detail = 'Growing by one copies 1 + 2 + ⋯ + (n − 1) = n(n−1)/2 = ' + r.copies + ' elements: Θ(n²) in total and Θ(n) per '
+          + 'insertion. The plot is a parabola against two straight lines — the two policies differ by a whole class.';
+      } else {
+        detail = 'A factor of 1.5 still gives a geometric series, ratio 1.5, so the copies stay under 3n and the total under 4n: the '
+          + 'amortised cost is constant, which is the standard\'s claim. Any fixed ratio above 1 works; only the constant changes.';
+      }
+      status.innerHTML = '<strong>' + policyName.charAt(0).toUpperCase() + policyName.slice(1) + ': ' + n + ' inserts cost ' + n + ' + ' + r.copies
+        + ' = ' + r.total + '</strong>, an amortised ' + r.amortised.toFixed(2) + ' per insertion, while the worst single insertion cost '
+        + r.worst + ' (the resize at element ' + r.worstAt + '). ' + detail + ' At this n the three policies total ' + r2.total
+        + ' (doubling), ' + r15.total + ' (×1.5) and ' + r1.total + ' (by one). Amortised is a guarantee about every sequence of '
+        + n + ' inserts, with no probability anywhere.';
     },
     greedy: function () {
       show(['alNWrap']);
@@ -384,7 +728,7 @@ def algorithm_lab(cfg):
         var g1 = greedyCoins(coinSets[0], a), d1 = dpCoins(coinSets[0], a);
         var g2 = greedyCoins(coinSets[1], a), d2 = dpCoins(coinSets[1], a);
         if (g2.count !== d2.count && mismatch === null) mismatch = { a: a, greedy: g2, dp: d2 };
-        if (a > amount - 12) {
+        if (a > amount - 16) {
           rows += '<tr' + (g2.count !== d2.count ? ' class="focus"' : '') + '><td>' + a + '</td><td>' + g1.count
             + '</td><td>' + d1.count + '</td><td>' + g2.count + ' (' + g2.picks.join('+') + ')</td><td>'
             + d2.count + ' (' + d2.picks.join('+') + ')</td></tr>';
@@ -402,27 +746,35 @@ def algorithm_lab(cfg):
         { label: 'greedy', colour: 'var(--red)', values: gv },
         { label: 'optimal', colour: 'var(--cyan)', values: dv }
       ], xs, false);
+      var failures = greedyFailures(coinSets[1], amount);
       k1L.textContent = 'first failure'; k1.textContent = mismatch ? mismatch.a : 'none yet';
       k2L.textContent = 'gap'; k2.textContent = mismatch ? (mismatch.greedy.count - mismatch.dp.count) : 0;
       status.innerHTML = mismatch
         ? '<strong>Greedy is wrong at ' + mismatch.a + '.</strong> Taking the largest coin first gives '
           + mismatch.greedy.picks.join(' + ') + ' — ' + mismatch.greedy.count + ' coins — while the optimum is '
-          + mismatch.dp.picks.join(' + ') + ', just ' + mismatch.dp.count + '. The same greedy rule is OPTIMAL for '
+          + mismatch.dp.picks.join(' + ') + ', just ' + mismatch.dp.count + '. Up to ' + amount + ' it is wrong at '
+          + failures.join(', ') + ' and right everywhere else, and nothing in the algorithm signals which. The same greedy rule is OPTIMAL for '
           + '{1, 5, 10, 25}, which is why "greedy works" is a property of the coin system, never of the strategy. '
-          + 'Dynamic programming gets it right by solving every smaller amount once and reusing the answers.'
+          + 'Dynamic programming gets it right by solving every smaller amount once and reusing the answers: the optimal column is '
+          + 'best[v] = 1 + min best[v − c] filled from 1 upward.'
         : 'Raise n past 5 to find where greedy fails on the coin set {1, 3, 4}.';
     }
   };
 
+  var N_LABELS = { invariant: 'n (the exponent)', amortised: 'inserts', greedy: 'amount' };
   function redraw() {
     document.getElementById('alNOut').textContent = nS.value;
+    nLabel.textContent = N_LABELS[modeSel.value] || 'n';
     MODES[modeSel.value]();
   }
 
-  [nS, fSel, gSel].forEach(function (el) { el.addEventListener('input', redraw); });
-  [modeSel, fSel, gSel].forEach(function (el) { el.addEventListener('change', redraw); });
-  modeSel.value = """ + '"%s"' % cfg.get("mode", "growth") + r""";
-  nS.value = """ + str(cfg.get("n", 16)) + r""";
+  [nS, aIn, bIn, dIn].forEach(function (el) { el.addEventListener('input', redraw); });
+  [modeSel, fSel, gSel, kindSel, policySel, aIn, bIn, dIn].forEach(function (el) { el.addEventListener('change', redraw); });
+  modeSel.value = PRESET.mode || 'growth';
+  nS.value = String(PRESET.n !== undefined ? PRESET.n : 16);
+  kindSel.value = PRESET.kind || 'shuffle';
+  policySel.value = PRESET.policy || 'double';
+  if (PRESET.abd) { aIn.value = String(PRESET.abd[0]); bIn.value = String(PRESET.abd[1]); dIn.value = String(PRESET.abd[2]); }
   """ + (cfg.get("overrides_js") or "") + r"""
   redraw();
   window.redrawLab = redraw;

@@ -39,6 +39,8 @@ const NUMBER_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'number.py');
 const numberSrc = fs.readFileSync(NUMBER_SOURCE, 'utf8');
 const GRAPH_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'graph.py');
 const graphSrc = fs.readFileSync(GRAPH_SOURCE, 'utf8');
+const ALGO_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'algorithms.py');
+const algoSrc = fs.readFileSync(ALGO_SOURCE, 'utf8');
 
 /* Each block is  NAME = r"""..."""  in the Python module. */
 function blockFrom(text, name, where) {
@@ -52,6 +54,7 @@ function countingBlock(name) { return blockFrom(countingSrc, name, COUNTING_SOUR
 function probBlock(name) { return blockFrom(probSrc, name, PROB_SOURCE); }
 function numberBlock(name) { return blockFrom(numberSrc, name, NUMBER_SOURCE); }
 function graphBlock(name) { return blockFrom(graphSrc, name, GRAPH_SOURCE); }
+function algoBlock(name) { return blockFrom(algoSrc, name, ALGO_SOURCE); }
 
 let fails = 0;
 function eq(got, want, label) {
@@ -772,6 +775,90 @@ console.log('graph algorithms (course 7 workbench)');
   eq(planarity().verdict, 'open', 'a subdivided K_{3,3} passes the bounds, has no K_{3,3} subgraph, and is reported open, not planar');
   load('cycle', 4); link(A, 0, 2); link(A, 1, 3);
   eq(planarity().verdict + ',' + planarity().triangles, 'planar,4', 'K4 built by hand: four triangles, planar');
+}
+
+// ------------------------------------------------------------ algorithms
+console.log('algorithm counts and the witness verdict (course 8 lab)');
+{
+  /* Every course-8 lesson renders through one lab, and its panels quote what
+     it prints: comparison counts, the loop-nest sums, the invariant trace,
+     the dynamic array's copies, the master theorem's case, the amounts where
+     greedy fails. The functions below are the shipped ones, extracted from
+     algorithms.py. The case that motivated this section: the witness mode
+     searched C ≤ 1000 over n ≤ 64 and reported n² = O(n) with C = 100,
+     contradicting the lesson's own example directly above it. */
+  eval(algoBlock('ALGO_JS'));
+  const F = { one: 0, log: 1, n: 2, nlogn: 3, n2: 4, n3: 5, exp: 6, fact: 7, poly: 8, hundred: 9 };
+  const W = (f, g) => { const w = witnessSearch(F[f], F[g], 16); return w ? w.C + ',' + w.k : 'none'; };
+  eq(bigO(F.poly, F.n2) + ':' + W('poly', 'n2'), 'true:4,13', '3n² + 5n + 100 = O(n²) with C = 4, k = 13 (lesson 4 preset)');
+  eq(bigO(F.n, F.n2) + ':' + W('n', 'n2'), 'true:1,1', 'n = O(n²) with C = 1, k = 1 (lesson 4 quiz)');
+  eq(bigO(F.n2, F.n), false, 'n² ≠ O(n) — the lesson 4 example the old search contradicted');
+  eq(bigO(F.nlogn, F.n), false, 'n log n ≠ O(n), though a search to n = 10⁹ would find C = 50');
+  eq([bigO(F.n3, F.n2), bigO(F.log, F.one), bigO(F.fact, F.exp), bigO(F.exp, F.n3)].join(','), 'false,false,false,false',
+     'n³ vs n², log n vs 1, n! vs 2ⁿ, 2ⁿ vs n³ are all false');
+  eq(bigO(F.one, F.log) + ':' + W('one', 'log'), 'true:1,2', '1 = O(log n) needs k = 2 because log 1 = 0');
+  eq(bigO(F.exp, F.fact) + ':' + W('exp', 'fact'), 'true:1,4', '2ⁿ = O(n!) from n = 4');
+  eq(W('n3', 'exp'), '1,10', 'n³ ≤ 2ⁿ from n = 10');
+  eq(W('hundred', 'n'), '100,1', '100n = O(n) with C = 100');
+  {
+    let bad = 0;
+    for (let f = 0; f < FUNCS.length; f += 1) for (let g = 0; g < FUNCS.length; g += 1) if (bigO(f, g) && !witnessSearch(f, g, 16)) bad += 1;
+    eq(bad, 0, 'every true relation among the ten functions has a witness in the grid');
+  }
+  eq(ratioAt(F.n2, F.n, 1000000), 1000000, 'the ratio n²/n at 10⁶ is 10⁶ — the disproof column');
+
+  const S = (n, kind) => bubbleSort(makeArray(n, kind)) + ',' + insertionSort(makeArray(n, kind)) + ',' + mergeSort(makeArray(n, kind));
+  eq(S(16, 'shuffle'), '120,77,48', 'n = 16 shuffled: bubble 120, insertion 77, merge 48 (lesson 6 worked example)');
+  eq(insertionSort(makeArray(16, 'sorted')) + ',' + insertionSort(makeArray(16, 'reverse')), '15,120', 'insertion sort: 15 on sorted, 120 on reversed input');
+  eq(S(24, 'shuffle'), '276,174,82', 'n = 24 shuffled');
+  eq(S(1000, 'shuffle'), '499500,235149,7387', 'n = 1000: bubble 499 500 = n(n−1)/2, merge 7 387');
+  eq(makeArray(16, 'shuffle').join(' '), '8 16 9 2 12 6 3 15 14 1 5 11 10 4 13 7', 'the shuffle is the same permutation for every reader');
+  eq(linearSearch(makeArray(16, 'sorted'), 16) + ',' + binaryWorst(16), '16,5', 'linear 16, binary ⌊log₂16⌋ + 1 = 5');
+  {
+    let ok = true;
+    for (let n = 2; n <= 64; n += 1) if (binaryWorst(n) !== ilog2(n) + 1) ok = false;
+    eq(ok, true, 'binary search worst case is ⌊log₂ n⌋ + 1 for every n to 64');
+  }
+  eq(binaryWorst(1000), 10, 'and 10 at n = 1000');
+
+  const nest = countNests(16);
+  eq([nest.A, nest.B, nest.C, nest.D].join(','), '4096,136,64,816', 'lesson 5 nests at n = 16: n³, n(n+1)/2, n⌊log₂n⌋, n(n+1)(n+2)/6');
+  {
+    let ok = true;
+    for (let n = 1; n <= 64; n += 1) { const r = countNests(n); if (r.A !== r.predA || r.B !== r.predB || r.C !== r.predC || r.D !== r.predD) ok = false; }
+    eq(ok, true, 'every nest equals its formula for every n to 64');
+  }
+
+  const p = powerTrace(3, 13);
+  eq([p.rows.every((r) => r.ok), p.rows.length, p.squarings, p.mults, p.value].join(','), 'true,5,4,3,1594323',
+     'POWER(3, 13): the invariant holds on all five rows, 4 squarings, 3 multiplications, 3¹³ (lesson 2 preset)');
+  eq(powerTrace(3, 1000).squarings + ',' + powerTrace(3, 1000).mults, '10,6', 'x¹⁰⁰⁰: 10 squarings and 6 multiplications against 999');
+  eq(powerTrace(2, 64).value, 18446744073709551616n, '2⁶⁴ exactly, beyond double precision');
+
+  const d16 = dynamicArray(16, 'double');
+  eq([d16.copies, d16.total, d16.worst, d16.worstAt].join(','), '15,31,9,9', 'doubling, 16 inserts: 15 copies, total 31, worst insertion 9 at element 9 (lesson 8 worked example)');
+  eq(d16.events.map((e) => e.at + ':' + e.from + '>' + e.to).join(' '), '2:1>2 3:2>4 5:4>8 9:8>16', 'resizes at inserts 2, 3, 5, 9');
+  const d17 = dynamicArray(17, 'double');
+  eq([d17.copies, d17.total, d17.amortised < 3].join(','), '31,48,true', '17 inserts: total 48, above 2n and still under 3n');
+  eq(dynamicArray(16, 'one').copies, 120, 'growing by one copies 1 + ⋯ + 15 = 120');
+  {
+    let ok = true;
+    for (let n = 2; n <= 64; n += 1) if (dynamicArray(n, 'double').amortised >= 3 || dynamicArray(n, 'half').amortised >= 4) ok = false;
+    eq(ok, true, 'doubling stays under 3 and ×1.5 under 4 per insertion for every n to 64');
+  }
+
+  const M = (a, b, d) => { const m = masterCase(a, b, d); return m.which + ':' + m.result; };
+  eq(M(4, 2, 1), '3:Θ(n^2)', 'lesson 7 baseline 4T(n/2) + n: case 3, Θ(n²)');
+  eq(M(4, 2, 0), '3:Θ(n^2)', 'faster combining, d = 0: still Θ(n²)');
+  eq(M(3, 2, 1), '3:Θ(n^log_2 3) ≈ Θ(n^1.585)', 'one fewer subproblem: Θ(n^1.585)');
+  eq(M(9, 3, 2), '2:Θ(n^2 log n)', 'the standard\'s 9T(n/3) + n²: balanced');
+  eq([M(2, 2, 1), M(1, 2, 0), M(2, 4, 1), M(7, 2, 2)].join('|'), '2:Θ(n log n)|2:Θ(log n)|1:Θ(n)|3:Θ(n^log_2 7) ≈ Θ(n^2.807)',
+     'merge sort, binary search, course 3 lesson 11\'s last row, Strassen');
+
+  eq(greedyFailures([1, 3, 4], 24).join(','), '6,10,14,18,22', 'greedy with {1, 3, 4} fails first at 6 (lesson 9 preset)');
+  eq(greedyCoins([1, 3, 4], 6).picks.join('+') + ' vs ' + dpCoins([1, 3, 4], 6).picks.join('+'), '4+1+1 vs 3+3', 'at 6: 4 + 1 + 1 against 3 + 3');
+  eq(dpCoins([1, 3, 4], 8).table.join(' '), '0 1 2 1 1 2 2 2 2', 'the lesson 10 table best[0..8]');
+  eq(greedyFailures([1, 5, 10, 25], 99).length, 0, 'with {1, 5, 10, 25} greedy is optimal for every amount to 99');
 }
 
 if (fails) {

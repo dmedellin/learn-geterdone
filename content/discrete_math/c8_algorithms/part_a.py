@@ -86,11 +86,16 @@ LESSONS = [
                   "wrong answer, and the speed makes the error harder to find."),
         ],
         "lab": ("algorithm", {
-            "mode": "growth", "n": 16,
+            "mode": "growth", "n": 64,
             "panel_title": "Why the choice matters",
             "panel_intro": "The functions plotted are the cost curves of different "
-                           "algorithms for the same tasks. At `n = 64` they differ by "
-                           "nineteen orders of magnitude.",
+                           "algorithms for the same tasks. At `n = 64`, where the lab "
+                           "opens, `log₂ n` is 6 and `2ⁿ` is about `1.8 × 10¹⁹` &mdash; "
+                           "more than eighteen orders of magnitude between the cheapest "
+                           "curve and the dearest, and at a billion operations a second "
+                           "the exponential one alone takes about 585 years. The other "
+                           "modes are the lessons to come: the invariant trace is lesson "
+                           "2, the counted loops and sorts lessons 5 and 6.",
         }),
         "steps_title": "Writing an algorithm down",
         "steps_intro": "State the contract before the steps.",
@@ -137,21 +142,32 @@ LESSONS = [
             {"q": "Which requirement excludes \"choose a suitable value for `k`\"?",
              "a": ["finiteness", "definiteness", "output", "input"],
              "c": 1,
-             "why": "Every step must be unambiguous. A step requiring judgement is a "
-                    "subproblem, not an instruction."},
+             "why": "Every step must be unambiguous, and \"suitable\" leaves the choice to "
+                    "judgement: two people could pick different `k` and do different "
+                    "things. Finiteness is about whether the procedure stops, not about "
+                    "whether a step is clear; input and output are about what goes in and "
+                    "what comes out, and a vague `k` is neither."},
             {"q": "A procedure that may loop forever on some inputs is:",
              "a": ["an algorithm", "not an algorithm — finiteness fails",
                    "an efficient algorithm", "a heuristic that is also an algorithm"],
              "c": 1,
-             "why": "Termination on every valid input is part of the definition."},
+             "why": "Termination on every valid input is part of the definition, so it is "
+                    "not an algorithm at all, efficient or otherwise. \"Heuristic\" is the "
+                    "word for a procedure that offers no guarantee, and a heuristic that "
+                    "may not stop fails finiteness just the same; the Collatz procedure of "
+                    "lesson 2 is exactly this case."},
             {"q": "Computing `x¹⁰⁰⁰` by repeated multiplication versus repeated squaring:",
              "a": ["both take 1000 steps",
                    "999 multiplications versus about 15",
                    "squaring is slower",
                    "the difference depends on the machine"],
              "c": 1,
-             "why": "The gap is a property of the algorithms, not of the hardware, which "
-                    "is why analysis is about the method."},
+             "why": "Repeated multiplication does `n − 1 = 999`; squaring does one squaring "
+                    "per binary digit of 1000 (ten) and one multiplication per 1 in "
+                    "`1000 = 1111101000₂` (six), sixteen in all, or fifteen when the "
+                    "wasted last squaring is skipped. The gap is a property of the "
+                    "algorithms, not of the hardware: a faster machine speeds both by the "
+                    "same factor and changes nothing about the ratio."},
         ],
         "mistakes": [
             ("Leaving a step to judgement",
@@ -258,12 +274,17 @@ LESSONS = [
                   "arbitrary programs, which is why each one needs its own argument."),
         ],
         "lab": ("algorithm", {
-            "mode": "sort", "n": 16,
-            "panel_title": "Counts, from running",
-            "panel_intro": "The counts come from executing each algorithm on the same "
-                           "input. Insertion sort's count depends on the data and bubble "
-                           "sort's does not &mdash; which is a fact about their loop "
-                           "structures.",
+            "mode": "invariant", "n": 13, "x": 3,
+            "panel_title": "The invariant, checked at every step",
+            "panel_intro": "The lab runs the worked example's `POWER(3, 13)` and evaluates "
+                           "`result · base^m = 3¹³` exactly after every iteration: it holds "
+                           "before the loop and after each of the four, and at exit `m = 0` "
+                           "it reads `result = 1 594 323`. Four squarings and three "
+                           "multiplications &mdash; one for each 1 in `13 = 1101₂` &mdash; "
+                           "against twelve for repeated multiplication. Slide `n` to 64 "
+                           "for seven squarings, one multiplication and 63. Checking is "
+                           "not proving: the worked example is the proof, and the lab is "
+                           "the evidence that it is the right invariant to prove.",
         }),
         "steps_title": "Proving an algorithm correct",
         "steps_intro": "Invariant, then measure.",
@@ -315,21 +336,31 @@ LESSONS = [
                    "the algorithm terminates",
                    "the algorithm is efficient"],
              "c": 1,
-             "why": "Termination is the separate obligation. Partial correctness says "
-                    "nothing about whether it stops."},
+             "why": "Termination is the separate obligation, so \"the algorithm "
+                    "terminates\" is the other half, not this one. \"Correct on some "
+                    "inputs\" is no guarantee at all &mdash; partial correctness covers "
+                    "every input on which the algorithm stops &mdash; and efficiency is "
+                    "not a correctness notion of any kind."},
             {"q": "An invariant that is preserved but does not give the postcondition at exit is:",
              "a": ["sufficient", "too weak", "false", "a termination proof"],
              "c": 1,
-             "why": "Weak invariants are easy to preserve and prove nothing. Test at exit "
-                    "before doing any other work."},
+             "why": "It is true and useless. Not false: preserved means it holds at every "
+                    "iteration. Not sufficient: at exit it does not say what the "
+                    "specification asks. And an invariant is about what the loop preserves, "
+                    "never about whether the loop stops &mdash; termination needs a "
+                    "decreasing measure, a different object. Test at exit first."},
             {"q": "The Collatz procedure illustrates that:",
              "a": ["invariants are unnecessary",
                    "termination can be the hard obligation",
                    "partial correctness is hard",
                    "algorithms always terminate"],
              "c": 1,
-             "why": "Partial correctness is trivial and termination is an open problem "
-                    "after decades of work."},
+             "why": "Its partial correctness is trivial &mdash; if it stops, it stops at 1 "
+                    "&mdash; and its termination is an open problem after decades of "
+                    "work. Invariants are still how the trivial half is stated. And "
+                    "\"algorithms always terminate\" is backwards: termination is a "
+                    "requirement, and whether this procedure meets it is exactly what "
+                    "nobody knows."},
         ],
         "mistakes": [
             ("Proving one obligation and stopping",
@@ -395,9 +426,10 @@ LESSONS = [
                 "1 000 000    20.0   2.0 × 10⁷    10¹²             —",
             ]),
             ("p", "At a million elements, an `n log n` algorithm does about 20 million "
-                  "operations and an `n²` algorithm does `10¹²` &mdash; the difference "
-                  "between a fraction of a second and about a fortnight. Both are "
-                  "polynomial; the gap is already decisive."),
+                  "operations and an `n²` algorithm does `10¹²` &mdash; at a billion "
+                  "operations a second, the difference between a fiftieth of a second and "
+                  "about a quarter of an hour. Both are polynomial; the gap is already "
+                  "decisive."),
             ("p", "`2ⁿ` at `n = 100` is `1.27 × 10³⁰`. At a billion operations per second "
                   "that is about `4 × 10¹³` years, roughly three thousand times the age of "
                   "the universe. No hardware improvement addresses this."),
@@ -440,7 +472,11 @@ LESSONS = [
             "panel_title": "The hierarchy, drawn",
             "panel_intro": "The vertical axis is logarithmic, so exponential growth is a "
                            "straight line. The table gives the values, which are more "
-                           "persuasive than the picture.",
+                           "persuasive than the picture: at `n = 32`, `n²` is 1 024 and "
+                           "`2ⁿ` is 4 294 967 296 &mdash; 4.3 seconds at a billion "
+                           "operations a second. Slide to 64 and the exponential curve "
+                           "alone takes about 585 years, which is the speed-up theorem "
+                           "read the other way: doubling `n` did not double the cost.",
         }),
         "steps_title": "Comparing two algorithms",
         "steps_intro": "Growth first; constants only when the growth matches.",
@@ -465,11 +501,12 @@ LESSONS = [
                 "",
                 "n = 100      100·6.6 = 664   >   100        B wins",
                 "n = 500      100·9.0 = 897   >   500        B wins",
-                "n = 1000     100·10  = 1000  =  1000        equal",
+                "n = 1000     100·9.97 = 997  ≈  1000       the crossover",
                 "n = 2000     100·11  = 1100  <  2000        A wins",
                 "n = 10⁶      100·20  = 2000  <  10⁶         A wins by 500×",
                 "",
-                "The asymptotically better algorithm loses on every input below 1000.",
+                "The asymptotically better algorithm loses on every input below 996,",
+                "where 100 log₂ n first drops under n.",
             ],
             "after": [
                 "Both facts are true and neither is the whole story. `A` is asymptotically "
@@ -483,19 +520,26 @@ LESSONS = [
             {"q": "Which grows fastest?",
              "a": ["`n²`", "`n log n`", "`2ⁿ`", "`n³`"],
              "c": 2,
-             "why": "Exponential eventually exceeds every polynomial. At `n = 100`, `2ⁿ` is "
-                    "about `10³⁰` and `n³` is `10⁶`."},
+             "why": "Exponential eventually exceeds every polynomial. `n³` is the fastest "
+                    "of the three polynomials, and at `n = 100` it is `10⁶` while `2ⁿ` is "
+                    "about `10³⁰`; `n²` and `n log n` are slower still. The hierarchy in "
+                    "the key block is the order to remember."},
             {"q": "A machine becomes 1000 times faster. An exponential algorithm can now handle:",
              "a": ["1000 times more data", "about 32 times more",
                    "about 10 more items", "the same amount"],
              "c": 2,
              "why": "`1000 ≈ 2¹⁰`, so the solvable size increases by about 10 &mdash; "
-                    "additively. That is the practical meaning of exponential."},
+                    "additively. A thousand times more data is the linear algorithm's "
+                    "gain and 32 times (`√1000`) the quadratic one's; \"the same amount\" "
+                    "is too pessimistic, since the wall does move &mdash; by ten items."},
             {"q": "`3n² + 5n + 100` grows like:",
-             "a": ["`n`", "`n²`", "`n³`", "`3n²`"],
+             "a": ["`n`", "`n²`", "`n³`", "`n log n`"],
              "c": 1,
-             "why": "The dominant term is quadratic. The constant 3 and the lower-order "
-                    "terms do not affect the class."},
+             "why": "The dominant term is quadratic: at `n = 1000` it is 99.8% of the "
+                    "total. `n` and `n log n` are the lower-order terms' rates, which the "
+                    "quadratic term swamps, and `n³` overshoots &mdash; nothing in the "
+                    "expression grows that fast. The constant 3 does not change the class "
+                    "either, so `3n²` and `n²` are the same answer."},
         ],
         "mistakes": [
             ("Comparing at one input size",
@@ -511,7 +555,8 @@ LESSONS = [
         "standard": ("Finish when you can find a crossover point.",
                      "Determine where `50n log₂ n` overtakes `n²` and say which algorithm "
                      "you would use for `n = 200` and for `n = 10⁶`. Both answers are "
-                     "defensible and they are different."),
+                     "defensible and they are different. To check against: `50 log₂ n` "
+                     "first drops under `n` at `n = 439`."),
         "note": "The distinction between polynomial and exponential is the one that "
                 "organises complexity theory. Lesson 11 makes it the definition of "
                 "tractability, and every argument there depends on the arithmetic in this "
@@ -604,10 +649,17 @@ LESSONS = [
         "lab": ("algorithm", {
             "mode": "witness", "n": 16,
             "panel_title": "Find the witnesses",
-            "panel_intro": "The lab searches for a `C` and a `k` that work, and reports "
-                           "them. When no pair in its range works it says so rather than "
-                           "inventing one &mdash; and that is evidence the relation is "
-                           "false.",
+            "panel_intro": "The lab opens on the body's claim, `3n² + 5n + 100` against "
+                           "`n²`, and finds `C = 4`, `k = 13` &mdash; a sharper pair than "
+                           "the body's `C = 108`, `k = 1`, and equally a proof; the rows "
+                           "below `k` are highlighted where the bound fails, which is what "
+                           "`k` is for. Set `f` to `n²` and `g` to `n` for the body's "
+                           "disproof: no pair exists, and the lab shows the ratio `n²/n` "
+                           "running through 10, 100, 1 000 &hellip; instead of inventing a "
+                           "constant. That verdict comes from the growth classes, not from "
+                           "a search &mdash; a search that stopped at `n = 64` would report "
+                           "`C = 100`, and every finite search has that flaw. Try `n log₂ n` "
+                           "against `n` for the same reason.",
         }),
         "steps_title": "Proving a big-O claim",
         "steps_intro": "Bound each term, then collect.",
@@ -656,13 +708,21 @@ LESSONS = [
                    "`f` is smaller than `g`",
                    "`f` and `g` are equal"],
              "c": 1,
-             "why": "An upper bound with witnesses. \"Exactly like\" is `Θ`."},
+             "why": "An upper bound with witnesses, and nothing more. \"Exactly like\" is "
+                    "`Θ`, which needs the lower bound too. \"Smaller than\" is wrong "
+                    "twice: `100n = O(n)` though `100n` is larger, and the bound need only "
+                    "hold beyond `k`. \"Equal\" is what the misleading `=` suggests and "
+                    "the body warns against: the relation is not even symmetric."},
             {"q": "Is `n = O(n²)` true?",
              "a": ["No", "Yes, but it is a loose bound",
                    "Only for `n &gt; 1`", "Only if `n` is large"],
              "c": 1,
-             "why": "`n ≤ n²` for `n ≥ 1`, so `C = 1`, `k = 1` works. Big-O is an upper "
-                    "bound and may be far from tight."},
+             "why": "`n ≤ n²` for `n ≥ 1`, so `C = 1`, `k = 1` works and the claim is "
+                    "simply true. The two \"only\" answers misread the definition: a "
+                    "big-O statement is not true for some `n` and false for others, it "
+                    "is true or false outright, and the threshold `k` is part of the "
+                    "witness rather than a condition on the claim. The bound is loose "
+                    "because `Θ(n)` would be the tight statement."},
             {"q": "\"Quicksort is `O(n log n)`\" is:",
              "a": ["correct",
                    "false — its worst case is `Θ(n²)`; the AVERAGE case is `Θ(n log n)`",
@@ -670,7 +730,10 @@ LESSONS = [
                    "meaningless"],
              "c": 1,
              "why": "The unqualified claim asserts an upper bound on every case, and "
-                    "quicksort's worst case is quadratic."},
+                    "quicksort's worst case is quadratic &mdash; so it is false, not "
+                    "meaningless: it has a definite meaning and that meaning is wrong. "
+                    "Sorted input is the classic bad case for a naive pivot, the opposite "
+                    "of the one input the claim might survive on."},
         ],
         "mistakes": [
             ("Claiming `O` where `Θ` is meant",
@@ -682,9 +745,10 @@ LESSONS = [
              "`O` is already an upper bound. The intended word is `Ω`."),
         ],
         "standard": ("Finish when you produce witnesses without being asked.",
-                     "Prove `5n³ + 2n² + n = O(n³)` by exhibiting a `C` and a `k`, and then "
-                     "prove `n³ ≠ O(n²)` by contradiction. The two shapes cover almost "
-                     "every claim you will meet."),
+                     "Prove `5n³ + 2n² + n = O(n³)` by exhibiting a `C` and a `k` "
+                     "(`C = 8`, `k = 1` is one pair), and then prove `n³ ≠ O(n²)` by "
+                     "contradiction: divide the supposed bound through by `n²`. The two "
+                     "shapes cover almost every claim you will meet."),
         "note": "The notation is due to Bachmann and Landau, from analytic number theory, "
                 "and Knuth introduced it to algorithm analysis. The abuse of `=` is his "
                 "too, and it is now unfixable.",
@@ -795,11 +859,18 @@ LESSONS = [
                   "&mdash; nearly sorted input is the classic bad case for a naive pivot."),
         ],
         "lab": ("algorithm", {
-            "mode": "sort", "n": 24,
-            "panel_title": "Predicted and measured",
-            "panel_intro": "Bubble sort's count matches `n(n−1)/2` exactly, because its "
-                           "loops never look at the data. Insertion sort's does not, which "
-                           "is the whole difference between them.",
+            "mode": "loops", "n": 16,
+            "panel_title": "The four nests, run with a counter",
+            "panel_intro": "The lab opens on the worked example's three nests and the "
+                           "standard's fourth at `n = 16`: A ran 4 096 times (`n³`), B 136 "
+                           "(`n(n+1)/2`), C 64 (`n · ⌊log₂ n⌋`) and D 816 "
+                           "(`n(n+1)(n+2)/6`, the triple triangular nest). Every measured "
+                           "column equals its formula exactly, because none of these "
+                           "loops looks at data. For the third mistake, switch to Sorting "
+                           "at `n = 16` and change the input order: insertion sort makes "
+                           "15 comparisons on sorted input, 120 on reversed and 77 on the "
+                           "shuffled array &mdash; one algorithm, three counts &mdash; "
+                           "while bubble sort makes 120 on all three.",
         }),
         "steps_title": "Analysing a loop nest",
         "steps_intro": "Innermost outward.",
@@ -848,12 +919,17 @@ LESSONS = [
              "a": ["`n`", "`n²`", "`n(n+1)/2`, which is `Θ(n²)`", "`n log n`"],
              "c": 2,
              "why": "The inner loop runs `i` times, so the total is `Σ i = n(n+1)/2` "
-                    "&mdash; half of `n²`, and the same class."},
+                    "&mdash; half of `n²`, and the same class. `n²` is what multiplying "
+                    "the two bounds gives, the first mistake; `n` counts only the outer "
+                    "loop; `n log n` would need the inner counter to be halved or doubled, "
+                    "and here it simply counts up to `i`."},
             {"q": "A loop `while i &lt; n: i = i · 3` runs:",
              "a": ["`n` times", "`n/3` times", "about `log₃ n` times", "3 times"],
              "c": 2,
-             "why": "The counter is multiplied by a constant each time, so it reaches `n` "
-                    "after logarithmically many steps."},
+             "why": "The counter is multiplied by a constant each time &mdash; 1, 3, 9, 27, "
+                    "&hellip; &mdash; so it reaches `n` after logarithmically many steps. "
+                    "`n` times is the count for `i = i + 1`, and `n/3` for `i = i + 3`; "
+                    "\"3 times\" confuses the multiplier with the number of iterations."},
             {"q": "Bubble sort's comparison count is the same in all three cases because:",
              "a": ["it is optimal",
                    "its loop bounds do not depend on the data",
@@ -861,7 +937,11 @@ LESSONS = [
                    "the count is wrong"],
              "c": 1,
              "why": "The two loops run to fixed limits regardless of what the comparisons "
-                    "find. Insertion sort's inner loop stops early, so its count varies."},
+                    "find, so the count is `n(n−1)/2` on every input &mdash; the lab "
+                    "measures 120 at `n = 16` sorted, reversed and shuffled. It is far "
+                    "from optimal (merge sort makes 48 on the same shuffled array), and "
+                    "nothing in it is random. Insertion sort's inner loop stops early, "
+                    "which is why its count is the one that varies."},
         ],
         "mistakes": [
             ("Multiplying loop bounds when the inner one depends on the outer",
@@ -960,10 +1040,16 @@ LESSONS = [
                 "comparison with two outcomes, and each leaf is one possible output "
                 "ordering. To sort correctly the tree must have at least `n!` leaves, one "
                 "per permutation of the input.",
-                "A binary tree with `L` leaves has height at least `log₂ L` (course 7 "
-                "lesson 10). So the height is at least `log₂(n!)`.",
-                "By Stirling's approximation `log₂(n!) = Θ(n log n)`, and the height is the "
-                "worst-case number of comparisons.",
+                "A binary tree of height `h` has at most `2^h` leaves &mdash; course 7 "
+                "lesson 10's bound of `2^{h+1} − 1` vertices, restricted to the last "
+                "level &mdash; so a tree with `L` leaves has height at least `log₂ L`, "
+                "and this one has height at least `log₂(n!)`.",
+                "The largest `n/2` factors of `n!` are each at least `n/2`, so "
+                "`n! ≥ (n/2)^{n/2}` and `log₂(n!) ≥ (n/2) log₂(n/2)`, which is "
+                "`Ω(n log n)`. The height is the worst-case number of comparisons, and "
+                "the bound follows. (Stirling's approximation sharpens this to "
+                "`log₂(n!) ≈ n log₂ n − 1.44n`, but the crude bound is all the theorem "
+                "needs.)",
             ]),
             ("p", "This is a genuine impossibility result and it is worth distinguishing "
                   "from a failure of ingenuity: no comparison sort will ever beat "
@@ -976,11 +1062,16 @@ LESSONS = [
                   "theorem; they fall outside its hypothesis."),
         ],
         "lab": ("algorithm", {
-            "mode": "sort", "n": 24,
+            "mode": "sort", "n": 16,
             "panel_title": "Three sorts, counted",
-            "panel_intro": "The counts come from running each algorithm on the same array. "
-                           "Compare merge sort's column with `n log₂ n` &mdash; it stays "
-                           "below, as the analysis predicts.",
+            "panel_intro": "The lab opens on the worked example: the same shuffled array of "
+                           "16 through all three algorithms, 120, 77 and 48 comparisons. "
+                           "Change the input order for insertion sort's 15 on sorted input "
+                           "and 120 on reversed, and watch bubble sort not move. Merge "
+                           "sort's column stays below `n log₂ n = 64`, as the analysis "
+                           "allows. Switch to Search for the other half of the worked "
+                           "example: 16 comparisons against `⌊log₂ 16⌋ + 1 = 5`, and 10 "
+                           "at `n = 1000` if you extend the table.",
         }),
         "steps_title": "Choosing a search or a sort",
         "steps_intro": "The data decides.",
@@ -1003,19 +1094,21 @@ LESSONS = [
             "intro": ["Measured by running each algorithm on the same shuffled array."],
             "lines": [
                 "bubble      120        = n(n−1)/2, exactly — data-independent",
-                "insertion    62        data-dependent; 15 on sorted input",
+                "insertion    77        data-dependent; 15 on sorted input, 120 reversed",
                 "merge        48        below n log₂ n = 64, as the analysis allows",
                 "",
                 "binary search worst case:  ⌊log₂ 16⌋ + 1 = 5",
                 "linear search worst case:  16",
                 "",
-                "At n = 1000:",
-                "   bubble ≈ 500 000     merge ≈ 8 700     binary search ≈ 10",
+                "At n = 1000, on the lab's shuffled array:",
+                "   bubble 499 500     insertion 235 149     merge 7 387",
+                "   binary search worst case  ⌊log₂ 1000⌋ + 1 = 10",
             ],
             "after": [
-                "Merge sort's 48 comparisons is below `n log₂ n` because the true bound is "
-                "`n log₂ n − n + 1`, and the analysis quotes the leading term. Measured "
-                "counts sitting under a predicted curve is normal and not an error."
+                "Merge sort's 48 comparisons is below `n log₂ n` because the true worst "
+                "case for `n` a power of two is `n log₂ n − n + 1 = 49`, and the analysis "
+                "quotes the leading term. Measured counts sitting under a predicted curve "
+                "is normal and not an error; a measured count sitting above it would be."
             ],
         },
         "quiz_title": "Searching and sorting",
@@ -1023,19 +1116,30 @@ LESSONS = [
             {"q": "Binary search requires:",
              "a": ["a linked list", "sorted input", "distinct elements", "extra space"],
              "c": 1,
-             "why": "Sortedness is what licenses discarding half the range. On unsorted "
-                    "data it terminates and is wrong."},
+             "why": "Sortedness is what licenses discarding half the range; on unsorted "
+                    "data it terminates and is wrong. It needs random access, so a linked "
+                    "list is the one structure it does NOT suit; duplicates only affect "
+                    "which matching index is returned; and it uses no extra space at all "
+                    "&mdash; merge sort is the algorithm on this page that does."},
             {"q": "No comparison sort can do better than:",
              "a": ["`Θ(n)`", "`Ω(n log n)`", "`Θ(n²)`", "there is no limit"],
              "c": 1,
              "why": "The decision tree needs `n!` leaves and a binary tree with `n!` leaves "
-                    "has height `Θ(n log n)`."},
+                    "has height `Ω(n log n)`. `Θ(n)` is achieved only by sorts that do not "
+                    "compare; `Θ(n²)` is beaten by merge sort, so it is no bound; and "
+                    "\"no limit\" is exactly what the theorem denies &mdash; it is a "
+                    "statement about every algorithm of the kind, proved or not yet "
+                    "invented."},
             {"q": "Counting sort runs in `Θ(n)`. Does it contradict the lower bound?",
              "a": ["Yes", "No — it does not use comparisons",
                    "Only for small `n`", "The bound is wrong"],
              "c": 1,
-             "why": "The theorem constrains comparison sorts. Counting sort uses values as "
-                    "indices and falls outside its hypothesis."},
+             "why": "The theorem constrains comparison sorts, and counting sort uses the "
+                    "values as indices, so it falls outside the hypothesis rather than "
+                    "against the conclusion. A theorem cannot be contradicted by an "
+                    "example that does not meet its hypothesis; the bound is right, and "
+                    "\"small `n`\" has nothing to do with it &mdash; counting sort is "
+                    "linear at every `n` for which its key range is small."},
         ],
         "mistakes": [
             ("Binary searching unsorted data",
