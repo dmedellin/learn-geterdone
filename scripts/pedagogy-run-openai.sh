@@ -54,7 +54,7 @@ for slug in "${targets[@]}"; do
 
   cat > "$prompt" <<EOF
 You are the pedagogical expert for learn.geterdone.io. Work on the single course
-`$slug` in $REPO.
+'$slug' in $REPO.
 
 First read AGENTS.md sections 1, 1a and 2 and then read
 .claude/agents/pedagogical-expert.md in full. Adopt that role contract even though
@@ -118,7 +118,9 @@ EOF
   /usr/bin/python3 scripts/validate_release_contract.py release/contract.json
   node scripts/mathcheck.js
   node scripts/labcheck.js --generated
-  git diff --check "$before..$after"
+  # The outer runner is often attached to a PTY. Force Git's pager off: an empty
+  # successful diff-check otherwise opens `less` and waits forever for RETURN.
+  GIT_PAGER=cat git --no-pager diff --check "$before..$after"
 
   git push origin HEAD:pedagogy/openai-algebra
   echo "== $slug OK  $after"
