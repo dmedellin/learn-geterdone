@@ -10,8 +10,8 @@ LESSONS = [
         "summary": (
             "`f(x)` names the output that the function `f` produces from the input "
             "`x`. It is one number, not `f` multiplied by `x`, and once that is "
-            "settled the notation answers two different questions: evaluate, and "
-            "solve."
+            "settled the notation distinguishes two different questions: evaluate a "
+            "given input, and solve for the inputs that produce a given output."
         ),
         "key": [
             "f(x)      the output of f at x        NOT f times x",
@@ -37,9 +37,10 @@ LESSONS = [
              "are what stop `(−2)²` from collapsing to `−4`."),
             ("Evaluate and solve are opposite questions",
              "`f(3)` hands you an input and asks for the output; there is exactly one "
-             "answer. `f(x) = 3` hands you an output and asks for the inputs; there "
-             "may be none, one, or many. Confusing the two is the most common error "
-             "in this lesson, and both notations use the same three symbols."),
+             "answer. `g(x) = 5` for `g(x) = 3x − 7` hands you an output and asks "
+             "which input produced it; course 2's linear method gives `x = 4`. On a "
+             "table or graph there may be none, one or several such inputs. Confusing "
+             "the two questions is the most common error in this lesson."),
         ],
         "read_title": "Reading and using the notation",
         "read_intro": "What the symbol means, how to substitute safely, and the two questions it can pose.",
@@ -97,12 +98,13 @@ LESSONS = [
             ("ul", [
                 "<strong>Evaluate.</strong> `f(3)` is a command: substitute `3`. The "
                 "answer is one number, guaranteed by the definition of a function.",
-                "<strong>Solve.</strong> `f(x) = 5` is an equation: find every input "
-                "whose output is `5`. Here `x² − 4x + 5 = 5` gives `x² − 4x = 0`, so "
-                "`x(x − 4) = 0` and the answers are `x = 0` and `x = 4`.",
-                "<strong>Neither is guaranteed to have an answer.</strong> "
-                "`f(x) = 0` means `x² − 4x + 5 = 0`, whose discriminant is "
-                "`16 − 20 = −4`. No real input is sent to `0`.",
+                "<strong>Solve.</strong> `g(x) = 5` for `g(x) = 3x − 7` is the linear "
+                "equation `3x − 7 = 5`, so `3x = 12` and `x = 4`. The answer is an "
+                "input, not the displayed output `5`.",
+                "<strong>A graph or table may give several inputs or none.</strong> "
+                "Solving means collect every input paired with the requested output. "
+                "The definition of a function limits outputs per input; it does not "
+                "limit how many inputs may share one output.",
             ]),
             ("example", ("Reading values off a graph",
                          "A point `(3, 2)` on the graph of `f` says `f(3) = 2`, "
@@ -113,31 +115,14 @@ LESSONS = [
                          "collecting every `x` beneath. One vertical sweep, one "
                          "horizontal sweep, and they can return different numbers "
                          "of answers.")),
-            ("h3", "The difference quotient"),
-            ("p", "One expression is worth meeting now because it uses the notation "
-                  "at full stretch and returns in calculus. For the same `f`, "
-                  "`(f(x + h) − f(x))/h` measures the average rate of change between "
-                  "`x` and `x + h`, which is the slope of lesson 3 with the two "
-                  "points named by the function. Predict one thing before expanding: "
-                  "`f(x + 0)` is `f(x)`, so the difference must vanish when `h` does, "
-                  "and therefore every surviving term has to carry a factor of `h`. "
-                  "If the terms without an `h` fail to cancel, the expansion is wrong."),
-            ("math", [
-                "f(x + h) = (x + h)^2 - 4(x + h) + 5",
-                "         = x^2 + 2xh + h^2 - 4x - 4h + 5",
-                "",
-                "f(x + h) - f(x) = 2xh + h^2 - 4h",
-                "",
-                "divide by h  (h is not 0):     2x + h - 4",
-            ]),
         ],
         "lab": ("funcops", {
             "mode": "notation",
-            "panel_title": "Evaluate, then solve",
-            "panel_intro": "Type a rule for `f` and an input; the lab shows the "
-                           "substitution with the brackets in place before it "
-                           "simplifies. Switch to solve mode to enter an output "
-                           "instead, and watch the number of answers change.",
+            "panel_title": "Substitute before simplifying",
+            "panel_intro": "Choose a rule and an input, predict `f(a)`, then reveal "
+                           "the bracketed substitution. The panel also computes "
+                           "`f(x + 1)` and `f(x) + 1` separately; it does not solve "
+                           "equations, so do the linear solve in the faded task yourself.",
         }),
         "steps_title": "Evaluating without losing a sign",
         "steps_intro": "Four moves. The third is the one that goes wrong.",
@@ -160,72 +145,63 @@ LESSONS = [
              "disagree, the expansion is wrong and you have found it in one line."),
         ],
         "worked": {
-            "title": "One function, five questions",
-            "intro": ["Throughout, `f(x) = x² − 4x + 5`. The questions look alike and "
-                      "are not alike."],
+            "title": "Two functions, four different requests",
+            "intro": ["Use `f(x) = x² − 4x + 5` for substitution and "
+                      "`g(x) = 3x − 7` for a solve that needs only Course 2."],
             "lines": [
                 "1.  f(3)                 (3)^2 - 4(3) + 5                    = 2",
                 "",
                 "2.  f(-2)                (-2)^2 - 4(-2) + 5 = 4 + 8 + 5      = 17",
                 "        careless:        -2^2 - 4*2 + 5     = -4 - 8 + 5     = -7   WRONG",
                 "",
-                "3.  f(x) = 5             x^2 - 4x + 5 = 5",
-                "                         x^2 - 4x = 0",
-                "                         x(x - 4) = 0            x = 0  or  x = 4",
+                "3.  g(x) = 5             3x - 7 = 5",
+                "                         3x = 12                 x = 4",
+                "        check:           g(4) = 3(4) - 7 = 5",
                 "",
-                "4.  f(x) = 0             x^2 - 4x + 5 = 0",
-                "                         discriminant 16 - 20 = -4    no real solution",
-                "",
-                "5.  f(a + 1)             (a + 1)^2 - 4(a + 1) + 5",
+                "4.  f(a + 1)             (a + 1)^2 - 4(a + 1) + 5",
                 "                         a^2 + 2a + 1 - 4a - 4 + 5",
                 "                                                    = a^2 - 2a + 2",
                 "        check a = 2:     f(3) = 2      4 - 4 + 2 = 2           agrees",
             ],
             "after": [
                 "Questions 1 and 3 are the pair to keep apart. Both mention `f`, `x` "
-                "and a number; one has a single answer by definition, the other "
-                "turned out to have two.",
-                "Question 4 shows that solving can fail. The smallest value this "
-                "function takes is `1`, at `x = 2`, so no input is sent to `0` and "
-                "the discriminant records that fact in one number.",
-                "Question 5 is worth repeating with `f(a) + f(1) = a² − 4a + 7`. The "
+                "and a number; one starts with an input and returns its output, while "
+                "the other starts with an output and recovers its input.",
+                "Question 4 is worth comparing with `f(a) + f(1) = a² − 4a + 7`. The "
                 "two expressions agree only at `a = 5/2`, so a spot check at that one "
                 "value would wrongly suggest the shortcut works &mdash; which is why "
                 "the check above uses `a = 2`.",
+                "For a faded pass, let `p(t) = t² + 3t − 1`. The bracketed substitution "
+                "for `p(−2)` is supplied as `(−2)² + 3(−2) − 1`; simplify it and "
+                "check the sign of each term. Then form `p(a − 1)` by replacing every "
+                "slot before expanding. Separately solve `4x + 3 = 19` as the "
+                "function equation `q(x) = 19` for `q(x) = 4x + 3`.",
             ],
         },
         "quiz_title": "Notation, evaluated and solved",
         "quiz": [
-            {"q": "For `f(x) = x² − 4x + 5`, what is `f(−2)`?",
-             "a": ["`17`", "`1`", "`−7`", "`−1`"],
+            {"q": "For `f(x) = x² − 4x + 5`, what is `f(−3)`?",
+             "a": ["`26`", "`2`", "`−16`", "`−2`"],
              "c": 0,
-             "why": "`(−2)² − 4(−2) + 5 = 4 + 8 + 5 = 17`. `1` comes from keeping the "
-                    "sign in the squared term but dropping it in the linear term, "
-                    "`4 − 8 + 5`. `−7` comes from writing `−2²` without brackets, so "
-                    "the square is `−4` and the linear term is `−8`. `−1` is `−f(2)`, "
-                    "which treats the minus sign as something applied after the "
-                    "function rather than to the input."},
-            {"q": "For the same `f`, what does `f(x) = 5` give?",
-             "a": ["`x = 5`",
-                   "`x = 0` and `x = 4`",
-                   "`x = 0` only",
-                   "No real solution, since the discriminant of `x² − 4x + 5` is `−4`"],
+             "why": "`(−3)² − 4(−3) + 5 = 9 + 12 + 5 = 26`. `2` changes the "
+                    "linear term to `−12`; `−16` leaves the square unbracketed and "
+                    "also loses the input's sign in the linear term; `−2` is "
+                    "`−f(3)`, which negates the output instead of the input."},
+            {"q": "For `g(x) = 5x − 4`, what does `g(x) = 16` give?",
+             "a": ["`x = 16`", "`x = 4`", "`x = 12/5`", "`x = 20`"],
              "c": 1,
-             "why": "`x² − 4x + 5 = 5` gives `x² − 4x = 0`, so `x(x − 4) = 0` and both "
-                    "`0` and `4` work. `x = 5` reads the equation as if the `5` were "
-                    "the input. `x = 0` only is what is left after dividing both sides "
-                    "by `x`, which discards the root `x = 4`. The last choice computes "
-                    "the discriminant of `f(x) = 0`, a different equation; the "
-                    "constant `5` must be moved across first."},
-            {"q": "For the same `f`, which expression equals `f(a + 1)`?",
-             "a": ["`a² − 2a + 2`", "`a² − 4a + 6`", "`a² − 2a + 6`", "`a² − 4a + 7`"],
+             "why": "Solving `5x − 4 = 16` gives `5x = 20`, so `x = 4`, and "
+                    "`g(4) = 16`. `x = 16` copies the output into the input; `12/5` "
+                    "subtracts `4` instead of undoing `−4` by addition; `20` stops "
+                    "before the final division."},
+            {"q": "For `f(x) = x² − 4x + 5`, which expression equals `f(a − 1)`?",
+             "a": ["`a² − 6a + 10`", "`a² − 4a + 4`", "`a² − 6a + 6`", "`a² − 4a + 6`"],
              "c": 0,
-             "why": "`(a + 1)² − 4(a + 1) + 5 = a² + 2a + 1 − 4a − 4 + 5 = a² − 2a + 2`, "
-                    "and at `a = 2` it gives `2`, matching `f(3)`. `a² − 4a + 6` is "
-                    "`f(a) + 1`, adding to the output instead of the input. "
-                    "`a² − 2a + 6` distributes the `−4` onto the `a` but not the `1`. "
-                    "`a² − 4a + 7` is `f(a) + f(1)`, the assumption that `f` "
-                    "distributes over addition."},
+             "why": "`(a − 1)² − 4(a − 1) + 5 = a² − 2a + 1 − 4a + 4 + 5`, "
+                    "so the result is `a² − 6a + 10`. `a² − 4a + 4` is `f(a) − 1`; "
+                    "`a² − 6a + 6` fails to distribute `−4` to the `−1`; and "
+                    "`a² − 4a + 6` adds one to the output rather than subtracting one "
+                    "from the input."},
         ],
         "mistakes": [
             ("Reading f(x) as f times x",
@@ -246,14 +222,14 @@ LESSONS = [
         "standard": ("Finish when you can evaluate at a number or an expression "
                      "without losing a bracket, and can tell an evaluation from an "
                      "equation on sight.",
-                     "Given `f(x) = x² − 4x + 5` you should produce `f(−2) = 17` and "
-                     "`f(a + 1) = a² − 2a + 2` cleanly, solve `f(x) = 5` to get "
-                     "`x = 0` and `x = 4`, and explain why `f(x) = 0` has no answer. "
-                     "The difference quotient `2x + h − 4` is the stretch goal, and it "
-                     "is the one that pays off in lesson 12 and again in calculus."),
+                     "Given `r(x) = x² + 2x − 3` you should evaluate `r(−4)` and form "
+                     "`r(a + 2)` from bracketed substitutions, then solve the separate "
+                     "linear function equation `s(x) = 11` for `s(x) = 2x − 5`. "
+                     "For each answer, say whether it is an output or an input and "
+                     "check it in the original rule."),
         "note": "Every lesson from here on is written in this notation, so the habit "
                 "of reading `f(x)` as one name rather than two factors is worth "
-                "forming now. Lesson 9 asks which inputs the slot is allowed to "
+                "forming now. Lesson 10 asks which inputs the slot is allowed to "
                 "accept, which is the first question the notation makes it possible "
                 "to state precisely.",
     },
@@ -266,9 +242,9 @@ LESSONS = [
         "one_line": "What goes in, what comes out, and what is excluded.",
         "summary": (
             "The domain is the set of inputs a function accepts; the range is the "
-            "set of outputs it actually produces. In algebra only two things force "
-            "an input out of the domain &mdash; a zero denominator and an even root "
-            "of a negative &mdash; and the range is the harder of the two to find."
+            "set of outputs it actually produces. Among the formulas available so "
+            "far, a zero denominator and an even root of a negative are the two "
+            "domain failures; finding a range needs an argument about the outputs."
         ),
         "key": [
             "domain = every input the rule accepts",
@@ -276,28 +252,28 @@ LESSONS = [
             "exclude:  denominator = 0     even root of a negative",
             "[a, b] includes the ends    (a, b) excludes them    U joins pieces",
         ],
-        "key_label": "The two sets, and the only two exclusions",
+        "key_label": "The two sets, and the two exclusions used here",
         "concepts_intro": (
-            "Lesson 7 said a function must give an output for each input it claims. "
+            "Lesson 8 said a function must give an output for each input it claims. "
             "This lesson is about stating exactly what it claims."
         ),
         "concepts": [
             ("The domain is part of the function",
              "A function is a rule together with the set it accepts. `f(x) = x²` on "
              "every real number and `f(x) = x²` on `x ≥ 0` are different functions "
-             "with the same formula, and lesson 13 depends on the difference. When no "
+             "with the same formula, and lesson 14 depends on the difference. When no "
              "domain is stated, the convention is the largest set of real numbers for "
              "which the formula gives a real value."),
-            ("Only two things exclude an input",
-             "In this course a real input fails for one of two reasons: it makes a "
+            ("Two checks cover every formula in this lesson",
+             "Among the formulas used here, a real input fails for one of two reasons: it makes a "
              "denominator zero, or it puts a negative number under a square root or "
-             "any other even root. Everything else &mdash; adding, multiplying, "
-             "cubing, taking an odd root &mdash; accepts every real number."),
+             "another even root. Logarithms add a new condition in course 7; for now, "
+             "adding, multiplying, cubing and taking an odd root accept every real number."),
             ("The range is what actually comes out",
              "The domain can be read off the formula by inspection. The range usually "
-             "cannot: it needs the shape of the graph, or a completed square, or an "
-             "argument about which outputs are reachable. `f(x) = x² − 6x + 7` accepts "
-             "every real number but produces only values from `−2` upward."),
+             "cannot: it needs a graph landmark or an argument about which outputs are "
+             "reachable. `f(x) = x²` accepts every real input but produces only "
+             "non-negative outputs, while `g(x) = 2x − 3` reaches every real output."),
         ],
         "read_title": "Finding the domain, then the range",
         "read_intro": "Two exclusions to test for, interval notation to write the answer in, and the reason ranges are harder.",
@@ -318,8 +294,9 @@ LESSONS = [
             ("ul", [
                 "<strong>A zero denominator.</strong> Division by zero is undefined, "
                 "so set every denominator equal to zero, solve, and exclude the "
-                "solutions. For `(x + 2)/(x² − 5x + 6)`, factor the bottom as "
-                "`(x − 2)(x − 3)`; the excluded inputs are `2` and `3`.",
+                "solutions. For `(x + 2)/((x − 2)(x − 3))`, the denominator is "
+                "already displayed as factors, so the excluded inputs are `2` and `3`. "
+                "Producing such a factorisation is course 4 work, not a hidden prerequisite here.",
                 "<strong>An even root of a negative.</strong> `√(2x − 7)` needs "
                 "`2x − 7 ≥ 0`, so `x ≥ 7/2`. Write the exact fraction, not `3.5`. "
                 "Fourth roots, sixth roots and so on behave the same way; cube roots "
@@ -331,7 +308,7 @@ LESSONS = [
                   "Note that `−4` is included: `√0 = 0` is a perfectly good output. "
                   "It is the denominator, not the root, that produces an open end."),
             ("math", [
-                "f(x) = (x + 2)/(x^2 - 5x + 6)     bottom = (x - 2)(x - 3)",
+                "f(x) = (x + 2)/((x - 2)(x - 3))   bottom is already factored",
                 "                                  domain: x =/= 2, x =/= 3",
                 "",
                 "g(x) = sqrt(2x - 7)               2x - 7 >= 0   ->  x >= 7/2",
@@ -353,27 +330,24 @@ LESSONS = [
                   "across its whole domain, and there is no equivalent checklist. "
                   "Three tools cover most cases at this level."),
             ("ol", [
-                "<strong>Completing the square,</strong> for a quadratic. "
-                "`x² − 6x + 7 = (x − 3)² − 2`. A square is never negative, so the "
-                "output is never below `−2`, and it equals `−2` when `x = 3`. The "
-                "range is `[−2, ∞)`.",
-                "<strong>Tracking the outer operation,</strong> for a root. "
+                "<strong>Use non-negativity,</strong> for a square or absolute value. "
+                "`x² ≥ 0`, with equality at `x = 0`, and every non-negative `y` is "
+                "`(√y)²`; the range of `x²` is `[0, ∞)`. Likewise `|x| − 2` has "
+                "range `[−2, ∞)`.",
+                "<strong>Track the outer operation,</strong> for a root. "
                 "`√(9 − x²)` takes the square root of something running from `0` up "
                 "to `9`, so the outputs run from `0` to `3`, giving `[0, 3]`.",
-                "<strong>Solving for the input,</strong> in general. Ask which `y` "
-                "make `f(x) = y` solvable. For `f(x) = 1/(x − 3)`, solving gives "
-                "`x = 3 + 1/y`, which needs `y ≠ 0`; the range is every real number "
-                "except `0`.",
+                "<strong>Solve for the input,</strong> for a non-horizontal line. "
+                "If `y = 2x − 3`, then `x = (y + 3)/2` exists for every real `y`, "
+                "so the line reaches every real output.",
             ]),
-            ("example", ("A hole that the formula hides",
-                         "`q(x) = (x² − 9)/(x − 3)` cancels to `x + 3`, but only "
-                         "where the cancellation is legal. The domain is still "
-                         "`x ≠ 3`, because the original expression divides by `x − 3` "
-                         "before any simplifying happens. The graph is the line "
-                         "`y = x + 3` with the single point `(3, 6)` removed, so the "
-                         "range is every real number except `6`. Simplifying an "
-                         "expression can change its domain; it never changes the "
-                         "function that was written down.")),
+            ("example", ("An excluded input removes an output, not its own number",
+                         "Let `q(x) = 2x + 1` with the stated domain `x ≠ 3`. The "
+                         "formula is a non-horizontal line, so each output comes from "
+                         "exactly one input. Removing `x = 3` therefore removes the "
+                         "point `(3, 7)` and the output `7`. The domain excludes `3`; "
+                         "the range excludes `7`. Copying the input restriction into "
+                         "the range confuses the two axes.")),
             ("h3", "Writing the answer"),
             ("p", "Interval notation from course 2, lesson 13, is the expected form. "
                   "A square bracket includes the endpoint, a round bracket excludes "
@@ -389,19 +363,27 @@ LESSONS = [
         ],
         "lab": ("funcops", {
             "mode": "domain",
+            "presets": [
+                ("A zero denominator", "1/(x - 2)"),
+                ("A square-root endpoint", "sqrt(x - 3)"),
+                ("A root and a denominator", "sqrt(x + 4)/(x - 1)"),
+                ("A square has no exclusions", "x^2"),
+                ("A non-horizontal line reaches every output", "2x - 3"),
+            ],
             "panel_title": "Excluded inputs, shown",
-            "panel_intro": "Enter a formula; the lab marks the inputs it refuses and "
-                           "says which of the two exclusions caused each one. Try "
-                           "`sqrt(x+4)/(x-1)` and watch the left end stay closed "
-                           "while `1` opens up.",
+            "panel_intro": "Predict the domain before choosing a preset. The lab marks "
+                           "the inputs the formula refuses and names the condition; the "
+                           "range readout is proved for these simple cases and labels "
+                           "itself when a more general formula can only be sampled.",
         }),
         "steps_title": "Finding a domain in four passes",
         "steps_intro": "Scan for each exclusion separately, then combine. Combining first is where answers go missing.",
         "steps": [
             ("List every denominator",
              "Including denominators buried inside a root or a compound fraction. Set "
-             "each to zero, solve, and mark those inputs as excluded. Factor first: "
-             "`x² − 5x + 6` hides two exclusions until it becomes `(x − 2)(x − 3)`."),
+             "each to zero, solve, and mark those inputs as excluded. This lesson "
+             "supplies denominators already factored when there is more than one "
+             "zero; course 4 teaches how to produce the factorisation."),
             ("List every even root",
              "Square roots, fourth roots, and any rational exponent with an even "
              "denominator. Each contributes an inequality of the form "
@@ -420,8 +402,8 @@ LESSONS = [
             "intro": ["The domains first, since they are mechanical. The ranges "
                       "afterwards, since they are not."],
             "lines": [
-                "1.  f(x) = (x + 2)/(x^2 - 5x + 6)",
-                "        x^2 - 5x + 6 = (x - 2)(x - 3) = 0   ->  x = 2, x = 3",
+                "1.  f(x) = (x + 2)/((x - 2)(x - 3))",
+                "        (x - 2)(x - 3) = 0   ->  x = 2, x = 3",
                 "        domain   (-inf, 2) U (2, 3) U (3, inf)",
                 "",
                 "2.  g(x) = sqrt(2x - 7)",
@@ -440,13 +422,14 @@ LESSONS = [
                 "",
                 "ranges",
                 "",
-                "5.  p(x) = x^2 - 6x + 7 = (x - 3)^2 - 2",
-                "        (x - 3)^2 >= 0, and equals 0 at x = 3",
-                "        range    [-2, inf)               p(3) = 9 - 18 + 7 = -2",
+                "5.  p(x) = x^2",
+                "        x^2 >= 0, and equals 0 at x = 0",
+                "        every y >= 0 is reached at x = sqrt(y)",
+                "        range    [0, inf)",
                 "",
-                "6.  k(x) = sqrt(9 - x^2)   on  [-3, 3]",
-                "        9 - x^2 runs from 0 (at x = +-3) up to 9 (at x = 0)",
-                "        range    [0, 3]",
+                "6.  r(x) = |x| - 2",
+                "        |x| >= 0, and equals 0 at x = 0",
+                "        range    [-2, inf)              r(0) = -2",
             ],
             "after": [
                 "Line 3 is the one that decides whether the technique has been "
@@ -454,60 +437,53 @@ LESSONS = [
                 "parts of the expression, and the left end is closed while the "
                 "interior point is open. Reading `[−4, 1) ∪ (1, ∞)` back out loud as "
                 "\"from `−4` inclusive, everything except `1`\" is a fair test.",
-                "Line 5 shows the range depending on a rewrite. In the form "
-                "`x² − 6x + 7` nothing about `−2` is visible; in the form "
-                "`(x − 3)² − 2` it is the only constant in sight. The two "
-                "expressions are equal at every input, and the second answers a "
-                "question the first cannot.",
-                "Line 6 reuses the domain found in line 4. A range can only be found "
-                "over a known domain, so the order is never optional: domain first, "
-                "always.",
+                "Lines 5 and 6 use facts already taught in Course 1: a square and an "
+                "absolute value are non-negative. Subtracting `2` changes every output "
+                "of `|x|` and therefore changes the range endpoint, not the domain.",
+                "For a faded domain, take `s(x) = √(x + 2)/(x − 4)`. The root condition "
+                "`x ≥ −2` is supplied. Find the denominator exclusion, intersect the "
+                "conditions, write the intervals, and test both `−2` and `4`. Then find "
+                "the range of `t(x) = |x + 1| − 3` from its minimum and show an input "
+                "that produces two different allowed output values.",
             ],
         },
         "quiz_title": "In, out and excluded",
         "quiz": [
-            {"q": "What is the domain of `f(x) = √(x + 4)/(x − 1)`?",
-             "a": ["`[−4, ∞)`",
-                   "`[−4, 1) ∪ (1, ∞)`",
-                   "`(−4, 1) ∪ (1, ∞)`",
-                   "`(−∞, −4] ∪ (1, ∞)`"],
+            {"q": "What is the domain of `f(x) = √(x + 2)/(x − 4)`?",
+             "a": ["`[−2, ∞)`",
+                   "`[−2, 4) ∪ (4, ∞)`",
+                   "`(−2, 4) ∪ (4, ∞)`",
+                   "`(−∞, −2] ∪ (4, ∞)`"],
              "c": 1,
-             "why": "Two conditions hold at once: `x + 4 ≥ 0` gives `x ≥ −4`, and "
-                    "`x − 1 ≠ 0` removes `1`. The first choice solves the root and "
+             "why": "Two conditions hold at once: `x + 2 ≥ 0` gives `x ≥ −2`, and "
+                    "`x − 4 ≠ 0` removes `4`. The first choice solves the root and "
                     "forgets the denominator. The third wrongly opens the left end, "
-                    "but `x = −4` gives `√0/(−5) = 0`, a perfectly good output. The "
-                    "fourth solves `x + 4 ≥ 0` backwards, keeping the inputs that "
+                    "but `x = −2` gives `√0/(−6) = 0`, a perfectly good output. The "
+                    "fourth solves `x + 2 ≥ 0` backwards, keeping inputs that "
                     "make the root imaginary."},
-            {"q": "What is the range of `f(x) = x² − 6x + 7`?",
-             "a": ["`[−2, ∞)`", "`[0, ∞)`", "`[3, ∞)`", "`(−∞, −2]`"],
+            {"q": "What is the range of `g(x) = |x + 3| − 4`?",
+             "a": ["`[−4, ∞)`", "`[0, ∞)`", "`[−3, ∞)`", "`(−∞, −4]`"],
              "c": 0,
-             "why": "`x² − 6x + 7 = (x − 3)² − 2`, and `(x − 3)²` is never negative "
-                    "and is `0` at `x = 3`, so the smallest output is `−2`. `[0, ∞)` "
-                    "assumes the square alone controls the sign and ignores the `−2`. "
-                    "`[3, ∞)` quotes the input at which the minimum happens rather "
-                    "than the output. `(−∞, −2]` has the right boundary and the wrong "
-                    "direction; the parabola opens upward, since the coefficient of "
-                    "`x²` is positive."},
-            {"q": "`g(x) = (x² − 9)/(x − 3)` simplifies to `x + 3`. What is its range?",
+             "why": "Absolute value is never below `0` and equals `0` at `x = −3`, so "
+                    "the smallest output is `−4` and every larger output occurs. "
+                    "`[0, ∞)` forgets the outside subtraction; `[−3, ∞)` copies the "
+                    "input where the minimum occurs; `(−∞, −4]` reverses the direction."},
+            {"q": "`q(x) = 3x + 1` has the stated domain `x ≠ −2`. What is its range?",
              "a": ["Every real number",
-                   "Every real number except `3`",
-                   "Every real number except `6`",
-                   "Every real number except `0`"],
+                   "Every real number except `−2`",
+                   "Every real number except `−5`",
+                   "Every real number except `5`"],
              "c": 2,
-             "why": "Cancelling changes the expression, not the function: `x = 3` is "
-                    "still divided out, so it is still excluded, and the output it "
-                    "would have produced is `3 + 3 = 6`. The first choice reads the "
-                    "range off the simplified line and misses the hole. The second "
-                    "copies the excluded <em>input</em> into the range. The fourth "
-                    "assumes `0` is missing, but `x = −3` gives `0` and `−3` is in "
-                    "the domain."},
+             "why": "A non-horizontal line reaches each output once. The removed input "
+                    "`−2` would have produced `3(−2) + 1 = −5`, so that is the missing "
+                    "output. Every-real ignores the stated restriction, `−2` copies an "
+                    "input into the range, and `5` loses the sign in the substitution."},
         ],
         "mistakes": [
-            ("Simplifying first and reading the domain second",
-             "`(x² − 9)/(x − 3)` is undefined at `3` no matter how the expression is "
-             "rewritten. Find the domain from the expression as written, then "
-             "simplify. Doing it the other way round invents inputs the function "
-             "never accepted."),
+            ("Copying a missing input into the range",
+             "For `q(x) = 2x + 1` on `x ≠ 3`, the domain misses `3` and the range "
+             "misses `7`. Domain values live on the input axis; pass an excluded input "
+             "through the formula to find which output its absence removes."),
             ("Opening an endpoint that a root leaves closed",
              "`√(x + 4)` is defined at `x = −4`, because `√0 = 0`. Only a strict "
              "inequality or a zero denominator opens an end, and a square root "
@@ -518,18 +494,18 @@ LESSONS = [
              "inside negative. Solve it as an absolute value inequality: `|x| ≤ 3`."),
         ],
         "standard": ("Finish when you can state a domain from the formula in one "
-                     "pass, and can find the range of a quadratic or a simple root "
+                     "pass, and can justify the range of a line, square, absolute-value "
+                     "rule or simple root "
                      "with a reason attached.",
-                     "Given a mixture of rational and radical expressions you should "
+                     "Given formulas with displayed linear denominators and square roots you should "
                      "produce the domain in interval notation, with the right "
                      "bracket at each end, and be able to justify each excluded input "
-                     "by naming which of the two exclusions caused it. For ranges, "
-                     "completing the square and tracking the outer operation should "
-                     "be automatic; the general method of solving `f(x) = y` for `x` "
-                     "is the one that carries into lesson 13."),
-        "note": "Domain restrictions are the reason lesson 13 needs a restriction at "
-                "all, and the reason a composite in lesson 12 can have a smaller "
-                "domain than either function it was built from. Lesson 10 takes the "
+                     "by naming which condition caused it. For a range, state the "
+                     "minimum or the input recovered from a requested output; do not "
+                     "read the answer from a sketch alone."),
+        "note": "Domain restrictions are the reason lesson 14 needs a restriction at "
+                "all, and the reason a composite in lesson 13 can have a smaller "
+                "domain than either function it was built from. Lesson 11 takes the "
                 "idea one step further: a function whose domain is deliberately cut "
                 "into pieces, with a different formula on each.",
     },
@@ -543,17 +519,17 @@ LESSONS = [
         "summary": (
             "A piecewise function splits its domain into pieces and gives a separate "
             "formula on each. It is one function, not several: the conditions decide "
-            "which formula applies, and they must cover each input exactly once."
+            "which formula applies, and no input may receive conflicting outputs."
         ),
         "key": [
             "          -x - 1     if x < -1",
             "f(x) =     x^2       if -1 <= x < 2",
             "          8 - 2x     if x >= 2",
-            "conditions must not overlap, or the rule is not a function",
+            "overlap is safe only where the formulas agree",
         ],
         "key_label": "One function in three lines",
         "concepts_intro": (
-            "The definition in lesson 7 says nothing about a function being given by "
+            "The definition in lesson 8 says nothing about a function being given by "
             "a single formula. It never did; this lesson takes the permission."
         ),
         "concepts": [
@@ -562,11 +538,12 @@ LESSONS = [
              "satisfies; only then use the matching formula. Evaluating first and "
              "checking the condition afterwards produces an answer from the wrong "
              "branch, and it will look reasonable."),
-            ("The pieces must not overlap",
+            ("The pieces must not conflict",
              "If two conditions accept the same input and the formulas disagree "
              "there, the rule assigns two outputs and is not a function. Watch the "
              "endpoints: `x ≤ 3` and `x ≥ 3` overlap at `3`, while `x &lt; 3` and "
-             "`x ≥ 3` do not. One symbol is the whole difference."),
+             "`x ≥ 3` do not. If overlapping formulas agree wherever they overlap the "
+             "rule is still a function, but exclusive conditions make that fact visible."),
             ("A gap is legal; it just shrinks the domain",
              "`x &lt; 3` paired with `x &gt; 3` defines a perfectly good function "
              "whose domain omits `3`. That is a domain statement, not an error. Only "
@@ -578,9 +555,10 @@ LESSONS = [
             ("def", ("Piecewise function",
                      "A <strong>piecewise</strong> function is defined by splitting "
                      "its domain into pieces and giving a formula for each piece. "
-                     "For the rule to be a function, each input in the domain must "
-                     "satisfy exactly one condition &mdash; the conditions partition "
-                     "the domain.")),
+                     "The cleanest definition uses conditions that partition the domain, "
+                     "so each input selects exactly one piece. Overlap is also legal "
+                     "when every formula that applies gives the same output; conflicting "
+                     "outputs are what violate the function definition.")),
             ("p", "The most familiar example was written down long before the "
                   "notation was: absolute value. `|x|` is `x` when `x` is at least "
                   "zero and `−x` when `x` is negative, which is two formulas and a "
@@ -614,9 +592,11 @@ LESSONS = [
             ]),
             ("p", "The last line is the error this lesson exists to prevent. `10` is "
                   "a real number produced by a real formula belonging to this very "
-                  "function, and nothing about it looks suspect. Only the condition "
-                  "`x ≥ 2` rules it out, and the condition is the part that gets "
-                  "skipped."),
+                  "piecewise definition, and nothing about it looks suspect. It is not "
+                  "`f(−1)`, because the condition `x ≥ 2` rules that branch out. The "
+                  "number `10` is in fact produced elsewhere by this function; branch "
+                  "selection decides the value at the requested input, not whether the "
+                  "number appears anywhere in the range."),
             ("h3", "What happens at a join"),
             ("p", "At `x = −1` the two neighbouring formulas disagree. Approaching "
                   "from the left, `−x − 1` heads toward `0`; the value the function "
@@ -643,9 +623,10 @@ LESSONS = [
                 "<strong>An open circle</strong> marks a point the graph approaches "
                 "but does not include, because the condition on that piece excluded "
                 "the endpoint.",
-                "<strong>A vertical stack of two filled circles is impossible.</strong> "
+                "<strong>A vertical stack of two different filled circles is impossible.</strong> "
                 "Two filled circles above the same input would be two outputs, and "
-                "the vertical line test from lesson 7 rules it out on sight.",
+                "the vertical line test from lesson 8 rules it out on sight. Two pieces "
+                "that include the same identical point still contribute only one point.",
             ]),
             ("example", ("Overlap, gap, and neither",
                          "`{x + 1 if x ≤ 3; 2x if x ≥ 3}` is not a function: at `3` "
@@ -681,8 +662,8 @@ LESSONS = [
              "rather than an assumption."),
             ("Evaluate only the matching formula",
              "The other formulas are not merely unhelpful, they are not part of the "
-             "answer. At `x = −1` the third piece returns `10`, and `10` is not a "
-             "value this function takes anywhere."),
+             "answer. At `x = −1` the third formula returns `10`, but its condition "
+             "fails, so `10` is not `f(−1)`."),
             ("At each join, evaluate both neighbours",
              "Compute the left formula and the right formula at the cut point. Equal "
              "values mean the graph connects; different values give the size of the "
@@ -728,49 +709,53 @@ LESSONS = [
                 "`0` upward without bound, so between them every real number is "
                 "produced. The range is every real number, even though no single "
                 "piece has that range.",
+                "For a faded rehearsal, define `g(x)` by `2x + 1` for `x &lt; 0`, "
+                "`x² + 1` for `0 ≤ x &lt; 3`, and `7 − x` for `x ≥ 3`. The condition "
+                "for `x = 0` is supplied: use the middle piece. Evaluate at `−2`, "
+                "`0` and `3`; compute both formulas at each join; then draw the open "
+                "and filled endpoints and state which join connects and which jumps.",
             ],
         },
         "quiz_title": "Which piece, and what happens there",
         "quiz": [
-            {"q": "For `f` above, what is `f(−1)`?",
-             "a": ["`1`", "`0`", "`10`", "Undefined, since two conditions mention `−1`"],
+            {"q": "Let `h(x) = x − 1` for `x &lt; 2` and `h(x) = 5 − x` for `x ≥ 2`. "
+                  "What is `h(2)`?",
+             "a": ["`1`", "`2`", "`3`", "Undefined"],
+             "c": 2,
+             "why": "The condition `x ≥ 2` includes the endpoint, so "
+                    "`h(2) = 5 − 2 = 3`. `1` uses the excluded first formula; `2` "
+                    "copies the input; undefined ignores that the second condition "
+                    "covers the endpoint."},
+            {"q": "At `x = 1`, do the pieces `2x` for `x &lt; 1` and `x + 1` for "
+                  "`x ≥ 1` meet or jump?",
+             "a": ["They meet at output `2`", "They jump from `1` to `2`",
+                   "They jump from `2` to `1`", "The comparison cannot be made"],
              "c": 0,
-             "why": "`−1` satisfies `−1 ≤ x &lt; 2`, so the second piece applies and "
-                    "`(−1)² = 1`. `0` comes from the first piece, `−x − 1`, whose "
-                    "condition `x &lt; −1` `−1` does not satisfy. `10` comes from the "
-                    "third piece, `8 − 2(−1)`, which is further out of range still. "
-                    "The last choice misreads the conditions: `−1` appears in two of "
-                    "them as a boundary, but satisfies only one."},
-            {"q": "Where does the graph of `f` have a step?",
-             "a": ["At `x = −1` only", "At `x = 2` only", "At both joins", "At neither join"],
-             "c": 0,
-             "why": "At `x = −1` the left formula gives `−(−1) − 1 = 0` while the "
-                    "value taken is `(−1)² = 1`, a step of `1`. At `x = 2` the left "
-                    "formula gives `2² = 4` and the right gives `8 − 2(2) = 4`, so "
-                    "the pieces meet. A join is a step or not according to whether "
-                    "the two numbers differ, and here one join does and one does not."},
-            {"q": "Which of these fails to define a function?",
-             "a": ["`{x + 1 if x ≤ 3; 2x if x &gt; 3}`",
-                   "`{x + 1 if x ≤ 3; 2x if x ≥ 3}`",
-                   "`{x + 1 if x &lt; 3; 2x if x &gt; 3}`",
-                   "`{x + 1 if x &lt; 3; 2x if x ≥ 3}`"],
-             "c": 1,
-             "why": "In the second, `x = 3` satisfies both conditions, and the two "
-                    "formulas give `4` and `6`. One input, two outputs, so it is not "
-                    "a function. The third also treats `3` unusually, but by leaving "
-                    "it out: that is a function whose domain omits `3`, which is "
-                    "legal. The first and fourth each assign `3` to exactly one "
-                    "piece."},
+             "why": "Both endpoint calculations give `2`: `2(1) = 2` and `1 + 1 = 2`, "
+                    "so the pieces meet. The two jump choices use a formula without "
+                    "evaluating it at the cut point, and the comparison is always "
+                    "available even though only the second piece owns the value."},
+            {"q": "Which piecewise rule fails to define a function?",
+             "a": ["`{x + 2 if x ≤ 1; 3x if x ≥ 1}`",
+                   "`{x − 1 if x ≤ 2; x + 1 if x &gt; 2}`",
+                   "`{2x if x &lt; 0; 2x if x &gt; 0}`",
+                   "`{x + 1 if x ≤ 2; 4 − x if x ≥ 2}`"],
+             "c": 3,
+             "why": "In the fourth rule, `x = 2` satisfies both conditions and the "
+                    "formulas give `3` and `2`, so one input receives two outputs. "
+                    "The first also overlaps, but both formulas give `3` at `1`, so it "
+                    "is harmless. The second partitions the domain, and the third is "
+                    "a legal function whose domain omits `0`."},
         ],
         "mistakes": [
             ("Evaluating first and checking the condition afterwards",
              "Substituting into whichever formula is nearest gives a plausible number "
-             "from the wrong branch. At `x = −1` the third piece returns `10`, a "
-             "value this function never takes. Read the conditions first, every time."),
+             "from the wrong branch. At `x = −1` the third formula returns `10`, but "
+             "that is not `f(−1)` because the condition fails. Read the conditions first."),
             ("Writing both endpoint conditions with a non-strict sign",
              "`x ≤ 3` beside `x ≥ 3` claims `3` twice. If the formulas disagree "
-             "there, the rule is not a function at all. Exactly one of the two "
-             "conditions at each cut point should include the endpoint."),
+             "there, the rule is not a function at all. Prefer exactly one included "
+             "endpoint; if both include it, verify that the outputs agree."),
             ("Assuming a join is a break",
              "Two different formulas can meet. At `x = 2`, `x²` and `8 − 2x` both "
              "give `4`, so the graph connects and neither endpoint needs a circle. "
@@ -782,13 +767,13 @@ LESSONS = [
                      "the two numbers that settle it.",
                      "Given a two- or three-piece definition you should evaluate at "
                      "any input including the cut points, decide whether the "
-                     "conditions partition the domain, sketch the graph with open and "
+                     "conditions partition the domain or agree on any overlap, sketch the graph with open and "
                      "filled circles in the right places, and state the domain and "
                      "range. Recognising `|x|` as a piecewise function is the check "
                      "that the idea has landed."),
         "note": "Piecewise definitions are how a domain restriction becomes visible "
-                "in a formula, and lesson 13 uses exactly that device: a function is "
-                "cut down to a piece on which it can be inverted. Lesson 11 leaves "
+                "in a formula, and lesson 14 uses exactly that device: a function is "
+                "cut down to a piece on which it can be inverted. Lesson 12 leaves "
                 "formulas alone and asks a different question: what moving the graph "
                 "does to the rule.",
     },
@@ -798,24 +783,24 @@ LESSONS = [
         "slug": "transformations-of-graphs",
         "title": "Transformations of Graphs",
         "module": "Functions",
-        "one_line": "Shift, stretch and reflect, from the parent curve.",
+        "one_line": "Shift, stretch and reflect by mapping points from a known graph.",
         "summary": (
             "Changing a formula in four standard ways moves its graph in four "
             "predictable ways. Everything done outside the function acts on the "
             "output and behaves as written; everything done inside acts on the input "
-            "and behaves in the opposite direction."
+            "and behaves in the opposite direction, all captured by one point map."
         ),
         "key": [
             "y = a f(b(x - h)) + k",
             "outside x:  a stretches by |a|,  k shifts up      as written",
             "inside  x:  b squashes by 1/|b|, h shifts right   the other way",
-            "a < 0 flips over the x-axis     b < 0 flips over the y-axis",
+            "(x0, y0)  ->  (x0/b + h,  a*y0 + k)",
         ],
         "key_label": "One template, four controls",
         "concepts_intro": (
-            "A handful of parent curves and four moves generate most of the graphs "
-            "in the rest of this path, so the moves are worth understanding rather "
-            "than memorising."
+            "The graph of `f` is supplied. The task is not to know a future family of "
+            "curves; it is to send known points to their new coordinates and use that "
+            "mapping to explain the four familiar moves."
         ),
         "concepts": [
             ("Outside acts on the output, and reads normally",
@@ -833,15 +818,15 @@ LESSONS = [
              "squash by `1/2` and a shift left by `3`. Until `b` is factored out, the "
              "number next to it is not the shift."),
         ],
-        "read_title": "The four moves and the order they compose in",
-        "read_intro": "Why inside and outside behave differently, what each constant does, and how to read a formula that combines them.",
+        "read_title": "One point map, with four consequences",
+        "read_intro": "Why inside and outside behave differently, where a known point lands, and how the four constants follow from that calculation.",
         "body": [
             ("def", ("Parent function",
-                     "A <strong>parent function</strong> is the simplest member of a "
-                     "family, carrying the family's shape and nothing else: `x`, "
-                     "`x²`, `|x|`, `√x`, `1/x`, `x³`. Every graph in this lesson is "
-                     "described as a parent plus a list of moves, which is shorter "
-                     "and more reliable than plotting points.")),
+                     "A <strong>parent function</strong> here is simply the supplied "
+                     "reference graph `y = f(x)`. The core examples use a line, "
+                     "`|x|` and `x³`, whose arithmetic is already available. The lab "
+                     "also offers root and reciprocal previews, but those families are "
+                     "not part of this lesson's completion standard.")),
             ("h3", "Why inside is backwards"),
             ("p", "This is the one point in the lesson that repays a proof rather "
                   "than a rule. Nothing about the graph of `f` changes; what changes "
@@ -875,83 +860,83 @@ LESSONS = [
             ]),
             ("p", "The two reflections are worth separating. `−f(x)` negates the "
                   "output and turns the picture upside down; `f(−x)` negates the "
-                  "input and turns it left to right. For `f(x) = x²` they do not "
-                  "agree: `−f(x) = −x²` is the parabola upside down, while "
-                  "`f(−x) = (−x)² = x²` is the original curve unchanged, because a "
-                  "parabola is already symmetric about the vertical axis. It is the "
-                  "horizontal flip leaving no visible trace that makes `x²` a poor "
-                  "curve to learn reflections on. Try them on `√x` instead: `−√x` "
-                  "sits below the axis, while `√(−x)` sits to the left of it."),
+                  "input and turns it left to right. For `f(x) = x + 1`, they are "
+                  "`−x − 1` and `−x + 1`, visibly different parallel lines. At the "
+                  "parent point `(0, 1)`, the vertical flip lands at `(0, −1)` while "
+                  "the horizontal flip leaves `(0, 1)` fixed. One point separates "
+                  "the two readings without requiring a new curve family."),
             ("h3", "Reading a combined formula"),
-            ("p", "Take `y = −2(x − 3)² + 5`, a parabola in the template's shape with "
-                  "`a = −2`, `b = 1`, `h = 3`, `k = 5`. From the parent `x²`: move "
-                  "right `3`, stretch vertically by `2`, flip over the horizontal "
-                  "axis, move up `5`. The vertex, which sits at `(0, 0)` on the "
-                  "parent, lands at `(3, 5)`."),
+            ("p", "Take `g(x) = −2|x − 3| + 5`, in the template with parent "
+                  "`f(x) = |x|`, `a = −2`, `b = 1`, `h = 3`, `k = 5`. Move each "
+                  "parent point by `(x₀, y₀) → (x₀ + 3, −2y₀ + 5)`. The corner "
+                  "`(0, 0)` lands at `(3, 5)`; the two points `(−1, 1)` and `(1, 1)` "
+                  "land at `(2, 3)` and `(4, 3)`. Those three points determine the "
+                  "transformed V without any future quadratic technique."),
             ("math", [
-                "y = -2(x - 3)^2 + 5          vertex (3, 5), opening downward",
+                "g(x) = -2|x - 3| + 5          parent f(x) = |x|",
                 "",
-                "x        0     1     2     3     4     5     6",
-                "y      -13    -3     3     5     3    -3   -13",
+                "parent point        new x = x0 + 3        new y = -2y0 + 5       image",
+                "( 0, 0)                    3                       5              (3, 5)",
+                "(-1, 1)                    2                       3              (2, 3)",
+                "( 1, 1)                    4                       3              (4, 3)",
                 "",
-                "symmetric about x = 3: the values at 2 and 4 agree, as do 1 and 5",
-                "",
-                "y-intercept   x = 0:   -2(0 - 3)^2 + 5 = -2(9) + 5 = -13",
-                "x-intercepts  y = 0:   (x - 3)^2 = 5/2    x = 3 +- sqrt(10)/2",
+                "direct checks:  g(3) = 5      g(2) = 3      g(4) = 3",
+                "the equal heights at x = 2 and x = 4 confirm symmetry about x = 3",
             ]),
-            ("p", "The `y`-intercept is where two arithmetic slips hide. Squaring "
-                  "term by term turns `(0 − 3)²` into `0 − 9`, giving `+23`; "
-                  "multiplying the `−2` in before squaring turns the whole bracket "
-                  "into `(6)²`, giving `41`. They are wrong for different reasons: "
-                  "the first distributes the exponent across a subtraction, and "
-                  "`(a − b)²` is not `a² − b²`; the second multiplies before "
-                  "squaring, where the exponent binds tighter than the "
-                  "multiplication in front of it. What both miss is that the square "
-                  "applies to the whole bracket, which has to be evaluated first."),
+            ("p", "The coordinate map makes the order explicit. The new x-coordinate "
+                  "is found from the inside equation `b(x − h) = x₀`, giving "
+                  "`x = x₀/b + h`; the new y-coordinate is found after the parent "
+                  "has run, as `ay₀ + k`. Mixing those routes &mdash; adding `k` to "
+                  "an x-coordinate or dividing a y-coordinate by `b` &mdash; is not a "
+                  "small slip but a change of which quantity each constant acts on."),
             ("h3", "When a horizontal stretch and a shift are combined"),
-            ("p", "`y = √(2x + 6)` is the case that separates rule-following from "
-                  "understanding. The `6` is not a shift. Factor the `2` out of the "
-                  "whole input first: `√(2(x + 3))`, so the shift is `3`, matching "
-                  "the domain `2x + 6 ≥ 0`, that is `x ≥ −3`."),
+            ("p", "Let `f(x) = x³` and `r(x) = f(2x + 6)`. The `6` is not the shift. "
+                  "Factoring gives `f(2(x + 3))`, so `b = 2` and `h = −3`. A parent "
+                  "point with input `x₀` lands at `x₀/2 − 3`: the graph is half as "
+                  "wide and moved left by `3`."),
             ("math", [
-                "sqrt(2x + 6) = sqrt(2(x + 3))       domain x >= -3",
+                "r(x) = f(2x + 6) = f(2(x + 3))      f(x) = x^3",
                 "",
-                "squash by 1/2, then left 3      sqrt(2(x + 3)) = sqrt(2x + 6)   yes",
-                "left 6, then squash by 1/2      sqrt(2x + 6)                    yes",
-                "left 3, then squash by 1/2      sqrt(2x + 3)                    no",
-                "squash by 1/2, then left 6      sqrt(2(x + 6)) = sqrt(2x + 12)  no",
+                "parent ( 0,  0)  ->  ( 0/2 - 3,  0) = (  -3,  0)",
+                "parent ( 1,  1)  ->  ( 1/2 - 3,  1) = (-5/2,  1)",
+                "parent (-1, -1)  ->  (-1/2 - 3, -1) = (-7/2, -1)",
                 "",
-                "the starting point (0, 0) moves to (-3, 0)",
+                "check at x = -5/2:   2(-5/2) + 6 = 1, so r(-5/2) = f(1) = 1",
             ]),
-            ("p", "Two of those four orders reach the right graph and two do not, so "
-                  "the order and the numbers have to be quoted together. Shifting "
-                  "before squashing needs the raw `6`; squashing before shifting "
-                  "needs the factored `3`. A description that names one order and "
-                  "the other order's number is simply a different graph."),
-            ("example", ("Same shape, four ways to say it",
-                         "`y = |x − 2| + 1` is `|x|` moved right `2` and up `1`, with "
-                         "its corner at `(2, 1)`. `y = −|x − 2| + 1` flips it "
-                         "downward about the horizontal axis, keeping the corner at "
-                         "`(2, 1)`, since the flip happens after the shift right and "
-                         "the corner already has output `0` before the `+1`. Check "
-                         "one point rather than trusting the sentence: at `x = 4`, "
-                         "the first gives `2 + 1 = 3` and the second `−2 + 1 = −1`.")),
+            ("p", "The point calculation settles both horizontal constants at once. "
+                  "Reading `6` as a shift left `6` would send `(0, 0)` to `(-6, 0)`, "
+                  "but direct substitution shows `r(−6) = f(−6)`, not `f(0)`. The "
+                  "factored `3` and the division by `2` are not a mnemonic; they are "
+                  "the solution of `2x + 6 = x₀` for the new input."),
+            ("example", ("Vertical and horizontal changes kept separate",
+                         "If `(4, −2)` lies on `y = f(x)`, then on "
+                         "`y = 3f(x − 5) + 1` it becomes `(9, −5)`: the inside equation "
+                         "`x − 5 = 4` gives `x = 9`, while the outside calculation "
+                         "`3(−2) + 1` gives `−5`. Checking one mapped point forces each "
+                         "constant to act on the coordinate it actually controls.")),
         ],
         "lab": ("transform", {
             "mode": "all",
+            "presets": [
+                ("A line shifted right 3", "id|2|2|3|0"),
+                ("A cubic squashed horizontally", "cu|2|4|0|0"),
+                ("Absolute value flipped vertically", "ab|-2|2|0|0"),
+                ("A cubic reflected horizontally", "cu|2|-2|0|0"),
+                ("Absolute value with all four constants", "ab|-4|2|3|5"),
+            ],
             "panel_title": "Four sliders, one parent",
-            "panel_intro": "Pick a parent curve and move `a`, `b`, `h` and `k`. The "
-                           "parent stays on screen in outline, so the effect of each "
-                           "constant is visible on its own. Watch `h` while it is "
-                           "positive: the curve goes right.",
+            "panel_intro": "Predict where one labelled parent point will land, then "
+                           "choose a line, absolute-value or cubic preset. The parent "
+                           "stays behind the image, and the table computes the exact "
+                           "point map before checking the drawn curve.",
         }),
         "steps_title": "Describing a graph from its formula",
         "steps_intro": "Identify the parent, factor the input, then read the constants in a fixed order.",
         "steps": [
             ("Name the parent",
-             "Strip every constant and see what shape is left: `x²`, `√x`, `|x|`, "
-             "`1/x`, `x³`. Everything after this step is a description of how that "
-             "one shape has been moved."),
+             "Identify the supplied reference graph `y = f(x)`. For assessed work it "
+             "will be a line, `|x|` or `x³`; the lesson is about moving its known "
+             "points, not recalling an unlearned family shape."),
             ("Factor the coefficient out of the input",
              "Turn `f(2x + 6)` into `f(2(x + 3))` before reading anything horizontal. "
              "Skipping this is the single most common source of a wrong shift, "
@@ -961,88 +946,79 @@ LESSONS = [
              "need no reinterpretation, which is why doing the vertical part first "
              "builds confidence for the horizontal part."),
             ("Read the inside constants backwards, then verify one point",
-             "`h` shifts right when it is subtracted; `b` squashes by `1/|b|`. Then "
-             "substitute a single input into the original formula and check the point "
-             "lands where the description predicts. One substitution catches almost "
-             "every misread."),
+             "For a parent point `(x₀, y₀)`, solve `b(x − h) = x₀` to get "
+             "`x = x₀/b + h`, then compute `y = ay₀ + k`. Substitute that new x into "
+             "the transformed formula; the result must be the mapped y."),
         ],
         "worked": {
             "title": "Two formulas, described and checked",
-            "intro": ["The first combines every vertical move; the second is the "
-                      "horizontal case that has to be factored."],
+            "intro": ["The first maps three landmarks of `|x|`; the second factors "
+                      "the input before moving three points of `x³`."],
             "lines": [
-                "1.  y = -2(x - 3)^2 + 5        parent  y = x^2",
+                "1.  g(x) = -2|x - 3| + 5        parent f(x) = |x|",
                 "",
                 "        a = -2   b = 1   h = 3   k = 5",
                 "        right 3, stretch vertically by 2, flip down, up 5",
-                "        vertex (0, 0)  ->  (3, 5)",
+                "        point map:  (x0, y0) -> (x0 + 3, -2y0 + 5)",
                 "",
-                "        check   x = 4:   -2(4 - 3)^2 + 5 = -2(1) + 5 =  3",
-                "                x = 2:   -2(2 - 3)^2 + 5 = -2(1) + 5 =  3",
-                "                x = 0:   -2(0 - 3)^2 + 5 = -2(9) + 5 = -13",
+                "        ( 0, 0) -> (3, 5)       check g(3) = -2|0| + 5 = 5",
+                "        (-1, 1) -> (2, 3)       check g(2) = -2| -1 | + 5 = 3",
+                "        ( 1, 1) -> (4, 3)       check g(4) = -2|  1 | + 5 = 3",
                 "",
-                "        wrong ways to get the last one:",
-                "                -2(0^2 - 3^2) + 5 = -2(-9) + 5 =  23     squared termwise",
-                "                (-2(0 - 3))^2 + 5 =     6^2  + 5 =  41   multiplied first",
+                "        the corner (0, 0) becomes (3, 5); equal heights remain equal",
                 "",
-                "2.  y = sqrt(2x + 6) - 1       parent  y = sqrt(x)",
+                "2.  r(x) = f(2x + 6)            parent f(x) = x^3",
                 "",
-                "        factor:  sqrt(2(x + 3)) - 1",
-                "        a = 1   b = 2   h = -3   k = -1",
-                "        squash horizontally by 1/2, left 3, down 1",
-                "        start   (0, 0)  ->  (-3, -1)",
+                "        factor:  f(2(x + 3))",
+                "        a = 1   b = 2   h = -3   k = 0",
+                "        point map:  (x0, y0) -> (x0/2 - 3, y0)",
                 "",
-                "        check   x = -3:  sqrt(0) - 1 = -1                 the endpoint",
-                "                x = -1:  sqrt(4) - 1 =  1",
-                "                x =  5:  sqrt(16) - 1 = 3",
-                "        domain  2x + 6 >= 0  ->  x >= -3   agrees with left 3",
+                "        ( 0,  0) -> (  -3,  0)    check 2(-3)   + 6 =  0",
+                "        ( 1,  1) -> (-5/2,  1)    check 2(-5/2) + 6 =  1",
+                "        (-1, -1) -> (-7/2, -1)    check 2(-7/2) + 6 = -1",
             ],
             "after": [
-                "In the first formula the vertex is readable without any arithmetic, "
-                "which is the point of the template form. In the second the domain "
-                "and the shift are two views of one fact, and they agree: the curve "
-                "starts at `x = −3` because it has been moved three to the left.",
-                "The two wrong lines under the first example produce `23` and `41`, "
-                "both from misplacing the square. Neither is a sign error, so "
-                "checking the sign of the answer would not catch either one. "
-                "Substituting a second input, `x = 6`, gives `−13` again and confirms "
-                "the symmetry about `x = 3`.",
-                "The domain check in the second example is the cheapest verification "
-                "available for any horizontal transformation of a root. If the domain "
-                "and the described shift disagree, the factoring was wrong.",
+                "The first point map handles all four constants without asking the "
+                "learner to picture four moves at once. Equal parent heights at `−1` "
+                "and `1` become equal image heights at `2` and `4`, a built-in check.",
+                "The second formula shows why factoring comes before naming `h`. The "
+                "raw `6` disappears into `2(x + 3)`, and each direct input check "
+                "confirms the half-width and the shift left by `3`.",
+                "For a faded point map, suppose `(2, −1)` is on `y = f(x)` and "
+                "`q(x) = 3f(2(x + 1)) − 4`. The supplied inside equation is "
+                "`2(x + 1) = 2`. Solve for the new x, compute the new y, and verify "
+                "the mapped point by substituting its x into the displayed rule.",
             ],
         },
         "quiz_title": "Which way does it move",
         "quiz": [
-            {"q": "The graph of `y = f(x − 4)` is the graph of `y = f(x)` moved which way?",
-             "a": ["Right `4`", "Left `4`", "Up `4`", "Down `4`"],
-             "c": 0,
-             "why": "The point `(t, f(t))` reappears where `x − 4 = t`, that is at "
-                    "`x = t + 4`, so every point moves four to the right. The minus "
-                    "sign suggests left, which is why this is the most missed fact in "
+            {"q": "The graph of `y = f(x + 5)` is the graph of `y = f(x)` moved which way?",
+             "a": ["Right `5`", "Left `5`", "Up `5`", "Down `5`"],
+             "c": 1,
+             "why": "The point `(t, f(t))` reappears where `x + 5 = t`, that is at "
+                    "`x = t − 5`, so every point moves five to the left. The plus "
+                    "sign suggests right, which is why this is the most missed fact in "
                     "the lesson. Up and down are changes made outside the function, "
-                    "and `−4` is inside it."},
-            {"q": "What is the `y`-intercept of `y = −2(x − 3)² + 5`?",
-             "a": ["`−13`", "`23`", "`41`", "`5`"],
+                    "and `+5` is inside it."},
+            {"q": "The point `(4, −2)` lies on `y = f(x)`. Where does it land on "
+                  "`y = 3f(x − 5) + 1`?",
+             "a": ["`(9, −5)`", "`(−1, −5)`", "`(9, −7)`", "`(4, −5)`"],
              "c": 0,
-             "why": "At `x = 0`, `(0 − 3)² = 9`, so `−2(9) + 5 = −13`. `23` comes "
-                    "from squaring term by term, `0² − 3² = −9`, then `−2(−9) + 5`. "
-                    "`41` comes from multiplying the `−2` in before squaring, giving "
-                    "`(6)² + 5`. `5` is the output at the vertex, `x = 3`, not at "
-                    "`x = 0`."},
-            {"q": "Starting from `y = √x`, which description reaches `y = √(2x + 6)`?",
-             "a": ["Squash horizontally by a factor of `1/2`, then shift left `3`",
-                   "Shift left `3`, then squash horizontally by a factor of `1/2`",
-                   "Squash horizontally by a factor of `1/2`, then shift left `6`",
-                   "Stretch horizontally by a factor of `2`, then shift left `3`"],
+             "why": "Solve `x − 5 = 4` to get the new input `x = 9`, and compute "
+                    "`3(−2) + 1 = −5`, so the image is `(9, −5)`. `−1` reads the "
+                    "inside shift forwards; `−7` subtracts the outside `1`; `(4, −5)` "
+                    "changes only the output."},
+            {"q": "Which description matches `y = f(3x + 6)`?",
+             "a": ["Squash horizontally by `1/3`, then shift left `2`",
+                   "Stretch horizontally by `3`, then shift left `2`",
+                   "Squash horizontally by `1/3`, then shift left `6`",
+                   "Shift right `2`, with no horizontal scaling"],
              "c": 0,
-             "why": "`√(2x + 6) = √(2(x + 3))`, so once the `2` is factored out the "
-                    "shift is `3`. Shifting first gives `√(x + 3)` and then "
-                    "`√(2x + 3)`. Squashing first and shifting `6` gives "
-                    "`√(2(x + 6)) = √(2x + 12)`. Stretching instead of squashing "
-                    "gives `√((x + 3)/2)`. Shifting left `6` <em>first</em> and "
-                    "squashing second also lands on `√(2x + 6)`, which is why the "
-                    "order and the number have to be quoted together."},
+             "why": "Factor the input: `3x + 6 = 3(x + 2)`. Thus `b = 3` gives "
+                    "width factor `1/3`, and `h = −2` shifts left `2`. The second "
+                    "uses `b` instead of its reciprocal, the third reads the unfactored "
+                    "constant as the shift, and the fourth reverses the direction and "
+                    "drops the scaling."},
         ],
         "mistakes": [
             ("Reading a subtraction inside as a shift left",
@@ -1051,9 +1027,8 @@ LESSONS = [
              "direction is in doubt, that one line settles it."),
             ("Reading the number beside x as the shift",
              "In `f(2x + 6)` the shift is `3`, not `6`, because the input must be "
-             "written as `2(x + 3)` first. For a root there is a free check: the "
-             "domain of `√(2x + 6)` starts at `−3`, and a shift of `6` would have "
-             "started it at `−6`."),
+             "written as `2(x + 3)` first. Check a parent point: input `0` moves to "
+             "`−3`, because `2(−3) + 6 = 0`; a supposed shift of `6` fails that test."),
             ("Calling f(2x) a stretch by 2",
              "It is a squash by `1/2`. The graph reaches at `x = 1` what the parent "
              "reached at `x = 2`, so horizontal distances are halved. The factor "
@@ -1061,15 +1036,15 @@ LESSONS = [
         ],
         "standard": ("Finish when you can go from formula to described graph and "
                      "back, including the case where the input has a coefficient.",
-                     "Given `y = a f(b(x − h)) + k` you should name the parent, list "
-                     "the four moves with directions and factors, and locate the "
-                     "image of one landmark point such as a vertex, a corner or an "
-                     "endpoint. Given a described graph you should produce the "
-                     "formula. The test of real understanding is `√(2x + 6)`: shift "
-                     "`3` after factoring, confirmed by a domain starting at `−3`."),
+                     "Given a supplied graph and `y = a f(b(x − h)) + k`, you should "
+                     "factor the input, map at least three known points with "
+                     "`(x₀/b + h, ay₀ + k)`, and verify one in the displayed rule. "
+                     "Given `f(4) = −2`, for example, you should locate the matching "
+                     "point on `3f(2(x + 1)) − 4` without needing to know any new "
+                     "parent-function family."),
         "note": "Every transformation here is a composition in disguise: `f(x − 3)` "
                 "is `f` applied to the output of the rule that sends `x` to `x − 3`. "
-                "Lesson 12 makes that "
+                "Lesson 13 makes that "
                 "explicit and general, which is why the horizontal moves will stop "
                 "feeling like an exception once composition is in place.",
     },
@@ -1094,7 +1069,7 @@ LESSONS = [
         ],
         "key_label": "The definition and its three consequences",
         "concepts_intro": (
-            "Lesson 11's horizontal shifts were compositions written informally. "
+            "Lesson 12's horizontal shifts were compositions written informally. "
             "Here the operation gets its own symbol and its own rules."
         ),
         "concepts": [
@@ -1104,10 +1079,9 @@ LESSONS = [
              "English reading order, and that mismatch is the whole difficulty. "
              "`f(g(x))` is the same statement with the order visible."),
             ("Order changes the answer",
-             "With `f(x) = 2x + 3` and `g(x) = x² − 1`, `(f ∘ g)(x) = 2x² + 1` and "
-             "`(g ∘ f)(x) = 4x² + 12x + 8`. At `x = 2` they give `9` and `48`. "
-             "Composition is not commutative, and the two composites usually do not "
-             "even have the same shape."),
+             "With `f(x) = 2x + 3` and `g(x) = x − 4`, `(f ∘ g)(x) = 2x − 5` and "
+             "`(g ∘ f)(x) = 2x − 1`. At `x = 2` they give `−1` and `3`. Composition "
+             "is not commutative even when both functions and both composites are lines."),
             ("The domain is decided in two stages",
              "An input must first be acceptable to `g`, and then `g(x)` must be "
              "acceptable to `f`. Both tests happen on the original expression, "
@@ -1115,7 +1089,7 @@ LESSONS = [
              "of the first stage."),
         ],
         "read_title": "Building a composite and finding where it is defined",
-        "read_intro": "The definition, why order matters, how the domain is assembled, and how to take a composite apart.",
+        "read_intro": "The definition, why order matters, how the domain is assembled, and why simplification cannot enlarge it.",
         "body": [
             ("def", ("Composition",
                      "Given functions `f` and `g`, the <strong>composite</strong> "
@@ -1129,32 +1103,25 @@ LESSONS = [
                      "is also correct but is easier to say without thinking about "
                      "which one moves first.")),
             ("h3", "Computing a composite"),
-            ("p", "Substitution again, exactly as in lesson 8, with a whole function "
-                  "in the slot. Take `f(x) = 2x + 3` and `g(x) = x² − 1`."),
+            ("p", "Substitution again, exactly as in lesson 9, with a whole function "
+                  "in the slot. Take `f(x) = 2x + 3` and `g(x) = x − 4`."),
             ("math", [
-                "(f o g)(x) = f(g(x)) = f(x^2 - 1)",
-                "           = 2(x^2 - 1) + 3",
-                "           = 2x^2 - 2 + 3   =   2x^2 + 1",
+                "(f o g)(x) = f(g(x)) = f(x - 4)",
+                "           = 2(x - 4) + 3",
+                "           = 2x - 8 + 3   =   2x - 5",
                 "",
                 "(g o f)(x) = g(f(x)) = g(2x + 3)",
-                "           = (2x + 3)^2 - 1",
-                "           = 4x^2 + 12x + 9 - 1   =   4x^2 + 12x + 8",
+                "           = (2x + 3) - 4",
+                "           = 2x - 1",
                 "",
-                "at x = 2     g(2) = 3,  f(3) = 9        (f o g)(2) = 9",
-                "             f(2) = 7,  g(7) = 48       (g o f)(2) = 48",
+                "at x = 2     g(2) = -2,  f(-2) = -1     (f o g)(2) = -1",
+                "             f(2) = 7,   g(7) = 3       (g o f)(2) = 3",
             ]),
-            ("p", "Both composites are quadratics and neither is the other. The "
+            ("p", "Both composites are lines and they are still different functions. The "
                   "check at `x = 2` is worth doing every time a composite is built: "
                   "evaluate step by step through the two functions, then evaluate the "
-                  "combined formula, and confirm they agree. Nine against nine "
-                  "catches an expansion error immediately."),
-            ("thm", ("Composition is associative but not commutative",
-                     "`(f ∘ g) ∘ h` and `f ∘ (g ∘ h)` are the same function: both "
-                     "send `x` to `f(g(h(x)))`, so brackets around a chain of "
-                     "compositions never matter. `f ∘ g` and `g ∘ f`, by contrast, "
-                     "are usually different, and when they do agree it is a fact "
-                     "about those particular functions &mdash; as in lesson 13, where "
-                     "agreeing on both sides is the definition of an inverse.")),
+                  "combined formula, and confirm they agree. `−1` against `−1` "
+                  "catches an order or substitution error immediately."),
             ("h3", "The domain of a composite"),
             ("p", "Two conditions, applied in order. The input must be legal for the "
                   "inner function, and the inner function's output must be legal for "
@@ -1173,63 +1140,52 @@ LESSONS = [
                   "and the subtraction cannot cause a failure, so only the root's own "
                   "condition applies."),
             ("h3", "The trap: simplifying before finding the domain"),
-            ("p", "Take `f(x) = 1/(x − 1)` and `g(x) = 1/x`. The composite simplifies "
-                  "to something whose formula has forgotten where it came from."),
+            ("p", "Take `f(x) = x²` and `g(x) = √x`. The composite simplifies to a "
+                  "formula whose appearance has forgotten the inner function's domain."),
             ("math", [
-                "(f o g)(x) = f(1/x) = 1/((1/x) - 1)",
-                "                    = 1/((1 - x)/x)",
-                "                    = x/(1 - x)",
+                "(f o g)(x) = f(sqrt(x)) = (sqrt(x))^2 = x",
                 "",
-                "check x = 2:   1/((1/2) - 1) = 1/(-1/2) = -2        2/(1 - 2) = -2",
+                "stage 1:  g(x) = sqrt(x) needs x >= 0",
+                "stage 2:  f accepts every output from g",
                 "",
-                "domain     x =/= 0    g needs it",
-                "           x =/= 1    g(x) = 1 there, and f rejects 1",
+                "domain of f o g:  [0, inf), even though the final formula is x",
                 "",
-                "but x/(1 - x) at x = 0 returns 0, an input the composite never had",
+                "the other order:  (g o f)(x) = sqrt(x^2) = |x|, domain (-inf, inf)",
             ]),
-            ("p", "The simplified formula accepts `0` and the composite does not. "
-                  "This is the same phenomenon as the cancelled factor in lesson 9, "
-                  "and the same rule applies: the domain belongs to the expression as "
-                  "originally built, not to whatever it tidies into. Find the domain "
-                  "before simplifying, or find it from the two-stage test, but never "
-                  "from the final line."),
-            ("h3", "Taking a composite apart"),
-            ("example", ("Three decompositions",
-                         "The reverse skill matters in calculus, where the chain rule "
-                         "needs the decomposition rather than the composite. Given "
-                         "`h(x) = √(3x + 1)`, ask what happens last: a square root. "
-                         "That is the outer function, and what it acts on, `3x + 1`, "
-                         "is the inner one.",
-                         "`h(x) = √(3x + 1)` is `f(g(x))` with `g(x) = 3x + 1` and "
-                         "`f(x) = √x`. `h(x) = (x² + 1)³` is `f(g(x))` with "
-                         "`g(x) = x² + 1` and `f(x) = x³`. `h(x) = 1/(x + 4)²` is "
-                         "`f(g(x))` with `g(x) = x + 4` and `f(x) = 1/x²`. "
-                         "Decompositions are not unique &mdash; the last one is also "
-                         "`f(x) = 1/x` after `g(x) = (x + 4)²` &mdash; so any pair "
-                         "that recomposes correctly is a right answer.")),
+            ("p", "The simplified formula `x` accepts negative inputs, but the "
+                  "composite does not: `g(−1)` never produces a real number, so `f` "
+                  "is never reached. This needs no cancellation or rational-function "
+                  "technique. It follows directly from the two stages: find the domain "
+                  "before simplifying, and carry it beside the simplified rule."),
         ],
         "lab": ("funcops", {
             "mode": "compose",
+            "presets": [
+                ("Two lines: order changes the intercept", "2x + 3|x - 4"),
+                ("Two shifts: this pair commutes", "x + 1|x + 2"),
+                ("A root after a shift", "sqrt(x)|x - 5"),
+                ("A square after a root: hidden domain", "x^2|sqrt(x)"),
+            ],
             "panel_title": "Both orders, side by side",
-            "panel_intro": "Enter `f` and `g`; the lab builds `f ∘ g` and `g ∘ f` "
-                           "together and traces a chosen input through each chain one "
-                           "step at a time. The domain readout shows which of the two "
-                           "stages rejected an input.",
+            "panel_intro": "Predict both orders before choosing a preset. The lab "
+                           "substitutes each whole inner rule, compares the outputs at "
+                           "sample inputs, and carries the composite domain beside any "
+                           "simplified formula.",
         }),
         "steps_title": "Building a composite safely",
         "steps_intro": "Four steps. The domain step comes before the simplifying step, and that ordering is the point.",
         "steps": [
             ("Write the composite with the inner function in brackets",
              "`f(g(x))` first, on its own line, before any substitution. For "
-             "`(f ∘ g)` with `g(x) = x² − 1`, that is `f(x² − 1)`. Seeing the inner "
+             "`(f ∘ g)` with `g(x) = x − 4`, that is `f(x − 4)`. Seeing the inner "
              "expression sitting in the slot prevents the order from flipping."),
             ("Substitute into every occurrence of the variable",
-             "Same discipline as lesson 8: brackets around the whole inner "
-             "expression, in every slot. `(2x + 3)² − 1`, not `2x + 3² − 1`."),
+             "Same discipline as lesson 9: brackets around the whole inner "
+             "expression, in every slot. `2(x − 4) + 3`, not `2x − 4 + 3`."),
             ("Find the domain from the unsimplified form",
              "Ask which inputs `g` rejects, then which of `g`'s outputs `f` rejects. "
-             "For `f(x) = 1/(x − 1)` after `g(x) = 1/x`, that is `x ≠ 0` from the "
-             "first test and `x ≠ 1` from the second."),
+             "For `f(x) = x²` after `g(x) = √x`, the inner root requires `x ≥ 0`; "
+             "the outer square adds no restriction."),
             ("Simplify, then check one input end to end",
              "Now expand and collect. Then pick an input, run it through `g` and `f` "
              "separately, and compare with the simplified formula. Disagreement "
@@ -1241,82 +1197,75 @@ LESSONS = [
             "intro": ["The first pair shows that order matters. The second shows that "
                       "the simplified formula cannot be trusted for a domain."],
             "lines": [
-                "f(x) = 2x + 3        g(x) = x^2 - 1",
+                "f(x) = 2x + 3        g(x) = x - 4",
                 "",
-                "(f o g)(x) = f(x^2 - 1) = 2(x^2 - 1) + 3 = 2x^2 + 1",
-                "(g o f)(x) = g(2x + 3) = (2x + 3)^2 - 1 = 4x^2 + 12x + 8",
+                "(f o g)(x) = f(x - 4) = 2(x - 4) + 3 = 2x - 5",
+                "(g o f)(x) = g(2x + 3) = (2x + 3) - 4 = 2x - 1",
                 "",
                 "         x        (f o g)(x)       (g o f)(x)",
-                "         0             1                8",
-                "         2             9               48",
-                "        -1             3                0",
+                "         0            -5               -1",
+                "         2            -1                3",
+                "        -1            -7               -3",
                 "",
-                "step by step at x = 2:   g(2) = 3   then f(3) = 9        agrees",
-                "                         f(2) = 7   then g(7) = 48       agrees",
+                "step by step at x = 2:   g(2) = -2  then f(-2) = -1      agrees",
+                "                         f(2) = 7   then g(7) = 3         agrees",
                 "",
-                "both are defined for every real number: no roots, no denominators",
+                "both orders are defined for every real number",
                 "",
                 "-----------------------------------------------------------------",
                 "",
-                "f(x) = 1/(x - 1)     g(x) = 1/x",
+                "p(x) = x^2           r(x) = sqrt(x)",
                 "",
-                "(f o g)(x) = 1/((1/x) - 1) = 1/((1 - x)/x) = x/(1 - x)",
+                "(p o r)(x) = (sqrt(x))^2 = x",
                 "",
-                "domain, stage 1:   g needs x =/= 0",
-                "domain, stage 2:   f rejects input 1, and g(x) = 1 when x = 1",
-                "domain:            every x except 0 and 1",
+                "domain, stage 1:   r needs x >= 0",
+                "domain, stage 2:   p accepts every output",
+                "domain:            [0, inf), carried beside the simplified x",
                 "",
-                "check x = 2:  g(2) = 1/2,  f(1/2) = 1/(-1/2) = -2",
-                "              x/(1 - x) = 2/(-1) = -2                    agrees",
+                "the other order:   (r o p)(x) = sqrt(x^2) = |x|",
+                "domain:            every real x",
             ],
             "after": [
-                "The table is the honest way to show that order matters: at three "
-                "inputs the two composites give six different-looking numbers, and "
-                "they agree nowhere in the table. Setting `2x² + 1 = 4x² + 12x + 8` "
-                "gives `2x² + 12x + 7 = 0`, whose discriminant is "
-                "`144 − 56 = 88`, so the two curves do cross at two irrational "
-                "inputs. Different functions can still share points. The `0` in the "
-                "last row is not one of them: `4x² + 12x + 8` factors as "
-                "`4(x + 1)(x + 2)`, so `x = −1` is a root of `g ∘ f` alone.",
-                "In the second example the simplified formula `x/(1 − x)` is "
-                "perfectly happy at `x = 0`, returning `0`. The composite is not "
-                "defined there at all, because `g(0)` does not exist and `f` is never "
-                "reached. This is why stage 1 of the domain test is not optional.",
+                "The table is the honest way to show that order matters. Both results "
+                "are lines with the same slope, so a quick glance could mistake them; "
+                "the intermediate values reveal which constant was applied first.",
+                "In the second example the simplified formula `x` is perfectly happy "
+                "at `x = −1`, but the composite is not defined there because "
+                "`√(−1)` is not real and the outer square is never reached. This is "
+                "why stage 1 of the domain test is not optional.",
                 "Both checks were done by running an input through the two functions "
                 "in sequence. That is slower than trusting the algebra and it is the "
-                "only verification that tests the order as well as the expansion.",
+                "only verification that tests the order as well as the simplification.",
+                "For a faded composite, take `u(x) = 3x − 1` and `v(x) = x + 2`. "
+                "The first line `(u ∘ v)(x) = u(x + 2)` is supplied. Finish both "
+                "orders, find each domain, and run `x = −1` through each chain before "
+                "checking the two simplified formulas.",
             ],
         },
         "quiz_title": "Order, value and domain",
         "quiz": [
-            {"q": "With `f(x) = 2x + 3` and `g(x) = x² − 1`, what is `(f ∘ g)(2)`?",
-             "a": ["`9`", "`48`", "`21`", "`10`"],
+            {"q": "With `f(x) = 3x − 1` and `g(x) = x + 2`, what is `(f ∘ g)(1)`?",
+             "a": ["`8`", "`4`", "`5`", "`6`"],
              "c": 0,
-             "why": "`g` runs first: `g(2) = 3`, then `f(3) = 9`. `48` is "
-                    "`(g ∘ f)(2)`, the same two functions in the wrong order. `21` is "
-                    "`f(2)·g(2) = 7·3`, reading the circle as multiplication. `10` is "
-                    "`f(2) + g(2) = 7 + 3`, reading it as addition."},
-            {"q": "With `f(x) = √x` and `g(x) = x − 5`, what is the domain of `f ∘ g`?",
-             "a": ["`[5, ∞)`", "`[0, ∞)`", "`(−∞, 5]`", "`[−5, ∞)`"],
+             "why": "`g` runs first: `g(1) = 3`, then `f(3) = 8`. `4` is "
+                    "`(g ∘ f)(1)`: `f(1) = 2`, then `g(2) = 4`. `5` is the sum "
+                    "`f(1) + g(1)`, while `6` is their product; both replace composition "
+                    "with a different operation."},
+            {"q": "With `f(x) = √x` and `g(x) = 2x − 6`, what is the domain of `f ∘ g`?",
+             "a": ["`[3, ∞)`", "`[0, ∞)`", "`(−∞, 3]`", "`[−3, ∞)`"],
              "c": 0,
-             "why": "`(f ∘ g)(x) = √(x − 5)`, which needs `x − 5 ≥ 0`, so `x ≥ 5`. "
-                    "`[0, ∞)` is the domain of the other order, `√x − 5`. "
-                    "`(−∞, 5]` solves the inequality with the direction reversed. "
-                    "`[−5, ∞)` composes the wrong way inside the root, as though the "
-                    "composite were `√(x + 5)`."},
-            {"q": "With `f(x) = 1/(x − 1)` and `g(x) = 1/x`, the composite `f ∘ g` "
-                  "simplifies to `x/(1 − x)`. What is its domain?",
-             "a": ["Every `x` with `x ≠ 1`",
-                   "Every `x` with `x ≠ 0` and `x ≠ 1`",
-                   "Every `x` with `x ≠ 0`",
-                   "Every real number"],
+             "why": "`(f ∘ g)(x) = √(2x − 6)`, which needs `2x − 6 ≥ 0`, so "
+                    "`x ≥ 3`. `[0, ∞)` keeps the outer root's usual domain without "
+                    "accounting for `g`; `(−∞, 3]` reverses the inequality; and "
+                    "`[−3, ∞)` moves the `−6` with the wrong sign before dividing."},
+            {"q": "With `p(x) = x²` and `r(x) = √x`, the composite `p ∘ r` simplifies "
+                  "to `x`. What is its domain?",
+             "a": ["Every real number", "`[0, ∞)`", "`(0, ∞)`", "`(−∞, 0]`"],
              "c": 1,
-             "why": "Two stages exclude two inputs. `g` is undefined at `0`, so the "
-                    "chain never starts there; and `g(1) = 1`, which `f` rejects. The "
-                    "first choice reads the domain off the simplified formula, which "
-                    "has lost the `x ≠ 0` and would happily return `0` at `x = 0`. "
-                    "The third keeps only the inner condition. The fourth ignores "
-                    "both."},
+             "why": "The inner function runs first, and `r(x) = √x` needs `x ≥ 0`; "
+                    "the outer square adds no restriction. Every-real reads only the "
+                    "simplified formula, `(0, ∞)` wrongly excludes `√0`, and "
+                    "`(−∞, 0]` reverses the square-root condition."},
         ],
         "mistakes": [
             ("Composing in the written order",
@@ -1324,26 +1273,26 @@ LESSONS = [
              "notation reads right to left. Saying \"f after g\" out loud before "
              "computing puts the order back the right way."),
             ("Treating the circle as multiplication",
-             "`(f ∘ g)(2)` is `9` for the functions above, while `f(2)·g(2)` is `21`. "
+             "`(f ∘ g)(1)` is `8` for `f(x) = 3x − 1`, `g(x) = x + 2`, while "
+             "`f(1)·g(1)` is `6`. "
              "The circle is a small raised ring and the multiplication dot is a small "
              "raised dot, which does not help; the difference is in what the symbol "
              "does, not how it looks."),
             ("Reading the composite's domain off the simplified formula",
-             "Simplifying can cancel exactly the factor that recorded a restriction. "
-             "`x/(1 − x)` accepts `0`; the composite it came from does not, because "
-             "`g(0)` is undefined. Test the two stages on the original expressions."),
+             "Simplifying can erase the operation that recorded a restriction. "
+             "`(√x)²` simplifies to `x`, but negative inputs never pass through the "
+             "inner root. Test the two stages on the original expressions."),
         ],
         "standard": ("Finish when you can build either composite, state its domain "
                      "from the two-stage test rather than from the simplified "
-                     "formula, and decompose a given function into an inner and an "
-                     "outer part.",
+                     "formula, and verify the order at a chosen input.",
                      "Given two functions you should produce `f ∘ g` and `g ∘ f`, "
                      "show they differ by evaluating both at a specific input, and "
                      "give each domain with the excluded values justified by which "
-                     "stage rejected them. Decomposing `√(3x + 1)` into `√x` after "
-                     "`3x + 1` should be immediate; it is the skill the chain rule "
-                     "will assume."),
-        "note": "Composition is the machinery lesson 13 needs. An inverse is defined "
+                     "stage rejected them. One independent pair should be linear; a "
+                     "second should include a square root whose restriction survives "
+                     "simplification."),
+        "note": "Composition is the machinery lesson 14 needs. An inverse is defined "
                 "by what it does under composition &mdash; `f⁻¹ ∘ f` and `f ∘ f⁻¹` "
                 "both have to be the function that leaves its input alone &mdash; so "
                 "the order sensitivity established here is what makes that definition "
@@ -1358,8 +1307,8 @@ LESSONS = [
         "one_line": "Undoing a function, and the restriction that is usually needed.",
         "summary": (
             "An inverse sends every output back to the input it came from. It exists "
-            "only when no two inputs share an output, so most functions have to be "
-            "cut down to a piece before they have one. The superscript `−1` is a "
+            "only when no two inputs share an output; a function that repeats outputs "
+            "must be cut down to a one-to-one piece first. The superscript `−1` is a "
             "label, not an exponent."
         ),
         "key": [
@@ -1381,7 +1330,7 @@ LESSONS = [
              "how a candidate inverse is verified."),
             ("It exists exactly when f is one-to-one",
              "If two inputs share an output, the inverse would have to send that one "
-             "output back to two places, and lesson 7 ruled that out. `f(x) = x²` "
+             "output back to two places, and lesson 8 ruled that out. `f(x) = x²` "
              "sends `2` and `−2` both to `4`, so on all real numbers it has no "
              "inverse. On a graph, the horizontal line test decides it."),
             ("Restricting the domain is the usual repair",
@@ -1411,7 +1360,7 @@ LESSONS = [
                      "meets its graph more than once. A horizontal line is the set of "
                      "points sharing one output, so two intersections are two inputs "
                      "with the same output &mdash; exactly what one-to-one forbids.")),
-            ("p", "The pairing with lesson 7 is exact. The vertical line test asks "
+            ("p", "The pairing with lesson 8 is exact. The vertical line test asks "
                   "whether a graph is a function at all; the horizontal line test "
                   "asks whether that function can be run backwards. A graph that "
                   "passes both is a function with an inverse, and the second test "
@@ -1438,50 +1387,40 @@ LESSONS = [
                   "one they will not disagree. They start to matter as soon as a "
                   "restriction is involved, because a candidate can undo `f` on part "
                   "of the domain and fail elsewhere."),
-            ("h3", "A rational example"),
-            ("p", "The same three lines work when `y` appears in a denominator; the "
-                  "only extra step is collecting the `y` terms on one side and "
-                  "factoring."),
+            ("h3", "Verifying both directions"),
+            ("p", "The swap gives a candidate formula; composition proves it performs "
+                  "the promised undoing. For the line above, both directions use only "
+                  "the linear algebra already learned."),
             ("math", [
-                "f(x) = (2x + 1)/(x - 3)          domain x =/= 3",
+                "f⁻¹(f(x)) = ((3x - 7) + 7)/3",
+                "           = 3x/3",
+                "           = x",
                 "",
-                "  x = (2y + 1)/(y - 3)           swap",
-                "  x(y - 3) = 2y + 1              clear the denominator",
-                "  xy - 3x = 2y + 1",
-                "  xy - 2y = 3x + 1               all y terms on the left",
-                "  y(x - 2) = 3x + 1              factor",
-                "  y = (3x + 1)/(x - 2)",
-                "",
-                "f⁻¹(x) = (3x + 1)/(x - 2)        domain x =/= 2",
-                "",
-                "check   f(4) = 9/1 = 9          f⁻¹(9) = 28/7 = 4",
-                "        f(5) = 11/2             f⁻¹(11/2) = (35/2)/(7/2) = 5",
+                "f(f⁻¹(x)) = 3((x + 7)/3) - 7",
+                "           = x + 7 - 7",
+                "           = x",
             ]),
-            ("p", "The excluded value moved from `3` to `2`, and that is not a "
-                  "coincidence. The range of `f` is every value except `2`: setting "
-                  "`(2x + 1)/(x − 3) = 2` gives `2x + 1 = 2x − 6`, that is `1 = −6`, "
-                  "which no input satisfies. Since the domain of `f⁻¹` is the range "
-                  "of `f`, the `2` had to appear. When the two sets fail to match, "
-                  "one of them has been computed wrongly."),
+            ("p", "The first direction starts with an input of `f`; the second starts "
+                  "with an input of `f⁻¹`. A single numerical round trip can catch an "
+                  "error, but these two symbolic simplifications establish the claim "
+                  "for every real input of the two lines."),
             ("h3", "When the inverse does not exist"),
             ("p", "`f(x) = x²` on all real numbers fails the horizontal line test at "
                   "every positive height. The output `4` came from `2` and from `−2`, "
                   "and an inverse would have to choose. Writing `√x` and calling it "
                   "the inverse of `x²` quietly makes that choice without saying so."),
-            ("example", ("Restricting a parabola",
-                         "`f(x) = (x − 2)² + 1` on `x ≥ 2` is one-to-one, since the "
-                         "restriction keeps only the right half of the parabola. "
-                         "Swapping gives `x = (y − 2)² + 1`, so `(y − 2)² = x − 1` and "
-                         "`y − 2 = ±√(x − 1)`. The restriction `y ≥ 2` selects the "
-                         "positive root, so `f⁻¹(x) = 2 + √(x − 1)`, with domain "
-                         "`x ≥ 1`. Check: `f(5) = 10` and `2 + √9 = 5`. On the other "
-                         "half, `x ≤ 2`, the same working selects the negative root "
-                         "and gives `f⁻¹(x) = 2 − √(x − 1)`; there `f(−1) = 10` and "
-                         "`2 − √9 = −1`.",
+            ("example", ("Restricting a square",
+                         "`f(x) = x²` on `x ≥ 0` is one-to-one because the restriction "
+                         "keeps only the non-negative inputs. Swapping gives `x = y²`, "
+                         "so `y = ±√x`. The restriction `y ≥ 0` selects the positive "
+                         "root, giving `f⁻¹(x) = √x` with domain `x ≥ 0`. Check: "
+                         "`f(5) = 25` and `√25 = 5`. On the other half, `x ≤ 0`, the "
+                         "same swap selects `−√x`; there `f(−5) = 25` and "
+                         "`−√25 = −5`.",
                          "The `±` is where the restriction does its work. Without a "
                          "stated domain there is no way to choose a sign, and the two "
                          "choices are genuinely different functions undoing genuinely "
-                         "different halves of the parabola. Both are correct "
+                         "different halves of the square's graph. Both are correct "
                          "inverses; neither is the inverse of the unrestricted `f`, "
                          "which has none.")),
             ("ul", [
@@ -1500,11 +1439,17 @@ LESSONS = [
         ],
         "lab": ("funcops", {
             "mode": "inverse",
+            "presets": [
+                ("A line: f(x) = 2x + 3", "2x + 3"),
+                ("A square: needs a restriction", "x^2"),
+                ("A cube: one-to-one", "x^3"),
+                ("A constant: cannot be repaired on an interval", "3"),
+            ],
             "panel_title": "Reflect in the line y = x",
-            "panel_intro": "Enter a function; the lab draws it, draws the reflection "
-                           "in `y = x`, and reports whether that reflection is itself "
-                           "a function. Drag the domain markers to restrict `f` and "
-                           "watch the reflection become one.",
+            "panel_intro": "Predict whether the reflection will be a function, then "
+                           "choose a preset. For a square the lab displays the exact "
+                           "restriction it keeps and draws the discarded half dashed; "
+                           "there are no draggable domain controls.",
         }),
         "steps_title": "Finding an inverse",
         "steps_intro": "Test first, then swap. Finding a formula for something that does not exist is the failure this order prevents.",
@@ -1519,19 +1464,18 @@ LESSONS = [
              "the reflection in `y = x` carried out on the equation, and it is the "
              "only step where the two letters change roles."),
             ("Solve for y",
-             "Standard rearranging. When `y` appears more than once, as in a "
-             "rational function, collect the `y` terms on one side and factor. When a "
-             "square appears, the `±` arrives here, and the restriction from step 1 "
-             "decides the sign."),
+             "Use Course 2 rearranging for a line. When a square appears, the `±` "
+             "arrives here, and the restriction from step 1 decides which sign can "
+             "return inputs from the retained half."),
             ("State the domain, and verify both compositions",
              "The domain of `f⁻¹` is the range of `f`, which is a check as much as a "
              "statement: if the two do not match, something earlier is wrong. Then "
              "confirm `f⁻¹(f(a)) = a` and `f(f⁻¹(b)) = b` at one value each."),
         ],
         "worked": {
-            "title": "Three inverses, one of them needing a restriction",
-            "intro": ["A line, a rational function, and a parabola that has to be cut "
-                      "in half first."],
+            "title": "A line and a square restricted before inversion",
+            "intro": ["The line passes the horizontal test. The square does not until "
+                      "its domain is cut to one side of zero."],
             "lines": [
                 "1.  f(x) = 3x - 7",
                 "",
@@ -1539,37 +1483,26 @@ LESSONS = [
                 "        f⁻¹(x) = (x + 7)/3",
                 "        domain and range of both: every real number",
                 "        check   f(2) = -1    f⁻¹(-1) = 6/3 = 2",
+                "        compositions:",
+                "             f⁻¹(f(x)) = ((3x - 7) + 7)/3 = x",
+                "             f(f⁻¹(x)) = 3((x + 7)/3) - 7 = x",
                 "",
                 "        NOT the inverse:  1/(3x - 7)   at x = -1 gives -1/10",
                 "        NOT the inverse:  (x - 7)/3    at x = -1 gives -8/3",
                 "",
-                "2.  f(x) = (2x + 1)/(x - 3)          domain x =/= 3",
+                "2.  p(x) = x^2                    on x >= 0",
                 "",
-                "        x = (2y + 1)/(y - 3)             swap x and y",
-                "        x(y - 3) = 2y + 1",
-                "        xy - 3x  = 2y + 1",
-                "        xy - 2y  = 3x + 1",
-                "        y(x - 2) = 3x + 1",
-                "        f⁻¹(x) = (3x + 1)/(x - 2)    domain x =/= 2",
+                "        horizontal test: passes on the retained right half",
+                "        x = y^2   ->   y = +-sqrt(x)    swap and solve",
+                "        retained inputs have y >= 0, so choose +",
+                "        p⁻¹(x) = sqrt(x)                domain x >= 0",
                 "",
-                "        range of f is every value except 2:",
-                "            (2x + 1)/(x - 3) = 2  ->  2x + 1 = 2x - 6  ->  1 = -6",
-                "        so domain of f⁻¹ = range of f, as required",
+                "        check   p(5) = 25             p⁻¹(25) = 5",
+                "        p⁻¹(p(x)) = sqrt(x^2) = x     because x >= 0",
+                "        p(p⁻¹(x)) = (sqrt(x))^2 = x   because x >= 0",
                 "",
-                "        check   f(4) = 9       f⁻¹(9) = 28/7 = 4",
-                "",
-                "3.  f(x) = (x - 2)^2 + 1        on x >= 2",
-                "",
-                "        x = (y - 2)^2 + 1",
-                "        (y - 2)^2 = x - 1",
-                "        y - 2 = +- sqrt(x - 1)         restriction y >= 2 picks +",
-                "        f⁻¹(x) = 2 + sqrt(x - 1)       domain x >= 1",
-                "",
-                "        check   f(5) = 9 + 1 = 10     f⁻¹(10) = 2 + 3 = 5",
-                "                f(2) = 1              f⁻¹(1) = 2 + 0 = 2",
-                "",
-                "        on x <= 2 instead:  f⁻¹(x) = 2 - sqrt(x - 1)",
-                "                f(-1) = 9 + 1 = 10      2 - sqrt(9) = -1",
+                "        on x <= 0 instead:  p⁻¹(x) = -sqrt(x)",
+                "                p(-5) = 25              -sqrt(25) = -5",
             ],
             "after": [
                 "The two rejected candidates in the first example fail in two "
@@ -1578,14 +1511,15 @@ LESSONS = [
                 "order, but keeps the sign it arrived with: the `7` was subtracted "
                 "last, so it must be <em>added</em> back first. At `x = −1` that "
                 "candidate gives `−8/3` where the inverse gives `2`.",
-                "In the second example the range of `f` was computed independently "
-                "and then matched against the domain of `f⁻¹`. That is the cheapest "
-                "available check on the whole calculation, and it uses the third tool "
-                "from lesson 9 with the roles of the letters swapped.",
-                "The third example produces two different inverses from one formula. "
+                "The square example produces two different inverses from one formula. "
                 "Both check out, and which one is correct depends entirely on the "
-                "restriction that was stated. An answer of `f⁻¹(x) = 2 + √(x − 1)` "
-                "without a domain attached to `f` is incomplete, not merely untidy.",
+                "restriction that was stated. An answer of `p⁻¹(x) = √x` without a "
+                "domain attached to `p` is incomplete, not merely untidy.",
+                "For a faded inverse, let `g(x) = 5x + 2`. The swapped equation "
+                "`x = 5y + 2` is supplied. Solve for `y`, state the inverse's domain, "
+                "simplify both compositions symbolically, and use `g(−1) = −3` for "
+                "a numerical round trip. Then explain why the horizontal line "
+                "`h(x) = 4` cannot pass the same test.",
             ],
         },
         "quiz_title": "Undoing, and when it is possible",
@@ -1599,35 +1533,27 @@ LESSONS = [
              "c": 1,
              "why": "One-to-one fails: two inputs share an output, so running the "
                     "assignment backwards produces two outputs for the input `4`, "
-                    "which lesson 7 forbids. The first choice describes the range and "
+                    "which lesson 8 forbids. The first choice describes the range and "
                     "is true but irrelevant &mdash; `x³` has range every real number "
                     "and `√x` has range `[0, ∞)`, and both are invertible. The third "
                     "is a single value. The fourth is false as a criterion: `x³` is "
                     "not linear and does have an inverse."},
-            {"q": "For `f(x) = (2x + 1)/(x − 3)`, what is `f⁻¹(x)`?",
-             "a": ["`(3x + 1)/(x − 2)`",
-                   "`(x − 3)/(2x + 1)`",
-                   "`(3x − 1)/(x + 2)`",
-                   "`(x + 3)/(2x − 1)`"],
+            {"q": "For `f(x) = 4x + 5`, what is `f⁻¹(x)`?",
+             "a": ["`(x − 5)/4`", "`1/(4x + 5)`", "`(x + 5)/4`", "`4x − 5`"],
              "c": 0,
-             "why": "Swapping and solving gives `y(x − 2) = 3x + 1`. Test it: "
-                    "`f(4) = 9` and `(3·9 + 1)/(9 − 2) = 28/7 = 4`. The second choice "
-                    "is `1/f(x)`, the reciprocal rather than the inverse; at `x = 9` "
-                    "it gives `6/19`. The third and fourth flip individual signs "
-                    "during the rearrangement and give `26/11` and `12/17` at `x = 9` "
-                    "instead of `4`."},
-            {"q": "`f(x) = (x − 2)² + 1` is restricted to `x ≥ 2`. What is `f⁻¹`?",
-             "a": ["`f⁻¹(x) = 2 + √(x − 1)`",
-                   "`f⁻¹(x) = 2 − √(x − 1)`",
-                   "`f⁻¹(x) = √(x − 1) − 2`",
-                   "`f⁻¹(x) = √(x + 1) − 2`"],
-             "c": 0,
-             "why": "`(y − 2)² = x − 1` gives `y = 2 ± √(x − 1)`, and `y ≥ 2` selects "
-                    "the plus sign. Check with `f(5) = 10`: `2 + √9 = 5`. The second "
-                    "choice is the inverse of the other restriction, `x ≤ 2`, where "
-                    "`f(−1) = 10` and `2 − √9 = −1`. The third subtracts the `2` "
-                    "instead of adding it, giving `1` at `x = 10`. The fourth also "
-                    "shifts the wrong constant inside the root."},
+             "why": "Swapping gives `x = 4y + 5`, so `x − 5 = 4y` and "
+                    "`y = (x − 5)/4`. The second choice is the reciprocal, not the "
+                    "inverse; the third adds instead of undoing the added `5`; the "
+                    "fourth performs the two inverse operations in the wrong form."},
+            {"q": "`f(x) = x²` is restricted to `x ≤ 0`. What is `f⁻¹`?",
+             "a": ["`f⁻¹(x) = √x`", "`f⁻¹(x) = −√x`",
+                   "`f⁻¹(x) = x/2`", "The restriction still does not help"],
+             "c": 1,
+             "why": "Swapping gives `y = ±√x`, and the original restriction means "
+                    "the recovered value must be non-positive, so choose `−√x`. The "
+                    "positive root belongs to the `x ≥ 0` restriction; `x/2` treats "
+                    "a square as multiplication by two; and retaining one half does "
+                    "make the square one-to-one."},
         ],
         "mistakes": [
             ("Reading the superscript as an exponent",
@@ -1650,16 +1576,16 @@ LESSONS = [
         "standard": ("Finish when you test for one-to-one before hunting for a "
                      "formula, and can produce an inverse together with its domain "
                      "and the restriction it required.",
-                     "Given a line, a rational function or a restricted quadratic you "
-                     "should apply the swap method cleanly, including the collect-"
-                     "and-factor step when `y` appears twice and the sign choice when "
-                     "a square root appears. Quoting the domain of `f⁻¹` as the range "
-                     "of `f` and verifying both compositions at one value each is "
-                     "what turns a plausible formula into a checked one."),
+                     "Given a non-horizontal line or `x²` restricted to one half-axis, "
+                     "you should apply the swap method, state the inverse domain, make "
+                     "the sign choice forced by the restriction, and verify both "
+                     "compositions. Rational-function inverses and shifted quadratics "
+                     "wait for the courses that teach their algebra."),
         "note": "That completes the toolkit the course promised: notation, domain, "
-                "shape, composition and inverse. Lesson 14 returns to lines for one "
-                "last question, where the answer is not a curve but a region, and it "
-                "is the bridge into the systems of course 8.",
+                "shape, composition and inverse. The path can now use function "
+                "notation and inverse reasoning without smuggling in factoring, "
+                "rational-function algebra or the quadratic formula before their "
+                "own courses teach them.",
     },
 
     # ---------------------------------------------------------------- 14
@@ -1791,11 +1717,23 @@ LESSONS = [
         ],
         "lab": ("system", {
             "mode": "inequalities",
+            "presets": [
+                {"label": "solid boundary: 2x + 3y <= 12",
+                 "eq": ["2x + 3y <= 12", "", "", ""]},
+                {"label": "negative y coefficient: 4x - 2y > 8",
+                 "eq": ["4x - 2y > 8", "", "", ""]},
+                {"label": "boundary through the origin: y < 3x",
+                 "eq": ["y < 3x", "", "", ""]},
+                {"label": "vertical boundary: x >= -2",
+                 "eq": ["x >= -2", "", "", ""]},
+            ],
             "panel_title": "Boundary, then side",
-            "panel_intro": "Type an inequality; the lab draws the boundary solid or "
-                           "dashed and shades the half-plane. Click anywhere to test "
-                           "that point and see the substitution written out, "
-                           "including points that land on the boundary itself.",
+            "panel_intro": "Each preset uses one constraint box and leaves the others "
+                           "empty. The lab draws the boundary and shaded half-plane; it "
+                           "does not accept a clicked test point, so predict and "
+                           "substitute your own point before revealing the graph. Any "
+                           "multi-constraint corner summary is a Course 8 preview, not "
+                           "completion work here.",
         }),
         "steps_title": "Graphing a linear inequality",
         "steps_intro": "Boundary, style, test, shade. Doing the test before choosing a side keeps the symbol from misleading you.",
@@ -1863,27 +1801,30 @@ LESSONS = [
                 "rather than re-reading the picture. Shading is easy to draw on the "
                 "wrong side of a correctly drawn line, and only a substitution "
                 "catches it.",
+                "For a faded graph, use `3x − 2y ≤ 6`. The boundary "
+                "`3x − 2y = 6` is supplied. Decide its line style, find two points on "
+                "it, test the origin in the original inequality, shade the winning "
+                "side, and confirm with a second point. Finally solve for `y` and use "
+                "the reversed sign as an independent check on the shading.",
             ],
         },
         "quiz_title": "Boundaries and sides",
         "quiz": [
-            {"q": "Which point satisfies `4x − 2y &gt; 8`?",
-             "a": ["`(0, 0)`", "`(3, 1)`", "`(0, −4)`", "`(1, 2)`"],
+            {"q": "Which point satisfies `3x + y ≤ 5`?",
+             "a": ["`(0, 6)`", "`(2, 0)`", "`(1, 2)`", "`(3, −3)`"],
+             "c": 2,
+             "why": "At `(1, 2)`, `3(1) + 2 = 5`, and `≤` includes equality. The "
+                    "other three points each give `6`, so they lie on the non-solution "
+                    "side. Rejecting `(1, 2)` because it is on the boundary would read "
+                    "`≤` as a strict inequality."},
+            {"q": "Solving `2x − 4y &gt; 12` for `y` gives which inequality?",
+             "a": ["`y &gt; (1/2)x − 3`", "`y &lt; (1/2)x − 3`",
+                   "`y &gt; −(1/2)x + 3`", "`y &lt; −(1/2)x − 3`"],
              "c": 1,
-             "why": "`4(3) − 2(1) = 10`, and `10 &gt; 8` is true. `(0, 0)` gives `0`, "
-                    "and `(1, 2)` gives `4 − 4 = 0`; both are on the far side. "
-                    "`(0, −4)` gives exactly `8`, and `8 &gt; 8` is false: that point "
-                    "lies on the boundary, which a strict inequality excludes. It "
-                    "would be a solution if the symbol were `≥`."},
-            {"q": "Solving `4x − 2y &gt; 8` for `y` gives which inequality?",
-             "a": ["`y &gt; 2x − 4`", "`y &lt; 2x − 4`", "`y &gt; −2x + 4`", "`y &lt; −2x − 4`"],
-             "c": 1,
-             "why": "`−2y &gt; −4x + 8`, and dividing by `−2` reverses the direction, "
-                    "giving `y &lt; 2x − 4`. The first choice divides by `−2` without "
-                    "flipping, and it disagrees with the original at almost every "
-                    "point: `(0, −10)` satisfies `4x − 2y &gt; 8` but not "
-                    "`y &gt; 2x − 4`. The third and fourth also mishandle the signs "
-                    "when moving `4x` across."},
+             "why": "`−4y &gt; −2x + 12`, and division by `−4` reverses the sign and "
+                    "divides every term, giving `y &lt; (1/2)x − 3`. The first choice "
+                    "does not flip; the third loses the sign of the x-term and the "
+                    "constant; the fourth gets the constant sign wrong."},
             {"q": "A boundary line passes through the origin. Why can `(0, 0)` not be "
                   "used as the test point?",
              "a": ["Because the origin belongs to no quadrant",
@@ -1920,16 +1861,15 @@ LESSONS = [
         "standard": ("Finish when you can graph any linear inequality with the right "
                      "line style and the right side shaded, and can justify the side "
                      "by a substitution rather than by the symbol.",
-                     "Given `4x − 2y &gt; 8` you should draw a dashed line through "
-                     "`(2, 0)` and `(0, −4)`, shade below it, and explain that the "
-                     "region is below although the symbol is `&gt;` because solving "
-                     "for `y` divides by `−2`. You should also handle a boundary "
-                     "through the origin by choosing a different test point, and read "
-                     "an inequality back off a shaded picture."),
-        "note": "That closes the course. Lines came first, then the definition of a "
-                "function and everything a function has, and this last lesson puts "
-                "the two together by asking a line to describe a region instead of a "
-                "path. Course 8 stacks several of these regions on one set of axes; "
+                     "Given `5x − 2y ≥ 10` you should draw the solid boundary from two "
+                     "checked points, choose and substitute a test point, shade the "
+                     "correct half-plane, and confirm the result after solving for "
+                     "`y`. You should also handle a boundary through the origin by "
+                     "choosing a different test point, and read an inequality back off "
+                     "a shaded picture."),
+        "note": "That closes the line block. The next lesson changes the question from "
+                "which pairs solve a statement to whether each input has exactly one "
+                "output. Course 8 later stacks several shaded regions on one set of axes; "
                 "the overlap of the shaded half-planes is the feasible set that "
                 "linear programming optimises over.",
     },

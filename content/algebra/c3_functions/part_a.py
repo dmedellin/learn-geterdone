@@ -76,7 +76,7 @@ LESSONS = [
             ]),
             ("p", "Every inequality there is strict, so a point with a zero coordinate "
                   "lies on an axis and in no quadrant. The origin lies on both axes. "
-                  "This is not pedantry: in lesson 9 the same strictness decides whether "
+                  "This is not pedantry: in lesson 10 the same strictness decides whether "
                   "an endpoint belongs to a domain."),
             ("h3", "The graph of an equation"),
             ("def", ("Graph",
@@ -100,10 +100,12 @@ LESSONS = [
         ],
         "lab": ("grapher", {
             "mode": "plane",
-            "panel_title": "Place a point, read its pair",
-            "panel_intro": "Drag the point and watch the two coordinates change sign as "
-                           "it crosses an axis. The quadrant label is computed from the "
-                           "signs, so it reports none the moment a coordinate is zero.",
+            "panel_title": "Type points, then read their coordinates",
+            "panel_intro": "Predict each quadrant before choosing a preset or typing "
+                           "points. The panel plots the list, classifies every point "
+                           "from its signs, and computes exact midpoint and distance. "
+                           "Those last two rows are previews, not completion work here; "
+                           "the points are entered in a text box, not dragged.",
         }),
         "steps_title": "Plotting a point",
         "steps_intro": "Four moves. The first one is where the errors are.",
@@ -140,7 +142,11 @@ LESSONS = [
                 "The last line is worth the space it takes. Both points are in quadrant "
                 "I and both are built from the digits 3 and 5, so a swap survives every "
                 "check that looks only at signs. The only defence is reading the pair in "
-                "order the first time."
+                "order the first time.",
+                "For a faded rehearsal, plot `(−2, 4)`, `(3, −5)` and `(0, 6)`. The "
+                "first move is supplied: read each pair as across, then up. Finish by "
+                "naming the region of each point and testing all three in "
+                "`x − y = −6`; show the substitution that supports every verdict.",
             ],
         },
         "quiz_title": "Points and regions",
@@ -150,20 +156,24 @@ LESSONS = [
              "c": 1,
              "why": "`x` is negative and `y` is positive, which is the upper left. "
                     "Quadrant III would need both negative."},
-            {"q": "Is `(−3, 6)` on the graph of `2x + 3y = 12`?",
-             "a": ["Yes, because `−6 + 18 = 12`",
-                   "No, because `x` is negative",
-                   "No, because it is not in quadrant I",
-                   "Only if the axes use the same scale"],
+            {"q": "Is `(2, 1)` on the graph of `3x − 2y = 4`?",
+             "a": ["Yes, because `6 − 2 = 4`",
+                   "No, because the coordinates are unequal",
+                   "No, because it is in quadrant I",
+                   "Only if both axes use the same scale"],
              "c": 0,
-             "why": "Membership is decided by substitution and nothing else. The sign of "
-                    "a coordinate and the scale of the drawing are both irrelevant."},
-            {"q": "Which quadrant contains `(0, −3)`?",
-             "a": ["Quadrant III", "Quadrant IV", "None &mdash; it is on an axis",
-                   "Both III and IV"],
+             "why": "Substitution gives `3(2) − 2(1) = 6 − 2 = 4`, so the point is on "
+                    "the graph. Unequal coordinates do not matter, quadrant I contains "
+                    "many points on many graphs, and changing axis scale cannot change "
+                    "whether the arithmetic statement is true."},
+            {"q": "Which quadrant contains `(4, 0)`?",
+             "a": ["Quadrant I", "Quadrant IV", "None &mdash; it is on an axis",
+                   "Both I and IV"],
              "c": 2,
              "why": "The quadrant conditions are strict inequalities. A zero coordinate "
-                    "puts the point on an axis, which is in no quadrant."},
+                    "puts `(4, 0)` on the x-axis, which is in no quadrant. Calling it I "
+                    "or IV uses only the sign of `x`; calling it both treats an axis as "
+                    "part of the regions it separates."},
         ],
         "mistakes": [
             ("Reading the pair as (up, across)",
@@ -182,9 +192,9 @@ LESSONS = [
                      "six, classify each by sign, and say which are on the graph with "
                      "the arithmetic that proves it. That substitution test is the "
                      "definition every later lesson leans on, from the intercepts in "
-                     "lesson 2 to the inverse in lesson 13."),
+                     "lesson 2 to the inverse in lesson 14."),
         "note": "The convention that `x` comes first is arbitrary but universal, and it "
-                "is the same convention that makes `f(x)` in lesson 8 an input and the "
+                "is the same convention that makes `f(x)` in lesson 9 an input and the "
                 "value it returns an output. Once a pair is written `(input, output)` "
                 "the whole course reads in one direction.",
     },
@@ -285,7 +295,7 @@ LESSONS = [
                   "point comes from course 2, where it was one; with a second variable "
                   "present, `y` is unconstrained and the solution set is a whole line."),
             ("p", "Keep `x = −2` in view. It is the one shape that will fail the test in "
-                  "lesson 7, and knowing what it looks like now is what makes that test "
+                  "lesson 8, and knowing what it looks like now is what makes that test "
                   "obvious later."),
         ],
         "lab": ("line", {
@@ -293,8 +303,9 @@ LESSONS = [
             "panel_title": "Two points, and everything that follows from them",
             "panel_intro": "The line, its two intercepts and the table of values are all "
                            "computed from the points you choose, so moving a point moves "
-                           "all three together. The vertical preset shows what happens to "
-                           "a table when one x-value has to serve every y.",
+                           "all three together. Predict the table and intercepts first; "
+                           "the slope readout is a preview for lesson 3. The vertical "
+                           "preset shows one x-value serving every y.",
         }),
         "steps_title": "Graphing ax + by = c",
         "steps_intro": "Intercepts first, table as the fallback, third point always.",
@@ -338,7 +349,12 @@ LESSONS = [
                 "get `(12, 0)`, `(0, 8)` and `(6, 4)`, which pass the midway check just "
                 "as cleanly while every one of them is wrong for this equation. "
                 "Correctness still rests on the substitutions: a third point can reveal "
-                "an error, not certify its absence."
+                "an error, not certify its absence.",
+                "For a faded graph, start `3x − 2y = 12` with the supplied x-intercept "
+                "`(4, 0)`. Find the y-intercept, choose a third input that is not zero "
+                "or four, verify all three pairs in the original equation, and only "
+                "then draw the line. If the two intercepts collapse to one point on a "
+                "different problem, state the table value you would use instead.",
             ],
         },
         "quiz_title": "Lines from equations",
@@ -347,7 +363,9 @@ LESSONS = [
              "a": ["`(0, −6)`", "`(8, 0)`", "`(0, 8)`", "`(−6, 0)`"],
              "c": 1,
              "why": "Set `y = 0`: `3x = 24`, so `x = 8`, giving `(8, 0)`. Setting `x = 0` "
-                    "instead would give the y-intercept `(0, −6)`."},
+                    "instead gives the y-intercept `(0, −6)`. `(0, 8)` puts the right "
+                    "number on the wrong axis, while `(−6, 0)` copies the y-intercept's "
+                    "value into the x-intercept."},
             {"q": "What does the graph of `x = 5` look like?",
              "a": ["A single point at `(5, 0)`",
                    "A horizontal line through `(0, 5)`",
@@ -482,7 +500,7 @@ LESSONS = [
                   "them. \"No slope\" is ambiguous and best avoided; say `m = 0` for "
                   "horizontal and \"slope undefined\" for vertical. The distinction "
                   "returns with consequences in lesson 6, where the perpendicular rule "
-                  "needs both slopes to exist, and again in lesson 7."),
+                  "needs both slopes to exist, and again in lesson 8."),
             ("example", ("Four slopes",
                          "`(−2, 1)` to `(4, 10)`: `9/6 = 3/2`, rising. `(1, 7)` to "
                          "`(3, 1)`: `−6/2 = −3`, falling. `(−3, 4)` to `(6, 4)`: "
@@ -497,7 +515,7 @@ LESSONS = [
         "lab": ("line", {
             "mode": "slope",
             "panel_title": "Move two points, watch the ratio",
-            "panel_intro": "Drag either point and the rise, the run and the quotient are "
+            "panel_intro": "Change either point with the coordinate selectors and the rise, run and quotient are "
                            "recomputed exactly. Slide the two points along the line "
                            "without leaving it and the slope does not move &mdash; that "
                            "is the well-definedness theorem, checked rather than asserted.",
@@ -541,6 +559,10 @@ LESSONS = [
                 "your head is what keeps the run from coming out as 2.",
                 "That every pair gives `3/2` is the theorem in action. It is also the "
                 "reason lesson 5 can build the line from whichever point is convenient.",
+                "For a faded computation, use `(−5, 4)` and `(1, −8)`. The numerator "
+                "is supplied as `−8 − 4 = −12`; write the denominator in the matching "
+                "order, simplify the ratio, and check its sign against the right-and-down "
+                "movement. Then reverse both subtraction orders and confirm the same slope.",
             ],
         },
         "quiz_title": "Rise over run",
@@ -549,12 +571,15 @@ LESSONS = [
              "a": ["`3`", "`−3`", "`−1/3`", "`1/3`"],
              "c": 1,
              "why": "`(1 − 7)/(3 − 1) = −6/2 = −3`. The points move right and down, so a "
-                    "negative slope is expected; `−1/3` inverts the ratio."},
-            {"q": "What is the slope of the line through `(5, 2)` and `(5, 9)`?",
+                    "negative slope is expected. `3` loses the sign, `−1/3` inverts "
+                    "rise/run, and `1/3` makes both errors."},
+            {"q": "What is the slope of the line through `(−4, 6)` and `(−4, −1)`?",
              "a": ["`0`", "`7`", "Undefined", "`1`"],
              "c": 2,
-             "why": "The run is `5 − 5 = 0`, and division by zero is not defined. This is "
-                    "a vertical line. Zero would be the answer for a horizontal one."},
+             "why": "The run is `−4 − (−4) = 0`, and division by zero is not defined. "
+                    "This is a vertical line. `0` would describe a horizontal line; `7` "
+                    "is the magnitude of the rise without a legal run, and `1` is not "
+                    "produced by either difference."},
             {"q": "A student computes `(y₂ − y₁)/(x₁ − x₂)`. What is wrong with the answer?",
              "a": ["Nothing &mdash; it is an equivalent form",
                    "It is the reciprocal of the correct slope",
@@ -627,7 +652,7 @@ LESSONS = [
             ("Every non-vertical line has one such equation",
              "Vertical lines are the sole exception, since they cannot be solved for `y` "
              "at all. That exception is not an inconvenience; it is a signal, and lesson "
-             "7 explains what it signals."),
+             "8 explains what it signals."),
         ],
         "read_title": "Solving for y, and what that buys",
         "read_intro": "The rearrangement, the reading, and the graphing method it enables.",
@@ -734,6 +759,10 @@ LESSONS = [
                 "intercept is a genuine solution; the second confirms the two equations "
                 "have the same solutions, which is what rearranging is supposed to "
                 "preserve.",
+                "For a faded rearrangement, start `−3x + 6y = 18` from the supplied "
+                "line `6y = 3x + 18`. Divide every term, identify `m` and `b`, make one "
+                "slope step from the intercept, and verify that new point in the "
+                "original equation.",
             ],
         },
         "quiz_title": "Reading m and b",
@@ -742,12 +771,15 @@ LESSONS = [
              "a": ["`y = −3x + 4`", "`y = 3x + 4`", "`y = −6x + 8`", "`y = −3x + 8`"],
              "c": 0,
              "why": "`2y = −6x + 8`, then dividing every term by 2 gives `y = −3x + 4`. "
-                    "The last option divides the `x`-term but forgets the constant."},
+                    "`y = 3x + 4` loses the sign when `6x` moves across. `y = −6x + 8` "
+                    "stops before dividing, and `y = −3x + 8` divides only the x-term."},
             {"q": "What is the slope of `y = 7`?",
              "a": ["`7`", "`0`", "Undefined", "`1`"],
              "c": 1,
              "why": "It is `y = 0·x + 7`, so `m = 0` and the line is horizontal. Slope 7 "
-                    "would need `x` to appear with coefficient 7."},
+                    "would need `x` to appear with coefficient 7. Undefined belongs to "
+                    "a vertical line, and `1` is not an invisible default coefficient of "
+                    "`x` when the x-term is absent."},
             {"q": "Which line cannot be written as `y = mx + b`?",
              "a": ["A horizontal line", "A line through the origin",
                    "A vertical line", "A line with negative slope"],
@@ -936,6 +968,11 @@ LESSONS = [
                 "Step 5 is the reason to trust the answer. The point `(4, 10)` was never "
                 "used after step 1, so its satisfying the final equation is genuine "
                 "evidence rather than a restatement of the work.",
+                "For a faded construction, use the points `(−3, 5)` and `(1, −3)`. "
+                "The supplied slope is `−2`. Build point-slope form from `(−3, 5)`, "
+                "convert it to slope-intercept and standard form, then use `(1, −3)` "
+                "as the unused-point check. If the check fails, identify whether the "
+                "slope, the double negative or the distribution caused it.",
             ],
         },
         "quiz_title": "Building a line",
@@ -945,7 +982,8 @@ LESSONS = [
              "c": 0,
              "why": "`y − 5 = −4(x − 2)` gives `y − 5 = −4x + 8`, so `y = −4x + 13`. "
                     "Check: `−4(2) + 13 = 5`. The third option distributes `−4` over "
-                    "`x − 2` as `−4x − 8`."},
+                    "`x − 2` as `−4x − 8`. `y = −4x + 5` copies the point's y-value "
+                    "into the intercept, while `y = −4x + 22` adds `5` and `8` twice."},
             {"q": "You build a line from two points, once from each point. What should "
                   "happen?",
              "a": ["The two equations describe different lines",
@@ -956,12 +994,14 @@ LESSONS = [
              "why": "Both equations describe the unique line through the two points, so "
                     "they must simplify to the same thing even though the unsimplified "
                     "forms look different."},
-            {"q": "Which form can represent the vertical line `x = 5`?",
+            {"q": "Which form can represent the vertical line `x = −4`?",
              "a": ["Slope-intercept only", "Point-slope only",
                    "Standard form", "None of the three"],
              "c": 2,
-             "why": "`x = 5` is `1·x + 0·y = 5`. The other two forms both require a "
-                    "slope, and a vertical line has none."},
+             "why": "`x = −4` is `1·x + 0·y = −4`, which is standard form. "
+                    "Slope-intercept and point-slope both require a slope, and a vertical "
+                    "line has none; saying none overlooks the zero y-coefficient allowed "
+                    "in standard form."},
         ],
         "mistakes": [
             ("Dropping the minus signs built into the form",
@@ -1137,6 +1177,11 @@ LESSONS = [
                 "Both checks are worth doing. The point check catches an arithmetic slip "
                 "in the simplification; the slope check catches having flipped without "
                 "negating, which the point check would happily pass.",
+                "For a faded pair, use the point `(−2, 3)` and the line "
+                "`2x + 5y = 10`. The supplied first move is `y = −(2/5)x + 2`, so "
+                "the given slope is `−2/5`. Find the required parallel and "
+                "perpendicular slopes, build both lines through the point, and perform "
+                "both the point check and the relationship check.",
             ],
         },
         "quiz_title": "Slopes compared",
@@ -1146,16 +1191,18 @@ LESSONS = [
              "c": 2,
              "why": "Flip and negate: `2/5` becomes `−5/2`, and `(2/5)(−5/2) = −1`. "
                     "Option 2 flips without negating; option 4 negates without flipping."},
-            {"q": "Are `y = 2x + 1` and `4x − 2y = 10` parallel?",
-             "a": ["Yes &mdash; both have slope 2 and different intercepts",
-                   "No &mdash; the second has slope 4",
+            {"q": "Are `y = −3x + 2` and `6x + 2y = 10` parallel?",
+             "a": ["Yes &mdash; both have slope `−3` and different intercepts",
+                   "No &mdash; the second has slope `6`",
                    "No &mdash; they are the same line",
                    "No &mdash; they are perpendicular"],
              "c": 0,
-             "why": "`4x − 2y = 10` rearranges to `y = 2x − 5`. Same slope, and the "
-                    "intercepts `1` and `−5` differ, so the lines are parallel and "
-                    "distinct."},
-            {"q": "Why does the product test fail to show that `x = 3` and `y = 4` are "
+             "why": "`6x + 2y = 10` rearranges to `y = −3x + 5`. The slopes are "
+                    "both `−3` and the intercepts `2` and `5` differ, so the lines are "
+                    "parallel and distinct. Reading `6` before isolating `y` gives the "
+                    "second choice; equal intercepts would be needed for the same line, "
+                    "and a perpendicular slope would be `1/3`."},
+            {"q": "Why does the product test fail to show that `x = −2` and `y = 5` are "
                   "perpendicular?",
              "a": ["They are not actually perpendicular",
                    "`x = 3` has no slope, so there is no product to form",
@@ -1164,7 +1211,9 @@ LESSONS = [
              "c": 1,
              "why": "They are perpendicular, but a vertical line has no slope at all. The "
                     "test is stated for lines that have slopes, and this pair falls "
-                    "outside its scope rather than failing it."},
+                    "outside its scope rather than failing it. Saying their slopes "
+                    "multiply to zero invents a slope for the vertical line, and neither "
+                    "passing through the origin nor the particular constants matter."},
         ],
         "mistakes": [
             ("Flipping without negating, or negating without flipping",
@@ -1212,13 +1261,13 @@ LESSONS = [
         ],
         "key_label": "The definition, and what it does not forbid",
         "concepts_intro": (
-            "Lessons 1 to 6 were about one particular shape. This lesson names the idea "
-            "that organises every shape in the rest of the course."
+            "The first seven lessons used points and lines as solution sets. This lesson "
+            "names the input-output idea that organises every graph that follows."
         ),
         "concepts": [
             ("Exactly one means at least one and at most one",
              "The rule must produce an output for each input it claims to accept, and it "
-             "must never produce two. Both halves can fail, and lesson 9 is largely "
+             "must never produce two. Both halves can fail, and lesson 10 is largely "
              "about the first half."),
             ("Many-to-one is allowed; one-to-many is not",
              "`f(x) = x²` sends both `3` and `−3` to `9`, and that is a function. "
@@ -1241,8 +1290,8 @@ LESSONS = [
             ("p", "Every word is load-bearing. \"Each\" forbids an input the rule cannot "
                   "handle. \"Exactly one\" forbids an input with two answers. A rule that "
                   "fails either is not a function, and calling it one anyway breaks "
-                  "everything downstream &mdash; notation in lesson 8 assumes `f(3)` "
-                  "names a single number, and an inverse in lesson 13 assumes the "
+                  "everything downstream &mdash; notation in lesson 9 assumes `f(3)` "
+                  "names a single number, and an inverse in lesson 14 assumes the "
                   "assignment can be run backwards."),
             ("h3", "What the definition permits"),
             ("p", "The asymmetry surprises people, so state it plainly: outputs may "
@@ -1297,11 +1346,12 @@ LESSONS = [
         ],
         "lab": ("funcops", {
             "mode": "definition",
-            "panel_title": "Sweep the vertical line",
-            "panel_intro": "Type a relation and drag the vertical line across it; the "
-                           "lab counts intersections at each position and reports the "
-                           "first input it finds with two outputs. Try `y^2 = x` and "
-                           "`x^2 + y^2 = 25`.",
+            "panel_title": "Find the input that breaks it",
+            "panel_intro": "Choose a list of points or type a relation solved for `x`. "
+                           "Predict the verdict first; the lab groups points by input or "
+                           "searches for a witness, then draws the vertical line through "
+                           "the repeated input it actually found. Its one-to-one readout "
+                           "is a preview for inverse functions, not today's completion act.",
         }),
         "steps_title": "Deciding whether a rule is a function",
         "steps_intro": "Four questions, in this order. The first \"no\" settles it.",
@@ -1345,25 +1395,35 @@ LESSONS = [
                 "an input, not what arrives at an output.",
                 "The two tables make the same point in the representation where it is "
                 "easiest to misread. A repeated row of outputs looks suspicious and is "
-                "fine; a repeated input is the only thing that disqualifies.",
+                "fine; a repeated input with a different output is what disqualifies.",
+                "For a faded classification, use the pairs `(−2, 1)`, `(0, 3)`, "
+                "`(2, 1)` and `(0, 4)`. The supplied first move is to group them by "
+                "their first coordinate. Finish the input-output table, give the "
+                "verdict, and name the exact input and two outputs that witness it. "
+                "Then remove one pair so the remaining relation becomes a function.",
             ],
         },
         "quiz_title": "Function or not",
         "quiz": [
-            {"q": "Which of these is NOT a function of `x`?",
-             "a": ["`y = x²`", "`y = |x|`", "`y² = x`", "`y = 2x + 1`"],
+            {"q": "Which set of pairs is NOT a function?",
+             "a": ["`{(1, 4), (2, 4), (3, 7)}`",
+                   "`{(−1, 2), (0, 2), (1, 2)}`",
+                   "`{(2, 5), (3, 6), (2, 8)}`",
+                   "`{(0, 0), (1, 1), (2, 4)}`"],
              "c": 2,
-             "why": "`y² = x` gives two outputs at every positive input &mdash; `x = 4` "
-                    "yields `y = 2` and `y = −2`. The first two send several inputs to "
-                    "one output, which the definition permits."},
-            {"q": "A table lists the pairs `(1, 5)`, `(2, 5)`, `(3, 5)`. Is it a function?",
+             "why": "The third set sends the input `2` to both `5` and `8`, so it is "
+                    "not a function. The first two repeat outputs, which is allowed, "
+                    "and the fourth uses each input once; neither pattern creates one "
+                    "input with two outputs."},
+            {"q": "A table lists `(1, 4)`, `(2, 4)`, `(3, 6)`. Is it a function?",
              "a": ["No, the outputs repeat",
                    "Yes, each input has exactly one output",
-                   "No, the range has only one element",
+                   "No, the range has fewer elements than the domain",
                    "Only if the inputs are consecutive"],
              "c": 1,
-             "why": "Repeated outputs are permitted. Each of `1`, `2` and `3` is assigned "
-                    "exactly one value, so this is a function &mdash; a constant one."},
+             "why": "Repeated outputs are permitted. Each of `1`, `2` and `3` has one "
+                    "output, so this is a function. A smaller range does not violate the "
+                    "definition, and whether inputs are consecutive is irrelevant."},
             {"q": "Why is the vertical line test the right test?",
              "a": ["Vertical lines are the only lines with undefined slope",
                    "A vertical line collects all points with the same `x`, so two hits "
@@ -1373,7 +1433,9 @@ LESSONS = [
              "c": 1,
              "why": "The test is the definition restated geometrically. Two intersections "
                     "are two points sharing an `x`-coordinate and differing in `y`, which "
-                    "is precisely one input with two outputs."},
+                    "is precisely one input with two outputs. Undefined slope explains a "
+                    "vertical line, not the test; the axes encode the input choice but do "
+                    "not make the test arbitrary, and the origin is irrelevant."},
         ],
         "mistakes": [
             ("Thinking repeated outputs break the definition",
@@ -1381,11 +1443,11 @@ LESSONS = [
              "<em>input</em> with different outputs disqualifies a rule."),
             ("Applying the horizontal line test to decide functionhood",
              "A horizontal line meeting a graph twice says the function is not one-to-one, "
-             "which is a real property and the subject of lesson 13. It says nothing "
+             "which is a real property and the subject of lesson 14. It says nothing "
              "about whether the graph is a function."),
             ("Answering \"not a function\" without a witness",
              "Name the input that breaks it. Saying `x = 4` gives both `2` and `−2` is "
-             "the answer that survives into lesson 9's domain work and lesson 13's "
+             "the answer that survives into lesson 10's domain work and lesson 14's "
              "restrictions; the bare verdict does not."),
         ],
         "standard": ("Finish when you can apply the definition to a rule in any of its "
@@ -1399,7 +1461,7 @@ LESSONS = [
         "note": "The definition explains an exception that has come up three times "
                 "already. Vertical lines have no slope, cannot be written `y = mx + b`, "
                 "and are not functions &mdash; all three because a single `x` is paired "
-                "with many `y`. From lesson 8 onward everything in this course is a "
+                "with many `y`. From lesson 9 onward everything in this course is a "
                 "function, and that is why the notation `f(x)` is about to be safe to use.",
     },
 ]

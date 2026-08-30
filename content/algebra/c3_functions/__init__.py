@@ -2,6 +2,30 @@
 
 from . import part_a, part_b
 
+_LESSONS_BY_SLUG = {
+    lesson["slug"]: lesson for lesson in part_a.LESSONS + part_b.LESSONS
+}
+
+# Keep the source records grouped by topic, but finish the line sequence before
+# functions begin.  The inequality lesson needs only the six line lessons and
+# Course 2; leaving it after inverses made the course change subjects twice.
+_LESSON_ORDER = (
+    "the-coordinate-plane",
+    "graphing-a-linear-equation",
+    "slope",
+    "slope-intercept-form",
+    "point-slope-and-standard-form",
+    "parallel-and-perpendicular-lines",
+    "linear-inequalities-in-two-variables",
+    "what-a-function-is",
+    "function-notation",
+    "domain-and-range",
+    "piecewise-functions",
+    "transformations-of-graphs",
+    "composition-of-functions",
+    "inverse-functions",
+)
+
 COURSE = {
     "slug": "lines-functions-and-graphs",
     "title": "Lines, Functions and Graphs",
@@ -21,7 +45,9 @@ COURSE = {
     "assumes_short": "Courses 1–2",
     "assumes_long": "solving and rearranging linear equations",
     "outcomes_intro": (
-        "By the end you can move between an equation, its graph and its description in words without re-deriving the connection each time."
+        "By the end you can turn a linear equation or function rule into a checked "
+        "graph, value or related rule, and justify each decision from the definition "
+        "rather than from the picture alone."
     ),
     "outcomes": [
         ("Read and write a line four ways",
@@ -29,17 +55,28 @@ COURSE = {
         ("Apply the definition of a function",
          "Decide whether a rule, a table or a graph defines a function, and say which input breaks it when one does."),
         ("State a domain and a range",
-         "Find what a formula excludes &mdash; a zero denominator, a negative under a square root &mdash; and write the result in interval notation."),
+         "Find what a formula excludes &mdash; a zero denominator or a negative under "
+         "a square root &mdash; write the domain in interval notation, and justify the "
+         "range of a line, square or absolute-value rule from its outputs."),
         ("Transform, compose and invert",
-         "Predict the graph of `a·f(b(x − h)) + k` from the parent, compose two functions in the right order, and find an inverse and the restriction it needs."),
+         "Map a known point under `a·f(b(x − h)) + k`, compose two functions in the "
+         "right order with the correct domain, and find and verify the inverse of a "
+         "line or a restricted square."),
     ],
     "syllabus_intro": (
-        "Lessons 1 to 6 are lines. Lesson 7 defines a function, and 8 to 14 develop everything a function has: notation, domain, shape, composition, inverse."
+        "Lessons 1 to 7 are lines and the half-planes they bound. Lesson 8 defines a "
+        "function; lessons 9 to 14 develop its notation, domain and range, piecewise "
+        "rules, graph transformations, composition and inverse."
     ),
     "how_to": [
-        "Sketch before you compute. Every graphing lab lets you type your own function; predicting the picture and then drawing it is worth more than reading the picture.",
-        "Watch the order in the transformation lesson. `f(x − 3)` moves right, not left, and no amount of memorising fixes it &mdash; watch the lab move the curve while you change the number.",
-        "Composition is not multiplication. `(f ∘ g)` and `(g ∘ f)` are different functions, and the lab computes both side by side for exactly that reason.",
+        "After each complete example, cover its answer and finish the faded rehearsal. "
+        "The supplied first decision is guidance; the remaining algebra, graph check "
+        "and explanation are yours.",
+        "Sketch or predict before you reveal a lab result. A graph is most useful when "
+        "it tests a claim you already made, not when it makes the claim for you.",
+        "For transformations and composition, trace one input or one known point all "
+        "the way through. The order becomes visible in the intermediate value, and a "
+        "wrong order cannot hide behind a plausible final formula.",
     ],
     "not_covered": [
         "Continuity and limits. The word \"smooth\" is used informally here; making it precise is calculus.",
@@ -49,5 +86,5 @@ COURSE = {
     "footer_lead": (
         "Every curve on this course is drawn by evaluating the function at hundreds of points and joining them; nothing is a stored shape. When a lab marks a vertex or an intercept, the label and the picture come from the same computation, so the drawing cannot flatter the answer."
     ),
-    "lessons": part_a.LESSONS + part_b.LESSONS,
+    "lessons": [_LESSONS_BY_SLUG[slug] for slug in _LESSON_ORDER],
 }

@@ -448,10 +448,10 @@ ALGEBRA_COURSE_3_HOME = "/lines-functions-and-graphs/"
 ALGEBRA_COURSE_3_LESSONS = (
     "the-coordinate-plane", "graphing-a-linear-equation", "slope",
     "slope-intercept-form", "point-slope-and-standard-form",
-    "parallel-and-perpendicular-lines", "what-a-function-is",
-    "function-notation", "domain-and-range", "piecewise-functions",
+    "parallel-and-perpendicular-lines", "linear-inequalities-in-two-variables",
+    "what-a-function-is", "function-notation", "domain-and-range", "piecewise-functions",
     "transformations-of-graphs", "composition-of-functions",
-    "inverse-functions", "linear-inequalities-in-two-variables",
+    "inverse-functions",
 )
 
 ALGEBRA_COURSE_4_HOME = "/polynomials-and-factoring/"
