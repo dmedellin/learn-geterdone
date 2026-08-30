@@ -6,7 +6,7 @@ LESSONS = [
         "slug": "determinants-and-cramers-rule",
         "title": "Determinants and Cramer's Rule",
         "module": "Matrices",
-        "one_line": "One number that decides whether a system has one solution.",
+        "one_line": "Compute a determinant, use it to test uniqueness, and apply Cramer's rule only when division is legal.",
         "summary": (
             "The determinant of a square matrix is one number built from its entries, "
             "and for a system with as many equations as unknowns it decides whether "
@@ -180,6 +180,11 @@ LESSONS = [
                 "and substituting gives `2(0.94) + 3(1.71) = 7.01`, which is close "
                 "enough to look like an arithmetic error somewhere and is in fact the "
                 "rounding. Exact fractions check exactly; decimals do not.",
+                "Faded rehearsal: for `3x + 2y = 4` and `x − y = 5`, first write the "
+                "coefficient determinant and decide whether Cramer's rule is legal. "
+                "Then build `Dx` and `Dy` one replaced column at a time, keep the "
+                "quotients exact, and check the pair in both original equations. If "
+                "your determinant were `0`, state what you would do instead.",
             ],
         },
         "quiz_title": "Determinants and the condition",
@@ -243,7 +248,7 @@ LESSONS = [
         "slug": "inverse-matrices",
         "title": "Inverse Matrices",
         "module": "Matrices",
-        "one_line": "The matrix that undoes another, and when there is not one.",
+        "one_line": "Test invertibility, construct an inverse, verify both products, and use it on the correct side.",
         "summary": (
             "The inverse of `A` is the matrix that multiplies with it to give the "
             "identity, and it turns `AX = B` into `X = A⁻¹B`. Unlike numbers, where "
@@ -428,6 +433,11 @@ LESSONS = [
                 "happens to be `1` or `-1`.",
                 "One `B` was solved here, so the inverse was not the cheap route. Solve "
                 "`AX = B` for five different right-hand sides and it is.",
+                "Faded rehearsal: invert `[ 2  1 ; 5  3 ]`. The first decision is "
+                "supplied: its determinant is nonzero, so an inverse exists. Apply the "
+                "swap-and-negate pattern, divide every entry by the determinant, and "
+                "multiply in both orders to verify the identity before using the "
+                "result on any system.",
             ],
         },
         "quiz_title": "Inverses",
@@ -492,18 +502,19 @@ LESSONS = [
         "slug": "systems-of-inequalities-and-linear-programming",
         "title": "Systems of Inequalities and Linear Programming",
         "module": "Matrices",
-        "one_line": "A feasible region, and where the optimum has to be.",
+        "one_line": "Build a closed, bounded feasible region, test every boundary crossing, and optimise at its corners.",
         "summary": (
             "A linear inequality in two variables is satisfied by a half-plane, and a "
-            "system of them by the region where the half-planes overlap. Linear "
-            "programming asks for the largest value of a linear expression on that "
-            "region, and the answer always sits at a corner."
+            "system of them by the region where the half-planes overlap. On a nonempty "
+            "closed, bounded feasible polygon, a linear objective reaches its largest and "
+            "smallest values at corners, reducing infinitely many candidates to a "
+            "finite list."
         ),
         "key": [
             "one inequality      a half-plane, boundary solid for ≤ and ≥",
             "several            the overlap: every constraint holds at once",
             "corners            solve the boundary lines in pairs, then test",
-            "max and min of ax + by on a bounded region:  at a corner",
+            "max and min on a nonempty closed bounded polygon:  at a corner",
         ],
         "key_label": "From a region to a finite list of candidates",
         "concepts_intro": (
@@ -522,11 +533,11 @@ LESSONS = [
              "boundary lines crossing somewhere is not enough to make that crossing a "
              "corner of the region; it has to survive all the other constraints as "
              "well."),
-            ("The corner point theorem is what makes this finite",
-             "A linear objective on a region that is closed and bounded attains its "
+            ("The corner point theorem is what makes the bounded case finite",
+             "A linear objective on a feasible polygon that is nonempty, closed and bounded attains its "
              "largest and smallest values at corners. That is why the method is "
-             "\"list the corners and evaluate\" rather than a search, and it is the "
-             "only non-obvious statement in the lesson."),
+             "\"list the corners and evaluate\" rather than a search. An unbounded "
+             "region needs a separate check of the directions in which it continues."),
         ],
         "read_title": "Feasible regions and the corner point theorem",
         "read_intro": "Shading by test point, finding corners by elimination, and the theorem that says corners are enough.",
@@ -578,13 +589,15 @@ LESSONS = [
                      "the feasible region at which `P` is largest, or smallest. Such a "
                      "point is called <strong>optimal</strong>.")),
             ("thm", ("The corner point theorem",
-                     "If the feasible region is not empty and is bounded, then a linear "
+                     "If the feasible region is not empty, closed and bounded, then a linear "
                      "objective function attains both a maximum and a minimum on it, "
                      "and each occurs at a corner. If the same optimal value occurs at "
                      "two corners, then every point of the edge joining them is optimal "
                      "as well.",
-                     "If the region is unbounded, an optimum may fail to exist; when "
-                     "one does exist, it is still at a corner.")),
+                     "This statement does not classify an unbounded feasible region. "
+                     "There the objective must also be tested along the directions in "
+                     "which the region continues; a maximum, a minimum, both or "
+                     "neither may exist.")),
             ("p", "The reason is worth seeing even though the proof is not given here. "
                   "The points where `ax + by` takes some fixed value `k` form a line, "
                   "and different values of `k` give parallel lines. Increasing `k` "
@@ -597,13 +610,15 @@ LESSONS = [
                   "theorem says four of them need checking. Nothing about it survives "
                   "if the objective is not linear: `P = xy` on the region above is "
                   "largest at `(2.5, 5)`, which is not a corner of anything."),
-            ("example", ("An unbounded region has no maximum",
+            ("example", ("An unbounded region needs a direction check",
                          "Take `x ≥ 0`, `y ≥ 0`, `x + y ≥ 4`. The region is everything "
                          "in the first quadrant on or above the line `x + y = 4`, and "
                          "it runs off to infinity. `C = 2x + 3y` has a minimum of `8` "
-                         "at the corner `(4, 0)` &mdash; the other corner `(0, 4)` "
-                         "gives `12` &mdash; but no maximum at all, because `2x + 3y` "
-                         "grows without bound as you travel out along the region.")),
+                         "at `(4, 0)`: `C = 2(x + y) + y ≥ 8`. It has no maximum, "
+                         "because the feasible points `(4 + t, 0)` make "
+                         "`C = 8 + 2t` grow without bound. The corner values suggest "
+                         "the minimum, but these two inequalities prove the global "
+                         "claims.")),
             ("p", "Two practical cautions. A strict inequality removes its boundary "
                   "line from the region, so an optimum sitting on that line is "
                   "approached but never reached; applied problems are stated with `≤` "
@@ -636,8 +651,10 @@ LESSONS = [
              "two equations together &mdash; elimination, from lesson 3. Then test the "
              "point against every other constraint and discard it if it fails one."),
             ("Evaluate the objective at each surviving corner",
-             "Tabulate the values and pick the largest or the smallest, as asked. There "
-             "is no need to look anywhere else, and no interior point can beat them."),
+             "For a nonempty closed, bounded region, tabulate the values and pick the largest "
+             "or the smallest, as asked; the corner theorem makes that comparison "
+             "conclusive. For an unbounded region, also test the feasible directions "
+             "in which the region continues."),
         ],
         "worked": {
             "title": "Maximise P = 5x + 4y subject to x ≥ 0, y ≥ 0, x + y ≤ 8, 2x + y ≤ 10",
@@ -678,6 +695,11 @@ LESSONS = [
                 "at which one of the constraints is false.",
                 "The maximum is `34`, attained at `x = 2`, `y = 6`. Report the point as "
                 "well as the value: \"34\" alone does not say what to do.",
+                "Faded rehearsal: keep the same four constraints but minimise "
+                "`C = 2x + 7y`. The feasible corners have already been established, "
+                "so build a fresh objective table without reusing the old `P` values. "
+                "Name both the winning point and value, then explain why the bounded "
+                "closed, bounded region makes the corner comparison conclusive.",
             ],
         },
         "quiz_title": "Regions and corners",
@@ -706,10 +728,10 @@ LESSONS = [
                    "It has neither a maximum nor a minimum",
                    "It has a maximum of `12` at `(0, 4)`"],
              "c": 1,
-             "why": "The corners are `(4, 0)` and `(0, 4)`, giving `8` and `12`. "
-                    "Travelling out along the region makes `2x + 3y` as large as you "
-                    "like, so no maximum exists; the minimum survives and, as the "
-                    "theorem promises, sits at a corner."},
+             "why": "Because `C = 2(x + y) + y ≥ 8`, the value `8` at `(4, 0)` is a "
+                    "global minimum. The feasible ray `(4 + t, 0)` gives `C = 8 + 2t`, "
+                    "so no maximum exists. The bounded corner theorem does not prove "
+                    "either claim here; the lower bound and feasible ray do."},
         ],
         "mistakes": [
             ("Treating every crossing of two boundary lines as a corner",
@@ -722,15 +744,18 @@ LESSONS = [
              "`y ≥ 2x - 6`: dividing by `-1` reverses the sign. The safer route is not "
              "to rearrange at all &mdash; draw the boundary and test a point."),
             ("Looking for the optimum inside the region",
-             "The best point is never strictly inside a region for a linear objective, "
-             "because moving in the direction that increases `ax + by` always keeps "
-             "increasing it until a boundary stops you. Checking a few feasible points "
-             "at random and taking the best is not the method."),
+             "A nonconstant linear objective cannot have its only optimum strictly "
+             "inside a full-dimensional feasible region: moving in the direction that "
+             "increases `ax + by` improves it until a boundary stops you. A constant "
+             "objective makes every feasible point optimal; neither case is solved by "
+             "checking a few random interior points."),
         ],
-        "standard": ("Finish when finding a corner means solving a 2 by 2 system and then testing it.",
+        "standard": ("Finish when every candidate corner is solved, tested and used within the theorem's scope.",
                      "Given four or five constraints you should be able to produce the "
                      "corner list without a graph, discard the crossings that fail a "
-                     "constraint, and name the optimal point and its value. Saying "
+                     "constraint, and on a nonempty closed, bounded region name the optimal "
+                     "point and its value. For an unbounded region, exhibit a feasible "
+                     "ray or a global bound instead of citing the bounded theorem. Saying "
                      "\"the maximum is 34\" without saying where is half an answer."),
         "note": "Everything expensive in this lesson was elimination: each corner is a "
                 "2 by 2 system, solved exactly as in lesson 3. That is the course's "
