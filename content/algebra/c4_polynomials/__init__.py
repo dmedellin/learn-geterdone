@@ -7,7 +7,10 @@ COURSE = {
     "title": "Polynomials and Factoring",
     "level": "Intermediate",
     "summary": (
-        "Polynomial arithmetic and the reverse of it: degree and standard form, the four operations, special products, every standard factoring technique, long and synthetic division, the remainder and factor theorems, rational roots and polynomial graphs."
+        "Polynomial arithmetic and the reverse of it: degree and standard form, "
+        "the four operations, special products, the standard integer-coefficient "
+        "factoring techniques, long and synthetic division, the remainder and "
+        "factor theorems, rational roots and polynomial graphs."
     ),
     "blurb": (
         "Multiply out, then learn to go back. The factored form is the one that answers questions &mdash; where a graph crosses, when a product is zero &mdash; and this course is about producing it reliably rather than by inspection."
@@ -21,33 +24,50 @@ COURSE = {
     "assumes_short": "Courses 1–3",
     "assumes_long": "exponents, distribution, function notation",
     "outcomes_intro": (
-        "By the end you can factor any polynomial a school course will hand you, and say when one cannot be factored."
+        "By the end you can carry out polynomial arithmetic, factor the standard "
+        "integer-coefficient forms over the rationals, and state exactly what a "
+        "completed search has and has not ruled out."
     ),
     "outcomes": [
         ("Operate on polynomials",
          "Add, subtract and multiply polynomials of any degree, and recognise the special products on sight rather than expanding them."),
         ("Choose the right factoring technique",
-         "Work down a decision list &mdash; common factor, then count the terms, then match a pattern &mdash; instead of trying methods at random."),
+         "Work down a decision list &mdash; common factor, then term count, then pattern "
+         "or finite pair search &mdash; and expand the result to verify it."),
         ("Divide polynomials",
          "Carry out long division, use synthetic division where it applies, and read the remainder as a function value."),
         ("Find every rational root",
-         "Generate the candidate list from the constant and leading coefficients, test it, and know that an empty result is an answer."),
+         "For an integer-coefficient polynomial, generate every candidate from the "
+         "constant and leading coefficients, test the list, and distinguish no rational "
+         "root from no root at all."),
     ],
     "syllabus_intro": (
-        "Lessons 1 to 4 multiply. Lessons 5 to 9 factor, in the order you should try the techniques. Lessons 10 to 13 divide and then graph."
+        "Lessons 1 to 4 define polynomials and operate on them. Lesson 5 is the "
+        "first move in every factorisation; lessons 6 to 9 are branches chosen by "
+        "term count and pattern. Lessons 10 to 13 divide, find roots and then sketch."
     ),
     "how_to": [
         "Always look for a common factor first. The lab's decision list starts there because skipping it is what turns a one-line problem into an unfactorable-looking mess.",
         "Expand your factored answer to check it. Factoring is the only topic on this path where checking is faster than the work itself.",
-        "Use the rational-root lab on something that has no rational root. Watching a complete search come back empty is the fastest way to believe the theorem.",
+        "After each complete example, cover the answer and do the faded rehearsal on "
+        "paper. The first decision is supplied; the remaining algebra and the expansion "
+        "or substitution check are yours before you answer the quiz.",
     ],
     "not_covered": [
-        "Factoring over the complex numbers, and the fundamental theorem of algebra. Course 6 introduces `i` and factors quadratics with it; the general theorem is stated there and not proved.",
-        "Numerical root-finding. Where a polynomial has an irrational root, this course says so and stops; approximating it is a computational topic.",
-        "Polynomial interpolation and finite differences.",
+        "Factoring quadratics with irrational or complex coefficients. Course 6 teaches "
+        "the discriminant, the quadratic formula and `i`; this course stops after proving "
+        "that no rational factor exists.",
+        "A complete factorisation algorithm for arbitrary polynomials of degree 4 or "
+        "more. No rational root rules out rational linear factors, but a quartic may "
+        "still split into two quadratics.",
+        "Numerical root-finding and polynomial interpolation. An irrational root may be "
+        "named exactly when its form is already known, but it is not approximated here.",
     ],
     "footer_lead": (
-        "Every factorisation on this course is SEARCHED for, in exact integer arithmetic, by the theorem the lesson states &mdash; the candidate list is generated and each candidate tested where you can see it. When a lab reports that a polynomial does not factor over the rationals, that is the result of a complete search, not a lookup."
+        "Every pair or rational-root search on this course is carried out in exact "
+        "arithmetic: the candidate list is generated and each candidate is tested where "
+        "you can see it. A negative result is stated only at the scope the search proves "
+        "&mdash; no rational linear factor is not the same claim as no factor of any kind."
     ),
     "lessons": part_a.LESSONS + part_b.LESSONS,
 }

@@ -1890,7 +1890,7 @@ def factoring_lab(cfg):
         + 'left mismatched brackets, but ' + Ptext(p) + ' = ' + full + '. That combination is worth '
         + 'meeting early: a method that comes back empty has told you about the METHOD, not about the '
         + 'polynomial. The rational root search is what settles it.'
-      : '<strong>Grouping fails, and nothing else would have worked either.</strong> All three '
+      : '<strong>Grouping fails, and this polynomial has no rational linear factor.</strong> All three '
         + 'pairings left mismatched brackets, and the rational root search finds no root. '
         + (settled
           ? 'At degree ' + Pdegtext(p) + ' that settles it: a polynomial of this degree that factors '
@@ -1898,8 +1898,11 @@ def factoring_lab(cfg):
             + 'factor over the rationals.'
           : 'That rules out every linear factor, though at degree ' + Pdegtext(p) + ' it does not rule '
             + 'out a split into two factors of degree 2 or more.')
-        + ' The curve above still crosses the axis, so there IS a real root &mdash; an irrational one, '
-        + 'and irrational roots are exactly the ones no amount of grouping will reveal.';
+        + (Pdeg(p) % 2 === 1
+          ? ' The odd-degree curve above still crosses the axis, so there IS a real root &mdash; an '
+            + 'irrational one, and irrational roots are exactly the ones no amount of grouping will reveal.'
+          : ' At even degree this search does not decide whether the curve reaches the axis: Course 6 '
+            + 'separates irrational real roots from complex ones.');
   }
 """
 
@@ -1924,20 +1927,6 @@ def factoring_lab(cfg):
       settled: Pdeg(f.rest) <= 3,
       linear: f.factors.length
     };
-  }
-
-  /* What the roots of a quadratic actually are, in the four cases the
-     discriminant distinguishes. Calling a rational root irrational because the
-     search that was run happened to miss it is the error this exists to stop. */
-  function rootsSentence(r) {
-    if (r.kind === 'complex') return 'x = ' + pmtext(r.p, r.s, true)
-      + ' &mdash; not real at all, so the curve below never meets the axis';
-    if (r.kind === 'double') return 'x = ' + Rtext(r.p)
-      + ', twice &mdash; a repeated rational root, and the curve touches the axis without crossing';
-    if (r.kind === 'rational') return 'x = ' + r.roots.map(Rtext).join(' and ')
-      + ' &mdash; both rational, so this quadratic does factor over the rationals';
-    return 'x = ' + pmtext(r.p, r.s) + ' &mdash; real and irrational, and no bracket with whole '
-      + 'numbers in it can produce an irrational root';
   }
 
   /* --------------------------------------------------- mode: x^2 + bx + c */
@@ -2030,8 +2019,6 @@ def factoring_lab(cfg):
       ]));
       blocks.push(table('The check', [], verifyRows(pieces, p)));
     } else {
-      var r = quadroots(a, b, c);
-      var perfect = Rsign(r.disc) >= 0 && Rsurd(r.disc).k === 1n;
       blocks.push(table('The search came back empty', [], [
         say('pairs tried', String(pairs.length)),
         say('why that settles it', monic
@@ -2040,14 +2027,11 @@ def factoring_lab(cfg):
             + 'rationals at all.'
           : 'nothing at all &mdash; this search was the wrong one to run for a = ' + Rtext(a) + '. It '
             + 'looked for the middle coefficient of a MONIC trinomial, and this one is not monic.'),
-        say('the discriminant', 'b^2 - 4ac = ' + Rtext(r.disc) + ', '
-          + (perfect ? 'a perfect square' : 'not a perfect square') + ' &mdash; '
-          + (monic
-            ? chip(perfect === false, 'and for a = 1 that is the same statement as "no integer pair works"')
-            : 'and a perfect square here means ' + Ptext(p) + ' DOES factor over the rationals, as '
-              + Pfactortextfull(p) + '. The pair search missed it because it was searching for the '
-              + 'wrong product.')),
-        say('the exact roots', rootsSentence(r))
+        say('what follows', monic
+          ? Ptext(p) + ' has no rational linear factor. Whether its non-rational zeros are real or '
+            + 'complex is a different question, taught with the quadratic formula in Course 6.'
+          : 'run the ac search on a*c = ' + Rtext(Rmul(a, c)) + '. It gives '
+            + Pfactortextfull(p) + ', which is why this smaller c-only search was not evidence.')
       ]));
     }
     work.innerHTML = blocks.join('');
@@ -2071,7 +2055,7 @@ def factoring_lab(cfg):
         + '.</strong> ' + pairs.length + ' pair' + (pairs.length === 1 ? ' was' : 's were')
         + ' tried and every sum missed. '
         + (monic ? 'For a monic trinomial that is conclusive: it does not factor over the rationals, '
-                 + 'and the exact roots are irrational or complex rather than nonexistent.'
+                 + 'while Course 6 determines whether the remaining zeros are irrational or complex.'
                  : 'With a = ' + Rtext(a) + ' this search was the wrong one to run: the ac method '
                  + 'searches for a product of a*c = ' + Rtext(Rmul(a, c)) + ' instead, and it finds '
                  + Ptext(p) + ' = ' + Pfactortextfull(p) + '.');
@@ -2144,9 +2128,6 @@ def factoring_lab(cfg):
     blocks.push(table('Every pair multiplying to a*c = ' + ac,
       ['m', 'n', 'm &times; n', 'm + n', 'is the sum b = ' + Rtext(b) + '?'], pairRows));
 
-    /* The discriminant answers the same question a completely different way. */
-    var r = quadroots(a, b, c);
-    var perfect = Rsign(r.disc) >= 0 && Rsurd(r.disc).k === 1n;
     var pieces = null;
 
     if (hit) {
@@ -2180,14 +2161,12 @@ def factoring_lab(cfg):
     } else {
       blocks.push(table('The search came back empty', [], [
         say('pairs tried', String(pairs.length) + ', every pair of whole numbers whose product is ' + ac),
-        say('the discriminant', 'b^2 - 4ac = ' + Rtext(r.disc) + ', which is '
-          + (perfect ? 'a perfect square' : 'not a perfect square')),
-        say('the two tests agree', chip(!perfect, !perfect
-          ? 'no pair, and no perfect square: both say the same thing'
-          : 'a pair should exist &mdash; that would be a bug')
-          + ' &mdash; a pair (m, n) with m + n = b and mn = ac exists exactly when b^2 - 4ac is a '
-          + 'perfect square, because m and n are the roots of t^2 - bt + ac'),
-        say('the exact roots', rootsSentence(r))
+        say('why every integer bracket was tested', 'if (rx + s)(tx + u) were a factorisation, '
+          + 'the two middle products m = ru and n = st would obey m*n = (rt)(su) = a*c and '
+          + 'm + n = ru + st = b. They would have appeared in the list above.'),
+        say('the exact conclusion', Ptext(core) + ' has no factorisation into two binomials with '
+          + 'integer coefficients. Course 6 supplies the quadratic formula for classifying its '
+          + 'non-rational zeros; this pair search does not need that later method.')
       ]));
     }
     work.innerHTML = blocks.join('');
@@ -2204,11 +2183,10 @@ def factoring_lab(cfg):
         + (pulled ? 'Taking the common factor ' + gcfText(g) + ' out first is what kept the search '
                   + 'this short.' : '')
       : '<strong>No pair of whole numbers multiplies to ' + ac + ' and adds to ' + Rtext(b) + '.</strong> '
-        + 'All ' + pairs.length + ' were tried above. The discriminant says the same thing from the '
-        + 'other side: b^2 - 4ac = ' + Rtext(r.disc) + ' is not a perfect square, and those two '
-        + 'statements are equivalent. ' + Ptext(core) + ' does not factor over the rationals; its '
-        + 'roots are ' + (r.kind === 'complex' ? 'not real at all' : 'real but irrational')
-        + ', and no arrangement of whole numbers in brackets can produce them.';
+        + 'All ' + pairs.length + ' were tried above. Any integer-coefficient binomial product would '
+        + 'create one of those pairs from its two middle products, so ' + Ptext(core)
+        + ' does not factor into integer-coefficient binomials. That is the exact scope of this '
+        + 'search; Course 6 classifies the roots that lie outside it.';
   }
 """
 
@@ -2365,8 +2343,9 @@ def factoring_lab(cfg):
           ? 'It is a sum of squares, and the difference-of-squares identity needs a minus: '
             + '(A - B)(A + B) multiplied out has -B^2 in it and there is no arrangement of brackets '
             + 'with rational coefficients that gives +B^2 for a quadratic. '
-            + (Pdeg(p) === 2 ? 'For this quadratic the curve above shows the same thing: it never '
-                 + 'reaches the axis, so there is no real root and no real factorisation either.' : '')
+            + (Pdeg(p) === 2 ? 'For this quadratic the algebra says more: a sum of two non-negative '
+                 + 'squares is positive away from a common zero. The curve above visualises that '
+                 + 'result; it is not the proof of it.' : '')
           : 'That is the ordinary case. The patterns are worth knowing because they are fast when they '
             + 'fit, not because they are complete; ' + (v.linear ? 'the rational root search factors '
             + 'this one as ' + v.text + '.' : 'here even the rational root search comes back empty.'));
@@ -2561,11 +2540,9 @@ def factoring_lab(cfg):
         say('why the search stopped', 'none of the remaining candidates is a root of it, so it has no '
           + 'linear factor with rational coefficients')];
       if (Pdeg(leftover) === 2) {
-        var qr = quadroots(leftover[2], leftover[1] || R0, leftover[0] || R0);
-        leftRows.push(say('its exact roots', qr.kind === 'complex'
-          ? 'x = ' + pmtext(qr.p, qr.s, true) + ' &mdash; not real'
-          : 'x = ' + pmtext(qr.p, qr.s) + ' &mdash; real, and irrational, which is exactly why no '
-            + 'rational candidate could have found them'));
+        leftRows.push(say('is that final over the rationals?', 'yes: a quadratic that factors over '
+          + 'the rationals has a rational linear factor, and the search ruled every one out. Course 6 '
+          + 'then determines whether its two non-rational zeros are real or complex.'));
       } else if (Pdeg(leftover) === 3) {
         leftRows.push(say('is that final?', 'for a cubic, yes: a cubic that factors at all has a linear '
           + 'factor, and the search just ruled every one of them out'));
@@ -2593,12 +2570,15 @@ def factoring_lab(cfg):
         + 'The search is exhaustive: any rational root p/q must have p dividing ' + Rtext(core[0])
         + ' and q dividing ' + Rtext(core[deg]) + ', and every such number was substituted above. So '
         + Ptext(core) + ' has NO rational root. '
-        + (Pdeg(core) <= 3
-          ? 'For degree ' + Pdeg(core) + ' that also settles factorisation: it does not factor over '
-            + 'the rationals at all. The curve above still crosses the axis, so it does have a real '
-            + 'root &mdash; an irrational one, which no list of fractions was ever going to contain.'
+        + (Pdeg(core) === 3
+          ? 'For degree 3 that also settles factorisation over the rationals: any cubic factorisation '
+            + 'would contain a linear factor. An odd-degree polynomial still has a real zero, so the '
+            + 'curve crosses at an irrational value that no list of fractions could contain.'
+          : (Pdeg(core) === 2
+            ? 'For degree 2 that also settles factorisation over the rationals. Course 6 determines '
+              + 'whether the remaining non-rational zeros are real or complex; this search does not.'
           : 'At degree ' + Pdeg(core) + ' that rules out linear factors but not a split into two '
-            + 'quadratics, which this search does not test for.');
+            + 'quadratics, which this search does not test for.'));
   }
 
   /* ------------------------------------------------------------- wiring */
