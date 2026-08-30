@@ -6,7 +6,7 @@ LESSONS = [
         "slug": "exponential-functions",
         "title": "Exponential Functions",
         "module": "Exponential functions",
-        "one_line": "The variable moves into the exponent.",
+        "one_line": "Classify exponential formulas and tables, then state their base, intercept and asymptote.",
         "summary": (
             "In every function so far the variable sat in the base: `x²`, `x³`, "
             "`√x`. An exponential function puts it in the exponent instead, and "
@@ -171,6 +171,11 @@ LESSONS = [
                 "constant, and it is drifting toward `1` &mdash; a line eventually "
                 "grows by a smaller and smaller <em>proportion</em>, while an "
                 "exponential never does.",
+                "For a faded classification, use the table `x: 0, 1, 2, 3` and "
+                "`h(x): −4, −12, −36, −108`. The first supplied move is "
+                "`(−12)/(−4) = 3`. Finish the ratio and difference rows, classify the "
+                "table, and state `a`, `b` and the horizontal asymptote. Check the "
+                "formula you obtain against all four values before opening the quiz.",
             ],
         },
         "quiz_title": "Which function is which",
@@ -228,12 +233,12 @@ LESSONS = [
         "slug": "growth-and-decay",
         "title": "Growth and Decay",
         "module": "Exponential functions",
-        "one_line": "One model, two behaviours, decided by the base.",
+        "one_line": "Translate percentage change into a positive-quantity model and distinguish growth from decay.",
         "summary": (
-            "The same formula `a·b^x` describes a quantity that keeps multiplying up "
-            "and one that keeps shrinking. Which of the two you have is decided by "
-            "the base and by nothing else in the formula, and the percentage in the "
-            "problem statement is the base in disguise."
+            "For a positive starting quantity, the same formula `a·b^x` describes an "
+            "amount that keeps multiplying up and one that keeps shrinking. Which of "
+            "the two you have is decided by the base, and the percentage in the "
+            "problem statement is that base in disguise."
         ),
         "key": [
             "f(x) = a·b^x    with   a > 0",
@@ -311,11 +316,12 @@ LESSONS = [
                          "For a rise of `r` percent a step, the doubling time is "
                          "close to `70/r`. At 1% that gives `70` against a true "
                          "`69.6607`; at 5% it gives `14` against `14.2067`; at 10% it "
-                         "gives `7` against `7.2725`. The `70` is a convenient "
-                         "rounding of `100·ln 2 ≈ 69.3147`, a quantity lesson 7 will "
-                         "name. The rule runs slightly high below about 2% a step and "
-                         "slightly low above it, and by 20% a step it offers `3.5` "
-                         "against a true `3.8018`.")),
+                         "gives `7` against `7.2725`. For now this is a checked "
+                         "shortcut, not a derived rule: lesson 9 will solve the "
+                         "doubling equation after logarithms have been defined. The "
+                         "rule runs slightly high below about 2% a step and slightly "
+                         "low above it, and by 20% a step it offers `3.5` against a "
+                         "true `3.8018`.")),
             ("h3", "Decay is growth reflected"),
             ("p", "`(1/b)^x = b^(−x)`, so the decay curve with base `1/b` is the "
                   "growth curve with base `b` reflected in the vertical axis. There "
@@ -389,7 +395,12 @@ LESSONS = [
                 "A reader who models this as \"loses 100 g a year\" gets year one "
                 "right and year five badly wrong: that model is at `0 g` after five "
                 "years, and the true figure is `163.84 g`. The two answers are not "
-                "close, and they were built from the same sentence."
+                "close, and they were built from the same sentence.",
+                "For a faded model, take `240` units growing by `12%` each hour. The "
+                "first move is supplied: `b = 1 + 12/100 = 28/25`. Write the function "
+                "with its time unit, find the amount after two hours without rounding "
+                "the base, and explain why the second hourly gain differs from the "
+                "first. Check that consecutive values have ratio `28/25`.",
             ],
         },
         "quiz_title": "Base, direction, amount",
@@ -449,7 +460,7 @@ LESSONS = [
         "slug": "the-number-e",
         "title": "The Number e",
         "module": "Exponential functions",
-        "one_line": "Where e comes from, by compounding faster and faster.",
+        "one_line": "Compute finite compounding values, distinguish them from their limit, and use e exactly.",
         "summary": (
             "Pay 100% interest once a year and a dollar becomes two. Pay it in "
             "smaller instalments more often and the year-end total climbs &mdash; but "
@@ -528,29 +539,13 @@ LESSONS = [
                   "value is `2.714567…`. Both readings are off, in opposite "
                   "directions, on every single row. That is what makes the limit worth "
                   "computing rather than reasoning about informally."),
-            ("h3", "A faster route to the same number"),
-            ("p", "The same number is the sum of `1/k!` over all `k ≥ 0`. The partial "
-                  "sums arrive far more quickly than the compounding sequence does, "
-                  "because each new term is smaller than the last by a factor of `k`."),
-            ("math", [
-                "terms                      partial sum",
-                "───────────────────────────────────────────────",
-                "1                          1.000000000000",
-                "1 + 1                      2.000000000000",
-                "  + 1/2                    2.500000000000",
-                "  + 1/6                    2.666666666667",
-                "  + 1/24                   2.708333333333",
-                "  + 1/120                  2.716666666667",
-                "  + 1/720                  2.718055555556",
-                "  + 1/5040                 2.718253968254",
-                "───────────────────────────────────────────────",
-                "e                          2.718281828459",
-            ]),
-            ("p", "Eight terms of the series agree with `e` to four decimal places. "
-                  "The compounding sequence at `n = 1000` agrees to two. To get `k` "
-                  "correct digits from `(1 + 1/n)^n` you need `n` of roughly `10^k`; "
-                  "the series needs about `k` terms. The limit is the definition; the "
-                  "series is how the digits are actually produced."),
+            ("h3", "The lab's second computation is a check, not a second method"),
+            ("p", "The lab also sums `1 + 1/1! + 1/2! + …` and compares its finite "
+                  "partial sums with the compounding values. That factorial series is "
+                  "a fast independent way to approximate `e`, but deriving why it has "
+                  "the same limit belongs to analysis. This course neither asks you to "
+                  "use the series nor treats numerical agreement as a proof. The "
+                  "definition needed here remains the compounding limit above."),
             ("h3", "The function e^x"),
             ("p", "`f(x) = e^x` is the exponential function with base `e`. "
                   "`f(0) = 1`, `f(1) = e ≈ 2.718282`, `f(2) = e² ≈ 7.389056`, and "
@@ -569,10 +564,10 @@ LESSONS = [
             "mode": "e",
             "panel_title": "Computed, not quoted",
             "panel_intro": "The rows are `(1 + 1/n)^n` as exact fractions, beside the "
-                           "partial sums of the series, with the two wrong readings as "
-                           "their own columns so you can watch them be wrong on every "
-                           "row. The value of `e` in the last box was summed in this "
-                           "browser and rounded once, at the end.",
+                           "partial sums of an optional independent check, with the two "
+                           "wrong readings as their own columns so you can watch them "
+                           "fail. You are responsible for the compounding column; the "
+                           "factorial-series column is not a method assessed here.",
         }),
         "steps_title": "Working with e",
         "steps_intro": "It is a number. Four habits keep it from being treated as "
@@ -590,10 +585,10 @@ LESSONS = [
              "`e ≈ 2.71828` is a true statement; `e = 2.71828` is a false one. Every "
              "decimal here and in the lab carries the number of places it was rounded "
              "to, and yours should too."),
-            ("Do not compute e from the limit",
-             "`(1 + 1/n)^n` needs roughly `10^k` terms for `k` correct digits; the "
-             "series needs about `k`. The limit is what `e` means, and the series is "
-             "what you sum."),
+            ("Keep a finite term distinct from the limit",
+             "For every finite `n`, `(1 + 1/n)^n` is a rational approximation below "
+             "`e`, not the value of `e`. Use the supplied `n` when a compounding term "
+             "is requested; use the symbol `e` when the limiting value is requested."),
         ],
         "worked": {
             "title": "One dollar, compounded more and more often",
@@ -627,6 +622,12 @@ LESSONS = [
                 "compounding more often changes the answer in places nobody is "
                 "counting. What it does buy is a formula that no longer mentions "
                 "`n` at all.",
+                "For a faded limit comparison, take one dollar at `100%` split into "
+                "ten equal compounding periods. The first line is supplied: the final "
+                "amount is `(1 + 1/10)^10 = (11/10)^10`. Evaluate that finite term, "
+                "place it between the quarterly value and `e`, and state why neither "
+                "the decimal nor the exact fraction equals `e`. Use inequalities, not "
+                "matching displayed digits, as the check.",
             ],
         },
         "quiz_title": "What e is",
@@ -642,12 +643,18 @@ LESSONS = [
                     "the move is illegal. The sequence increases and stays under `3`, "
                     "so it has a limit; no term equals that limit, because every term "
                     "is rational and `e` is not."},
-            {"q": "What is `(1 + 1/4)⁴` exactly?",
-             "a": ["`625/256`", "`125/64`", "`5/4`", "`2`"],
-             "c": 0,
-             "why": "`(5/4)⁴ = 5⁴/4⁴ = 625/256`, which is `2.44140625` with nothing "
-                    "rounded. `125/64` is `(5/4)³`, one power short; `5/4` is the base "
-                    "with the exponent dropped."},
+            {"q": "A table shows that `(1 + 1/n)^n &lt; 3` for `n = 1, 2, 4, 12, 365`. What has that table established by itself?",
+             "a": ["Every term of the infinite sequence is below `3`",
+                   "Only the five displayed terms are below `3`",
+                   "The sequence converges to `e`",
+                   "The next term must be closer to `e`"],
+             "c": 1,
+             "why": "A finite table establishes facts about its five displayed rows "
+                    "and no others. The first choice generalises to infinitely many "
+                    "unseen terms; the third asserts convergence; the fourth asserts "
+                    "monotonic improvement. Those claims are true here only because of "
+                    "the theorem stated in the reading, not because five examples "
+                    "proved them."},
             {"q": "Which statement about `e` is correct?",
              "a": ["`e = 2.71828`",
                    "`e` is irrational, so every decimal written for it is a rounding",
@@ -691,7 +698,7 @@ LESSONS = [
         "slug": "what-a-logarithm-is",
         "title": "What a Logarithm Is",
         "module": "Logarithms",
-        "one_line": "A logarithm is an exponent. That sentence is the lesson.",
+        "one_line": "Convert between exponential and logarithmic form and evaluate exact logarithms.",
         "summary": (
             "`log_b(x)` is the exponent you put on `b` to get `x`. Everything later "
             "in this course &mdash; the graphs, the three laws, both kinds of equation "
@@ -843,6 +850,10 @@ LESSONS = [
                 "positive for every real `y`, so no exponent gives `−7`. Logarithms of "
                 "negative numbers are not covered in this course and are not merely "
                 "difficult here; within the real numbers there is nothing to compute.",
+                "For a faded evaluation, start `log_27(9) = y` from the supplied "
+                "rewrite `27^y = 9`, then express both sides as powers of `3`, solve "
+                "for `y`, and check by raising `27` to the result. Keep the answer as "
+                "an exact fraction and say which role each of `27`, `9` and `y` plays.",
             ],
         },
         "quiz_title": "Reading the definition",
@@ -901,7 +912,7 @@ LESSONS = [
         "slug": "logarithmic-functions-and-their-graphs",
         "title": "Logarithmic Functions and Their Graphs",
         "module": "Logarithms",
-        "one_line": "The inverse of an exponential, reflected in y = x.",
+        "one_line": "Sketch a logarithmic function from its domain, asymptote, direction and anchor points.",
         "summary": (
             "`g(x) = log_b(x)` is the inverse of `f(x) = b^x`, so its graph is that "
             "curve reflected in the line `y = x`. The domain, the range, the "
@@ -1077,6 +1088,11 @@ LESSONS = [
                 "`(6, 0)` and `(2, 1)` became `(7, 1)`. Nothing about the shape "
                 "changed; every landmark moved five to the right, the asymptote "
                 "included.",
+                "For a faded sketch, use `g(x) = log_4(x + 3)`. The first line is "
+                "supplied: `x + 3 &gt; 0`. Finish the domain, draw the vertical "
+                "asymptote, move the three anchor inputs `1`, `4` and `1/4` through "
+                "the shift, and state the direction. Check each plotted point by "
+                "converting it back to an exponential equation.",
             ],
         },
         "quiz_title": "Domain, points, direction",
@@ -1136,7 +1152,7 @@ LESSONS = [
         "slug": "the-laws-of-logarithms",
         "title": "The Laws of Logarithms",
         "module": "Logarithms",
-        "one_line": "Three laws, which are the exponent laws read backwards.",
+        "one_line": "Expand or condense logarithmic expressions while preserving their domain.",
         "summary": (
             "Three laws turn a product into a sum, a quotient into a difference, and "
             "a power into a multiple. Each one is a single exponent law from course 1 "
@@ -1308,6 +1324,12 @@ LESSONS = [
                 "that it holds for every positive `x`, `y` and `z` is the two-line "
                 "derivation of each law above &mdash; a numeric check can refute a "
                 "false rule but cannot establish a true one.",
+                "For a faded expansion, take `log_b(√(x^5·y) / z³)` with "
+                "`x, y, z &gt; 0`. The supplied first line is the quotient-law split. "
+                "Rewrite the root as a power, finish the expansion, then condense your "
+                "answer back to the original expression. Check that every exponent "
+                "lands on the whole factor it came from and that the minus sign stays "
+                "with the denominator.",
             ],
         },
         "quiz_title": "Laws, and things that are not laws",

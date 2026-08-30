@@ -49,8 +49,8 @@ log_2(8) is 3 exactly, and log_2(10) is a number we can only pin down.
   laws      each law checked on the reader's numbers, and the two invented laws
             log(M + N) = log M + log N and log(M/N) = log M / log N shown
             failing on a concrete example rather than merely warned against
-  common    base 10 and base e: the characteristic is exact and the mantissa is
-            not, which is the whole reason log tables had two columns
+  common    base 10 and base e on one argument, with an exact power-of-ten
+            bracket beside the rounded values as a check
   base      change of base, derived, then checked through three different helper
             bases that must agree
   solveexp  b^(cx+d) = k by matching powers when that is possible and by logs
@@ -1012,8 +1012,8 @@ LOG_PRESETS = {
         ("x = 5000", "5000"),
         ("x = 1/500, which is 0.002", "1/500"),
         ("x = 1 &mdash; the log is exactly 0", "1"),
-        ("x = 10000000 &mdash; exact, all characteristic", "10000000"),
-        ("x = 7 &mdash; the mantissa is irrational", "7"),
+        ("x = 10000000 &mdash; an exact power of ten", "10000000"),
+        ("x = 7 &mdash; the remaining logarithm is irrational", "7"),
         ("x = 0 &mdash; there is no answer to give", "0"),
     ],
     "base": [
@@ -1054,7 +1054,7 @@ LOG_TITLES = {
     "define": ("Two ways to say one thing", "log_b(x) = y and b^y = x are the same sentence"),
     "graph": ("The graph, and its reflection", "y = b^x and y = log_b(x) across the line y = x"),
     "laws": ("The laws, checked", "Three that hold, two that people invent"),
-    "common": ("Base 10 and base e", "The characteristic is exact; the mantissa is not"),
+    "common": ("Base 10 and base e", "Two exponents for one argument, checked by a power-of-ten bracket"),
     "base": ("Change of base", "Derived, then checked through three different bases"),
     "solveexp": ("Solving b^(cx+d) = k", "Match the powers when you can; take logs when you cannot"),
     "solvelog": ("Solving a logarithmic equation", "The domain check is a step, not a formality"),
@@ -1079,7 +1079,7 @@ LOG_KPIS = {
     "define": [("log_b(x)", "lgKpi1"), ("Written as a power", "lgKpi2"), ("Exact?", "lgKpi3")],
     "graph": [("b^x at your x", "lgKpi1"), ("The mirrored point", "lgKpi2"), ("Direction", "lgKpi3")],
     "laws": [("Laws that held", "lgKpi1"), ("Invented laws that held", "lgKpi2"), ("Checked", "lgKpi3")],
-    "common": [("Characteristic", "lgKpi1"), ("log_10(x)", "lgKpi2"), ("ln(x)", "lgKpi3")],
+    "common": [("Power-of-ten exponent", "lgKpi1"), ("log_10(x)", "lgKpi2"), ("ln(x)", "lgKpi3")],
     "base": [("log_b(x)", "lgKpi1"), ("Through base 10", "lgKpi2"), ("Helper bases agree?", "lgKpi3")],
     "solveexp": [("x", "lgKpi1"), ("Method", "lgKpi2"), ("Check", "lgKpi3")],
     "solvelog": [("Candidates", "lgKpi1"), ("Accepted", "lgKpi2"), ("Rejected", "lgKpi3")],
@@ -1103,8 +1103,8 @@ LOG_HINT = {
     "graph": "Type <code>e</code> as the base to see the natural logarithm; every number for that "
              "base is a decimal, and the panel says so.",
     "laws": "p has to be a whole number, so that M^p is exact and the check can be exact too.",
-    "common": "Any positive number. The characteristic comes from comparing x with powers of ten, "
-              "which is exact arithmetic; only the mantissa is rounded.",
+    "common": "Any positive number. The lab brackets x between consecutive powers of ten in exact "
+              "arithmetic before it prints either rounded logarithm.",
     "base": "The helper bases are 10, e and 2. They are not special &mdash; they are the ones a "
             "calculator happens to carry.",
     "solveexp": "The equation is a&middot;b^(cx + d) = k. Set a = 1 and d = 0 for the plain case.",
@@ -1671,7 +1671,7 @@ def logarithm_lab(cfg):
       plot0.describe('y = log_10(x) and y = ln(x), both stopping at x = 0, which is where the '
         + 'requested value lies.');
       work.innerHTML = steps('what happens at x = ' + Rtext(x), [
-        ['the characteristic', 'there is none. The characteristic is the k with 10^k &le; x, and '
+        ['the power-of-ten bracket', 'there is none. The bracket needs a k with 10^k &le; x, and '
           + 'no power of ten is zero or negative, so the search has nothing to return.'],
         ['what a calculator does', 'it prints an error, or -Infinity for zero. -Infinity is not a '
           + 'number and not an answer: it is the machine reporting that log_10(x) falls without '
@@ -1687,8 +1687,8 @@ def logarithm_lab(cfg):
       return;
     }
 
-    /* The characteristic is found by comparing x with powers of ten. That part
-       is exact; the mantissa is the part that is not. */
+    /* The power-of-ten exponent is found by exact comparison. The remaining
+       logarithm is the part that needs rounding. */
     var br = bracketexp(R(10n), x);
     if (br === null) {
       fail('<strong>That number is too far from 1 for this lab to bracket.</strong> The search '
@@ -1702,18 +1702,18 @@ def logarithm_lab(cfg):
     var mantlog = Math.log(Rfloat(mant)) / Math.LN10;
     var exactly = Requ(mant, R1);
 
-    work.innerHTML = ttable('the two parts of a common logarithm',
+    work.innerHTML = ttable('two named bases, checked by powers of ten',
       ['part', 'value', 'where it comes from', 'arithmetic'], [
         trow([rowhead('x in scientific notation'), cell(Rshow(mant) + ' &times; 10^' + k),
           cell('10^' + k + ' = ' + Rshow(br.low) + ' &le; ' + Rtext(x) + ' &lt; '
             + Rshow(br.high) + ' = 10^' + (k + 1)), cell(chip('exact', 'ok'))]),
-        trow([rowhead('characteristic'), cell(String(k)),
-          cell('the whole number part: how many powers of ten fit inside x'), cell(chip('exact', 'ok'))]),
-        trow([rowhead('mantissa'), cell(exactly ? '0' : '&asymp;&nbsp;' + mantlog.toFixed(8)),
+        trow([rowhead('power-of-ten exponent'), cell(String(k)),
+          cell('the k in 10^k &le; x &lt; 10^(k+1)'), cell(chip('exact', 'ok'))]),
+        trow([rowhead('remaining common log'), cell(exactly ? '0' : '&asymp;&nbsp;' + mantlog.toFixed(8)),
           cell('log_10(' + Rshow(mant) + '), a number in [0, 1)'),
           cell(exactly ? chip('exact', 'ok') : chip('irrational', 'hi'))]),
         trow([rowhead('log_10(x)'), cell(exactly ? String(k) : '&asymp;&nbsp;' + log10.toFixed(8)),
-          cell('characteristic + mantissa = ' + k + (exactly ? '' : ' + ' + mantlog.toFixed(8))),
+          cell('power-of-ten exponent + remainder = ' + k + (exactly ? '' : ' + ' + mantlog.toFixed(8))),
           cell(exactly ? chip('exact', 'ok') : chip('rounded', 'no'))]),
         trow([rowhead('ln(x)'), cell('&asymp;&nbsp;' + ln.toFixed(8)),
           cell('log_10(x) &times; ln(10) = ' + log10.toFixed(8) + ' &times; ' + Math.LN10.toFixed(8)
@@ -1723,19 +1723,17 @@ def logarithm_lab(cfg):
           cell('log_10(x) / log_10(2) &asymp; ' + (log10 / (Math.LN2 / Math.LN10)).toFixed(8)),
           cell(chip('rounded', 'no'))])
       ])
-      + steps('why this split is the whole history of the subject', [
-        ['ten times x has the same mantissa', 'x = ' + Rtext(x) + ' and 10x = ' + Rtext(Rmul(x, R(10n)))
-          + ' differ by exactly 1 in the characteristic and not at all in the mantissa, because '
-          + 'log_10(10x) = log_10(10) + log_10(x) = 1 + log_10(x). A table of logarithms therefore '
-          + 'only ever had to list mantissas for numbers between 1 and 10; the reader supplied the '
-          + 'characteristic by looking at the number.'],
-        ['what is exact here', 'the characteristic ' + k + ' and the scientific-notation form '
+      + steps('what the bracket checks', [
+        ['ten times x raises the common logarithm by one', 'x = ' + Rtext(x) + ' and 10x = ' + Rtext(Rmul(x, R(10n)))
+          + ' differ by exactly 1 because log_10(10x) = log_10(10) + log_10(x) '
+          + '= 1 + log_10(x). The base predicts the change before either decimal is computed.'],
+        ['what is exact here', 'the power-of-ten exponent ' + k + ' and the scientific-notation form '
           + Rshow(mant) + ' &times; 10^' + k + '. Both came from comparing fractions with powers of '
           + 'ten, which is multiplication and nothing else.'],
         ['what is not', exactly
-          ? 'nothing, on this x: the mantissa is 0 because x is exactly a power of ten, so '
+          ? 'nothing, on this x: the remainder is 0 because x is exactly a power of ten, so '
             + 'log_10(x) = ' + k + ' with no rounding anywhere.'
-          : 'the mantissa. log_10(' + Rshow(mant) + ') is irrational, and every decimal in the '
+          : 'the remaining logarithm. log_10(' + Rshow(mant) + ') is irrational, and every decimal in the '
             + 'last four rows is a rounding of it to 8 places.'],
         ['ln against log', 'the two differ by the constant factor ln(10) &asymp; '
           + Math.LN10.toFixed(8) + '. Which one a formula uses is a matter of convention, and the '
@@ -1758,10 +1756,10 @@ def logarithm_lab(cfg):
 
     status.innerHTML = exactly
       ? '<strong>log_10(' + Rtext(x) + ') = ' + k + ' exactly.</strong> x is a whole power of ten, '
-        + 'so the mantissa is zero and there is nothing to round. These are the only arguments for '
+        + 'so the remainder is zero and there is nothing to round. These are the only arguments for '
         + 'which a common logarithm is exact, which is worth remembering when a page prints '
         + 'log_10(2) = 0.3010 without a word about where the rest of the digits went.'
-      : '<strong>The characteristic is ' + k + ' and it is exact; the mantissa is not.</strong> '
+      : '<strong>The power-of-ten exponent is ' + k + ' and it is exact; the remainder is not.</strong> '
         + 'Writing x as ' + Rshow(mant) + ' &times; 10^' + k + ' splits log_10(x) into a whole '
         + 'number anybody can read off and an irrational remainder in [0, 1) that has to be '
         + 'computed. log_10(' + Rtext(x) + ') &asymp; ' + log10.toFixed(8) + ' is that sum, rounded '
