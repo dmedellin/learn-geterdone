@@ -119,10 +119,11 @@ LESSONS = [
         "lab": ("equation", {
             "mode": "model",
             "panel_title": "Build it, solve it, then judge it",
-            "panel_intro": "Pick a scenario and change its numbers. The lab rebuilds the "
-                           "equation from what you typed, solves it in exact fractions, "
-                           "and hands the answer back to the situation to be accepted or "
-                           "rejected. Run the two mixture presets one after the other.",
+            "panel_intro": "Before running a preset, write the unknown with its unit, name "
+                           "the quantity counted two ways, predict the equation and decide "
+                           "what values the situation could accept. Start with plans and "
+                           "consecutive numbers; the mixture presets are a conservation "
+                           "challenge after those acts are secure.",
         }),
         "steps_title": "Turning a described situation into an answer",
         "steps_intro": "The equation is written in step 3 and solved in step 4. Steps 1 and 2 are where models are won, and step 4's second half is where they are lost.",
@@ -146,9 +147,10 @@ LESSONS = [
         ],
         "worked": {
             "title": "A mixture accepted, and the same mixture refused",
-            "intro": ["You have 20 litres of a 10% solution and add `x` litres of a 50% "
-                      "solution. What must `x` be to finish at 25%, and what happens if "
-                      "you aim at 60% instead?"],
+            "intro": ["This is the transfer example. The conserved quantity is pure "
+                      "substance: amount before plus amount added must equal the target "
+                      "fraction of the final volume. You have 20 litres at 10% and add "
+                      "`x` litres at 50%; first aim at 25%, then at 60%."],
             "lines": [
                 "unknown   x = the number of litres of 50% solution added",
                 "",
@@ -187,6 +189,11 @@ LESSONS = [
                 "that range. The negative answer is the model reporting an impossible "
                 "request. A write-up that stopped at `x = −100` would have reported it as "
                 "a recipe.",
+                "For a faded model, let `m` be the number of months. Two club plans cost "
+                "`50 + 8m` and `20 + 11m`. The unknown and both expressions have been "
+                "supplied; you must say which question earns an equals sign, write and "
+                "solve that equation, check both costs, and decide whether the resulting "
+                "number of months is usable before opening the plans preset.",
             ],
         },
         "quiz_title": "Building and judging",
@@ -202,25 +209,23 @@ LESSONS = [
                     "description as <em>2 more "
                     "than 3 times</em>. Solving the right one gives `w = 8` and length "
                     "`19`, and `16 + 38 = 54`."},
-            {"q": "Three consecutive whole numbers add to 48. What is the largest of them?",
-             "a": ["15", "16", "17", "18"],
+            {"q": "Five consecutive whole numbers add to 65. What is the largest?",
+             "a": ["11", "13", "15", "17"],
              "c": 2,
-             "why": "`3n + 3 = 48` gives `n = 15`, and `n` was the first number, so the "
-                    "three are `15, 16, 17`. `15` is the equation's answer rather than the "
-                    "question's, `16` is the middle number, and `18` comes from dropping "
-                    "the `+ 3`: `3n = 48` gives `n = 16`, and the largest of "
-                    "`16, 17, 18` is `18`."},
-            {"q": "Aiming a 10% solution and a 50% solution at 60% gives the equation an "
-                  "answer of `x = −100` litres. What is the correct conclusion?",
-             "a": ["The arithmetic must be wrong, because a mixture cannot come out negative",
-                   "`x = −100`, measured in litres, is the answer",
-                   "The equation is solved correctly and the situation has no answer: "
-                   "mixing 10% with 50% can never exceed 50%",
-                   "Take the size of it and add 100 litres"],
+             "why": "With `n` first, the sum is `n + (n + 1) + ... + (n + 4) = 5n + 10`. "
+                    "So `5n + 10 = 65` gives `n = 11`, and the largest is `15`. `11` "
+                    "answers for the first number, `13` is the middle, and `17` comes from "
+                    "using the wrong total offset."},
+            {"q": "A correct model for the required number of buses gives `b = 9/2`. Each bus must be whole. What should be reported?",
+             "a": ["Use 4 buses, because 9/2 rounds down", "Use 5 buses, because 9/2 rounds up",
+                   "The exact-equality model has no allowable whole-number answer; revisit the question before rounding",
+                   "The algebra is wrong because an answer may not be fractional"],
              "c": 2,
-             "why": "Substituting `−100` into the equation gives `−48` on both sides, so "
-                    "the algebra is right. The model is what rejects it, and it rejects it "
-                    "for a reason you can state in words before solving anything."},
+             "why": "`9/2` can solve the equation exactly while failing the stated domain "
+                    "of whole buses. Rounding changes the value and may destroy the "
+                    "equality; whether 5 is acceptable depends on a different question, "
+                    "such as asking for at least enough capacity. The algebra need not be "
+                    "wrong for the model to reject its result."},
         ],
         "mistakes": [
             ("Naming an object instead of a number",
@@ -242,10 +247,11 @@ LESSONS = [
              "in the same unit."),
         ],
         "standard": ("Finish when you can say, in English, which quantity the problem measures twice.",
-                     "That sentence is the model; the algebra after it is lesson 3. You "
-                     "should also be able to state what your letter means and what unit it "
-                     "carries, and to reject a solved value on the grounds of the "
-                     "situation rather than the arithmetic."),
+                     "Model two venues that cost `120 + 4p` and `60 + 6p`, where `p` is "
+                     "the number of people. State the equality question, solve it, check "
+                     "both totals and judge the value against the situation. Then explain "
+                     "why a negative or fractional `p` could pass the equation and still "
+                     "fail this model."),
         "note": "Situations often say <em>at least</em>, <em>no more than</em> or <em>at "
                 "most</em> rather than <em>exactly</em>. Those words give an inequality "
                 "instead of an equation, and the rest of this course builds the machinery "
@@ -378,11 +384,11 @@ LESSONS = [
         "lab": ("inequality", {
             "mode": "linear",
             "panel_title": "One inequality, solved and drawn",
-            "panel_intro": "The trace names every operation and gives the reversal its own "
-                           "row with its reason, and the table underneath tests sample "
-                           "numbers against the statement you typed. Start with "
-                           "`-2x &gt; 6`, then change the `-2` to `2` and watch the "
-                           "reversal row disappear.",
+            "panel_intro": "Before running a preset, predict the boundary, whether it is "
+                           "included, and the exact operation that will reverse the "
+                           "relation. The lab reports the answer only as an inequality, "
+                           "words and a number line; formal set notation waits for lesson "
+                           "13.",
         }),
         "steps_title": "Solving a linear inequality",
         "steps_intro": "Steps 1 to 3 are lesson 3 unchanged. Step 4 is what the relation adds.",
@@ -433,6 +439,10 @@ LESSONS = [
                 "one by multiplying by `−6` turns the relation round a second time and "
                 "returns `3x + 6 ≤ 2x`. Two reversals cancel, which is a useful thing to "
                 "have seen once.",
+                "For a faded solve, start `7 − 4x &gt; −9` from the supplied first line "
+                "`−4x &gt; −16`. Before dividing, write the relation you expect afterwards "
+                "and why. Finish the solve, then test the boundary, one number inside and "
+                "one outside against the original statement.",
             ],
         },
         "quiz_title": "Sign and set",
@@ -478,11 +488,10 @@ LESSONS = [
              "relation, for the same reason multiplying by `−1` does."),
         ],
         "standard": ("Finish when you can say, before you divide, whether the sign will reverse.",
-                     "For any linear inequality you should reach the solution set and be "
-                     "able to point at the single step that reversed it, or state that no "
-                     "step did. Then test one number from each side of the boundary "
-                     "against the original statement, not against a line halfway down "
-                     "your working."),
+                     "Solve `3 − 5x ≤ 18` and `4x + 1 &gt; 2x + 9` without the lab. Point "
+                     "to the step that reverses the first relation and explain why no step "
+                     "reverses the second. For each answer, test its boundary plus one "
+                     "number from either side in the original statement."),
         "note": "The answer above was written `x ≤ −6`. Lesson 13 writes the same set as "
                 "`(−∞, −6]` and as `{ x ∈ ℝ : x ≤ −6 }`, and all three say the same thing. "
                 "The next three lessons produce solution sets in two pieces, which is "
@@ -599,10 +608,10 @@ LESSONS = [
         "lab": ("inequality", {
             "mode": "compound",
             "panel_title": "Two statements, three number lines",
-            "panel_intro": "The lab draws each solution set and then the combination, so "
-                           "the overlap is something you see rather than something you "
-                           "are told. Solve one pair with `and`, then switch the connector "
-                           "to `or` and change nothing else.",
+            "panel_intro": "Solve both statements on paper and predict the combined shape "
+                           "before choosing `and` or `or`. The lab draws each set and the "
+                           "combination, using inequalities and words only; interval and "
+                           "set-builder notation wait for lesson 13.",
         }),
         "steps_title": "Solving a compound inequality",
         "steps_intro": "The two halves are solved independently. The connector is applied once, at the end, to the two answers.",
@@ -661,6 +670,10 @@ LESSONS = [
                 "than 4, so the second statement holds; if it is at least 2, the first "
                 "holds. Nothing is left out, and the union is the whole line even though "
                 "neither statement is true everywhere on its own.",
+                "For a faded intersection, use `x + 2 ≥ 7 and 3x &lt; 18`. The first "
+                "statement has been solved for you as `x ≥ 5`; solve the second, draw both "
+                "against one line, combine them, and test both resulting endpoints before "
+                "using the lab.",
             ],
         },
         "quiz_title": "And, or, and what is left",
@@ -672,22 +685,21 @@ LESSONS = [
                     "all three by 3. The second option stops after the subtraction, the "
                     "third moves the strictness to the wrong end, and the fourth keeps "
                     "only the left half of the statement."},
-            {"q": "Which numbers satisfy `x &lt; 4 or x &gt; 1`?",
-             "a": ["Every real number", "Only the numbers strictly between 1 and 4",
-                   "No numbers at all", "Every number except those between 1 and 4"],
+            {"q": "Which numbers satisfy `x ≤ 2 or x &gt; −1`?",
+             "a": ["Every real number", "Only the numbers strictly between −1 and 2",
+                   "No numbers at all", "Every number except those between −1 and 2"],
              "c": 0,
-             "why": "Any number below 4 satisfies the first statement, and any number not "
-                    "below 4 is at least 4 and so satisfies the second. The numbers "
-                    "between 1 and 4 satisfy both, and <em>or</em> keeps them &mdash; "
-                    "which is what the fourth option gets backwards."},
-            {"q": "What is the solution set of `x ≥ 3 and x ≤ 3`?",
+             "why": "Every number at or below 2 satisfies the first statement, and every "
+                    "number above −1 satisfies the second. Those two sets overlap and "
+                    "between them cover the whole line; inclusive <em>or</em> keeps the "
+                    "overlap as well."},
+            {"q": "What is the solution set of `2x ≥ 6 and x ≤ 3`?",
              "a": ["Every real number", "No numbers at all", "Exactly one number, `x = 3`",
                    "Every number except `3`"],
              "c": 2,
-             "why": "The two sets overlap at the single point 3, and both relations include "
-                    "their endpoint. Change either `≤` or `≥` to a strict relation and the "
-                    "intersection becomes empty, which is the sharpest demonstration of "
-                    "what the strictness does."},
+             "why": "The first statement is `x ≥ 3`; intersecting it with `x ≤ 3` leaves "
+                    "only 3, and both relations include that endpoint. If either relation "
+                    "were strict, the one-point intersection would become empty."},
         ],
         "mistakes": [
             ("Writing an or as a three-part statement",
@@ -706,11 +718,10 @@ LESSONS = [
              "itself."),
         ],
         "standard": ("Finish when you can predict the shape of the answer before you combine.",
-                     "Given two solved inequalities you should be able to say from the "
-                     "picture whether an <em>and</em> will give an interval, a single "
-                     "point or nothing, and whether an <em>or</em> will give two pieces, "
-                     "one piece or the whole line &mdash; and then settle each endpoint "
-                     "by testing it against both statements."),
+                     "Solve `3x − 2 &lt; 7 and 5 − x ≤ 3`, draw both sets and report their "
+                     "overlap with correct endpoint inclusion. Then solve "
+                     "`2x + 1 ≤ −3 or x − 4 &gt; 0` and report both rays. Test every finite "
+                     "boundary against the original pair."),
         "note": "The connector decides everything here, and the next two lessons supply "
                 "it automatically: `|X| &lt; k` produces an <em>and</em> and "
                 "`|X| &gt; k` produces an <em>or</em>. That is the reason absolute value "
@@ -826,10 +837,10 @@ LESSONS = [
         "lab": ("equation", {
             "mode": "absolute",
             "panel_title": "Two cases, and a check that can throw one out",
-            "panel_intro": "The lab runs both cases and substitutes each candidate back "
-                           "into the equation as you typed it, marking the survivors in "
-                           "green and the rejects in red. Put `x - 5` on the right and "
-                           "watch both candidates fail.",
+            "panel_intro": "Before running a preset, predict the sign of the right side, "
+                           "the number of cases, and which candidates can survive. The lab "
+                           "then substitutes every candidate into the equation as typed, "
+                           "marking survivors and rejects separately.",
         }),
         "steps_title": "Solving an absolute value equation",
         "steps_intro": "Step 1 comes before everything else, and step 4 is not a formality.",
@@ -886,6 +897,9 @@ LESSONS = [
                 "Change the right side to `x + 3` and the same two cases produce `x = 4` "
                 "and `x = −2/3`, and both survive. The algebra of the split is identical; "
                 "everything that differs is in the check.",
+                "For a faded solve, isolate the bars in `2|x + 2| − 1 = 9`; the supplied "
+                "result is `|x + 2| = 5`. Write both equations, finish both candidates and "
+                "substitute each into the original statement before using the lab.",
             ],
         },
         "quiz_title": "Cases and candidates",
@@ -904,14 +918,14 @@ LESSONS = [
              "why": "An absolute value is a distance and is never negative, so nothing can "
                     "make the left side `−4`. Splitting anyway produces `x = −11/3` and "
                     "`x = −1`, and substituting either gives a left side of `4`, not `−4`."},
-            {"q": "What is the solution set of `|2x − 1| = x − 5`?",
-             "a": ["`x = −4` and `x = 2`", "`x = 2` only", "`x = −4` only",
-                   "There are no solutions"],
-             "c": 3,
-             "why": "Both cases produce a candidate and both candidates fail the "
-                    "substitution: at `x = −4` the two sides are `9` and `−9`, and at "
-                    "`x = 2` they are `3` and `−3`. A left side that is never negative "
-                    "cannot equal `x − 5` unless `x ≥ 5`, and neither candidate is."},
+            {"q": "What is the solution set of `|x − 1| = x + 3`?",
+             "a": ["`x = −1` only", "There are no solutions", "`x = −1` and `x = 4`",
+                   "Every real number"],
+             "c": 0,
+             "why": "The case `x − 1 = x + 3` is a contradiction. The other case gives "
+                    "`x − 1 = −x − 3`, hence `x = −1`, and the check reads "
+                    "`|−2| = 2`. Inventing `x = 4` treats the right side as a fixed 3 and "
+                    "ignores its `x`."},
         ],
         "mistakes": [
             ("Splitting before the bars are alone",
@@ -929,10 +943,11 @@ LESSONS = [
              "may be extraneous. Only substitution into the original equation says which."),
         ],
         "standard": ("Finish when the substitution is part of the method rather than a habit.",
-                     "You should isolate the bars, read the right side and say how many "
-                     "cases there are, solve them, and substitute every candidate into the "
-                     "original equation &mdash; and be willing to write <em>no "
-                     "solutions</em> as a final answer when both candidates fail."),
+                     "Solve `|2x + 3| = x` without the lab. State the sign restriction on "
+                     "the right side, solve both case equations, and substitute both "
+                     "candidates into the original. If neither survives, write the empty "
+                     "solution set and identify why the case equations still produced "
+                     "numbers."),
         "note": "The same distance reading drives the next lesson. `|X| = 5` picks out two "
                 "points; `|X| &lt; 5` picks out everything between them and `|X| &gt; 5` "
                 "everything outside them, which is where lesson 10's <em>and</em> and "
@@ -1034,8 +1049,10 @@ LESSONS = [
                   "isolates the bars, before any case split exists."),
             ("h3", "Right-hand sides that end the question"),
             ("ul", [
+                "`|2x + 1| &lt; 0`. Nothing. No distance is below zero.",
                 "`|2x + 1| ≤ 0`. A distance is never negative, so the only possibility is "
                 "`2x + 1 = 0`, giving `x = −1/2`. The solution set has one member.",
+                "`|2x + 1| ≥ 0`. Everything. Every absolute value is nonnegative.",
                 "`|x + 3| &lt; −1`. Nothing at all. The solution set is `∅`.",
                 "`|x + 3| &gt; −1`. Everything. Every absolute value is at least `0`, and "
                 "`0 &gt; −1`.",
@@ -1057,10 +1074,10 @@ LESSONS = [
         "lab": ("inequality", {
             "mode": "absolute",
             "panel_title": "The band and the two rays, drawn",
-            "panel_intro": "The lab plots the absolute value against the constant, shades "
-                           "where the statement holds, and draws the solution set on the "
-                           "number line. Run the two presets with a negative right-hand "
-                           "side before you trust the two-case rule anywhere.",
+            "panel_intro": "Before running a preset, predict whether the result is a band, "
+                           "two rays, everything or nothing, and name the connector. The "
+                           "lab answers with inequalities, words and drawings only; formal "
+                           "set notation waits for lesson 13.",
         }),
         "steps_title": "Solving an absolute value inequality",
         "steps_intro": "The first two steps decide which rule you are about to use, or whether you need one at all.",
@@ -1072,8 +1089,9 @@ LESSONS = [
              "exists."),
             ("Look at the right side",
              "Negative with `&lt;` or `≤`: no solutions. Negative with `&gt;` or `≥`: "
-             "every real number. Zero: `|X| ≤ 0` means `X = 0`, and `|X| &gt; 0` means "
-             "everywhere except where `X = 0`. Positive: go on to step 3."),
+             "every real number. At zero, `&lt;` gives none, `≤` gives `X = 0`, `&gt;` gives "
+             "everywhere except `X = 0`, and `≥` gives every real number. With a positive "
+             "right side, go on to step 3."),
             ("Write the band for less-than and the two rays for greater-than",
              "`|X| &lt; k` becomes `−k &lt; X &lt; k`, one statement, connector "
              "<em>and</em>. `|X| &gt; k` becomes `X &lt; −k` or `X &gt; k`, two "
@@ -1113,6 +1131,9 @@ LESSONS = [
                 "`−7`, both of absolute value 7. Change the statement to "
                 "`|3 − 2x| &gt; 7` and the answer becomes `x &lt; −2` or `x &gt; 5`, with "
                 "the same two numbers now excluded.",
+                "For a faded band, isolate `3|x − 2| − 1 ≤ 8`; the supplied result is "
+                "`|x − 2| ≤ 3`. Write the three-part inequality, solve all three parts, "
+                "and test both endpoints plus one outside value before using the lab.",
             ],
         },
         "quiz_title": "Bands and rays",
@@ -1159,11 +1180,11 @@ LESSONS = [
              "number that tells the two apart."),
         ],
         "standard": ("Finish when you can name the connector before you split, and say why.",
-                     "Given `|X| &lt; k` or `|X| &gt; k` you should produce <em>and</em> "
-                     "or <em>or</em> from the distance reading rather than from memory, "
-                     "handle a negative or zero right-hand side without splitting at all, "
-                     "and test the answer against the statement with the bars still in "
-                     "it."),
+                     "Solve `−2|x + 1| ≤ −6` without the lab. Record the reversal while "
+                     "isolating the bars, derive the connector from the distance reading, "
+                     "solve both pieces and test both boundaries plus one excluded value "
+                     "in the original. Then classify all four statements `|x| &lt; 0`, "
+                     "`|x| ≤ 0`, `|x| &gt; 0`, and `|x| ≥ 0`."),
         "note": "Two of the answers in this lesson &mdash; `x ≤ −2 or x ≥ 5`, and every "
                 "real number &mdash; are awkward to write in the notation used so far. The "
                 "last lesson supplies interval and set-builder notation, in which they "
@@ -1285,11 +1306,10 @@ LESSONS = [
         "lab": ("inequality", {
             "mode": "notation",
             "panel_title": "Type an interval, read it four ways",
-            "panel_intro": "Set the two endpoints and their brackets, and the lab prints "
-                           "the interval, the inequality, the set-builder form and the "
-                           "number line from a single structure. Try putting a square "
-                           "bracket on infinity, and try the two endpoints the wrong way "
-                           "round.",
+            "panel_intro": "Use the lab to rehearse one interval: predict its inequality, "
+                           "set-builder condition and number line before changing an "
+                           "endpoint. It corrects infinity and reversed-endpoint errors; "
+                           "the faded task and quiz below assess unions of two intervals.",
         }),
         "steps_title": "Writing a solution set down",
         "steps_intro": "Four checks, in this order. The last one catches a bracket copied from the wrong side.",
@@ -1341,37 +1361,39 @@ LESSONS = [
                 "it takes a word, <em>or</em>; written as an interval it takes a symbol, "
                 "`∪`. Both are exact, and the interval form is the one that scales: "
                 "however many pieces a set has, it is a list of intervals joined by `∪`.",
+                "For a faded two-piece conversion, start from `x ≤ −3 or x &gt; 2`. The "
+                "left piece has been started as `(−∞, −3` and the right as `(2, ∞)`. "
+                "Choose the missing bracket at `−3`, join the pieces, write the real-number "
+                "set-builder form, and describe the corresponding endpoint dots before "
+                "checking the worked patterns above.",
             ],
         },
         "quiz_title": "Brackets and ends",
         "quiz": [
-            {"q": "Which interval is the set of `x` with `−3 &lt; x ≤ 4`?",
-             "a": ["`(−3, 4]`", "`[−3, 4)`", "`(−3, 4)`", "`[−3, 4]`"],
+            {"q": "Which interval form represents `x &lt; −1 or x ≥ 4`?",
+             "a": ["`(−∞, −1) ∪ [4, ∞)`", "`(−∞, −1] ∪ (4, ∞)`",
+                   "`[−1, 4)`", "`(4, −1)`"],
              "c": 0,
-             "why": "The strict `&lt;` at the left end gives a round bracket and the `≤` "
-                    "at the right end gives a square one. The second option puts both "
-                    "brackets on the wrong ends, and the last two make the two ends match "
-                    "when the statement does not."},
-            {"q": "What is wrong with `[2, ∞]`?",
-             "a": ["Nothing; it is a correct way of writing `x ≥ 2`",
-                   "The two endpoints are in the wrong order",
-                   "The square bracket on `∞` claims infinity is a number in the set, and "
-                   "it is not a number at all; the correct form is `[2, ∞)`",
-                   "The bracket at `2` should be round, because an interval running to "
-                   "infinity cannot include its left endpoint"],
-             "c": 2,
-             "why": "Infinity marks an end that never arrives, so there is nothing there "
-                    "to include and its bracket is always round. The bracket at `2` is "
-                    "decided by the relation `≥`, which includes 2; the far end has no "
-                    "say in it."},
-            {"q": "What set is `(4, 4)`?",
-             "a": ["The empty set", "The single number `4`", "Every number except `4`",
-                   "It is not valid interval notation"],
+             "why": "Strict `x &lt; −1` excludes `−1`, while `x ≥ 4` includes 4; infinity "
+                    "always has a round bracket. The second option reverses both finite "
+                    "endpoint decisions, the third fills the gap instead of keeping the "
+                    "two rays, and the last writes endpoints backwards."},
+            {"q": "Which inequality is stated by `{ x ∈ ℝ : −2 ≤ x &lt; 5 }`?",
+             "a": ["`−2 ≤ x &lt; 5`", "`−2 &lt; x ≤ 5`", "`x ≤ −2 or x &gt; 5`",
+                   "Only the integers `−2, −1, 0, 1, 2, 3, 4`"],
              "c": 0,
-             "why": "Both ends are excluded and they are the same number, so no number "
-                    "lies strictly between them. `[4, 4]` is the set `{ 4 }`, and opening "
-                    "either bracket empties it. The notation is valid; the set it names "
-                    "has nothing in it."},
+             "why": "The condition after the colon is read exactly as written, over real "
+                    "numbers. The second option swaps endpoint inclusion, the third turns "
+                    "a band into two rays, and the last silently changes the domain from "
+                    "`ℝ` to `ℤ`."},
+            {"q": "What is `{ x ∈ ℤ : 1 &lt; x ≤ 4 }`?",
+             "a": ["`{ 2, 3, 4 }`", "Every real number between 1 and 4",
+                   "`{ 1, 2, 3, 4 }`", "`(1, 4]` as a real interval"],
+             "c": 0,
+             "why": "The domain is the integers, so only `2, 3, 4` are available; the "
+                    "strict left relation excludes 1 and the right relation includes 4. "
+                    "The other options either ignore the integer domain or include the "
+                    "excluded endpoint."},
         ],
         "mistakes": [
             ("Putting a square bracket on infinity",
@@ -1388,11 +1410,11 @@ LESSONS = [
              "claims that `0` is a solution."),
         ],
         "standard": ("Finish when you can move between the four representations without stopping to think.",
-                     "Given an inequality you should produce the interval, the set-builder "
-                     "form and the number line; given any one of those you should produce "
-                     "the other three &mdash; including for a set in two pieces and for "
-                     "the empty set. Every solution set you write from here on is expected "
-                     "in one of these forms."),
+                     "Translate `(−∞, 1) ∪ [6, ∞)` into an inequality, a real-number "
+                     "set-builder condition and a number line with correct endpoint dots. "
+                     "Then list `{ n ∈ ℤ : −2 &lt; n ≤ 2 }` and explain why the same condition "
+                     "over `ℝ` cannot be listed. Every later solution set is expected in "
+                     "one of these exact forms."),
         "note": "This closes the course. Every solution set of an inequality here has been "
                 "an interval or a union of two intervals, because each statement reduces to "
                 "at most two linear ones and a linear statement changes from true to false "

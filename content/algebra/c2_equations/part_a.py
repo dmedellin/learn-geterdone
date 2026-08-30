@@ -121,9 +121,10 @@ LESSONS = [
         "lab": ("equation", {
             "mode": "check",
             "panel_title": "Substitute, then read the verdict",
-            "panel_intro": "Type an equation and one value. The lab evaluates each side at "
-                           "that value in exact fractions and reports true or false; it "
-                           "never solves anything. Run `3x = 1` at `0.333`, then at `1/3`.",
+            "panel_intro": "Before you run a preset, write the substituted left and right "
+                           "sides and predict the verdict. The lab evaluates only the value "
+                           "you chose in exact fractions; it does not reveal the solution "
+                           "set. Run `3x = 1` at `0.333`, then at `1/3`.",
         }),
         "steps_title": "Testing a candidate value",
         "steps_intro": "Four moves, none of which involves solving anything.",
@@ -175,26 +176,32 @@ LESSONS = [
                 "Lines 1 and 4 each establish exactly one thing: that particular value "
                 "passes. Whether any other value also passes is a question these checks do "
                 "not touch.",
+                "For a faded check, take `4 − 3x = 10` with candidate `x = −2`. The "
+                "substitution string is `4 − 3(−2) = 10`; finish the left-side arithmetic, "
+                "write the true-or-false verdict, and state exactly what that verdict does "
+                "and does not establish before using the lab.",
             ],
         },
         "quiz_title": "Solutions and checks",
         "quiz": [
-            {"q": "Which value makes `5x + 2 = 17` true?",
-             "a": ["`x = 3`", "`x = 19/5`", "`x = 15`", "`x = 17/5`"],
+            {"q": "Does the candidate `x = 3` make `5x + 2 = 17` true?",
+             "a": ["Yes: `5·3 + 2 = 17`", "No: `5·3 + 2 = 15`",
+                   "No: `5 + 3 + 2 = 10`", "Yes, because `17 − 2 = 15`"],
              "c": 0,
-             "why": "`5·3 + 2 = 17`. `19/5` comes from adding 2 to both sides instead of "
-                    "subtracting it; `15` from reading the equation as `x + 2 = 17` and "
-                    "ignoring the coefficient; `17/5` from dividing by 5 and forgetting "
-                    "the `+ 2` altogether."},
-            {"q": "Is `x = 0.333` a solution of `3x = 1`?",
-             "a": ["Yes, because `0.333` rounds to `1/3`",
-                   "No: `3 · 0.333 = 0.999`, and `0.999 ≠ 1`",
-                   "Yes, because `0.333` and `1/3` are the same number",
+             "why": "Substitution means replacing `x`, not solving: the left side is "
+                    "`5·3 + 2 = 17`, equal to the right. The second option forgets the "
+                    "final `+ 2`; the third replaces multiplication by addition; the last "
+                    "computes an intermediate number but never compares both sides."},
+            {"q": "Is `x = 0.66` a solution of `3x = 2`?",
+             "a": ["Yes, because `0.66` rounds to `2/3`",
+                   "No: `3 · 0.66 = 1.98`, and `1.98 ≠ 2`",
+                   "Yes, because `0.66` and `2/3` are the same number",
                    "It cannot be decided without a calculator"],
              "c": 1,
              "why": "The test is whether the statement comes out true, and it does not: "
-                    "`999/1000` is not `1`. `0.333` and `1/3` are different numbers, which "
-                    "is why one of them solves the equation and the other does not."},
+                    "`0.66 = 33/50`, so `3·0.66 = 99/50`, not `2`. The exact value "
+                    "`2/3` would pass, but a nearby terminating decimal is a different "
+                    "number."},
             {"q": "Both sides of `2x = 6` are multiplied by `0`. What is the result?",
              "a": ["`0 = 0`, which is true for every `x` &mdash; the move destroyed the information",
                    "`x = 0`",
@@ -220,11 +227,10 @@ LESSONS = [
              "keeping them separate is what makes the chain of equivalences readable."),
         ],
         "standard": ("Finish when you can decide, in exact arithmetic, whether a given number is a solution.",
-                     "Handed any equation and any candidate you should substitute into the "
-                     "original, evaluate both sides in fractions, and report true or false "
-                     "without hesitating &mdash; and you should be able to say why "
-                     "multiplying both sides by zero is not on the list of legal moves. "
-                     "Every lesson from here produces candidates; this is how you find out "
+                     "Without the lab, test both `x = 3` and `x = 5/2` in `4x + 1 = 13`, "
+                     "showing the two side values and a verdict for each. Then explain why "
+                     "multiplying both sides by zero cannot preserve that solution set. "
+                     "Every later lesson produces candidates; this is how you find out "
                      "what they are worth."),
         "note": "Lesson 2 starts producing candidates instead of testing them, using "
                 "exactly the two properties stated above. Notice that the properties never "
@@ -337,10 +343,10 @@ LESSONS = [
         "lab": ("equation", {
             "mode": "solve",
             "panel_title": "One operation per row",
-            "panel_intro": "Type any linear equation. Each row of the trace is a single "
-                           "operation applied to both sides, named as it happens, and the "
-                           "last table puts the answer back into the equation exactly as "
-                           "you typed it.",
+            "panel_intro": "Before selecting a preset, write the operations in the order "
+                           "you expect and predict the exact answer. Each lab row then names "
+                           "one operation applied to both sides, and the last table puts the "
+                           "answer back into the equation exactly as you typed it.",
         }),
         "steps_title": "Solving a one- or two-step equation",
         "steps_intro": "Simplify before you undo anything; then undo in reverse order.",
@@ -387,6 +393,10 @@ LESSONS = [
                 "In C the bracket in `(−8)/4` matters when you write the check out. "
                 "Substituting a negative value without brackets is how a correct answer "
                 "gets rejected by its own verification.",
+                "For a faded pass, start `5 − 3x = −7` with the supplied first move: "
+                "subtract `5` from both sides to get `−3x = −12`. Name and complete the "
+                "remaining move, then check the value in `5 − 3x = −7` before opening "
+                "the same equation in the lab.",
             ],
         },
         "quiz_title": "Undoing operations",
@@ -398,26 +408,22 @@ LESSONS = [
                     "9 instead of subtracting it; `2` from losing the sign in the "
                     "division; `−35/4` from dividing by 4 first but leaving the `9` "
                     "undivided."},
-            {"q": "Solve `7 − 2x = 19`.",
-             "a": ["`x = −6`", "`x = 6`", "`x = −13`", "`x = 13`"],
+            {"q": "Solve `6 − 3x = 21`.",
+             "a": ["`x = −5`", "`x = 5`", "`x = −9`", "`x = 9`"],
              "c": 0,
-             "why": "Subtracting 7 gives `−2x = 12`, and dividing by `−2` gives `−6`. "
-                    "Dividing by `2` gives `6` and loses the coefficient's sign. Writing "
-                    "`−2x = 19 + 7` in place of `19 − 7` gives `−2x = 26`, and then `−13` "
-                    "or `13` according to whether the sign survives the division."},
-            {"q": "Which of these first lines of working on `2(x + 3) = 14` is wrong?",
-             "a": ["Divide both sides by 2, giving `x + 3 = 7`",
-                   "Multiply out the bracket, giving `2x + 6 = 14`",
-                   "Subtract 3 from both sides, giving `2x = 11`",
-                   "Subtract 14 from both sides, giving `2(x + 3) − 14 = 0`"],
+             "why": "Subtracting `6` gives `−3x = 15`, and dividing by `−3` gives "
+                    "`x = −5`. `5` loses the coefficient's sign; `−9` comes from adding "
+                    "6 to 21 before dividing; `9` makes both of those errors."},
+            {"q": "Which first line of working on `4(x − 2) = 20` is wrong?",
+             "a": ["Divide both sides by 4, giving `x − 2 = 5`",
+                   "Multiply out the bracket, giving `4x − 8 = 20`",
+                   "Subtract 2 from both sides, giving `4x = 18`",
+                   "Subtract 20 from both sides, giving `4(x − 2) − 20 = 0`"],
              "c": 2,
-             "why": "Subtracting 3 from both sides is a legal move, but it does not give "
-                    "`2x = 11`. The `3` sits inside a product, so it is not a term of the "
-                    "left side: subtracting 3 from `2(x + 3)` leaves `2x + 6 − 3`, that is "
-                    "`2x + 3`, so the line should read `2x + 3 = 11`. The other three "
-                    "lines are correct &mdash; the first reaches `x = 4` in one more "
-                    "step and the second in two more, and subtracting 14 is valid but "
-                    "gets no closer to an answer."},
+             "why": "Subtracting 2 from both sides is legal, but it leaves "
+                    "`4(x − 2) − 2 = 18`, or `4x − 10 = 18`; it does not strip the 2 "
+                    "from inside the product. The other lines apply one valid operation "
+                    "to both complete sides, even though the last is not efficient."},
         ],
         "mistakes": [
             ("Applying the operation to one side only",
@@ -434,11 +440,11 @@ LESSONS = [
              "path expects them."),
         ],
         "standard": ("Finish when you can name every operation you apply and check the result without being asked.",
-                     "Given a two-step equation you should reach the answer in two named "
-                     "moves, keep the sign of a negative coefficient, write the result as "
-                     "an exact fraction, and substitute it back into the original as a "
-                     "matter of habit. Everything in lessons 3 to 5 adds new opening moves "
-                     "and finishes exactly like this."),
+                     "Solve `9 − 4x = −6` without the lab: name each operation, keep the "
+                     "answer as an exact fraction, and substitute it into the original. "
+                     "Then solve `3(x + 2) = 21` once by division first and once by "
+                     "distribution; the two routes must agree. Everything in lessons 3 "
+                     "to 5 adds new opening moves and finishes exactly like this."),
         "note": "The lab shows one operation per row on purpose. When an equation goes "
                 "wrong it is almost never the strategy that failed &mdash; it is one row, "
                 "and a trace where every row is named tells you which one. Lesson 3 adds "
@@ -552,10 +558,10 @@ LESSONS = [
         "lab": ("equation", {
             "mode": "sides",
             "panel_title": "Both routes, side by side",
-            "panel_intro": "The lab solves the same equation twice &mdash; collecting the "
-                           "variable on the left, then on the right &mdash; and reports "
-                           "whether the two routes agree. Watch which of the two divides "
-                           "by a negative number.",
+            "panel_intro": "Before the traces appear, compare the two coefficients and "
+                           "predict which collecting direction avoids a negative divisor. "
+                           "The lab then solves both ways and reports whether the routes "
+                           "agree.",
         }),
         "steps_title": "Solving with the variable on both sides",
         "steps_intro": "One extra step at the front; the rest is lesson 2 unchanged.",
@@ -606,17 +612,20 @@ LESSONS = [
                 "gets `−2` twice, which is what makes it a solution. A reader who expected "
                 "\"no solution\" from seeing a zero has misread the result, not the "
                 "algebra.",
+                "For a faded pass, take `4x − 7 = 9x + 8`. The smaller coefficient is "
+                "`4`, so begin by subtracting `4x` from both sides. Finish the constant "
+                "move and division, solve the same equation by subtracting `9x` instead, "
+                "and check that both routes give the same signed value.",
             ],
         },
         "quiz_title": "Collecting the unknown",
         "quiz": [
-            {"q": "Solve `3x − 7 = 8x + 3`.",
-             "a": ["`x = −2`", "`x = 2`", "`x = −4/5`", "`x = −10`"],
+            {"q": "Solve `7x + 4 = 2x − 11`.",
+             "a": ["`x = −3`", "`x = 3`", "`x = −7/5`", "`x = −15`"],
              "c": 0,
-             "why": "Subtracting `3x` gives `−7 = 5x + 3`, then `−10 = 5x`, so `x = −2`. "
-                    "`2` comes from writing `3x − 8x = 5x`; `−4/5` from adding the 3 "
-                    "instead of subtracting it; `−10` from stopping at `5x = −10` and "
-                    "never dividing."},
+             "why": "Subtracting `2x` gives `5x + 4 = −11`, then `5x = −15` and "
+                    "`x = −3`. `3` loses the sign; `−7/5` moves the constants in the "
+                    "wrong direction; `−15` stops before dividing by the coefficient."},
             {"q": "Solve `2 − x = 4 − 3x`.",
              "a": ["`x = 1`", "`x = 3`", "`x = −1/2`", "`x = 1/2`"],
              "c": 0,
@@ -624,13 +633,12 @@ LESSONS = [
                     "from writing `2x = 4 + 2`; `−1/2` from subtracting `3x` on the left "
                     "while cancelling it on the right, which leaves `2 − 4x = 4`; `1/2` "
                     "from that same slip with the sign lost in the division."},
-            {"q": "After simplifying, an equation reads `2x − 2 = 3x − 2`. What is its solution?",
+            {"q": "After simplifying, an equation reads `3x + 5 = x + 5`. What is its solution?",
              "a": ["`x = 0`", "There is no solution", "Every number is a solution", "`x = −2`"],
              "c": 0,
-             "why": "Subtracting `2x` leaves `−2 = x − 2`, and adding 2 gives `x = 0`. "
-                    "Zero is a value like any other, and reaching it is not the same as "
-                    "reaching a contradiction &mdash; substituting `0` into both sides "
-                    "gives `−2` and `−2`."},
+             "why": "Subtracting `x` and then `5` gives `2x = 0`, hence `x = 0`. "
+                    "The variable did not disappear: its coefficient is 2. At `x = 0` "
+                    "both sides equal 5, while `x = −2` gives `−1` and `3`."},
         ],
         "mistakes": [
             ("Adding a variable term to one side and subtracting it from the other",
@@ -647,11 +655,10 @@ LESSONS = [
              "genuinely means the second thing, and it does not look like `x = 0`."),
         ],
         "standard": ("Finish when the choice of side is deliberate and every sign survives the collecting.",
-                     "You should look at the two coefficients, decide which term to "
-                     "subtract, say why, and carry the equation to `x = ` a number with "
-                     "the brackets expanded correctly on the way. You should also be able "
-                     "to solve the same equation the other way round and get the same "
-                     "answer, which is the cheapest possible test of your own signs."),
+                     "Solve `3(x − 2) + 4 = 5x − 8` without the lab. Expand first, choose "
+                     "the collecting side deliberately, carry the equation to `x = ` a "
+                     "number, and check in the bracketed original. Then collect the other "
+                     "way and verify that the answer is unchanged."),
         "note": "The lab runs both routes at once precisely so that the answer can be seen "
                 "not to depend on the choice. If the two columns ever disagreed, one of "
                 "them would contain an illegal step &mdash; and that is a useful way to "
@@ -705,6 +712,20 @@ LESSONS = [
                      "For `2` and `3` it is `6`. For `4` and `6` it is `12`, not `24`: "
                      "`24` is the product, and the product is a common multiple but not "
                      "usually the least one.")),
+            ("h3", "Producing the LCD instead of guessing it"),
+            ("p", "For small denominators, list multiples until the lists first meet: the "
+                  "multiples of 4 are `4, 8, 12, ...` and of 6 are `6, 12, ...`, so the "
+                  "LCD is 12. For a longer list, prime-factor each denominator and take "
+                  "every prime at the highest power that occurs:"),
+            ("math", [
+                "6  = 2·3        8 = 2³        12 = 2²·3",
+                "highest power of 2: 2³       highest power of 3: 3",
+                "LCD = 2³·3 = 24",
+                "check: 24/6 = 4,   24/8 = 3,   24/12 = 2",
+            ]),
+            ("p", "The list method is quickest for two small denominators; the prime-power "
+                  "method scales. In either case, verify the result by dividing it by "
+                  "every denominator before multiplying the equation."),
             ("math", [
                 "x/2 + x/3 = 5",
                 "     × 6 both sides      6·(x/2) + 6·(x/3) = 6·5",
@@ -767,10 +788,10 @@ LESSONS = [
         "lab": ("equation", {
             "mode": "fractions",
             "panel_title": "Every written term, multiplied",
-            "panel_intro": "The lab lists the denominators it found, reports the LCD, and "
-                           "multiplies each term you wrote by it on its own row. Decimals "
-                           "count as fractions: type `0.2x + 1.5 = 3.1` and watch the "
-                           "multiplier come out as 10.",
+            "panel_intro": "Before selecting a preset, list the denominators, predict the "
+                           "LCD, and count the written terms that must survive the "
+                           "multiplication. The lab then shows one row per term. Decimals "
+                           "count as fractions: try `0.2x + 1.5 = 3.1`.",
         }),
         "steps_title": "Clearing the denominators",
         "steps_intro": "Find the multiplier first, then use it on everything without exception.",
@@ -825,6 +846,10 @@ LESSONS = [
                 "The sign on `−3(x − 2)` is the second trap. It produces `+6`, and writing "
                 "`−6` instead gives `x = 14` &mdash; an answer that survives every later "
                 "step and fails the check.",
+                "For a faded clearing, use `(2x − 1)/6 + (x + 2)/4 = 3`. The supplied "
+                "LCD is 12 and the cleared line is `2(2x − 1) + 3(x + 2) = 36`. Expand "
+                "both brackets, solve for an exact fraction, and check it in the original "
+                "fractional equation before asking the lab.",
             ],
         },
         "quiz_title": "Denominators",
@@ -836,13 +861,13 @@ LESSONS = [
                     "`x = 12/5`. `1/5` comes from leaving the right side unmultiplied; "
                     "`10` from adding the denominators into `x/10 = 1`; `5/12` from "
                     "inverting the last division."},
-            {"q": "Solve `(x + 1)/3 − (x − 2)/4 = 1`.",
-             "a": ["`x = 2`", "`x = 14`", "`x = −9`", "`x = 9`"],
+            {"q": "Solve `(x − 2)/5 + (x + 1)/2 = 4`.",
+             "a": ["`x = 39/7`", "`x = 37/7`", "`x = 3/7`", "`x = 31/7`"],
              "c": 0,
-             "why": "`4(x + 1) − 3(x − 2) = 12` gives `x + 10 = 12`. `14` is what you get "
-                    "from `−3(x − 2) = −3x − 6`; `−9` from forgetting to multiply the "
-                    "right side; `9` from dropping both brackets and writing "
-                    "`4x + 1 − (3x − 2) = 12`."},
+             "why": "Multiplying by 10 gives `2(x − 2) + 5(x + 1) = 40`, hence "
+                    "`7x + 1 = 40` and `x = 39/7`. `37/7` drops the multiplier from the "
+                    "`−2`; `3/7` leaves the right side unmultiplied; `31/7` changes "
+                    "`x − 2` to `x + 2` while expanding."},
             {"q": "Why does multiplying an equation through by the LCD never change its solutions?",
              "a": ["Because the LCD is the smallest such number",
                    "Because the LCD is a nonzero number, so the multiplication can be undone by dividing",
@@ -868,11 +893,10 @@ LESSONS = [
              "whole numerator, so it reaches both terms once the denominator has gone."),
         ],
         "standard": ("Finish when you can clear any set of denominators in one multiplication and account for every term.",
-                     "Given an equation with fractions or decimals you should name the "
-                     "denominators, state the LCD, multiply every term including the ones "
-                     "on the right, keep brackets around multi-term numerators, and check "
-                     "in the original. The term count before and after should be the first "
-                     "thing you verify."),
+                     "Without the lab, solve `0.3x − 1.2 = 0.05x + 0.8`. State a positive "
+                     "power-of-ten multiplier, apply it to all four written terms, solve, "
+                     "and check in the decimal original. Then find the LCD of 6, 8 and 12 "
+                     "by prime powers and verify that each denominator divides it."),
         "note": "Lesson 5 rearranges formulas, where the fractions are made of letters "
                 "rather than numbers and exactly the same multiplication clears them. The "
                 "condition that the multiplier be nonzero, which is free here, becomes the "
@@ -966,11 +990,28 @@ LESSONS = [
                      "The letter you are solving for plays the part of `x`; every other "
                      "letter is swept into `p` and `q`. What happens when `p = 0` is "
                      "lesson 6.")),
+            ("h3", "When the target is on both sides"),
+            ("p", "Factoring two target terms on one side is not enough when they begin on "
+                  "opposite sides. Collect them first, exactly as in lesson 3, and only "
+                  "then factor the target:"),
+            ("math", [
+                "ax + b = cx + d                    solve for x",
+                "     subtract cx             ax − cx + b = d",
+                "     subtract b                 ax − cx = d − b",
+                "     factor x                  (a − c)x = d − b",
+                "     divide by a − c                 x = (d − b)/(a − c)",
+                "answer valid when a − c ≠ 0",
+            ]),
+            ("p", "If `a − c = 0`, division is not available and the original formula "
+                  "must be read as lesson 6 reads it: `b = d` gives every `x`, while "
+                  "`b ≠ d` gives none. The condition records a real change in the answer, "
+                  "not a technical annoyance."),
             ("h3", "The condition on the division"),
             ("p", "`A = (1/2)bh` solved for `h` gives `h = 2A/b`, and that statement is "
-                  "silent about `b = 0`, where it says nothing at all. The restriction is "
-                  "not pedantry: a triangle with no base is not a triangle, and the formula "
-                  "is telling you so."),
+                  "valid when `b ≠ 0`. At `b = 0` the original equation becomes `A = 0`: "
+                  "if `A = 0`, every `h` satisfies it, and if `A ≠ 0`, none does. A physical "
+                  "triangle model normally excludes `b = 0` as well, but that modelling "
+                  "restriction is separate from what the equation says."),
             ("p", "Sometimes the condition is invisible until you write it. In "
                   "`C = S/(1 + r)` the forbidden value is `r = −1`, not `r = 0`, because "
                   "it is `1 + r` that gets divided by. Read the divisor, not the letter."),
@@ -986,10 +1027,10 @@ LESSONS = [
         "lab": ("equation", {
             "mode": "literal",
             "panel_title": "Name the letter, read the condition",
-            "panel_intro": "Enter a formula and name the letter to solve for. The answer "
-                           "comes back as an expression in the others, with the condition "
-                           "under which the final division was legal, and it is checked at "
-                           "exact values of the remaining letters.",
+            "panel_intro": "Before running a formula, circle the target, predict its "
+                           "coefficient after collecting, and write the expression that "
+                           "must be nonzero. The lab returns an expression in the other "
+                           "letters and checks it at exact values.",
         }),
         "steps_title": "Solving for a named letter",
         "steps_intro": "Decide what the unknown is first; after that every other letter behaves like a number.",
@@ -1043,6 +1084,10 @@ LESSONS = [
                 "`P` in the numerator is part of the term `A − P`, not a factor of it. "
                 "What you may write instead is `(A/P − 1)/t`, which is the same expression "
                 "with the division done first.",
+                "For a faded rearrangement, take `K = pR + qR` and solve for `R`. The "
+                "supplied structural move is `K = R(p + q)`. Finish the isolation, state "
+                "the condition on `p + q`, and choose exact values for `p`, `q` and `R` "
+                "that spot-check both the original and rearranged formulas.",
             ],
         },
         "quiz_title": "Rearranging",
@@ -1054,13 +1099,13 @@ LESSONS = [
                     "dividing by 2 instead of multiplying; `2A − b` from subtracting `b` "
                     "when it is a factor, not a term; `b/(2A)` from inverting the last "
                     "division."},
-            {"q": "Solve `S = C + rC` for `C`.",
-             "a": ["`C = S/(1 + r)`", "`C = S − rC`", "`C = S − r`", "`C = S(1 + r)`"],
+            {"q": "Solve `P = aQ + bQ` for `Q`.",
+             "a": ["`Q = P/(a + b)`", "`Q = P/a + b`", "`Q = P − a − b`", "`Q = P(a + b)`"],
              "c": 0,
-             "why": "Factoring gives `S = C(1 + r)`, and dividing isolates `C`. `S − rC` "
-                    "still contains `C`, so nothing has been solved; `S − r` comes from "
-                    "cancelling one `C` out of `C + rC`, which is not a legal cancellation "
-                    "in a sum; `S(1 + r)` multiplies where it should divide."},
+             "why": "Factoring gives `P = Q(a + b)`, then division gives "
+                    "`Q = P/(a + b)`, valid when `a + b ≠ 0`. `P/a + b` divides only one "
+                    "piece of the coefficient; `P − a − b` treats factors as terms; the "
+                    "last option multiplies where isolation requires division."},
             {"q": "`ax + b = c` rearranges to `x = (c − b)/a`. When is that answer valid?",
              "a": ["For every `a`, `b` and `c`",
                    "Exactly when `a ≠ 0`",
@@ -1089,12 +1134,11 @@ LESSONS = [
              "Writing `h = 2A/b` and not writing `b ≠ 0` leaves the answer claiming "
              "something about a case where it says nothing."),
         ],
-        "standard": ("Finish when you can isolate any letter, including one that appears twice, and state the condition.",
-                     "Given a formula and a named letter you should clear fractions, "
-                     "expand, collect the target's terms, factor, divide, and write the "
-                     "condition on the divisor without being prompted. A numerical spot "
-                     "check on the result should be automatic, and you should be able to "
-                     "say what it does and does not establish."),
+        "standard": ("Finish when you can isolate a formula's linear target, including when it appears twice, and state the condition.",
+                     "Rearrange `p(t − r) = q(t + s)` for `t` without the lab. Expand, "
+                     "collect both target terms, factor, divide, and state the condition "
+                     "on the divisor. Use exact values to spot-check the result, then say "
+                     "why that one assignment checks signs but does not prove the formula."),
         "note": "The condition `p ≠ 0` has now appeared in three lessons in three "
                 "disguises: the multiplication property in lesson 1, the final division in "
                 "lesson 2, and the divisor here. Lesson 6 asks what an equation is saying "
@@ -1205,10 +1249,10 @@ LESSONS = [
         "lab": ("equation", {
             "mode": "type",
             "panel_title": "Identity, contradiction, or one answer",
-            "panel_intro": "The lab subtracts one side from the other and shows exactly "
-                           "what is left. Take the preset `2(x + 3) = 2x + 6` and change "
-                           "the `6` to a `5`: an identity becomes a contradiction, and the "
-                           "difference between them is one constant.",
+            "panel_intro": "Classify the statement before selecting it: predict what will "
+                           "remain after one side is subtracted from the other. The lab then "
+                           "shows that remainder. Change the `6` in `2(x + 3) = 2x + 6` "
+                           "to `5` only after committing to both verdicts.",
         }),
         "steps_title": "Deciding which of the three it is",
         "steps_intro": "Do not judge by appearance. Simplify, subtract, then read.",
@@ -1264,14 +1308,18 @@ LESSONS = [
                 "`3x − x − 4 = 2x − 4`, and the equation would then look like a "
                 "contradiction. A sign error can manufacture any of the three outcomes, "
                 "which is why the simplifying comes first and gets checked.",
+                "For a faded classification, expand only the left side of "
+                "`4(x − 2) + 3 = 4x − 5` to get `4x − 5`. Stop there, predict the "
+                "outcome and solution set, then subtract one whole side and test two "
+                "different values before comparing with the lab.",
             ],
         },
         "quiz_title": "Three outcomes",
         "quiz": [
-            {"q": "What is the solution set of `4(x + 1) = 4x + 4`?",
+            {"q": "What is the solution set of `5(x − 2) + 3 = 5x − 7`?",
              "a": ["Every real number", "`x = 0`", "There is no solution", "`x = 1`"],
              "c": 0,
-             "why": "Expanding the left gives `4x + 4`, the same expression as the right, "
+             "why": "Expanding the left gives `5x − 10 + 3 = 5x − 7`, the same expression as the right, "
                     "so the statement is true whatever `x` is. It is an identity, and "
                     "answering `x = 0` would name one solution and discard all the "
                     "others."},
@@ -1307,11 +1355,11 @@ LESSONS = [
              "Neither verdict is visible until both sides are expanded and collected."),
         ],
         "standard": ("Finish when a vanished variable tells you something instead of worrying you.",
-                     "You should simplify, subtract, and name the outcome in words &mdash; "
-                     "\"every real number\", \"no solution\", or the value &mdash; without "
-                     "reaching for an `x = ` that is not there. You should also be able to "
-                     "say why a linear equation can never have exactly two solutions, and "
-                     "the reason is the theorem above, not experience."),
+                     "Classify and solve these without the lab: `5x − 2 = 2x + 7`, "
+                     "`3(x + 4) = 3x + 12`, and `2(x − 1) = 2x + 1`. For each, show the "
+                     "simplified remainder and write either the value, every real number, "
+                     "or no solution. Then use `px = q` to explain why no linear equation "
+                     "has exactly two solutions."),
         "note": "Every method later on can produce these two lines, and they always mean "
                 "the same thing. In course 8 a system of equations collapsing to `0 = 0` "
                 "means the two equations were the same line, and one collapsing to `0 = 5` "
@@ -1326,8 +1374,8 @@ LESSONS = [
         "summary": (
             "A ratio is a quotient, a proportion is an equation between two of them, and a "
             "percent is a ratio whose denominator is 100. Cross-multiplying is not a new "
-            "rule: it is multiplying both sides by both denominators, which is legal only "
-            "where neither of them is zero."
+            "rule: it is multiplying both sides by both nonzero denominators. The central "
+            "work is keeping the two ratios in the same order and identifying the whole."
         ),
         "key": [
             "a/b = c/d   ⟺   ad = bc          provided b ≠ 0 and d ≠ 0",
@@ -1348,15 +1396,15 @@ LESSONS = [
             ("Cross-multiplying is one multiplication, not a rule of its own",
              "Multiply both sides of `a/b = c/d` by `bd` and the denominators cancel, "
              "leaving `ad = bc`. Knowing that is what tells you when it is allowed: `b` "
-             "and `d` must not be zero, which matters as soon as a denominator contains "
-             "the variable."),
+             "and `d` must not be zero. Completion work here uses numerical denominators; "
+             "variable-denominator equations belong to course 5."),
             ("Percent is a ratio with denominator 100",
              "`15%` is the number `15/100`, that is `3/20`. Every percent question is "
              "`part/whole = p/100` with one of the three quantities missing, and the only "
              "difficulty is deciding which number is the whole."),
         ],
         "read_title": "Ratios, proportions and percents",
-        "read_intro": "What each one is, why cross-multiplication works, and the values that have to be excluded first.",
+        "read_intro": "What each one is, why cross-multiplication works, how units fix the ratio order, and how to identify the percent whole.",
         "body": [
             ("def", ("Ratio and proportion",
                      "A <strong>ratio</strong> of `a` to `b`, written `a : b` or `a/b`, is "
@@ -1375,18 +1423,12 @@ LESSONS = [
                 "Dividing `ad = bc` by the nonzero number `bd` returns `a/b = c/d`, so the "
                 "move is reversible and the two statements have the same solutions.",
             ]),
-            ("p", "The proof is where the conditions come from. When both denominators are "
-                  "plain numbers there is nothing to worry about. When one contains the "
-                  "variable, the values making it zero must be excluded before you solve, "
-                  "and a candidate that turns out to be one of them is not a solution."),
-            ("math", [
-                "x/(x − 2) = 2/(x − 2)         the denominator is 0 at x = 2, so x ≠ 2",
-                "",
-                "     × (x − 2) both sides,  legal only where x ≠ 2",
-                "     x = 2",
-                "",
-                "the only candidate is the excluded value      →   no solution",
-            ]),
+            ("p", "The proof is where the conditions come from. In this lesson the "
+                  "denominators in the proportions you solve are stated nonzero numbers, "
+                  "so checking the condition is immediate. If a denominator contains the "
+                  "variable, multiplying by it may create a candidate at a value where the "
+                  "original quotient is undefined; that is a rational-equation issue, and "
+                  "course 5 supplies the full method."),
             ("h3", "Setting one up"),
             ("p", "The two ratios must be built the same way round: if the left side is "
                   "kilometres over litres, so is the right. A car covers 150 km on 12 L; "
@@ -1428,14 +1470,19 @@ LESSONS = [
                          "The two percentages are taken on different bases. This is not a "
                          "trick question &mdash; it is the reason a percent is meaningless "
                          "until you say what it is a percent of.")),
+            ("p", "<strong>Preview, not completion work.</strong> The proportion lab can "
+                  "also accept a variable in a denominator and can show a candidate that "
+                  "makes that denominator zero. Use those presets to preview course 5 if "
+                  "you wish; they are not evidence that the domain method has been mastered "
+                  "here, and a quadratic cross product is outside this course."),
         ],
         "lab": ("equation", {
             "mode": "proportion",
-            "panel_title": "Cross-multiply, after excluding",
-            "panel_intro": "Enter the four parts of a proportion; the denominators may "
-                           "contain the variable. The lab finds every value that would "
-                           "make a denominator zero before it solves, then tests each "
-                           "candidate against that list.",
+            "panel_title": "Keep the ratio order, then cross-multiply",
+            "panel_intro": "Before running the first or third preset, label what each "
+                           "numerator and denominator measures and predict the two cross "
+                           "products. Presets with a variable denominator are a course-5 "
+                           "preview, not completion work for this lesson.",
         }),
         "steps_title": "Solving a proportion",
         "steps_intro": "Most of the work is done before the algebra starts.",
@@ -1445,8 +1492,9 @@ LESSONS = [
              "proportion built out of order is a correctly solved answer to the wrong "
              "question."),
             ("Write down any value that would make a denominator zero",
-             "If both denominators are numbers there are none. If one contains the "
-             "variable, solve \"denominator = 0\" first and keep the list beside you."),
+             "For this lesson both denominators are nonzero numbers, so this is a short "
+             "check rather than a new solve. A variable denominator starts the rational-"
+             "equation method deferred to course 5."),
             ("Multiply both sides by both denominators and solve",
              "This is cross-multiplication, and it produces `ad = bc`. What follows is a "
              "linear equation of the kind lesson 3 handles."),
@@ -1456,8 +1504,8 @@ LESSONS = [
              "true, and substituting is what confirms it."),
         ],
         "worked": {
-            "title": "A proportion, an exclusion, and the three percent questions",
-            "intro": ["The first has numerical denominators; the second does not."],
+            "title": "A proportion, a rate, and the three percent questions",
+            "intro": ["Every denominator here is a stated nonzero number; the hard step is keeping each comparison in the same order."],
             "lines": [
                 "A.  (x + 1)/3 = (x − 2)/5        denominators 3 and 5, never zero",
                 "        × 15      5(x + 1) = 3(x − 2)",
@@ -1468,59 +1516,57 @@ LESSONS = [
                 "    check   left   (−11/2 + 1)/3 = (−9/2)/3  = −3/2",
                 "            right  (−11/2 − 2)/5 = (−15/2)/5 = −3/2        agrees",
                 "",
-                "B.  x/(x − 2) = 2/(x − 2)        x = 2 makes both denominators 0",
-                "        excluded first:  x ≠ 2",
-                "        × (x − 2), legal only where x ≠ 2:   x = 2",
-                "    answer   no solution: the only candidate was excluded",
+                "B.  8 notebooks cost 18; what do 14 cost?",
+                "        money/notebooks both times:     18/8 = c/14",
+                "        cross products:                18·14 = 8c",
+                "                                             c = 63/2",
+                "    check   (63/2)/14 = 9/4   and   18/8 = 9/4",
                 "",
                 "C.  15% of 80        part/80 = 15/100      100·part = 1200    part = 12",
                 "    42 of 120        42/120 = p/100        120p = 4200        p = 35",
                 "    30 is 12% of     30/w = 12/100         12w = 3000         w = 250",
             ],
             "after": [
-                "B is the case that makes the exclusion worth doing first. The algebra "
-                "produces `x = 2` quite happily; it is the denominator, not the algebra, "
-                "that rules it out. Substituting `2` into the original gives `2/0` on both "
-                "sides, and that is not a number: neither side has a value at `x = 2`, so "
-                "the equation cannot be true there.",
+                "In B, `18/8 = 14/c` would compare money per notebook on the left with "
+                "notebooks per unit of money on the right. The units expose the reversal "
+                "before any algebra does, which is why they belong beside the ratios.",
                 "In C the three lines are the same equation with a different unknown. "
                 "Naming the whole is the entire difficulty: in the third line the whole is "
                 "the thing being asked for, which is why `30` goes on top.",
+                "For a faded proportion, start `7/12 = n/30` from the supplied cross "
+                "product `12n = 210`. Finish the exact division and substitute into both "
+                "ratios. Then say in words what would have to be measured by 7, 12, `n` "
+                "and 30 for that set-up to be meaningful.",
             ],
         },
         "quiz_title": "Proportions and percents",
         "quiz": [
-            {"q": "Solve `5/x = 15/9`.",
-             "a": ["`x = 3`", "`x = 27`", "`x = 25/3`", "`x = 45`"],
+            {"q": "Solve `y/7 = 12/21`.",
+             "a": ["`y = 4`", "`y = 28`", "`y = 9/4`", "`y = 84`"],
              "c": 0,
-             "why": "Cross products give `5·9 = 15x`, so `45 = 15x` and `x = 3`. `27` "
-                    "solves `5/9 = 15/x`, which pairs the numbers differently; `25/3` "
-                    "comes from multiplying numerator by numerator; `45` is the cross "
-                    "product itself, reported before the division by 15."},
-            {"q": "A price rises from 60 to 75. What is the percentage increase?",
-             "a": ["25%", "125%", "20%", "15%"],
+             "why": "Cross products give `21y = 7·12 = 84`, so `y = 4`. `28` divides "
+                    "by the wrong denominator; `9/4` inverts the final quotient; `84` "
+                    "reports the cross product before dividing by 21."},
+            {"q": "A price rises from 80 to 92. What is the percentage increase?",
+             "a": ["15%", "115%", "about 13.04%", "12%"],
              "c": 0,
-             "why": "The increase is 15 and the base is the original 60, so "
-                    "`15/60 = 25/100`. `125%` is the new price as a percentage of the old, "
-                    "which is 100 more than the increase; `20%` divides by the new price "
-                    "instead of the old; `15%` reports the increase in currency as though "
-                    "it were a percentage."},
-            {"q": "What is the solution of `x/(x − 5) = 5/(x − 5)`?",
-             "a": ["`x = 5`",
-                   "No solution: the only candidate is the value that makes the denominators zero",
-                   "Every number except 5",
-                   "`x = 0`"],
-             "c": 1,
-             "why": "Multiplying by `x − 5` is legal only where `x ≠ 5`, and it gives "
-                    "`x = 5` &mdash; the one value that step excluded. Substituting `5` "
-                    "into the original produces `5/0`, which is not a number, so `5` is "
-                    "not a solution and there is no other candidate."},
+             "why": "The increase is 12 and the whole is the original 80, so "
+                    "`12/80 = 15/100`. `115%` is the new price compared with the old, not "
+                    "the increase; about `13.04%` divides by the new price 92; `12%` "
+                    "reports the currency increase as though it were already a percent."},
+            {"q": "36 is 24% of what whole?",
+             "a": ["150", "864", "8.64", "60"],
+             "c": 0,
+             "why": "`36/w = 24/100` gives `24w = 3600`, hence `w = 150`. `864` "
+                    "multiplies 36 by 24; `8.64` finds 24% of 36, reversing part and whole; "
+                    "`60` treats 24 as an amount to subtract rather than a percent."},
         ],
         "mistakes": [
-            ("Cross-multiplying before looking at the denominators",
-             "The step is only valid where both denominators are nonzero. Skipping the "
-             "exclusion list makes `x/(x − 2) = 2/(x − 2)` look as though it has the "
-             "solution `x = 2`, which substitution immediately refuses."),
+            ("Treating a variable-denominator preview as an ordinary proportion",
+             "A denominator containing `x` can be zero for a candidate, so multiplying by "
+             "it is not automatically reversible. The lab can display that warning, but "
+             "course 5 owns the exclusion-and-check method; completion here uses stated "
+             "nonzero numerical denominators."),
             ("Building the two ratios in opposite orders",
              "`150/12 = d/18` compares km per litre on both sides. `150/12 = 18/d` "
              "compares km per litre with litres per km, and gives `d = 36/25` &mdash; a "
@@ -1531,12 +1577,11 @@ LESSONS = [
              "20% of 120. For a change, the base is always the original amount, and "
              "`(new − old)/old` says so explicitly."),
         ],
-        "standard": ("Finish when you set the proportion up with the units matching and exclude before you solve.",
-                     "You should be able to turn a rate or a percent question into "
-                     "`a/b = c/d`, name what each ratio compares, list any value that kills "
-                     "a denominator, cross-multiply, solve and check. For a percent "
-                     "question you should be able to say which number is the whole before "
-                     "writing anything down."),
+        "standard": ("Finish when you set the proportion up with matching units and identify the percent whole before you solve.",
+                     "Without the lab, model this rate: 5 kg cost 14, so what do 8 kg "
+                     "cost? Label both ratio units, cross-multiply and check the exact "
+                     "answer. Then solve `45/w = 18/100` and say why `w`, rather than 45, "
+                     "is the whole. Variable-denominator equations remain course-5 work."),
         "note": "Lesson 8 takes the same step &mdash; turning a described situation into "
                 "an equation &mdash; without the proportion to hang it on, which makes "
                 "naming the unknown the main decision. The excluded-value habit built here "

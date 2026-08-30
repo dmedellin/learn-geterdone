@@ -7,7 +7,10 @@ COURSE = {
     "title": "Linear Equations and Inequalities",
     "level": "Beginner",
     "summary": (
-        "Solving for an unknown: what a solution is, the operations that preserve one, equations with fractions and with the variable on both sides, formulas rearranged for any letter, inequalities and their one surprising rule, and absolute value."
+        "Solving for an unknown: what a solution is, the operations that preserve one, "
+        "one-variable linear equations with fractions and variables on both sides, "
+        "formulas linear in a named letter, inequalities and their one surprising rule, "
+        "and absolute value."
     ),
     "blurb": (
         "Find the value that makes a statement true &mdash; and know why each move you made kept it true. Linear equations, literal formulas, inequalities, compound and absolute value statements, and the notation for writing a solution set down."
@@ -21,15 +24,16 @@ COURSE = {
     "assumes_short": "Course 1",
     "assumes_long": "expressions, exponents, the distributive law",
     "outcomes_intro": (
-        "By the end you can solve any linear statement and say what its solution set is, in either standard notation."
+        "By the end you can solve the one-variable real linear equations and inequalities "
+        "taught here, justify every move, and state the resulting solution set exactly."
     ),
     "outcomes": [
         ("Solve and justify",
-         "Carry a linear equation to `x = ` a number, naming the operation applied to both sides at each step, and check the answer in the ORIGINAL equation."),
+         "Carry a one-variable linear equation to `x = ` a number, naming the operation applied to both sides at each step, and check the answer in the ORIGINAL equation."),
         ("Recognise the three outcomes",
          "Tell a conditional equation from an identity and from a contradiction, and read `0 = 0` and `0 = 5` correctly rather than as \"x = 0\"."),
-        ("Rearrange any formula",
-         "Solve a literal equation for whichever letter is asked for, including when that letter appears twice."),
+        ("Rearrange a linear formula",
+         "Solve a literal equation that is linear in the requested letter, including when that letter appears on both sides, and state when the final divisor is nonzero."),
         ("Handle inequalities and absolute value",
          "Solve linear, compound and absolute-value statements, reverse the sign when and only when you must, and write the answer in interval notation."),
     ],
@@ -37,7 +41,7 @@ COURSE = {
         "Lessons 1 to 6 are equations, 7 and 8 apply them, and 9 to 13 are inequalities, absolute value and the notation for a solution set."
     ),
     "how_to": [
-        "Check every answer by substituting it back. It costs ten seconds and it catches the arithmetic slip that a step-by-step trace will not.",
+        "After the complete example, cover its answer and do the faded rehearsal before the quiz. The supplied first move is guidance; the remaining moves and the substitution check are yours.",
         "Do the fraction lessons without decimals. `x = 7/3` is the answer; `x = 2.333` is a rounding of it, and the rest of this path expects the fraction.",
         "In the inequality lessons, test a number from your own answer against the original statement. A reversed sign is invisible in the algebra and obvious in the test.",
     ],
