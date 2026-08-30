@@ -35,6 +35,7 @@ REGISTRY = {
     "counting": counting.counting_lab,
     "pascal": counting.pascal_lab,
     "inclusion_exclusion": counting.inclusion_exclusion,
+    "derangement": counting.derangement_lab,
     "induction": induction.induction_lab,
     "recurrence": induction.recurrence_lab,
     "number": number.number_lab,
@@ -42,6 +43,7 @@ REGISTRY = {
     "graph": graph.graph_lab,
     "probability": probability.probability_lab,
     "distribution": probability.distribution_lab,
+    "bayes": probability.bayes_lab,
     "algorithm": algorithms.algorithm_lab,
 
     # The algebra path. Its labs share the exact-arithmetic core in

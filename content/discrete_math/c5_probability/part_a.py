@@ -41,10 +41,11 @@ LESSONS = [
                      "The <strong>sample space</strong> `S` is the set of all possible "
                      "outcomes of an experiment. An <strong>outcome</strong> is one "
                      "element of `S`; an <strong>event</strong> is a subset of `S`.")),
-            ("p", "The outcomes must be <strong>mutually exclusive</strong> (exactly one "
-                  "happens) and <strong>exhaustive</strong> (at least one happens). Those "
-                  "are the same conditions a proof by cases needs, and they fail in the "
-                  "same ways."),
+            ("p", "The outcomes must be <strong>mutually exclusive</strong> (no two "
+                  "happen together) and <strong>exhaustive</strong> (at least one "
+                  "happens), so that exactly one happens. Those are the two obligations "
+                  "a proof by cases carries in course 1 lesson 14 &mdash; overlap nowhere, "
+                  "cover everything &mdash; and they fail in the same ways."),
             ("example", ("Two dice, two models",
                          "Model A: `S` is the 36 ordered pairs `(1,1)` through `(6,6)`, all "
                          "equally likely. Model B: `S` is the 11 sums `2, …, 12`. Both are "
@@ -80,11 +81,18 @@ LESSONS = [
                          "answering `1/4` is the error the fine model prevents.")),
         ],
         "lab": ("probability", {
-            "experiment": "coins4",
+            "experiment": "dice2",
+            "a": 0,
+            "b": 3,
             "panel_title": "Every outcome, listed",
-            "panel_intro": "The sample space is drawn in full and each event highlights "
-                           "its members. Every probability below is a count of highlighted "
-                           "chips divided by the total.",
+            "panel_intro": "The 36 ordered pairs are drawn in full, and the two events "
+                           "open on the worked example: A = sum is 7 (six cyan chips) and "
+                           "B = a double (six purple), with no chip green because "
+                           "`A ∩ B = ∅`. Switch B to \"the first die is 4\" and one chip "
+                           "turns green: `(4,3)`, the `1/36` of the worked example. "
+                           "`P(A)`, `P(B)` and `P(A ∩ B)` are the rows to read now; the "
+                           "conditional rows, the `P(A)·P(B)` row and the status line's "
+                           "verdict belong to lessons 4 and 5.",
         }),
         "steps_title": "Building a probability model",
         "steps_intro": "Outcomes first, and choose them fine enough.",
@@ -133,22 +141,32 @@ LESSONS = [
                    "the 21 unordered pairs",
                    "the 12 faces"],
              "c": 1,
-             "why": "Only the ordered pairs are equally likely. Sums are not: 7 arises six "
-                    "ways and 2 arises one."},
+             "why": "Only the ordered pairs are equally likely. The 11 sums are not: 7 "
+                    "arises six ways and 2 arises one. The 21 unordered pairs are not "
+                    "either: `{1,2}` arises as `(1,2)` and `(2,1)` while `{1,1}` arises "
+                    "once. And the 12 faces are parts of the apparatus, not results of "
+                    "rolling it."},
             {"q": "An event is:",
              "a": ["a single outcome", "a subset of the sample space",
                    "a probability", "a random variable"],
              "c": 1,
              "why": "Any subset, including `∅` (probability 0) and `S` (probability 1). A "
-                    "single outcome is a one-element event."},
+                    "single outcome is an element of `S`; the event is the one-element "
+                    "set containing it. A probability is a number attached to an event, "
+                    "and a random variable (lesson 7) is a function on outcomes &mdash; "
+                    "neither is a subset."},
             {"q": "Outcomes must be mutually exclusive, meaning:",
              "a": ["they are equally likely",
-                   "exactly one of them occurs",
+                   "no two of them can occur together",
                    "there are finitely many",
                    "they are independent"],
              "c": 1,
-             "why": "Exclusive and exhaustive together mean exactly one occurs, which is "
-                    "what makes the probabilities sum to 1."},
+             "why": "Exclusive is \"at most one occurs\"; exhaustive is \"at least one\"; "
+                    "together, exactly one, which is what makes the probabilities sum to "
+                    "1. Equal likelihood is a modelling assumption the lesson says to "
+                    "check, not a requirement; finitely many is not required either "
+                    "(lesson 12's space is infinite); and two distinct outcomes are "
+                    "disjoint events, which lesson 5 shows is the opposite of independent."},
         ],
         "mistakes": [
             ("Choosing outcomes too coarse",
@@ -222,6 +240,12 @@ LESSONS = [
                          "= 1 − 625/1296 = 671/1296 ≈ 0.518`. Counting the ways to get at "
                          "least one six directly requires inclusion and exclusion over the "
                          "four dice; the complement is one line.")),
+            ("p", "The answer most people give first is `4 × 1/6 = 2/3`. That adds the "
+                  "four events \"die `i` shows a 6\", which overlap &mdash; the roll "
+                  "`(6,6,1,2)` is counted twice &mdash; and the same reasoning with six "
+                  "dice would give a probability of 1. Adding gives an upper bound, which "
+                  "lesson 3 names the union bound, and it gives the answer only when the "
+                  "events are disjoint."),
             ("h3", "The birthday problem"),
             ("thm", ("Shared birthdays",
                      "With `n` people and 365 equally likely birthdays, "
@@ -240,7 +264,8 @@ LESSONS = [
                   "<em>pairs</em>: 23 people form `C(23,2) = 253` pairs, and each has about "
                   "a `1/365` chance of matching. The intuition that fails is comparing 23 "
                   "with 365 rather than 253 with 365."),
-            ("p", "This is a different question from the pigeonhole statement in course 2. "
+            ("p", "This is a different question from the pigeonhole statement in course 2 "
+                  "lesson 14. "
                   "That one said 367 people <em>guarantee</em> a match; this one says 23 "
                   "make it likely. Certainty and probability are different claims and "
                   "neither implies the other."),
@@ -252,10 +277,17 @@ LESSONS = [
         ],
         "lab": ("probability", {
             "experiment": "cards",
+            "a": 2,
+            "b": 0,
             "panel_title": "Count, count, divide",
-            "panel_intro": "The table shows each probability as a count over a count "
-                           "before showing it as a fraction and a percentage. The counts "
-                           "are what you would compute by hand.",
+            "panel_intro": "The 66 two-card hands from the 12-card deck are the chips, "
+                           "and every row of the table is a count over a count before it "
+                           "is a fraction. A = at least one A holds in 21 of them, and 21 "
+                           "is `66 − C(10,2) = 66 − 45`: the complement rule on the "
+                           "screen, with the 45 hands drawn from the ten non-aces the "
+                           "chips that are neither cyan nor green. B = a pair holds in 6, "
+                           "so `P(B) = 6/66 = 1/11`, and the one green chip is the pair of "
+                           "aces. The conditional rows are lesson 4's.",
         }),
         "steps_title": "Computing a probability",
         "steps_intro": "Denominator first; it is often easier and it anchors the model.",
@@ -302,12 +334,18 @@ LESSONS = [
              "a": ["1/11", "1/6", "1/12", "7/36"],
              "c": 1,
              "why": "Six of the 36 ordered pairs sum to 7, so `6/36 = 1/6`. Answering "
-                    "`1/11` uses the sums as the sample space, which are not equally likely."},
+                    "`1/11` uses the sums as the sample space, which are not equally "
+                    "likely; `7/36` puts the sum itself in the numerator, where a count "
+                    "of pairs belongs; and `1/12` is what `1/6` becomes if the "
+                    "symmetric pairs `(3,4)` and `(4,3)` are wrongly merged into one."},
             {"q": "`P(at least one head)` in four coin flips:",
              "a": ["1/2", "15/16", "1/16", "4/16"],
              "c": 1,
-             "why": "`1 − P(no heads) = 1 − 1/16 = 15/16`. The complement is one "
-                    "calculation; the direct count needs four cases."},
+             "why": "`1 − P(no heads) = 1 − 1/16 = 15/16`. `1/16` is the complement "
+                    "itself, the probability of no heads; `4/16` counts only the four "
+                    "outcomes with exactly one head; and `1/2` is the probability the "
+                    "first flip is heads, one of the four overlapping events whose union "
+                    "was asked for."},
             {"q": "The birthday problem's answer surprises people because:",
              "a": ["365 is large",
                    "the question is about pairs, and 23 people form 253 pairs",
@@ -315,7 +353,11 @@ LESSONS = [
                    "the calculation is wrong"],
              "c": 1,
              "why": "The relevant comparison is 253 pairs against 365 days, not 23 people "
-                    "against 365 days."},
+                    "against 365 days. That 365 is large is exactly the intuition that "
+                    "misleads; real birthdays being slightly non-uniform makes a "
+                    "coincidence more likely, not less (the note below); and the "
+                    "calculation is right &mdash; the surprise is in the reader, not the "
+                    "arithmetic."},
         ],
         "mistakes": [
             ("Counting the event with a different model from the space",
@@ -418,10 +460,20 @@ LESSONS = [
         ],
         "lab": ("probability", {
             "experiment": "urn",
+            "a": 0,
+            "b": 2,
             "panel_title": "The axioms, in a finite space",
-            "panel_intro": "Every quantity in the table obeys the axioms because it is a "
-                           "ratio of counts. Check monotonicity yourself: an event "
-                           "contained in another never has a larger probability.",
+            "panel_intro": "The 15 pairs of balls are the chips, and every row of the "
+                           "table obeys the axioms because it is a ratio of counts. "
+                           "A = both red holds in 3 of them and B = no blue in 6, and "
+                           "every chip in A is green &mdash; in both &mdash; with none cyan "
+                           "alone: both red is a way of having no blue, so `A ⊆ B` and "
+                           "`3/15 ≤ 6/15`. That is monotonicity on the screen, and the "
+                           "three purple chips are `B \\ A`. Now set A to \"the green ball "
+                           "is drawn\" (5 of 15) and B to \"both red\": no chip is green, "
+                           "so A3 applies and `P(A ∪ B) = 5/15 + 3/15 = 8/15` &mdash; a row "
+                           "the table does not print, because the lab only reports "
+                           "intersections. Add it yourself.",
         }),
         "steps_title": "Working from the axioms",
         "steps_intro": "Use disjointness where you have it, inclusion and exclusion where you do not.",
@@ -469,23 +521,33 @@ LESSONS = [
              "a": ["`A` and `B` independent",
                    "`A` and `B` disjoint",
                    "nothing",
-                   "`P(A) + P(B) ≤ 1`"],
+                   "`P(A) = P(B)`"],
              "c": 1,
              "why": "Axiom A3 is additivity over DISJOINT events. Independence is a "
-                    "different and unrelated condition, introduced in lesson 5."},
+                    "different condition (lesson 5) under which the sum overcounts by "
+                    "exactly `P(A)P(B)`; \"nothing\" is wrong because any overlap is "
+                    "counted twice; and equal probabilities are neither necessary nor "
+                    "sufficient &mdash; two disjoint events of different sizes add, and two "
+                    "copies of the same event do not."},
             {"q": "`A ⊆ B`. What follows about their probabilities?",
              "a": ["`P(A) = P(B)`", "`P(A) ≤ P(B)`", "`P(A) ≥ P(B)`", "nothing"],
              "c": 1,
              "why": "Monotonicity, proved by splitting `B` into `A` and `B \\ A` and "
-                    "applying non-negativity."},
+                    "applying non-negativity to the second piece. Equality holds only "
+                    "when `B \\ A` has probability 0, so `P(A) = P(B)` is not forced; "
+                    "`P(A) ≥ P(B)` runs the wrong way; and \"nothing\" is what a reader "
+                    "concludes who has not yet seen that a subset is a smaller event."},
             {"q": "The union bound says:",
              "a": ["`P(A ∪ B) = P(A) + P(B)`",
                    "`P(A ∪ B) ≤ P(A) + P(B)`",
                    "`P(A ∩ B) ≤ P(A)P(B)`",
                    "`P(A) ≤ 1`"],
              "c": 1,
-             "why": "It follows from inclusion&ndash;exclusion and non-negativity, and it "
-                    "needs no independence &mdash; which is what makes it so widely usable."},
+             "why": "It follows from inclusion&ndash;exclusion and the non-negativity of "
+                    "`P(A ∩ B)`, and it needs no independence &mdash; which is what makes "
+                    "it so widely usable. The first option is A3 and needs disjointness; "
+                    "`P(A ∩ B) ≤ P(A)P(B)` is false in general (take `A = B`); and "
+                    "`P(A) ≤ 1` is true but is a consequence of A2, not the union bound."},
         ],
         "mistakes": [
             ("Adding probabilities of overlapping events",
@@ -592,10 +654,20 @@ LESSONS = [
         ],
         "lab": ("probability", {
             "experiment": "dice2",
+            "a": 0,
+            "b": 2,
             "panel_title": "Conditioning, visibly",
-            "panel_intro": "Event B is the condition. The table shows `P(A|B)` as the count "
-                           "of outcomes in both divided by the count in B &mdash; the "
-                           "restricted sample space, not the original one.",
+            "panel_intro": "Event B is the condition, and the table shows `P(A|B)` as the "
+                           "count in both divided by the count in B &mdash; the restricted "
+                           "sample space, not the original. A = sum is 7 and B = the first "
+                           "die is 4 is the dice example in the body: B holds in 6 of the "
+                           "36 chips and A in one of those, `(4,3)`, so `P(A|B) = 1/6`. "
+                           "Now switch B to \"at least one 6\": the numerator is two "
+                           "chips, `(1,6)` and `(6,1)`, but `P(A|B) = 2/11` while "
+                           "`P(B|A) = 2/6 = 1/3` &mdash; same numerator, different "
+                           "denominators, and the ratio of the two answers is "
+                           "`P(A)/P(B) = 6/11`, which is lesson 6's theorem before it is "
+                           "stated.",
         }),
         "steps_title": "Conditioning correctly",
         "steps_intro": "Say which event is the condition, out loud.",
@@ -644,13 +716,18 @@ LESSONS = [
             {"q": "`P(A|B)` is defined as:",
              "a": ["`P(A)P(B)`", "`P(A ∩ B)/P(B)`", "`P(A ∩ B)/P(A)`", "`P(A ∪ B)/P(B)`"],
              "c": 1,
-             "why": "The outcomes in both, out of the outcomes in `B`. It requires "
-                    "`P(B) &gt; 0`."},
+             "why": "The outcomes in both, out of the outcomes in `B`; it requires "
+                    "`P(B) &gt; 0`. `P(A)P(B)` equals `P(A ∩ B)` only for independent "
+                    "events (lesson 5); `P(A ∩ B)/P(A)` is the other conditional, "
+                    "`P(B|A)`; and `P(A ∪ B)/P(B)` is at least 1, which no probability is."},
             {"q": "Two cards drawn without replacement. `P(second is an ace | first is an ace)`:",
              "a": ["4/52", "3/51", "4/51", "1/13"],
              "c": 1,
-             "why": "After removing one ace, 3 aces remain among 51 cards. Conditioning is "
-                    "what \"without replacement\" means."},
+             "why": "After removing one ace, 3 aces remain among 51 cards. `4/52` and "
+                    "`1/13` are the same number, the probability of an ace with the deck "
+                    "intact &mdash; conditioning is what \"without replacement\" means, and "
+                    "both ignore it; `4/51` shrinks the deck but forgets that the ace "
+                    "drawn is gone."},
             {"q": "In Monty Hall, switching wins with probability 2/3 because:",
              "a": ["there are three doors",
                    "the host's choice is constrained by knowledge, which is information",
@@ -658,7 +735,11 @@ LESSONS = [
                    "the prize moves"],
              "c": 1,
              "why": "The host must open a losing door, so his action carries information. "
-                    "A random host who happened to reveal an empty door gives 1/2."},
+                    "Three doors and equal likelihood describe the situation before "
+                    "anything happened, when each door was `1/3`; the prize never moves. "
+                    "A random host who happened to reveal an empty door would leave "
+                    "`1/2`, which is why the constraint, and not the picture, is the "
+                    "answer."},
         ],
         "mistakes": [
             ("Swapping the two conditionals",
@@ -748,6 +829,11 @@ LESSONS = [
                   "Intuitively: knowing `B` occurred tells you `A` did not, which is a "
                   "large change in your information. The only way to be both disjoint and "
                   "independent is for one of them to have probability 0."),
+            ("p", "Nor is the union of independent events the sum: "
+                  "`P(A ∪ B) = P(A) + P(B) − P(A)P(B)`, by lesson 3's inclusion and "
+                  "exclusion with the product put in for the intersection. \"Independent, "
+                  "so add\" and \"disjoint, so multiply\" are the two halves of one "
+                  "confusion, and both come from treating the two properties as one."),
             ("h3", "Mutual independence"),
             ("def", ("Mutually independent",
                      "Events `A₁, …, A_n` are <strong>mutually independent</strong> when "
@@ -767,11 +853,19 @@ LESSONS = [
         ],
         "lab": ("probability", {
             "experiment": "dice2",
+            "a": 7,
+            "b": 0,
             "panel_title": "Test the equation",
-            "panel_intro": "The table prints `P(A∩B)` and `P(A)·P(B)` on adjacent rows. "
-                           "Independence is those two being equal, which the status line "
-                           "reports &mdash; and some independent pairs are genuinely "
-                           "surprising.",
+            "panel_intro": "The table prints `P(A ∩ B)` and `P(A)·P(B)` on adjacent rows, "
+                           "and independence is those two being equal. A = the first die "
+                           "is even and B = sum is 7 is the lesson's surprising pair: three "
+                           "chips are green &mdash; `(2,5)`, `(4,3)`, `(6,1)` &mdash; so "
+                           "`P(A ∩ B) = 3/36 = 1/12`, and the `P(A)·P(B)` row reads `1/12` "
+                           "too. Independent, as the status line says, with nothing in the "
+                           "description to suggest it. Switch B to \"at least one 6\": "
+                           "eight green chips give `8/36 = 2/9` against `P(A)·P(B) = "
+                           "11/72`, so that pair is dependent &mdash; and `P(A|B) = 8/11` "
+                           "against `P(A) = 1/2` says which way.",
         }),
         "steps_title": "Checking independence",
         "steps_intro": "Compute three numbers and compare two of them.",
@@ -821,22 +915,32 @@ LESSONS = [
              "a": ["independent", "dependent", "mutually exclusive and independent",
                    "impossible to classify"],
              "c": 1,
-             "why": "`P(A∩B) = 0` but `P(A)P(B) &gt; 0`. Knowing `B` occurred rules out "
-                    "`A` entirely, which is maximal dependence."},
+             "why": "`P(A∩B) = 0` but `P(A)P(B) &gt; 0`, so the equation fails: knowing "
+                    "`B` occurred rules out `A` entirely, which is maximal dependence. "
+                    "\"Mutually exclusive and independent\" is possible only when one "
+                    "event has probability 0, which the question excludes; and the pair "
+                    "is not hard to classify &mdash; the definition is one equation and "
+                    "both sides are known."},
             {"q": "The test for independence is:",
              "a": ["the events have no common cause",
                    "`P(A ∩ B) = P(A)P(B)`",
                    "the events are disjoint",
                    "`P(A) = P(B)`"],
              "c": 1,
-             "why": "The equation is the definition. Stories about causes are not evidence "
-                    "either way &mdash; the sum-of-dice example is independent despite an "
-                    "obvious dependence in the description."},
+             "why": "The equation is the definition, and it is the only test. Stories "
+                    "about causes are not evidence either way &mdash; first die even and "
+                    "sum 7 are independent despite an obvious dependence in the "
+                    "description; disjoint events with positive probability are "
+                    "dependent, not independent; and `P(A) = P(B)` says nothing about "
+                    "the intersection at all."},
             {"q": "Three events are pairwise independent. Are they mutually independent?",
              "a": ["Yes, always", "Not necessarily", "Only if disjoint", "Only if equally likely"],
              "c": 1,
              "why": "The two-coin example is pairwise independent and fails the triple "
-                    "condition. Mutual independence requires every subset."},
+                    "condition, so mutual independence requires every subset. "
+                    "Disjointness would make them dependent, not more independent; and "
+                    "equal likelihood is what the coin example already has, so it cannot "
+                    "be what was missing."},
         ],
         "mistakes": [
             ("Confusing independent with disjoint",
@@ -946,12 +1050,22 @@ LESSONS = [
                   "by the factor `P(D)/P(+)`, and when the disease is rare that factor is "
                   "enormous."),
         ],
-        "lab": ("probability", {
-            "experiment": "urn",
-            "panel_title": "Both conditionals at once",
-            "panel_intro": "The table shows `P(A|B)` and `P(B|A)` on adjacent rows so the "
-                           "difference between them is visible. The status line confirms "
-                           "that both routes to `P(A ∩ B)` agree, which is Bayes.",
+        "lab": ("bayes", {
+            "prev": 1000,
+            "sens": 99,
+            "fpr": 5,
+            "panel_title": "The medical test, counted",
+            "panel_intro": "The lab opens on the lesson's test &mdash; 1 in 1 000, 99% "
+                           "sensitivity, 5% false positives &mdash; applied to a million "
+                           "people so that every cell is a whole number. Read the table: "
+                           "1 000 have the condition and 990 of them test positive; 999 000 "
+                           "do not and 49 950 of them test positive anyway. So "
+                           "`P(D|+) = 990/50 940 = 11/566 ≈ 1.94%`, and the bar shows it: a "
+                           "green sliver against 50.5 false positives for every true one. "
+                           "The status line then does the formula with the same numbers. "
+                           "Now set the prevalence to 30 in 100 and watch the posterior go "
+                           "to `297/332 ≈ 89.5%` with the test untouched &mdash; that is the "
+                           "worked example.",
         }),
         "steps_title": "Applying Bayes",
         "steps_intro": "Write the prior down first; it is the number people forget.",
@@ -997,13 +1111,19 @@ LESSONS = [
              "a": ["99%", "95%", "2%", "50%"],
              "c": 2,
              "why": "The false positives from the 99.9% who are healthy vastly outnumber "
-                    "the true positives. About 2%."},
+                    "the true positives: 4 995 against 99 per 100 000, so about 2%. `99%` "
+                    "is the sensitivity, a property of the test; `95%` is `1 − 0.05`, "
+                    "the specificity, also a property of the test; and `50%` is what the "
+                    "answer would be if the prior were about 5%, not 0.1%."},
             {"q": "The law of total probability is used in Bayes to:",
              "a": ["compute the numerator", "expand the denominator `P(B)`",
                    "check independence", "normalise the prior"],
              "c": 1,
              "why": "`P(B)` is split over the partition, which is where the base rate "
-                    "enters and why the answer depends on it."},
+                    "enters and why the answer depends on it. The numerator `P(B|A)P(A)` "
+                    "is a single product and needs no splitting; independence is not "
+                    "being checked anywhere in Bayes; and the prior is a given number "
+                    "&mdash; nothing normalises it."},
             {"q": "Base-rate neglect is:",
              "a": ["ignoring the false positive rate",
                    "reading `P(B|A)` as though it were `P(A|B)`",
@@ -1011,7 +1131,10 @@ LESSONS = [
                    "a rounding error"],
              "c": 1,
              "why": "The two conditionals differ by the factor `P(A)/P(B)`, and neglecting "
-                    "the prior is treating that factor as 1."},
+                    "the prior is treating that factor as 1. Ignoring the false-positive "
+                    "rate is a different error &mdash; it drops a branch of the denominator "
+                    "(mistake 2 below); the test is not at fault; and the gap between 99% "
+                    "and 2% is fifty-fold, not a rounding."},
         ],
         "mistakes": [
             ("Reporting the sensitivity as the answer",
@@ -1027,8 +1150,9 @@ LESSONS = [
         "standard": ("Finish when you can do the calculation both ways.",
                      "Take a test with 95% sensitivity and 10% false positives for a "
                      "condition affecting 2% of the population. Compute `P(D|+)` by the "
-                     "formula, then by counting a population of 10 000. The agreement is "
-                     "the point."),
+                     "formula, then by counting a population of 10 000: you should find "
+                     "190 true positives against 980 false ones, so about 16%. The "
+                     "agreement is the point."),
         "note": "Bayes' theorem is also the foundation of a whole approach to statistics, "
                 "in which the prior encodes belief before the data and the posterior "
                 "encodes it afterwards. The mathematics here is the same; what is "

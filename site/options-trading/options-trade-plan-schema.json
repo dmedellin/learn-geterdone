@@ -95,6 +95,14 @@
         "ask": {
           "type": "number",
           "minimum": 0
+        },
+        "netPrice": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Premium paid or received per share: a single option's premium, a debit spread's net debit, a credit spread's net credit."
+        },
+        "strategyLabel": {
+          "type": "string"
         }
       }
     },
@@ -116,6 +124,35 @@
         "breakeven": {
           "type": "number",
           "minimum": 0
+        },
+        "riskBudget": {
+          "type": "number",
+          "minimum": 0,
+          "description": "accountSize × riskBudgetPct / 100."
+        },
+        "lossAtInvalidation": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Expiration loss if the underlying finishes at the thesis invalidation level. For covered calls and cash-secured puts this is the figure the budget check compares, as course 2 defined planned risk; maximumLoss is the stock-to-zero figure and is reported separately."
+        },
+        "plannedRisk": {
+          "type": "number",
+          "minimum": 0,
+          "description": "The figure the risk-budget check compared with riskBudget: maximumLoss for defined-risk structures, lossAtInvalidation for share-backed ones."
+        },
+        "spreadPct": {
+          "type": "number",
+          "minimum": 0,
+          "description": "(ask − bid) / midpoint × 100."
+        },
+        "targetPnl": {
+          "type": "number",
+          "description": "Expiration P/L at the thesis target."
+        },
+        "targetR": {
+          "type": "number",
+          "minimum": 0,
+          "description": "targetPnl / plannedRisk, or 0 when the target does not pay."
         }
       }
     },
@@ -156,10 +193,35 @@
         "checks": {
           "type": "array",
           "items": {
-            "type": "object"
+            "type": "object",
+            "required": [
+              "name",
+              "ok",
+              "weight"
+            ],
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "ok": {
+                "type": "boolean"
+              },
+              "detail": {
+                "type": "string"
+              },
+              "weight": {
+                "type": "number",
+                "minimum": 0
+              }
+            }
           }
+        },
+        "grade": {
+          "type": "string",
+          "description": "The wording shown on the page for the decision."
         }
       }
     }
-  }
+  },
+  "description": "The document lesson 16 (Options Trade Planning) exports after scoring a plan. thesis is the course-2 thesis the plan expresses; contract is what would be traded; risk is the figures the checks compared; management is the exit and event handling; evaluation is the score, the decision it implies (approved at 90 or more, revise from 55, reject below) and every check with its weight."
 }

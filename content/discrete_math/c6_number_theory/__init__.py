@@ -26,8 +26,9 @@ COURSE = {
     "assumes_short": "Courses 1–3",
     "assumes_long": "proof technique and induction",
     "outcomes_intro": (
-        "By the end you can compute in modular arithmetic confidently and explain "
-        "exactly what RSA's security rests on."
+        "By the end you can compute in modular arithmetic confidently, judge the "
+        "parameters of the everyday systems built on it, and explain exactly what "
+        "RSA's security rests on."
     ),
     "outcomes": [
         ("Run the algorithms by hand",
@@ -42,6 +43,10 @@ COURSE = {
         ("Explain RSA honestly",
          "Generate a key, encrypt and decrypt, and then recover the private key by "
          "factoring &mdash; which is what shows what the security actually depends on."),
+        ("Judge an application's parameters",
+         "Choose a hash modulus and say why a power of two fails, check the three "
+         "conditions that give a generator full period, and validate an affine key "
+         "&mdash; then break one from two letter frequencies."),
     ],
     "syllabus_intro": (
         "Lessons 1 to 6 are divisibility and gcd, 7 to 11 are modular arithmetic, and "
@@ -50,7 +55,9 @@ COURSE = {
     "how_to": [
         "Use the workbench lab in every lesson. Each mode prints the algorithm's trace "
         "rather than only its answer, and the point is to be able to reproduce the "
-        "trace on paper afterwards.",
+        "trace on paper afterwards. Every lab opens on its own lesson's example, so "
+        "the first figure on the screen is one the text above it already states; "
+        "change one input and watch which lines move.",
         "Do the RSA lesson with the primes it starts with, then change them. Watching "
         "the key change and the ciphertext change with it is what makes the mechanism "
         "concrete.",

@@ -152,8 +152,10 @@ LESSONS = [
              "a": ["3", "5", "8", "512"],
              "c": 1,
              "why": "One per partition: all separate, three ways to pair two together, "
-                    "and all in one block &mdash; five in total. This count is the Bell "
-                    "number `B₃`."},
+                    "and all in one block &mdash; five in total, the Bell number `B₃`. "
+                    "3 misses the two extremes; 8 is `2³`, the subsets, not the "
+                    "partitions; 512 is every relation on the set, almost none of "
+                    "which is an equivalence."},
         ],
         "mistakes": [
             ("Calling a relation an equivalence after checking two properties",
@@ -263,7 +265,8 @@ LESSONS = [
                      "A <strong>topological sort</strong> of a finite poset is a total "
                      "order extending it: a listing of the elements in which every element "
                      "appears after everything below it. Every finite poset has at least "
-                     "one, and course 7 lesson 12 produces them from a directed graph.")),
+                     "one, and course 7 lesson 8 notes that a depth-first traversal of "
+                     "the directed graph produces one.")),
         ],
         "lab": ("relation", {
             "size": 5, "preset": "div",
@@ -330,12 +333,19 @@ LESSONS = [
              "c": 2,
              "why": "Neither is a subset of the other, so they are incomparable &mdash; "
                     "which is exactly what makes `⊆` a partial rather than a total order."},
-            {"q": "A poset has three minimal elements. How many least elements can it have?",
-             "a": ["Three", "One", "Zero", "At most one, and here zero"],
-             "c": 3,
-             "why": "A least element is comparable to everything, so it would be the only "
-                    "minimal element. With three minimal elements there can be no least "
-                    "one, and in general there is at most one."},
+            {"q": "A poset has three minimal elements. How many least elements does it have?",
+             "a": ["Three, one for each minimal element",
+                   "Exactly one, the smallest of the three",
+                   "None: a least element would be the only minimal element",
+                   "It depends on whether the poset is finite"],
+             "c": 2,
+             "why": "A least element is below everything, so every other element is "
+                    "strictly above it and cannot be minimal; a least element is "
+                    "therefore the only minimal one, and three minimal elements rule it "
+                    "out. \"One for each\" confuses minimal with least; \"the smallest "
+                    "of the three\" assumes they are comparable, and two distinct "
+                    "minimal elements never are; finiteness plays no part in the "
+                    "argument."},
         ],
         "mistakes": [
             ("Confusing minimal with least",
@@ -356,8 +366,9 @@ LESSONS = [
                      "incomparable elements in the middle two levels."),
         "note": "Topological sorting is the practical face of this lesson: build "
                 "dependencies, course prerequisites and spreadsheet recalculation all "
-                "extend a partial order to a total one. Course 7 lesson 12 gives the "
-                "algorithm, and it fails exactly when the dependencies contain a cycle "
+                "extend a partial order to a total one. Course 7 lesson 8's depth-first "
+                "search is where the algorithm comes from, and it fails exactly when the "
+                "dependencies contain a cycle "
                 "&mdash; which is to say, when they were not a partial order at all.",
     },
     # ---------------------------------------------------------------- 10
@@ -446,7 +457,12 @@ LESSONS = [
             "panel_title": "Assign each input an output",
             "panel_intro": "Every element of `A` has exactly one arrow, which is what "
                            "makes this a function. Notice you cannot build a non-function "
-                           "here &mdash; the control only permits one target per source.",
+                           "here &mdash; the control only permits one target per source. "
+                           "The figure that is this lesson's is Image size: it reads "
+                           "`4 / 4` because the image fills the codomain. Click one arrow "
+                           "so that two elements share a target and it drops to `3 / 4` "
+                           "&mdash; the codomain unchanged, the image smaller. The "
+                           "property table underneath is lesson 11's.",
         }),
         "steps_title": "Checking a rule is a function",
         "steps_intro": "Two conditions, plus a third when classes are involved.",
@@ -670,11 +686,12 @@ LESSONS = [
                     "real has a real cube root so nothing is missed."},
             {"q": "`|A| = 5`, `|B| = 7`. Which is impossible?",
              "a": ["an injection `A → B`", "a surjection `A → B`",
-                   "a function `A → B`", "an injection `B → A`"],
+                   "a function `A → B`", "a surjection `B → A`"],
              "c": 1,
-             "why": "Five inputs cannot cover seven targets. (An injection `B → A` is also "
-                    "impossible, for the mirror reason &mdash; but the question asks for "
-                    "`A → B`.)"},
+             "why": "Five inputs cannot cover seven targets. An injection `A → B` exists "
+                    "(send the five to any five distinct targets), a function `A → B` "
+                    "certainly exists, and a surjection `B → A` exists because seven "
+                    "inputs can cover five targets with two to spare."},
             {"q": "`f : ℕ → ℕ`, `f(n) = n + 1`. This shows that:",
              "a": ["injectivity implies surjectivity",
                    "on infinite sets, injective does not imply surjective",
@@ -912,7 +929,8 @@ LESSONS = [
              "proposed list, a real number missing from it."),
         ],
         "read_title": "Countable and uncountable",
-        "read_intro": "The definition, the three positive results, and the one negative one.",
+        "read_intro": "The definition, two sets that can be listed, one that cannot, and "
+                      "the theorem behind the one that cannot.",
         "body": [
             ("def", ("Same cardinality",
                      "`|A| = |B|` means there is a bijection `A → B`. `|A| ≤ |B|` means "
@@ -954,8 +972,9 @@ LESSONS = [
                      "There is no surjection `ℕ → ℝ`; in particular no bijection.")),
             ("proof", [
                 "It is enough to show the interval `(0,1)` cannot be listed. Suppose "
-                "`r₀, r₁, r₂, …` is any list of reals in `(0,1)`, each written as a decimal "
-                "expansion `rₙ = 0.dₙ₁dₙ₂dₙ₃…`",
+                "`r₁, r₂, r₃, …` is any list of reals in `(0,1)`, each written as a decimal "
+                "expansion `rₙ = 0.dₙ₁dₙ₂dₙ₃…` (a list indexed from 0 is reindexed from 1 "
+                "without loss).",
                 "Build a new number `x = 0.x₁x₂x₃…` by choosing `xₖ = 5` if `dₖₖ ≠ 5`, and "
                 "`xₖ = 4` otherwise. (Restricting to 4 and 5 avoids the ambiguity of "
                 "expansions ending in all 9s.)",
@@ -971,12 +990,25 @@ LESSONS = [
             ("thm", ("Cantor's theorem",
                      "For every set `A`, there is no surjection `A → P(A)`; so "
                      "`|A| &lt; |P(A)|`. There is no largest cardinality.")),
+            ("proof", [
+                "Let `f : A → P(A)` be any function and set `D = {a ∈ A : a ∉ f(a)}`, a "
+                "subset of `A`. If `D = f(d)` for some `d ∈ A`, then `d ∈ D` exactly when "
+                "`d ∉ f(d) = D` &mdash; a contradiction either way. So `D` is not in the "
+                "image of `f`, and `f` is not a surjection.",
+                "`a ↦ {a}` is an injection `A → P(A)`, so `|A| ≤ |P(A)|`, and with no "
+                "surjection the inequality is strict. This is the diagonal argument "
+                "again: `D` is built to disagree with `f(a)` at the element `a`, for "
+                "every `a` at once.",
+            ]),
         ],
         "lab": ("function", {
             "panel_title": "Bijection as the definition of size",
             "panel_intro": "On finite sets a bijection needs `|A| = |B|`, and the lab "
-                           "enforces it. The whole content of this lesson is that on "
-                           "infinite sets that constraint disappears.",
+                           "reports it: set the sizes apart and it says which of the two "
+                           "properties no arrangement of arrows can reach. The whole "
+                           "content of this lesson is that on infinite sets that "
+                           "constraint disappears &mdash; the worked example's `n ↦ 2n` "
+                           "is a bijection from `ℕ` onto a proper part of itself.",
         }),
         "steps_title": "Proving a set countable or uncountable",
         "steps_intro": "Produce a list, or defeat every list.",
@@ -1234,7 +1266,7 @@ LESSONS = [
                      "different subsets have the same sum. The objects are subsets and the "
                      "boxes are possible sums &mdash; count both and the argument writes "
                      "itself, which is the skill this lesson is for."),
-        "note": "Course 4 lesson 12 returns to the generalised principle with harder "
+        "note": "Course 4 lesson 11 returns to the generalised principle with harder "
                 "applications, and course 7 uses it to prove that a graph on `n` vertices "
                 "with more than `n − 1` edges must contain a cycle. It is the most "
                 "reusable single fact on this path.",

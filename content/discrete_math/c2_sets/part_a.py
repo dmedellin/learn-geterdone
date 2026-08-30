@@ -86,8 +86,12 @@ LESSONS = [
             "default": ["A", "B"],
             "panel_title": "Twelve elements, three sets",
             "panel_intro": "Click an element to cycle it through the eight possible "
-                           "memberships. The chips below the diagram show which elements "
-                           "are in each region.",
+                           "memberships; the chips below the diagram show which elements "
+                           "are in each region. The figure marked Equal? is extensionality "
+                           "made visible: it reads yes exactly when `A` and `B` have the "
+                           "same members, and the difference row names what stops it. "
+                           "Cycle each of 1, 2, 3, 7, 8 and 9 until it is in both sets or "
+                           "in neither, and watch the row empty and the verdict flip.",
         }),
         "steps_title": "Working with a set description",
         "steps_intro": "Decide membership one element at a time.",
@@ -131,7 +135,9 @@ LESSONS = [
                    "`∅ = {∅}`"],
              "c": 2,
              "why": "Repetition carries no information, so both sets have exactly the "
-                    "members 1, 2 and 3. Order carries none either."},
+                    "members 1, 2 and 3 &mdash; three elements, not four &mdash; and order "
+                    "carries none either. `∅ = {∅}` fails because the right side has a "
+                    "member and the left has none."},
             {"q": "What is `|{∅, {∅}}|`?",
              "a": ["0", "1", "2", "undefined"],
              "c": 2,
@@ -140,8 +146,10 @@ LESSONS = [
             {"q": "`{x ∈ ℕ : x &lt; 0}` is:",
              "a": ["`∅`", "`{0}`", "undefined", "all negative integers"],
              "c": 0,
-             "why": "No natural number is negative, so nothing satisfies the condition. "
-                    "A set-builder description that nothing satisfies denotes the empty set."},
+             "why": "The domain is `ℕ`, so the negative integers are never candidates, and "
+                    "no natural number is below 0. A set-builder description that nothing "
+                    "satisfies is not undefined: it denotes the empty set, and 0 fails the "
+                    "condition like everything else."},
         ],
         "mistakes": [
             ("Confusing `∈` with `⊆`",
@@ -247,9 +255,13 @@ LESSONS = [
         "lab": ("counting", {
             "n": 4, "r": 2, "rule": "c",
             "panel_title": "Subsets by size",
-            "panel_intro": "The C column counts subsets of a given size. Summing it over "
-                           "all sizes from 0 to `n` gives `2ⁿ` &mdash; the identity course "
-                           "4 lesson 5 highlights in Pascal's triangle.",
+            "panel_intro": "This is course 4's lab, and only the row marked C is this "
+                           "lesson's: `C(n, r)` counts the subsets of size `r`, and the "
+                           "enumeration underneath lists them. Ignore the other three "
+                           "rows for now. Move `r` from 0 to 4 and add up the C row: "
+                           "`1 + 4 + 6 + 4 + 1 = 16 = 2⁴`, which is the power set counted "
+                           "size by size &mdash; the identity course 4 lesson 5 reads off "
+                           "Pascal's triangle.",
         }),
         "steps_title": "Proving a containment or an equality",
         "steps_intro": "One arbitrary element, followed all the way through.",
@@ -267,25 +279,33 @@ LESSONS = [
              "refutes any universal claim."),
         ],
         "worked": {
-            "title": "Prove `A ∩ B ⊆ A ∪ B`",
-            "intro": ["One inclusion, one arbitrary element."],
+            "title": "One set, two descriptions: prove them equal",
+            "intro": ["Lesson 1's set `A = {x ∈ ℤ : x = 3k + 1 for some k ∈ ℤ}` against "
+                      "`B = {x ∈ ℤ : x = 3m − 2 for some m ∈ ℤ}`. Two inclusions, one "
+                      "arbitrary element each."],
             "lines": [
-                "Let x be arbitrary with x ∈ A ∩ B.",
+                "(⊆)  Let x ∈ A be arbitrary.   Then x = 3k + 1 for some integer k.",
+                "     x = 3k + 1 = 3k + 3 − 2 = 3(k + 1) − 2,   and k + 1 ∈ ℤ.",
+                "     So x = 3m − 2 with m = k + 1, which is the condition for x ∈ B.",
                 "",
-                "By definition of intersection:  x ∈ A  and  x ∈ B.",
-                "In particular x ∈ A.",
-                "By definition of union, x ∈ A is enough for x ∈ A ∪ B.",
+                "(⊇)  Let x ∈ B be arbitrary.   Then x = 3m − 2 for some integer m.",
+                "     x = 3m − 2 = 3m − 3 + 1 = 3(m − 1) + 1,   and m − 1 ∈ ℤ.",
+                "     So x ∈ A.",
                 "",
-                "Since x was arbitrary, A ∩ B ⊆ A ∪ B.        ∎",
+                "Both inclusions hold, so A = B.        ∎",
                 "",
-                "The reverse inclusion is FALSE: take A = {1}, B = {2}.",
-                "Then A ∪ B = {1, 2} but A ∩ B = ∅, and 1 ∉ A ∩ B.",
+                "A containment that goes one way only:",
+                "  {x ∈ ℤ : 6 | x} ⊆ {x ∈ ℤ : 3 | x}   since x = 6k = 3(2k).",
+                "  The reverse is FALSE:  3 is a multiple of 3 and not of 6.",
             ],
             "after": [
-                "The counterexample at the end is doing real work. Having proved one "
-                "inclusion it is tempting to assume the other; one two-element example "
-                "shows it fails, and produces the standard fact that intersection is "
-                "contained in union and not conversely."
+                "Each inclusion took an arbitrary element, unfolded the set-builder "
+                "condition, and rewrote until the other condition appeared &mdash; step 2 "
+                "of the method, and course 1's direct proof with `x ∈ A` as the "
+                "hypothesis. The last two lines are the other half of the technique. "
+                "Having proved one inclusion it is tempting to assume the reverse; one "
+                "element, 3, shows it fails, and one element is all a refutation ever "
+                "needs."
             ],
         },
         "quiz_title": "Subsets",
@@ -293,8 +313,10 @@ LESSONS = [
             {"q": "Which is true for `A = {1, {2}}`?",
              "a": ["`2 ∈ A`", "`{2} ∈ A`", "`{2} ⊆ A`", "`{1} ∈ A`"],
              "c": 1,
-             "why": "The members of `A` are 1 and `{2}`. So `{2} ∈ A` holds; `2 ∈ A` does "
-                    "not, because 2 itself is not a member."},
+             "why": "The members of `A` are 1 and `{2}`. So `{2} ∈ A` holds and `2 ∈ A` "
+                    "does not, because 2 itself is not a member &mdash; which is also why "
+                    "`{2} ⊆ A` fails: a subset's members must be members of `A`, and 2 is "
+                    "not. `{1} ∈ A` fails because `{1}` is not one of the two members."},
             {"q": "How many subsets does a set with 5 elements have?",
              "a": ["5", "10", "25", "32"],
              "c": 3,
@@ -321,12 +343,13 @@ LESSONS = [
              "That difference is what makes `⊆` a partial order in lesson 9."),
         ],
         "standard": ("Finish when double inclusion is your reflex for any set equality.",
-                     "Prove `A ∩ (A ∪ B) = A` by double inclusion. Both directions are "
-                     "three lines, and writing them is what makes lesson 4's algebraic "
-                     "shortcuts safe to use."),
+                     "Prove `{n ∈ ℤ : n = 2k + 1 for some k ∈ ℤ} = {n ∈ ℤ : n = 2m − 1 "
+                     "for some m ∈ ℤ}` by double inclusion. Both directions are three "
+                     "lines in the shape of the worked example, and writing them is what "
+                     "makes lesson 4's chain of laws safe to use as a shortcut."),
         "note": "`|P(A)| = 2^|A|` holds for infinite sets too, in the sense that `P(A)` "
                 "is always strictly larger than `A` &mdash; Cantor's theorem, which "
-                "lesson 13 proves for the case that matters.",
+                "lesson 13 proves in four lines.",
     },
     # ---------------------------------------------------------------- 03
     {
@@ -400,7 +423,7 @@ LESSONS = [
                 "in each term &mdash; and every other element of `A ∪ B` once. Subtracting "
                 "`|A ∩ B|` removes exactly the surplus.",
             ]),
-            ("p", "Course 4 lesson 10 generalises this to any number of sets, where the "
+            ("p", "Course 4 lesson 9 generalises this to any number of sets, where the "
                   "alternating signs are less obvious and the correction is larger. The "
                   "two-set case is worth having by heart now."),
             ("example", ("Difference is not symmetric",
@@ -409,11 +432,17 @@ LESSONS = [
                          "`A ∩ B = {3}` is exactly what `△` excludes.")),
         ],
         "lab": ("sets", {
-            "default": ["A ∪ (B ∩ C)", "(A ∪ B) ∩ (A ∪ C)"],
+            "default": ["A \\ B", "B \\ A"],
             "panel_title": "Evaluate any expression",
             "panel_intro": "Both expressions are evaluated against the same membership, "
-                           "so the row labelled \"difference\" lists exactly the elements "
-                           "separating them &mdash; empty when they are equal.",
+                           "and the row labelled \"difference\" is their symmetric "
+                           "difference &mdash; the elements in exactly one of them. With "
+                           "`A \\ B` against `B \\ A` at the starting membership it reads "
+                           "`{1, 2, 3, 7, 8, 9}`: the two differences share nothing, and "
+                           "their union is `A △ B`. Cycle element 4 until it is in `A` "
+                           "only and it joins `A \\ B`. The distributive pair further down "
+                           "the list gives an empty row on every membership; lesson 4 says "
+                           "why.",
         }),
         "steps_title": "Evaluating a set expression",
         "steps_intro": "Translate to membership conditions, then evaluate elementwise.",
@@ -456,7 +485,9 @@ LESSONS = [
              "a": ["`{3}`", "`{1,2,4}`", "`{1,2,3,4}`", "`{1,2}`"],
              "c": 1,
              "why": "Symmetric difference keeps the elements in exactly one set. 3 is in "
-                    "both, so it is excluded."},
+                    "both, so it is excluded &mdash; which rules out `{3}` (that is "
+                    "`A ∩ B`) and `{1,2,3,4}` (that is `A ∪ B`, which keeps 3). `{1,2}` "
+                    "is `A \\ B` alone, and forgets the 4 that `B \\ A` contributes."},
             {"q": "`Ā` is well defined only when:",
              "a": ["`A` is finite", "a universal set `U` has been stated",
                    "`A` is nonempty", "always"],
@@ -467,7 +498,9 @@ LESSONS = [
              "a": ["12", "10", "14", "9"],
              "c": 1,
              "why": "`7 + 5 − 2 = 10`. Adding the sizes double-counts the intersection, "
-                    "so it is subtracted once."},
+                    "so it is subtracted once: 12 forgets to, 14 adds the overlap "
+                    "instead of subtracting it, and 9 subtracts more than the two "
+                    "shared elements."},
         ],
         "mistakes": [
             ("Assuming `A \\ B = B \\ A`",
@@ -498,8 +531,8 @@ LESSONS = [
         "one_line": "The laws, and the two ways to prove one.",
         "summary": (
             "The set identities are course 1's logical equivalences in set notation. "
-            "Prove them by double inclusion or by a chain of laws &mdash; and note that "
-            "a Venn diagram illustrates without proving."
+            "Prove them by double inclusion or by a chain of laws &mdash; and know when "
+            "a Venn diagram is a case check and when it is only a picture."
         ),
         "key": [
             "(A ∪ B)‾ = Ā ∩ B̄               De Morgan",
@@ -519,10 +552,12 @@ LESSONS = [
             ("Double inclusion always works",
              "Take an arbitrary element of each side and show it belongs to the other. "
              "Longer than a chain of laws, and impossible to get wrong."),
-            ("A Venn diagram is not a proof",
-             "It shows the identity on a picture of the general position. It is excellent "
-             "for finding identities and for spotting false ones, and it establishes "
-             "nothing on its own."),
+            ("A Venn diagram is a case check, not a method",
+             "Three circles show all eight membership patterns, so a correctly shaded "
+             "three-set diagram does establish a three-set identity. It cannot be written "
+             "as named steps, it does not extend to more sets, and the usual four-circle "
+             "picture is missing regions &mdash; so it finds identities; the proof is "
+             "still written."),
         ],
         "read_title": "The identities and how to establish them",
         "read_intro": "The laws, then both proof routes on the same example.",
@@ -587,7 +622,10 @@ LESSONS = [
             "panel_title": "Try to break an identity",
             "panel_intro": "Both sides are evaluated on your membership. If an identity "
                            "is real, no arrangement of the twelve elements separates them "
-                           "&mdash; and failing to break it is worth more than being told.",
+                           "&mdash; and failing to break it is worth more than being told. "
+                           "Then choose `Ā ∪ B̄` as the second expression: that is the "
+                           "wrong De Morgan, and the difference row names the elements "
+                           "that separate it from `(A ∪ B)‾` at once.",
         }),
         "steps_title": "Proving a set identity",
         "steps_intro": "Pick the route by how many operations are involved.",
@@ -630,12 +668,15 @@ LESSONS = [
              "c": 1,
              "why": "De Morgan: the complement passes inward and the operation flips. "
                     "Not being in both means missing at least one."},
-            {"q": "To prove `A = B` by double inclusion you must show:",
-             "a": ["`A ⊆ B`", "`B ⊆ A`", "both", "`A ∩ B = A ∪ B`"],
-             "c": 2,
-             "why": "Each inclusion is half the claim. The last option is actually "
-                    "equivalent to `A = B` as well, but it is not what double inclusion "
-                    "means."},
+            {"q": "In the chain proof above, which law licenses the step "
+                  "`A ∩ (Ā ∪ B̄) = (A ∩ Ā) ∪ (A ∩ B̄)`?",
+             "a": ["De Morgan", "distribution", "absorption", "complement"],
+             "c": 1,
+             "why": "`∩` is distributed over the `∪` inside the bracket, exactly as `∧` "
+                    "distributes over `∨`. De Morgan was the step before, which turned "
+                    "`(A ∩ B)‾` into `Ā ∪ B̄`; complement is the step after, which turns "
+                    "`A ∩ Ā` into `∅`; absorption would remove a term, and nothing has "
+                    "been removed."},
             {"q": "A three-circle Venn diagram shows an identity holding. This:",
              "a": ["proves it for all sets",
                    "proves it for three sets, since all eight membership regions appear",
@@ -742,8 +783,9 @@ LESSONS = [
             ("p", "That last coincidence is worth pausing on. A subset of an `n`-element "
                   "set is exactly a choice of in-or-out for each element, which is exactly "
                   "a bit string of length `n`. The bijection between `P(A)` and `{0,1}ⁿ` "
-                  "is why both are counted by `2ⁿ`, and it is a preview of lesson 12's "
-                  "argument style."),
+                  "is why both are counted by `2ⁿ`. It is a preview of lesson 11, which "
+                  "names such a pairing a bijection, and of lesson 13, which makes it "
+                  "the definition of size."),
             ("def", ("Cardinality of a product of a set with itself",
                      "`|Aⁿ| = |A|ⁿ`. With `|A| = 2` this gives `2ⁿ`; with `|A| = 26` and "
                      "`n = 4` it gives the number of four-letter strings, 456 976.")),
@@ -751,9 +793,12 @@ LESSONS = [
         "lab": ("counting", {
             "n": 3, "r": 2, "rule": "pr",
             "panel_title": "Ordered with repetition is a product",
-            "panel_intro": "The first row, `nʳ`, counts exactly the elements of `Aʳ` "
-                           "when `|A| = n`. The enumeration below lists them, which is "
-                           "the product written out.",
+            "panel_intro": "This is course 4's lab; the first row, `nʳ`, is this lesson's. "
+                           "It counts exactly the elements of `Aʳ` when `|A| = n`, and the "
+                           "enumeration below lists them, which is the product written "
+                           "out. Slide `r` to 4 and the row reads 81 while the `P` row "
+                           "underneath reads 0 &mdash; the worked example's two counts. "
+                           "The other three rows are course 4's rules; leave them for now.",
         }),
         "steps_title": "Working with products",
         "steps_intro": "Coordinates first, then count.",
@@ -805,7 +850,10 @@ LESSONS = [
                    "`A × B = B × A` always", "`(1, 1)` is a legitimate ordered pair"],
              "c": 3,
              "why": "Tuples allow repeated coordinates; only sets discard duplicates. "
-                    "The first three are all false."},
+                    "`(1, 2) ≠ (2, 1)` because pairs are equal only coordinate by "
+                    "coordinate; `{1, 2} = {2, 1}` because sets ignore order; and "
+                    "`A × B = B × A` fails as soon as `A ≠ B` are both nonempty, since "
+                    "`(a, b)` and `(b, a)` are different pairs."},
             {"q": "How many bit strings of length 8 are there?",
              "a": ["16", "64", "256", "512"],
              "c": 2,
@@ -826,7 +874,8 @@ LESSONS = [
         "standard": ("Finish when you can say why `2ⁿ` counts both subsets and bit strings.",
                      "Describe the bijection explicitly: given a subset, produce its bit "
                      "string; given a bit string, produce its subset. That construction "
-                     "is the pattern lesson 12 formalises and course 4 uses constantly."),
+                     "is what lesson 11 calls a bijection, what lesson 13 turns into the "
+                     "definition of same size, and what course 4 uses constantly."),
         "note": "Formally an ordered pair can be defined purely in terms of sets, as "
                 "`(a, b) = {{a}, {a, b}}` &mdash; Kuratowski's definition &mdash; which "
                 "does satisfy the equality property. Nothing on this path needs it; it is "
@@ -875,8 +924,8 @@ LESSONS = [
             ("p", "The definition permits everything. `∅` is a relation (nothing is "
                   "related), and `A × A` is a relation (everything is related to "
                   "everything). Between those extremes there are `2^(n²)` relations on an "
-                  "`n`-element set &mdash; 512 on a three-element set, and over half a "
-                  "billion on a five-element one."),
+                  "`n`-element set &mdash; 512 on a three-element set, and over "
+                  "thirty-three million on a five-element one."),
             ("h3", "Three presentations"),
             ("ul", [
                 "<strong>As pairs.</strong> `R = {(1,2), (2,3), (3,1)}`. Complete and "
@@ -917,9 +966,14 @@ LESSONS = [
         "lab": ("relation", {
             "size": 5, "preset": "succ",
             "panel_title": "A relation as a matrix",
-            "panel_intro": "Every cell is one pair. The presets give relations you know "
-                           "by name; clicking cells gives you ones nobody named, which is "
-                           "where the properties of lesson 7 get interesting.",
+            "panel_intro": "Every cell is one pair, and the grid is the matrix: row `a`, "
+                           "column `b`, a 1 where `a R b`. The presets give relations you "
+                           "know by name; clicking cells gives you ones nobody named. The "
+                           "property table and the verdict under it are lesson 7's and "
+                           "can wait. What is this lesson's: set the closure selector to "
+                           "transitive, and the amber cells complete `b = a + 1` into "
+                           "`a &lt; b` &mdash; the worked example's last line, on five "
+                           "elements.",
         }),
         "steps_title": "Reading a relation",
         "steps_intro": "Choose the presentation that makes your question easy.",
@@ -966,7 +1020,9 @@ LESSONS = [
              "a": ["9", "27", "512", "6"],
              "c": 2,
              "why": "A relation is any subset of the 9 pairs in `A × A`, so there are "
-                    "`2⁹ = 512` of them."},
+                    "`2⁹ = 512` of them. 9 counts the pairs, not the sets of pairs; 27 is "
+                    "`3³`, which counts nothing here; 6 is the number of orderings of "
+                    "three elements."},
             {"q": "`R = {(1,2)}` and `S = {(2,3)}`. What is `S ∘ R`?",
              "a": ["`{(1,3)}`", "`{(3,1)}`", "`∅`", "`{(1,2),(2,3)}`"],
              "c": 0,
@@ -1094,7 +1150,10 @@ LESSONS = [
             "panel_title": "Check properties, then close",
             "panel_intro": "Every verdict names the pair that decides it. The closure "
                            "selector marks in amber the pairs a closure would add "
-                           "&mdash; the least it can add, not any repair that works.",
+                           "&mdash; the least it can add, not any repair that works. The "
+                           "`a &lt; b` preset fails reflexivity and nothing else; choose "
+                           "the reflexive closure and the amber diagonal turns it into "
+                           "`a ≤ b`, which the verdict then calls a partial order.",
         }),
         "steps_title": "Deciding a property",
         "steps_intro": "Evaluate the sentence; produce the witness either way.",
@@ -1137,7 +1196,9 @@ LESSONS = [
              "a": ["`=`", "`≤`", "`|a − b| ≤ 1`", "`a` divides `b`"],
              "c": 2,
              "why": "`|1−2| ≤ 1` and `|2−3| ≤ 1` but `|1−3| = 2`, so transitivity fails. "
-                    "Symmetry is clear since `|a−b| = |b−a|`."},
+                    "Symmetry is clear since `|a−b| = |b−a|`. `=` is symmetric but also "
+                    "transitive; `≤` and \"divides\" are transitive and not symmetric "
+                    "(`1 ≤ 2` without `2 ≤ 1`, `2 | 4` without `4 | 2`)."},
             {"q": "A relation is antisymmetric. Can it also be symmetric?",
              "a": ["No, they are opposites",
                    "Yes, if it contains no pair `(a,b)` with `a ≠ b`",

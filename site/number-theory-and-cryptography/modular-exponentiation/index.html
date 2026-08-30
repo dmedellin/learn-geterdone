@@ -1142,7 +1142,7 @@
         <div class="mathblock">square and multiply:  read the exponent in binary
 reduce mod m at EVERY step
 cost: about 2·log₂(b) multiplications, not b
-7^128 mod 13 in 8 squarings, not 128 multiplications</div>
+7^128 mod 13 in 7 squarings, not 128 multiplications</div>
         <div class="float-label" style="right:16px;bottom:16px;">Logarithmic, not linear</div>
       </div>
     </section>
@@ -1159,7 +1159,7 @@ cost: about 2·log₂(b) multiplications, not b
         if b is odd:  result = (result · base) mod m
         base = (base · base) mod m
         b    = b div 2
-    return result</div><p>The loop reads <span class="math">b</span> in binary from the least significant bit. <span class="math">base</span> holds <span class="math">a^{2^i} mod m</span> at step <span class="math">i</span>, and the result accumulates exactly those powers whose bit is set. Since <span class="math">b = Σ bᵢ2ⁱ</span>, the product of the selected powers is <span class="math">a^b</span>.</p><div class="thm"><span class="label">Theorem &middot; Correctness</span><p>MODPOW returns <span class="math">a^b mod m</span>.</p></div><div class="proof"><p>The loop invariant is <span class="math">result · base^b ≡ a^{b₀} (mod m)</span>, where <span class="math">b₀</span> is the original exponent.</p><p>Initially <span class="math">result = 1</span> and <span class="math">base = a</span>, so it holds. If <span class="math">b</span> is even, <span class="math">base^b = (base²)^{b/2}</span>, and the update preserves it. If <span class="math">b</span> is odd, <span class="math">base^b = base · (base²)^{(b−1)/2}</span>, and multiplying <span class="math">result</span> by <span class="math">base</span> before the halving preserves it.</p><p>At exit <span class="math">b = 0</span>, so the invariant reads <span class="math">result ≡ a^{b₀}</span>.</p><p><span class="qed">&#9633;</span></p></div><h3>The cost</h3><p>The loop runs <span class="math">⌊log₂ b⌋ + 1</span> times, with one squaring per iteration and at most one extra multiplication. So the total is at most about <span class="math">2 log₂ b</span> modular multiplications.</p><div class="mathblock">b = 128:      naive 128 multiplications,  fast 8 squarings
+    return result</div><p>The loop reads <span class="math">b</span> in binary from the least significant bit. <span class="math">base</span> holds <span class="math">a^{2^i} mod m</span> at step <span class="math">i</span>, and the result accumulates exactly those powers whose bit is set. Since <span class="math">b = Σ bᵢ2ⁱ</span>, the product of the selected powers is <span class="math">a^b</span>.</p><div class="thm"><span class="label">Theorem &middot; Correctness</span><p>MODPOW returns <span class="math">a^b mod m</span>.</p></div><div class="proof"><p>The loop invariant is <span class="math">result · base^b ≡ a^{b₀} (mod m)</span>, where <span class="math">b₀</span> is the original exponent.</p><p>Initially <span class="math">result = 1</span> and <span class="math">base = a</span>, so it holds. If <span class="math">b</span> is even, <span class="math">base^b = (base²)^{b/2}</span>, and the update preserves it. If <span class="math">b</span> is odd, <span class="math">base^b = base · (base²)^{(b−1)/2}</span>, and multiplying <span class="math">result</span> by <span class="math">base</span> before the halving preserves it.</p><p>At exit <span class="math">b = 0</span>, so the invariant reads <span class="math">result ≡ a^{b₀}</span>.</p><p><span class="qed">&#9633;</span></p></div><h3>The cost</h3><p>The loop runs <span class="math">⌊log₂ b⌋ + 1</span> times, with one squaring per iteration and at most one extra multiplication. The last squaring is never used, so the useful count is <span class="math">⌊log₂ b⌋</span> squarings plus one multiplication per set bit &mdash; at most about <span class="math">2 log₂ b</span> modular multiplications in all.</p><div class="mathblock">b = 128:      naive 128 multiplications,  fast 8 squarings
 b = 10⁶:      naive a million,            fast about 20 squarings
 b = 2¹⁰²⁴:    naive impossible,           fast about 1024 squarings</div><div class="example"><span class="label">Example &middot; <span class="math">7^128 mod 13</span></span><p><span class="math">7² = 49 ≡ 10</span>; <span class="math">10² = 100 ≡ 9</span>; <span class="math">9² = 81 ≡ 3</span>; <span class="math">3² = 9</span>; <span class="math">9² = 81 ≡ 3</span>; <span class="math">3² ≡ 9</span>; <span class="math">9² ≡ 3</span>. Since <span class="math">128 = 2⁷</span>, seven squarings give <span class="math">7^128 ≡ 3 (mod 13)</span>. No number above 144 ever appeared.</p></div><p>That bound is the second essential point: every intermediate is a product of two numbers below <span class="math">m</span>, hence below <span class="math">m²</span>. For a 2048-bit modulus the intermediates are 4096 bits, which is entirely routine, while <span class="math">a^b</span> itself would have about <span class="math">2^1024</span> bits.</p><h3>Where it is used</h3><ul><li><strong>RSA</strong> (lesson 14): both encryption and decryption are a single modular exponentiation, with 2048-bit exponents.</li><li><strong>Diffie&ndash;Hellman key exchange</strong> and the whole family of discrete-logarithm systems.</li><li><strong>Primality testing</strong>: Fermat and Miller&ndash;Rabin both compute <span class="math">a^{n−1} mod n</span>, which is only feasible this way.</li></ul><p>It is worth appreciating the asymmetry the algorithm creates. Computing <span class="math">a^b mod m</span> is fast; recovering <span class="math">b</span> from <span class="math">a</span>, <span class="math">a^b mod m</span> and <span class="math">m</span> &mdash; the discrete logarithm &mdash; is believed hard. A great deal of cryptography lives in that gap.</p></article>
     </section>
@@ -1176,7 +1176,7 @@ b = 2¹⁰²⁴:    naive impossible,           fast about 1024 squarings</div><
         </article>
         <aside class="card side-panel" aria-live="polite">
           <h3>Every squaring, traced</h3>
-          <p>Each row is one bit of the exponent. The running result only updates on set bits, and no intermediate ever exceeds <span class="math">m²</span>.</p>
+          <p>The preset is the body's <span class="math">7^128 mod 13</span>: eight rows, one per bit of <span class="math">128 = 10000000₂</span>, the running result changing only on the top bit, seven squarings and one multiplication, and 3 in the corner. Enter 3, 200, 50 and the rows are the worked example's table. No intermediate ever exceeds <span class="math">m²</span>.</p>
         <div class="field">
           <label for="ntMode">Mode</label>
           <select id="ntMode">
@@ -1190,19 +1190,25 @@ b = 2¹⁰²⁴:    naive impossible,           fast about 1024 squarings</div><
             <option value="fermat">Fermat and Euler</option>
             <option value="sieve">Sieve of Eratosthenes</option>
             <option value="factor">Prime factorisation</option>
+            <option value="lcg">Linear congruential generator</option>
+            <option value="affine">Affine cipher on 26 letters</option>
           </select>
         </div>
         <div class="field" id="ntAWrap">
-          <label for="ntA">a</label>
+          <label for="ntA" id="ntALabel">a</label>
           <input id="ntA" type="number" value="1071" />
         </div>
         <div class="field" id="ntBWrap">
-          <label for="ntB">b</label>
+          <label for="ntB" id="ntBLabel">b</label>
           <input id="ntB" type="number" value="462" />
         </div>
         <div class="field" id="ntMWrap">
-          <label for="ntM">m (modulus)</label>
+          <label for="ntM" id="ntMLabel">m (modulus)</label>
           <input id="ntM" type="number" value="26" />
+        </div>
+        <div class="field" id="ntNWrap">
+          <label for="ntN" id="ntNLabel">n</label>
+          <input id="ntN" type="number" value="5" />
         </div>
         <div class="kpi-grid">
           <div class="kpi"><span id="ntK1Label">gcd</span><strong id="ntK1">&mdash;</strong></div>
@@ -1237,13 +1243,13 @@ b = 2¹⁰²⁴:    naive impossible,           fast about 1024 squarings</div><
 result = 11 · 31 · 11 mod 50
        = 341 mod 50 · 11 = 41 · 11 = 451 ≡ 1  (mod 50)
 
-8 squarings and 3 multiplications, against 199 the naive way.</div><p>The powers began repeating &mdash; <span class="math">3^4 ≡ 3^64 ≡ 31</span> &mdash; because the multiplicative order of 3 modulo 50 divides <span class="math">φ(50) = 20</span>. Lesson 11 explains that, and it is why the answer came out as 1.</p></article>
+7 squarings and 3 multiplications, against 199 the naive way.</div><p>The powers began repeating &mdash; <span class="math">3^4 ≡ 3^64 ≡ 31</span> &mdash; because the multiplicative order of 3 modulo 50 divides <span class="math">φ(50) = 20</span>. Lesson 11 explains that, and it is why the answer came out as 1.</p></article>
       </div>
     </section>
     <section class="section">
       <div class="grid-2">
         <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reducing the exponent modulo <span class="math">m</span></strong><span>Exponents reduce modulo <span class="math">φ(m)</span>, not <span class="math">m</span>, and only when the base is coprime to <span class="math">m</span>. Lesson 11 states the rule.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Computing <span class="math">a^b</span> before reducing</strong><span>The intermediate is astronomically large. Reducing at every step is the whole point.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Multiplying in the wrong powers</strong><span>Only the set bits of the exponent contribute. Writing <span class="math">b</span> in binary first makes this mechanical.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Completion standard</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can trace the algorithm on paper.</strong><p>Compute <span class="math">5^117 mod 19</span> by square and multiply, writing 117 in binary first. Seven squarings and four multiplications, and no intermediate above 361.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The same algorithm works for any associative operation: matrix powers, compositions of functions, and group elements generally. The exponent's binary expansion is what is being exploited, and multiplication is incidental.</div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Completion standard</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can trace the algorithm on paper.</strong><p>Compute <span class="math">5^117 mod 19</span> by square and multiply, writing 117 in binary first: <span class="math">1110101₂</span>, five set bits. Six squarings to reach <span class="math">5^64</span>, five factors to multiply together, and no intermediate above 361.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The same algorithm works for any associative operation: matrix powers, compositions of functions, and group elements generally. The exponent's binary expansion is what is being exploited, and multiplication is incidental.</div></article>
       </div>
     </section>
     </main>
@@ -1341,14 +1347,19 @@ result = 11 · 31 · 11 mod 50
         + '. Your completion ticks can follow you to another device.');
       a.classList.add('is-in');
     }());
-  var QUIZ = [{"q": "About how many multiplications does <span class=\"math\">a^1000 mod m<\/span> need by square and multiply?", "a": ["1000", "about 20", "about 500", "about 100"], "c": 1, "why": "<span class=\"math\">2 log\u2082 1000 \u2248 20<\/span>. Ten squarings and at most ten extra multiplications, one per set bit."}, {"q": "Why reduce mod <span class=\"math\">m<\/span> at every step?", "a": ["To get the right answer", "To keep every intermediate below <span class=\"math\">m\u00b2<\/span> instead of astronomically large", "It is optional", "To make the exponent smaller"], "c": 1, "why": "The answer would be the same without reducing; the numbers would be unrepresentable. Reduction is what makes it computable."}, {"q": "RSA encryption of one block is:", "a": ["a factorisation", "a single modular exponentiation", "a gcd computation", "a table lookup"], "c": 1, "why": "<span class=\"math\">c = m^e mod n<\/span>. Decryption is <span class=\"math\">c^d mod n<\/span>. Both are this algorithm with 2048-bit exponents."}];
+  var QUIZ = [{"q": "About how many multiplications does <span class=\"math\">a^1000 mod m<\/span> need by square and multiply?", "a": ["1000", "about 20", "about 500", "about 100"], "c": 1, "why": "<span class=\"math\">2 log\u2082 1000 \u2248 20<\/span>: ten squarings and at most ten extra multiplications, one per set bit (<span class=\"math\">1000 = 1111101000\u2082<\/span> has six). 1000 is the naive count; 500 would be halving the work once; 100 is the square root, which plays no part here."}, {"q": "Why reduce mod <span class=\"math\">m<\/span> at every step?", "a": ["To get the right answer", "To keep every intermediate below <span class=\"math\">m\u00b2<\/span> instead of astronomically large", "It is optional", "To make the exponent smaller"], "c": 1, "why": "The answer would be the same without reducing; the numbers would be unrepresentable, so reduction is what makes it computable. It does nothing to the exponent &mdash; that is lesson 11's <span class=\"math\">\u03c6(m)<\/span> &mdash; and it is optional only in the sense that fitting in memory is."}, {"q": "RSA encryption of one block is:", "a": ["a factorisation", "a single modular exponentiation", "a gcd computation", "a table lookup"], "c": 1, "why": "<span class=\"math\">c = m^e mod n<\/span>, and decryption is <span class=\"math\">c^d mod n<\/span>: both are this algorithm with 2048-bit exponents. A factorisation is the attack, not the encryption; a gcd appears once, in key generation, to check <span class=\"math\">e<\/span> against <span class=\"math\">\u03c6(n)<\/span>; and no table with <span class=\"math\">n<\/span> entries could be stored."}];
 
   (function () {
 
   /* Everything here is BigInt. Modular exponentiation with 4-digit moduli
      already overflows exact double arithmetic, and a cryptography lab that
      silently rounded would produce ciphertext that does not decrypt -- with no
-     sign that arithmetic rather than the method was at fault. */
+     sign that arithmetic rather than the method was at fault.
+
+     The functions below are the arithmetic; the modes further down only
+     display it. scripts/mathcheck.js extracts this block and executes it,
+     which is the only check in the repository that can tell a wrong gcd from
+     a right one. */
   function bgcd(a, b) { a = a < 0n ? -a : a; b = b < 0n ? -b : b; while (b) { var t = a % b; a = b; b = t; } return a; }
   function egcd(a, b) {
     /* Returns [g, x, y] with a*x + b*y = g. The coefficients are what make
@@ -1362,6 +1373,24 @@ result = 11 · 31 · 11 mod 50
     }
     return [old_r, old_s, old_t];
   }
+  function egcdTrace(a, b) {
+    /* The same algorithm on |a| and |b|, keeping every row. On each row
+       r = |a|*s + |b|*t holds -- that is the loop invariant, and it is why the
+       last nonzero row IS Bezout's identity with no back-substitution. The
+       signs of the coefficients are restored at the end so the identity is
+       stated for the inputs as typed. */
+    var A = a < 0n ? -a : a, B = b < 0n ? -b : b;
+    var rows = [{ r: A, q: null, s: 1n, t: 0n }, { r: B, q: null, s: 0n, t: 1n }];
+    var old_r = A, r = B, old_s = 1n, s = 0n, old_t = 0n, t = 1n;
+    while (r !== 0n && rows.length < 400) {
+      var q = old_r / r;
+      var nr = old_r - q * r, ns = old_s - q * s, nt = old_t - q * t;
+      old_r = r; r = nr; old_s = s; s = ns; old_t = t; t = nt;
+      rows.push({ r: r, q: q, s: s, t: t });
+    }
+    var sa = a < 0n ? -1n : 1n, sb = b < 0n ? -1n : 1n;
+    return { rows: rows, g: old_r, x: old_s * sa, y: old_t * sb };
+  }
   function modpow(base, exp, mod) {
     var result = 1n; base %= mod;
     if (base < 0n) base += mod;
@@ -1371,6 +1400,19 @@ result = 11 · 31 · 11 mod 50
       exp >>= 1n;
     }
     return result;
+  }
+  function modpowTrace(base, exp, mod, limit) {
+    /* Square and multiply, one row per bit of the exponent. The count is what
+       the loop actually did: one squaring per row except the last (whose
+       square is never used) and one multiplication per set bit. */
+    var rows = [], b = ((base % mod) + mod) % mod, e = exp, result = 1n, bit = 0, mults = 0;
+    while (e > 0n && bit < limit) {
+      var use = (e & 1n) === 1n;
+      if (use) { result = result * b % mod; mults += 1; }
+      rows.push({ bit: bit, use: use, power: b, result: use ? result : null });
+      b = b * b % mod; e >>= 1n; bit += 1;
+    }
+    return { rows: rows, result: result, squarings: rows.length ? rows.length - 1 : 0, mults: mults, complete: e === 0n };
   }
   function modinv(a, m) {
     var e = egcd(((a % m) + m) % m, m);
@@ -1383,9 +1425,84 @@ result = 11 · 31 · 11 mod 50
     for (var d = 3n; d * d <= n; d += 2n) if (n % d === 0n) return false;
     return true;
   }
+  function factorize(n) {
+    /* Trial division, the lesson-2 method: [[p, e], ...] with p increasing.
+       Stops at sqrt(remaining), which is the bound lesson 2 proves. */
+    var out = [], left = n < 0n ? -n : n;
+    if (left < 2n) return out;
+    for (var d = 2n; d * d <= left; d += (d === 2n ? 1n : 2n)) {
+      var e = 0n;
+      while (left % d === 0n) { left /= d; e += 1n; }
+      if (e > 0n) out.push([d, e]);
+    }
+    if (left > 1n) out.push([left, 1n]);
+    return out;
+  }
+  function totient(n) {
+    /* phi(n) = n * prod (1 - 1/p), computed as n / p * (p - 1) per prime so
+       every intermediate is an integer. This is lesson 11's formula, not a
+       count over 1..n, so it costs sqrt(n) rather than n. */
+    var phi = n;
+    factorize(n).forEach(function (pe) { phi = phi / pe[0] * (pe[0] - 1n); });
+    return phi;
+  }
+  function divisorCount(n) {
+    var c = 1n;
+    factorize(n).forEach(function (pe) { c *= pe[1] + 1n; });
+    return c;
+  }
+  function crtPair(a1, m1, a2, m2) {
+    /* x = a1 (mod m1), x = a2 (mod m2) for ANY positive moduli. Coprime
+       moduli are the theorem. Otherwise the system is consistent exactly
+       when a1 = a2 (mod gcd), and then the solution is unique modulo the
+       LCM, not the product -- which is what lesson 10's "coprimality is not
+       optional" section says and what its lab must be able to show. */
+    var g = bgcd(m1, m2), l = m1 / g * m2;
+    var r1 = ((a1 % m1) + m1) % m1, r2 = ((a2 % m2) + m2) % m2;
+    var diff = r2 - r1;
+    if (((diff % g) + g) % g !== 0n) return { g: g, lcm: l, r1: r1, r2: r2, x: null };
+    var m2g = m2 / g, inv = modinv((m1 / g) % m2g, m2g);
+    var k = inv === null ? 0n : ((((diff / g) % m2g) + m2g) % m2g) * inv % m2g;
+    var x = ((r1 + m1 * k) % l + l) % l;
+    return { g: g, lcm: l, r1: r1, r2: r2, x: x };
+  }
+  function lcgRun(a, c, m, seed, limit) {
+    /* Iterate x -> (a x + c) mod m until a value repeats or `limit` values
+       have been produced. `start` is the index the repeated value first
+       appeared at, so the period is seq.length - start and the values before
+       `start` are a tail the cycle never returns to. */
+    var seen = {}, seq = [], x = ((seed % m) + m) % m, i = 0;
+    while (!(x.toString() in seen) && i < limit) {
+      seen[x.toString()] = i; seq.push(x);
+      x = ((a * x + c) % m + m) % m; i += 1;
+    }
+    var start = (x.toString() in seen) ? seen[x.toString()] : -1;
+    return { seq: seq, next: x, start: start, period: start < 0 ? -1 : seq.length - start };
+  }
+  function hullDobell(a, c, m) {
+    /* The three conditions of the Hull-Dobell theorem, in the lesson's order:
+       gcd(c, m) = 1; every prime dividing m divides a - 1; 4 | m implies 4 | a - 1. */
+    var ps = factorize(m).map(function (pe) { return pe[0]; });
+    return [bgcd(c, m) === 1n,
+            ps.every(function (p) { return ((a - 1n) % p + p) % p === 0n; }),
+            m % 4n !== 0n || ((a - 1n) % 4n + 4n) % 4n === 0n];
+  }
+  function affineMap(a, b, m) {
+    /* x -> (a x + b) mod m on 0..m-1, with the number of distinct images.
+       Injective exactly when gcd(a, m) = 1, which is when `inv` exists. */
+    var out = [], images = {};
+    for (var x = 0n; x < m; x += 1n) {
+      var y = (((a * x + b) % m) + m) % m;
+      out.push(y); images[y.toString()] = 1;
+    }
+    return { map: out, distinct: Object.keys(images).length, inv: modinv(a, m) };
+  }
+  var PRESET = {"a": 7, "b": 128, "m": 13};
 
+  var TRIAL_LIMIT = 1000000000000n;
   var modeSel = document.getElementById('ntMode');
-  var aIn = document.getElementById('ntA'), bIn = document.getElementById('ntB'), mIn = document.getElementById('ntM');
+  var aIn = document.getElementById('ntA'), bIn = document.getElementById('ntB');
+  var mIn = document.getElementById('ntM'), nIn = document.getElementById('ntN');
   var out = document.getElementById('ntOut'), status = document.getElementById('ntStatus');
   var title = document.getElementById('ntTitle'), sub = document.getElementById('ntSub');
   var k1 = document.getElementById('ntK1'), k2 = document.getElementById('ntK2');
@@ -1399,16 +1516,29 @@ result = 11 · 31 · 11 mod 50
     return '<tr' + (focus ? ' class="focus"' : '') + '>' + cells.map(function (c) { return '<td>' + c + '</td>'; }).join('') + '</tr>';
   }
   function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+  function tooBig(n) { return (n < 0n ? -n : n) > TRIAL_LIMIT; }
+  function refuse(what) {
+    out.innerHTML = '';
+    status.innerHTML = '<strong>' + what + ' is too large for this lab.</strong> Its only method is trial division up to '
+      + 'the square root, which is fine below 10<sup>12</sup> and would freeze this page for minutes above it. That '
+      + 'the cost climbs like that is exactly what lesson 14 relies on; a number this size is best factored on paper, '
+      + 'which is to say not at all.';
+  }
+  function letter(x) { return String.fromCharCode(65 + Number(x)); }
 
-  function show(fields) {
-    ['A', 'B', 'M'].forEach(function (f) {
-      document.getElementById('nt' + f + 'Wrap').hidden = fields.indexOf(f) === -1;
+  /* Which inputs a mode uses, and what it calls them. Everything else is hidden
+     by the id on its wrapper, never by walking up from the input. */
+  function show(spec) {
+    ['A', 'B', 'M', 'N'].forEach(function (f) {
+      var on = Object.prototype.hasOwnProperty.call(spec, f);
+      document.getElementById('nt' + f + 'Wrap').hidden = !on;
+      if (on) document.getElementById('nt' + f + 'Label').textContent = spec[f];
     });
   }
 
   var MODES = {
     div: function (a, b) {
-      show(['A', 'B']);
+      show({ A: 'a (dividend)', B: 'b (divisor)' });
       title.textContent = 'Division algorithm';
       sub.textContent = 'a = qb + r with 0 ≤ r < |b|';
       if (b === 0n) { out.innerHTML = ''; status.textContent = 'b must not be 0 — division by zero has no quotient.'; return; }
@@ -1419,11 +1549,12 @@ result = 11 · 31 · 11 mod 50
       k1L.textContent = 'remainder'; k1.textContent = r;
       k2L.textContent = 'quotient'; k2.textContent = q;
       status.innerHTML = 'The theorem says this q and r are <strong>unique</strong>: exactly one pair satisfies '
-        + 'a = qb + r with 0 ≤ r &lt; |b|. Note the remainder is never negative here even when a is — '
-        + 'which is why −7 mod 3 is 2, not −1.';
+        + 'a = qb + r with 0 ≤ r &lt; |b|. The remainder is never negative here even when a is'
+        + (a < 0n ? ' — the quotient rounded toward −∞ to make ' + r + ' land in [0, ' + (b < 0n ? -b : b) + ')' : '')
+        + ' — which is why −7 mod 3 is 2, not −1.';
     },
     euclid: function (a, b) {
-      show(['A', 'B']);
+      show({ A: 'a', B: 'b' });
       title.textContent = 'Euclidean algorithm';
       sub.textContent = 'replace (a, b) by (b, a mod b) until b = 0';
       var rows = [], x = a < 0n ? -a : a, y = b < 0n ? -b : b, steps = 0;
@@ -1431,30 +1562,46 @@ result = 11 · 31 · 11 mod 50
         var q = x / y, r = x % y;
         rows.push(row([x, y, q, r], r === 0n));
         x = y; y = r; steps += 1;
-        if (steps > 200) break;
+        if (steps > 400) break;
       }
       out.innerHTML = table(['a', 'b', 'q = ⌊a/b⌋', 'r = a mod b'], rows);
       k1L.textContent = 'gcd'; k1.textContent = x;
       k2L.textContent = 'divisions'; k2.textContent = steps;
-      status.innerHTML = 'gcd(' + a + ', ' + b + ') = <strong>' + x + '</strong> in ' + steps + ' divisions. '
+      status.innerHTML = 'gcd(' + a + ', ' + b + ') = <strong>' + x + '</strong> in ' + steps + ' division' + (steps === 1 ? '' : 's') + '. '
         + 'Each line is justified by one fact: gcd(a, b) = gcd(b, a mod b), because any common divisor of a and b '
-        + 'divides a − qb. Listing divisors of ' + a + ' instead would take vastly longer.';
+        + 'divides a − qb. The gcd is the last <em>nonzero</em> remainder — the highlighted row\'s b, not its r. '
+        + 'Listing divisors of ' + a + ' instead would take vastly longer.';
     },
     bezout: function (a, b) {
-      show(['A', 'B']);
+      show({ A: 'a', B: 'b' });
       title.textContent = 'Extended Euclidean algorithm';
-      sub.textContent = 'ax + by = gcd(a, b)';
-      var e = egcd(a, b);
-      var rows = [row([a, b, e[1], e[2], e[0], a + '·(' + e[1] + ') + ' + b + '·(' + e[2] + ') = ' + (a * e[1] + b * e[2])], true)];
-      out.innerHTML = table(['a', 'b', 'x', 'y', 'gcd', 'check'], rows);
-      k1L.textContent = 'gcd'; k1.textContent = e[0];
-      k2L.textContent = 'x, y'; k2.textContent = e[1] + ', ' + e[2];
-      status.innerHTML = 'Bézout: the gcd is not merely a common divisor, it is the smallest positive '
-        + 'integer expressible as ' + a + 'x + ' + b + 'y. The coefficients above are computed by running '
-        + 'the Euclidean algorithm backwards, which is also where modular inverses come from.';
+      sub.textContent = 'every row keeps r = a·s + b·t';
+      var e = egcdTrace(a, b);
+      var A = a < 0n ? -a : a, B = b < 0n ? -b : b;
+      var last = e.rows.length - 2;
+      var rows = e.rows.map(function (rw, i) {
+        return row([i, rw.r, rw.q === null ? '—' : rw.q, rw.s, rw.t,
+                    A + '·(' + rw.s + ') + ' + B + '·(' + rw.t + ') = ' + (A * rw.s + B * rw.t)], i === last);
+      });
+      out.innerHTML = table(['row', 'r', 'q', 's', 't', 'check'], rows);
+      k1L.textContent = 'gcd'; k1.textContent = e.g;
+      k2L.textContent = 'x, y'; k2.textContent = e.x + ', ' + e.y;
+      var inverse = '';
+      if (e.g === 1n && B > 1n) {
+        var red = ((e.x % B) + B) % B;
+        inverse = ' Because the gcd is 1, x is an inverse of ' + a + ' modulo ' + B + '; reduced into [0, ' + B + ') it is <strong>'
+          + red + '</strong>, and ' + a + '·' + red + ' = ' + (a * red) + ' ≡ 1 (mod ' + B + ').';
+      } else if (e.g !== 1n && e.g !== 0n) {
+        inverse = ' The gcd is ' + e.g + ', not 1, so ' + a + ' has no inverse modulo ' + B + ': there is no x with '
+          + a + 'x ≡ 1, because every ' + a + 'x + ' + B + 'y is a multiple of ' + e.g + '.';
+      }
+      status.innerHTML = 'Bézout: <strong>' + a + '·(' + e.x + ') + ' + b + '·(' + e.y + ') = ' + e.g + '</strong>. '
+        + 'The two starting rows are a = a·1 + b·0 and b = a·0 + b·1; each later row is the one above minus q times the one '
+        + 'before it, in all three of r, s and t, so the check column holds on every line without back-substitution. '
+        + 'The highlighted row is the last nonzero remainder.' + inverse;
     },
     modtable: function (a, b, m) {
-      show(['M']);
+      show({ M: 'm (modulus)' });
       title.textContent = 'Arithmetic modulo ' + m;
       sub.textContent = 'addition and multiplication tables';
       if (m < 2n || m > 16n) { out.innerHTML = ''; status.textContent = 'Choose a modulus between 2 and 16 so the tables fit.'; return; }
@@ -1477,44 +1624,50 @@ result = 11 · 31 · 11 mod 50
       k1L.textContent = 'units'; k1.textContent = units.length;
       k2L.textContent = 'prime?'; k2.textContent = isPrimeBig(m) ? 'yes' : 'no';
       status.innerHTML = 'The ' + units.length + ' elements with a multiplicative inverse are '
-        + units.join(', ') + ' — exactly those coprime to ' + m + '. '
+        + units.join(', ') + ' — exactly those coprime to ' + m + ', and their rows of the × table are permutations of 0 … ' + (n - 1) + '. '
         + (isPrimeBig(m)
             ? 'Because ' + m + ' is prime, every nonzero element is invertible, so this is a field.'
             : 'Because ' + m + ' is composite, some nonzero products are 0 (zero divisors), and those elements have no inverse.');
     },
     modexp: function (a, b, m) {
-      show(['A', 'B', 'M']);
+      show({ A: 'a (base)', B: 'b (exponent)', M: 'm (modulus)' });
       title.textContent = 'Modular exponentiation';
       sub.textContent = 'a^b mod m by repeated squaring';
       if (m < 2n) { out.innerHTML = ''; status.textContent = 'The modulus must be at least 2.'; return; }
       if (b < 0n) { out.innerHTML = ''; status.textContent = 'Use a non-negative exponent.'; return; }
-      var rows = [], base = ((a % m) + m) % m, exp = b, result = 1n, bit = 0;
-      while (exp > 0n) {
-        var use = (exp & 1n) === 1n;
-        if (use) result = result * base % m;
-        rows.push(row([bit, use ? '1' : '0', base, use ? result : '—'], use));
-        base = base * base % m;
-        exp >>= 1n;
-        bit += 1;
-        if (bit > 64) break;
-      }
+      var tr = modpowTrace(a, b, m, 64);
+      var rows = tr.rows.map(function (rw) {
+        return row([rw.bit, rw.use ? '1' : '0', rw.power, rw.use ? rw.result : '—'], rw.use);
+      });
       out.innerHTML = table(['bit of b', 'value', 'a^(2^bit) mod m', 'running result'], rows);
-      k1L.textContent = 'a^b mod m'; k1.textContent = modpow(a, b, m);
-      k2L.textContent = 'multiplications'; k2.textContent = rows.length * 2;
-      status.innerHTML = '<strong>' + a + '^' + b + ' mod ' + m + ' = ' + modpow(a, b, m) + '</strong>, found in about '
-        + (rows.length * 2) + ' multiplications rather than ' + b + '. Reducing mod m at every step is what keeps the '
-        + 'numbers small; computing ' + a + '^' + b + ' first would be an integer with thousands of digits.';
+      var answer = modpow(a, b, m);
+      k1L.textContent = 'a^b mod m'; k1.textContent = answer;
+      k2L.textContent = 'squarings + mults'; k2.textContent = tr.squarings + ' + ' + tr.mults;
+      var absA = a < 0n ? -a : a, digits = null;
+      if (absA > 1n && b > 0n) {
+        var est = Number(b) * Math.log10(Number(absA));
+        digits = isFinite(est) ? Math.floor(est) + 1 : null;
+      }
+      status.innerHTML = '<strong>' + a + '^' + b + ' mod ' + m + ' = ' + answer + '</strong>, found in '
+        + tr.squarings + ' squaring' + (tr.squarings === 1 ? '' : 's') + ' and ' + tr.mults + ' multiplication'
+        + (tr.mults === 1 ? '' : 's') + ' — one squaring per row except the last, whose square is never used, and one '
+        + 'multiplication per set bit — rather than ' + (b > 0n ? (b - 1n) : 0n) + ' multiplications the naive way. '
+        + 'Reducing mod m at every step keeps every intermediate below m² = ' + (m * m) + '; '
+        + (digits !== null
+            ? a + '^' + b + ' itself has ' + (digits > 1e9 ? 'more than a billion' : digits.toLocaleString('en-GB')) + ' digits.'
+            : 'the power itself is not the point.')
+        + (tr.complete ? '' : ' Only the first 64 bits of the exponent are shown; the result in the corner uses them all.');
     },
     congr: function (a, b, m) {
-      show(['A', 'B', 'M']);
+      show({ A: 'a (coefficient)', B: 'b (right-hand side)', M: 'm (modulus)' });
       title.textContent = 'Linear congruence';
       sub.textContent = 'ax ≡ b (mod m)';
       if (m < 2n) { out.innerHTML = ''; status.textContent = 'The modulus must be at least 2.'; return; }
       var g = bgcd(((a % m) + m) % m, m);
       var solutions = [];
-      if (b % g === 0n) {
-        var m2 = m / g, a2 = (a / g) % m2, b2 = (b / g) % m2;
-        var inv = modinv(a2, m2);
+      if (((b % g) + g) % g === 0n) {
+        var m2 = m / g, a2 = (((a / g) % m2) + m2) % m2, b2 = (((b / g) % m2) + m2) % m2;
+        var inv = m2 === 1n ? 0n : modinv(a2, m2);
         if (inv !== null) {
           var x0 = ((b2 * inv) % m2 + m2) % m2;
           for (var i = 0n; i < g; i += 1n) solutions.push((x0 + i * m2) % m);
@@ -1527,61 +1680,99 @@ result = 11 · 31 · 11 mod 50
       k1L.textContent = 'gcd(a, m)'; k1.textContent = g;
       k2L.textContent = 'solutions'; k2.textContent = solutions.length;
       status.innerHTML = solutions.length
-        ? 'gcd(a, m) = ' + g + ' divides b, so there are exactly <strong>' + g + '</strong> solutions modulo ' + m
-          + ', spaced ' + (m / g) + ' apart. The count is the gcd — not one, and not m.'
+        ? 'gcd(a, m) = ' + g + ' divides b, so there are exactly <strong>' + g + '</strong> solution' + (g === 1n ? '' : 's') + ' modulo ' + m
+          + (g === 1n ? '' : ', spaced ' + (m / g) + ' apart') + '. The count is the gcd — not one, and not m. '
+          + (g === 1n ? 'Since the gcd is 1, a is invertible and x ≡ a⁻¹b.'
+                      : 'Dividing a, b AND m by ' + g + ' gives ' + (a / g) + 'x ≡ ' + (b / g) + ' (mod ' + (m / g) + '), whose one solution lifts to these ' + g + '.')
         : 'gcd(a, m) = ' + g + ' does <strong>not</strong> divide ' + b + ', so there is <strong>no solution at all</strong>. '
           + 'That is the whole solvability criterion, and it is checkable before any work is done.';
     },
-    crt: function (a, b, m) {
-      show(['A', 'B', 'M']);
+    crt: function (a, b, m, n) {
+      show({ A: 'a₁ (remainder mod m₁)', B: 'a₂ (remainder mod m₂)', M: 'm₁', N: 'm₂' });
       title.textContent = 'Chinese remainder theorem';
-      sub.textContent = 'x ≡ a (mod m), x ≡ b (mod m+1) — two coprime moduli';
-      var m1 = m, m2 = m + 1n;
-      if (m1 < 2n) { out.innerHTML = ''; status.textContent = 'The modulus must be at least 2.'; return; }
-      var r1 = ((a % m1) + m1) % m1, r2 = ((b % m2) + m2) % m2;
-      var M = m1 * m2;
-      var inv1 = modinv(m2 % m1, m1), inv2 = modinv(m1 % m2, m2);
-      var x = ((r1 * m2 % M) * inv1 + (r2 * m1 % M) * inv2) % M;
-      var rows = [
-        row(['x ≡ ' + r1 + ' (mod ' + m1 + ')', m2, inv1, r1 * m2 * inv1 % M], false),
-        row(['x ≡ ' + r2 + ' (mod ' + m2 + ')', m1, inv2, r2 * m1 * inv2 % M], false),
-        row(['<strong>x</strong>', '', '', '<strong>' + x + ' (mod ' + M + ')</strong>'], true)
+      sub.textContent = 'x ≡ a₁ (mod m₁), x ≡ a₂ (mod m₂)';
+      if (m < 2n || n < 2n) { out.innerHTML = ''; status.textContent = 'Both moduli must be at least 2.'; return; }
+      var sol = crtPair(a, m, b, n);
+      var m1 = m, m2 = n, r1 = sol.r1, r2 = sol.r2;
+      if (sol.g === 1n) {
+        var M = m1 * m2;
+        var inv1 = modinv(m2 % m1, m1), inv2 = modinv(m1 % m2, m2);
+        var t1 = r1 * m2 * inv1 % M, t2 = r2 * m1 * inv2 % M;
+        var rows = [
+          row(['x ≡ ' + r1 + ' (mod ' + m1 + ')', m2, inv1, t1, (t1 % m1) + ', ' + (t1 % m2)], false),
+          row(['x ≡ ' + r2 + ' (mod ' + m2 + ')', m1, inv2, t2, (t2 % m1) + ', ' + (t2 % m2)], false),
+          row(['<strong>x</strong>', '', '', '<strong>' + sol.x + ' (mod ' + M + ')</strong>', (sol.x % m1) + ', ' + (sol.x % m2)], true)
+        ];
+        out.innerHTML = table(['congruence', 'Mᵢ = M/mᵢ', 'yᵢ = Mᵢ⁻¹ mod mᵢ', 'term aᵢMᵢyᵢ mod M', 'mod m₁, mod m₂'], rows);
+        k1L.textContent = 'x'; k1.textContent = sol.x;
+        k2L.textContent = 'modulus'; k2.textContent = M;
+        status.innerHTML = 'gcd(' + m1 + ', ' + m2 + ') = 1, so the theorem applies: <strong>x = ' + sol.x + '</strong>, unique modulo '
+          + M + '. The last column is the point of the construction — each term is 0 modulo the other modulus and the right '
+          + 'remainder modulo its own, so adding them cannot spoil either congruence. Check: ' + sol.x + ' mod ' + m1 + ' = '
+          + (sol.x % m1) + ' and ' + sol.x + ' mod ' + m2 + ' = ' + (sol.x % m2) + '.';
+        return;
+      }
+      var rowsN = [
+        row(['x ≡ ' + r1 + ' (mod ' + m1 + ')', r1 % sol.g], false),
+        row(['x ≡ ' + r2 + ' (mod ' + m2 + ')', r2 % sol.g], false)
       ];
-      out.innerHTML = table(['congruence', 'other modulus', 'its inverse', 'contribution'], rows);
-      k1L.textContent = 'x'; k1.textContent = x;
-      k2L.textContent = 'modulus'; k2.textContent = M;
-      status.innerHTML = 'Consecutive integers are always coprime, so ' + m1 + ' and ' + m2 + ' are, and the theorem '
-        + 'applies: <strong>x = ' + x + '</strong>, unique modulo ' + M + '. Check it: ' + x + ' mod ' + m1 + ' = '
-        + (x % m1) + ' and ' + x + ' mod ' + m2 + ' = ' + (x % m2) + '.';
+      if (sol.x !== null) rowsN.push(row(['<strong>x</strong>', '<strong>' + sol.x + ' (mod ' + sol.lcm + ')</strong>'], true));
+      else rowsN.push(row(['<strong>x</strong>', '<strong>no solution</strong>'], true));
+      out.innerHTML = table(['congruence', 'remainder mod gcd = ' + sol.g], rowsN);
+      k1L.textContent = 'x'; k1.textContent = sol.x === null ? 'none' : sol.x;
+      k2L.textContent = 'modulus'; k2.textContent = sol.x === null ? '—' : sol.lcm;
+      status.innerHTML = 'gcd(' + m1 + ', ' + m2 + ') = ' + sol.g + ', so the theorem does <strong>not</strong> apply. '
+        + (sol.x === null
+            ? 'The system is <strong>inconsistent</strong>: any x has one remainder modulo ' + sol.g + ', but the two congruences demand '
+              + (r1 % sol.g) + ' and ' + (r2 % sol.g) + '. No integer satisfies both.'
+            : 'The remainders agree modulo ' + sol.g + ' (both ' + (r1 % sol.g) + '), so the system is consistent, and its solution '
+              + '<strong>x = ' + sol.x + '</strong> is unique modulo lcm(' + m1 + ', ' + m2 + ') = ' + sol.lcm + ' — not modulo the product '
+              + (m1 * m2) + ', which would list ' + (m1 * m2 / sol.lcm) + ' copies of the same answer. Check: ' + sol.x + ' mod ' + m1 + ' = '
+              + (sol.x % m1) + ' and ' + sol.x + ' mod ' + m2 + ' = ' + (sol.x % m2) + '.');
     },
     fermat: function (a, b, m) {
-      show(['A', 'M']);
+      show({ A: 'a (base)', M: 'm (modulus)' });
       title.textContent = "Fermat's little theorem and Euler's theorem";
-      sub.textContent = 'a^(p−1) ≡ 1 (mod p) when p is prime and p ∤ a';
+      sub.textContent = 'a^φ(m) ≡ 1 (mod m) when gcd(a, m) = 1';
       if (m < 2n) { out.innerHTML = ''; status.textContent = 'The modulus must be at least 2.'; return; }
-      var prime = isPrimeBig(m);
-      var phi = 0n;
-      for (var i = 1n; i < m; i += 1n) if (bgcd(i, m) === 1n) phi += 1n;
+      if (tooBig(m)) { refuse('m = ' + m); return; }
+      var fac = factorize(m), prime = fac.length === 1 && fac[0][1] === 1n;
+      var phi = totient(m);
       var base = ((a % m) + m) % m;
       var coprime = bgcd(base, m) === 1n;
-      var rows = [];
-      for (var e = 1n; e <= (m < 14n ? m : 14n); e += 1n) {
-        var v = modpow(base, e, m);
-        rows.push(row([e, v, v === 1n ? '← 1' : ''], v === 1n));
+      var limit = coprime ? Number(phi < 23n ? phi + 1n : 24n) : Number(m < 14n ? m : 14n);
+      var rows = [], order = -1;
+      for (var e = 1; e <= limit; e += 1) {
+        var v = modpow(base, BigInt(e), m);
+        if (v === 1n && order < 0) order = e;
+        rows.push(row([e, v, v === 1n ? '← 1' : (e === Number(phi) ? '← e = φ(m)' : '')], v === 1n));
+      }
+      if (coprime && order < 0) {
+        var cap = phi < 200000n ? phi : 200000n;
+        for (var e2 = BigInt(limit + 1); e2 <= cap; e2 += 1n) if (modpow(base, e2, m) === 1n) { order = Number(e2); break; }
       }
       out.innerHTML = table(['e', a + '^e mod ' + m, ''], rows);
       k1L.textContent = 'φ(m)'; k1.textContent = phi;
-      k2L.textContent = 'a^φ(m) mod m'; k2.textContent = coprime ? modpow(base, phi, m) : 'undefined';
+      k2L.textContent = 'a^φ(m) mod m'; k2.textContent = coprime ? modpow(base, phi, m) : 'not 1 — ever';
+      var formula = prime
+        ? 'φ(' + m + ') = ' + m + ' − 1 = ' + phi + ' because ' + m + ' is prime'
+        : 'φ(' + m + ') = ' + m + fac.map(function (pe) { return '·(1 − 1/' + pe[0] + ')'; }).join('') + ' = ' + phi
+          + ', from ' + m + ' = ' + fac.map(function (pe) { return pe[0] + (pe[1] > 1n ? '^' + pe[1] : ''); }).join(' · ');
       status.innerHTML = coprime
-        ? 'φ(' + m + ') = ' + phi + ' and ' + a + '^' + phi + ' ≡ ' + modpow(base, phi, m) + ' (mod ' + m + '). '
-          + (prime
-              ? 'Since ' + m + ' is prime, φ(m) = m − 1 and this is Fermat\'s little theorem — the special case.'
-              : 'Since ' + m + ' is composite, Fermat does not apply but Euler still does; φ(m) counts the units, not m − 1.')
-        : '<strong>gcd(' + a + ', ' + m + ') ≠ 1</strong>, so neither theorem applies: both require a coprime to the modulus, '
-          + 'and no power of ' + a + ' can ever be 1 mod ' + m + '.';
+        ? formula + '. gcd(' + a + ', ' + m + ') = 1, so the theorem applies and ' + a + '^' + phi + ' ≡ '
+          + modpow(base, phi, m) + ' (mod ' + m + '). '
+          + (prime ? 'With a prime modulus this is Fermat\'s little theorem, the special case φ(p) = p − 1. '
+                   : 'With a composite modulus Fermat says nothing; Euler still does, and φ(m) counts the units, not m − 1. ')
+          + (order > 0
+              ? 'The powers first return to 1 at e = ' + order + ', the <strong>order</strong> of ' + a + ', which divides φ(m)'
+                + (order > limit ? ' — beyond the rows shown.' : '.')
+              : 'The order of ' + a + ' is beyond what this table searches.')
+        : formula + '. But <strong>gcd(' + a + ', ' + m + ') = ' + bgcd(base, m) + ' ≠ 1</strong>, so neither theorem applies: '
+          + 'both require a coprime to the modulus, and no power of ' + a + ' can ever be 1 mod ' + m + ', because every power '
+          + 'shares that factor with ' + m + '.';
     },
     sieve: function (a, b, m) {
-      show(['A']);
+      show({ A: 'N (sieve up to)' });
       title.textContent = 'Sieve of Eratosthenes';
       sub.textContent = 'cross out the multiples of each prime in turn';
       var N = clamp(Number(a), 10, 200);
@@ -1602,67 +1793,125 @@ result = 11 · 31 · 11 mod 50
       k2L.textContent = 'N'; k2.textContent = N;
       status.innerHTML = 'There are <strong>' + primes + '</strong> primes up to ' + N + '. Sieving stops at √N = '
         + Math.floor(Math.sqrt(N)) + ': any composite has a factor no larger than its square root, so anything still '
-        + 'standing after that is prime. Hover a crossed-out number to see which prime removed it.';
+        + 'standing after that is prime. Hover a crossed-out number to see which prime removed it.'
+        + (N < 10 || N > 200 ? '' : (Number(a) !== N ? ' N is kept between 10 and 200 so the chips fit.' : ''));
     },
     factor: function (a) {
-      show(['A']);
+      show({ A: 'n' });
       title.textContent = 'Prime factorisation';
       sub.textContent = 'the unique decomposition guaranteed by the fundamental theorem';
       var n = a < 0n ? -a : a;
       if (n < 2n) { out.innerHTML = ''; status.textContent = 'Factorisation is defined for integers greater than 1.'; return; }
-      var rows = [], parts = [], left = n, steps = 0;
-      for (var d = 2n; d * d <= left; d += 1n) {
-        var e = 0n;
-        while (left % d === 0n) { left /= d; e += 1n; steps += 1; }
-        if (e > 0n) { rows.push(row([d, e, left], false)); parts.push(d + (e > 1n ? '^' + e : '')); }
-      }
-      if (left > 1n) { rows.push(row([left, 1n, 1n], true)); parts.push(left.toString()); }
+      if (tooBig(n)) { refuse('n = ' + n); return; }
+      var fac = factorize(n), rows = [], parts = [], left = n;
+      fac.forEach(function (pe, i) {
+        for (var k = 0n; k < pe[1]; k += 1n) left /= pe[0];
+        rows.push(row([pe[0], pe[1], left], i === fac.length - 1));
+        parts.push(pe[0] + (pe[1] > 1n ? '^' + pe[1] : ''));
+      });
       out.innerHTML = table(['prime', 'exponent', 'remaining'], rows);
-      k1L.textContent = 'factors'; k1.textContent = parts.length;
-      k2L.textContent = 'divisors'; k2.textContent = (function () {
-        var count = 1n, m2 = n;
-        for (var d2 = 2n; d2 * d2 <= m2; d2 += 1n) {
-          var e2 = 0n;
-          while (m2 % d2 === 0n) { m2 /= d2; e2 += 1n; }
-          if (e2 > 0n) count *= (e2 + 1n);
-        }
-        if (m2 > 1n) count *= 2n;
-        return count.toString();
-      })();
-      status.innerHTML = '<strong>' + n + ' = ' + (parts.join(' · ') || n) + '</strong>. '
+      k1L.textContent = 'distinct primes'; k1.textContent = fac.length;
+      k2L.textContent = 'divisors'; k2.textContent = divisorCount(n);
+      status.innerHTML = '<strong>' + n + ' = ' + parts.join(' · ') + '</strong>. '
         + 'The fundamental theorem of arithmetic says this decomposition exists and is unique up to order — '
-        + 'which is exactly what makes the exponent counting above give the number of divisors.';
+        + 'which is exactly what makes the exponent counting (' + fac.map(function (pe) { return '(' + pe[1] + '+1)'; }).join('')
+        + ' = ' + divisorCount(n) + ') give the number of divisors.'
+        + (fac.length === 1 && fac[0][1] === 1n ? ' ' + n + ' is prime: nothing up to √' + n + ' divided it.' : '');
+    },
+    lcg: function (a, c, m, seed) {
+      show({ A: 'a (multiplier)', B: 'c (increment)', M: 'm (modulus)', N: 'x₀ (seed)' });
+      title.textContent = 'Linear congruential generator';
+      sub.textContent = 'xₙ₊₁ = (a·xₙ + c) mod m';
+      if (m < 2n) { out.innerHTML = ''; status.textContent = 'The modulus must be at least 2.'; return; }
+      if (tooBig(m)) { refuse('m = ' + m); return; }
+      var run = lcgRun(a, c, m, seed, Number(m < 5000n ? m + 1n : 5000n));
+      var shown = Math.min(run.seq.length, 40);
+      var rows = [];
+      for (var i = 0; i < shown; i += 1) rows.push(row([i, run.seq[i], i === run.start ? '← the cycle starts here' : ''], i === run.start));
+      if (shown < run.seq.length) rows.push(row(['…', '…', (run.seq.length - shown) + ' more value' + (run.seq.length - shown === 1 ? '' : 's')], false));
+      rows.push(row([run.seq.length, run.next, run.start >= 0 ? '= x' + run.start + ', repeats' : 'not yet repeated'], true));
+      out.innerHTML = table(['n', 'xₙ', ''], rows);
+      var hd = hullDobell(a, c, m), full = run.period === Number(m) && run.start === 0;
+      k1L.textContent = 'period'; k1.textContent = run.period < 0 ? '> ' + run.seq.length : run.period;
+      k2L.textContent = 'distinct values'; k2.textContent = run.seq.length + ' of ' + m;
+      var primes = factorize(m).map(function (pe) { return pe[0]; });
+      var checks = '<br />Hull–Dobell: gcd(c, m) = gcd(' + c + ', ' + m + ') = ' + bgcd(c, m) + (hd[0] ? ' ✓' : ' ✗')
+        + '; a − 1 = ' + (a - 1n) + ' divisible by every prime of m (' + primes.join(', ') + ')' + (hd[1] ? ' ✓' : ' ✗')
+        + '; ' + (m % 4n === 0n ? '4 | m, so 4 | a − 1 needed' + (hd[2] ? ' ✓' : ' ✗') : '4 ∤ m, third condition vacuous ✓') + '.';
+      status.innerHTML = (run.period < 0
+        ? 'No repeat within ' + run.seq.length + ' values; the period is longer than this lab follows.'
+        : full
+          ? '<strong>Full period ' + m + '</strong>: every residue appears once and the sequence returns to the seed.'
+          : 'Period <strong>' + run.period + '</strong>' + (run.start > 0 ? ' after a tail of ' + run.start + ' value' + (run.start === 1 ? '' : 's') + ' the cycle never revisits' : '')
+            + ' — out of ' + m + ' possible values, so most of the range is never produced.')
+        + checks
+        + (hd[0] && hd[1] && hd[2]
+            ? ' All three hold, so the theorem promises full period from <em>every</em> seed.'
+            : ' A condition fails, so the theorem promises nothing — and the period above shows what that costs.');
+    },
+    affine: function (a, b) {
+      show({ A: 'a (multiplier)', B: 'b (shift)' });
+      title.textContent = 'Affine cipher';
+      sub.textContent = 'E(x) = (a·x + b) mod 26 on A = 0 … Z = 25';
+      var M = 26n, am = affineMap(a, b, M), g = bgcd(a, M);
+      var counts = {};
+      am.map.forEach(function (y) { counts[y.toString()] = (counts[y.toString()] || 0) + 1; });
+      var chips = '';
+      for (var x = 0n; x < M; x += 1n) {
+        var y = am.map[Number(x)], clash = counts[y.toString()] > 1;
+        chips += '<span class="chip' + (clash ? ' no' : (x === 7n || x === 4n || x === 19n ? ' hi' : '')) + '" title="'
+          + letter(x) + ' = ' + x + ' → ' + a + '·' + x + ' + ' + b + ' = ' + (a * x + b) + ' ≡ ' + y + ' = ' + letter(y) + '">'
+          + letter(x) + '→' + letter(y) + '</span>';
+      }
+      out.innerHTML = '<div>' + chips + '</div>';
+      k1L.textContent = 'gcd(a, 26)'; k1.textContent = g;
+      k2L.textContent = 'a⁻¹ mod 26'; k2.textContent = am.inv === null ? 'none' : am.inv;
+      var H = am.map[7];
+      status.innerHTML = (am.inv !== null
+        ? 'gcd(' + a + ', 26) = 1, so all <strong>26</strong> ciphertext letters are distinct and the cipher can be undone: '
+          + 'a⁻¹ ≡ ' + am.inv + ' (' + a + '·' + am.inv + ' = ' + (a * am.inv) + ' ≡ 1), so D(y) = ' + am.inv + '·(y − ' + b + ') mod 26. '
+          + 'H = 7 encrypts to ' + a + '·7 + ' + b + ' = ' + (a * 7n + b) + ' ≡ ' + H + ' = ' + letter(H) + ', and D(' + H + ') = '
+          + am.inv + '·(' + H + ' − ' + b + ') ≡ ' + ((((H - b) * am.inv) % M) + M) % M + ' = H again.'
+        : '<strong>gcd(' + a + ', 26) = ' + g + ' ≠ 1</strong>, so ' + a + ' has no inverse modulo 26 and this is not a cipher: only '
+          + am.distinct + ' distinct ciphertext letter' + (am.distinct === 1 ? '' : 's') + ' appear' + (am.distinct === 1 ? 's' : '')
+          + ', the red chips share their output with another letter, and no decryption rule exists — the map is not injective.')
+        + ' Hover a chip for its arithmetic; E, H and T are marked.';
     }
   };
 
   function redraw() {
-    var a, b, m;
+    var a, b, m, n;
     try {
-      a = BigInt(aIn.value || '0'); b = BigInt(bIn.value || '0'); m = BigInt(mIn.value || '2');
+      a = BigInt(aIn.value || '0'); b = BigInt(bIn.value || '0'); m = BigInt(mIn.value || '2'); n = BigInt(nIn.value || '2');
     } catch (e) {
       status.textContent = 'Enter whole numbers.';
       return;
     }
-    MODES[modeSel.value](a, b, m);
+    MODES[modeSel.value](a, b, m, n);
   }
 
-  [aIn, bIn, mIn].forEach(function (el) { el.addEventListener('input', redraw); });
+  [aIn, bIn, mIn, nIn].forEach(function (el) { el.addEventListener('input', redraw); });
   modeSel.addEventListener('change', function () {
     var d = DEFAULTS[modeSel.value];
-    if (d) { aIn.value = d[0]; bIn.value = d[1]; mIn.value = d[2]; }
+    if (d) { aIn.value = d[0]; bIn.value = d[1]; mIn.value = d[2]; nIn.value = d[3]; }
     redraw();
   });
 
   var DEFAULTS = {
-    div: [1071, 462, 26], euclid: [1071, 462, 26], bezout: [1071, 462, 26],
-    modtable: [3, 5, 12], modexp: [7, 128, 13], congr: [6, 9, 15],
-    crt: [2, 3, 5], fermat: [3, 0, 7], sieve: [100, 0, 26], factor: [360, 0, 26]
+    div: [1071, 462, 26, 5], euclid: [1071, 462, 26, 5], bezout: [1071, 462, 26, 5],
+    modtable: [3, 5, 12, 5], modexp: [7, 128, 13, 5], congr: [6, 9, 15, 5],
+    crt: [2, 3, 3, 5], fermat: [7, 0, 13, 5], sieve: [100, 0, 26, 5], factor: [360, 0, 26, 5],
+    lcg: [5, 3, 16, 1], affine: [5, 8, 26, 5]
   };
 
   modeSel.value = "modexp";
   (function () {
-    var d = DEFAULTS[modeSel.value];
-    if (d) { aIn.value = d[0]; bIn.value = d[1]; mIn.value = d[2]; }
+    var d = (DEFAULTS[modeSel.value] || DEFAULTS.euclid).slice();
+    if (PRESET.a !== undefined) d[0] = PRESET.a;
+    if (PRESET.b !== undefined) d[1] = PRESET.b;
+    if (PRESET.m !== undefined) d[2] = PRESET.m;
+    if (PRESET.n !== undefined) d[3] = PRESET.n;
+    aIn.value = d[0]; bIn.value = d[1]; mIn.value = d[2]; nIn.value = d[3];
   })();
   
   redraw();

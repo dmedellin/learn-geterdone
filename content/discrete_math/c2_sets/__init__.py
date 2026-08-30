@@ -32,17 +32,20 @@ COURSE = {
     ),
     "outcomes": [
         ("Prove a set identity",
-         "By double inclusion or by a chain of laws &mdash; and know that a Venn "
-         "diagram illustrates an identity without proving it."),
+         "By double inclusion or by a chain of laws &mdash; and know exactly when a "
+         "Venn diagram is a case check (three circles, all eight regions) and when it "
+         "is only a picture."),
         ("Classify a relation",
          "Decide reflexivity, symmetry, antisymmetry and transitivity by checking the "
          "definition, and recognise the equivalence relations and partial orders."),
         ("Work with functions precisely",
          "Distinguish injective from surjective, compose functions in the right order, "
          "and say exactly when an inverse exists."),
-        ("Compare infinite sets",
+        ("Compare sets by pairing",
          "Show `ℤ` and `ℚ` are countable and `ℝ` is not, using the two arguments "
-         "that settle both &mdash; explicit listing and diagonalisation."),
+         "that settle both &mdash; explicit listing and diagonalisation &mdash; and "
+         "turn the finite half of the same idea, no injection from a larger set into "
+         "a smaller, into a pigeonhole proof by inventing the boxes yourself."),
     ],
     "syllabus_intro": (
         "Lessons 1 to 5 are sets, 6 to 9 relations, 10 to 12 functions, and 13 and 14 "
@@ -54,7 +57,10 @@ COURSE = {
         "what makes the later structural proofs writable.",
         "Use the relation lab as a counterexample machine. Almost every claim about "
         "relations is refuted by a three-element example, and building one yourself "
-        "is faster than recalling which property implies which.",
+        "is faster than recalling which property implies which. Start from the empty "
+        "preset and use as few elements as the claim needs &mdash; but the elements "
+        "you leave untouched still count, so reflexivity fails until every one of "
+        "them has its loop.",
         "Pay attention to lesson 13. Countability is where intuition about size stops "
         "working, and every argument after it depends on accepting bijection as the "
         "definition of \"same size\".",
@@ -71,9 +77,9 @@ COURSE = {
     "footer_lead": (
         "The set, relation and function labs on this course decide every property by "
         "evaluating its definition over the finite object you built, and name the "
-        "element or pair that decides it. A property that holds on the twelve "
-        "elements you can see is a property of those twelve elements; the proofs are "
-        "what extend it."
+        "element or pair that decides it. A property that holds on the handful of "
+        "elements you can see is a property of those elements; the proofs are what "
+        "extend it."
     ),
     "lessons": part_a.LESSONS + part_b.LESSONS,
 }

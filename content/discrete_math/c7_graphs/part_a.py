@@ -56,7 +56,7 @@ LESSONS = [
                 "weighted graph    carry a number              distances, costs",
             ]),
             ("p", "Unless stated otherwise, \"graph\" on this course means a simple "
-                  "undirected graph. Lessons 8 and 10 attach weights; directions appear "
+                  "undirected graph. Lessons 9 and 12 attach weights; directions appear "
                   "only in remarks."),
             ("h3", "Standard families"),
             ("math", [
@@ -75,7 +75,7 @@ LESSONS = [
                 "acquaintance. Course 2's pigeonhole result &mdash; two people share a "
                 "degree &mdash; is a statement about this graph.",
                 "<strong>Road networks.</strong> Vertices are junctions, edges are roads, "
-                "weights are distances. Shortest paths are lesson 10.",
+                "weights are distances. Shortest paths are lesson 9.",
                 "<strong>Dependencies.</strong> Vertices are tasks, directed edges are "
                 "\"must precede\". A valid schedule exists exactly when there is no cycle, "
                 "which is course 2's partial order again.",
@@ -99,9 +99,13 @@ LESSONS = [
         "lab": ("graph", {
             "algo": "degree", "preset": "complete", "n": 5,
             "panel_title": "Build any graph",
-            "panel_intro": "Toggle any cell of the adjacency matrix. The presets are the "
-                           "standard families; everything else is yours, and every "
-                           "algorithm re-derives from what you build.",
+            "panel_intro": (
+                "`K₅` is loaded: five vertices, `|E| = 10 = C(5, 2)`, every degree 4 and "
+                "`Σ deg = 20`. Switch the preset to Complete bipartite at 6 vertices for "
+                "`K_{3,3}` and its 9 edges, to Cycle for `Cₙ` with `n` edges and every degree "
+                "2, and to Path for `n − 1`. Everything else is yours: toggle any cell of the "
+                "adjacency matrix and every algorithm re-derives from what you build."
+            ),
         }),
         "steps_title": "Modelling with a graph",
         "steps_intro": "Vertices first, then decide what an edge means.",
@@ -149,19 +153,27 @@ LESSONS = [
             {"q": "How many edges does `K₆` have?",
              "a": ["6", "12", "15", "30"],
              "c": 2,
-             "why": "`C(6,2) = 15`: every pair of the six vertices is joined exactly once."},
+             "why": "`C(6,2) = 15`: every pair of the six vertices is joined exactly once. 6 is the "
+                    "edge count of `C₆`, not `K₆`; 30 counts each pair twice, once from each end; "
+                    "12 is `2 · 6` and counts nothing here."
+            },
             {"q": "A simple graph may not have:",
              "a": ["isolated vertices", "loops or repeated edges",
                    "more than `n` edges", "cycles"],
              "c": 1,
-             "why": "Those are exactly the two exclusions. Isolated vertices and cycles "
-                    "are both perfectly ordinary."},
+             "why": "Those are exactly the two exclusions. Isolated vertices are ordinary (degree 0 "
+                    "is allowed), cycles are ordinary (`Cₙ` is simple), and a simple graph on `n` "
+                    "vertices may have up to `C(n, 2)` edges, far more than `n`."
+            },
             {"q": "Task dependencies are best modelled as:",
              "a": ["an undirected graph", "a directed graph",
                    "a complete graph", "a tree"],
              "c": 1,
-             "why": "\"Must precede\" is asymmetric, so the edges need direction. A valid "
-                    "schedule exists exactly when the digraph has no cycle."},
+             "why": "\"Must precede\" is asymmetric, so the edges need direction; an undirected "
+                    "edge cannot say which task comes first. A complete graph would make every pair "
+                    "dependent both ways, and a tree is a shape a dependency graph may or may not "
+                    "have. A valid schedule exists exactly when the digraph has no cycle."
+            },
         ],
         "mistakes": [
             ("Reading a graph as a plot",
@@ -272,11 +284,17 @@ LESSONS = [
                   "sum, and no degree exceeding `n − 1` &mdash; catch most cases."),
         ],
         "lab": ("graph", {
-            "algo": "degree", "preset": "cycle", "n": 6,
+            "algo": "degree", "preset": "lesson", "n": 8,
+            "example": [[1, 2], [1, 3], [1, 5], [2, 4], [2, 6], [3, 4], [3, 7], [4, 8], [5, 6], [5, 7], [6, 8], [7, 8]],
             "panel_title": "Degrees, and the identity",
-            "panel_intro": "Each vertex is labelled with its degree. `Σ deg(v)` and `2|E|` "
-                           "are printed together &mdash; toggle any edge and watch both "
-                           "move by exactly 2.",
+            "panel_intro": (
+                "The cube graph `Q₃` from the worked example is loaded: eight vertices, every "
+                "degree 3, so `Σ deg = 24` and `|E| = 12`, with no vertex of odd degree. Remove "
+                "any one edge and exactly two vertices become odd &mdash; never one, never three "
+                "&mdash; while `Σ deg` and `2|E|` both drop by exactly 2. For the standard, choose "
+                "the No edges preset at 6 vertices and try to build `(4, 4, 3, 3, 2, 2)`; the "
+                "degree sequence row tells you when you have it."
+            ),
         }),
         "steps_title": "Using degrees",
         "steps_intro": "Sum first; it is often the whole argument.",
@@ -322,17 +340,26 @@ LESSONS = [
             {"q": "A graph has 10 edges. What is the sum of its degrees?",
              "a": ["10", "20", "5", "cannot be determined"],
              "c": 1,
-             "why": "`Σ deg(v) = 2|E| = 20`, regardless of how the edges are arranged."},
+             "why": "`Σ deg(v) = 2|E| = 20`, whatever the arrangement: every edge is counted at both "
+                    "ends. 10 is `|E|` with the doubling forgotten, the lesson's first mistake; 5 "
+                    "halves where the theorem doubles; and the sum IS determined, by the edge count "
+                    "alone."
+            },
             {"q": "Can a graph have exactly three vertices of odd degree?",
              "a": ["Yes", "No — the number of odd-degree vertices is always even",
                    "Only if it is disconnected", "Only if it has loops"],
              "c": 1,
-             "why": "The degree sum is even, so the odd degrees must pair up. Three is "
-                    "impossible in any graph."},
+             "why": "The degree sum is `2|E|`, even, so the odd degrees must pair up: three is "
+                    "impossible in any graph, connected or not. Loops do not rescue it either &mdash; a "
+                    "loop adds 2 to its vertex's degree and changes no parity."
+            },
             {"q": "A 3-regular graph on `n` vertices exists only if:",
              "a": ["`n` is prime", "`n` is even", "`n ≥ 6`", "`n` is odd"],
              "c": 1,
-             "why": "`3n` must be even, so `n` must be. `|E| = 3n/2` has to be an integer."},
+             "why": "`|E| = 3n/2` must be an integer, so `n` must be even. `K₄` is 3-regular on four "
+                    "vertices, so `n ≥ 6` is not required; `n` odd is exactly what is ruled out; and "
+                    "primality has nothing to do with it &mdash; `K₄` again, with `n = 4`."
+            },
         ],
         "mistakes": [
             ("Forgetting that `Σ deg = 2|E|`, not `|E|`",
@@ -349,7 +376,7 @@ LESSONS = [
                      "`(4,4,3,3,2,2)`, and say which test settles it. The sum is 18, so "
                      "`|E| = 9`, and no degree exceeds 5 &mdash; so try to build one."),
         "note": "The handshake theorem is the most reused fact in this course. It supplies "
-                "the edge count in lesson 11's tree characterisation, the parity condition "
+                "the edge count in lesson 10's tree characterisation, the parity condition "
                 "in lesson 7's Euler criterion, and the counting argument in lesson 14's "
                 "planarity bound.",
     },
@@ -404,7 +431,11 @@ LESSONS = [
                 "add an edge                      O(1)          O(1)",
                 "iterate all edges                O(n²)         Θ(n + |E|)",
             ]),
-            ("p", "The traversals of lesson 9 iterate neighbours constantly, so an "
+            ("p", "The `O` and `Θ` in the table are course 3 lesson 11's notation: "
+                  "`Θ(n + |E|)` means proportional to `n + |E|` up to a constant factor, "
+                  "and `O(1)` means bounded by a constant. Course 8 lesson 4 makes both "
+                  "precise; here they are read as \"linear\" and \"constant\"."),
+            ("p", "The traversals of lesson 8 iterate neighbours constantly, so an "
                   "adjacency list gives breadth-first search a running time of "
                   "`Θ(n + |E|)` while a matrix gives `Θ(n²)`. On a sparse graph that is "
                   "the difference between linear and quadratic."),
@@ -437,17 +468,22 @@ LESSONS = [
             ("h3", "Other representations"),
             ("ul", [
                 "<strong>Edge list.</strong> Just the pairs. Minimal space, and every "
-                "query is a scan. Kruskal's algorithm in lesson 13 sorts exactly this.",
+                "query is a scan. Kruskal's algorithm in lesson 12 sorts exactly this.",
                 "<strong>Incidence matrix.</strong> Rows are vertices, columns edges, with "
                 "a 1 where they meet. Useful in flow problems and rarely elsewhere here.",
             ]),
         ],
         "lab": ("graph", {
-            "algo": "walks", "preset": "petersen", "n": 6,
+            "algo": "walks", "preset": "cycle", "n": 4,
             "panel_title": "`A²`, and what it counts",
-            "panel_intro": "The matrix shown is `A²`, whose entries count walks of length "
-                           "2. The diagonal of `A²` is the degree sequence, and one sixth "
-                           "of the trace of `A³` is the triangle count.",
+            "panel_intro": (
+                "`C₄` from the worked example is loaded and the matrix shown is `A²`: the "
+                "diagonal reads 2 (each vertex's degree), the entries at adjacent positions read "
+                "0, and the panel reports `A²[1][4] = 0`, `A³[1][4] = 4` and `Σ A³[v][v] = 0` "
+                "&mdash; no triangle. Switch the preset to Two triangles joined at 6 vertices: "
+                "the closed-walk count becomes 12, one sixth of which is the 2 triangles you can "
+                "see. To edit the graph, switch the algorithm to Degrees, toggle, and switch back."
+            ),
         }),
         "steps_title": "Choosing a representation",
         "steps_intro": "Ask which operation dominates.",
@@ -496,20 +532,28 @@ LESSONS = [
                    "paths from `i` to `j`",
                    "the distance from `i` to `j`"],
              "c": 1,
-             "why": "Walks, which may repeat vertices. `A²[i][i] = deg(i)`, and those are "
-                    "not paths."},
+             "why": "Walks, which may repeat vertices: `A²[i][i] = deg(i)` counts the walks out and "
+                    "straight back, and those are not paths. Edges between `i` and `j` is `A` itself, "
+                    "not `A²`, and the distance is the smallest `k` with `Aᵏ[i][j] &gt; 0`, which no "
+                    "single power reports."
+            },
             {"q": "For a sparse graph with a million vertices, you should use:",
              "a": ["an adjacency matrix", "an adjacency list",
                    "either", "an incidence matrix"],
              "c": 1,
-             "why": "A matrix would need `10¹²` entries. Lists need `Θ(n + |E|)`, which is "
-                    "a few million."},
+             "why": "A matrix needs `n² = 10¹²` entries, almost all zero; lists need `Θ(n + |E|)`, a "
+                    "few million. \"Either\" ignores a factor of a hundred thousand, and an "
+                    "incidence matrix is `n × |E|`, worse still."
+            },
             {"q": "The adjacency matrix of a simple undirected graph is:",
              "a": ["symmetric with zero diagonal", "upper triangular",
                    "always invertible", "never symmetric"],
              "c": 0,
-             "why": "Symmetric because the relation is; zero diagonal because there are no "
-                    "loops."},
+             "why": "Symmetric because adjacency is a symmetric relation; zero diagonal because there "
+                    "are no loops. Upper triangular would mean `A[j][i] = 0` whenever `A[i][j] = 1`, "
+                    "which is a directed graph; and `A` is often singular &mdash; `C₄`'s matrix has two "
+                    "pairs of identical rows and rank 2."
+            },
         ],
         "mistakes": [
             ("Confusing walks with paths",
@@ -524,8 +568,10 @@ LESSONS = [
         ],
         "standard": ("Finish when you can predict which structure suits a problem.",
                      "For a road network of a million junctions with an average of three "
-                     "roads each, state the space each representation needs and which "
-                     "queries each makes cheap. The gap is a factor of about 300 000."),
+                     "roads each, state the space each representation needs: `|E| = 1.5` "
+                     "million, so the lists hold `2|E| = 3` million entries against the "
+                     "matrix's `10¹²` &mdash; a factor of about 300 000. Then say which "
+                     "queries each makes cheap."),
         "note": "Sparse matrix formats used in practice &mdash; compressed sparse row and "
                 "its relatives &mdash; are adjacency lists with the indices packed into "
                 "flat arrays. The trade-off in the table is the one every graph library "
@@ -606,7 +652,7 @@ LESSONS = [
                 "two.",
                 "To reach one component from `n`, at least `n − 1` edges are required.",
             ]),
-            ("p", "Lesson 11 shows that `n − 1` edges suffice exactly when the graph is a "
+            ("p", "Lesson 10 shows that `n − 1` edges suffice exactly when the graph is a "
                   "tree, so trees are the minimally connected graphs &mdash; connected, "
                   "and no edge to spare."),
             ("h3", "Weak points"),
@@ -627,17 +673,23 @@ LESSONS = [
                   "no redundancy. In a tree, every edge is a bridge."),
         ],
         "lab": ("graph", {
-            "algo": "components", "preset": "tree", "n": 7,
-            "panel_title": "Components, coloured",
-            "panel_intro": "Each component gets its own colour. Delete an edge of the tree "
-                           "preset and the graph splits immediately &mdash; in a tree every "
-                           "edge is a bridge.",
+            "algo": "cuts", "preset": "lesson", "n": 7,
+            "example": [[1, 2], [2, 3], [3, 1], [3, 4], [5, 6]],
+            "panel_title": "Components, bridges, cut vertices",
+            "panel_intro": (
+                "The worked example is loaded: seven vertices, five edges. The panel names the "
+                "bridges `3–4` and `5–6` (highlighted) and the one cut vertex, 3 (coloured); the "
+                "edges `1–2`, `2–3`, `3–1` lie on the triangle and are not bridges. Switch the "
+                "algorithm to Connected components for `{1, 2, 3, 4}`, `{5, 6}`, `{7}` &mdash; "
+                "three, guaranteed in advance by `5 &lt; n − 1 = 6`. Then load the Tree preset: "
+                "every edge is a bridge and every internal vertex a cut vertex."
+            ),
         }),
         "steps_title": "Analysing connectivity",
         "steps_intro": "Search from one vertex; repeat for what is left.",
         "steps": [
             ("Search from any vertex",
-             "Breadth-first or depth-first (lesson 9). What you reach is its component."),
+             "Breadth-first or depth-first (lesson 8). What you reach is its component."),
             ("Repeat from an unvisited vertex",
              "Until every vertex is assigned. The number of searches is the number of "
              "components."),
@@ -676,19 +728,28 @@ LESSONS = [
              "a": ["it is shorter", "it repeats no vertex",
                    "it is closed", "it uses every edge"],
              "c": 1,
-             "why": "Walks may repeat anything. A path repeats no vertex, which forces it "
-                    "to repeat no edge either."},
+             "why": "A walk may repeat anything; a path repeats no vertex, which forces it to repeat "
+                    "no edge either. A path need not be shorter than a given walk, need not be closed "
+                    "(a closed path is a cycle), and a route using every edge once is an Euler path, "
+                    "lesson 7's object."
+            },
             {"q": "A connected graph on 10 vertices has at least:",
              "a": ["10 edges", "9 edges", "45 edges", "1 edge"],
              "c": 1,
-             "why": "`n − 1 = 9`. Each edge reduces the component count by at most one, "
-                    "and you start with 10 components."},
+             "why": "`n − 1 = 9`: each edge reduces the component count by at most one, and you start "
+                    "with 10 components. 10 edges is one more than needed and forces a cycle, 45 is "
+                    "`K₁₀`, and one edge joins two vertices and leaves eight isolated."
+            },
             {"q": "An edge is a bridge exactly when:",
              "a": ["it joins two leaves", "it lies on no cycle",
                    "it has the largest weight", "the graph is a tree"],
              "c": 1,
-             "why": "On a cycle there is an alternative route, so removal disconnects "
-                    "nothing. Off every cycle there is none."},
+             "why": "On a cycle there is an alternative route, so removal disconnects nothing; off "
+                    "every cycle there is none. Joining two leaves is not required &mdash; `3–4` in the "
+                    "worked example is a bridge whose ends have degrees 3 and 1; weight is lesson 9's "
+                    "concern and has no bearing; and a tree is the case where EVERY edge is a bridge, "
+                    "not the condition for one."
+            },
         ],
         "mistakes": [
             ("Using \"path\" for any route",
@@ -806,11 +867,16 @@ LESSONS = [
                   "difficulty that course 1 noted for SAT."),
         ],
         "lab": ("graph", {
-            "algo": "degree", "preset": "bipartite", "n": 6,
+            "algo": "degree", "preset": "lesson", "n": 6,
+            "example": [[1, 2], [2, 3], [3, 1], [4, 5], [5, 6], [6, 4]],
             "panel_title": "Compare invariants",
-            "panel_intro": "Build a graph, note its degree sequence and component count, "
-                           "then build a different graph with the same degrees. If you "
-                           "manage it, the sequence has proved nothing.",
+            "panel_intro": (
+                "Two disjoint triangles are loaded: degree sequence `2, 2, 2, 2, 2, 2`, six "
+                "edges. Switch the preset to Cycle at 6 vertices and the degree row is identical "
+                "&mdash; the invariant has proved nothing. Switch the algorithm to Connected "
+                "components on each: 2 against 1, and the question is settled. Then build a "
+                "graph of your own with the same degrees and see which invariant separates it."
+            ),
         }),
         "steps_title": "Deciding isomorphism",
         "steps_intro": "Try to disprove first; it is much cheaper.",
@@ -857,23 +923,31 @@ LESSONS = [
             {"q": "Two graphs have the same degree sequence. Are they isomorphic?",
              "a": ["Yes", "Not necessarily", "Only if connected", "Only if regular"],
              "c": 1,
-             "why": "Two triangles and a 6-cycle share the sequence `(2,2,2,2,2,2)` and "
-                    "differ in component count and cycle length."},
+             "why": "Two disjoint triangles and `C₆` share the sequence `(2,2,2,2,2,2)` and differ in "
+                    "component count and cycle length. Connectivity does not rescue the inference "
+                    "&mdash; connected non-isomorphic pairs with equal degrees exist &mdash; and neither "
+                    "does regularity: both graphs in that example are 2-regular."
+            },
             {"q": "To prove two graphs isomorphic you must:",
              "a": ["show all invariants match",
                    "exhibit a bijection preserving adjacency both ways",
                    "count the edges",
                    "draw them the same way"],
              "c": 1,
-             "why": "Invariants can only disprove. The bijection is the definition and the "
-                    "only proof."},
+             "why": "Invariants can only disprove; the bijection is the definition and the only proof. "
+                    "Matching every invariant you can list is evidence, not proof; the edge count is "
+                    "one invariant among many; and a drawing is not the graph, so drawing them alike "
+                    "proves nothing."
+            },
             {"q": "The graph isomorphism problem is:",
              "a": ["known to be in P", "known to be NP-complete",
                    "neither known to be in P nor known to be NP-complete",
                    "undecidable"],
              "c": 2,
-             "why": "An unusual middle position. Babai's 2015 algorithm is "
-                    "quasi-polynomial, between the two."},
+             "why": "An unusual middle position: no polynomial-time algorithm is known and no "
+                    "NP-completeness proof exists, and Babai's 2015 algorithm is quasi-polynomial, "
+                    "between the two. It is certainly decidable &mdash; try all `n!` bijections."
+            },
         ],
         "mistakes": [
             ("Treating matching invariants as proof",
@@ -964,7 +1038,7 @@ LESSONS = [
                      "vertices of the same colour, the graph is not bipartite and that edge "
                      "closes an odd cycle. Otherwise the colouring is a bipartition. The "
                      "cost is `Θ(n + |E|)`.")),
-            ("p", "Contrast that with lesson 12's chromatic number, where deciding "
+            ("p", "Contrast that with lesson 13's chromatic number, where deciding "
                   "3-colourability is NP-complete. Two colours is easy and three is hard, "
                   "and the boundary is exactly here."),
             ("h3", "Matching"),
@@ -995,9 +1069,13 @@ LESSONS = [
         "lab": ("graph", {
             "algo": "bipartite", "preset": "cycle", "n": 6,
             "panel_title": "Two-colour, or find the odd cycle",
-            "panel_intro": "Set the vertex count to 6 for an even cycle, then to 5. The "
-                           "odd cycle cannot be two-coloured, and the lab names the edge "
-                           "where the colouring fails.",
+            "panel_intro": (
+                "`C₆` is loaded and two-coloured exactly as the worked example did it: "
+                "`X = {1, 3, 5}`, `Y = {2, 4, 6}`. Set the vertex count to 5 and the colouring "
+                "fails at vertices 3 and 4 &mdash; the edge `3–4` of the worked example, which "
+                "closes the odd cycle. Back at 6, add a chord: `1–3` closes a triangle and the "
+                "verdict flips; `1–4` closes two 4-cycles and it does not."
+            ),
         }),
         "steps_title": "Testing bipartiteness",
         "steps_intro": "Colour by breadth-first search; a conflict is the proof it fails.",
@@ -1043,20 +1121,25 @@ LESSONS = [
             {"q": "Which is bipartite?",
              "a": ["`K₃`", "`C₅`", "`C₄`", "`K₄`"],
              "c": 2,
-             "why": "`C₄` splits into alternate vertices. The other three all contain "
-                    "triangles or odd cycles."},
+             "why": "`C₄` splits into alternate vertices, `{1, 3}` and `{2, 4}`. `K₃` is a triangle, "
+                    "`C₅` an odd cycle, and `K₄` contains triangles &mdash; each has an odd cycle, and "
+                    "one is enough."
+            },
             {"q": "A graph is bipartite if and only if it has no:",
              "a": ["cycles", "odd cycles", "even cycles", "triangles"],
              "c": 1,
-             "why": "Odd cycles are the only obstruction. Even cycles are fine, and "
-                    "\"no triangles\" is weaker &mdash; `C₅` is triangle-free and not "
-                    "bipartite."},
+             "why": "Odd cycles are the only obstruction. Even cycles are fine (`C₄` is bipartite); "
+                    "\"no cycles\" is far too strong (`K_{3,3}` has cycles and is bipartite); and "
+                    "\"no triangles\" is too weak &mdash; `C₅` is triangle-free and not bipartite."
+            },
             {"q": "Testing bipartiteness costs:",
              "a": ["exponential time", "`Θ(n + |E|)` — one search",
                    "`Θ(n³)`", "it is NP-complete"],
              "c": 1,
-             "why": "One breadth-first search with a parity colouring. Three-colourability, "
-                    "by contrast, is NP-complete."},
+             "why": "One breadth-first search with a parity colouring: `Θ(n + |E|)`. Nothing "
+                    "exponential, nothing cubic, and nothing NP-complete &mdash; that is three colours, "
+                    "lesson 13, and the point is that two is easy."
+            },
         ],
         "mistakes": [
             ("Assuming triangle-free means bipartite",
@@ -1075,7 +1158,7 @@ LESSONS = [
                      "edge they form the odd cycle."),
         "note": "The gap between 2-colouring and 3-colouring is one of the sharpest in "
                 "complexity theory: the first is linear time and the second is NP-complete. "
-                "Lesson 12 returns to it, and course 8 explains what NP-complete means.",
+                "Lesson 13 returns to it, and course 8 explains what NP-complete means.",
     },
     # ---------------------------------------------------------------- 07
     {
@@ -1181,9 +1264,17 @@ LESSONS = [
         "lab": ("graph", {
             "algo": "euler", "preset": "cycle", "n": 6,
             "panel_title": "Both questions, on your graph",
-            "panel_intro": "The Euler verdict comes from counting odd degrees. Switch to "
-                           "Hamilton and the lab searches orderings exhaustively &mdash; "
-                           "which is why the vertex count stops at 8.",
+            "panel_intro": (
+                "`C₆` is loaded: no odd vertex, so an Euler circuit exists, and switching to "
+                "Hamilton finds `1 → 2 → 3 → 4 → 5 → 6 → 1` too. Remove the edge `1–2`: vertices "
+                "1 and 2 are now the two odd vertices, an Euler path exists from one to the other "
+                "and no circuit, and the Hamilton search finds a path (`1 → 6 → 5 → 4 → 3 → 2`) "
+                "but no circuit. Königsberg itself cannot be built here &mdash; two pairs of its "
+                "land masses are joined by two bridges each, and the lab draws simple graphs "
+                "&mdash; but Euler's proof never used simplicity, and the same degree count "
+                "settles it. The Hamilton search tries orderings exhaustively, which is why the "
+                "vertex count stops at 8."
+            ),
         }),
         "steps_title": "Deciding both questions",
         "steps_intro": "Euler is a degree count. Hamilton is a search.",
@@ -1232,22 +1323,30 @@ LESSONS = [
              "a": ["an Euler circuit", "an Euler path but no circuit",
                    "neither", "a Hamilton circuit"],
              "c": 1,
-             "why": "Two odd degrees give a path, which must start at one and end at the "
-                    "other. A circuit requires zero."},
+             "why": "Two odd degrees give a path, which must start at one and end at the other. A "
+                    "circuit requires zero odd degrees; \"neither\" would need four or more; and a "
+                    "Hamilton circuit is a different question, which degrees alone never settle."
+            },
             {"q": "Deciding whether a Hamilton circuit exists is:",
              "a": ["a degree count", "linear time",
                    "NP-complete, with no known simple criterion", "always possible"],
              "c": 2,
-             "why": "No characterisation is known. Dirac and Ore give sufficient conditions "
-                    "only, and neither is necessary."},
+             "why": "No characterisation is known and the decision problem is NP-complete. It is not "
+                    "a degree count and not linear time &mdash; those describe Euler &mdash; and "
+                    "\"always possible\" fails already for the path `Pₙ`, which has a Hamilton path "
+                    "and no circuit."
+            },
             {"q": "Why must every degree be even for an Euler circuit?",
              "a": ["the graph must be connected",
                    "each visit to a vertex uses two edge-ends, one in and one out",
                    "even numbers are easier",
                    "it need not be"],
              "c": 1,
-             "why": "The edges at each vertex pair up into entries and exits, so their "
-                    "count is even."},
+             "why": "The edges at each vertex pair up into entries and exits, so their count is even. "
+                    "Connectivity is the other half of the criterion, not the reason for this half; "
+                    "\"easier\" is not a reason; and the condition is genuinely necessary &mdash; one "
+                    "odd vertex leaves an edge that can be entered and never left."
+            },
         ],
         "mistakes": [
             ("Confusing the two problems",

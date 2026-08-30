@@ -540,18 +540,23 @@ input[type=range]{width:100%;accent-color:var(--cyan)}.segmented{display:grid;gr
     <div class="section-head"><div><span class="eyebrow">Knowledge check</span><h2>Check your interpretation</h2></div><p>Select one answer for each question. Feedback appears immediately.</p></div>
     <div class="quiz"><article class="question" data-correct="0">
           <h3>1. Price falls while volume expands. What is happening?</h3>
-          <div class="choices"><button class="choice" type="button">Sellers are making downward progress with more participation</button><button class="choice" type="button">Buyers are in control</button><button class="choice" type="button">The market is balanced</button></div>
+          <div class="choices"><button class="choice" type="button">Sellers are making downward progress with more participation</button><button class="choice" type="button" data-why="Falling price is sellers accepting lower bids; the buyers in those trades are the passive side, not the side making progress.">Buyers are in control</button><button class="choice" type="button" data-why="Balance means price ends near where it began; a falling price on rising participation is a decided move, not a contest.">The market is balanced</button></div>
           <div class="feedback">Falling prices plus expanding participation shows active selling pressure and downward progress.</div>
         </article>
 <article class="question" data-correct="1">
           <h3>2. Price rises while volume contracts. What is the best description?</h3>
-          <div class="choices"><button class="choice" type="button">Strong confirmed demand</button><button class="choice" type="button">Upward progress with weakening participation</button><button class="choice" type="button">Guaranteed reversal</button></div>
+          <div class="choices"><button class="choice" type="button" data-why="Confirmation is expanding participation behind the move; contracting volume is the weaker of the two cases, not the stronger.">Strong confirmed demand</button><button class="choice" type="button">Upward progress with weakening participation</button><button class="choice" type="button" data-why="Thin participation lowers the evidence for the trend; it does not reverse it, and trends on falling volume can persist for a long time.">Guaranteed reversal</button></div>
           <div class="feedback">Buyers are still moving price higher, but participation is not expanding.</div>
         </article>
 <article class="question" data-correct="1">
           <h3>3. Which variable establishes direction?</h3>
-          <div class="choices"><button class="choice" type="button">Volume</button><button class="choice" type="button">Price movement</button><button class="choice" type="button">Trade count alone</button></div>
+          <div class="choices"><button class="choice" type="button" data-why="Volume has no sign: every contract was bought and sold. Direction is what price did while it traded.">Volume</button><button class="choice" type="button">Price movement</button><button class="choice" type="button" data-why="One candle&#x27;s colour is one bar&#x27;s close against its open; direction is read from the sequence of closes, not from a single bar.">The colour of the most recent candle</button></div>
           <div class="feedback">Direction is observed in price progress; volume describes participation.</div>
+        </article>
+<article class="question" data-correct="0">
+          <h3>4. The last fourteen bars average 1,250 contracts; the first fourteen averaged 1,000. What volume trend does the lab report?</h3>
+          <div class="choices"><button class="choice" type="button">+25%</button><button class="choice" type="button" data-why="1,000 ÷ 1,250 = 0.8 measures the change backwards. The lab divides the recent average by the earlier one: 1,250 ÷ 1,000 = 1.25, up 25%.">−20%</button><button class="choice" type="button" data-why="The difference is 250 contracts, not 250%. Relative to the 1,000 baseline that is 25%.">+250%</button></div>
+          <div class="feedback">1,250 ÷ 1,000 = 1.25, so participation expanded by 25%.</div>
         </article></div>
   </section>
 
@@ -652,12 +657,16 @@ $("#resetBtn").addEventListener("click",()=>window.initLab&&window.initLab(true)
 $("#startLab").addEventListener("click",()=>$("#lab").scrollIntoView({behavior:"smooth"}));
 
 $$(".question").forEach(q=>{
-  const correct=Number(q.dataset.correct);
+  const correct=Number(q.dataset.correct),fb=$(".feedback",q),base=fb.innerHTML;
   $$(".choice",q).forEach((b,i)=>b.addEventListener("click",()=>{
     if(q.dataset.done) return;
     q.dataset.done="1";
     $$(".choice",q).forEach((x,j)=>{if(j===correct)x.classList.add("correct");else if(j===i)x.classList.add("wrong")});
-    $(".feedback",q).classList.add("show");
+    /* A wrong choice may carry its own why (data-why), so the feedback answers
+       the answer that was given; the question's own text explains the right one. */
+    const why=i===correct?null:b.dataset.why;
+    fb.innerHTML=`<strong>${i===correct?"Correct.":"Not quite."}</strong> ${why||base}`;
+    fb.classList.add("show");
   }));
 });
 
@@ -673,9 +682,12 @@ function rng(seed){
 function makeSeries(kind="bull", n=54, seed=1){
   const r=rng(seed+hashSeed(kind)); let p=100, out=[];
   for(let i=0;i<n;i++){
-    let drift=0;
-    if(kind.includes("bull")||kind.includes("up")) drift=.22;
-    if(kind.includes("bear")||kind.includes("down")) drift=-.22;
+    /* The price regime is the FIRST token of the kind; everything after the
+       hyphen describes volume only. Matching "down" anywhere in the string
+       used to turn "bull-volumedown" into a downtrend. */
+    const priceKind=kind.split("-")[0];let drift=0;
+    if(priceKind==="bull"||priceKind==="up") drift=.22;
+    if(priceKind==="bear"||priceKind==="down") drift=-.22;
     if(kind.includes("range")||kind.includes("balance")) drift=(100-p)*.08;
     if(kind.includes("breakout")) drift=i>Math.floor(n*.62)?.48:(100-p)*.06;
     if(kind.includes("failed")) drift=i>Math.floor(n*.62)&&i<Math.floor(n*.73)?.55:i>=Math.floor(n*.73)?-.45:(100-p)*.05;
@@ -721,6 +733,36 @@ function cmf(series,p=14){
 }
 function cvd(series){
   let x=0;return series.map(d=>x+=d.delta);
+}
+/* A divergence has to be built. Rising price on contracting volume still puts
+   most of the volume on up closes, so OBV rises with it; from `from` onward
+   the down-closing bars carry downK times their volume and the up-closing
+   bars upK times, which is exactly the condition the OBV divergence card
+   describes. */
+function divergentVolume(series,from,downK,upK){
+  return series.map((d,i)=>{if(i<from)return d;const up=d.c>series[i-1].c;return{...d,v:Math.round(d.v*(up?upK:downK))}});
+}
+/* makeSeries("breakout-volumeup") trends for the rest of the window, which is
+   an excursion, not a second distribution. The profile tab is named for the
+   two-distribution shape, so the last fifteen bars rotate around the level
+   reached at bar 51 at breakout volume: value has to be BUILT up there for
+   the profile to show it. */
+function breakoutProfileSeries(){
+  const s=makeSeries("breakout-volumeup",66,909),r=rng(909+hashSeed("breakout-second")),anchor=s[50].c;
+  for(let i=51;i<s.length;i++){const o=s[i-1].c,c=anchor+(r()-.5)*1.1+(anchor-o)*.35,h=Math.max(o,c)+.18+r()*.5,l=Math.min(o,c)-.18-r()*.5,v=Math.round((1000+(r()-.5)*260)*1.9);s[i]={...s[i],o,h,l,c,v}}
+  return s;
+}
+/* The thinnest non-empty bin below the value-area low: where a low-volume
+   node actually is, rather than a point just inside the area. */
+function lvnPrice(p){
+  let best=-1;for(let k=0;k<p.val;k++)if(p.vols[k]>0&&(best<0||p.vols[k]<p.vols[best]))best=k;
+  return best<0?p.lo+p.step*p.val-p.step*.5:p.price(best);
+}
+/* The worked arithmetic: the figures the chart was drawn from, shown being
+   produced, so the reading beside them is a faded example and the quiz an
+   independent one. */
+function workedHTML(title,lines){
+  return`<div class="formula" style="margin-top:14px"><strong style="display:block;margin-bottom:6px">${title}</strong>${lines.join("<br>")}</div>`;
 }
 
 function canvasContext(){
@@ -837,18 +879,12 @@ const PARTICIPATION = {
     bull: "Price finishes about 13% above where the window opened while the last fourteen bars average close to twice the volume of the first fourteen. Normally read as buyers accepting higher prices with more contracts changing hands as they do &mdash; though the volume half is participation only, since every one of those contracts had a seller on the other side. The direction in this reading is carried by the price progress; a close back under the lows the advance started from would leave the same volume with none of it.",
     bear: "Price finishes about 13% lower with the same expansion in participation, roughly 1.9 times the opening bars by the close of the window. Normally read as sellers accepting lower prices while more contracts trade. Expanding volume is not bearish by itself &mdash; it counts trades, both sides of each &mdash; so a reclaim of the highs the decline began from would end the reading without the volume changing at all.",
     balance: "Participation rises through the window while price ends within half a percent of where it started, rotating in a band of roughly two and a half points. The usual interpretation is that both sides are active at these prices and neither is making the other give ground; heavy volume here is evidence of a contest, not of a result. It stops reading as balance when a close holds outside the band rather than turning back into it.",
-    absorb: "Volume in the closing stretch runs about three times the earlier bars while price covers a little over a point. Normally read as absorption: aggressive orders arriving into resting size that is willing to take the other side at these prices. It is a reading about what has happened so far and nothing more &mdash; it fails as a description the moment price begins making sustained progress on that same volume."
+    absorb: "Volume in the closing stretch runs about three and a half times the earlier bars while price gains about half a point across that stretch and a little over a point across the whole window. Normally read as absorption: aggressive orders arriving into resting size that is willing to take the other side at these prices. It is a reading about what has happened so far and nothing more &mdash; it fails as a description the moment price begins making sustained progress on that same volume."
   },
 
-  /* priceVolume: no entry for "upDown". The tab is labelled Price up / Volume
-     down, but makeSeries("bull-volumedown") matches the kind.includes("down")
-     branch and applies a negative drift, so the series that renders falls about
-     10.5%. A participation reading written for a rising market would be
-     attached to a falling chart, and one written for the falling chart would
-     contradict the tab and the explanation above it. Left empty until the
-     generated series matches the state it is named for. */
   priceVolume: {
     upUp: "Price gains about 15% and the last fourteen bars average roughly 83% more volume than the first fourteen. Normally read as buyers accepting higher prices with participation expanding behind them. The volume is the count of contracts, not a net side, so it is the price progress that makes this directional; a close back under the level the advance began from would end the reading with the volume unchanged.",
+    upDown: "Price gains about 14% while the last fourteen bars average roughly 39% less volume than the first fourteen. Normally read as an advance fewer participants are taking part in: buyers are still accepting higher prices, but the evidence behind each new high is thinner than it was. The usual caution is that this weakens the case for the trend rather than reversing it; volume expanding again on a down close is the first thing that would change the reading.",
     downUp: "Price loses about 11% while volume in the closing bars runs about 84% above the opening bars. Normally read as sellers accepting lower prices with participation expanding. Expanding volume is not itself bearish &mdash; every one of those trades had a buyer &mdash; and the reading ends where price stops making downward progress on the same activity.",
     downDown: "Price falls about 12% while the last fourteen bars average roughly 40% less volume than the first fourteen. Normally read as a decline fewer participants are taking part in: the usual caution is that a move on contracting participation has less evidence behind it, not that it must turn. Volume expanding again without price making a new low would be the first thing to break the reading."
   },
@@ -856,32 +892,28 @@ const PARTICIPATION = {
   relativeVolume: {
     expansion: "The marked bar trades about 4.7 times the twenty-bar baseline and the sixteen bars after it carry price roughly four and a half points higher. Normally read as a burst of participation the market then followed through on &mdash; and it is the follow-through, not the height of the bar, that makes it readable. A stall or a return back under the spike bar would leave the same 4.7x print saying nothing in particular.",
     climax: "Participation keeps expanding after the marked bar, reaching close to six times baseline on the final bars, while price stops advancing and gives back about a point. Normally read as a climax: the heaviest activity of the window arriving where price can no longer make progress on it. The failure to advance is the whole reading &mdash; price simply resuming higher on that same volume is what would remove it.",
-    absorption: "The marked bar trades about seven times baseline and price ends the following seventeen bars roughly where it started them, inside a one and a half point band. Normally read as absorption, aggressive orders meeting resting size content to take the other side here. The spike itself says nothing directional; sustained progress away from this area on comparable volume is what would end the reading.",
-    balanced: "About four times baseline volume prints inside a range price never leaves, and the seventeen bars after it close within roughly seven tenths of a point of one another. Normally read as heavy two-way trade at an agreed price rather than a directional event. It stops reading that way when a close holds outside the range this activity has been contained in."
+    absorption: "The marked bar trades about seven times baseline and price ends the following sixteen bars roughly where it started them, inside a one and a half point band. Normally read as absorption, aggressive orders meeting resting size content to take the other side here. The spike itself says nothing directional; sustained progress away from this area on comparable volume is what would end the reading.",
+    balanced: "About four times baseline volume prints inside a range price never leaves, and the sixteen bars after it close within roughly seven tenths of a point of one another. Normally read as heavy two-way trade at an agreed price rather than a directional event. It stops reading that way when a close holds outside the range this activity has been contained in."
   },
 
   volumeConfirmation: {
     strong: "The bar that closes above 101.10 carries about 1.6 times the prior eighteen-bar average, and all five of the most recent closes are still above the level. Normally read as acceptance rather than a probe: the level stopped capping price and the bars since have held above it without needing to retest whether it does. A close back under 101.10 is what would return this to a failed break.",
-    weak: "The break bar carries only about 1.2 times the prior baseline, with the volume trend through the window falling, yet price holds above 101.10 on all five recent closes. The usual reading is that the level gave way with thin evidence of participation behind it, so acceptance is being shown by price alone &mdash; the weaker of the two. Volume expanding on a pullback that then closes back inside would settle it the other way.",
+    weak: "The break bar carries only about 1.2 times the prior baseline, and that baseline had itself been thinning into the break, yet price holds above 101.10 on all five recent closes. The usual reading is that the level gave way with thin evidence of participation behind it, so acceptance is being shown by price alone &mdash; the weaker of the two. Volume expanding on a pullback that then closes back inside would settle it the other way.",
     failed: "Price closes above 101.10 on about 1.8 times the prior baseline, reaches 103.41, then closes below the level for the rest of the window and finishes near 95.35 &mdash; under the range it broke out of. Normally read as a failed break: participation at the level did not convert into acceptance above it. Reclaiming 101.10 and holding there is what would break this reading in turn.",
     range: "No bar in the window closes above 101.10; the highest high reaches 100.96. Structurally this says the level has not been tested to completion, so the volume trading inside the range is participation with no decision attached to it. The reading begins when a close appears on the other side of the level, not before."
   },
 
-  /* obv: no entries for "bearDiv" or "bullDiv". Both tabs are named for a
-     divergence the generated series does not contain. bearDiv builds from
-     makeSeries("bull-volumedown"), which the kind.includes("down") branch turns
-     into a downtrend, so price falls about 15.6% and OBV falls with it to its
-     low; bullDiv falls about 16.4% with OBV likewise ending near its low. In
-     neither chart do price and OBV disagree, so there is no divergence to read. */
   obv: {
     confirmBull: "Price finishes about 14% higher and OBV ends at its high for the window, having risen through nearly all of it. Normally read as up-closing bars carrying the larger share of the volume &mdash; but OBV is built from these same closes and these same volumes, so it restates the chart above it rather than adding evidence to it. OBV turning down while price keeps making highs is the condition that would make it worth a second look.",
-    confirmBear: "Price finishes about 15% lower and OBV falls with it to its low for the window. Normally read as down-closing bars carrying the larger share of the volume. The caveat is in the construction: OBV assigns a bar's entire volume to the direction of its close, so a bar that closed a cent lower after trading both ways counts wholly as selling, and OBV flattening while price keeps making lows is what would put the reading in question."
+    confirmBear: "Price finishes about 15% lower and OBV falls with it to its low for the window. Normally read as down-closing bars carrying the larger share of the volume. The caveat is in the construction: OBV assigns a bar's entire volume to the direction of its close, so a bar that closed a cent lower after trading both ways counts wholly as selling, and OBV flattening while price keeps making lows is what would put the reading in question.",
+    bearDiv: "Price finishes about 17% higher with its high on the last bar, while OBV peaks a little past the halfway point and ends near -14,200, more than 20,000 below that peak. Normally read as a bearish non-confirmation: the bars that closed down carried more volume than the bars that closed up, so the advance is being made on the lighter side of the tape. It is a warning about the evidence, not a signal; OBV turning back up through its prior swing high, or price simply continuing on rising OBV, would end it.",
+    bullDiv: "Price finishes about 11% lower with its low on the last bar, while OBV bottoms about a third of the way through the window and ends around +8,900, rising through the whole second half. The usual interpretation is a bullish non-confirmation: the up-closing bars are carrying more of the volume even as price makes lower lows. As with the mirror case it describes the evidence behind the trend, not the next bar, and price confirmation is still required before anyone is called in control."
   },
 
   cmf: {
     "accum/pos": "Every bar closes in the upper part of its own range, averaging near 78% of the bar, which holds CMF around +0.55 at any lookback the slider offers. Normally read as persistent buying pressure; what is actually measured is closing location weighted by that bar's volume, not who transacted. CMF cannot contradict this chart &mdash; it is computed from the same highs, lows, closes and volumes drawn above it.",
     "distrib/neg": "Every bar closes in the lower part of its range, averaging near 21% of the bar, and CMF stays around -0.6 for every available lookback. The usual interpretation is persistent selling pressure. The measurement behind it is closing location weighted by volume, so a bar dragged to its low by one late print counts the same as one that spent the whole period there.",
-    "balanced/neg": "Closes average around 42% of their bars, just below the midpoint, and price ends the window within a third of a percent of where it began. Normally read as no persistent closing pressure either way: the mildly negative value reflects closes fractionally below mid rather than a one-sided window. This is also where the indicator's limit shows, since a reading near zero can mean balance or two opposite halves cancelling out."
+    "balanced/flat": "Closes average right at the midpoint of their bars and price ends the window within a quarter of a percent of where it began, which keeps CMF within about 0.08 of zero at every lookback the slider offers. Normally read as no persistent closing pressure either way: the positive and negative money-flow contributions are offsetting. This is also where the indicator's limit shows, since a reading near zero can mean balance or two opposite halves cancelling out, and only the bars themselves say which."
   },
 
   vwap: {
@@ -902,7 +934,7 @@ const PARTICIPATION = {
   volumeProfile: {
     range: "The heaviest bins sit in the middle of the window and the outermost bins hold no volume at all, with roughly 70% of the traded volume fitting into about a point and a quarter around the POC. Structurally this says where trade concentrated, not where price is meant to go &mdash; a POC is a record of agreement, not a target. It stops describing the market when volume starts building outside the value area instead of returning into it.",
     trend: "The busiest bins sit near the top of the window: the POC prints around 111.7 in a 99.4 to 115.8 range, so volume built at the higher prices rather than at the ones price left behind. Normally read as higher prices being accepted rather than merely visited, since time and volume followed the move instead of staying where it began. Volume rebuilding down at the old prices is what would take that reading away.",
-    breakout: "About 61% of the window's volume trades after price leaves the old range, but it is spread across twelve points instead of concentrating, so the profile still shows a single node low down where the first forty bars sat and thin bins all the way up. Normally read as an excursion that has not yet built value &mdash; the second distribution that would make it acceptance has not formed. Those upper bins beginning to fill in is what would turn this into the two-distribution profile the pattern is named for."
+    breakout: "About 53% of the window's volume trades after price leaves the old range at bar 43, and instead of spreading out it settles: the last fifteen bars rotate inside about a point around 104.9 at breakout volume, so the profile shows two nodes &mdash; one at the old range near 99.5 to 100.0, one at the new near 104.5 to 105.0 &mdash; with thin bins between them. Normally read as acceptance after the breakout, since a second distribution has formed where price went rather than price merely visiting. Two cautions travel with it: a single value area drawn across both nodes spans the thin middle too, which is why a double distribution is usually read as two profiles; and volume rebuilding in that thin middle is what would begin to undo the reading."
   },
 
   valueArea: {
@@ -910,7 +942,7 @@ const PARTICIPATION = {
     acceptHigh: "The line is above the value-area high, but the profile behind it has not changed: every bin above the area still holds less than half the volume of the busiest one. Normally read as an excursion above value, and what would make it acceptance is volume building up there &mdash; a second node forming above the old area, not a line drawn above it. Price returning inside is what ends an excursion without it ever becoming acceptance.",
     rejectHigh: "The line sits just under the value-area high, back inside the band holding most of the window's volume, while the bins above it are among the thinnest on the profile. Structurally this says the higher prices exist on the chart but attracted little trade. Normally read as those prices being rejected rather than a level being defended, and it stops reading that way if trade starts filling those bins in.",
     acceptLow: "The line is below the value-area low, in bins holding a fraction of the volume the busiest band holds. Normally read as an excursion below value, with the same test as the upside case: acceptance would mean volume beginning to build down there, not price merely visiting. A return into the value area leaves the excursion as an excursion.",
-    lvn: "The line sits at the lower edge of the value area, just above the thin bins where this window recorded little trade. Normally read as a transition area &mdash; prices the market moved through rather than settled at, which is why movement across them is often quick. Quick is not the same as certain: a thin area can equally be traded back through, and a low-volume node describes the past rather than a speed to come."
+    lvn: "The line sits below the value-area low, in the thinnest bin of trade beneath it &mdash; one holding a small fraction of what the busiest bin took. Normally read as a transition area &mdash; prices the market moved through rather than settled at, which is why movement across them is often quick. Quick is not the same as certain: a thin area can equally be traded back through, and a low-volume node describes the past rather than a speed to come."
   },
 
   orderTypes: {
@@ -921,7 +953,7 @@ const PARTICIPATION = {
   },
 
   timeSales: {
-    buyProgress: "Twenty-five of the forty-two prints classify at the ask, carrying 8,110 shares against 5,139 at the bid, and price walks from 100.01 to 100.17 without giving any of it back. Normally read as buyers paying the offer and the offer moving up to meet them &mdash; with the caveat that at-bid and at-ask describe where a print landed relative to the quote, not who initiated it. The price progress is what carries the reading: the same split with price unchanged would say the opposite.",
+    buyProgress: "Twenty-five of the forty-two prints classify at the ask, carrying 8,110 shares against 5,139 at the bid, and price walks from 100.01 to 100.17, with small pullbacks along the way but none that undoes the advance. Normally read as buyers paying the offer and the offer moving up to meet them &mdash; with the caveat that at-bid and at-ask describe where a print landed relative to the quote, not who initiated it. The price progress is what carries the reading: the same split with price unchanged would say the opposite.",
     sellProgress: "Twenty-six prints classify at the bid, carrying 6,665 shares against 4,798 at the ask, and price works from 100.00 down to 99.79. Normally read as sellers hitting the bid and the bid stepping lower each time it is taken. It would stop reading that way the moment the same bid-side flow arrived without price following it.",
     buyAbsorb: "Thirty-three of forty-two prints land at the ask and ask-classified volume runs about 2.7 times the bid side, yet price covers four cents across the entire tape. Normally read as absorption: resting size is willing to keep selling at these prices for as long as the buying keeps arriving. What would break the reading is simply price starting to travel on the same flow, which so far it has not.",
     sellAbsorb: "Bid-classified volume runs about five and a half times the ask side over forty-two prints while price falls four cents. The usual interpretation is that resting buyers are taking the other side of everything being sold here. To be precise about it, those 10,452 shares are not net selling &mdash; every one of them was bought by someone &mdash; and it reads as absorption only while price refuses to move.",
@@ -929,9 +961,9 @@ const PARTICIPATION = {
   },
 
   footprint: {
-    alignedBuy: "Every candle in the window carries positive delta and closes above its open, with the selected one showing delta at roughly a fifth to a third of its own volume. Normally read as ask-side aggression that price is following. Delta is an inference from where each print landed against the quote rather than a measurement of who initiated, so a positive-delta candle that closes at or below its open is what would separate the aggression from the result.",
+    alignedBuy: "Every candle in the window carries positive delta and closes above its open, with the selected one showing delta at a little over a third of its own volume and the others between a tenth and a third. Normally read as ask-side aggression that price is following. Delta is an inference from where each print landed against the quote rather than a measurement of who initiated, so a positive-delta candle that closes at or below its open is what would separate the aggression from the result.",
     alignedSell: "Every candle carries negative delta and closes below its open. Normally read as bid-side aggression that price is following down, with the same caveat: the classification describes prints against the quote and can be wrong on any individual one. The reading holds only while the two agree.",
-    buyAbsorb: "All six candles carry positive delta &mdash; the largest is about 45% of its own candle's volume &mdash; and every one closes at or below its open. Normally read as absorption at the ask: buying is arriving and being met by resting size without price being pushed. This is the case that makes the point about delta, since a strongly positive number and a lower close belong to the same candle, and it is the close that shows the aggression did not work.",
+    buyAbsorb: "All six candles carry positive delta &mdash; the largest is nearly half its own candle's volume &mdash; and every one closes at or below its open. Normally read as absorption at the ask: buying is arriving and being met by resting size without price being pushed. This is the case that makes the point about delta, since a strongly positive number and a lower close belong to the same candle, and it is the close that shows the aggression did not work.",
     sellAbsorb: "All six candles carry negative delta while closing at or above their opens. Normally read as absorption at the bid: the selling is being taken by resting size and is not moving price. As in the mirror case the delta figure alone would have read as one-sided; only the close shows that what was resting on the other side was enough."
   },
 
@@ -945,11 +977,11 @@ const PARTICIPATION = {
   },
 
   marketDepth: {
-    untested: "Nothing on this book has been tested yet. Structurally that is the whole content of the state: displayed size is what participants are currently willing to show, and until an order arrives there is no way to separate showing from meaning it. Everything readable about depth comes from what happens next &mdash; whether the size is executed, replenished, or cancelled.",
+    untested: "Little of this book has been tested yet. Structurally that is the whole content of the state: displayed size is what participants are currently willing to show, and until an order arrives there is no way to separate showing from meaning it. Everything readable about depth comes from what happens next &mdash; whether the size is executed, replenished, or cancelled.",
     bidWall: "Eight hundred lots trade against the 4,200 displayed at 99.98, and the level is back to 4,500 by the next event and 4,600 after that, larger than before it was hit. Normally read as a bid being defended, since size that replenishes after being taken is doing something a cancelled order cannot. The invalidation is the one that matters for depth: the level can be withdrawn rather than taken, and a bid that is cancelled was never support.",
     askWall: "Nine hundred lots are lifted from the 4,300 displayed at 100.02, and the level returns to 4,600 and then 4,700 with the best offer never moving. Normally read as an offer being defended, replenishment being the part that distinguishes it from resting size nobody has tested. The same caution applies in reverse: it can be pulled instead of traded, and an offer that is cancelled never resisted anything.",
-    wallCancel: "The large level is gone and nothing traded against it &mdash; near-touch depth drops from about 6,000 to 2,300 between events without a single fill. Structurally this says what displayed size is: an intention, revocable at no cost, and therefore not evidence of anything until it is executed. It is the reason depth is read as available liquidity rather than as support or resistance.",
-    thin: "The order eats through the front of a book holding roughly a fifth of the normal size per level, and the best offer walks from 100.01 to 100.03 while the spread widens from two cents to four. Normally read as price impact rather than as a move: nothing about the market changed, one order simply cost more because there was less to trade against. Depth returning at the new prices would leave the impact temporary; it not returning is what turns impact into a repricing.",
+    wallCancel: "The large level is gone. It absorbed real executions and replenished twice before it withdrew, and then near-touch depth drops from about 6,000 to 2,300 between events. Structurally this says what displayed size is: an intention, revocable at no cost, and therefore not evidence of anything until it is executed. It is the reason depth is read as available liquidity rather than as support or resistance.",
+    thin: "The order eats through the front of a book holding roughly a quarter of the normal size per level, and the best offer walks from 100.01 to 100.03 while the spread widens from two cents to four. Normally read as price impact rather than as a move: nothing about the market changed, one order simply cost more because there was less to trade against. Depth returning at the new prices would leave the impact temporary; it not returning is what turns impact into a repricing.",
     normalConsumed: "The 99.99 bid was added to, then sold into, then finished: the best bid is now 99.98 and the spread has widened to three cents. Normally read as a level consumed rather than withdrawn &mdash; the version of the story where displayed size did mean something, because it was there, it traded, and it is gone. What it does not say is where price goes next, only that the price at which buying was resting has moved down a cent."
   }
 };
@@ -1025,7 +1057,15 @@ function initRelativeVolume(){
     const baseline=s.slice(Math.max(0,spike-20),spike).reduce((a,d)=>a+d.v,0)/20,rvol=s[spike].v/baseline;
     const y=ch.volume.y+ch.volume.h*(1-(baseline*threshold)/(Math.max(...s.map(d=>d.v))*1.12));drawHorizontal(ch.ctx,y,ch.volume.x,ch.volume.x+ch.volume.w,ch.c.amber,`${threshold.toFixed(1)}× baseline`);
     drawLabel(ch.ctx,"SPIKE",Math.min(ch.price.x+ch.price.w-54,ch.sx(spike)-20),ch.price.y+18,ch.c.amber);
-    setKPIs([["Spike RVOL",fmt(rvol,2)+"×"],["Threshold",threshold.toFixed(1)+"×"],["Response",mode==="expansion"?"Progress":mode==="climax"?"Reversal":mode==="absorption"?"No progress":"Two-way"]]);
+    /* The climax case has no spike bar: participation builds AFTER the marked
+       bar, so the figure that matters is the window's peak, not the marked bar's 1.5x. */
+    const peak=Math.max(...s.slice(spike).map(d=>d.v))/baseline;
+    setKPIs([[mode==="climax"?"Peak RVOL":"Spike RVOL",fmt(mode==="climax"?peak:rvol,2)+"×"],["Threshold",threshold.toFixed(1)+"×"],["Response",mode==="expansion"?"Progress":mode==="climax"?"Reversal":mode==="absorption"?"No progress":"Two-way"]]);
+    $("#extraVisual").innerHTML=workedHTML("How the marked bar's RVOL is computed",[
+      `Baseline = Σ volume of bars ${spike-19}–${spike} ÷ 20 = ${fmt(baseline,0)}`,
+      `Marked bar ${spike+1} volume = ${fmt(s[spike].v,0)}`,
+      `RVOL = ${fmt(s[spike].v,0)} ÷ ${fmt(baseline,0)} = ${fmt(rvol,2)}× &nbsp;(threshold ${threshold.toFixed(1)}×: ${rvol>=threshold?"qualifies":"does not qualify"})`
+    ].concat(mode==="climax"?[`Peak after the marked bar = ${fmt(Math.max(...s.slice(spike).map(d=>d.v)),0)} ÷ ${fmt(baseline,0)} = ${fmt(peak,2)}×`]:[]));
     if(mode==="expansion")marketRead("bull","Buyers increased activity and continued moving price higher.","The spike produced upward follow-through, so buy-side aggression made price progress.",mode);
     else if(mode==="climax")marketRead("warn","Buying activity became extreme, then price stopped progressing.","The spike did not sustain higher prices and was followed by reversal. It behaved like a climax, not confirmation.",mode);
     else if(mode==="absorption")marketRead("warn","Aggressive activity increased, but price stayed nearly flat.","Opposing liquidity absorbed the orders. High volume did not produce control.",mode);
@@ -1052,6 +1092,12 @@ function initVolumeConfirmation(){
     const base=s.slice(priorStart,priorEnd).reduce((a,d)=>a+d.v,0)/Math.max(1,priorEnd-priorStart);
     const ratio=breakIdx>=0?s[breakIdx].v/base:0; const accepted=s.slice(-5).filter(d=>d.c>level).length;
     setKPIs([["Break volume",breakIdx>=0?fmt(ratio,2)+"×":"None"],["Closes above",accepted+"/5"],["Result",mode==="strong"?"Accepted":mode==="weak"?"Low confirmation":mode==="failed"?"Failed":"No break"]]);
+    $("#extraVisual").innerHTML=workedHTML("How the break ratio is computed",breakIdx>=0?[
+      `Baseline = average volume of the ${priorEnd-priorStart} bars before the break (bars ${priorStart+1}–${priorEnd}) = ${fmt(base,0)}`,
+      `Break bar ${breakIdx+1}: first close above ${fmt(level,2)}, volume ${fmt(s[breakIdx].v,0)}`,
+      `Ratio = ${fmt(s[breakIdx].v,0)} ÷ ${fmt(base,0)} = ${fmt(ratio,2)}×`,
+      `Acceptance: ${accepted} of the last 5 closes above ${fmt(level,2)}`
+    ]:[`No close above ${fmt(level,2)} after bar ${baseN}: there is no break bar, so no ratio to compute.`,`Highest high in the window: ${fmt(Math.max(...s.map(d=>d.h)),2)}`]);
     if(mode==="strong")marketRead("bull","Buyers broke resistance and kept accepting higher prices.","Volume expanded at the break, and price stayed above the level. Buyers made and maintained upward progress.",mode);
     else if(mode==="weak")marketRead("warn","Buyers moved above resistance, but participation did not expand.","Price is outside the range, but volume confirmation is weak. More acceptance evidence is needed.",mode);
     else if(mode==="failed")marketRead("bear","Buyers crossed resistance but could not maintain higher prices.","High activity appeared at the break, then price returned inside. The attempted move was rejected.",mode);
@@ -1066,8 +1112,8 @@ function initOBV(){
   let mode="confirmBull",period=8;
   const draw=()=>{
     let kind=mode.includes("Bull")?"bull-volumeup":"bear-volumeup";let s=makeSeries(kind,62,505);
-    if(mode==="bearDiv"){s=makeSeries("bull-volumedown",62,506)}
-    if(mode==="bullDiv"){s=makeSeries("bear-volumedown",62,507)}
+    if(mode==="bearDiv"){s=divergentVolume(makeSeries("bull-volumeup",62,506),24,3,.45)}
+    if(mode==="bullDiv"){s=divergentVolume(makeSeries("bear-volumeup",62,507),24,.45,3)}
     let vals=obv(s);
     const {ctx,w,h}=canvasContext(),c=colors(),m={l:18,r:58,t:18,b:20},totalH=h-m.t-m.b,gap=18,priceH=totalH*.58;
     const price={x:m.l,y:m.t,w:w-m.l-m.r,h:priceH},panel={x:m.l,y:m.t+priceH+gap,w:w-m.l-m.r,h:totalH-priceH-gap};
@@ -1075,10 +1121,11 @@ function initOBV(){
     linePanel(ctx,vals,panel,c,{color:c.cyan});ctx.fillStyle=c.muted;ctx.font="10px system-ui";ctx.fillText("ON-BALANCE VOLUME",panel.x,panel.y+11);setBadge("PRICE + OBV");
     const pchg=(s.at(-1).c-s[0].o)/s[0].o*100,ochg=vals.at(-1)-vals[Math.max(0,vals.length-period-1)];
     setKPIs([["Price trend",pchg>=0?"Higher":"Lower"],["OBV change",(ochg>=0?"+":"")+compact(ochg)],["Relationship",mode.startsWith("confirm")?"Confirmation":"Divergence"]]);
+    $("#extraVisual").innerHTML=workedHTML("The last five bars, accumulated",Array.from({length:5},(_,k)=>{const i=s.length-5+k,d=s[i],p=s[i-1];const dir=d.c>p.c?"up":d.c<p.c?"down":"unchanged";return`Bar ${i+1}: close ${fmt(d.c,2)} vs ${fmt(p.c,2)} (${dir}) → ${dir==="up"?"+":dir==="down"?"−":"±"}${dir==="unchanged"?"0":fmt(d.v,0)} → OBV ${fmt(vals[i],0)}`}));
     if(mode==="confirmBull")marketRead("bull","Up-closing bars are carrying more cumulative volume as price rises.","Price and OBV agree: buyers are making upward progress with supporting volume participation.",mode);
     else if(mode==="confirmBear")marketRead("bear","Down-closing bars are carrying more cumulative volume as price falls.","Price and OBV agree: sellers are making downward progress with supporting volume participation.",mode);
-    else if(mode==="bearDiv")marketRead("warn","Price rises, but OBV participation fails to confirm.","Buyers are still making price progress, but volume is increasingly associated with down closes. This is a warning, not an automatic short.");
-    else marketRead("warn","Price falls, but OBV selling participation fails to confirm.","Sellers are making price progress, but cumulative down-close volume is weakening. This is a warning, not an automatic long.");
+    else if(mode==="bearDiv")marketRead("warn","Price rises, but OBV participation fails to confirm.","Buyers are still making price progress, but volume is increasingly associated with down closes. This is a warning, not an automatic short.",mode);
+    else marketRead("warn","Price falls, but OBV selling participation fails to confirm.","Sellers are making price progress, but cumulative down-close volume is weakening. This is a warning, not an automatic long.",mode);
   };
   $("#controls").innerHTML=controlHTML("Relationship",segmented("obvSeg",[["confirmBull","Bull confirm"],["confirmBear","Bear confirm"],["bearDiv","Bear divergence"],["bullDiv","Bull divergence"]],"confirmBull"))+
     rangeControl("obvLook","Comparison window",5,20,8,1," bars")+
@@ -1092,7 +1139,7 @@ function initCMF(){
     s=s.map((d,i)=>{
       if(mode==="accum")d.c=d.l+(d.h-d.l)*(.66+.25*Math.sin(i*.5)**2);
       else if(mode==="distrib")d.c=d.l+(d.h-d.l)*(.08+.26*Math.sin(i*.5)**2);
-      else d.c=d.l+(d.h-d.l)*(.42+.16*Math.sin(i));
+      else d.c=d.l+(d.h-d.l)*(.50+.16*Math.sin(i));
       return d;
     });
     const {cmf:vals}=cmf(s,period);const {ctx,w,h}=canvasContext(),c=colors(),m={l:18,r:58,t:18,b:20},gap=18,priceH=(h-m.t-m.b)*.58;
@@ -1101,6 +1148,13 @@ function initCMF(){
     linePanel(ctx,vals,panel,c,{color:c.purple,min:-.55,max:.55,zero:true});ctx.fillStyle=c.muted;ctx.font="10px system-ui";ctx.fillText(`CMF (${period})`,panel.x,panel.y+11);setBadge("PRICE + CMF");
     const last=vals.filter(v=>v!=null).at(-1)||0;
     setKPIs([["CMF",fmt(last,3)],["Closing pressure",last>.08?"Positive":last<-.08?"Negative":"Balanced"],["Lookback",period+" bars"]]);
+    {const d=s.at(-1),mult=((d.c-d.l)-(d.h-d.c))/(d.h-d.l);let a=0,b=0;for(let j=s.length-period;j<s.length;j++){const e=s[j];a+=((e.c-e.l)-(e.h-e.c))/Math.max(.001,e.h-e.l)*e.v;b+=e.v}
+    $("#extraVisual").innerHTML=workedHTML("The last bar, and the lookback sum",[
+      `Last bar: H ${fmt(d.h,2)} · L ${fmt(d.l,2)} · C ${fmt(d.c,2)} · V ${fmt(d.v,0)}`,
+      `Multiplier = ((${fmt(d.c,2)} − ${fmt(d.l,2)}) − (${fmt(d.h,2)} − ${fmt(d.c,2)})) ÷ (${fmt(d.h,2)} − ${fmt(d.l,2)}) = ${fmt(mult,3)}`,
+      `Money-flow volume = ${fmt(mult,3)} × ${fmt(d.v,0)} = ${fmt(mult*d.v,0)}`,
+      `CMF(${period}) = Σ money-flow volume ${fmt(a,0)} ÷ Σ volume ${fmt(b,0)} = ${fmt(a/b,3)}`
+    ]);}
     if(last>.08)marketRead("bull","High-volume bars are generally closing nearer their highs.","The calculation shows persistent positive closing pressure. Buyers are maintaining stronger closes, though this is inferred rather than trade-by-trade flow.",mode+"/pos");
     else if(last<-.08)marketRead("bear","High-volume bars are generally closing nearer their lows.","The calculation shows persistent negative closing pressure. Sellers are maintaining weaker closes.",mode+"/neg");
     else marketRead("","Closing pressure is balanced over the lookback.","Positive and negative money-flow contributions are offsetting. Neither side has persistent closing control.",mode+"/flat");
@@ -1119,8 +1173,18 @@ function initVWAP(){
       const dev=Math.sqrt(s.reduce((a,d,i)=>a+Math.pow(d.c-vw[i],2),0)/s.length);
       drawLine(ch.ctx,vw.map(v=>v+dev),ch.price,ch.min,ch.max,ch.c.purple,1);drawLine(ch.ctx,vw.map(v=>v-dev),ch.price,ch.min,ch.max,ch.c.purple,1);
     }
-    const last=s.at(-1),vlast=vw.at(-1),slope=vlast-vw[Math.max(0,vw.length-10)],above=s.slice(-10).filter((d,i)=>d.c>vw[vw.length-10+i]).length;
-    setKPIs([["Last vs VWAP",(last.c-vlast>=0?"+":"")+fmt(last.c-vlast,2)],["VWAP slope",slope>.08?"Rising":slope<-.08?"Falling":"Flat"],["Bars above",above+"/10"]]);
+    /* Slope threshold ±0.25 over ten bars: the trend cases move about 1 point,
+       the two-way case about 0.14, and the reading calls that one flat. The
+       count is the whole session's closes, the figure the reading quotes. */
+    const last=s.at(-1),vlast=vw.at(-1),slope=vlast-vw[Math.max(0,vw.length-10)],above=s.filter((d,i)=>d.c>vw[i]).length;
+    setKPIs([["Last vs VWAP",(last.c-vlast>=0?"+":"")+fmt(last.c-vlast,2)],["VWAP slope",slope>.25?"Rising":slope<-.25?"Falling":"Flat"],["Closes above",above+"/"+s.length]]);
+    {let pv=0,vv=0;s.forEach(d=>{pv+=(d.h+d.l+d.c)/3*d.v;vv+=d.v});const tp=(last.h+last.l+last.c)/3;
+    $("#extraVisual").innerHTML=workedHTML("The last bar, and the session's running sums",[
+      `Typical price = (${fmt(last.h,2)} + ${fmt(last.l,2)} + ${fmt(last.c,2)}) ÷ 3 = ${fmt(tp,3)}`,
+      `× volume ${fmt(last.v,0)} = ${fmt(tp*last.v,0)}`,
+      `Cumulative Σ(typical price × volume) = ${fmt(pv,0)} · Σ volume = ${fmt(vv,0)}`,
+      `VWAP = ${fmt(pv,0)} ÷ ${fmt(vv,0)} = ${fmt(pv/vv,3)}`
+    ]);}
     if(mode==="trendUp")marketRead("bull","Buyers keep accepting prices above a rising session average.","Price stays above VWAP and the average rises. Buyers are maintaining upward control.",mode);
     else if(mode==="trendDown")marketRead("bear","Sellers keep accepting prices below a falling session average.","Price stays below VWAP and the average falls. Sellers are maintaining downward control.",mode);
     else if(mode==="twoWay")marketRead("","Price repeatedly crosses a flat VWAP.","Trading is rotating around session average value. Neither side maintains directional progress.",mode);
@@ -1128,7 +1192,7 @@ function initVWAP(){
   };
   $("#controls").innerHTML=controlHTML("Session behavior",segmented("vwapSeg",[["trendUp","Bull trend"],["trendDown","Bear trend"],["twoWay","Two-way"],["reclaim","Reclaim"]],"trendUp"))+
     controlHTML("Display",`<label style="display:flex;align-items:center;gap:9px;color:var(--text)"><input id="bands" type="checkbox"> Show ±1 deviation</label>`)+
-    `<div class="formula">VWAP = cumulative Σ(typical price × volume) ÷ cumulative Σvolume</div>`;
+    `<div class="formula">VWAP = cumulative Σ(typical price × volume) ÷ cumulative Σvolume<br>typical price = (high + low + close) ÷ 3</div>`;
   bindSegment("vwapSeg",v=>{mode=v;draw()});$("#bands").addEventListener("change",e=>{showBands=e.target.checked;draw()});draw();return resizeHandler(draw);
 }
 function initAnchoredVWAP(){
@@ -1139,6 +1203,12 @@ function initAnchoredVWAP(){
     const x=ch.sx(anchor);ch.ctx.strokeStyle=ch.c.amber;ch.ctx.setLineDash([5,5]);ch.ctx.beginPath();ch.ctx.moveTo(x,ch.price.y);ch.ctx.lineTo(x,ch.volume.y+ch.volume.h);ch.ctx.stroke();ch.ctx.setLineDash([]);drawLabel(ch.ctx,"ANCHOR",Math.min(x+5,ch.price.x+ch.price.w-62),ch.price.y+20,ch.c.amber);
     const last=s.at(-1),val=av.at(-1),slope=val-av[Math.max(anchor,av.length-10)];
     setKPIs([["Anchor bar",anchor+1],["Price vs AVWAP",(last.c-val>=0?"+":"")+fmt(last.c-val,2)],["Slope",slope>.08?"Rising":slope<-.08?"Falling":"Flat"]]);
+    {let pv=0,vv=0;for(let i=anchor;i<s.length;i++){const d=s[i];pv+=(d.h+d.l+d.c)/3*d.v;vv+=d.v}const tp=(last.h+last.l+last.c)/3;
+    $("#extraVisual").innerHTML=workedHTML(`The sums since the anchor (bars ${anchor+1}–${s.length})`,[
+      `Last bar: typical price = (${fmt(last.h,2)} + ${fmt(last.l,2)} + ${fmt(last.c,2)}) ÷ 3 = ${fmt(tp,3)}, × volume ${fmt(last.v,0)} = ${fmt(tp*last.v,0)}`,
+      `Σ(typical price × volume) since the anchor = ${fmt(pv,0)} · Σ volume = ${fmt(vv,0)}`,
+      `Anchored VWAP = ${fmt(pv,0)} ÷ ${fmt(vv,0)} = ${fmt(pv/vv,3)} &nbsp;(bars before the anchor never enter the sum)`
+    ]);}
     if(last.c>val&&slope>0)marketRead("bull","Trading since the anchor is accepted above a rising average.","Buyers have favorable location relative to the event and continue making upward progress.","above");
     else if(last.c<val&&slope<0)marketRead("bear","Trading since the anchor is accepted below a falling average.","Sellers have favorable location relative to the event and continue making downward progress.","below");
     else marketRead("warn","Price and anchored value are not aligned.","The event-based average is flat or being crossed. Neither side has clear control relative to this anchor.","unaligned");
@@ -1182,7 +1252,7 @@ function drawProfileChart(series,bins=18,opts={}){
 function initVolumeProfile(){
   let mode="range",bins=18;
   const draw=()=>{
-    let s=makeSeries(mode==="range"?"range-volumeup":mode==="trend"?"bull-volumeup":"breakout-volumeup",66,909);
+    let s=mode==="breakout"?breakoutProfileSeries():makeSeries(mode==="range"?"range-volumeup":"bull-volumeup",66,909);
     const ch=drawProfileChart(s,bins);const p=ch.p;const hvn=p.price(p.poc),thin=p.vols.indexOf(Math.min(...p.vols.filter(v=>v>0)));
     setKPIs([["POC",fmt(hvn,2)],["Value area",fmt(ch.valPrice,2)+" – "+fmt(ch.vahPrice,2)],["Profile",mode==="range"?"Balanced":mode==="trend"?"Directional":"Two distributions"]]);
     if(mode==="range")marketRead("","Most activity is concentrated near the middle of the range.","Both sides repeatedly transact around the POC. The profile shows acceptance, not directional control.",mode);
@@ -1199,14 +1269,14 @@ function initValueArea(){
   const draw=()=>{
     const s=makeSeries("range-volumeup",64,1010);const p0=profileData(s,bins),baseVAH=p0.lo+p0.step*(p0.vah+1),baseVAL=p0.lo+p0.step*p0.val;
     if(current==null||mode!=="custom"){
-      current=mode==="inside"?(baseVAL+baseVAH)/2:mode==="acceptHigh"?baseVAH+p0.step*1.6:mode==="rejectHigh"?baseVAH-p0.step*.25:mode==="acceptLow"?baseVAL-p0.step*1.6:baseVAL+p0.step*.35;
+      current=mode==="inside"?(baseVAL+baseVAH)/2:mode==="acceptHigh"?baseVAH+p0.step*1.6:mode==="rejectHigh"?baseVAH-p0.step*.25:mode==="acceptLow"?baseVAL-p0.step*1.6:lvnPrice(p0);
     }
     const ch=drawProfileChart(s,bins,{current});const inside=current>=ch.valPrice&&current<=ch.vahPrice;
     setKPIs([["Current",fmt(current,2)],["Location",current>ch.vahPrice?"Above value":current<ch.valPrice?"Below value":"Inside value"],["POC",fmt(ch.pocPrice,2)]]);
-    if(mode==="rejectHigh")marketRead("bear","Higher prices were tested, then rejected back into value.","Buyers could not maintain trade above VAH. Price returned to the prior accepted area.","rejectHigh");
+    if(mode==="lvn")marketRead("warn","Price is moving through a thinner-volume transition area below value.","The market previously spent little activity here. Movement may be fast, but acceleration is not guaranteed.","lvn");
+    else if(mode==="rejectHigh")marketRead("bear","Higher prices were tested, then rejected back into value.","Buyers could not maintain trade above VAH. Price returned to the prior accepted area.","rejectHigh");
     else if(mode==="acceptHigh"||current>ch.vahPrice)marketRead("bull","Buyers are maintaining trade above the prior value area.","The market is accepting higher prices. Continued time and volume above VAH strengthen the evidence.","acceptHigh");
     else if(mode==="acceptLow"||current<ch.valPrice)marketRead("bear","Sellers are maintaining trade below the prior value area.","The market is accepting lower prices. Continued time and volume below VAL strengthen the evidence.","acceptLow");
-    else if(mode==="lvn")marketRead("warn","Price is moving through a thinner-volume transition area.","The market previously spent little activity here. Movement may be fast, but acceleration is not guaranteed.","lvn");
     else marketRead("","Price is trading inside the accepted value area.","Both sides are transacting around prior value. Neither side has established control outside it.","inside");
   };
   $("#controls").innerHTML=controlHTML("Auction response",segmented("vaSeg",[["inside","Inside value"],["acceptHigh","Accept above"],["rejectHigh","Reject high"],["acceptLow","Accept below"],["lvn","LVN transition"]],"inside"))+
@@ -1315,42 +1385,56 @@ function initTimeSales(){
 }
 
 function footprintScenario(mode){
-  const r=rng(1313+hashSeed(mode)),candles=[],levels=9;let base=100;
+  const r=rng(1313+hashSeed(mode)),levels=9;let base=100;const bars=[];
   for(let i=0;i<6;i++){
-    let o=base+(i-2.5)*.035, c=o;
+    let o=base+(i-2.5)*.035,c=o;
     if(mode==="alignedBuy")c=o+.055+r()*.025;
     if(mode==="alignedSell")c=o-.055-r()*.025;
     if(mode==="buyAbsorb")c=o-.018+r()*.018;
     if(mode==="sellAbsorb")c=o+.018-r()*.018;
-    const h=Math.max(o,c)+.035,l=Math.min(o,c)-.035;const rows=[];
+    const h=Math.max(o,c)+.05,l=Math.min(o,c)-.05;bars.push({o,h,l,c});base=c;
+  }
+  /* One price ladder for the whole window, and each candle prints volume only
+     at the rungs inside its own high-low range: a footprint records
+     executions, and nothing executed at a price the candle never reached. */
+  const maxH=Math.max(...bars.map(b=>b.h)),minL=Math.min(...bars.map(b=>b.l)),step=(maxH-minL)/(levels-1);
+  return bars.map(b=>{
+    const rows=[],mid=(b.h+b.l)/2;
     for(let j=0;j<levels;j++){
-      const center=(levels-1)/2,shape=Math.max(.2,1-Math.abs(j-center)/5);
+      const price=minL+step*j;
+      if(price<b.l-step*.5||price>b.h+step*.5){rows.push({price,bid:0,ask:0,traded:false});continue}
+      const shape=Math.max(.3,1-Math.abs(price-mid)/Math.max(step,(b.h-b.l))*1.1);
       let bid=Math.round((90+r()*210)*shape),ask=Math.round((90+r()*210)*shape);
       if(mode==="alignedBuy")ask=Math.round(ask*1.65);
       if(mode==="alignedSell")bid=Math.round(bid*1.65);
       if(mode==="buyAbsorb")ask=Math.round(ask*2.0);
       if(mode==="sellAbsorb")bid=Math.round(bid*2.0);
-      rows.push({bid,ask});
+      rows.push({price,bid,ask,traded:true});
     }
     const delta=rows.reduce((a,x)=>a+x.ask-x.bid,0),vol=rows.reduce((a,x)=>a+x.ask+x.bid,0);
-    candles.push({o,h,l,c,v:vol,delta,rows});base=c;
-  }
-  return candles;
+    return{...b,v:vol,delta,rows};
+  });
 }
 function initFootprint(){
   let mode="alignedBuy",selected=5,ratio=3;
   const draw=()=>{
     const s=footprintScenario(mode),ch=standardChart(s,{noVolume:false});setBadge("FOOTPRINT + DELTA");
     const step=ch.price.w/s.length,x=ch.price.x+step*selected;ch.ctx.fillStyle=ch.c.cyan;ch.ctx.globalAlpha=.09;ch.ctx.fillRect(x,ch.price.y,step,ch.price.h);ch.ctx.globalAlpha=1;
-    const maxH=Math.max(...s.map(d=>d.h)),minL=Math.min(...s.map(d=>d.l)),priceStep=(maxH-minL)/8;
     let html=`<div class="footprint" style="margin-top:14px"><div class="fp-grid">`;
     for(let row=8;row>=0;row--){
-      const price=minL+priceStep*row;html+=`<div class="fp-row"><div class="fp-cell price">${fmt(price,3)}</div>`;
-      for(let i=0;i<6;i++){const x=s[i].rows[row],imb=Math.max(x.ask,x.bid)/Math.max(1,Math.min(x.ask,x.bid));const cls=(x.ask-x.bid)>=0?"pos":"neg";html+=`<div class="fp-cell ${cls} ${imb>=ratio?"hot":""}" title="Bid × Ask">${x.bid} × ${x.ask}</div>`}
+      html+=`<div class="fp-row"><div class="fp-cell price">${fmt(s[0].rows[row].price,3)}</div>`;
+      for(let i=0;i<6;i++){const x=s[i].rows[row];if(!x.traded){html+=`<div class="fp-cell" style="opacity:.28" title="No executions at this price in this candle"></div>`;continue}const imb=Math.max(x.ask,x.bid)/Math.max(1,Math.min(x.ask,x.bid));const cls=(x.ask-x.bid)>=0?"pos":"neg";html+=`<div class="fp-cell ${cls} ${imb>=ratio?"hot":""}" title="Bid × Ask">${x.bid} × ${x.ask}</div>`}
       html+=`</div>`;
     }
-    html+=`</div></div>`;$("#extraVisual").innerHTML=html;
-    const d=s[selected],deltaPct=d.delta/d.v*100,body=d.c-d.o;
+    html+=`</div></div>`;
+    const d=s[selected],deltaPct=d.delta/d.v*100,body=d.c-d.o,askSum=d.rows.reduce((a,x)=>a+x.ask,0),bidSum=d.rows.reduce((a,x)=>a+x.bid,0);
+    html+=workedHTML(`Candle ${selected+1}, summed over the ${d.rows.filter(x=>x.traded).length} prices it traded at`,[
+      `Ask-classified volume = ${d.rows.filter(x=>x.traded).map(x=>x.ask).join(" + ")} = ${fmt(askSum,0)}`,
+      `Bid-classified volume = ${d.rows.filter(x=>x.traded).map(x=>x.bid).join(" + ")} = ${fmt(bidSum,0)}`,
+      `Delta = ${fmt(askSum,0)} − ${fmt(bidSum,0)} = ${d.delta>=0?"+":""}${fmt(d.delta,0)} &nbsp;·&nbsp; Delta ÷ volume = ${fmt(d.delta,0)} ÷ ${fmt(d.v,0)} = ${deltaPct>=0?"+":""}${fmt(deltaPct,1)}%`,
+      `Close ${fmt(d.c,3)} vs open ${fmt(d.o,3)}: ${body>0?"higher":body<0?"lower":"unchanged"}`
+    ]);
+    $("#extraVisual").innerHTML=html;
     setKPIs([["Selected candle",selected+1],["Delta",(d.delta>=0?"+":"")+compact(d.delta)],["Delta %",(deltaPct>=0?"+":"")+fmt(deltaPct,1)+"%"]]);
     if(d.delta>0&&body>0)marketRead("bull","Aggressive buyers traded more volume at the ask and price closed higher.","Buy-side aggression and upward price progress agree.","alignedBuy");
     else if(d.delta<0&&body<0)marketRead("bear","Aggressive sellers traded more volume at the bid and price closed lower.","Sell-side aggression and downward price progress agree.","alignedSell");
@@ -1360,7 +1444,7 @@ function initFootprint(){
   $("#controls").innerHTML=controlHTML("Footprint case",`<select id="fpMode"><option value="alignedBuy">Positive delta + price up</option><option value="alignedSell">Negative delta + price down</option><option value="buyAbsorb">Positive delta absorbed</option><option value="sellAbsorb">Negative delta absorbed</option></select>`)+
     rangeControl("fpCandle","Selected candle",1,6,6,1,"")+
     rangeControl("imbalance","Imbalance ratio",2,5,3,.5,"×")+
-    `<div class="formula">Delta = ask-classified volume − bid-classified volume<br>Highlighted cell = larger side ≥ threshold × smaller side</div>`;
+    `<div class="formula">Delta = ask-classified volume − bid-classified volume<br>Highlighted cell = larger side ≥ threshold × smaller side</div><p class="mini-note">This lab compares bid and ask at the same price. Most platforms test the imbalance diagonally &mdash; the ask at one price against the bid one tick below it &mdash; because that is the pair that competes for the same trade. Declare which test a rule uses.</p>`;
   $("#fpMode").addEventListener("change",e=>{mode=e.target.value;draw()});bindRange("fpCandle",v=>{selected=v-1;draw()});bindRange("imbalance",v=>{ratio=v;draw()},"×");draw();return resizeHandler(draw);
 }
 function makeCVDScenario(mode){
@@ -1389,6 +1473,7 @@ function initCVD(){
     if(reset>0){const xx=panel.x+panel.w*reset/(s.length-1);ctx.strokeStyle=c.amber;ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(xx,price.y);ctx.lineTo(xx,panel.y+panel.h);ctx.stroke();ctx.setLineDash([])}
     setBadge("PRICE + CVD");const pchg=s.at(-1).c-s[0].o,cchg=vals.filter(v=>v!=null).at(-1)||0;
     setKPIs([["Price change",(pchg>=0?"+":"")+fmt(pchg,2)],["CVD change",(cchg>=0?"+":"")+compact(cchg)],["Relationship",mode.startsWith("aligned")?"Aligned":mode.includes("Absorb")?"Absorption":"Divergence"]]);
+    $("#extraVisual").innerHTML=workedHTML(`The last five bars, accumulated${reset>0?` from the reset at bar ${reset+1}`:""}`,Array.from({length:5},(_,k)=>{const i=s.length-5+k,d=s[i];return`Bar ${i+1}: ask ${fmt(d.ask,0)} − bid ${fmt(d.bid,0)} = ${d.delta>=0?"+":""}${fmt(d.delta,0)} → CVD ${vals[i]==null?"—":fmt(vals[i],0)}`}));
     if(mode==="alignedBull")marketRead("bull","Aggressive buying accumulates while price moves higher.","Rising CVD and rising price agree: buyers are active and making progress.",mode);
     else if(mode==="alignedBear")marketRead("bear","Aggressive selling accumulates while price moves lower.","Falling CVD and falling price agree: sellers are active and making progress.",mode);
     else if(mode==="buyAbsorb")marketRead("warn","CVD rises, but price remains nearly flat.","Aggressive buyers are active, but passive sellers prevent upward progress.",mode);
@@ -1474,25 +1559,29 @@ function ruleSpec(state){
 function initRuleBuilder(){
   let state={context:"uptrend",side:"long",volume:"high",rvol:1.5,location:"aboveVWAP",flow:"positiveDelta",confirm:"breakHigh"};
   const validate=()=>{
-    const issues=[];
+    const issues=[],notes=[];
     if(state.side==="long"&&["breakLow","holdBelow"].includes(state.confirm))issues.push("Long side conflicts with bearish price confirmation.");
     if(state.side==="short"&&["breakHigh","holdAbove"].includes(state.confirm))issues.push("Short side conflicts with bullish price confirmation.");
     if(state.side==="long"&&state.flow==="askAbsorption")issues.push("Ask-side absorption describes buying that fails to move price; it conflicts with a basic long continuation rule.");
     if(state.side==="short"&&state.flow==="bidAbsorption")issues.push("Bid-side absorption describes selling that fails to move price; it conflicts with a basic short continuation rule.");
-    if(state.context==="uptrend"&&state.side==="short")issues.push("This is countertrend relative to the selected context.");
-    if(state.context==="downtrend"&&state.side==="long")issues.push("This is countertrend relative to the selected context.");
-    return issues
+    if(state.location==="belowVWAP"&&state.confirm==="holdAbove")issues.push("Location below VWAP conflicts with a confirmation that requires holding above VWAP; both cannot be true on the same bar.");
+    if(state.location==="aboveVWAP"&&state.confirm==="holdBelow")issues.push("Location above VWAP conflicts with a confirmation that requires holding below VWAP; both cannot be true on the same bar.");
+    /* Countertrend is a choice, not a contradiction: the rule can be true, it
+       simply needs a stated reason the trend is expected to fail. */
+    if(state.context==="uptrend"&&state.side==="short")notes.push("Note: this rule is countertrend relative to the selected uptrend context. That is a choice rather than a contradiction, but the rule should say why the trend is expected to fail.");
+    if(state.context==="downtrend"&&state.side==="long")notes.push("Note: this rule is countertrend relative to the selected downtrend context. That is a choice rather than a contradiction, but the rule should say why the trend is expected to fail.");
+    return{issues,notes}
   };
   const draw=()=>{
     const kind=state.side==="long"?(state.context==="range"?"breakout-volumeup":"bull-volumeup"):(state.context==="range"?"failed-volumeup":"bear-volumeup");
     const s=makeSeries(kind,62,1616),vw=vwap(s);const ch=standardChart(s);drawLine(ch.ctx,vw,ch.price,ch.min,ch.max,ch.c.cyan,2);setBadge("RULE PREVIEW");
     const signal=46,x=ch.sx(signal),y=ch.sy(s[signal].c);ch.ctx.fillStyle=state.side==="long"?ch.c.green:ch.c.red;ch.ctx.beginPath();
     if(state.side==="long"){ch.ctx.moveTo(x,y-18);ch.ctx.lineTo(x-7,y-5);ch.ctx.lineTo(x+7,y-5)}else{ch.ctx.moveTo(x,y+18);ch.ctx.lineTo(x-7,y+5);ch.ctx.lineTo(x+7,y+5)}ch.ctx.closePath();ch.ctx.fill();drawLabel(ch.ctx,"TRIGGER",Math.min(x+9,ch.price.x+ch.price.w-66),y,state.side==="long"?ch.c.green:ch.c.red);
-    const spec=ruleSpec(state),issues=validate();$("#ruleText").textContent=JSON.stringify(spec,null,2);const status=$("#ruleStatus");status.className="status "+(issues.length?"warn":"ok");status.innerHTML=issues.length?`<strong>${issues.length} issue${issues.length>1?"s":""}:</strong><br>${issues.join("<br>")}`:"Rule is internally consistent under this simplified model.";
+    const spec=ruleSpec(state),{issues,notes}=validate();$("#ruleText").textContent=JSON.stringify(spec,null,2);const status=$("#ruleStatus");status.className="status "+(issues.length?"warn":"ok");status.innerHTML=(issues.length?`<strong>${issues.length} issue${issues.length>1?"s":""}:</strong><br>${issues.join("<br>")}`:"Rule is internally consistent under this simplified model.")+(notes.length?`<br>${notes.join("<br>")}`:"");
     setKPIs([["Side",state.side.toUpperCase()],["RVOL",state.volume==="none"?"Not used":state.volume==="high"?`≥ ${state.rvol.toFixed(1)}`:"≤ 0.8"],["Validation",issues.length?issues.length+" issue(s)":"Passed"]]);
     if(issues.length)marketRead("warn","The rule asks the market to show conflicting behavior.",issues[0]+" Revise the conditions before backtesting.");
-    else if(state.side==="long")marketRead("bull","The rule requires buyers to show participation, aggression, and upward price confirmation.","A long trigger appears only after buyers make measurable progress in the selected context.");
-    else marketRead("bear","The rule requires sellers to show participation, aggression, and downward price confirmation.","A short trigger appears only after sellers make measurable progress in the selected context.");
+    else if(state.side==="long")marketRead("bull","The rule requires buyers to show participation, aggression, and upward price confirmation.","A long trigger appears only after buyers make measurable progress in the selected context."+(notes.length?" "+notes[0]:""));
+    else marketRead("bear","The rule requires sellers to show participation, aggression, and downward price confirmation.","A short trigger appears only after sellers make measurable progress in the selected context."+(notes.length?" "+notes[0]:""));
   };
   $("#controls").innerHTML=
     controlHTML("Market context",`<select id="ruleContext"><option value="uptrend">Uptrend</option><option value="downtrend">Downtrend</option><option value="range">Range boundary</option></select>`)+

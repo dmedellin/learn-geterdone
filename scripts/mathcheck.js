@@ -31,6 +31,16 @@ const SOURCE = path.join(__dirname, 'mathpath', 'labs', 'algebra_core.py');
 const src = fs.readFileSync(SOURCE, 'utf8');
 const LOGIC_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'logic.py');
 const logicSrc = fs.readFileSync(LOGIC_SOURCE, 'utf8');
+const COUNTING_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'counting.py');
+const countingSrc = fs.readFileSync(COUNTING_SOURCE, 'utf8');
+const PROB_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'probability.py');
+const probSrc = fs.readFileSync(PROB_SOURCE, 'utf8');
+const NUMBER_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'number.py');
+const numberSrc = fs.readFileSync(NUMBER_SOURCE, 'utf8');
+const GRAPH_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'graph.py');
+const graphSrc = fs.readFileSync(GRAPH_SOURCE, 'utf8');
+const ALGO_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'algorithms.py');
+const algoSrc = fs.readFileSync(ALGO_SOURCE, 'utf8');
 
 /* Each block is  NAME = r"""..."""  in the Python module. */
 function blockFrom(text, name, where) {
@@ -40,6 +50,11 @@ function blockFrom(text, name, where) {
 }
 function block(name) { return blockFrom(src, name, SOURCE); }
 function logicBlock(name) { return blockFrom(logicSrc, name, LOGIC_SOURCE); }
+function countingBlock(name) { return blockFrom(countingSrc, name, COUNTING_SOURCE); }
+function probBlock(name) { return blockFrom(probSrc, name, PROB_SOURCE); }
+function numberBlock(name) { return blockFrom(numberSrc, name, NUMBER_SOURCE); }
+function graphBlock(name) { return blockFrom(graphSrc, name, GRAPH_SOURCE); }
+function algoBlock(name) { return blockFrom(algoSrc, name, ALGO_SOURCE); }
 
 let fails = 0;
 function eq(got, want, label) {
@@ -350,6 +365,500 @@ eval(logicBlock('QUANT_EVAL_JS'));
                        qForallYExistsX(leC, 4), qExistsXForallY(leC, 4), qExistsExists(leC, 4)];
   eq(leCVerdicts.filter((r) => r.v).map((r) => r.why).join(';'),
      'x = 2, y = 1 works', 'complemented order preset: only exists-exists survives');
+}
+
+// ------------------------------------------------------------- counting
+console.log('counting in BigInt (course 4 labs)');
+{
+  /* The course-4 labs promise the reader that every count is exact and that
+     the derangement lab's three routes agree. The functions below are the
+     shipped ones, extracted from counting.py; a wrong comb() would reach
+     every page that lists selections, and a wrong derangeTerms() would ship a
+     table that confidently disagrees with the lesson above it. */
+  eval(countingBlock('BIGINT_JS') + countingBlock('DERANGE_JS'));
+
+  eq(fact(0), 1n, '0! = 1');
+  eq(fact(20), 2432902008176640000n, '20! exactly');
+  eq(perm(10, 3), 720n, 'P(10,3) = 720');
+  eq(perm(24, 12), 1295295050649600n, 'P(24,12), the largest P the lab can show');
+  eq(perm(3, 5), 0n, 'P(n, r) with r > n is 0');
+  eq(comb(52, 5), 2598960n, 'C(52,5) = 2 598 960');
+  eq(comb(35, 12), 834451800n, 'C(35,12), the largest C(n+r-1, r) the lab can show');
+  eq(comb(7, 5), 21n, 'C(7,5) = 21: five doughnuts from three kinds');
+  eq(comb(6, 2), comb(5, 1) + comb(5, 2), "Pascal's rule at the lesson-5 preset");
+  eq(comb(4, 7), 0n, 'C(n, r) with r > n is 0');
+  eq(group(1295295050649600n), '1 295 295 050 649 600', 'digit grouping');
+
+  const D = [1n, 0n, 1n, 2n, 9n, 44n, 265n, 1854n, 14833n, 133496n];
+  for (let n = 0; n < D.length; n += 1) {
+    eq(derangeFormula(n), D[n], 'D_' + n + ' by the alternating sum');
+    eq(derangeRec(n), D[n], 'D_' + n + ' by the recurrence');
+    if (n <= 8) eq(derangeBrute(n), D[n], 'D_' + n + ' by listing');
+  }
+  eq(derangeFormula(12), 176214841n, 'D_12, the largest n the slider allows');
+  eq(derangeList(4).sort().join(','), '2143,2341,2413,3142,3412,3421,4123,4312,4321', 'the nine derangements of 1..4');
+  const rows6 = derangeTerms(6).map((r) => r.running.toString()).join(',');
+  eq(rows6, '720,0,360,240,270,264,265', 'the running total at n = 6 swings and settles on 265');
+  eq(ratioDigits(265n, 720n, 7), '0.3680556', 'D_6/6! to seven places, rounded');
+  eq(ratioDigits(1854n, 5040n, 7), '0.3678571', 'D_7/7! to seven places');
+  eq(ratioDigits(14833n, 40320n, 7), '0.3678819', 'D_8/8! to seven places (the lesson table row)');
+  eq(ratioDigits(1n, 3n, 4), '0.3333', 'ratioDigits pads and truncates correctly');
+  eq(ratioDigits(0n, 1n, 7), '0.0000000', 'ratioDigits at zero');
+  eq(ratioDigits(1n, 2n, 3), '0.500', 'ratioDigits at one half');
+}
+
+// ---------------------------------------------------------- probability
+console.log('probability as exact fractions and summed distributions (course 5 labs)');
+{
+  /* The course-5 footer promises every probability is an exact fraction from
+     the enumerated sample space, and that the distributions are summed term by
+     term and compared with the closed forms. The functions below are the
+     shipped ones, extracted from probability.py. The geometric case is the one
+     that failed: a sum stopped at thirty terms reads 5.848 against a closed
+     form of 6 at p = 1/6, and the lab printed both side by side. */
+  eval(probBlock('FRACTION_JS') + probBlock('DIST_JS') + probBlock('BAYES_JS'));
+
+  eq(frac(6, 36).text, '1/6', '6/36 reduces to 1/6');
+  eq(frac(0, 15).text, '0', 'an empty event is 0, not 0/15');
+  eq(frac(15, 15).text, '1', 'the whole space is 1');
+  eq(frac(3, 0).text, 'undefined', 'conditioning on an empty event is undefined');
+  eq(pct(frac(1, 6)), '16.67%', 'pct rounds to two places');
+  eq(frac(18 * 6, 36 * 36).text, '1/12', 'P(A)·P(B) for first-even and sum-7, the lesson-5 pair');
+
+  eq(comb(52, 5), 2598960, 'C(52,5) in doubles is still exact');
+  eq(comb(20, 5), 15504, 'C(20,5)');
+
+  const bin = binomialPmf(20, 0.25), mb = moments(bin.ks, bin.probs);
+  near(bin.probs[5], 0.2023311518569244, 1e-12, 'P(X = 5) at n = 20, p = 1/4 (lesson 11 worked example)');
+  near(mb.E, 5, 1e-12, 'E[X] summed = np = 5');
+  near(mb.V, 3.75, 1e-12, 'Var(X) summed = np(1-p) = 3.75');
+  near(mb.total, 1, 1e-12, 'the binomial sums to 1');
+  near(bin.probs.slice(10).reduce((s, x) => s + x, 0), 0.01386441694376117, 1e-12, 'P(X >= 10) = 0.0139');
+  const bin10 = binomialPmf(10, 0.5);
+  near(bin10.probs[5], 0.24609375, 1e-15, 'P(exactly 5 heads in 10) = 252/1024');
+  near(moments(bin10.ks, bin10.probs).E, 5, 1e-12, 'E[X] = 5 at n = 10, p = 1/2 (lesson 9 preset)');
+
+  const K = geometricTerms(1 / 6);
+  eq(K > 30, true, 'the geometric sum runs past the thirty drawn bars');
+  eq(Math.pow(5 / 6, K) < 1e-15, true, 'and stops only when the tail is below 1e-15');
+  const geo = geometricPmf(1 / 6, K), mg = moments(geo.ks, geo.probs);
+  near(geo.probs[0], 1 / 6, 1e-15, 'P(X = 1) = 1/6, the mode');
+  near(geo.probs[5], 0.06697959533607682, 1e-15, 'P(X = 6) = (5/6)^5 / 6');
+  near(mg.E, 6, 1e-9, 'E[X] summed = 1/p = 6 (lesson 12 worked example)');
+  near(mg.V, 30, 1e-6, 'Var(X) summed = (1-p)/p^2 = 30');
+  near(mg.total, 1, 1e-12, 'the geometric sums to 1');
+  near(moments(geo.ks.slice(0, 30), geo.probs.slice(0, 30)).E, 5.848342071608853, 1e-9,
+       'thirty terms alone give 5.848 -- the figure the lab used to print beside 6');
+  const geo12 = geometricPmf(1 / 12, geometricTerms(1 / 12)), mg12 = moments(geo12.ks, geo12.probs);
+  near(mg12.E, 12, 1e-9, 'E[X] = 12 at the smallest p the slider allows');
+  near(mg12.V, 132, 1e-6, 'Var(X) = 132 there');
+
+  const uni = uniformPmf(6), mu = moments(uni.ks, uni.probs);
+  near(mu.E, 3.5, 1e-12, 'a fair die: E[X] = 3.5 (lesson 8 preset)');
+  near(mu.V, 35 / 12, 1e-12, 'a fair die: Var(X) = 35/12 (lesson 10)');
+  const dice = diceSumPmf(), md = moments(dice.ks, dice.probs);
+  eq(dice.probs.map((x) => Math.round(x * 36)).join(','), '1,2,3,4,5,6,5,4,3,2,1', 'the triangle over 36 (lesson 7 table)');
+  near(md.E, 7, 1e-12, 'sum of two dice: E[X] = 7');
+  near(md.V, 35 / 6, 1e-12, 'sum of two dice: Var(X) = 35/6, the lesson-10 worked example by another route');
+
+  const cells = bayesCounts(1000000, 1000, 99, 5);
+  eq([cells.D, cells.TP, cells.FN, cells.H, cells.FP, cells.TN].join(','), '1000,990,10,999000,49950,949050',
+     'the four cells at 1 in 1000, 99%, 5%');
+  eq(cells.posterior.text, '11/566', 'P(D|+) = 990/50940 = 11/566');
+  near(cells.posterior.dec, 0.019434628975265017, 1e-15, 'about 2%, the lesson-6 answer');
+  near(cells.npv.dec, 949050 / 949060, 1e-15, 'P(no D | -) from the same cells');
+  eq(bayesCounts(1000000, 300000, 99, 5).posterior.text, '297/332', 'the worked example: prior 0.30 gives 297/332 = 0.895');
+  eq(bayesCounts(1000000, 20000, 95, 10).posterior.text, '19/117', 'the standard: 2%, 95%, 10% gives 19/117');
+  const rare = bayesCounts(1000000, 100, 99, 1);
+  eq(rare.FP / rare.TP, 101, 'concept 3: 1 in 10 000 at a 1% false-positive rate is about 100 false positives per true one');
+  eq(grp(50940), '50 940', 'digit grouping');
+  eq(dec(990, 1000000), '0.00099', 'decimals are printed without trailing zeros');
+  eq(dec(99, 100), '0.99', 'and a percentage as its decimal');
+}
+
+// -------------------------------------------------------- number theory
+console.log('number theory in BigInt (course 6 labs)');
+{
+  /* The course-6 footer promises exact big-integer arithmetic, and lesson 14
+     promises that the key the lab generates decrypts and is then recovered by
+     factoring. The functions below are the shipped ones, extracted from
+     number.py. The case that motivated this section: the lesson-14 worked
+     example printed c = 3 for 9^7 mod 143 while the lab under it printed 48;
+     the lab was right, and nothing checked either. */
+  eval(numberBlock('NT_JS'));
+
+  eq(bgcd(1071n, 462n), 21n, 'gcd(1071, 462) = 21 (lesson 5 worked example)');
+  eq(bgcd(264n, 84n), 12n, 'gcd(264, 84) = 12 (lesson 4 worked example)');
+  eq(bgcd(-12n, 18n), 6n, 'gcd ignores sign');
+  eq(bgcd(17n, 0n), 17n, 'gcd(a, 0) = a, the base case');
+  eq(egcd(1071n, 462n).join(','), '21,-3,7', '1071·(−3) + 462·7 = 21 (lesson 6 body)');
+  eq(egcd(17n, 3120n).join(','), '1,-367,2', '17·(−367) + 3120·2 = 1 (lesson 6 worked example)');
+  const tr = egcdTrace(17n, 3120n);
+  eq(tr.g + ',' + tr.x + ',' + tr.y, '1,-367,2', 'the trace ends where egcd does');
+  eq(tr.rows.every((r) => 17n * r.s + 3120n * r.t === r.r), true, 'r = a·s + b·t holds on every row of the trace');
+  eq(tr.rows.map((r) => r.r).join(','), '17,3120,17,9,8,1,0', 'the remainders are the worked example\'s 9, 8, 1, 0');
+  const trn = egcdTrace(-1071n, 462n);
+  eq(-1071n * trn.x + 462n * trn.y, trn.g, 'a negative input keeps the identity true as typed');
+  eq(modinv(17n, 3120n), 2753n, '17⁻¹ mod 3120 = 2753, the RSA private exponent');
+  eq(modinv(7n, 26n), 15n, '7⁻¹ mod 26 = 15 (lesson 9 example, lesson 6 standard)');
+  eq(modinv(5n, 26n), 21n, '5⁻¹ mod 26 = 21 (lesson 13 example)');
+  eq(modinv(15n, 26n), 7n, '15⁻¹ mod 26 = 7 (lesson 13 worked example)');
+  eq(modinv(6n, 9n), null, 'no inverse when the gcd is not 1');
+  eq(modinv(2n, 4n), null, '2 has no inverse mod 4');
+  eq(modinv(-367n, 3120n), 17n, 'the inverse of −367 ≡ 2753 is 17: a negative representative is reduced first');
+
+  eq(modpow(7n, 128n, 13n), 3n, '7^128 mod 13 = 3 (lesson 8 body)');
+  eq(modpow(3n, 200n, 50n), 1n, '3^200 mod 50 = 1 (lesson 8 worked example)');
+  eq(modpow(5n, 117n, 19n), 1n, '5^117 mod 19 (lesson 8 standard)');
+  eq(modpow(7n, 100n, 10n), 1n, '7^100 ends in 1 (lesson 7 worked example)');
+  eq(modpow(7n, 1000n, 13n), 9n, '7^1000 mod 13 = 9 (lesson 11 body)');
+  eq(modpow(3n, 1234567n, 100n), 87n, '3^1234567 mod 100 = 87 (lesson 11 worked example)');
+  eq(modpow(2n, 1000000n, 77n), 23n, '2^1000000 mod 77 (lesson 11 standard) equals 2^40 mod 77');
+  eq(modpow(2n, 40n, 77n), 23n, 'because the exponent reduces modulo φ(77) = 60');
+  eq(modpow(2n, 10n, 7n), 2n, '2^10 mod 7 = 2, not the 1 that reducing the exponent mod 7 gives (lesson 11 mistake 1)');
+  eq(modpow(-7n, 3n, 10n), 7n, 'a negative base is reduced into [0, m) first');
+  eq(modpow(65n, 17n, 3233n), 2790n, '65^17 mod 3233 = 2790 (the textbook key)');
+  eq(modpow(2790n, 2753n, 3233n), 65n, 'and 2790^2753 mod 3233 = 65 decrypts it');
+  eq(modpow(9n, 7n, 143n), 48n, '9^7 mod 143 = 48 — the lesson-14 worked example, which once said 3');
+  eq(modpow(48n, 103n, 143n), 9n, 'and 48^103 mod 143 = 9 decrypts it');
+  eq(modpow(3n, 103n, 143n), 16n, 'the old ciphertext 3 would not have decrypted to 9');
+  const mt = modpowTrace(7n, 128n, 13n, 64);
+  eq(mt.result, 3n, 'the trace reaches the same answer as modpow');
+  eq(mt.rows.length + ',' + mt.squarings + ',' + mt.mults, '8,7,1', '7^128: eight rows, seven squarings, one multiplication');
+  eq(mt.rows.map((r) => r.power).join(','), '7,10,9,3,9,3,9,3', 'the powers 7, 10, 9, 3, 9, 3, 9, 3 the body lists');
+  const mt2 = modpowTrace(3n, 200n, 50n, 64);
+  eq(mt2.rows.map((r) => r.power).join(','), '3,9,31,11,21,41,31,11', 'the worked example\'s column: 3, 9, 31, 11, 21, 41, 31, 11');
+  eq(mt2.rows.map((r) => (r.use ? 1 : 0)).join(''), '00010011', 'set bits at positions 3, 6 and 7');
+  eq(mt2.squarings + ',' + mt2.mults + ',' + mt2.result, '7,3,1', 'seven squarings, three multiplications, result 1');
+  eq(modpowTrace(5n, 117n, 19n, 64).squarings + ',' + modpowTrace(5n, 117n, 19n, 64).mults, '6,5', '5^117: six squarings, five set bits');
+  eq(modpowTrace(7n, 2n ** 100n, 13n, 64).complete, false, 'a 101-bit exponent is reported as truncated at 64 rows');
+
+  eq(isPrimeBig(2n), true, '2 is prime');
+  eq(isPrimeBig(1n), false, '1 is not prime');
+  eq(isPrimeBig(101n), true, '101 is prime (lesson 2: four divisions)');
+  eq(isPrimeBig(149n), true, '149 is prime (lesson 2 quiz)');
+  eq(isPrimeBig(561n), false, '561, a Carmichael number, is composite');
+  eq(isPrimeBig(30031n), false, '2·3·5·7·11·13 + 1 is composite');
+  eq(factorize(360n).map((pe) => pe.join('^')).join(','), '2^3,3^2,5^1', '360 = 2³·3²·5 (lesson 2 worked example)');
+  eq(divisorCount(360n), 24n, '360 has 24 divisors');
+  eq(divisorCount(2520n), 48n, '2520 has 48 divisors (lesson 2 standard)');
+  eq(factorize(30031n).map((pe) => pe[0]).join(','), '59,509', '30031 = 59 · 509');
+  eq(factorize(1071n).map((pe) => pe.join('^')).join(','), '3^2,7^1,17^1', '1071 = 3²·7·17');
+  eq(factorize(1n).length, 0, '1 has no prime factors');
+  eq(factorize(97n).map((pe) => pe.join('^')).join(','), '97^1', 'a prime is its own factorisation');
+  eq(totient(7n), 6n, 'φ(7) = 6');
+  eq(totient(9n), 6n, 'φ(9) = 6');
+  eq(totient(12n), 4n, 'φ(12) = 4');
+  eq(totient(15n), 8n, 'φ(15) = 8 (lesson 11 quiz)');
+  eq(totient(35n), 24n, 'φ(35) = 24');
+  eq(totient(100n), 40n, 'φ(100) = 40 (lesson 11 worked example)');
+  eq(totient(77n), 60n, 'φ(77) = 60 (lesson 11 standard)');
+  eq(totient(3120n), 768n, 'φ(3120) = 768');
+  eq(totient(26n), 12n, 'φ(26) = 12, the affine multipliers');
+  eq(totient(1n), 1n, 'φ(1) = 1');
+  eq(modpow(7n, totient(13n), 13n), 1n, 'Fermat at the lesson-11 preset: 7^12 ≡ 1 (mod 13)');
+  eq(modpow(2n, totient(4n), 4n), 0n, '2^φ(4) ≡ 0 (mod 4): the theorem needs a coprime base');
+
+  const sun = crtPair(2n, 3n, 3n, 5n);
+  eq(sun.x + ' mod ' + sun.lcm, '8 mod 15', 'x ≡ 2 (3), x ≡ 3 (5) gives 8 mod 15 (lesson 10 preset)');
+  const sun2 = crtPair(8n, 15n, 2n, 7n);
+  eq(sun2.x + ' mod ' + sun2.lcm, '23 mod 105', 'then with x ≡ 2 (7): Sun Tzu\'s 23 mod 105');
+  const std = crtPair(crtPair(1n, 5n, 2n, 7n).x, 35n, 3n, 9n);
+  eq(std.x + ' mod ' + std.lcm, '156 mod 315', 'the lesson-10 standard: 156 mod 315');
+  const bad = crtPair(1n, 4n, 2n, 6n);
+  eq(bad.x === null && bad.g === 2n, true, 'x ≡ 1 (4), x ≡ 2 (6) is inconsistent modulo gcd 2');
+  const ok = crtPair(1n, 4n, 3n, 6n);
+  eq(ok.x + ' mod ' + ok.lcm, '9 mod 12', 'x ≡ 1 (4), x ≡ 3 (6) is 9 modulo the lcm 12, not 24');
+  eq(crtPair(1n, 2n, 3n, 4n).x, 3n, 'one modulus dividing the other');
+  eq(crtPair(-1n, 4n, 5n, 6n).x, 11n, 'negative remainders are reduced first');
+  {
+    /* The construction the lab displays for coprime moduli must agree with the
+       general solver: Σ aᵢMᵢyᵢ mod M. */
+    const M = 15n, t1 = 2n * 5n * modinv(5n, 3n) % M, t2 = 3n * 3n * modinv(3n, 5n) % M;
+    eq((t1 + t2) % M, sun.x, 'the displayed construction agrees with crtPair');
+  }
+
+  const g1 = lcgRun(5n, 3n, 8n, 0n, 9);
+  eq(g1.seq.join(','), '0,3,2,5,4,7,6,1', 'a = 5, c = 3, m = 8 from 0: the lesson-12 body sequence');
+  eq(g1.start + ',' + g1.period, '0,8', 'full period 8');
+  const g2 = lcgRun(4n, 3n, 8n, 0n, 9);
+  eq(g2.seq.join(',') + ' then ' + g2.next, '0,3,7 then 7', 'a = 4 collapses: 0, 3, 7, 7, …');
+  eq(g2.start + ',' + g2.period, '2,1', 'period 1 after a tail of 2');
+  const g3 = lcgRun(5n, 3n, 16n, 1n, 17);
+  eq(g3.seq.join(','), '1,8,11,10,5,12,15,14,9,0,3,2,13,4,7,6', 'the worked example\'s good generator at m = 16');
+  eq(g3.period, 16, 'period 16 — every value once');
+  const g4 = lcgRun(6n, 3n, 16n, 1n, 17);
+  eq(g4.seq.join(',') + ' then ' + g4.next + ',' + g4.period, '1,9 then 9,1', 'a = 6: 1, 9, 9, 9, … period 1');
+  eq(hullDobell(5n, 3n, 16n).join(','), 'true,true,true', 'Hull–Dobell passes for (5, 3, 16)');
+  eq(hullDobell(6n, 3n, 16n).join(','), 'true,false,false', 'and (6, 3, 16) fails the second and third: 2 ∤ 5 and 4 ∤ 5');
+  eq(hullDobell(4n, 3n, 8n).join(','), 'true,false,false', '(4, 3, 8): a − 1 = 3 is divisible by neither 2 nor 4');
+  eq(hullDobell(21n, 1n, 100n).join(','), 'true,true,true', '(21, 1, 100) passes: a full-period generator for the standard');
+  eq(lcgRun(21n, 1n, 100n, 0n, 101).period, 100, 'and it does have period 100');
+  eq(hullDobell(5n, 3n, 7n).join(','), 'true,false,true', 'm = 7: the third condition is vacuous, the second fails');
+  eq(lcgRun(5n, 3n, 7n, 0n, 8).period + ',' + lcgRun(5n, 3n, 7n, 1n, 8).period, '6,1',
+     'so the period depends on the seed: 6 from 0, and 1 from the fixed point 1');
+
+  const af = affineMap(5n, 8n, 26n);
+  eq(af.map[7], 17n, 'H = 7 → 17 = R under (5, 8) (lesson 13 body)');
+  eq(af.distinct + ',' + af.inv, '26,21', 'all 26 letters distinct, a⁻¹ = 21');
+  eq((((17n - 8n) * 21n) % 26n + 26n) % 26n, 7n, 'D(17) = 21·(17 − 8) ≡ 7 = H');
+  const af2 = affineMap(15n, 9n, 26n);
+  eq(af2.map[4] + ',' + af2.map[19], '17,8', 'the recovered key (15, 9) sends E → R and T → I (lesson 13 worked example)');
+  const af3 = affineMap(3n, 24n, 26n);
+  eq(af3.map[4] + ',' + af3.map[19], '10,3', 'the standard\'s key (3, 24) sends E → K and T → D');
+  const af13 = affineMap(13n, 0n, 26n);
+  eq(af13.distinct + ',' + af13.inv, '2,null', 'a = 13 gives two outputs and no inverse');
+  eq(affineMap(2n, 5n, 26n).distinct, 13, 'an even multiplier gives thirteen outputs');
+}
+
+// ---------------------------------------------------------------- graphs
+console.log('graph algorithms (course 7 workbench)');
+{
+  /* Every course-7 lesson renders through one workbench, and the panels quote
+     what it prints at their presets: distances, visit orders, Kruskal's
+     decisions, the clique bound, the planarity counts. The functions below
+     are the shipped ones, extracted from graph.py. The case that motivated
+     this section: lesson 8's panel promised that BFS and DFS draw different
+     trees on a preset that was itself a tree, and nothing could have said so. */
+  eval(graphBlock('GRAPH_JS'));
+  const L = (a) => a.map((v) => v + 1).join(' ');
+  const S = (a) => '{' + L(a) + '}';
+  const tree = (parent) => parent.map((p, v) => (p === -1 ? null : (p + 1) + '-' + (v + 1))).filter(Boolean).join(',');
+  function load(preset, n) { N = n; useLessonWeights = false; A = PRESETS[preset](n); }
+  function custom(n, list) { LESSON = lessonFrom(list); useLessonWeights = true; N = n; A = PRESETS.lesson(n); }
+  const degs = () => { const d = []; for (let v = 0; v < N; v += 1) d.push(degree(v)); return d.join(''); };
+
+  load('complete', 5);
+  eq(edges().length, 10, 'K5 has 10 edges (lesson 1 preset)');
+  eq(degs(), '44444', 'every degree 4');
+  load('bipartite', 6);
+  eq(edges().length + ',' + degs(), '9,333333', 'K_{3,3}: 9 edges, every degree 3');
+  load('cycle', 6);
+  eq(edges().length + ',' + degs(), '6,222222', 'C6: 6 edges, every degree 2');
+
+  custom(8, [[1, 2], [1, 3], [1, 5], [2, 4], [2, 6], [3, 4], [3, 7], [4, 8], [5, 6], [5, 7], [6, 8], [7, 8]]);
+  eq(degs() + ',' + edges().length, '33333333,12', 'Q3 (lesson 2 preset): eight vertices of degree 3, twelve edges');
+  eq(twoColour().conflict, null, 'and Q3 is bipartite');
+  eq(hamilton().circuit !== null, true, 'and has a Hamilton circuit');
+
+  load('cycle', 4);
+  eq(JSON.stringify(matrixPower(2)), '[[2,0,2,0],[0,2,0,2],[2,0,2,0],[0,2,0,2]]', 'A² of C4 (lesson 3 worked example)');
+  eq(matrixPower(3)[0][3] + ',' + triangles(), '4,0', 'A³[1][4] = 4 and no triangle');
+  load('petersen', 6);
+  eq(triangles() + ',' + edges().length, '2,7', 'two triangles joined: 2 triangles, 7 edges');
+
+  custom(7, [[1, 2], [2, 3], [3, 1], [3, 4], [5, 6]]);
+  eq(componentsOf().map(S).join(' '), '{1 2 3 4} {5 6} {7}', 'lesson 4 worked example: three components');
+  {
+    const c = cuts();
+    eq(c.bridges.map((b) => L(b.edge)).join(','), '3 4,5 6', 'bridges 3–4 and 5–6');
+    eq(L(c.cutVertices), '3', 'the one cut vertex is 3');
+    eq(c.bridges[0].sides.map(S).join(' '), '{1 2 3} {4}', 'removing 3–4 separates {1, 2, 3} from {4}');
+    eq(componentsOf(2).length, 4, 'deleting vertex 3 leaves four components');
+  }
+  load('tree', 7);
+  eq(cuts().bridges.length + ',' + L(cuts().cutVertices), '6,1 2 3', 'on the tree preset every edge is a bridge and every internal vertex a cut vertex');
+  load('cycle', 6);
+  eq(cuts().bridges.length + ',' + cuts().cutVertices.length, '0,0', 'a cycle has no bridge and no cut vertex');
+
+  custom(6, [[1, 2], [2, 3], [3, 1], [4, 5], [5, 6], [6, 4]]);
+  eq(degs() + ',' + componentsOf().length, '222222,2', 'two disjoint triangles (lesson 5 preset): 2-regular, two components');
+  load('cycle', 6);
+  eq(degs() + ',' + componentsOf().length, '222222,1', 'C6: the same degrees, one component');
+
+  load('cycle', 6);
+  eq(twoColour().colour.join(''), '010101', 'C6 two-coloured by parity: X = {1, 3, 5}');
+  load('cycle', 5);
+  eq(L(twoColour().conflict), '3 4', 'C5: the conflict is at vertices 3 and 4 (lesson 6 worked example)');
+  load('cycle', 6); link(A, 0, 2);
+  eq(twoColour().conflict !== null, true, 'C6 plus the chord 1–3 is not bipartite');
+  load('cycle', 6); link(A, 0, 3);
+  eq(twoColour().conflict, null, 'C6 plus the chord 1–4 still is');
+
+  load('cycle', 6);
+  eq(L(hamilton().circuit), '1 2 3 4 5 6', 'C6 has a Hamilton circuit (lesson 7 preset)');
+  A[0][1] = 0; A[1][0] = 0;
+  eq(degs().split('').map((d, i) => (d % 2 ? i + 1 : null)).filter(Boolean).join(','), '1,2', 'minus 1–2: the odd vertices are 1 and 2');
+  eq(L(hamilton().path) + '|' + hamilton().circuit, '1 6 5 4 3 2|null', 'a Hamilton path and no circuit');
+
+  custom(6, [[1, 2], [1, 3], [2, 4], [3, 4], [4, 5], [5, 6]]);
+  {
+    const b = bfs(0), d = dfs(0);
+    eq(b.dist.join(' '), '0 1 1 2 3 4', 'lesson 8 worked example: BFS distances');
+    eq(L(b.order), '1 2 3 4 5 6', 'BFS order');
+    eq(tree(b.parent), '1-2,1-3,2-4,4-5,5-6', 'BFS tree edges');
+    eq(L(d.order), '1 2 4 3 5 6', 'DFS order');
+    eq(tree(d.parent), '1-2,4-3,2-4,4-5,5-6', 'DFS tree edges: 4–3 is a tree edge, so 3–1 is the back edge');
+  }
+  load('tree', 7);
+  eq(tree(bfs(0).parent) === tree(dfs(0).parent), true, 'on a tree BFS and DFS draw the same tree');
+
+  custom(4, [[1, 2, 10], [1, 3, 3], [3, 2, 2], [2, 4, 1], [3, 4, 9]]);
+  eq(weight(0, 1) + ',' + weight(1, 2), '10,2', 'the lesson preset carries its own weights');
+  {
+    const r = dijkstra(0);
+    eq(r.dist.join(' '), '0 5 3 6', 'lesson 9 worked example: s = 0, a = 5, b = 3, t = 6');
+    let v = 3; const route = []; while (v !== -1) { route.unshift(v); v = r.parent[v]; }
+    eq(L(route), '1 3 2 4', 'route s → b → a → t');
+    eq(bfs(0).dist[3], 2, 'against a fewest-edge distance of 2');
+  }
+  useLessonWeights = false;
+  eq(weight(0, 1), 5, 'off the lesson preset the formula weight returns');
+  load('complete', 6);
+  eq(dijkstra(0).dist[5] + ',' + bfs(0).dist[5], '3,1', 'on K6 the cheapest route 1 → 6 is the direct edge');
+
+  custom(6, [[1, 2], [2, 3], [3, 1], [4, 5], [5, 6]]);
+  eq(componentsOf().length + ',' + edges().length + ',' + (edges().length === N - componentsOf().length), '2,5,false',
+     'lesson 10 graph C: two components, five edges, not acyclic');
+  load('path', 6);
+  eq(componentsOf().length + ',' + edges().length + ',' + degs(), '1,5,122221', 'graph A is a path with leaves 1 and 6');
+
+  load('tree', 7);
+  {
+    const o = rootedOrders(0);
+    eq(L(o.pre), '1 2 4 5 3 6 7', 'preorder on the tree preset (lesson 11)');
+    eq(L(o.ino), '4 2 5 1 6 3 7', 'inorder');
+    eq(L(o.post), '4 5 2 6 7 3 1', 'postorder');
+    eq(L(o.level), '1 2 3 4 5 6 7', 'level order');
+    eq(o.treeEdges + ',' + o.reached, '6,7', 'six tree edges reach all seven');
+  }
+  load('star', 7);
+  eq(rootedOrders(0).ino + ',' + (rootedOrders(0).tooMany + 1), 'null,1', 'on a star inorder is undefined and vertex 1 is why');
+  load('cycle', 5);
+  eq(L(rootedOrders(0).pre) + ',' + rootedOrders(0).treeEdges, '1 2 3 4 5,4', 'on C5 the orders are those of the DFS spanning tree, one edge left out');
+
+  custom(5, [[1, 2, 1], [2, 3, 2], [3, 4, 3], [4, 5, 4], [1, 5, 5], [1, 3, 6], [2, 4, 7]]);
+  {
+    const k = kruskal();
+    eq(k.total + ',' + k.chosen.length, '10,4', 'lesson 12 worked example: total 10, four edges');
+    eq(k.considered.map((c) => L(c[0].slice(0, 2)) + (c[1] ? '+' : '-')).join(','), '1 2+,2 3+,3 4+,4 5+,1 5-,1 3-,2 4-',
+       'AB, BC, CD, DE taken; AE, AC, BD rejected, in weight order');
+    eq(dijkstra(0).dist[4], 5, 'Dijkstra 1 → 5 on the same graph is the rejected edge of weight 5');
+  }
+  load('complete', 6);
+  eq(kruskal().total + ',' + kruskal().chosen.length, '12,5', 'Kruskal on K6 with the formula weights');
+  load('petersen', 6); A[0][3] = 0; A[3][0] = 0;
+  eq(kruskal().chosen.length, 4, 'a disconnected graph gives a spanning forest with n − c edges');
+
+  custom(5, [[1, 2], [1, 3], [2, 3], [2, 4], [3, 4], [4, 5]]);
+  eq(greedyColour().join(''), '01201', 'lesson 13 worked example: greedy colours 1, 2, 3, 1, 2');
+  eq(cliqueNumber().size + ',' + S(cliqueNumber().vertices), '3,{1 2 3}', 'clique number 3 on the triangle');
+  eq(Math.max(...degs().split('').map(Number)), 3, 'Δ = 3, so the greedy bound is 4');
+  custom(6, [[1, 4], [1, 6], [3, 2], [3, 6], [5, 2], [5, 4]]);
+  eq(Math.max(...greedyColour()) + 1 + ',' + twoColour().conflict + ',' + cliqueNumber().size, '3,null,2',
+     'the bipartite trap: greedy uses three colours on a bipartite graph');
+  load('cycle', 5);
+  eq(Math.max(...greedyColour()) + 1 + ',' + cliqueNumber().size, '3,2', 'C5: greedy 3, clique 2, the odd cycle supplies the third');
+
+  load('complete', 5);
+  {
+    const p = planarity();
+    eq(p.verdict + ',' + p.E + ',' + p.bound, 'bound,10,9', 'K5: 10 > 3·5 − 6 = 9 (lesson 14 preset)');
+  }
+  load('bipartite', 6);
+  {
+    const p = planarity();
+    eq(p.verdict + ',' + p.triangles + ',' + p.bound + ',' + p.bound2, 'bound2,0,12,8', 'K_{3,3}: passes 12, triangle-free, fails 8');
+  }
+  load('complete', 4);
+  eq(planarity().verdict + ',' + planarity().E + ',' + planarity().bound, 'planar,6,6', 'K4: 6 ≤ 6 and planar');
+  load('petersen', 6);
+  eq(planarity().verdict, 'planar', 'seven edges: no subdivision of K5 or K_{3,3} fits');
+  custom(8, [[1, 2], [1, 3], [1, 4], [1, 5], [2, 3], [2, 4], [2, 5], [3, 4], [3, 5], [4, 5]]);
+  eq(planarity().verdict + ',' + S(planarity().k5), 'k5,{1 2 3 4 5}', 'K5 on eight vertices passes both bounds and is caught as a subgraph');
+  custom(7, [[1, 4], [1, 5], [1, 6], [2, 4], [2, 5], [2, 6], [3, 4], [3, 5], [3, 6]]);
+  {
+    const p = planarity();
+    eq(p.verdict + ',' + S(p.k33.left) + ',' + S(p.k33.right), 'k33,{1 2 3},{4 5 6}', 'K_{3,3} plus an isolated vertex passes 10 and is caught as a subgraph');
+  }
+  custom(7, [[1, 4], [1, 5], [1, 6], [2, 4], [2, 5], [2, 6], [3, 4], [3, 5], [3, 7], [7, 6]]);
+  eq(planarity().verdict, 'open', 'a subdivided K_{3,3} passes the bounds, has no K_{3,3} subgraph, and is reported open, not planar');
+  load('cycle', 4); link(A, 0, 2); link(A, 1, 3);
+  eq(planarity().verdict + ',' + planarity().triangles, 'planar,4', 'K4 built by hand: four triangles, planar');
+}
+
+// ------------------------------------------------------------ algorithms
+console.log('algorithm counts and the witness verdict (course 8 lab)');
+{
+  /* Every course-8 lesson renders through one lab, and its panels quote what
+     it prints: comparison counts, the loop-nest sums, the invariant trace,
+     the dynamic array's copies, the master theorem's case, the amounts where
+     greedy fails. The functions below are the shipped ones, extracted from
+     algorithms.py. The case that motivated this section: the witness mode
+     searched C ≤ 1000 over n ≤ 64 and reported n² = O(n) with C = 100,
+     contradicting the lesson's own example directly above it. */
+  eval(algoBlock('ALGO_JS'));
+  const F = { one: 0, log: 1, n: 2, nlogn: 3, n2: 4, n3: 5, exp: 6, fact: 7, poly: 8, hundred: 9 };
+  const W = (f, g) => { const w = witnessSearch(F[f], F[g], 16); return w ? w.C + ',' + w.k : 'none'; };
+  eq(bigO(F.poly, F.n2) + ':' + W('poly', 'n2'), 'true:4,13', '3n² + 5n + 100 = O(n²) with C = 4, k = 13 (lesson 4 preset)');
+  eq(bigO(F.n, F.n2) + ':' + W('n', 'n2'), 'true:1,1', 'n = O(n²) with C = 1, k = 1 (lesson 4 quiz)');
+  eq(bigO(F.n2, F.n), false, 'n² ≠ O(n) — the lesson 4 example the old search contradicted');
+  eq(bigO(F.nlogn, F.n), false, 'n log n ≠ O(n), though a search to n = 10⁹ would find C = 50');
+  eq([bigO(F.n3, F.n2), bigO(F.log, F.one), bigO(F.fact, F.exp), bigO(F.exp, F.n3)].join(','), 'false,false,false,false',
+     'n³ vs n², log n vs 1, n! vs 2ⁿ, 2ⁿ vs n³ are all false');
+  eq(bigO(F.one, F.log) + ':' + W('one', 'log'), 'true:1,2', '1 = O(log n) needs k = 2 because log 1 = 0');
+  eq(bigO(F.exp, F.fact) + ':' + W('exp', 'fact'), 'true:1,4', '2ⁿ = O(n!) from n = 4');
+  eq(W('n3', 'exp'), '1,10', 'n³ ≤ 2ⁿ from n = 10');
+  eq(W('hundred', 'n'), '100,1', '100n = O(n) with C = 100');
+  {
+    let bad = 0;
+    for (let f = 0; f < FUNCS.length; f += 1) for (let g = 0; g < FUNCS.length; g += 1) if (bigO(f, g) && !witnessSearch(f, g, 16)) bad += 1;
+    eq(bad, 0, 'every true relation among the ten functions has a witness in the grid');
+  }
+  eq(ratioAt(F.n2, F.n, 1000000), 1000000, 'the ratio n²/n at 10⁶ is 10⁶ — the disproof column');
+
+  const S = (n, kind) => bubbleSort(makeArray(n, kind)) + ',' + insertionSort(makeArray(n, kind)) + ',' + mergeSort(makeArray(n, kind));
+  eq(S(16, 'shuffle'), '120,77,48', 'n = 16 shuffled: bubble 120, insertion 77, merge 48 (lesson 6 worked example)');
+  eq(insertionSort(makeArray(16, 'sorted')) + ',' + insertionSort(makeArray(16, 'reverse')), '15,120', 'insertion sort: 15 on sorted, 120 on reversed input');
+  eq(S(24, 'shuffle'), '276,174,82', 'n = 24 shuffled');
+  eq(S(1000, 'shuffle'), '499500,235149,7387', 'n = 1000: bubble 499 500 = n(n−1)/2, merge 7 387');
+  eq(makeArray(16, 'shuffle').join(' '), '8 16 9 2 12 6 3 15 14 1 5 11 10 4 13 7', 'the shuffle is the same permutation for every reader');
+  eq(linearSearch(makeArray(16, 'sorted'), 16) + ',' + binaryWorst(16), '16,5', 'linear 16, binary ⌊log₂16⌋ + 1 = 5');
+  {
+    let ok = true;
+    for (let n = 2; n <= 64; n += 1) if (binaryWorst(n) !== ilog2(n) + 1) ok = false;
+    eq(ok, true, 'binary search worst case is ⌊log₂ n⌋ + 1 for every n to 64');
+  }
+  eq(binaryWorst(1000), 10, 'and 10 at n = 1000');
+
+  const nest = countNests(16);
+  eq([nest.A, nest.B, nest.C, nest.D].join(','), '4096,136,64,816', 'lesson 5 nests at n = 16: n³, n(n+1)/2, n⌊log₂n⌋, n(n+1)(n+2)/6');
+  {
+    let ok = true;
+    for (let n = 1; n <= 64; n += 1) { const r = countNests(n); if (r.A !== r.predA || r.B !== r.predB || r.C !== r.predC || r.D !== r.predD) ok = false; }
+    eq(ok, true, 'every nest equals its formula for every n to 64');
+  }
+
+  const p = powerTrace(3, 13);
+  eq([p.rows.every((r) => r.ok), p.rows.length, p.squarings, p.mults, p.value].join(','), 'true,5,4,3,1594323',
+     'POWER(3, 13): the invariant holds on all five rows, 4 squarings, 3 multiplications, 3¹³ (lesson 2 preset)');
+  eq(powerTrace(3, 1000).squarings + ',' + powerTrace(3, 1000).mults, '10,6', 'x¹⁰⁰⁰: 10 squarings and 6 multiplications against 999');
+  eq(powerTrace(2, 64).value, 18446744073709551616n, '2⁶⁴ exactly, beyond double precision');
+
+  const d16 = dynamicArray(16, 'double');
+  eq([d16.copies, d16.total, d16.worst, d16.worstAt].join(','), '15,31,9,9', 'doubling, 16 inserts: 15 copies, total 31, worst insertion 9 at element 9 (lesson 8 worked example)');
+  eq(d16.events.map((e) => e.at + ':' + e.from + '>' + e.to).join(' '), '2:1>2 3:2>4 5:4>8 9:8>16', 'resizes at inserts 2, 3, 5, 9');
+  const d17 = dynamicArray(17, 'double');
+  eq([d17.copies, d17.total, d17.amortised < 3].join(','), '31,48,true', '17 inserts: total 48, above 2n and still under 3n');
+  eq(dynamicArray(16, 'one').copies, 120, 'growing by one copies 1 + ⋯ + 15 = 120');
+  {
+    let ok = true;
+    for (let n = 2; n <= 64; n += 1) if (dynamicArray(n, 'double').amortised >= 3 || dynamicArray(n, 'half').amortised >= 4) ok = false;
+    eq(ok, true, 'doubling stays under 3 and ×1.5 under 4 per insertion for every n to 64');
+  }
+
+  const M = (a, b, d) => { const m = masterCase(a, b, d); return m.which + ':' + m.result; };
+  eq(M(4, 2, 1), '3:Θ(n^2)', 'lesson 7 baseline 4T(n/2) + n: case 3, Θ(n²)');
+  eq(M(4, 2, 0), '3:Θ(n^2)', 'faster combining, d = 0: still Θ(n²)');
+  eq(M(3, 2, 1), '3:Θ(n^log_2 3) ≈ Θ(n^1.585)', 'one fewer subproblem: Θ(n^1.585)');
+  eq(M(9, 3, 2), '2:Θ(n^2 log n)', 'the standard\'s 9T(n/3) + n²: balanced');
+  eq([M(2, 2, 1), M(1, 2, 0), M(2, 4, 1), M(7, 2, 2)].join('|'), '2:Θ(n log n)|2:Θ(log n)|1:Θ(n)|3:Θ(n^log_2 7) ≈ Θ(n^2.807)',
+     'merge sort, binary search, course 3 lesson 11\'s last row, Strassen');
+
+  eq(greedyFailures([1, 3, 4], 24).join(','), '6,10,14,18,22', 'greedy with {1, 3, 4} fails first at 6 (lesson 9 preset)');
+  eq(greedyCoins([1, 3, 4], 6).picks.join('+') + ' vs ' + dpCoins([1, 3, 4], 6).picks.join('+'), '4+1+1 vs 3+3', 'at 6: 4 + 1 + 1 against 3 + 3');
+  eq(dpCoins([1, 3, 4], 8).table.join(' '), '0 1 2 1 1 2 2 2 2', 'the lesson 10 table best[0..8]');
+  eq(greedyFailures([1, 5, 10, 25], 99).length, 0, 'with {1, 5, 10, 25} greedy is optimal for every amount to 99');
 }
 
 if (fails) {

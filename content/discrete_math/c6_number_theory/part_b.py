@@ -16,7 +16,7 @@ LESSONS = [
             "square and multiply:  read the exponent in binary",
             "reduce mod m at EVERY step",
             "cost: about 2·log₂(b) multiplications, not b",
-            "7^128 mod 13 in 8 squarings, not 128 multiplications",
+            "7^128 mod 13 in 7 squarings, not 128 multiplications",
         ],
         "key_label": "Logarithmic, not linear",
         "concepts_intro": (
@@ -64,8 +64,10 @@ LESSONS = [
             ]),
             ("h3", "The cost"),
             ("p", "The loop runs `⌊log₂ b⌋ + 1` times, with one squaring per iteration and "
-                  "at most one extra multiplication. So the total is at most about "
-                  "`2 log₂ b` modular multiplications."),
+                  "at most one extra multiplication. The last squaring is never used, so "
+                  "the useful count is `⌊log₂ b⌋` squarings plus one multiplication per "
+                  "set bit &mdash; at most about `2 log₂ b` modular multiplications in "
+                  "all."),
             ("math", [
                 "b = 128:      naive 128 multiplications,  fast 8 squarings",
                 "b = 10⁶:      naive a million,            fast about 20 squarings",
@@ -95,10 +97,13 @@ LESSONS = [
                   "cryptography lives in that gap."),
         ],
         "lab": ("number", {
-            "mode": "modexp",
+            "mode": "modexp", "a": 7, "b": 128, "m": 13,
             "panel_title": "Every squaring, traced",
-            "panel_intro": "Each row is one bit of the exponent. The running result only "
-                           "updates on set bits, and no intermediate ever exceeds `m²`.",
+            "panel_intro": "The preset is the body's `7^128 mod 13`: eight rows, one per "
+                           "bit of `128 = 10000000₂`, the running result changing only on "
+                           "the top bit, seven squarings and one multiplication, and 3 in "
+                           "the corner. Enter 3, 200, 50 and the rows are the worked "
+                           "example's table. No intermediate ever exceeds `m²`.",
         }),
         "steps_title": "Computing a modular power",
         "steps_intro": "Binary exponent, reduce every step.",
@@ -130,7 +135,7 @@ LESSONS = [
                 "result = 11 · 31 · 11 mod 50",
                 "       = 341 mod 50 · 11 = 41 · 11 = 451 ≡ 1  (mod 50)",
                 "",
-                "8 squarings and 3 multiplications, against 199 the naive way.",
+                "7 squarings and 3 multiplications, against 199 the naive way.",
             ],
             "after": [
                 "The powers began repeating &mdash; `3^4 ≡ 3^64 ≡ 31` &mdash; because the "
@@ -143,8 +148,10 @@ LESSONS = [
             {"q": "About how many multiplications does `a^1000 mod m` need by square and multiply?",
              "a": ["1000", "about 20", "about 500", "about 100"],
              "c": 1,
-             "why": "`2 log₂ 1000 ≈ 20`. Ten squarings and at most ten extra "
-                    "multiplications, one per set bit."},
+             "why": "`2 log₂ 1000 ≈ 20`: ten squarings and at most ten extra "
+                    "multiplications, one per set bit (`1000 = 1111101000₂` has six). "
+                    "1000 is the naive count; 500 would be halving the work once; 100 is "
+                    "the square root, which plays no part here."},
             {"q": "Why reduce mod `m` at every step?",
              "a": ["To get the right answer",
                    "To keep every intermediate below `m²` instead of astronomically large",
@@ -152,13 +159,17 @@ LESSONS = [
                    "To make the exponent smaller"],
              "c": 1,
              "why": "The answer would be the same without reducing; the numbers would be "
-                    "unrepresentable. Reduction is what makes it computable."},
+                    "unrepresentable, so reduction is what makes it computable. It does "
+                    "nothing to the exponent &mdash; that is lesson 11's `φ(m)` &mdash; "
+                    "and it is optional only in the sense that fitting in memory is."},
             {"q": "RSA encryption of one block is:",
              "a": ["a factorisation", "a single modular exponentiation",
                    "a gcd computation", "a table lookup"],
              "c": 1,
-             "why": "`c = m^e mod n`. Decryption is `c^d mod n`. Both are this algorithm "
-                    "with 2048-bit exponents."},
+             "why": "`c = m^e mod n`, and decryption is `c^d mod n`: both are this "
+                    "algorithm with 2048-bit exponents. A factorisation is the attack, not "
+                    "the encryption; a gcd appears once, in key generation, to check `e` "
+                    "against `φ(n)`; and no table with `n` entries could be stored."},
         ],
         "mistakes": [
             ("Reducing the exponent modulo `m`",
@@ -173,8 +184,8 @@ LESSONS = [
         ],
         "standard": ("Finish when you can trace the algorithm on paper.",
                      "Compute `5^117 mod 19` by square and multiply, writing 117 in binary "
-                     "first. Seven squarings and four multiplications, and no intermediate "
-                     "above 361."),
+                     "first: `1110101₂`, five set bits. Six squarings to reach `5^64`, "
+                     "five factors to multiply together, and no intermediate above 361."),
         "note": "The same algorithm works for any associative operation: matrix powers, "
                 "compositions of functions, and group elements generally. The exponent's "
                 "binary expansion is what is being exploited, and multiplication is "
@@ -262,11 +273,13 @@ LESSONS = [
                   "the failure is measured exactly by the gcd."),
         ],
         "lab": ("number", {
-            "mode": "congr",
+            "mode": "congr", "a": 6, "b": 9, "m": 15,
             "panel_title": "Solve, or prove unsolvable",
             "panel_intro": "The lab reports the gcd first, because that decides everything. "
-                           "Try `a = 6`, `b = 7`, `m = 15` for the unsolvable case and "
-                           "`b = 9` for three solutions.",
+                           "The preset is the body's `6x ≡ 9 (mod 15)`: gcd 3, three "
+                           "solutions 4, 9, 14 spaced 5 apart, each checked. Change `b` to "
+                           "7 for the unsolvable case, and enter 14, 30, 100 for the worked "
+                           "example's 45 and 95.",
         }),
         "steps_title": "Solving a linear congruence",
         "steps_intro": "Compute the gcd first; it answers most of the question.",
@@ -311,17 +324,25 @@ LESSONS = [
             {"q": "`4x ≡ 6 (mod 8)`. How many solutions modulo 8?",
              "a": ["0", "1", "2", "4"],
              "c": 0,
-             "why": "`gcd(4,8) = 4` and `4 ∤ 6`, so there is no solution. `4x` is always "
-                    "`0` or `4` modulo 8."},
+             "why": "`gcd(4,8) = 4` and `4 ∤ 6`, so there is no solution: `4x` is always "
+                    "`0` or `4` modulo 8. One solution would need `gcd = 1`; two is what "
+                    "dividing by 2 alone suggests (`2x ≡ 3 (mod 4)`, also unsolvable); "
+                    "four would be the count if `4 | 6`, which it does not."},
             {"q": "`ax ≡ b (mod m)` with `gcd(a,m) = 3` and `3 | b`. The number of solutions is:",
              "a": ["1", "3", "`m`", "`m/3`"],
              "c": 1,
-             "why": "Exactly `gcd(a,m) = 3` solutions modulo `m`, spaced `m/3` apart."},
-            {"q": "When is the solution unique modulo `m`?",
-             "a": ["always", "when `gcd(a,m) = 1`", "when `m` is prime", "when `b = 1`"],
+             "why": "Exactly `gcd(a,m) = 3` solutions modulo `m`, spaced `m/3` apart. "
+                    "One is the count modulo `m/3`, before lifting; `m` would mean every "
+                    "residue works, which needs `a ≡ b ≡ 0`; `m/3` is the spacing, not the "
+                    "count."},
+            {"q": "The solution is unique modulo `m` exactly when:",
+             "a": ["always", "`gcd(a,m) = 1`", "`m` is prime", "`b = 1`"],
              "c": 1,
-             "why": "Coprimality makes `a` invertible, and the solution is `x ≡ a⁻¹b`. A "
-                    "prime modulus guarantees it for every `a` not divisible by `m`."},
+             "why": "Coprimality makes `a` invertible, and the solution is `x ≡ a⁻¹b`. "
+                    "\"Always\" fails at `6x ≡ 9 (mod 15)`, which has three. A prime "
+                    "modulus guarantees uniqueness only for `a ≢ 0`, so it is sufficient "
+                    "in that case and not the condition. `b = 1` is irrelevant: "
+                    "`6x ≡ 1 (mod 15)` has no solution at all."},
         ],
         "mistakes": [
             ("Reporting only one solution when there are `g`",
@@ -428,11 +449,16 @@ LESSONS = [
                   "essentially every RSA implementation does this."),
         ],
         "lab": ("number", {
-            "mode": "crt",
-            "panel_title": "Two coprime moduli",
-            "panel_intro": "The lab uses `m` and `m+1`, which are always coprime, so the "
-                           "theorem always applies. The contribution column shows each term "
-                           "being invisible to the other modulus.",
+            "mode": "crt", "a": 2, "b": 3, "m": 3, "n": 5,
+            "panel_title": "Two moduli, coprime or not",
+            "panel_intro": "The preset is the first two of Sun Tzu's congruences, "
+                           "`x ≡ 2 (mod 3)` and `x ≡ 3 (mod 5)`: the last column shows "
+                           "each term invisible to the other modulus, and the answer is 8 "
+                           "modulo 15. Then set the moduli to 4 and 6. With remainders 1 "
+                           "and 2 the lab reports the system inconsistent, since "
+                           "`1 ≢ 2 (mod 2)`; with 1 and 3 it solves modulo the lcm 12 and "
+                           "says why 24 is the wrong modulus. Finish Sun Tzu by feeding "
+                           "`8 (mod 15)` and `2 (mod 7)` back in: 23.",
         }),
         "steps_title": "Solving a system",
         "steps_intro": "Check coprimality, then build the solution term by term.",
@@ -478,13 +504,19 @@ LESSONS = [
              "a": ["prime", "pairwise coprime", "distinct", "odd"],
              "c": 1,
              "why": "Pairwise coprime. They need not be prime &mdash; 4 and 9 work fine "
-                    "&mdash; but they must share no common factor."},
+                    "&mdash; but they must share no common factor. Distinct is not "
+                    "enough: 4 and 6 are distinct and share 2. Odd is neither necessary "
+                    "(4 and 9) nor sufficient (9 and 15)."},
             {"q": "`x ≡ 1 (mod 4)` and `x ≡ 2 (mod 6)` has:",
              "a": ["one solution mod 24", "no solution",
                    "two solutions", "one solution mod 12"],
              "c": 1,
-             "why": "The first forces `x` odd and the second forces it even. The moduli "
-                    "are not coprime and the remainders disagree modulo `gcd(4,6) = 2`."},
+             "why": "The first forces `x` odd and the second forces it even: the moduli "
+                    "are not coprime and the remainders disagree modulo `gcd(4,6) = 2`. "
+                    "\"One solution mod 24\" assumes the theorem applies; \"one "
+                    "solution mod 12\" is the answer for a consistent pair such as "
+                    "remainders 1 and 3; \"two solutions\" confuses the count with the "
+                    "gcd, which governs lesson 9's single congruence, not a system."},
             {"q": "RSA implementations use the theorem to:",
              "a": ["factor `n`",
                    "decrypt modulo `p` and `q` separately and recombine, about four times faster",
@@ -492,7 +524,11 @@ LESSONS = [
                    "verify signatures"],
              "c": 1,
              "why": "Two exponentiations on half-size numbers cost far less than one on "
-                    "full-size, because modular multiplication scales quadratically."},
+                    "full-size, because modular multiplication scales quadratically. It "
+                    "factors nothing &mdash; the owner of the key already has `p` and `q`; "
+                    "primes are generated by testing, lesson 11; and verification uses the "
+                    "public exponent, which is small enough that the trick is not worth "
+                    "applying there."},
         ],
         "mistakes": [
             ("Applying it without checking coprimality",
@@ -606,11 +642,15 @@ LESSONS = [
                   "factorises anything."),
         ],
         "lab": ("number", {
-            "mode": "fermat",
+            "mode": "fermat", "a": 7, "m": 13,
             "panel_title": "Powers, until they return to 1",
-            "panel_intro": "The table shows the powers of `a` modulo `m` and marks where "
-                           "they hit 1. Try a base sharing a factor with `m` &mdash; the "
-                           "powers never reach 1, because the theorem does not apply.",
+            "panel_intro": "The preset is the body's `7^{1000} mod 13`: the powers of 7 "
+                           "return to 1 at `e = 12 = φ(13)`, so the exponent 1000 reduces "
+                           "to `1000 mod 12 = 4`, and the row `e = 4` reads 9, the body's "
+                           "answer. The status line computes `φ` from the factorisation, "
+                           "as step 2 says to; set `m = 100` to see the product formula "
+                           "give 40. Then `a = 2`, `m = 4`: the powers never reach 1, "
+                           "because the theorem does not apply.",
         }),
         "steps_title": "Using the theorems",
         "steps_intro": "Check coprimality, compute `φ`, reduce the exponent.",
@@ -655,22 +695,32 @@ LESSONS = [
             {"q": "`φ(15)` equals:",
              "a": ["15", "14", "8", "7"],
              "c": 2,
-             "why": "`φ(15) = φ(3)φ(5) = 2 · 4 = 8`. The units are 1, 2, 4, 7, 8, 11, 13, 14."},
+             "why": "`φ(15) = φ(3)φ(5) = 2 · 4 = 8`; the units are 1, 2, 4, 7, 8, 11, 13, "
+                    "14. 14 is `m − 1`, Fermat's exponent, which is `φ` only for a prime "
+                    "modulus; 15 counts every residue, coprime or not; 7 is half of 15 "
+                    "rounded, and no formula."},
             {"q": "`a^k mod m` with `gcd(a,m) = 1`. The exponent reduces modulo:",
              "a": ["`m`", "`φ(m)`", "`m − 1`", "`k`"],
              "c": 1,
              "why": "Euler's theorem gives `a^{φ(m)} ≡ 1`, so exponents cycle with period "
-                    "dividing `φ(m)`. Reducing modulo `m` is the classic error."},
+                    "dividing `φ(m)`. Reducing modulo `m` is the classic error: `2^{10} "
+                    "mod 7` comes out 1 that way and is 2. `m − 1` is `φ(m)` only when "
+                    "`m` is prime; `k` reduces an exponent to nothing at all."},
             {"q": "561 passes Fermat's test for every coprime base but is composite. Such numbers are called:",
              "a": ["pseudoprimes only", "Carmichael numbers", "Mersenne numbers", "impossible"],
              "c": 1,
-             "why": "`561 = 3 · 11 · 17`. Carmichael numbers are why Miller&ndash;Rabin, "
-                    "rather than the plain Fermat test, is used in practice."},
+             "why": "`561 = 3 · 11 · 17`. A pseudoprime passes for one base; a Carmichael "
+                    "number passes for every coprime base, which is why "
+                    "Miller&ndash;Rabin, rather than the plain Fermat test, is used in "
+                    "practice. Mersenne numbers are `2^p − 1`, a different family; and "
+                    "such numbers are not impossible &mdash; there are infinitely many."},
         ],
         "mistakes": [
             ("Reducing the exponent modulo `m`",
-             "It reduces modulo `φ(m)`. For `m = 100` those are 100 and 40, and the answers "
-             "differ."),
+             "It reduces modulo `φ(m)`. `2^{10} mod 7`: reducing the exponent modulo 7 "
+             "gives `2³ = 8 ≡ 1`; reducing modulo `φ(7) = 6` gives `2⁴ = 16 ≡ 2`, and "
+             "`1024 = 146·7 + 2` confirms the second. The two rules sometimes agree by "
+             "accident, which is what makes the wrong one survive."),
             ("Applying the theorem to a non-coprime base",
              "`2^{φ(4)} = 4 ≡ 0 (mod 4)`. Coprimality is a hypothesis, not a formality."),
             ("Assuming passing Fermat's test proves primality",
@@ -775,12 +825,16 @@ LESSONS = [
                   "requirement as \"cannot be predicted\"."),
         ],
         "lab": ("number", {
-            "mode": "modtable",
-            "panel_title": "Prime versus composite moduli",
-            "panel_intro": "Set a prime modulus and note that every nonzero row of the "
-                           "multiplication table is a permutation. With a composite "
-                           "modulus some rows repeat values &mdash; which is exactly the "
-                           "clustering a bad hash modulus produces.",
+            "mode": "lcg", "a": 5, "b": 3, "m": 16, "n": 1,
+            "panel_title": "A generator, run",
+            "panel_intro": "The preset is the worked example's good generator: `a = 5`, "
+                           "`c = 3`, `m = 16` from seed 1, every value once, back to 1 at "
+                           "step 16, and all three Hull&ndash;Dobell checks passing in the "
+                           "status line. Change `a` to 6: the sequence reads 1, 9, 9, 9 and "
+                           "the second check fails, because `2 ∤ 5` &mdash; and the third "
+                           "with it, since `4 ∤ 5`. Then set `m = 100` "
+                           "and find your own passing and failing parameters for the "
+                           "completion standard.",
         }),
         "steps_title": "Choosing parameters",
         "steps_intro": "The modulus decides the behaviour.",
@@ -827,8 +881,11 @@ LESSONS = [
                    "Modular arithmetic is imprecise",
                    "They are avoidable with a prime modulus"],
              "c": 1,
-             "why": "A map from a larger set to a smaller one cannot be injective. The "
-                    "design question is how collisions are handled."},
+             "why": "A map from a larger set to a smaller one cannot be injective "
+                    "(course 2 lesson 14), so the design question is how collisions are "
+                    "handled. A better hash function spreads them and cannot remove them; "
+                    "modular arithmetic is exact; and a prime modulus changes which keys "
+                    "collide, not whether some do."},
             {"q": "`h(k) = k mod 2^r` is a poor choice because:",
              "a": ["it is slow",
                    "it uses only the low `r` bits of the key",
@@ -836,7 +893,11 @@ LESSONS = [
                    "it produces negative values"],
              "c": 1,
              "why": "Keys sharing their low bits &mdash; aligned addresses, common "
-                    "suffixes &mdash; all collide. A prime modulus uses every bit."},
+                    "suffixes &mdash; all collide, while a prime modulus uses every bit. "
+                    "It is the fastest possible modulus, a bit mask, which is why it is "
+                    "tempting; being composite is not itself the problem, since `m = 15` "
+                    "is composite and uses every bit; and `k mod m` is never negative for "
+                    "`k ≥ 0`."},
             {"q": "An LCG is unsuitable for cryptography because:",
              "a": ["its period is too short",
                    "observing a few outputs lets an attacker predict all the rest",
@@ -844,7 +905,10 @@ LESSONS = [
                    "it uses modular arithmetic"],
              "c": 1,
              "why": "It is entirely deterministic and its parameters are recoverable from "
-                    "its output. Statistical quality is a different and weaker requirement."},
+                    "a few outputs. Its period can be the full `m`, which is not the "
+                    "issue; it is among the fastest generators there are; and modular "
+                    "arithmetic is what every cryptographic generator uses too. "
+                    "Statistical quality is a different and weaker requirement."},
         ],
         "mistakes": [
             ("Using a power of two as a hash modulus with structured keys",
@@ -961,11 +1025,14 @@ LESSONS = [
                   "secret is needed at all."),
         ],
         "lab": ("number", {
-            "mode": "modtable",
+            "mode": "affine", "a": 5, "b": 8,
             "panel_title": "Why `gcd(a, 26) = 1`",
-            "panel_intro": "Set the modulus to 26 and look at the multiplication table. "
-                           "Rows for multipliers sharing a factor with 26 repeat values, so "
-                           "the affine cipher would map two letters to one.",
+            "panel_intro": "The preset is the body's key `(5, 8)`: the chips send H to R, "
+                           "the status line finds `5⁻¹ ≡ 21` and states the decryption "
+                           "rule, and all 26 outputs are distinct. Set `a = 13`: only two "
+                           "outputs appear, since `gcd(13, 26) = 13`, and there is nothing "
+                           "to decrypt. Set `(15, 9)`, the worked example's recovered key, "
+                           "and check E → R and T → I.",
         }),
         "steps_title": "Encrypting and breaking",
         "steps_intro": "The requirement first, then the attack.",
@@ -1016,8 +1083,10 @@ LESSONS = [
                    "To avoid negative values",
                    "It is not required"],
              "c": 1,
-             "why": "Without it the map is not injective &mdash; two letters encrypt to "
-                    "the same letter &mdash; and no decryption exists."},
+             "why": "Without it the map is not injective &mdash; with `a = 13` every "
+                    "letter lands on one of two &mdash; and no decryption exists. Speed is "
+                    "unaffected; negative values are handled by the reduction; and it is "
+                    "the one condition the cipher has."},
             {"q": "The Vigenère cipher is broken by:",
              "a": ["trying all keys",
                    "finding the key length, then breaking each column as a shift cipher",
@@ -1025,13 +1094,19 @@ LESSONS = [
                    "it is unbreakable"],
              "c": 1,
              "why": "Repetitions in the ciphertext reveal the period; each column is then a "
-                    "single shift, broken by frequency analysis."},
+                    "single shift, broken by frequency analysis. Trying all keys fails as "
+                    "soon as the keyword is long (`26^L` of them); there is no number to "
+                    "factor; and \"unbreakable\" was the belief for three centuries and "
+                    "the reason the name stuck."},
             {"q": "The one-time pad is unbreakable provided the key is:",
              "a": ["long", "random, at least as long as the message, and never reused",
                    "prime", "kept in a safe"],
              "c": 1,
-             "why": "All three conditions are needed. Reuse in particular destroys the "
-                    "security completely, as VENONA demonstrated."},
+             "why": "All three conditions are needed. Length alone gives a Vigenère with "
+                    "a long period; \"prime\" is not a property a key stream can have; a "
+                    "safe protects the key from theft, not the ciphertext from analysis. "
+                    "Reuse in particular destroys the security completely, as VENONA "
+                    "demonstrated."},
         ],
         "mistakes": [
             ("Choosing an affine multiplier sharing a factor with 26",
@@ -1047,7 +1122,8 @@ LESSONS = [
         "standard": ("Finish when you can break an affine cipher from two frequencies.",
                      "Given that the two commonest ciphertext letters are K and D, solve "
                      "for `a` and `b` assuming they correspond to E and T. The system is "
-                     "two linear congruences, which lesson 9 handles."),
+                     "two linear congruences, which lesson 9 handles; the key comes out as "
+                     "`(3, 24)`, and the lab will confirm E → K and T → D."),
         "note": "Every cipher here shares one weakness that lesson 14 removes: both parties "
                 "need the key in advance. Public-key cryptography changed that, and it is "
                 "the single most consequential idea in the subject.",
@@ -1160,9 +1236,13 @@ LESSONS = [
         ],
         "lab": ("rsa", {
             "panel_title": "Generate, use, break",
-            "panel_intro": "The default primes are the textbook ones. Change them and watch "
-                           "the key change; then read the last paragraph of the status "
-                           "line, where the lab factors `n` and recovers `d`.",
+            "panel_intro": "The default primes are the textbook ones: `n = 3233`, `d = 2753`, "
+                           "and 65 encrypts to 2790 and back. Set `p = 11`, `q = 13`, "
+                           "`e = 7`, `m = 9` and the lab prints the worked example's "
+                           "`c = 48` from the definitions rather than from this page. Change "
+                           "the primes and watch the key change; then read the last "
+                           "paragraph of the status line, where the lab factors `n` and "
+                           "recovers `d`.",
         }),
         "steps_title": "Using RSA",
         "steps_intro": "Each step is a theorem from this course.",
@@ -1173,8 +1253,10 @@ LESSONS = [
             ("Compute `φ(n) = (p−1)(q−1)`",
              "Multiplicativity of `φ` from lesson 11. This value must never be published."),
             ("Choose `e` coprime to `φ(n)` and invert it",
-             "`gcd(e, φ(n)) = 1` by lesson 4, and `d = e⁻¹ mod φ(n)` by lesson 6. 65537 is "
-             "the usual choice of `e`."),
+             "`gcd(e, φ(n)) = 1` by lesson 4, and `d = e⁻¹ mod φ(n)` by lesson 6. `e` need "
+             "not be prime, only coprime; 65537 is the usual choice because a prime is "
+             "coprime to `φ(n)` unless it divides it, one check, and `2¹⁶ + 1` has two set "
+             "bits, so `m^e` costs sixteen squarings and one multiplication."),
             ("Exponentiate to encrypt and decrypt",
              "By lesson 8's square and multiply, which is what makes 2048-bit exponents "
              "practical."),
@@ -1195,10 +1277,10 @@ LESSONS = [
                 "encrypt m = 9:    9^7 mod 143",
                 "    9² = 81      9⁴ = 81² = 6561 ≡ 126      (mod 143)",
                 "    9^7 = 9⁴·9²·9 ≡ 126·81·9",
-                "    126·81 = 10206 ≡ 48;   48·9 = 432 ≡ 3   (mod 143)",
-                "    c = 3",
+                "    126·81 = 10206 = 71·143 + 53 ≡ 53;   53·9 = 477 ≡ 48   (mod 143)",
+                "    c = 48",
                 "",
-                "decrypt:  3^103 mod 143 = 9                              ✓",
+                "decrypt:  48^103 mod 143 = 9      (103 = 1100111₂, lesson 8)     ✓",
             ],
             "after": [
                 "The public key `(143, 7)` is enough to encrypt and useless for decrypting "
@@ -1212,8 +1294,10 @@ LESSONS = [
             {"q": "In RSA, which value must remain secret?",
              "a": ["`n`", "`e`", "`φ(n)`", "the ciphertext"],
              "c": 2,
-             "why": "`n` and `e` are public. Knowing `φ(n)` together with `n` yields `p` "
-                    "and `q` immediately, so it is as secret as the factorisation."},
+             "why": "`n` and `e` are public by design, and the ciphertext is what the "
+                    "eavesdropper sees. Knowing `φ(n)` together with `n` yields `p + q` "
+                    "and hence `p` and `q` immediately, so it is as secret as the "
+                    "factorisation."},
             {"q": "RSA decryption works because of:",
              "a": ["the Chinese remainder theorem alone",
                    "Euler's theorem: `ed ≡ 1 (mod φ(n))` gives `m^{ed} ≡ m`",
@@ -1221,7 +1305,9 @@ LESSONS = [
                    "Bézout's identity alone"],
              "c": 1,
              "why": "Euler is the core, with Bézout supplying `d` and the Chinese remainder "
-                    "theorem covering the case `gcd(m, n) ≠ 1`."},
+                    "theorem covering the case `gcd(m, n) ≠ 1`. Neither alone is enough: "
+                    "the CRT gives no reason for `m^{ed} ≡ m` modulo `p`, and Bézout only "
+                    "produces `d`. The sieve plays no part at any size that matters."},
             {"q": "RSA's security rests on:",
              "a": ["a proof that factoring is hard",
                    "the belief that factoring large numbers is hard — which is unproved",
@@ -1229,7 +1315,10 @@ LESSONS = [
                    "the size of the message"],
              "c": 1,
              "why": "No hardness proof exists, and it is also unproved that breaking RSA "
-                    "requires factoring. Both are assumptions."},
+                    "requires factoring; both are assumptions. The algorithm is public "
+                    "&mdash; a system whose security needs a secret method has none "
+                    "&mdash; and the message size is a constraint, `m &lt; n`, not a "
+                    "source of security."},
         ],
         "mistakes": [
             ("Publishing or leaking `φ(n)`",
@@ -1244,7 +1333,8 @@ LESSONS = [
         ],
         "standard": ("Finish when you can generate a key and say what each step assumes.",
                      "Build a key from `p = 17`, `q = 23`, encrypt a small message, decrypt "
-                     "it, and then factor `n` to recover `d`. Doing the attack yourself is "
+                     "it, and then factor `n` to recover `d`. With `e = 3` you should find "
+                     "`n = 391`, `φ(n) = 352` and `d = 235`. Doing the attack yourself is "
                      "what makes the security argument concrete rather than asserted."),
         "note": "This course ends where cryptographic engineering begins. Padding schemes, "
                 "key management, side-channel resistance and protocol design are all "

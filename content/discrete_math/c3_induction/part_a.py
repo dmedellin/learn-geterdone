@@ -95,7 +95,12 @@ LESSONS = [
             "panel_intro": "Two of the statements in this list are FALSE and pass every "
                            "check a careful reader would run. Find them before going on; "
                            "the rest of this course is the technique that would have "
-                           "caught them.",
+                           "caught them. Read the `First failure` figure as this lesson's "
+                           "idea made visible: it is the least element of "
+                           "`S = {n : P(n) is false}`, the set the proof above takes the "
+                           "least element of, and the moment `S` is nonempty well-ordering "
+                           "says that figure exists &mdash; the lab merely finds it. The "
+                           "`Inductive step` note under the controls is lesson 2's.",
         }),
         "steps_title": "Using minimal counterexample",
         "steps_intro": "Assume failure, take the smallest, break it.",
@@ -139,7 +144,8 @@ LESSONS = [
                    "`{2, 4, 6, 8}`", "`{n ∈ ℕ : n is prime}`"],
              "c": 1,
              "why": "For any positive rational `q`, `q/2` is smaller and still positive. "
-                    "Every nonempty subset of `ℕ` does have one."},
+                    "Every nonempty subset of `ℕ` does have one: `{n ∈ ℕ : n &gt; 5}` has "
+                    "6, `{2, 4, 6, 8}` has 2, and so do the primes."},
             {"q": "Well-ordering and mathematical induction are:",
              "a": ["unrelated", "equivalent — each can be derived from the other",
                    "induction is stronger", "well-ordering is stronger"],
@@ -153,7 +159,10 @@ LESSONS = [
                    "assuming the claim is true"],
              "c": 1,
              "why": "Minimality is the lever: anything smaller than `m` satisfies the "
-                    "claim, and using that to establish it at `m` is the contradiction."},
+                    "claim, and using that to establish it at `m` is the contradiction. "
+                    "The set of counterexamples is assumed nonempty, not infinite; a false "
+                    "base case would make the claim false rather than the method fail; and "
+                    "assuming the claim is true is the conclusion, not a step."},
         ],
         "mistakes": [
             ("Assuming well-ordering holds for `ℤ` or `ℚ`",
@@ -268,7 +277,12 @@ LESSONS = [
             "panel_title": "The step, and the checks",
             "panel_intro": "The inductive step for each statement is shown in the note "
                            "below the controls. The table only checks cases &mdash; the "
-                           "step is what makes the claim general.",
+                           "step is what makes the claim general. If lesson 1's search "
+                           "did not turn up the first false statement, select "
+                           "`n² + n + 41 is prime` and push the slider to 40: it holds "
+                           "for `n = 0` to 39, and `40² + 40 + 41 = 1681 = 41²`. Its note "
+                           "reads \"there is no inductive step here\", and that absence "
+                           "is the whole difference between it and the identity above it.",
         }),
         "steps_title": "Writing an induction proof",
         "steps_intro": "Four sentences, in this order, every time.",
@@ -316,7 +330,9 @@ LESSONS = [
                    "`P(k+1)`", "nothing"],
              "c": 1,
              "why": "You assume `P(k)` for an arbitrary `k` and derive `P(k+1)`. That is a "
-                    "direct proof of the conditional `P(k) → P(k+1)`."},
+                    "direct proof of the conditional `P(k) → P(k+1)`. Assuming `P(n)` for "
+                    "all `n` is assuming the conclusion, the circularity the third mistake "
+                    "below names; `P(k+1)` is the target of the step, not its hypothesis."},
             {"q": "A proof has a correct step and no base case. What is established?",
              "a": ["The statement for all `n`",
                    "The statement for all `n ≥ 1`",
@@ -362,7 +378,8 @@ LESSONS = [
         "module": "Induction",
         "one_line": "The standard family of identities, and the pattern they share.",
         "summary": (
-            "Sums of integers, squares, cubes, geometric series and telescoping sums. "
+            "Sums of integers, squares, cubes, geometric series and telescoping sums, and "
+            "one product to show the pattern does not care which operation it is peeling. "
             "Every proof has the same shape, and recognising it makes these routine."
         ),
         "key": [
@@ -435,13 +452,37 @@ LESSONS = [
                   "its own reversal, obtaining `n` copies of `n+1`, hence `n(n+1)/2`. "
                   "Induction verifies a formula you already have; arguments like these "
                   "produce one."),
+            ("h3", "Products"),
+            ("p", "`Π` behaves exactly as `Σ` does under induction: the product to `k+1` "
+                  "is the product to `k` times one more factor, so the step peels the last "
+                  "factor off instead of the last term, substitutes the hypothesis, and "
+                  "factors toward the target. Nothing else changes."),
+            ("thm", ("A telescoping product",
+                     "For `n ≥ 2`, `Π_{i=2}^{n} (1 − 1/i²) = (n+1)/(2n)`.")),
+            ("proof", [
+                "<strong>Base.</strong> At `n = 2`: left is `1 − 1/4 = 3/4`, right is "
+                "`3/(2 · 2) = 3/4`.",
+                "<strong>Step.</strong> Assume the identity at `k ≥ 2`. Peel off the last "
+                "factor: `Π_{i≤k+1} (1 − 1/i²) = [(k+1)/(2k)] · (1 − 1/(k+1)²)` by the "
+                "hypothesis.",
+                "The target is `(k+2)/(2(k+1))`, so `(k+2)` is what to look for: "
+                "`1 − 1/(k+1)² = ((k+1)² − 1)/(k+1)² = k(k+2)/(k+1)²`. Then "
+                "`[(k+1)/(2k)] · [k(k+2)/(k+1)²] = (k+2)/(2(k+1))`, the claim at `k+1`.",
+            ]),
+            ("p", "The factoring `(k+1)² − 1 = k(k+2)` is a difference of two squares, "
+                  "found by knowing the target contained `(k+2)`. Written out, the product "
+                  "is `(1·3/2²)(2·4/3²)(3·5/4²)⋯`, and the same cancellation that collapsed "
+                  "the telescoping sum collapses it to `(n+1)/(2n)` &mdash; which is a "
+                  "check on the answer, not the proof of it."),
         ],
         "lab": ("induction", {
             "statement": "cubes",
             "panel_title": "The sum identities, checked",
-            "panel_intro": "The rational sum at the end of the list is computed in exact "
-                           "fractions, so its equality with `n/(n+1)` is not a rounding "
-                           "artefact.",
+            "panel_intro": "The two columns of the selected statement are the first "
+                           "quiz question's identity: the sum of the cubes beside the "
+                           "square of `n(n+1)/2`, agreeing at every `n`. The rational sum "
+                           "at the end of the list is computed in exact fractions, so its "
+                           "equality with `n/(n+1)` is not a rounding artefact.",
         }),
         "steps_title": "Proving a sum identity",
         "steps_intro": "Write the target first; the algebra then has somewhere to go.",
@@ -450,7 +491,8 @@ LESSONS = [
              "Substituting `k+1` into the formula tells you what the algebra must produce. "
              "Working forward blindly is how these stall."),
             ("Peel the last term off the sum",
-             "`Σ_{i≤k+1} = (Σ_{i≤k}) + f(k+1)`. This is the only structural move."),
+             "`Σ_{i≤k+1} = (Σ_{i≤k}) + f(k+1)`, and for a product the last factor: "
+             "`Π_{i≤k+1} = (Π_{i≤k}) · f(k+1)`. This is the only structural move."),
             ("Substitute the hypothesis and factor",
              "Take out the common factor &mdash; usually `(k+1)` &mdash; and simplify what "
              "remains toward the target."),
@@ -486,7 +528,9 @@ LESSONS = [
              "c": 1,
              "why": "The sum of the first `n` cubes is the square of the sum of the first "
                     "`n` integers &mdash; a striking identity, and one induction verifies "
-                    "in three lines."},
+                    "in three lines. `n(n+1)(2n+1)/6` is the sum of the squares; "
+                    "`n²(n+1)/2` is `n` times `Σ i`, not its square; and `n⁴/4` is only "
+                    "the leading term, already wrong at `n = 1`."},
             {"q": "In the inductive step for a sum identity, the first move is:",
              "a": ["substitute `n = k+1` into the closed form",
                    "split off the `(k+1)`th term so the hypothesis applies to the rest",
@@ -516,7 +560,9 @@ LESSONS = [
         "standard": ("Finish when these proofs are mechanical.",
                      "Prove `Σ_{i=1}^{n} (2i − 1)² = n(2n−1)(2n+1)/3` &mdash; the sum of "
                      "the squares of the odd numbers. Same three moves, slightly heavier "
-                     "algebra, and no new idea required."),
+                     "algebra, and no new idea required. Then the product "
+                     "`Π_{i=2}^{n} (1 − 1/i) = 1/n` for `n ≥ 2`, which is two lines once "
+                     "the last factor is peeled off."),
         "note": "Sums of `k`th powers have closed forms for every `k`, given by Faulhaber's "
                 "formula, and each is a polynomial of degree `k+1` in `n`. Induction "
                 "verifies any one of them; producing them requires a different technique.",
@@ -689,9 +735,15 @@ LESSONS = [
         ],
         "standard": ("Finish when you can locate a base case by testing rather than by "
                      "assuming.",
-                     "Determine the smallest `n` for which `n² &lt; 2ⁿ` holds and stays "
-                     "true, prove it from there, and state explicitly the side inequality "
-                     "your step needed. Both halves are the lesson."),
+                     "Find the smallest `n` from which `2ⁿ &gt; n³` holds and stays true. "
+                     "Test `n = 1, 2, 3, …` and keep going past the first failure: the "
+                     "claim is true at `n = 1`, false from 2 to 9, and true from `n = 10` "
+                     "on (`1024 &gt; 1000`). Prove it from there, and state the side "
+                     "inequality your step needed &mdash; the bridge is "
+                     "`2k³ ≥ (k+1)³`, which fails at `k = 3` and holds from `k = 4`, so it "
+                     "is available at every `k` the step uses. Both halves are the lesson, "
+                     "and so is noticing that the base case sits well past the point where "
+                     "the bridge starts working."),
         "note": "An inequality proof usually splits into an induction and a piece of "
                 "ordinary algebra. Isolating the second piece as its own claim &mdash; "
                 "\"it suffices to show `2k² ≥ (k+1)²` for `k ≥ 3`\" &mdash; makes the "
@@ -846,7 +898,10 @@ LESSONS = [
                    "strong induction always needs three"],
              "c": 1,
              "why": "The step derives `k+1` from `k−2`. For `k+1 = 9, 10, 11` that would "
-                    "point at 6, 7, 8 &mdash; two of which are outside the claim."},
+                    "point at 6, 7, 8 &mdash; two of which are outside the claim. "
+                    "`3 + 5 = 8` is why the claim starts at 8, not why three bases are "
+                    "needed; the number of bases is the reach of the step, and the worked "
+                    "example's step reaches back four."},
             {"q": "Strong induction can prove:",
              "a": ["strictly more than ordinary induction",
                    "exactly what ordinary induction can, more conveniently",
@@ -943,13 +998,14 @@ LESSONS = [
                          "BASE: the empty string is well formed. RECURSIVE: if `s` is well "
                          "formed then so is `(s)`, and if `s` and `t` are well formed then "
                          "so is `st`. This generates `()`, `(())`, `()()`, `(()())` and "
-                         "nothing else &mdash; and course 4 lesson 14 counts them.")),
+                         "nothing else. The Catalan numbers count them, and this path "
+                         "does not reach those.")),
             ("h3", "Recursively defined structures"),
             ("example", ("Binary trees",
                          "BASE: the empty tree is a binary tree. RECURSIVE: if `L` and `R` "
                          "are binary trees and `v` is a value, then the tree with root `v`, "
                          "left subtree `L` and right subtree `R` is a binary tree. Course 7 "
-                         "lesson 12 traverses exactly this object.")),
+                         "lesson 11 traverses exactly this object.")),
             ("p", "This is where recursion earns its place. A binary tree has no obvious "
                   "\"size parameter\" to induct on, but it does have a structure, and "
                   "lesson 7's structural induction proves things about it directly."),
@@ -965,7 +1021,12 @@ LESSONS = [
             "panel_intro": "The left column applies the recursive clause repeatedly from "
                            "the base. The right evaluates the closed form. Nothing "
                            "guarantees they agree until they are computed separately and "
-                           "compared.",
+                           "compared. The lab's base is one step earlier than the "
+                           "lesson's: `a₀ = 0` (no discs, no moves) where the lesson "
+                           "starts at `H₁ = 1`. One application of the clause gives "
+                           "`a₁ = 1`, and the two definitions agree from there &mdash; 1, "
+                           "3, 7, 15, 31, 63 &mdash; which is the sense in which a base "
+                           "clause is a choice, so long as the clause reaches it.",
         }),
         "steps_title": "Writing a recursive definition",
         "steps_intro": "Base first, then the rule, then the closing sentence.",
@@ -1013,7 +1074,8 @@ LESSONS = [
              "a": ["None", "One", "Two", "It depends on the values"],
              "c": 2,
              "why": "The clause reaches back two places, so `a₀` and `a₁` must be given "
-                    "outright or `a₂` is undefined."},
+                    "outright or `a₂` is undefined. Which values they are given changes "
+                    "the sequence, never the count."},
             {"q": "Why does \"`f(0) = 1`, `f(n) = f(n+1) − 1`\" define nothing?",
              "a": ["The base case is wrong",
                    "The recursion increases, so it never reaches the base",

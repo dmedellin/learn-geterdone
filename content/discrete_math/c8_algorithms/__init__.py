@@ -42,6 +42,10 @@ COURSE = {
         ("Place a problem",
          "P, NP, NP-complete, undecidable. Knowing which of those a problem is in "
          "changes what you should attempt."),
+        ("Prove an algorithm right, and bound a sequence",
+         "An invariant for partial correctness and a decreasing measure for termination "
+         "(lesson 2); the cost of a whole sequence of operations rather than the worst "
+         "single one (lesson 8); and the lower bound no comparison sort beats (lesson 6)."),
     ],
     "syllabus_intro": (
         "Lessons 1 to 2 are what an algorithm is and what correctness means, 3 to 8 are "
@@ -49,9 +53,15 @@ COURSE = {
     ),
     "how_to": [
         "Produce the witnesses. Every big-O claim in lesson 4 comes with a `C` and a `k`, "
-        "and the lab searches for them; a claim without them is a slogan.",
+        "and the lab searches for them; a claim without them is a slogan. When the "
+        "relation is false the lab says so from the growth classes and shows the ratio "
+        "diverging, because no finite search can refute a claim about every `n`.",
         "Use the measured columns. The lab counts operations by running the algorithms, "
-        "so the predicted growth can be compared with something rather than believed.",
+        "so the predicted growth can be compared with something rather than believed. "
+        "Each lesson's lab opens on that lesson's own example &mdash; the invariant "
+        "trace of lesson 2's `POWER(3, 13)`, lesson 5's four loop nests, lesson 6's "
+        "counts at `n = 16`, lesson 7's `4T(n/2) + n`, lesson 8's sixteen inserts, "
+        "lesson 10's table to 8 &mdash; and every panel quotes what the lab prints there.",
         "Take lesson 12 seriously. Undecidability is not a statement about current "
         "technology, and the halting proof is short enough to follow completely.",
     ],

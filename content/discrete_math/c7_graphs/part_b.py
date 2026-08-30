@@ -101,11 +101,18 @@ LESSONS = [
                   "practice."),
         ],
         "lab": ("graph", {
-            "algo": "bfs", "preset": "tree", "n": 7,
+            "algo": "bfs", "preset": "lesson", "n": 6,
+            "example": [[1, 2], [1, 3], [2, 4], [3, 4], [4, 5], [5, 6]],
             "panel_title": "Distances, then order",
-            "panel_intro": "In BFS mode the labels are distances from vertex 1. Switch to "
-                           "DFS and they become visit order &mdash; and the tree drawn "
-                           "changes shape completely on the same graph.",
+            "panel_intro": (
+                "The worked example's graph is loaded. In BFS mode the labels are distances from "
+                "vertex 1 &mdash; `0, 1, 1, 2, 3, 4` &mdash; the visit order is `1 → 2 → 3 → 4 → 5 → 6` "
+                "and the tree edges are `1–2, 1–3, 2–4, 4–5, 5–6`. Switch to DFS: the labels "
+                "become visit order, the order is `1 → 2 → 4 → 3 → 5 → 6`, and the tree swaps "
+                "`1–3` for `4–3`, reaching 3 at depth 3; the one edge left out, `3–1`, is the back "
+                "edge. Then load the Tree preset and switch between the two again: on a tree every "
+                "edge is a tree edge, so both searches draw the same tree and differ only in order."
+            ),
         }),
         "steps_title": "Running a search",
         "steps_intro": "Choose the structure from the question.",
@@ -146,8 +153,10 @@ LESSONS = [
             "after": [
                 "That last line is the reason DFS cannot be used for shortest paths. It "
                 "found vertex 3 by the route `1→2→4→3`, and the depth it records is a fact "
-                "about the search order rather than about the graph. The edge `3–4` is a "
-                "back edge and closes the cycle `1–2–4–3–1`."
+                "about the search order rather than about the graph. The edge `3–1` is a "
+                "back edge &mdash; at vertex 3 the neighbour 1 is already visited and is "
+                "not 3's parent &mdash; and it closes the cycle `1–2–4–3–1`. `4–3` is a "
+                "tree edge, since 3 was discovered from 4."
             ],
         },
         "quiz_title": "Traversal",
@@ -155,17 +164,27 @@ LESSONS = [
             {"q": "BFS uses a queue; DFS uses a:",
              "a": ["priority queue", "stack", "heap", "hash table"],
              "c": 1,
-             "why": "Last in, first out &mdash; explicitly, or implicitly via recursion. "
-                    "That single change produces a completely different tree."},
+             "why": "Last in, first out &mdash; explicitly, or implicitly via recursion &mdash; and that "
+                    "single change produces a completely different tree. A priority queue is Dijkstra "
+                    "(lesson 9), a heap is how a priority queue is usually built, and a hash table "
+                    "orders nothing."
+            },
             {"q": "Which finds shortest paths in an unweighted graph?",
              "a": ["DFS", "BFS", "both", "neither"],
              "c": 1,
-             "why": "BFS settles vertices in non-decreasing distance order. DFS may reach "
-                    "a near vertex by a long detour."},
+             "why": "BFS settles vertices in non-decreasing distance order, so the first time it "
+                    "reaches a vertex is by a shortest route. DFS may reach a near vertex by a long "
+                    "detour &mdash; in the worked example it reaches 3 at depth 3 &mdash; so \"both\" is "
+                    "wrong, and \"neither\" ignores that BFS's guarantee is the lesson's theorem."
+            },
             {"q": "Both searches cost, with adjacency lists:",
              "a": ["`Θ(n²)`", "`Θ(n + |E|)`", "`Θ(|E|²)`", "exponential"],
              "c": 1,
-             "why": "Each vertex is marked once and each edge examined from both ends."},
+             "why": "Each vertex is marked once and each edge examined from both ends: `Θ(n + |E|)`. "
+                    "`Θ(n²)` is the cost with an adjacency matrix, not with lists; `|E|²` counts pairs "
+                    "of edges nothing ever examines; and nothing exponential happens in a search that "
+                    "never revisits a vertex."
+            },
         ],
         "mistakes": [
             ("Using DFS for shortest paths",
@@ -276,11 +295,17 @@ LESSONS = [
                   "is Dijkstra's special case, which is why lesson 8 came first."),
         ],
         "lab": ("graph", {
-            "algo": "dijkstra", "preset": "complete", "n": 6,
+            "algo": "dijkstra", "preset": "lesson", "n": 4,
+            "example": [[1, 2, 10], [1, 3, 3], [3, 2, 2], [2, 4, 1], [3, 4, 9]],
             "panel_title": "Cheapest, not shortest",
-            "panel_intro": "Edge weights are shown on the graph. The panel reports both "
-                           "the weighted distance and the fewest-edge distance &mdash; and "
-                           "on most graphs they disagree.",
+            "panel_intro": (
+                "The worked example is loaded with its weights, `s, a, b, t` as `1, 2, 3, 4`. The "
+                "panel reads weighted distance 6 by `1 → 3 → 2 → 4`, three edges, against a "
+                "fewest-edge distance of 2 &mdash; the disagreement the lesson is about &mdash; and "
+                "the labels are the settled distances `0, 5, 3, 6`. Edges you add take the "
+                "workbench's own weights, which every other preset uses throughout; on `K₆` the "
+                "cheapest route `1 → 6` happens to be the direct edge, and the status line says so."
+            ),
         }),
         "steps_title": "Running Dijkstra",
         "steps_intro": "Settle the nearest, relax its edges, repeat.",
@@ -306,9 +331,10 @@ LESSONS = [
                 "settle t (6)",
                 "",
                 "shortest by WEIGHT:   s → b → a → t   weight 6,  three edges",
-                "shortest by EDGES:    s → b → t       two edges, weight 12",
+                "shortest by EDGES:    s → a → t  (weight 11)   or   s → b → t  (weight 12)",
+                "                      two edges each",
                 "",
-                "BFS would have returned the two-edge route — twice the cost.",
+                "BFS returns one of the two-edge routes: 11 or 12, against 6.",
             ],
             "after": [
                 "The relaxation of `a` from 10 down to 5 is the step BFS cannot perform: it "
@@ -322,22 +348,30 @@ LESSONS = [
              "a": ["a connected graph", "non-negative edge weights",
                    "integer weights", "a tree"],
              "c": 1,
-             "why": "A settled vertex is never revisited, which is only safe when no later "
-                    "route can be cheaper &mdash; guaranteed by non-negativity."},
+             "why": "A settled vertex is never revisited, which is only safe when no later route can "
+                    "be cheaper &mdash; guaranteed by non-negativity. Connectivity is not needed "
+                    "(unreachable vertices stay at `∞`), the weights may be any non-negative reals, "
+                    "and a tree would make the problem trivial: one path per pair."
+            },
             {"q": "With all weights equal to 1, Dijkstra reduces to:",
              "a": ["DFS", "BFS", "Kruskal", "nothing"],
              "c": 1,
-             "why": "The priority queue becomes an ordinary queue and vertices settle in "
-                    "distance order. BFS is the special case."},
+             "why": "The priority queue becomes an ordinary queue and vertices settle in distance "
+                    "order: BFS is the special case. DFS has no distance guarantee at any weight, and "
+                    "Kruskal builds a spanning tree, not shortest paths."
+            },
             {"q": "For negative edge weights you should use:",
              "a": ["Dijkstra with an offset added to every weight",
                    "Bellman&ndash;Ford",
                    "BFS",
                    "Kruskal"],
              "c": 1,
-             "why": "Adding a constant to every weight changes which path is cheapest, "
-                    "since paths have different lengths. Bellman&ndash;Ford handles "
-                    "negatives directly."},
+             "why": "Adding a constant `c` to every weight adds `c` times the edge count to each path, "
+                    "so paths of different lengths are penalised differently and the cheapest can "
+                    "change &mdash; the lesson's third mistake. BFS ignores weights altogether, Kruskal "
+                    "answers a different question, and Bellman&ndash;Ford handles negative weights "
+                    "directly and detects negative cycles."
+            },
         ],
         "mistakes": [
             ("Using BFS on a weighted graph",
@@ -421,6 +455,11 @@ LESSONS = [
                 "has `n − 1` edges by the previous part. Since `G` already had `n − 1`, no "
                 "edge was removed and `G` was acyclic.",
             ]),
+            ("p", "That proves (1) ⟺ (2) and (1) ⟹ (4) ⟹ (5); the remaining "
+                  "implications are of the same kind. The one the standard asks for is "
+                  "(3) ⟹ (1), and the tool for it is the forest edge count: an acyclic "
+                  "graph with `c` components has `n − c` edges, because each component "
+                  "is a tree and (1) ⟹ (2) applies to it."),
             ("thm", ("Leaf lemma",
                      "Every tree with at least two vertices has at least two leaves.")),
             ("proof", [
@@ -443,8 +482,9 @@ LESSONS = [
                      "<strong>children</strong>. The <strong>depth</strong> of a vertex is "
                      "its distance from the root, and the <strong>height</strong> of the "
                      "tree is the largest depth.")),
-            ("p", "Rooting adds structure that the underlying tree does not have: the "
-                  "parent relation is a partial order, and it is course 2 lesson 9's "
+            ("p", "Rooting adds structure that the underlying tree does not have: "
+                  "\"is an ancestor of\" &mdash; the parent relation closed under "
+                  "transitivity &mdash; is a partial order, and it is course 2 lesson 9's "
                   "material appearing as a data structure."),
             ("thm", ("Binary trees",
                      "A <strong>binary tree</strong> has at most two children per vertex. "
@@ -460,11 +500,17 @@ LESSONS = [
                      "For `n = 4` that is 16; for `n = 10` it is a hundred million.")),
         ],
         "lab": ("graph", {
-            "algo": "tree", "preset": "tree", "n": 7,
+            "algo": "tree", "preset": "lesson", "n": 6,
+            "example": [[1, 2], [2, 3], [3, 1], [4, 5], [5, 6]],
             "panel_title": "The characterisations, checked",
-            "panel_intro": "The panel reports connectivity, the edge count and `|V| − 1` "
-                           "side by side. Add one edge and a cycle appears; remove one and "
-                           "the graph splits.",
+            "panel_intro": (
+                "Graph C from the worked example is loaded: six vertices, `|E| = 5 = n − 1`, and "
+                "the panel reads connected: no, acyclic: no, tree: no &mdash; neither a tree nor a "
+                "forest, with the edge count holding and proving nothing. Load the Path preset at "
+                "6 vertices for graph A (a tree, leaves 1 and 6) and the Star for graph B (a tree, "
+                "five leaves). On any tree, add one edge and a cycle appears; remove one and the "
+                "graph splits."
+            ),
         }),
         "steps_title": "Recognising a tree",
         "steps_intro": "Two of the three conditions imply the third.",
@@ -509,22 +555,28 @@ LESSONS = [
             {"q": "A tree on 12 vertices has how many edges?",
              "a": ["12", "11", "13", "24"],
              "c": 1,
-             "why": "`n − 1 = 11`, always. It follows from the definition by induction on "
-                    "the leaf lemma."},
+             "why": "`n − 1 = 11`, always: remove a leaf and induct. 12 edges on 12 vertices forces a "
+                    "cycle, 13 forces two, and 24 is nothing a tree on 12 vertices produces &mdash; its "
+                    "degree sum is `2 · 11 = 22`."
+            },
             {"q": "Which is NOT equivalent to being a tree?",
              "a": ["connected and acyclic",
                    "connected with `n − 1` edges",
                    "having `n − 1` edges",
                    "exactly one path between every pair"],
              "c": 2,
-             "why": "A triangle plus a disjoint path has `n − 1` edges and is neither "
-                    "connected nor acyclic. The count needs a companion condition."},
+             "why": "A triangle plus a disjoint path has `n − 1` edges and is neither connected nor "
+                    "acyclic; the count needs a companion condition. The other three are each "
+                    "equivalent to being a tree, by the theorem's (1), (2) and (4)."
+            },
             {"q": "Every tree with at least two vertices has:",
              "a": ["a cycle", "at least two leaves",
                    "a vertex of degree 3", "an even number of edges"],
              "c": 1,
-             "why": "Take a longest path; both its endpoints must be leaves, or the path "
-                    "could be extended or a cycle would close."},
+             "why": "Take a longest path; both its endpoints must be leaves, or the path could be "
+                    "extended or a cycle would close. A tree has no cycle by definition; the path "
+                    "`Pₙ` has no vertex of degree 3; and `P₄` has three edges, an odd number."
+            },
         ],
         "mistakes": [
             ("Using the edge count alone",
@@ -537,9 +589,10 @@ LESSONS = [
              "Acyclic and disconnected is a forest. Its component count is `n − |E|`."),
         ],
         "standard": ("Finish when you can prove one characterisation from another.",
-                     "Prove that a connected graph with `n − 1` edges is acyclic, using the "
-                     "leaf lemma and induction. It is the direction that needs an argument, "
-                     "and it is four lines."),
+                     "Prove that an acyclic graph with `n − 1` edges is connected. Each of "
+                     "its `c` components is a tree, so the edge count is `n − c`; set that "
+                     "equal to `n − 1`. It is the direction the body did not prove, and it "
+                     "is four lines."),
         "note": "Trees are everywhere in computing because they combine two properties: "
                 "unique paths, so navigation is unambiguous, and logarithmic depth when "
                 "balanced, so navigation is fast. File systems, parse trees, search trees "
@@ -640,11 +693,18 @@ LESSONS = [
                   "children."),
         ],
         "lab": ("graph", {
-            "algo": "dfs", "preset": "tree", "n": 7,
-            "panel_title": "Depth-first order on a tree",
-            "panel_intro": "The tree preset is a rooted binary tree, and DFS from vertex 1 "
-                           "produces the preorder visit sequence. The labels are visit "
-                           "order, not distance.",
+            "algo": "orders", "preset": "tree", "n": 7,
+            "panel_title": "All four orders on a tree",
+            "panel_intro": (
+                "The Tree preset is a binary tree rooted at 1 with children 2 and 3, and the "
+                "panel reads all four orders on it: preorder `1 2 4 5 3 6 7`, inorder "
+                "`4 2 5 1 6 3 7`, postorder `4 5 2 6 7 3 1`, level order `1 2 3 4 5 6 7`. Check "
+                "each against the drawing. Then load the Star preset: vertex 1 has six children, "
+                "and the panel reports inorder as undefined &mdash; there is no single place for "
+                "the root among six subtrees. The worked example's search tree carries keys, not "
+                "the labels `1 … 7`, so it stays on paper; the standard gives its three orders to "
+                "check against."
+            ),
         }),
         "steps_title": "Traversing a tree",
         "steps_intro": "Pick the order from the task.",
@@ -691,20 +751,27 @@ LESSONS = [
             {"q": "Which traversal of a binary search tree gives sorted order?",
              "a": ["preorder", "inorder", "postorder", "level order"],
              "c": 1,
-             "why": "Left subtree, root, right subtree &mdash; and by the search-tree "
-                    "property those are increasing, the root, then larger."},
+             "why": "Left subtree, root, right subtree &mdash; and by the search-tree property those are "
+                    "smaller, the root, then larger. Preorder puts the root first, which is never the "
+                    "smallest key; postorder puts it last; level order lists by depth, and in the "
+                    "worked example that is `6 3 8 2 5 7`, not sorted."
+            },
             {"q": "Postfix notation comes from which traversal?",
              "a": ["preorder", "inorder", "postorder", "level order"],
              "c": 2,
-             "why": "Operands before the operator, which is exactly what a stack-based "
-                    "evaluator consumes."},
+             "why": "Operands before the operator &mdash; `3 4 * 5 +` &mdash; which is exactly what a "
+                    "stack-based evaluator consumes. Preorder gives prefix (`+ * 3 4 5`), inorder gives "
+                    "the infix people read, and level order gives no notation at all."
+            },
             {"q": "The names pre-, in- and post- refer to:",
              "a": ["the order of the children",
                    "when the root is visited relative to the subtrees",
                    "the depth", "the direction of recursion"],
              "c": 1,
-             "why": "Before, between and after. The subtree recursion is identical in all "
-                    "three."},
+             "why": "Before, between and after the subtrees; the subtree recursion is identical in all "
+                    "three. The children are visited left to right in every case, depth is what level "
+                    "order uses, and the recursion always descends."
+            },
         ],
         "mistakes": [
             ("Expecting preorder to be sorted on a search tree",
@@ -720,7 +787,8 @@ LESSONS = [
         "standard": ("Finish when you can produce all three orders from a drawing.",
                      "Build a binary search tree by inserting 5, 3, 8, 1, 4, 7, 9 in that "
                      "order, then write all three traversals. The inorder must come out "
-                     "sorted, which is a check on the insertion."),
+                     "sorted, which is a check on the insertion: preorder `5 3 1 4 8 7 9`, "
+                     "inorder `1 3 4 5 7 8 9`, postorder `1 4 3 7 9 8 5`."),
         "note": "Postorder is why reverse Polish notation needs no parentheses: the "
                 "traversal order already encodes the tree structure, so precedence never "
                 "has to be inferred. Calculators and stack machines consume it directly.",
@@ -830,11 +898,18 @@ LESSONS = [
                   "`Θ((n + |E|) log n)`."),
         ],
         "lab": ("graph", {
-            "algo": "mst", "preset": "complete", "n": 6,
+            "algo": "mst", "preset": "lesson", "n": 5,
+            "example": [[1, 2, 1], [2, 3, 2], [3, 4, 3], [4, 5, 4], [1, 5, 5], [1, 3, 6], [2, 4, 7]],
             "panel_title": "Kruskal, edge by edge",
-            "panel_intro": "The panel lists the edges in weight order and marks each as "
-                           "taken or rejected. A rejected edge is always one whose ends are "
-                           "already connected.",
+            "panel_intro": (
+                "The worked example is loaded with its weights, `A … E` as `1 … 5`. The panel "
+                "lists the seven edges in weight order &mdash; `1–2, 2–3, 3–4, 4–5` taken, then "
+                "`1–5`, `1–3`, `2–4` each rejected because its ends were already connected &mdash; "
+                "and the total 10 with `4 = n − 1` edges chosen. Switch the algorithm to Dijkstra "
+                "on the same graph: the cheapest route `1 → 5` is the direct edge of weight 5, "
+                "which the tree rejected; the tree's own route from 1 to 5 weighs 10. A minimum "
+                "spanning tree is not a shortest-path tree."
+            ),
         }),
         "steps_title": "Building a minimum spanning tree",
         "steps_intro": "Sort, then add whatever does not close a cycle.",
@@ -879,31 +954,43 @@ LESSONS = [
             {"q": "A spanning tree of a connected graph on 20 vertices has:",
              "a": ["20 edges", "19 edges", "as many edges as the graph", "1 edge"],
              "c": 1,
-             "why": "It is a tree on all `n` vertices, so `n − 1 = 19` edges."},
+             "why": "It is a tree on all `n` vertices, so `n − 1 = 19` edges. 20 would force a cycle; "
+                    "\"as many as the graph\" is true only when the graph is already a tree; and one "
+                    "edge spans two vertices."
+            },
             {"q": "Kruskal's algorithm rejects an edge when:",
              "a": ["it is too heavy",
                    "both its ends are already connected in the partial tree",
                    "it is a bridge",
                    "it has been seen before"],
              "c": 1,
-             "why": "Adding it would close a cycle. Weight decides the order, not the "
-                    "rejection."},
+             "why": "Adding it would close a cycle: both ends are already in the same component of the "
+                    "partial tree. Weight decides the order, never the rejection &mdash; the heaviest "
+                    "edge is taken if it is the first to reach some vertex; a bridge is never rejected, "
+                    "since it is the only route somewhere; and every edge is considered exactly once."
+            },
             {"q": "Greedy algorithms are optimal for minimum spanning trees because:",
              "a": ["greedy is always optimal",
                    "the cut property guarantees the locally cheapest crossing edge is in some optimum",
                    "the graph is a tree",
                    "the weights are positive"],
              "c": 1,
-             "why": "It is a theorem about this problem. Greed fails on coin change and on "
-                    "the travelling salesman."},
+             "why": "It is a theorem about this problem: the cut property says the lightest edge "
+                    "across any cut is in some minimum spanning tree. Greedy is not always optimal "
+                    "(coin change with `{1, 3, 4}` at 6, and the travelling salesman); the graph is "
+                    "not a tree, or there would be nothing to choose; and positivity is never used "
+                    "&mdash; Kruskal is correct with negative weights too."
+            },
         ],
         "mistakes": [
             ("Assuming greedy works generally",
              "It works here because of the cut property. Course 8 lesson 9 shows greedy "
              "failing on a problem that looks no harder."),
-            ("Stopping before `n − 1` edges",
-             "Unless the graph is disconnected, in which case you have a minimum spanning "
-             "forest and should say so."),
+            ("Reading the tree as a shortest-path tree",
+             "It minimises the total weight of the tree, not the distance between any "
+             "pair. In the worked example the tree route `A–B–C–D–E` weighs 10 while the "
+             "rejected edge `AE` weighs 5. Dijkstra's tree and Kruskal's tree optimise "
+             "different things."),
             ("Assuming the minimum spanning tree is unique",
              "It is unique when all edge weights are distinct. With ties there may be "
              "several, all of the same total weight."),
@@ -1010,11 +1097,18 @@ LESSONS = [
             ]),
         ],
         "lab": ("graph", {
-            "algo": "colour", "preset": "petersen", "n": 6,
-            "panel_title": "Greedy, and its bound",
-            "panel_intro": "The lab reports the colours greedy used and the `Δ + 1` bound. "
-                           "Build a bipartite graph and check whether greedy finds the "
-                           "two-colouring &mdash; it does not always.",
+            "algo": "colour", "preset": "lesson", "n": 5,
+            "example": [[1, 2], [1, 3], [2, 3], [2, 4], [3, 4], [4, 5]],
+            "panel_title": "Greedy, and both bounds",
+            "panel_intro": (
+                "The five exams are loaded, `A … E` as `1 … 5`. The panel reads clique number "
+                "`ω = 3` (the triangle `{1, 2, 3}`), greedy 3 colours, and the greedy bound "
+                "`Δ + 1 = 4`; the lower and upper bounds meet, so `χ = 3` &mdash; the worked "
+                "example's argument, run. To watch greedy lose: choose the No edges preset at 6 "
+                "vertices and toggle `1–4, 1–6, 3–2, 3–6, 5–2, 5–4`. The graph is bipartite, "
+                "`χ = 2`, and greedy in vertex order uses 3, because 1 and 2 are not adjacent and "
+                "both take the first colour."
+            ),
         }),
         "steps_title": "Colouring a graph",
         "steps_intro": "Bound first, then colour.",
@@ -1060,18 +1154,25 @@ LESSONS = [
             {"q": "`χ(C₅)` equals:",
              "a": ["2", "3", "5", "4"],
              "c": 1,
-             "why": "An odd cycle is not bipartite so `χ &gt; 2`, and three colours suffice "
-                    "by alternating with one repeat."},
+             "why": "An odd cycle is not bipartite so `χ &gt; 2`, and three colours suffice by "
+                    "alternating with one repeat: `1, 2, 1, 2, 3`. Five would give each vertex its "
+                    "own colour, and no cycle ever needs four."
+            },
             {"q": "Greedy colouring uses at most:",
              "a": ["`χ(G)`", "`Δ + 1` colours", "2 colours", "`n` colours"],
              "c": 1,
-             "why": "Each vertex has at most `Δ` coloured neighbours, so one of `Δ + 1` "
-                    "colours is free. It is a bound, not the optimum."},
+             "why": "Each vertex has at most `Δ` coloured neighbours, so one of `Δ + 1` colours is "
+                    "free. It is a bound, not the optimum: it can exceed `χ` (a bad order on a "
+                    "bipartite graph), 2 is what only bipartite graphs need, and `n` is the trivial "
+                    "bound every colouring beats unless the graph is complete."
+            },
             {"q": "Deciding whether three colours suffice is:",
              "a": ["linear time", "NP-complete", "impossible", "the same as bipartiteness"],
              "c": 1,
-             "why": "Two colours is one search; three is NP-complete. The boundary between "
-                    "easy and hard is exactly there."},
+             "why": "Two colours is one search; three is NP-complete. It is not impossible &mdash; "
+                    "exhaustive search decides it &mdash; and it is not bipartiteness, which is exactly "
+                    "the two-colour question."
+            },
         ],
         "mistakes": [
             ("Treating greedy's answer as `χ`",
@@ -1192,11 +1293,17 @@ LESSONS = [
                   "lesson 10, and now the degree bound that makes planar graphs colourable."),
         ],
         "lab": ("graph", {
-            "algo": "degree", "preset": "complete", "n": 5,
+            "algo": "planar", "preset": "complete", "n": 5,
             "panel_title": "Check the bound yourself",
-            "panel_intro": "`K₅` is loaded: five vertices and ten edges, against the planar "
-                           "limit of `3V − 6 = 9`. Drop to four vertices and `K₄` fits the "
-                           "bound &mdash; and is indeed planar.",
+            "panel_intro": (
+                "`K₅` is loaded: `|E| = 10` against `3V − 6 = 9`, exceeded, so the verdict is not "
+                "planar by counting alone. Switch the preset to Complete bipartite at 6 vertices "
+                "for `K_{3,3}`: `9 ≤ 12` passes the general bound, but the graph has no triangle "
+                "and `9 &gt; 2V − 4 = 8` &mdash; the sharper bound the lesson derived for exactly "
+                "this case. Drop to 4 vertices on the Complete preset: `6 ≤ 6`, and every graph on "
+                "at most four vertices is planar. The lab searches for `K₅` and `K_{3,3}` as "
+                "subgraphs, not for subdivisions, and says when it cannot settle the question."
+            ),
         }),
         "steps_title": "Testing planarity",
         "steps_intro": "Count first; the bound settles many cases.",
@@ -1239,19 +1346,31 @@ LESSONS = [
             {"q": "A connected planar graph has `V = 10` and `E = 15`. How many faces?",
              "a": ["5", "7", "25", "cannot be determined"],
              "c": 1,
-             "why": "`V − E + F = 2` gives `F = 2 − 10 + 15 = 7`, counting the outer face."},
+             "why": "`V − E + F = 2` gives `F = 2 − 10 + 15 = 7`, counting the outer face. 5 is "
+                    "`E − V` with the 2 dropped, 25 adds where the formula subtracts, and the count IS "
+                    "determined &mdash; the formula holds for every crossing-free drawing of a "
+                    "connected planar graph."
+            },
             {"q": "Why is `K₅` not planar?",
              "a": ["it has too many vertices",
                    "`E = 10 &gt; 9 = 3V − 6`",
                    "it is bipartite",
                    "it has a cycle"],
              "c": 1,
-             "why": "The edge bound is violated, which is a complete proof for this graph."},
+             "why": "The edge bound is violated: `10 &gt; 9 = 3V − 6`, a complete proof for this graph. "
+                    "Five vertices is not too many (`K₅` minus one edge is planar); `K₅` is not "
+                    "bipartite, it is full of triangles; and cycles are harmless &mdash; `K₄` has seven "
+                    "of them and is planar."
+            },
             {"q": "Kuratowski's theorem says a graph is planar exactly when it contains no subdivision of:",
              "a": ["`K₄`", "`K₅` or `K_{3,3}`", "any cycle", "`Kₙ` for large `n`"],
              "c": 1,
-             "why": "Two forbidden structures characterise planarity completely, however "
-                    "large the graph."},
+             "why": "Two forbidden structures characterise planarity completely, however large the "
+                    "graph. `K₄` is planar, so it cannot be an obstruction; cycles are planar; and "
+                    "\"`Kₙ` for large `n`\" is not the theorem &mdash; every `Kₙ` with `n ≥ 5` contains "
+                    "`K₅`, so that one obstruction already covers them, and `K_{3,3}` contains no "
+                    "`K₅` at all."
+            },
         ],
         "mistakes": [
             ("Concluding planarity from the edge bound",

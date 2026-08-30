@@ -5,7 +5,7 @@ LESSONS = [
     {
         "slug": "divide-and-conquer",
         "title": "Divide and Conquer",
-        "module": "Design",
+        "module": "Analysis",
         "one_line": "Split, solve the pieces, combine — and the theorem that costs it.",
         "summary": (
             "Divide-and-conquer produces recurrences of one shape, `T(n) = aT(n/b) + f(n)`, "
@@ -88,11 +88,18 @@ LESSONS = [
                   "ones."),
         ],
         "lab": ("algorithm", {
-            "mode": "master",
-            "panel_title": "The cases, tabulated",
-            "panel_intro": "Each row computes `log_b a` and compares it with `d`. Note that "
+            "mode": "master", "abd": [4, 2, 1],
+            "panel_title": "The cases, tabulated — and yours",
+            "panel_intro": "The top row is the recurrence you enter, and it opens on the "
+                           "worked example's baseline `4T(n/2) + n`: `log₂ 4 = 2 &gt; 1`, "
+                           "case 3, `Θ(n²)`. Set `d = 0` and the answer does not move "
+                           "&mdash; still `Θ(n²)`, the leaves already dominated. Set `a = 3` "
+                           "with `d = 1` and it becomes `Θ(n^1.585)`. The standard's "
+                           "`9T(n/3) + n²` lands in case 2, `Θ(n² log n)`. The fixed rows "
+                           "below compute `log_b a` for the algorithms in the body; "
                            "Karatsuba and Strassen both improve by lowering `a`, and both "
-                           "keep the same `d`.",
+                           "keep the same `d`. The cases are numbered as course 3 lesson "
+                           "11 numbers them: 1 root, 2 balanced, 3 leaves.",
         }),
         "steps_title": "Analysing a divide-and-conquer algorithm",
         "steps_intro": "Read off `a`, `b`, `d`; compare.",
@@ -137,21 +144,30 @@ LESSONS = [
              "a": ["`Θ(n)`", "`Θ(n log n)`", "`Θ(n²)`", "`Θ(log n)`"],
              "c": 1,
              "why": "`log₂2 = 1 = d`, the balanced case: every level does `Θ(n)` work and "
-                    "there are `log n` levels."},
+                    "there are `log n` levels, so the product is `n log n`. `Θ(n)` "
+                    "forgets the levels and `Θ(log n)` forgets the work per level; `Θ(n²)` "
+                    "would need the leaves to dominate, which takes `a &gt; b^d`, and here "
+                    "`a = b^d = 2`."},
             {"q": "Karatsuba beats the naive method because it:",
              "a": ["combines faster", "uses 3 subproblems instead of 4",
                    "splits into thirds", "uses less memory"],
              "c": 1,
              "why": "`log₂3 ≈ 1.585` against `log₂4 = 2`. The combining cost is `Θ(n)` in "
-                    "both."},
+                    "both &mdash; `d = 1` did not change, and in the leaf-dominated case "
+                    "it could not have helped if it had. The split is still into halves "
+                    "(`b = 2`); it is the number of half-size products, `a`, that fell. "
+                    "Memory is not what the master theorem measures."},
             {"q": "The master theorem does not apply to quicksort's worst case because:",
              "a": ["quicksort is not recursive",
                    "the split depends on the data, so there is no fixed `b`",
                    "the combining is too slow",
                    "it is randomised"],
              "c": 1,
-             "why": "`T(n) = T(n−1) + n` is not of the form `aT(n/b) + f(n)`. Its solution "
-                    "is `Θ(n²)`, found by unrolling."},
+             "why": "`T(n) = T(n−1) + n` is not of the form `aT(n/b) + f(n)`: the worst "
+                    "pivot leaves `n − 1` elements on one side, and no constant `b` "
+                    "shrinks `n` to `n − 1`. Quicksort is recursive; its partitioning is "
+                    "`Θ(n)`, no slower than merging; and the plain algorithm chooses no "
+                    "random pivot. The solution is `Θ(n²)`, found by unrolling."},
         ],
         "mistakes": [
             ("Swapping `a` and `b`",
@@ -177,7 +193,7 @@ LESSONS = [
     {
         "slug": "recursion-trees-and-amortised-analysis",
         "title": "Recursion Trees and Amortised Analysis",
-        "module": "Design",
+        "module": "Analysis",
         "one_line": "When the master theorem does not apply, and when the worst case is misleading.",
         "summary": (
             "A recursion tree solves recurrences the master theorem cannot. Amortised "
@@ -271,11 +287,17 @@ LESSONS = [
                   "sequence, which is a strictly stronger guarantee."),
         ],
         "lab": ("algorithm", {
-            "mode": "growth", "n": 32,
-            "panel_title": "Where the cost accumulates",
-            "panel_intro": "Compare `n` with `n log n` on the log scale. The doubling "
-                           "array's copies sum to less than `2n`, which is why they "
-                           "disappear into the linear term.",
+            "mode": "amortised", "n": 16, "policy": "double",
+            "panel_title": "The doubling array, counted",
+            "panel_intro": "The lab opens on the worked example: sixteen inserts from "
+                           "capacity 1, resizes at inserts 2, 3, 5 and 9, 15 copies, total "
+                           "cost 31, amortised 1.94 per insertion, worst single insertion "
+                           "9. Slide to 17 inserts and the next doubling lands: 31 copies, "
+                           "total 48, amortised 2.82 &mdash; above 2 and still below the "
+                           "3 the proof promises, which is why the theorem says 3. Change "
+                           "the policy to \"grow by one\" for 120 copies at `n = 16`, the "
+                           "`Θ(n²)` of the last two lines, and to a factor of 1.5 for the "
+                           "standard.",
         }),
         "steps_title": "Using each technique",
         "steps_intro": "Tree for a recurrence, amortisation for a sequence.",
@@ -313,7 +335,12 @@ LESSONS = [
             "after": [
                 "The last two lines are the point. Doubling and incrementing look like "
                 "minor implementation choices and differ by a whole complexity class. Every "
-                "dynamic array in every standard library doubles for this reason."
+                "dynamic array in every standard library doubles for this reason.",
+                "The \"< 2n\" above is a fact about `n = 16`, a power of two, where the "
+                "last doubling is well past. One insert later, at `n = 17`, the array "
+                "doubles again: 31 copies, total 48, amortised 2.82 &mdash; above 2 and "
+                "still below the 3 the proof guarantees for every `n`. That is why the "
+                "theorem is stated with 3."
             ],
         },
         "quiz_title": "Trees and amortisation",
@@ -321,21 +348,32 @@ LESSONS = [
             {"q": "`T(n) = T(n/3) + T(2n/3) + n` solves to:",
              "a": ["`Θ(n)`", "`Θ(n log n)`", "`Θ(n²)`", "the master theorem gives it directly"],
              "c": 1,
-             "why": "Each level does `Θ(n)` work and the depth is logarithmic. The master "
-                    "theorem does not apply because the split is uneven."},
+             "why": "Each level does `Θ(n)` work &mdash; the subproblem sizes at a level "
+                    "still sum to `n` &mdash; and the depth is `log_{3/2} n`, so the total "
+                    "is `n log n`. `Θ(n)` counts one level; `Θ(n²)` would need linear "
+                    "depth, which only a split that peels off a constant number of "
+                    "elements gives. The master theorem does not apply because the two "
+                    "pieces are different sizes, so there is no single `b`."},
             {"q": "Amortised `Θ(1)` insertion means:",
              "a": ["every insertion costs `Θ(1)`",
                    "any sequence of `m` insertions costs `Θ(m)` in total",
                    "insertions are `Θ(1)` on average over random inputs",
                    "the worst case is `Θ(1)`"],
              "c": 1,
-             "why": "A guarantee about sequences. A single insertion can cost `Θ(n)` when a "
-                    "resize happens."},
+             "why": "A guarantee about sequences, with no probability in it. A single "
+                    "insertion can cost `Θ(n)` when a resize happens &mdash; the lab's "
+                    "ninth insert costs 9 &mdash; so neither \"every insertion\" nor "
+                    "\"the worst case\" is `Θ(1)`. \"On average over random inputs\" is "
+                    "average-case analysis, a different and weaker claim: the amortised "
+                    "bound holds for the worst sequence, not the typical one."},
             {"q": "Growing an array by a fixed amount rather than doubling gives amortised:",
              "a": ["`Θ(1)`", "`Θ(log n)`", "`Θ(n)`", "the same as doubling"],
              "c": 2,
              "why": "Copies at sizes `c, 2c, 3c, …` total `Θ(n²)`, so `Θ(n)` per "
-                    "insertion. The geometric series is what makes doubling work."},
+                    "insertion &mdash; 120 copies for 16 inserts in the lab, against 15. "
+                    "The geometric series is what makes doubling `Θ(1)`, and an "
+                    "arithmetic series has no such sum. `Θ(log n)` is the number of "
+                    "resizes doubling performs, not a cost per insertion."},
         ],
         "mistakes": [
             ("Confusing amortised with average-case",
@@ -447,11 +485,16 @@ LESSONS = [
                   "than an observation."),
         ],
         "lab": ("algorithm", {
-            "mode": "greedy", "n": 20,
+            "mode": "greedy", "n": 12,
             "panel_title": "Greedy against optimal",
-            "panel_intro": "Both are computed for every amount: greedy takes the largest "
-                           "coin, dynamic programming solves it exactly. With `{1,3,4}` "
-                           "they part company at 6.",
+            "panel_intro": "Both are computed for every amount from 1 to 12: greedy takes "
+                           "the largest coin, dynamic programming solves it exactly. With "
+                           "`{1, 3, 4}` they part company at 6 &mdash; `4 + 1 + 1` against "
+                           "`3 + 3` &mdash; and again at 10, `4 + 4 + 1 + 1` against "
+                           "`3 + 3 + 4`, while agreeing on every other row; with "
+                           "`{1, 5, 10, 25}` the two columns never differ. Nothing in the "
+                           "greedy column marks the rows where it is wrong, which is the "
+                           "third concept.",
         }),
         "steps_title": "Designing a greedy algorithm",
         "steps_intro": "Write it, then prove it, then test it.",
@@ -501,7 +544,10 @@ LESSONS = [
              "a": ["3", "4", "6", "it never fails"],
              "c": 2,
              "why": "Greedy gives `4 + 1 + 1` (three coins); the optimum is `3 + 3` (two). "
-                    "The same rule is optimal for `{1,5,10,25}`."},
+                    "At 3 and 4 greedy takes the single coin, which is optimal, and at 5 "
+                    "its `4 + 1` ties the best. It fails again at 10, so \"never\" is "
+                    "wrong; the same rule is optimal for `{1,5,10,25}`, so the failure is "
+                    "the coin system's."},
             {"q": "The standard technique for proving a greedy algorithm optimal is:",
              "a": ["induction on the input size",
                    "an exchange argument",
@@ -509,13 +555,23 @@ LESSONS = [
                    "testing many inputs"],
              "c": 1,
              "why": "Show any optimal solution can be modified toward the greedy choice "
-                    "without getting worse. It is what proves the cut property too."},
+                    "without getting worse. The interval proof did use induction &mdash; "
+                    "on the position `i` in the two selections, not on the input size "
+                    "&mdash; but the induction only carries the exchange forward; the "
+                    "exchange is the content, and it is what proves the cut property too. "
+                    "Contradiction is a shape, not a technique for this. Testing proves "
+                    "nothing: shortest-first passes the first instance in the worked "
+                    "example and fails the second."},
             {"q": "For interval scheduling, the optimal greedy rule is:",
              "a": ["earliest start", "shortest interval",
                    "earliest finish", "fewest conflicts"],
              "c": 2,
              "why": "Earliest finish leaves the most room for what follows, and the "
-                    "exchange argument proves it. The others all have counterexamples."},
+                    "exchange argument proves it. Earliest start is defeated by one long "
+                    "interval that begins first (`A(0,10)` in the worked example); "
+                    "shortest interval by `(4,6)` sitting across `(0,5)` and `(5,10)`; "
+                    "fewest conflicts by a small instance too, though it takes a little "
+                    "longer to build. Every rule but one has a counterexample."},
         ],
         "mistakes": [
             ("Assuming greedy is optimal because it seems reasonable",
@@ -648,11 +704,15 @@ LESSONS = [
                   "two entries &mdash; which is why it is preferred when memory matters."),
         ],
         "lab": ("algorithm", {
-            "mode": "greedy", "n": 24,
+            "mode": "greedy", "n": 8,
             "panel_title": "Dynamic programming against greed",
-            "panel_intro": "The optimal columns are computed by the coin-change recurrence "
-                           "above, filling the table from 1 upward. Where greedy differs, "
-                           "the table is right.",
+            "panel_intro": "The lab opens on the worked example's table: the optimal "
+                           "column for `{1, 3, 4}` reads 1, 2, 1, 1, 2, 2, 2, 2 for amounts "
+                           "1 to 8, computed by the recurrence above, filled from 1 upward. "
+                           "Greedy differs only at 6, where the table is right with "
+                           "`3 + 3`; at 7 both give two coins, `4 + 3`, and at 8 both "
+                           "give `4 + 4`. Slide to 10 for the next amount where greedy is "
+                           "wrong.",
         }),
         "steps_title": "Designing a dynamic program",
         "steps_intro": "Recurrence first; the implementation follows.",
@@ -702,11 +762,19 @@ LESSONS = [
                    "sorted input"],
              "c": 1,
              "why": "Both. Optimal substructure without overlap is divide-and-conquer; "
-                    "overlap without it is not helped."},
+                    "overlap without it is not helped. Recursion is one way to write it "
+                    "and a table is the other, so \"recursion only\" is wrong on both "
+                    "counts. A greedy choice property is what greedy needs, and coin "
+                    "change with `{1, 3, 4}` lacks it while dynamic programming handles it "
+                    "fine. Nothing needs sorting."},
             {"q": "Memoising the naive Fibonacci reduces the call count from about `1.6ⁿ` to:",
              "a": ["`log n`", "`n`", "`n²`", "`2ⁿ`"],
              "c": 1,
-             "why": "Each value is computed once and reused thereafter."},
+             "why": "Each of the `n` values `F(0) … F(n)` is computed once and reused "
+                    "thereafter, so the count is `n`: 10 calls at `n = 10` against 177. "
+                    "`log n` is fewer than the number of distinct values, which cannot be; "
+                    "`n²` overcounts &mdash; each value is a constant amount of work; and "
+                    "`2ⁿ` is worse than the naive recursion it replaced."},
             {"q": "Longest simple path has no dynamic program because:",
              "a": ["it is too large",
                    "it lacks optimal substructure — subpaths may share vertices",
@@ -714,7 +782,11 @@ LESSONS = [
                    "it is undecidable"],
              "c": 1,
              "why": "Concatenating two longest subpaths may repeat a vertex, so the "
-                    "combination is not a simple path. The problem is NP-hard."},
+                    "combination is not a simple path and the recurrence is false. The "
+                    "problem is NP-hard, which is a statement about cost, not about "
+                    "existence: it is decidable by trying every path. Size is not the "
+                    "obstacle, and shortest path on the same unordered graph has a "
+                    "perfectly good dynamic program in Dijkstra."},
         ],
         "mistakes": [
             ("Applying it without checking optimal substructure",
@@ -843,11 +915,14 @@ LESSONS = [
                   "and it is one of the Clay Millennium Problems."),
         ],
         "lab": ("algorithm", {
-            "mode": "growth", "n": 24,
+            "mode": "growth", "n": 64,
             "panel_title": "The line the classification draws",
-            "panel_intro": "Polynomial curves and `2ⁿ` on one log-scale plot. The gap at "
-                           "`n = 64` is the practical content of \"tractable\", and it is "
-                           "why the boundary is drawn at polynomial.",
+            "panel_intro": "Polynomial curves and `2ⁿ` on one log-scale plot, opened at "
+                           "`n = 64`: `n²` is 4 096 and `2ⁿ` is about `1.8 × 10¹⁹`, which "
+                           "at a billion operations a second is 585 years. That gap is the "
+                           "practical content of \"tractable\", and it is why the boundary "
+                           "is drawn at polynomial: `2ⁿ` is the cost of trying every "
+                           "subset, and `n²` the cost of checking one.",
         }),
         "steps_title": "Placing a problem",
         "steps_intro": "Verification first; it is the cheapest test.",
@@ -895,16 +970,22 @@ LESSONS = [
              "a": ["not polynomial", "nondeterministic polynomial — problems verifiable in polynomial time",
                    "nearly polynomial", "no problem"],
              "c": 1,
-             "why": "It is about verification. P is a subset of NP, so \"not polynomial\" "
-                    "would be a contradiction."},
+             "why": "It is about verification. \"Not polynomial\" is the reading the first "
+                    "mistake warns against: P is a subset of NP, so every polynomial "
+                    "problem is in NP and the name would contradict itself. \"Nearly "
+                    "polynomial\" is not a class of anything, and the `N` is for "
+                    "nondeterministic, the guessing machine of the older definition."},
             {"q": "A polynomial algorithm for one NP-complete problem would:",
              "a": ["solve only that problem",
                    "give polynomial algorithms for every problem in NP",
                    "prove P ≠ NP",
                    "have no consequences"],
              "c": 1,
-             "why": "Every problem in NP reduces to it, so `P = NP` would follow. That is "
-                    "what completeness means."},
+             "why": "Every problem in NP reduces to it, so composing the reduction with the "
+                    "algorithm solves each of them in polynomial time and `P = NP` would "
+                    "follow &mdash; the opposite of proving `P ≠ NP`. That is what "
+                    "completeness means, and it is why the consequence is not confined to "
+                    "one problem: it would reach every problem in the class."},
             {"q": "\"NP-complete\" tells a practitioner to:",
              "a": ["give up entirely",
                    "stop seeking an efficient exact algorithm and consider approximation, heuristics or restricted cases",
@@ -912,7 +993,11 @@ LESSONS = [
                    "rewrite in a faster language"],
              "c": 1,
              "why": "It is actionable information about which approaches are worth "
-                    "attempting."},
+                    "attempting. Giving up is the response to undecidable, not to "
+                    "NP-complete &mdash; SAT solvers handle industrial instances daily. A "
+                    "faster computer or language changes the constant, and lesson 3 "
+                    "showed what a thousandfold speed-up buys an exponential algorithm: "
+                    "about ten more items."},
         ],
         "mistakes": [
             ("Reading NP as \"not polynomial\"",
@@ -1097,8 +1182,11 @@ LESSONS = [
                    "it takes exponential time",
                    "it has not been solved yet"],
              "c": 1,
-             "why": "A theorem, not a state of ignorance. No future technique will produce "
-                    "the algorithm."},
+             "why": "A theorem, not a state of ignorance: no future technique will produce "
+                    "the algorithm, because none can exist. \"Very hard\" and \"exponential "
+                    "time\" describe NP-complete problems, which do have algorithms; \"not "
+                    "solved yet\" describes `P` versus `NP`, an open question. This one is "
+                    "closed, by Turing, in 1936."},
             {"q": "Rice's theorem says:",
              "a": ["all programs halt",
                    "every nontrivial property of what a program computes is undecidable",
@@ -1106,7 +1194,10 @@ LESSONS = [
                    "sorting needs `n log n`"],
              "c": 1,
              "why": "Which is why static analysis is necessarily approximate: no tool can "
-                    "be both sound and complete for every program."},
+                    "be both sound and complete for every program. \"All programs halt\" is "
+                    "false outright (a loop with no exit). `P = NP` is open and not a "
+                    "theorem of anyone's; the sorting bound is lesson 6's theorem, true and "
+                    "unrelated."},
             {"q": "The halting proof works by:",
              "a": ["exhaustive search",
                    "constructing a program that does the opposite of what the decider predicts about it",
@@ -1114,7 +1205,11 @@ LESSONS = [
                    "assuming P = NP"],
              "c": 1,
              "why": "A diagonal argument: build the object that differs from every entry, "
-                    "here by applying `D` to itself."},
+                    "here by applying `D` to itself. Exhaustive search over programs "
+                    "cannot finish, since there are infinitely many; counting them is "
+                    "course 2's route to \"some functions have no program\", which proves "
+                    "existence but names no problem; and `P = NP` is not assumed anywhere "
+                    "&mdash; the proof needs only that `H` is an algorithm."},
         ],
         "mistakes": [
             ("Reading undecidable as \"very hard\"",
