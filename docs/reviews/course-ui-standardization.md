@@ -248,3 +248,35 @@ The earlier auth build failed on an undefined local variable introduced during t
 
 
 Changed-path accounting: **191 source, 4 test, 239 generated, 1 docs; 435 total**. Source includes 130 authored HTML pages, 53 content modules and 8 source scripts. Test includes the three test artifacts and `scripts/progresscheck.js`. Generated includes 237 mathematics pages and two auth/progress pages. No deleted or renamed path.
+
+## Responsive remediation of frozen candidate `13ba6d4`
+
+The parent tested exact commit `13ba6d48d528825d9e6db95314844bb5dfd42105` in Chrome 140.0.7339.207 over CDP with touch emulation, served at `http://127.0.0.1:18080`. The read-only evidence is `/home/dmedellin/.hermes/evidence/learn-ui-candidate/responsive-browser.jsonl` and `course-contract-matrix.json` in the same directory. These are **pre-fix measurements**, retained as failures; the earlier semantic matrix and declaration checks did not establish responsive browser acceptance.
+
+| Observed failure at `13ba6d4` | Systemic remediation | Verification status |
+| --- | --- | --- |
+| Across all 336 lesson routes, document overflow affected 62 at 390×844 and 114 at 320×800. `/logic-and-proof/proof-by-cases-and-counterexample/` measured 627px scroll width against 390px client width, with uncontained inline math. | `.math` now uses normal whitespace and emergency wrapping for long tokens. Unicode text remains selectable; `.mathblock` retains local horizontal scrolling and preserved expression lines. No global overflow masking was added. | Published cascade guard passes; post-fix CDP pending. |
+| Mobile masthead Sign in anchors were approximately 38–40px wide by 44px high. The earlier statement about 44px targets was incomplete: height passed, width did not. | The shared masthead rule now also sets `min-width: 44px`, overriding both legacy widths in effective sizing. The compact mobile treatment and accessible Sign in label remain. | Published anchor sizing contract passes for both source families; post-fix CDP pending. |
+| At 768×1024, `/market-structure/` had a 753px client width and 351.5px cards. The legacy 760px media rule placed a fixed 296px thumbnail beside the text; the lesson body reached x816.02 beyond the card's x737 right edge and was clipped. | Each shared course step is a named inline-size container. At a card width of 560px or less, its card stacks and its thumbnail returns to automatic width with the bottom divider restored. Wider desktop cards retain the authored row and 296px thumbnail; card clipping remains intentional. This applies to all eight Trading course homes. | Cascade checks cover media boundaries, the 753px client-width case, and desktop rows; post-fix CDP pending. |
+
+Only `scripts/mathpath/theme.py` changed implementation behavior. Its shared CSS is consumed by `scripts/build_paths.py`, `scripts/add_progress_marks.py`, and `scripts/build_auth_pages.py`; all published changes came from those canonical generators/normalizer. An exact before/after substitution check verified that all 369 changed HTML files differ only by these shared CSS changes. Public routes, filenames, markup, scripts, authored content, and **Learn library → Subject → Course → Lesson** remain unchanged.
+
+`tests/test_responsive_ui.py` reads actual published elements and their ancestor selectors through the existing comment-stripping/nesting-aware CSS helpers. It resolves the supported component declarations using specificity, source order, `!important`, media width and named container width. It is a deterministic CSS contract, **not a browser layout engine**: intrinsic text widths, line boxes, inherited styles, interactive pseudo states and rendered clipping remain outside its proof. The new guards were run before the source fix and failed on all three intended defects. During guard development, media whitespace handling, capstone capability scope and the preserved stacking below the legacy desktop breakpoint were corrected before accepting a green result.
+
+Focused verification in this remediation used `/usr/bin/python3`, with `PYTHONDONTWRITEBYTECODE=1` and `PYTHONPATH=tests` for unittest commands:
+
+| Command | Observed result |
+| --- | --- |
+| `/usr/bin/python3 -m unittest test_responsive_ui -v` before source changes | 3 tests, 3 intended failures: nowrap math, horizontal narrow card, undersized Sign in width. |
+| `/usr/bin/python3 scripts/build_paths.py` | 237 pages written. |
+| `/usr/bin/python3 scripts/add_progress_marks.py` | 130 pages visited and rewritten; second run visited 130 and rewrote 0. |
+| `/usr/bin/python3 scripts/build_auth_pages.py` | Callback and progress pages regenerated. |
+| `/usr/bin/python3 scripts/build_paths.py --check` | Every published generated page matches its content. |
+| `/usr/bin/python3 -m unittest test_responsive_ui -v` after regeneration | 3 tests passed in 13.291s. |
+| `/usr/bin/python3 tests/mutate_course_ui.py --responsive-only` | All 11 mutations caught by their intended assertions, on temporary copies: nowrap, unbreakable tokens, block clipping, global masking, both legacy anchor widths, anchor height, tablet row, fixed thumbnail, missing query ancestor, and lost desktop row. |
+| `/usr/bin/python3 -m unittest test_course_ui.TestPublishedUI test_course_ui.TestVisitorTaxonomy.test_published_copy_uses_subjects_and_course_titles test_site_invariants.TestGeneratedPathIsCurrent -v` | 6 tests passed in 7.872s. |
+| `node scripts/mathcheck.js` | Every arithmetic assertion passes. |
+| `node scripts/labcheck.js --generated` | 237 pages executed, 0 failing. |
+| `node scripts/progresscheck.js` and `node scripts/feedbackcheck.js` | All checks passed in both. |
+
+The full unittest suite, container build, final serial gates and post-fix CDP measurements remain with the parent. This remediation does not claim a new overflow count or browser acceptance, and did not push, merge or deploy.

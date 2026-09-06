@@ -37,13 +37,15 @@ def replace(old, new):
     return rewrite
 
 
-def run(label, case, mutation):
+def run(label, case, mutation, expected=None):
     result = unittest.TestResult()
     with mutation, contextlib.redirect_stdout(io.StringIO()):
         unittest.TestSuite([case]).run(result)
     if result.errors or not result.failures:
         raise AssertionError("mutation was not caught by an assertion: " + label + repr(result.errors))
     detail = result.failures[0][1].split("AssertionError: ")[-1].splitlines()[0]
+    if expected and expected not in result.failures[0][1]:
+        raise AssertionError("mutation hit the wrong guard: " + label + result.failures[0][1])
     print("CAUGHT " + label + ": " + detail[:160], flush=True)
 
 
@@ -164,7 +166,54 @@ def progress_mutations():
     print("5/5 progress UI mutations caught; worktree inputs untouched.", flush=True)
 
 
+def responsive_mutations():
+    """Late live overrides must beat safe declarations, comments and dead media."""
+    from test_responsive_ui import TestResponsiveUI
+    math = "algebra-foundations/absolute-value/index.html"
+    trading = "algorithmic-and-automated-trading/index.html"
+    cases = [
+        ("inline math nowrap", math, "test_inline_math_wraps_and_blocks_scroll",
+         '.math { white-space: nowrap !important; } /* .math { white-space: normal; } */',
+         "inline math must wrap"),
+        ("unbreakable math token", math, "test_inline_math_wraps_and_blocks_scroll",
+         '.math { overflow-wrap: normal !important; }', "long math tokens need emergency breaks"),
+        ("block math clipped", math, "test_inline_math_wraps_and_blocks_scroll",
+         '.mathblock { overflow: hidden !important; }', "block math needs local scrolling"),
+        ("global overflow masking", math, "test_inline_math_wraps_and_blocks_scroll",
+         'html { overflow-x: hidden; }', "no global overflow masking"),
+        ("generated Sign in width", math, "test_mobile_signin_hit_box",
+         '#signinLink { min-width: 0; width: 40px; } '
+         '@media (min-width: 900px) { #signinLink { min-width: 44px; } }', "Sign in hit box width"),
+        ("Trading Sign in width", trading, "test_mobile_signin_hit_box",
+         '#signinLink { min-width: 0; width: 38px; }', "Sign in hit box width"),
+        ("Sign in height", math, "test_mobile_signin_hit_box",
+         '#signinLink { min-height: 0; height: 40px; }', "Sign in hit box height"),
+        ("tablet horizontal card", trading, "test_lesson_cards_use_available_width",
+         '@media (min-width: 760px) { [data-ui="lesson-list"] .course-step .lesson-card '
+         '{ flex-direction: row; } }', "narrow card must stack at 768"),
+        ("tablet fixed thumbnail", trading, "test_lesson_cards_use_available_width",
+         '[data-ui="lesson-list"] .course-step .thumb { width: 296px; }', "stacked thumbnail must fit its card"),
+        ("missing query ancestor", trading, "test_lesson_cards_use_available_width",
+         '[data-ui="lesson-list"] .course-step { container-type: normal; }', "narrow card must stack at 768"),
+        ("lost desktop row", trading, "test_lesson_cards_use_available_width",
+         '[data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }', "preserve wide desktop rows"),
+    ]
+    with tempfile.TemporaryDirectory(prefix="learn-responsive-mutations-") as tmp:
+        site = Path(tmp) / "site"
+        shutil.copytree(ui.SITE, site)
+        with mock.patch.object(ui, "SITE", site):
+            for label, page, test, css, expected in cases:
+                run(label, TestResponsiveUI(test), page_mutation(site, page,
+                    replace("</head>", "<style>" + css + "</style></head>")), expected=expected)
+    print(f"{len(cases)}/{len(cases)} responsive mutations caught; worktree inputs untouched.", flush=True)
+
+
 if __name__ == "__main__":
-    if "--progress-only" not in sys.argv:
+    if "--responsive-only" in sys.argv:
+        responsive_mutations()
+    elif "--progress-only" in sys.argv:
+        progress_mutations()
+    else:
         main()
-    progress_mutations()
+        progress_mutations()
+        responsive_mutations()
