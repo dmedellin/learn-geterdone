@@ -14,9 +14,7 @@ COURSE = {
     ),
     "blurb": (
         (
-        "Develop primes, greatest common divisors, congruences, and modular inverses from "
-        "division with remainder, then use them to generate, apply, and factor small RSA "
-        "keys."
+        'Everything follows from one theorem about division with remainder. Primes, gcds, congruences and modular inverses build up to RSA &mdash; which is generated, used and then broken here on primes small enough to check by hand.'
     )
     ),
     "key": [

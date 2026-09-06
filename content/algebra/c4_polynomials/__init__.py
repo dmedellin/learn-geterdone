@@ -14,8 +14,7 @@ COURSE = {
     ),
     "blurb": (
         (
-        "Expand polynomial products and reverse the process by factoring. Factored form "
-        "reveals zeros and supports division, root tests, and graph analysis."
+        'Multiply out, then learn to go back. The factored form is the one that answers questions &mdash; where a graph crosses, when a product is zero &mdash; and this course is about producing it reliably rather than by inspection.'
     )
     ),
     "key": [
@@ -49,14 +48,7 @@ COURSE = {
         "first move in every factorisation; lessons 6 to 9 are branches chosen by "
         "term count and pattern. Lessons 10 to 13 divide, find roots and then sketch."
     ),
-    "how_to": [
-        "Look for a common factor before choosing a factoring method.",
-        "Expand your factored answer to check that it equals the original polynomial.",
-        (
-            "Use the worked examples and rehearsals to practise the algebra and an "
-            "independent expansion or substitution check."
-        )
-    ],
+    "how_to": ["Always look for a common factor first. The lab's decision list starts there because skipping it is what turns a one-line problem into an unfactorable-looking mess.", 'Expand your factored answer to check it. Checking a factorisation by expansion is faster than producing it.', 'After each complete example, cover the answer and do the faded rehearsal on paper. The first decision is supplied; the remaining algebra and the expansion or substitution check are yours before you answer the quiz.'],
     "not_covered": [
         (
             "Factoring quadratics with irrational or complex coefficients. Quadratics and "

@@ -432,6 +432,17 @@ def normalize_taxonomy_copy(text, courses, *, lesson=False):
             value = re.sub(r'\bnext course\b', 'Related course', value, flags=re.I)
             value = re.sub(r'\blearning path\b', 'Subject', value, flags=re.I)
             value = re.sub(r'\btrading path\b', 'Trading courses', value, flags=re.I)
+            for old, new in (
+                ('After the eight courses', 'Trading worked example'),
+                ('Educational path', 'Educational subject'),
+                ('the path position', 'the Subject context'),
+                ('method this path teaches', 'methods these courses teach'),
+                ('Worked example on the Trading courses', 'Worked example for the Trading Subject'),
+                ('That specification is the last thing this path asks you to write.',
+                 'That specification documents the methods covered in this Course.'),
+            ):
+                value = value.replace(old, new)
+            value = value.replace('Everything else on this page — the path,', 'Everything else on this page — the Subject,')
         return value
     def in_shell(start):
         return not lesson or any(n["start"] <= start < n["end"] for n in shell)
@@ -553,8 +564,99 @@ def course_navigation(courses, index, up="../"):
     return '<nav class="path-nav" data-ui="course-navigation" aria-label="Course navigation">%s</nav>' % ''.join(links)
 
 
+def neutral_course_details(text, slug):
+    """Repair reviewed legacy/current copy without replacing authored paragraphs."""
+    planning = {
+        'options-trading': 'The Options Trade Plan lesson documents an options trade plan.',
+        'trading-risk-management': 'The Trading Risk Plan lesson documents a risk plan.',
+    }
+    changes = (
+        ('This stage draws the boundaries, then fills them in', 'These lessons draw the boundaries, then fill them in'),
+        ('This stage converts', 'These lessons convert'),
+        ('then builds the four numbers', 'then build the four numbers'),
+        ('This stage removes', 'These lessons remove'),
+        ('This stage sets', 'These lessons set'),
+        ('The stage is really about', 'These lessons are about'),
+        ('this stage separates', 'these lessons separate'),
+        ('and then makes the strategy', 'and then make the strategy'),
+        ('This stage covers', 'These lessons cover'),
+        ('This stage builds', 'These lessons build'),
+        ('This stage is the part of the course that tries', 'These lessons try'),
+        ('By lesson 07 you can', 'The lessons explain how to'),
+    )
+    edits = []
+    for start, end, copy in ElementSpans(text).copy:
+        revised = re.sub(r'\bStage \d+ of \d+\s*', '', copy)
+        for old, new in changes:
+            revised = revised.replace(old, new)
+        if slug in planning:
+            for old in ('The last lesson is not a quiz you pass and close.',
+                        'The specification lesson documents a trading system.'):
+                revised = revised.replace(old, planning[slug])
+        if revised != copy:
+            edits.append((start, end, revised))
+    for start, end, revised in reversed(edits):
+        text = text[:start] + revised + text[end:]
+    text = text.replace('aria-label="Course stages"', 'aria-label="Lesson groups"')
+    hero = element(text, 'section', cls='hero')
+    region = text[hero['start']:hero['end']]
+    svg = element(region, 'svg', cls='hero-svg')
+    drawing = region[svg['start']:svg['end']]
+    if 'data-illustration="topics"' not in drawing:
+        first_four = {'market-structure', 'trade-setup-execution', 'options-trading', 'technical-indicators'}
+        if slug in first_four:
+            # Retain domain plots; the removed shapes represented curriculum.
+            plot = drawing[drawing.index('>')+1:drawing.index('<g class="sv-tile">')]
+            if slug == 'market-structure':
+                labels = ('<g class="sv-text"><text x="90" y="270">SWING LOW</text>'
+                          '<text x="256" y="145">SWING HIGH</text>'
+                          '<text x="300" y="298">PRICE STRUCTURE</text></g>')
+                description = 'A synthetic price trace with alternating swing highs and swing lows illustrating market structure.'
+                body = plot + labels
+            else:
+                topics = {
+                    'trade-setup-execution': ['PLAN', 'SETUPS', 'EXECUTION', 'RISK', 'REVIEW'],
+                    'options-trading': ['CONTRACT', 'PRICING', 'STRATEGY', 'ASSIGNMENT'],
+                    'technical-indicators': ['BASICS', 'TREND', 'MOMENTUM', 'VOLATILITY', 'SYNTHESIS'],
+                }[slug]
+                width = 488 / len(topics)
+                tiles = ''.join('<g class="sv-tile"><rect x="%g" y="18" width="%g" height="52" rx="12"/></g>'
+                    '<text class="sv-text" text-anchor="middle" x="%g" y="48">%s</text>'
+                    % (16+i*width, width-8, 16+i*width+(width-8)/2, label) for i, label in enumerate(topics))
+                if slug == 'trade-setup-execution':
+                    # Its rising spark represented lesson order, not price data.
+                    body = '<g transform="translate(0 98)">' + tiles + '</g>'
+                    description = 'Equal topic tiles for planning, setups, execution, risk and review.'
+                else:
+                    body = tiles + '<g transform="translate(0 82) scale(1 .72)">' + plot + '</g>'
+                    description = ('Contract, pricing, strategy and assignment topics above a long-call payoff: flat to the dashed strike, then rising.'
+                        if slug == 'options-trading' else
+                        'Basics, trend, momentum, volatility and synthesis topics above a price line in a widening channel and an oscillator crossing a dashed threshold.')
+            drawing = '<svg class="hero-svg" data-illustration="topics" viewBox="0 0 520 310" role="img" aria-label="%s">%s</svg>' % (esc(description), body)
+        else:
+            drawing = drawing.replace('stage tiles', 'Lesson-group tiles')
+            drawing = drawing.replace('six tiles for the five stages of the course', 'tiles naming five Lesson groups and the Course topic')
+            drawing = re.sub(r'and a final tile marking (?:Course|course 8 of 8), the end of the path\.',
+                             'and a tile naming automation, the Course topic.', drawing)
+            # Only the lower curriculum tiles in the automation graphic change;
+            # highlighted risk/order components of its execution pipeline stay.
+            boundary = drawing.find('<line class="sv-axis" x1="16" y1="178"') if slug == 'algorithmic-and-automated-trading' else 0
+            drawing = drawing[:boundary] + drawing[boundary:].replace('class="sv-tile-live"', 'class="sv-tile"')
+            drawing = drawing.replace('<svg ', '<svg data-illustration="topics" ', 1)
+    # Also refresh the first remediation's stamped drawings. Preserve their
+    # authored plots while restoring topic names for the SVG accessible name.
+    drawing = drawing.replace('Equal topic tiles above a long-call payoff:', 'Contract, pricing, strategy and assignment topics above a long-call payoff:')
+    drawing = drawing.replace('Equal topic tiles above a price line', 'Basics, trend, momentum, volatility and synthesis topics above a price line')
+    if slug == 'options-trading' and '>STRIKE</text>' not in drawing:
+        drawing = drawing.replace('</svg>', '<text class="sv-text" x="205" y="302">STRIKE</text></svg>')
+    region = replace_element(region, svg, drawing)
+    text = replace_element(text, hero, region)
+    return text
+
+
 def normalize_course_ui(text, course, courses, index):
     title, slug = course["title"], course["slug"]
+    text = neutral_course_details(text, slug)
     if 'data-ui="overview"' in text:
         # Refresh shared controls without overwriting subsequent authored copy.
         description = next(n["attrs"]["content"] for n in ElementSpans(text).elements
@@ -865,6 +967,7 @@ def main():
         text = ensure_css(before)
         text = ensure_masthead(text, relative)
         text = ensure_script(text, SIGNIN_JS)
+        text = normalize_taxonomy_copy(text, courses)
         save(relative, text, before)
 
     # Structural errors anywhere above must leave the complete source tree alone.

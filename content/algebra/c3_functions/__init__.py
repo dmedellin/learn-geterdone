@@ -35,8 +35,7 @@ COURSE = {
     ),
     "blurb": (
         (
-        "Connect algebra to the coordinate plane through slope and common forms of a line, "
-        "then study functions, domains, transformations, composition, and inverses."
+        'Put algebra on a picture. Slope and every form of a line, then the definition that organises these courses &mdash; a function &mdash; with its notation, its domain, the transformations that move its graph, and its inverse.'
     )
     ),
     "key": [

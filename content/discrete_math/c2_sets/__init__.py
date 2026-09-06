@@ -8,16 +8,12 @@ COURSE = {
     "level": "Beginner",
     "summary": (
         (
-        "Sets and their algebra, power sets and Cartesian products, relations and the "
-        "structures they define, functions and their mapping properties, cardinality, and the "
-        "pigeonhole principle."
+        'The vocabulary these courses are written in: sets and their algebra, power sets and Cartesian products, relations and the two kinds that matter (equivalence and order), functions and the three properties they may have, cardinality, and the pigeonhole principle.'
     )
     ),
     "blurb": (
         (
-        "Use set operations and identities, test relation properties, distinguish injections, "
-        "surjections, and bijections, compare cardinalities, and apply the pigeonhole "
-        "principle."
+        'Sets, the operations on them and the identities those obey; relations and the two structures they produce &mdash; partitions and orderings; functions, injections, surjections and bijections; countable and uncountable; and the counting principle that follows from all of it.'
     )
     ),
     "key": [
@@ -53,8 +49,7 @@ COURSE = {
     ],
     "syllabus_intro": (
         (
-        "The lessons cover sets, relations, functions, cardinality, and the pigeonhole "
-        "principle."
+        'Lessons 1 to 5 concern sets, 6 to 9 relations, 10 to 12 functions, and 13 and 14 the counting consequences that Combinatorics and Counting builds on.'
     )
     ),
     "how_to": [

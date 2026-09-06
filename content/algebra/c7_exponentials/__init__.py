@@ -11,8 +11,7 @@ COURSE = {
     ),
     "blurb": (
         (
-        "Model constant-ratio growth and decay with exponential functions. Define logarithms "
-        "as inverses, apply their laws, solve equations, and interpret logarithmic scales."
+        'The variable moves into the exponent, and ordinary algebra stops working. A logarithm is the tool that brings it back down &mdash; defined as an inverse, with three laws that are the exponent laws read backwards.'
     )
     ),
     "key": [
@@ -62,8 +61,7 @@ COURSE = {
     ],
     "footer_lead": (
         (
-        "The labs identify rounded exponential and logarithmic values. Domain conditions and "
-        "symbolic laws are checked separately from those decimal approximations."
+        'Exponential and logarithmic values can be irrational, so these labs show rounded decimals &mdash; and they say where they rounded. The exact statements, the laws and the domains, are computed exactly and the rounding never enters them.'
     )
     ),
     "lessons": part_a.LESSONS + part_b.LESSONS,

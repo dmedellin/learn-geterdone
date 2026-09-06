@@ -14,8 +14,7 @@ COURSE = {
     ),
     "blurb": (
         (
-        "Use recurrences, counting, and graphs to analyze running time, compare algorithm "
-        "designs, and distinguish tractable, intractable, and undecidable problems."
+        'Recurrences from Induction and Recursion, counting from Combinatorics and Counting and graphs from Graphs and Trees all reappear as the running time of something &mdash; and the last two lessons say what no algorithm can do.'
     )
     ),
     "key": [

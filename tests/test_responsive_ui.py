@@ -25,42 +25,129 @@ def ancestry(doc, node):
     return tuple((n["tag"], tuple(sorted(n["attrs"].items()))) for n in chain)
 
 
-def matches(selector, chain):
-    """Compound tag/class/id/attribute selectors and descendant/child relations.
+def split_selector(value, relations=False):
+    """Split only at the top level, respecting functions and attribute strings."""
+    parts, buf, depth, bracket, quote = [], [], 0, 0, None
+    for char in value:
+        if quote:
+            buf.append(char)
+            if char == quote:
+                quote = None
+            continue
+        if char in "\"'":
+            quote = char
+        elif char == "[":
+            bracket += 1
+        elif char == "]":
+            bracket -= 1
+        elif not bracket and char == "(":
+            depth += 1
+        elif not bracket and char == ")":
+            depth -= 1
+        if not depth and not bracket and not quote and (
+                (relations and (char.isspace() or char == ">")) or (not relations and char == ",")):
+            if "".join(buf).strip():
+                parts.append("".join(buf).strip())
+            buf = []
+            if char == ">":
+                parts.append(char)
+        else:
+            buf.append(char)
+    if depth or bracket or quote:
+        raise AssertionError("unbalanced selector: " + value)
+    if "".join(buf).strip():
+        parts.append("".join(buf).strip())
+    return parts
 
-    Interactive pseudo states and pseudo elements are outside this resting-state
-    contract. They cannot contribute declarations to the real element here.
+
+@functools.lru_cache(maxsize=4096)
+def selector_tree(selector):
+    """Supported static selector AST; unsupported pseudo states exclude a rule.
+
+    Excluding the whole selector also prevents :not(:hover) from spuriously
+    matching when hover is outside this contract's state model.
     """
-    parts = selector.replace(">", " > ").split()
+    result = []
+    for part in split_selector(selector, relations=True):
+        if part == ">":
+            result.append(part)
+            continue
+        tokens, i = [], 0
+        while i < len(part):
+            simple = re.match(r'\[[\w-]+(?:=(?:"[^"]*"|\'[^\']*\'|[\w-]+))?\]|[.#][\w-]+|[\w-]+|\*', part[i:])
+            if simple:
+                tokens.append(simple[0]); i += len(simple[0]); continue
+            function = re.match(r':(is|where|not)\(', part[i:])
+            if not function:
+                return None
+            start = i + len(function[0]); j, depth, quote, bracket = start, 1, None, 0
+            while j < len(part) and depth:
+                c = part[j]
+                if quote:
+                    if c == quote: quote = None
+                elif c in "\"'": quote = c
+                elif c == "[": bracket += 1
+                elif c == "]": bracket -= 1
+                elif not bracket and c == "(": depth += 1
+                elif not bracket and c == ")": depth -= 1
+                j += 1
+            if depth:
+                raise AssertionError("unbalanced functional selector: " + part)
+            arguments = tuple(selector_tree(arg) for arg in split_selector(part[start:j-1]))
+            if not arguments or any(arg is None for arg in arguments):
+                return None
+            tokens.append((function[1], arguments)); i = j
+        if not tokens:
+            return None
+        result.append(tuple(tokens))
+    return tuple(result)
 
-    def compound(part, node):
-        tag, attrs = node[0], dict(node[1])
-        tokens = re.findall(r'\[[\w-]+(?:=["\'][^"\']*["\'])?\]|[.#][\w-]+|[\w-]+|\*', part)
-        if "".join(tokens) != part:
-            return False
+
+def tree_specificity(tree):
+    total = [0, 0, 0, 0]
+    for part in tree:
+        if part == ">": continue
+        for token in part:
+            if isinstance(token, tuple):
+                name, args = token
+                score = (0, 0, 0, 0) if name == "where" else max(tree_specificity(arg) for arg in args)
+                total = [a+b for a, b in zip(total, score)]
+            elif token.startswith("#"): total[1] += 1
+            elif token.startswith((".", "[")): total[2] += 1
+            elif token != "*": total[3] += 1
+    return tuple(total)
+
+
+def tree_matches(tree, chain):
+    def compound(tokens, at):
+        tag, attrs = chain[at][0], dict(chain[at][1])
         for token in tokens:
-            if token.startswith(".") and token[1:] not in attrs.get("class", "").split():
-                return False
-            if token.startswith("#") and token[1:] != attrs.get("id"):
-                return False
-            if token.startswith("["):
+            if isinstance(token, tuple):
+                name, args = token
+                found = any(tree_matches(arg, chain[:at+1]) for arg in args)
+                if found == (name == "not"): return False
+            elif token.startswith("."):
+                if token[1:] not in attrs.get("class", "").split(): return False
+            elif token.startswith("#"):
+                if token[1:] != attrs.get("id"): return False
+            elif token.startswith("["):
                 key, sep, value = token[1:-1].partition("=")
-                if key not in attrs or (sep and attrs[key] != value.strip('"\'')):
-                    return False
-            if token[0] not in ".#[*" and token != tag:
+                if key not in attrs or (sep and attrs[key] != value.strip('"\'')): return False
+            elif token != "*" and token != tag:
                 return False
-        return bool(tokens)
+        return True
 
     def walk(i, j):
-        if j < 0 or not compound(parts[i], chain[j]):
-            return False
-        if i == 0:
-            return True
-        if parts[i - 1] == ">":
-            return i >= 2 and walk(i - 2, j - 1)
-        return any(walk(i - 1, k) for k in range(j - 1, -1, -1))
+        if j < 0 or tree[i] == ">" or not compound(tree[i], j): return False
+        if i == 0: return True
+        if tree[i-1] == ">": return i >= 2 and walk(i-2, j-1)
+        return any(walk(i-1, k) for k in range(j-1, -1, -1))
+    return bool(tree) and walk(len(tree)-1, len(chain)-1)
 
-    return bool(parts) and walk(len(parts) - 1, len(chain) - 1)
+
+def matches(selector, chain):
+    tree = selector_tree(selector)
+    return tree is not None and tree_matches(tree, chain)
 
 
 def active(context, viewport, container):
@@ -111,11 +198,9 @@ def effective(css, chain, viewport, container=None):
                     priorities[prop], values[prop] = priority, value
 
     for order, (context, selectors, body) in enumerate(rules(css)):
-        for selector in selectors.split(","):
+        for selector in split_selector(selectors):
             if matches(selector, chain) and active(context, viewport, container):
-                specificity = (0, len(re.findall(r"#[\w-]+", selector)),
-                               len(re.findall(r"\.[\w-]+|\[", selector)),
-                               len(re.findall(r"(?:^|[ >])([a-z][\w-]*)", selector)))
+                specificity = tree_specificity(selector_tree(selector))
                 apply(body, specificity, order)
     apply(dict(chain[-1][1]).get("style", ""), (1, 0, 0, 0), len(rules(css)))
     return values

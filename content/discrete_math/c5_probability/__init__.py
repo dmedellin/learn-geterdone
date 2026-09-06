@@ -13,9 +13,7 @@ COURSE = {
     ),
     "blurb": (
         (
-        "For equally likely finite outcomes, probability is a ratio of counts. Conditioning "
-        "and independence depend on defining events and the conditioned sample space "
-        "correctly."
+        'Counting with a denominator. For equally likely finite outcomes, probability is a ratio of counts, so the techniques of Combinatorics and Counting do much of the work. Conditioning and independence can go wrong for reasons that have nothing to do with arithmetic.'
     )
     ),
     "key": [

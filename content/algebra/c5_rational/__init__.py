@@ -11,9 +11,7 @@ COURSE = {
     ),
     "blurb": (
         (
-        "Find domain restrictions before simplifying rational and radical expressions. Solve "
-        "equations, check extraneous candidates, and identify holes and asymptotes from "
-        "factored form."
+        'What happens when a variable lands in a denominator or under a root. Both put values out of bounds, both create solutions that are not solutions, and both need the domain written down before the algebra starts.'
     )
     ),
     "key": [

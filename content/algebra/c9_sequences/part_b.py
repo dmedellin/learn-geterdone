@@ -1322,6 +1322,6 @@ LESSONS = [
                      "plainly when no such term exists. Getting `C(n,k)` from a row of "
                      "the triangle or from the factorial formula, and the sign from "
                      "`(-1)ᵏ`, should be routine by now."),
-        "note": "The course treats sequences as functions on the positive integers, finite sums, convergence of partial sums, and binomial coefficients as counts. Derive each closed form, check its conditions before applying it, and state what a check establishes and what it does not.",
+        "note": 'A sequence is a function on the positive integers, and a series sums its terms. An infinite sum needs a limit of partial sums before it can mean anything; a binomial coefficient is a count. The three habits worth keeping are: derive the closed form rather than reciting it, check the condition before applying the formula, and say exactly what a check has established and what it has not.',
     },
 ]

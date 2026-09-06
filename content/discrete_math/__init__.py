@@ -39,10 +39,10 @@ PATH = {
     "level": "Beginner → Advanced",
     "level_note": "no calculus required",
     "tagline": (
-        "Logic, proof, sets, relations, functions, induction, counting, discrete probability, number theory, graphs, and algorithm analysis."
+        'The mathematics of things you can count, list and check: statements that are true or false, sets and the relations between them, proof by induction, counting without enumerating, probability over finite outcomes, the arithmetic of remainders, graphs, and the analysis of the algorithms that run on all of it. Eight courses and 106 lessons are available.'
     ),
     "description": (
-        "Discrete Mathematics courses with definitions, proofs, worked examples, practice questions, and interactive tools for logic, counting, number theory, graphs, and algorithms."
+        'The Discrete Mathematics Subject offers eight courses covering propositional logic and proof, sets, relations and functions, induction and recursion, combinatorics, discrete probability, number theory and cryptography, graphs and trees, and the analysis of algorithms. All eight courses and 106 lessons are available. Every lesson is one self-contained page whose figures are computed in your browser.'
     ),
     "key": [
         "∀n ∈ ℕ.  P(n)          proved by induction, not by checking",
@@ -53,18 +53,10 @@ PATH = {
         "T(n) = 2T(n/2) + n  ⟹  T(n) = Θ(n log n)",
     ],
     "sequence_intro": (
-        "Choose a course by topic. Each course lists recommended background and its lessons."
+        'Induction and Recursion proves things about the sets described in Sets, Relations, and Functions. Discrete Probability uses the outcome-counting techniques of Combinatorics and Counting. Algorithms and Complexity analyses structures described in Graphs and Trees.'
     ),
-    "why_order": [
-    "Logic and proof provide methods for stating and checking mathematical arguments. Sets, relations, and functions describe the objects those arguments concern.",
-    "Induction and recursion connect definitions, proofs, and algorithms. Counting supports discrete probability; divisibility and modular arithmetic support number theory.",
-    "Graphs represent relationships and support traversal, optimization, and structural analysis. Algorithm analysis uses counting, recurrences, and proofs to study running time and correctness."
-],
-    "prerequisites": [
-    "School algebra, including rearranging equations and working with exponents, is useful.",
-    "Logic and Proof introduces the logical notation and proof techniques used across these courses. Individual courses list more specific recommended background.",
-    "No calculus or programming is required to use the interactive tools."
-],
+    "why_order": ['Logic provides the precision needed to state a claim as true or false. A reader who has not settled what `∀x ∃y P(x, y)` means can silently misread theorems throughout these courses.', 'Sets, relations and functions provide the vocabulary. Equivalence relations, bijections and partial orders recur across these courses; their definitions are developed in Sets, Relations, and Functions.', 'Induction is a proof technique used throughout this Subject. Counting arguments, recurrence solutions, graph theorems and algorithm correctness are all induction wearing different clothes.', 'Counting, probability and number theory apply that machinery to three specific worlds, and graphs give it an object to act on. Algorithms and Complexity uses recurrences from Induction and Recursion, counting from Combinatorics and Counting, and graphs from Graphs and Trees.'],
+    "prerequisites": ['School algebra, and nothing beyond it. You need to be comfortable rearranging an equation, working with exponents, and reading summation notation &mdash; the lessons that use `Σ` explain it where it appears.', 'No calculus. Nothing in this Subject takes a limit, a derivative or an integral. Where a growth rate is compared to another, it is compared by an explicit constant and threshold rather than by a limit.', 'No programming. Algorithms and Complexity reads pseudocode and Number Theory and Cryptography walks through algorithms step by step, but nothing asks you to write or run code. The labs execute in your browser so that you can watch an algorithm rather than implement it.', 'Patience with definitions. The single largest difficulty in this subject is that its words are used precisely: <em>or</em> is inclusive, <em>some</em> means at least one, and a <em>graph</em> is not a plot. Every one of those is stated where it first matters.'],
     # The hazard of learning THIS subject from interactive examples: a widget
     # that checks a claim for n = 1..40 has demonstrated nothing about n = 41,
     # and course 3 is about exactly that.
@@ -73,7 +65,7 @@ PATH = {
         "and a worked example is not a proof."
     ),
     "footer_lead": (
-        "Discrete Mathematics definitions, proofs, examples, and interactive calculations."
+        '<strong>Educational course material.</strong> Every figure in this Subject is computed in your browser from the definition the lesson states &mdash; the counting is done in exact integer arithmetic and the probabilities as exact fractions, so the numbers are not approximations. What the labs cannot do is prove anything: checking a statement for the cases on screen is evidence about those cases and nothing more, which is the subject of Induction and Recursion.'
     ),
     "courses": COURSES,
 }

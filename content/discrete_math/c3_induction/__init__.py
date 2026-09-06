@@ -14,9 +14,7 @@ COURSE = {
     ),
     "blurb": (
         (
-        "Checking examples can test a claim but cannot prove it for every natural number. "
-        "Induction combines a base case with an inductive step; related recursive methods "
-        "apply to definitions, data, algorithms, and recurrences."
+        'Checking cases is not proving, as Logic and Proof explains. Establish a base case and prove `P(k) → P(k+1)` once, and the claim holds for every natural number from that base onward, including those you could never check. The same idea applies to definitions, data, algorithms and recurrences.'
     )
     ),
     "key": [

@@ -11,9 +11,7 @@ COURSE = {
     ),
     "blurb": (
         (
-        "Solve quadratics by factoring, square roots, completing the square, and the "
-        "quadratic formula. Use the discriminant to classify real and complex roots and "
-        "connect vertex form to a parabola."
+        'One equation shape, four solution methods, and a number system that has to be extended so that every one of them always finishes. Completing the square is the centre of the course: it derives the formula and it puts a parabola in vertex form.'
     )
     ),
     "key": [

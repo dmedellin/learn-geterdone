@@ -100,7 +100,7 @@ LESSONS = [
                   "every pair by a chord with no three chords meeting at a point, and "
                   "count the regions the disc is cut into. For `n = 1` through `5` the "
                   "counts are `1, 2, 4, 8, 16`. For `n = 6` the count is `31`."),
-            ("p", "So a formula that matches the first five terms of a recursion is a candidate, not a fact. Establishing that it matches for every `n` requires mathematical induction, which is covered in Induction and Recursion under Discrete Mathematics. Within this course, say \"this formula agrees with the first six terms\" and mean exactly that."),
+            ("p", 'So a formula that matches the first five terms of a recursion is a candidate, not a fact. Establishing that it matches for every `n` requires mathematical induction, which these Algebra courses do not cover: it is the subject of Induction and Recursion under Discrete Mathematics. Within this course, say "this formula agrees with the first six terms" and mean exactly that.'),
         ],
         "lab": ("sequence", {
             "mode": "define",
@@ -158,7 +158,7 @@ LESSONS = [
                 "The `n = 6` line is the only one doing real work. The first two use "
                 "terms the guess was built from; the third predicts a term first and "
                 "then checks it, which is the only kind of test that can fail.",
-                "It still is not a proof. What would settle it is the argument that assumes `aₖ = 2ᵏ⁺¹ - 1` and shows the recurrence forces `aₖ₊₁ = 2(2ᵏ⁺¹ - 1) + 1 = 2ᵏ⁺² - 1`, so that the formula, once true anywhere, is true for ever after. That is induction, the subject of Induction and Recursion rather than this lesson.",
+                'It still is not a proof. What would settle it is the argument that assumes `aₖ = 2ᵏ⁺¹ - 1` and shows the recurrence forces `aₖ₊₁ = 2(2ᵏ⁺¹ - 1) + 1 = 2ᵏ⁺² - 1`, so that the formula, once true anywhere, is true for ever after. That is induction, the subject of Induction and Recursion under Discrete Mathematics, outside these Algebra courses.',
                 "For a faded conversion, take `b₁ = 2` and `bₙ = 3bₙ₋₁ + 2` for "
                 "`n ≥ 2`. The supplied first move is to compute `b₁ + 1` and "
                 "`b₂ + 1` rather than the terms alone. Generate through `b₅`, propose "

@@ -19,9 +19,7 @@ COURSE = {
     ),
     "blurb": (
         (
-        "Translate statements into propositional and predicate logic, test equivalence, "
-        "negate quantified claims, check inferences, and write proofs that another reader can "
-        "verify."
+        'Make a statement precise enough to be true or false, then establish it. Connectives and truth tables, logical equivalence, quantifiers and the order they come in, valid inference, and direct, contrapositive, contradiction and case proofs written out in full.'
     )
     ),
     "key": [
@@ -30,7 +28,7 @@ COURSE = {
         "¬∀x P(x)  ≡  ∃x ¬P(x)         negation flips the quantifier",
         "p → q   ≡   ¬q → ¬p           contraposition: the basis of a proof method",
     ],
-    "assumes_short": "School algebra",
+    "assumes_short": 'No prior logic',
     "assumes_long": "school algebra is enough",
     "outcomes_intro": (
         "By the end you can read a theorem statement exactly as written, and write a "
@@ -54,24 +52,7 @@ COURSE = {
         "Lessons 1 to 7 are propositional logic, 8 to 10 add quantifiers, and 11 to 14 "
         "turn all of it into proofs."
     ),
-    "how_to": [
-        (
-            "Use truth tables to check equivalences, and distinguish an implication from its "
-            "contrapositive."
-        ),
-        (
-            "Try your own formulas and predicates in the labs. Look for an assignment that "
-            "makes a proposed equivalence false."
-        ),
-        (
-            "Write the practice proofs out. Reading an argument and producing one exercise "
-            "different skills."
-        ),
-        (
-            "The continuity and convergence examples practise reading and negating "
-            "quantifiers; they do not require calculus."
-        )
-    ],
+    "how_to": ['Lesson 5 assumes you can build a truth table; lesson 13 assumes you know what the contrapositive is and why it is equivalent.', 'Use the labs adversarially. Most of them let you type your own formula or edit the predicate. The fastest way to understand a claim is to spend two minutes trying to make it false and finding out you cannot.', 'Write the proofs out. Lesson 11 ends with an argument to check, and lessons 12 to 14 each end with a claim to prove yourself. Reading a proof and producing one are different skills, and only the second transfers to these courses.', 'Do not be put off by the continuity and convergence definitions in lessons 9 and 10. They are there because they are the hardest quantifier strings most people ever meet, and the point of those lessons is that you can read and negate them mechanically without knowing what they mean. Nothing in this Subject needs the calculus.'],
     "not_covered": [
         "Formal proof systems. This course teaches proof as mathematicians write it "
         "&mdash; rigorous prose &mdash; not natural deduction trees, sequent calculus, or "
@@ -84,9 +65,7 @@ COURSE = {
     ],
     "footer_lead": (
         (
-        "Truth tables, equivalences and quantifier evaluations are computed in your browser "
-        "under every assignment. Checking finitely many cases does not prove a claim over an "
-        "infinite domain."
+        'Truth tables, equivalences and quantifier evaluations on this course are computed in your browser by evaluating the formula under every assignment, so a column is right because the evaluation is right. Verifying a statement on the cases shown is not a proof of it &mdash; lesson 14 and Induction and Recursion are about exactly that gap.'
     )
     ),
     "lessons": part_a.LESSONS + part_b.LESSONS,

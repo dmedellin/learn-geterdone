@@ -13,9 +13,7 @@ COURSE = {
     ),
     "blurb": (
         (
-        "Solve systems by substitution and elimination, then represent the same operations "
-        "with matrices. Classify solution sets, compute determinants and inverses, and "
-        "optimize a linear objective."
+        'Solve for several unknowns together, then find the notation that removes the bookkeeping. A matrix is elimination with the letters deleted, so hand elimination explains the row notation used in this course.'
     )
     ),
     "key": [

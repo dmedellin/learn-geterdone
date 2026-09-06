@@ -2860,35 +2860,31 @@ class TestPathPage(SiteFixture):
                 )
 
     def test_subject_catalog_preserves_authored_display_order(self):
+        from test_course_ui import Elements, words
+
+        def descendants(node):
+            yield node
+            for child in node['children']:
+                yield from descendants(child)
+
         for subject, page, courses, total, upcoming in PATHS:
-            doc = self.path_document(page)
-            copy = visible_text(doc.text)
-            names = [title for title, _home, _slugs in courses] + [
-                title for _n, title in upcoming
-            ]
+            doc = Elements(self.path_document(page).text)
+            catalogs = doc.find(**{'data-ui': 'course-list'})
             with self.subTest(path=subject):
-                self.assertEqual(
-                    total, len(names), "the %s path is %d courses long" % (page, total)
-                )
-            positions = []
-            for name in names:
-                index = copy.find(name)
-                with self.subTest(path=subject, course=name):
-                    self.assertNotEqual(
-                        -1,
-                        index,
-                        "%s names no course %r. A path page lists every course on "
-                        "its path, in order, and all of them are published."
-                        % (page, name),
-                    )
-                positions.append(index)
-            with self.subTest(path=subject):
-                self.assertEqual(
-                    sorted(positions),
-                    positions,
-                    "the courses are listed out of order: %s"
-                    % list(zip(names, positions)),
-                )
+                self.assertEqual(1, len(catalogs), 'catalog region must be unique')
+                cards = [n for n in descendants(catalogs[0]) if 'data-course' in n['attrs']]
+                self.assertEqual(total, len(cards), 'catalog must contain every course exactly once')
+                expected = [home.strip('/') for _title, home, _lessons in courses]
+                self.assertEqual(expected, [n['attrs']['data-course'] for n in cards],
+                                 'catalog cards must preserve authored display order')
+                for card, (title, home, _lessons) in zip(cards, courses):
+                    nodes = list(descendants(card))
+                    headings = [n for n in nodes if n['tag'] in ('strong', 'h3')]
+                    self.assertTrue(headings, 'catalog card needs a visible course heading')
+                    self.assertEqual(title, words(headings[0]), 'catalog card title must name its course')
+                    links = [urllib.parse.urljoin(page, n['attrs']['href']) for n in nodes
+                             if n['tag'] == 'a' and 'href' in n['attrs']]
+                    self.assertEqual([home], links, 'catalog card must link to its own course')
 
     def test_every_course_on_the_path_page_is_a_link(self):
         """No entry on the path page is inert any more.

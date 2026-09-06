@@ -13,9 +13,7 @@ COURSE = {
     ),
     "blurb": (
         (
-        "Represent sequences recursively and explicitly, use sigma notation, calculate "
-        "arithmetic and geometric sums, and apply geometric series to decimals and payments. "
-        "Construct binomial expansions using Pascal's triangle."
+        "A sequence is a function whose input is a position. Arithmetic and geometric families make that idea calculable: both have closed forms for a term and a finite sum, some geometric sums have a limit, and the same indexed notation leads to Pascal's triangle and binomial expansion."
     )
     ),
     "key": [

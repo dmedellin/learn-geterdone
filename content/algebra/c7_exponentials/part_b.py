@@ -1392,6 +1392,6 @@ LESSONS = [
                      "`10^((S₂ − S₁)/k)` as a factor on the quantity. If the answer "
                      "comes out carrying the units of the scale, the conversion has not "
                      "been done."),
-        "note": "Each reading on these scales is an exponent, and the manipulations use the three logarithm laws. Sequences and Series studies sequences with a constant ratio between successive terms.",
+        "note": "Each reading on these scales is an exponent: Lesson 4's definition doing ordinary work. Every legal manipulation is one of the three laws of Lesson 6 read in the other direction. Sequences and Series studies sequences with a constant ratio between successive terms.",
     },
 ]

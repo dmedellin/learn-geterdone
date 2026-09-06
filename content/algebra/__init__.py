@@ -41,10 +41,10 @@ PATH = {
     "level": "Beginner → Advanced",
     "level_note": "arithmetic with fractions and negative numbers",
     "tagline": (
-        "Expressions, equations, functions, polynomials, rational and radical expressions, quadratics, complex numbers, exponentials, logarithms, systems, matrices, sequences, and series."
+        'The language the rest of mathematics is written in: expressions and the rules for rearranging them, equations and what it means to solve one, functions and their graphs, polynomials and factoring, quadratics and the complex numbers they force into existence, exponentials and logarithms, and systems solved several unknowns at a time, and the sums of ordered lists. Nine courses and 112 lessons are available.'
     ),
     "description": (
-        "Algebra courses with explanations, worked examples, practice questions, and interactive tools for expressions, equations, functions, systems, matrices, sequences, and series."
+        'The Algebra Subject offers nine courses covering the real numbers and the properties that license every rearrangement, linear equations and inequalities, lines and functions, polynomials and factoring, rational and radical expressions, quadratics and complex numbers, exponentials and logarithms, systems and matrices, and sequences and series. All nine courses and 112 lessons are available. Every lesson is one self-contained page whose figures are computed in your browser.'
     ),
     "key": [
         "a(b + c) = ab + ac              the law behind almost every rearrangement",
@@ -54,18 +54,10 @@ PATH = {
         "aₙ = a₁r^(n−1)                  Sₙ = a₁(1 − rⁿ)/(1 − r)",
     ],
     "sequence_intro": (
-        "Choose a course by topic. Each course lists recommended background and its lessons."
+        'Polynomials and Factoring factors the expressions that Foundations of Algebra teaches you to build. Rational and Radical Expressions relies on factoring; Quadratics and Complex Numbers uses both expression manipulation and factoring. Systems and Matrices combines those algebraic skills with exact fraction arithmetic.'
     ),
-    "why_order": [
-    "Expressions and equations describe quantities and relationships. Function notation and graphs connect those relationships to their inputs and outputs.",
-    "Factoring supports rational expressions, quadratics, and polynomial graphs. Exponentials and logarithms describe constant-ratio change and its inverse.",
-    "Systems and matrices describe simultaneous constraints. Sequences and series describe indexed terms and their sums."
-],
-    "prerequisites": [
-    "Arithmetic with fractions and negative numbers is useful throughout these courses.",
-    "Foundations of Algebra introduces variables and algebraic notation. Individual courses list more specific recommended background.",
-    "The interactive tools require no programming. Calculus and trigonometry are not required."
-],
+    "why_order": ['Algebra is arithmetic with the numbers withheld, and every rearrangement is one of a small set of properties applied to an expression. A reader who cannot say why `-(x - 3)` is `-x + 3` can repeat that error throughout these courses without knowing they made it.', 'Solving is a mechanical skill built on the properties; a function is an idea, and it is far easier to understand once you can manipulate the formula that defines one. Linear Equations and Inequalities supplies that solving background for Lines, Functions and Graphs.', 'Factoring is a bottleneck: rational expressions, quadratics, and polynomial graphs are stated in terms of factors, and none of those techniques applies to a sum. Polynomials and Factoring provides practice in producing and checking those factors.', 'A logarithm is an inverse function, and inverse functions are covered in Lines, Functions and Graphs. Row reduction in Systems and Matrices is elimination performed on exact fractions; fluency in both makes the notation readable.'],
+    "prerequisites": ['Arithmetic, and specifically arithmetic with fractions and negative numbers. If `-3 - (-5)` and `2/3 ÷ 4/9` are not automatic, those calculations are useful background &mdash; every course here runs on them, and Systems and Matrices runs on them for pages at a time.', 'No prior algebra. Foundations of Algebra starts from what a variable is. If you have met some of this before, the labs are still worth opening: they show the step list, and a wrong step list survives a lot of correct answers.', 'No calculus, and none is used. Quadratics and Complex Numbers finds a maximum with the vertex of a parabola rather than a derivative, which is the honest algebraic method and not a workaround.', 'No programming. Nothing here asks you to write code. The labs run so that you can change a coefficient and watch what moves, which is the one thing a printed page cannot do.'],
     # The hazard of learning THIS subject from interactive examples is not the
     # same one. Algebra's characteristic error is the invented law -- cancelling
     # a term rather than a factor, log(M + N), (a + b)^2 = a^2 + b^2 -- and each
@@ -76,7 +68,7 @@ PATH = {
         "and a step that gives the right answer here is not thereby a valid rule."
     ),
     "footer_lead": (
-        "Algebra explanations, worked examples, practice questions, and interactive calculations."
+        '<strong>Educational course material.</strong> Every figure in this Subject is computed in your browser from the definition the lesson states, and the arithmetic is exact &mdash; coefficients, solutions and steps are carried as fractions, so `1/3` is `1/3` after twenty operations rather than `0.333`. Curves are drawn by evaluating the function, never from a stored shape. Where a quantity is genuinely irrational the lab says where it rounded.'
     ),
     "courses": COURSES,
 }

@@ -1429,7 +1429,7 @@ LESSONS = [
         "module": "Complex numbers",
         "one_line": "Convert negative square roots to i and identify both parts of a complex number.",
         "summary": (
-            "`x² = -1` has no real solution, so a number `i` with `i² = -1` is defined and joined to the reals. A complex number is `a + bi` with `a` and `b` real; every real number is one of them, and the system is built so that all the algebra of real-number algebra keeps working unchanged."
+            '`x² = -1` has no real solution, so a number `i` with `i² = -1` is defined and joined to the reals. A complex number is `a + bi` with `a` and `b` real; every real number is one of them, and the system is built so that all the algebraic properties of real numbers keep working unchanged.'
         ),
         "key": [
             "i² = -1                      the defining property",

@@ -345,7 +345,7 @@ LESSONS = [
             ("Counting \"at least one\" directly",
              "It produces overlapping cases. `1 − P(none)` cannot double-count."),
             ("Confusing certainty with high probability",
-             "367 people guarantee a shared birthday; 23 make it likely. the pigeonhole result from Sets, Relations, and Functions and this lesson answer different questions."),
+             '367 people guarantee a shared birthday; 23 make it likely. The pigeonhole result from Sets, Relations, and Functions and this lesson answer different questions.'),
         ],
         "standard": ("Finish when you check your answer against a complementary count.",
                      "Compute the probability that a five-card hand contains at least one "

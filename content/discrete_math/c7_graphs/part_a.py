@@ -70,7 +70,7 @@ LESSONS = [
                   "obstructions to drawing a graph in the plane without crossings."),
             ("h3", "Four models"),
             ("ul", [
-                "<strong>Social networks.</strong> Vertices are people, edges are acquaintance. the pigeonhole result from Sets, Relations, and Functions &mdash; two people share a degree &mdash; is a statement about this graph.",
+                '<strong>Social networks.</strong> Vertices are people, edges are acquaintance. The pigeonhole result from Sets, Relations, and Functions &mdash; two people share a degree &mdash; is a statement about this graph.',
                 "<strong>Road networks.</strong> Vertices are junctions, edges are roads, "
                 "weights are distances. Shortest paths are lesson 9.",
                 "<strong>Dependencies.</strong> Vertices are tasks, directed edges are \"must precede\". A valid schedule exists exactly when there is no cycle, which is the partial-order structure from Sets, Relations, and Functions again.",

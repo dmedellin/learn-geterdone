@@ -14,9 +14,7 @@ COURSE = {
     ),
     "blurb": (
         (
-        "Choose a counting method by deciding whether order matters and whether repetition is "
-        "allowed, then handle restrictions, over-counting, generating functions, and "
-        "double-counting proofs."
+        'How many? The two basic rules, the four ways to choose `r` from `n`, what changes when repetition is allowed, how to correct an over-count, and the double-counting arguments that prove identities without algebra.'
     )
     ),
     "key": [

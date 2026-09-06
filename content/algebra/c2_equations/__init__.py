@@ -14,8 +14,7 @@ COURSE = {
     ),
     "blurb": (
         (
-        "Solve linear equations and inequalities, rearrange formulas, distinguish identities "
-        "from contradictions, and write exact solution sets in interval notation."
+        'Find the value that makes a statement true &mdash; and know why each move you made kept it true. Linear equations, literal formulas, inequalities, compound and absolute value statements, and the notation for writing a solution set down.'
     )
     ),
     "key": [
@@ -43,14 +42,7 @@ COURSE = {
     "syllabus_intro": (
         "Lessons 1 to 6 are equations, 7 and 8 apply them, and 9 to 13 are inequalities, absolute value and the notation for a solution set."
     ),
-    "how_to": [
-        "After the complete example, cover its answer and do the faded rehearsal before the quiz. The supplied first move is guidance; the remaining moves and the substitution check are yours.",
-        (
-            "Do the fraction lessons without decimals. `x = 7/3` is the answer; `x = 2.333` "
-            "is a rounding of it, and the fraction retains the exact value."
-        ),
-        "In the inequality lessons, test a number from your own answer against the original statement. A reversed sign is invisible in the algebra and obvious in the test.",
-    ],
+    "how_to": ['After the complete example, cover its answer and do the faded rehearsal before the quiz. The supplied first move is guidance; the remaining moves and the substitution check are yours.', 'Do the fraction lessons without decimals. `x = 7/3` is the answer; `x = 2.333` is a rounding of it, and the fraction retains the exact value.', 'In the inequality lessons, test a number from your own answer against the original statement. A reversed sign is invisible in the algebra and obvious in the test.'],
     "not_covered": [
         (
             "Quadratic and higher equations. `x^2 = 9` waits for Quadratics and Complex "

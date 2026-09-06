@@ -1034,7 +1034,7 @@ LESSONS = [
                 "`log₂(n!) ≈ n log₂ n − 1.44n`, but the crude bound is all the theorem "
                 "needs.)",
             ]),
-            ("p", "This is a genuine impossibility result and it is worth distinguishing from a failure of ingenuity: no comparison sort will ever beat `n log n`, and merge sort therefore achieves the optimum. the permutation count from Combinatorics and Counting and the tree-height bound from Graphs and Trees are both doing work in the proof."),
+            ("p", 'This is a genuine impossibility result and it is worth distinguishing from a failure of ingenuity: no comparison sort will ever beat `n log n`, and merge sort therefore achieves the optimum. The permutation count from Combinatorics and Counting and the tree-height bound from Graphs and Trees are both doing work in the proof.'),
             ("p", "Sorts that beat the bound exist and they do not compare. Counting sort "
                   "and radix sort use the values themselves as indices and run in `Θ(n)` "
                   "under assumptions about the key range. They do not contradict the "

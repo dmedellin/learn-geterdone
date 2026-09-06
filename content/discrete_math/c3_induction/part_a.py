@@ -993,7 +993,7 @@ LESSONS = [
                          "else is in `E`. That last sentence is not optional &mdash; "
                          "without it the definition permits any superset.")),
             ("example", ("Well-formed parenthesis strings",
-                         "BASE: the empty string is well formed. RECURSIVE: if `s` is well formed then so is `(s)`, and if `s` and `t` are well formed then so is `st`. This generates `()`, `(())`, `()()`, `(()())` and nothing else. The Catalan numbers count them, but they are outside this lesson's scope.")),
+                         'BASE: the empty string is well formed. RECURSIVE: if `s` is well formed then so is `(s)`, and if `s` and `t` are well formed then so is `st`. This generates `()`, `(())`, `()()`, `(()())` and nothing else. The Catalan numbers count them, but they are outside these Discrete Mathematics courses.')),
             ("h3", "Recursively defined structures"),
             ("example", ("Binary trees",
                          "BASE: the empty tree is a binary tree. RECURSIVE: if `L` and `R` are binary trees and `v` is a value, then the tree with root `v`, left subtree `L` and right subtree `R` is a binary tree. Graphs and Trees lesson 11 traverses exactly this object.")),

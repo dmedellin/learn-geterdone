@@ -1165,7 +1165,7 @@ LESSONS = [
                      "For a graph of your own, find the largest complete subgraph you can "
                      "and run greedy. If the two numbers meet you have `χ` exactly; if not, "
                      "you have located the difficulty."),
-        "note": "Register allocation in compilers is graph colouring on a graph with thousands of vertices, solved by heuristics because the exact problem is NP-hard. It is an application of graph theory.",
+        "note": 'Register allocation in compilers is graph colouring on a graph with thousands of vertices, solved by heuristics because the exact problem is NP-hard. It is one of the most economically significant applications of graph theory.',
     },
     # ---------------------------------------------------------------- 14
     {

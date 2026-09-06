@@ -37,8 +37,7 @@ COURSE = {
     ),
     "blurb": (
         (
-        "Variables represent numbers, named properties justify rearrangements, and exponent "
-        "and radical rules preserve the meaning of an expression."
+        'Arithmetic, made general. Why a letter can stand for a number, which rearrangements are always allowed and which only look allowed, and the exponent and radical rules that algebraic manipulation relies on.'
     )
     ),
     "key": [
@@ -51,8 +50,7 @@ COURSE = {
     "assumes_long": "fractions, negatives, and long division",
     "outcomes_intro": (
         (
-        "Evaluate and simplify expressions using the properties of real numbers, exponent "
-        "rules, and radical notation."
+        'Read, evaluate and simplify real-number expressions, with a stated reason for every rearrangement.'
     )
     ),
     "outcomes": [
@@ -73,13 +71,7 @@ COURSE = {
         "cover absolute value, exponents and radicals; lessons 10 to 13 expand, collect, "
         "evaluate and translate expressions."
     ),
-    "how_to": [
-        "Do the arithmetic yourself before you read the answer. Every lab shows its steps, and the steps are worth more than the result &mdash; the result you could have got from a calculator.",
-        "Take the property lessons seriously even if the arithmetic is easy. Lesson 4 is "
-        "the reason `-(x - 3)` is `-x + 3`, and that single sign is the most common error "
-        "in equation-solving and function work.",
-        "When a lab disagrees with you, find which step differs rather than which answer. The step is the thing you will repeat a thousand times.",
-    ],
+    "how_to": ['Do the arithmetic yourself before you read the answer. Every lab shows its steps, and the steps are worth more than the result &mdash; the result you could have got from a calculator.', 'Take the property lessons seriously even if the arithmetic is easy. Lesson 4 is the reason `-(x - 3)` is `-x + 3`, and that single sign is the most common error in equation-solving and function work.', 'When a lab disagrees with you, find which step differs rather than which answer. The step is the thing you will repeat a thousand times.'],
     "not_covered": [
         "Proof of the field axioms. This course states the properties of the real numbers and uses them; constructing the reals from the rationals belongs to analysis.",
         (

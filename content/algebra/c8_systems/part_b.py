@@ -754,6 +754,6 @@ LESSONS = [
                      "point and its value. For an unbounded region, exhibit a feasible "
                      "ray or a global bound instead of citing the bounded theorem. Saying "
                      "\"the maximum is 34\" without saying where is half an answer."),
-        "note": "Each corner in this lesson is a 2 by 2 system, solved by elimination. Sequences and Series studies objects that are ordered lists rather than solution sets.",
+        "note": 'Everything expensive in this lesson was elimination: each corner is a 2 by 2 system, solved exactly as in Lesson 3. Elimination therefore answers an optimisation question about feasible corners. Sequences and Series studies objects that are ordered lists rather than solution sets.',
     },
 ]
