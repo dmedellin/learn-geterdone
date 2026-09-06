@@ -189,6 +189,53 @@ class TestResponsiveUI(unittest.TestCase):
                 self.assertEqual("absolute", label_style.get("position"), route + ": compact mobile label")
         self.assertGreater(count, 360, "masthead sweep must cover every course and lesson family")
 
+    def test_button_like_controls_have_minimum_hit_boxes(self):
+        count = 0
+        for route, doc, css in self.pages('data-page-kind='):
+            if not doc.find("body", **{"data-page-kind": "lesson"}):
+                continue
+            count += 1
+            controls = [n for n in doc.nodes if n["tag"] in ("button", "select", "summary")
+                        or n["attrs"].get("role") == "button"]
+            self.assertTrue(controls, route + ": lesson control sweep must run")
+            chains = {ancestry(doc, node) for node in controls}
+            # Truth tables and graph matrices create button-role cells at runtime.
+            # Exercise their native table display: min-height does not size a cell.
+            body = doc.find("body")[0]
+            cell = ancestry(doc, body) + (("table", ()), ("tbody", ()), ("tr", ()),
+                                         ("td", (("role", "button"),)))
+            for width in (320, 390):
+                for chain in chains | {cell}:
+                    style = effective(css, chain, width)
+                    for axis in ("width", "height"):
+                        size = px(style.get("min-" + axis))
+                        if chain[-1][0] == "td" and axis == "height":
+                            size = px(style.get("height"))
+                        self.assertGreaterEqual(size, 44, route + ": button-like hit box " + axis)
+        self.assertEqual(336, count, "all lessons must enforce control hit boxes")
+
+    def test_lab_grids_respect_their_container(self):
+        capabilities = {"grid-2": 0, "kpi-grid": 0}
+        for route, doc, css in self.pages('data-page-kind="lesson"'):
+            grids = [n for n in doc.nodes if any(c in n["attrs"].get("class", "").split()
+                                                for c in capabilities)]
+            for node in grids:
+                classes = node["attrs"].get("class", "").split()
+                if "kpi-grid" in classes:
+                    kind, minimum = "kpi-grid", 140
+                elif doc.find("table", id="gMatrix"):
+                    kind, minimum = "grid-2", 290
+                else:
+                    continue
+                capabilities[kind] += 1
+                for width in (320, 390, 1024):
+                    style = effective(css, ancestry(doc, node), width)
+                    self.assertEqual(
+                        f"repeat(auto-fit, minmax(min(100%, {minimum}px), 1fr))",
+                        style.get("grid-template-columns"), route + ": lab grid must fit its container")
+        self.assertGreaterEqual(capabilities["grid-2"], 14, "graph matrix grid sweep must run")
+        self.assertGreater(capabilities["kpi-grid"], 100, "lab metric grid sweep must run")
+
     def test_lesson_cards_use_available_width(self):
         count = 0
         for route, doc, css in self.pages('class="course-step"'):

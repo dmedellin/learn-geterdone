@@ -1441,6 +1441,16 @@ textarea { font: inherit; }
     [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
     body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
     body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
     body[data-page-kind] .section { margin-top: 32px; }
     body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
     body[data-page-kind] .section-head { margin-bottom: 18px; }
@@ -1561,7 +1571,8 @@ textarea { font: inherit; }
     <div class="chart-toolbar"><div class="chart-title"><strong id="premiumChartTitle">Call value by stock price</strong><span>Theoretical value before expiration versus intrinsic value at expiration</span></div></div>
     <div class="chart-wrap"><svg id="premiumChart" class="market-chart" aria-label="Option premium components chart"></svg><div class="chart-tooltip"></div></div>
     <div style="padding:0 14px 14px;display:grid;gap:10px;" aria-live="polite">
-      <div class="value-stack"><div class="intrinsic" id="premiumIntrinsicBar" style="width:0%">Intrinsic</div><div class="extrinsic" id="premiumExtrinsicBar" style="width:100%">Extrinsic</div></div>
+      <div class="seg-row" aria-label="Premium components"><span class="legend-item"><i class="legend-dot green" aria-hidden="true"></i>Intrinsic</span><span class="legend-item"><i class="legend-dot purple" aria-hidden="true"></i>Extrinsic</span></div>
+      <div class="value-stack" aria-hidden="true"><div class="intrinsic" id="premiumIntrinsicBar" style="width:0%"></div><div class="extrinsic" id="premiumExtrinsicBar" style="width:100%"></div></div>
       <div class="payoff-summary"><div><span>Theoretical premium</span><strong id="premiumTotal">$1.67</strong></div><div><span>Intrinsic value</span><strong id="premiumIntrinsic">$0.00</strong></div><div><span>Extrinsic value</span><strong id="premiumExtrinsic">$1.67</strong></div><div><span>Expiration value now</span><strong id="premiumExpiry">$0.00</strong></div></div>
     </div>
   </article>
@@ -1734,7 +1745,7 @@ const premiumReading={
 function renderPremium(){
  const S=Math.max(1,num(document.getElementById('premiumStock').value,100)),K=Math.max(1,num(document.getElementById('premiumStrike').value,105)),dte=Math.max(1,num(document.getElementById('premiumDte').value,30)),iv=num(document.getElementById('premiumIv').value,30)/100;setText('premiumIvOut',pct(iv*100,0));
  const m=optionModel({type:premiumType,S,K,dte,iv});const total=Math.max(.0001,m.price),iPct=m.intrinsic/total*100,ePct=m.extrinsic/total*100;setText('premiumTotal',money(m.price));setText('premiumIntrinsic',money(m.intrinsic));setText('premiumExtrinsic',money(m.extrinsic));setText('premiumExpiry',money(m.intrinsic));
- const ib=document.getElementById('premiumIntrinsicBar'),eb=document.getElementById('premiumExtrinsicBar');ib.style.width=`${iPct}%`;eb.style.width=`${ePct}%`;ib.textContent=iPct>14?'Intrinsic':'';eb.textContent=ePct>14?'Extrinsic':'';
+ const ib=document.getElementById('premiumIntrinsicBar'),eb=document.getElementById('premiumExtrinsicBar');ib.style.width=`${iPct}%`;eb.style.width=`${ePct}%`;
  setHTML('premiumStatus',(m.intrinsic>0?`<strong>In-the-money.</strong> ${money(m.intrinsic)} is intrinsic and ${money(m.extrinsic)} is extrinsic in this theoretical estimate.`:`<strong>No intrinsic value.</strong> The theoretical premium of ${money(m.price)} is entirely extrinsic.`)+`<div class="reading-note"><b>What this is normally read as</b>${premiumReading[m.intrinsic>0?'intrinsic':'none']}</div>`);setText('premiumChartTitle',`${premiumType==='call'?'Call':'Put'} value by stock price`);
  const min=Math.max(1,S*.55),max=S*1.45;const theoretical=payoffPoints(x=>optionModel({type:premiumType,S:x,K,dte,iv}).price,min,max),expiry=payoffPoints(x=>optionIntrinsic(premiumType,x,K),min,max);
  drawPayoffChart(document.getElementById('premiumChart'),[{points:theoretical,tone:'cyan'},{points:expiry,tone:'purple',width:2,opacity:.8}],{verticals:[{value:K,label:'Strike',tone:'amber'},{value:S,label:'Current stock',tone:'green'}],decimals:1,xDecimals:0});
