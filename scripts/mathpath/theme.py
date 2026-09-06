@@ -27,13 +27,13 @@ LIGHT_TOKENS = """      color-scheme: light;
       --panel-2: #f3f8fb;
       --panel-3: #eaf2f7;
       --text: #102433;
-      --muted: #586c7c;
+      --muted: #4f6373;
       --line: rgba(24, 62, 88, 0.13);
       --line-strong: rgba(24, 62, 88, 0.24);
-      --cyan: #0e7382;
+      --cyan: #0b6875;
       --cyan-2: #0b6d79;
-      --green: #10784f;
-      --red: #c22a34;
+      --green: #0d6e48;
+      --red: #b9242e;
       --amber: #8a5a06;
       --purple: #6b46d6;
       --blue: #1d5fd0;
@@ -1038,6 +1038,11 @@ UI_CSS = """
     [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
     body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
     body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
     /* Lab controls share the same hit-box floor as the navigation, including
        buttons created after load by quizzes and interactive tables. */
     body[data-page-kind] button, body[data-page-kind] [role="button"],

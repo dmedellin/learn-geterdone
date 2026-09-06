@@ -74,13 +74,13 @@
         --panel-2: #f3f8fb;
         --panel-3: #eaf2f7;
         --text: #102433;
-        --muted: #586c7c;
+        --muted: #4f6373;
         --line: rgba(24, 62, 88, 0.13);
         --line-strong: rgba(24, 62, 88, 0.24);
-        --cyan: #0e7382;
+        --cyan: #0b6875;
         --cyan-2: #0b6d79;
-        --green: #10784f;
-        --red: #c22a34;
+        --green: #0d6e48;
+        --red: #b9242e;
         --amber: #8a5a06;
         --purple: #6b46d6;
         --blue: #1d5fd0;
@@ -100,13 +100,13 @@
       --panel-2: #f3f8fb;
       --panel-3: #eaf2f7;
       --text: #102433;
-      --muted: #586c7c;
+      --muted: #4f6373;
       --line: rgba(24, 62, 88, 0.13);
       --line-strong: rgba(24, 62, 88, 0.24);
-      --cyan: #0e7382;
+      --cyan: #0b6875;
       --cyan-2: #0b6d79;
-      --green: #10784f;
-      --red: #c22a34;
+      --green: #0d6e48;
+      --red: #b9242e;
       --amber: #8a5a06;
       --purple: #6b46d6;
       --blue: #1d5fd0;
@@ -1138,6 +1138,11 @@
     [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
     body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
     body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
     /* Lab controls share the same hit-box floor as the navigation, including
        buttons created after load by quizzes and interactive tables. */
     body[data-page-kind] button, body[data-page-kind] [role="button"],
@@ -1263,7 +1268,7 @@
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock">n = pq,  φ(n) = (p−1)(q−1),  gcd(e, φ(n)) = 1,  d = e⁻¹ mod φ(n)
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">n = pq,  φ(n) = (p−1)(q−1),  gcd(e, φ(n)) = 1,  d = e⁻¹ mod φ(n)
 PUBLIC  (n, e)      PRIVATE  (d, and p, q)
 encrypt  c = m^e mod n        decrypt  m = c^d mod n
 security: factoring n is believed hard. It is not proved.</div>
@@ -1276,14 +1281,14 @@ security: factoring n is believed hard. It is not proved.</div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>RSA</h2></div><p>Key generation, the correctness proof, the attacks, and the honest caveats.</p></div>
-      <article class="card card-pad prose"><h3>Key generation</h3><div class="mathblock">1.  choose two large distinct primes  p, q
+      <article class="card card-pad prose"><h3>Key generation</h3><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">1.  choose two large distinct primes  p, q
 2.  n = p·q
 3.  φ(n) = (p−1)(q−1)
 4.  choose e with 1 &lt; e &lt; φ(n) and gcd(e, φ(n)) = 1
 5.  compute d = e⁻¹ mod φ(n)          extended Euclid
 
     PUBLIC KEY   (n, e)
-    PRIVATE KEY  (n, d)      and p, q, φ(n) must stay secret</div><p>Every step is a lesson from this course: primality testing from lesson 11, the totient formula from lesson 11, coprimality from lesson 4, and the modular inverse from lesson 6.</p><h3>Encryption and decryption</h3><p>With the message encoded as an integer <span class="math">m</span> with <span class="math">0 ≤ m &lt; n</span>, encryption is <span class="math">c = m^e mod n</span> and decryption is <span class="math">m = c^d mod n</span>. Both are single modular exponentiations, computed by lesson 8's algorithm.</p><div class="thm"><span class="label">Theorem &middot; Correctness</span><p>For <span class="math">0 ≤ m &lt; n</span>, <span class="math">(m^e)^d ≡ m (mod n)</span>.</p></div><div class="proof"><p><span class="math">ed ≡ 1 (mod φ(n))</span> means <span class="math">ed = 1 + kφ(n)</span> for some integer <span class="math">k</span>, so <span class="math">m^{ed} = m · (m^{φ(n)})^k</span>.</p><p>If <span class="math">gcd(m, n) = 1</span>, Euler's theorem gives <span class="math">m^{φ(n)} ≡ 1 (mod n)</span>, so <span class="math">m^{ed} ≡ m</span>.</p><p>If <span class="math">gcd(m, n) ≠ 1</span> the argument still works via the Chinese remainder theorem: modulo <span class="math">p</span>, either <span class="math">p | m</span> and both sides are 0, or Fermat gives <span class="math">m^{p−1} ≡ 1</span> and <span class="math">m^{ed} ≡ m</span>. The same holds modulo <span class="math">q</span>, and since <span class="math">p</span> and <span class="math">q</span> are coprime the congruence holds modulo <span class="math">n</span>.</p><p><span class="qed">&#9633;</span></p></div><p>Four of this course's theorems appear in that proof. RSA is not an application of number theory so much as an assembly of it.</p><h3>The standard example</h3><div class="mathblock">p = 61,  q = 53        n = 3233        φ(n) = 60 · 52 = 3120
+    PRIVATE KEY  (n, d)      and p, q, φ(n) must stay secret</div><p>Every step is a lesson from this course: primality testing from lesson 11, the totient formula from lesson 11, coprimality from lesson 4, and the modular inverse from lesson 6.</p><h3>Encryption and decryption</h3><p>With the message encoded as an integer <span class="math">m</span> with <span class="math">0 ≤ m &lt; n</span>, encryption is <span class="math">c = m^e mod n</span> and decryption is <span class="math">m = c^d mod n</span>. Both are single modular exponentiations, computed by lesson 8's algorithm.</p><div class="thm"><span class="label">Theorem &middot; Correctness</span><p>For <span class="math">0 ≤ m &lt; n</span>, <span class="math">(m^e)^d ≡ m (mod n)</span>.</p></div><div class="proof"><p><span class="math">ed ≡ 1 (mod φ(n))</span> means <span class="math">ed = 1 + kφ(n)</span> for some integer <span class="math">k</span>, so <span class="math">m^{ed} = m · (m^{φ(n)})^k</span>.</p><p>If <span class="math">gcd(m, n) = 1</span>, Euler's theorem gives <span class="math">m^{φ(n)} ≡ 1 (mod n)</span>, so <span class="math">m^{ed} ≡ m</span>.</p><p>If <span class="math">gcd(m, n) ≠ 1</span> the argument still works via the Chinese remainder theorem: modulo <span class="math">p</span>, either <span class="math">p | m</span> and both sides are 0, or Fermat gives <span class="math">m^{p−1} ≡ 1</span> and <span class="math">m^{ed} ≡ m</span>. The same holds modulo <span class="math">q</span>, and since <span class="math">p</span> and <span class="math">q</span> are coprime the congruence holds modulo <span class="math">n</span>.</p><p><span class="qed">&#9633;</span></p></div><p>Four of this course's theorems appear in that proof. RSA is not an application of number theory so much as an assembly of it.</p><h3>The standard example</h3><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">p = 61,  q = 53        n = 3233        φ(n) = 60 · 52 = 3120
 e = 17                 gcd(17, 3120) = 1                  ✓
 d = 17⁻¹ mod 3120 = 2753        (lesson 6 computed this)
 
@@ -1298,7 +1303,7 @@ decrypt:        2790^2753 mod 3233 =   65        ✓</div><h3>What the security 
         <div class="lab-title"><strong>RSA with small primes</strong><span>Key generation, encryption, decryption, and the attack</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>public</span><span class="tone-red"><i class="legend-swatch"></i>private</span></div>
       </div>
-      <div class="lab-stage"><div class="table-wrap" id="rsaOut"></div></div>
+      <div class="lab-stage"><div class="table-wrap" id="rsaOut" tabindex="0" role="region" aria-label="Data table"></div></div>
       <div class="status-banner" id="rsaStatus" style="margin-top:12px;"></div>
         </article>
         <aside class="card side-panel" aria-live="polite">
@@ -1341,7 +1346,7 @@ decrypt:        2790^2753 mod 3233 =   65        ✓</div><h3>What the security 
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>A complete small key</h3><p>Every step, with the theorem that licenses it.</p><div class="mathblock">p = 11, q = 13                        two distinct primes
+      <article class="card card-pad prose"><h3>A complete small key</h3><p>Every step, with the theorem that licenses it.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">p = 11, q = 13                        two distinct primes
 n = 143
 φ(n) = 10 · 12 = 120                  multiplicativity of φ
 
@@ -1375,9 +1380,9 @@ decrypt:  48^103 mod 143 = 9      (103 = 1100111₂, lesson 8)     ✓</div><p>T
         <a href="../../progress/">Carry it to another device</a>.</p>
     </div>
 
-    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Lesson navigation">
-      <a class="lesson-link prev" href="../classical-ciphers/" rel="prev"><span>Previous lesson</span><strong>13 &middot; Classical Ciphers</strong></a>
-      <a class="lesson-link next" href="../"><span>Course overview</span><strong>Number Theory and Cryptography</strong></a>
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../classical-ciphers/" rel="prev"><span>Lesson</span><strong>Classical Ciphers</strong></a>
+      <a class="lesson-link next" href="../"><span>Course</span><strong>Number Theory and Cryptography</strong></a>
     </nav>
 
     <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"

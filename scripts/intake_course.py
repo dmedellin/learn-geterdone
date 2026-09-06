@@ -2494,16 +2494,16 @@ def build_pager(ctx, indent="    "):
         prev = lessons[index - 1]
         rows.append(
             '{i}  <a class="lesson-link prev" href="../{slug}/" rel="prev">'
-            "<span>Previous lesson</span><strong>{n} &middot; {title}</strong></a>".format(
-                i=indent, slug=prev.slug, n=prev.ordinal, title=text_escape(prev.title)
+            "<span>Lesson</span><strong>{title}</strong></a>".format(
+                i=indent, slug=prev.slug, title=text_escape(prev.title)
             )
         )
     if index < len(lessons) - 1:
         nxt = lessons[index + 1]
         rows.append(
             '{i}  <a class="lesson-link next" href="../{slug}/" rel="next">'
-            "<span>Next lesson</span><strong>{n} &middot; {title}</strong></a>".format(
-                i=indent, slug=nxt.slug, n=nxt.ordinal, title=text_escape(nxt.title)
+            "<span>Lesson</span><strong>{title}</strong></a>".format(
+                i=indent, slug=nxt.slug, title=text_escape(nxt.title)
             )
         )
     else:
@@ -2511,7 +2511,7 @@ def build_pager(ctx, indent="    "):
         # out of the course carries no rel and no ordinal in its label.
         rows.append(
             '{i}  <a class="lesson-link next" href="../">'
-            "<span>Course overview</span><strong>{course}</strong></a>".format(i=indent, course=text_escape(ctx["course_title"]))
+            "<span>Course</span><strong>{course}</strong></a>".format(i=indent, course=text_escape(ctx["course_title"]))
         )
     return "%s%s\n%s\n%s</nav>" % (indent, LESSON_NAV_MARKUP, "\n".join(rows), indent)
 

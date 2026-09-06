@@ -266,12 +266,12 @@ def lesson_page(*, path, course, lesson, index, prev_lesson, next_lesson):
     if prev_lesson is not None:
         prev = (
             "../%s/" % prev_lesson["slug"],
-            "%02d &middot; %s" % (index, esc(prev_lesson["title"])),
+            esc(prev_lesson["title"]),
         )
     if next_lesson is not None:
         nxt = (
             "../%s/" % next_lesson["slug"],
-            "%02d &middot; %s" % (index + 2, esc(next_lesson["title"])),
+            esc(next_lesson["title"]),
             False,
         )
     else:
@@ -312,7 +312,7 @@ def lesson_page(*, path, course, lesson, index, prev_lesson, next_lesson):
                              + progress.LESSON_JS % json.dumps(lesson_id)
                              + feedback.STORE_JS
                              + feedback.LESSON_JS))
-    return "".join(parts)
+    return chrome.name_horizontal_scrollers("".join(parts))
 
 
 def course_home(*, course, index, courses, path):
@@ -426,7 +426,7 @@ def course_home(*, course, index, courses, path):
         ),
         chrome.close(progress.PROGRESS_JS + progress.COURSE_JS),
     ]
-    return "".join(parts)
+    return chrome.name_horizontal_scrollers("".join(parts))
 
 
 def path_page(path):
@@ -440,7 +440,7 @@ def path_page(path):
         '<span class="spine-progress"></span></div></div></a>'
         % (c["slug"], c["slug"], len(c["lessons"]), esc(c["title"]),
            inline(c["blurb"]), len(c["lessons"]), esc(c["level"])) for c in courses)
-    return "".join([
+    return chrome.name_horizontal_scrollers("".join([
         chrome.head(title="%s | Subject | Learn · geterdone.io" % path["title"],
                     description=plain(path["description"]),
                     canonical_path="/paths/%s/" % path["slug"], favicon=chrome.FAVICON_PATH, page_kind="subject"),
@@ -470,4 +470,4 @@ def path_page(path):
         '</main>\n',
         chrome.footer(inline(path["footer_lead"]), path["material"]),
         chrome.close(progress.PROGRESS_JS + progress.PATH_JS),
-    ])
+    ]))

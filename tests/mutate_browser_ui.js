@@ -8,12 +8,21 @@ const ROOT=path.resolve(__dirname,'..'),OUT=process.env.BROWSER_EVIDENCE;
 assert(OUT&&path.resolve(OUT)!==ROOT&&!path.resolve(OUT).startsWith(ROOT+'/'),'external evidence directory required');
 fs.mkdirSync(OUT,{recursive:true});
 const COPY=path.join(OUT,'disposable-export');assert(!fs.existsSync(COPY),'fresh mutation export required');
+try {
 fs.mkdirSync(COPY);
 for(const dir of ['site','scripts','tests','content'])fs.cpSync(path.join(ROOT,dir),path.join(COPY,dir),{recursive:true,filter:p=>!p.includes('__pycache__')});
 const preflight=path.join(OUT,'target-preflight');fs.mkdirSync(preflight);
 const baseline=spawnSync(process.execPath,[path.join(ROOT,'tests/browser_acceptance.js')],{env:{...process.env,SOURCE_ROOT:COPY,BROWSER_EVIDENCE:preflight},encoding:'utf8'});
 fs.writeFileSync(path.join(preflight,'command.log'),baseline.stdout+baseline.stderr);
 assert.equal(baseline.status,0,'mutation baseline must be green');
+for(const [name,driver,args] of [
+ ['contrast-preflight','browser_contrast.js',['--capstones']],
+ ['contract-preflight','browser_contract_fixtures.js',[]]]){
+ const out=path.join(OUT,name);fs.mkdirSync(out);
+ const run=spawnSync(process.execPath,[path.join(COPY,'tests',driver),...args],{env:{...process.env,SOURCE_ROOT:COPY,BROWSER_EVIDENCE:out},encoding:'utf8'});
+ fs.writeFileSync(path.join(out,'command.log'),run.stdout+run.stderr);
+ assert.equal(run.status,0,name+' mutation baseline must be green');
+}
 const witnesses=new Map();
 for(const line of fs.readFileSync(path.join(preflight,'observations.jsonl'),'utf8').trim().split('\n')) {
  const row=JSON.parse(line);
@@ -47,7 +56,7 @@ for(const [name,old,value] of [
  ['y-tick-overshoot','v = Math.ceil(ymin / gy) * gy; v <= ymax;','v = Math.ceil(ymin / gy) * gy; v <= ymax + gy / 2;'],
  ['numberline-overshoot','v <= hi; v += step','v <= hi + step / 2; v += step'],
  ['curve-clip',"{ 'clip-path': 'url(#plotclip)' }",'{}']])
- add(name,core,replace(old,value),'svg',name==='invisible-annotation'?'annotation presence':name==='curve-clip'?'curve clipping lost':name.includes('grid')?'grid outside declared window':'FAIL svg-fixture',['--fixtures-only']);
+ add(name,core,replace(old,value),'svg',name==='invisible-annotation'?'no readable semantic SVG labels':name==='curve-clip'?'curve clipping lost':name.includes('grid')?'grid outside declared window':'FAIL svg-fixture',['--fixtures-only']);
 const controlPage=select(/id="premiumIv"/),carry=select(/class="progress-note"/),filePage=select(/id="reviewImport"/);
 for(const [name,file,css,expected] of [
  ['brand-height',carry,'[data-ui="masthead"] .brand {min-height:43.99px!important;height:43.99px!important}', '"class":"brand"'],
@@ -93,17 +102,40 @@ const course=select(/<body data-page-kind="course">/);
 add('light-theme-handler',course,replace('</body>','<script>document.getElementById("themeToggle").replaceWith(document.getElementById("themeToggle").cloneNode(true));</script></body>'),'theme','actual theme policy',['--only='+route(course),'--all']);
 add('light-theme-colors',course,replace('</head>','<style>body{color:#edf7ff!important}</style></head>'),'theme','resolved theme colors',['--only='+route(course),'--all']);
 add('dark-theme-palette',course,replace('--bg: #071019;', '--bg: #edf4f8;'),'theme','resolved theme colors',['--only='+route(course),'--all']);
+const contractFile=path.join(COPY,'tests/browser_contracts.js');
+for(const [name,old,value,expected] of [
+ ['contract-clipped-main',"failures.push({reason:'clipped content owner'","false&&failures.push({reason:'clipped content owner'",'FAIL content clipping'],
+ ['contract-svg-nonvacuity',"if(!readable.length)failures.push",'if(false)failures.push','FAIL all semantic SVG labels hidden'],
+ ['contract-dark-contrast','if(ratio<4.5)failures.push','if(false)failures.push','FAIL one-to-one dark text'],
+ ['contract-rendered-contrast','if(row.ratio+1e-6<row.threshold)failures.push','if(false)failures.push','FAIL rendered contrast ignores unrelated token health'],
+ ['contract-empty-contrast',"if(!rows.length)failures.push({reason:'no meaningful text contrast samples'})","if(false)failures.push({reason:'no meaningful text contrast samples'})",'FAIL empty contrast scope']])
+ add(name,contractFile,replace(old,value),'contract',expected);
+add('contract-empty-layout',contractFile,replace("if(!rows.length)failures.push({reason:'no visible content owners'})","if(false)failures.push({reason:'no visible content owners'})"),'contract','FAIL empty content owners');
+const pixels=path.join(COPY,'tests/browser_contrast_pixels.js');
+add('raster-svg-coverage',pixels,replace('r.requiresRaster||failed.has(r.nodeIndex)','failed.has(r.nodeIndex)'),'contract','FAIL SVG same accent paint');
+add('raster-group-opacity',pixels,replace('for(let i=opacities.length-1;i>=0;i--)','for(let i=-1;i>=0;i--)'),'contract','opacity compositing foreground');
+const plottedLabels=select(/id="alPlot"/);
+add('svg-label-halo',plottedLabels,replace('</head>','<style>svg text{stroke:none!important}</style></head>'),'contrast','text contrast below threshold',['--only='+route(plottedLabels)]);
+add('contract-halo-paint',contractFile,replace('if(halo[3]===1){row.halo=halo','if(false){row.halo=halo'),'contract','FAIL SVG contrasting halo');
+for(const file of caps){
+ const suffix=file===deck?'deck':'lab';
+ add('light-accent-contrast-'+suffix,file,replace('--capstone-accent: #08616e','--capstone-accent: #98f5ff'),'contrast','text contrast below threshold',['--only='+route(file)]);
+}
+add('light-active-button-contrast',caps.find(p=>p!==deck),replace('color:var(--on-accent);background:var(--cyan)','color:#041116;background:var(--cyan)'),'contrast','text contrast below threshold',['--only='+route(caps.find(p=>p!==deck))]);
+const chosen=process.argv.find(a=>a.startsWith('--case='))?.slice(7),selected=chosen?cases.filter(c=>c.name===chosen):cases;
+assert(selected.length,'nonempty mutation case selection');
 const summary=[];
-try {
- for(const c of cases){const original=fs.readFileSync(c.file,'utf8');const out=path.join(OUT,c.name);fs.mkdirSync(out);let run;
+ for(const c of selected){const original=fs.readFileSync(c.file,'utf8');const out=path.join(OUT,c.name);fs.mkdirSync(out);let run;
   try{fs.writeFileSync(c.file,c.change(original));run=c.group==='source'
     ?spawnSync('/usr/bin/python3',['-m','unittest','discover','-s',path.join(ROOT,'tests'),'-p','test_browser_source.py','-v'],{env:{...process.env,SOURCE_ROOT:COPY,TMPDIR:out},encoding:'utf8'})
-    :spawnSync(process.execPath,[path.join(ROOT,'tests/browser_acceptance.js'),'--class='+c.group,...c.extra],{env:{...process.env,SOURCE_ROOT:COPY,BROWSER_EVIDENCE:out},encoding:'utf8'});}
+    :spawnSync(process.execPath,c.group==='contract'?[path.join(COPY,'tests/browser_contract_fixtures.js')]
+      :c.group==='contrast'?[path.join(ROOT,'tests/browser_contrast.js'),...c.extra]
+      :[path.join(ROOT,'tests/browser_acceptance.js'),'--class='+c.group,...c.extra],{env:{...process.env,SOURCE_ROOT:COPY,BROWSER_EVIDENCE:out},encoding:'utf8'});}
   finally{fs.writeFileSync(c.file,original);}
   fs.writeFileSync(path.join(out,'command.log'),(run?.stdout||'')+(run?.stderr||''));
   const caught=run.status===1&&((run.stdout||'')+(run.stderr||'')).includes(c.expected);
   summary.push({name:c.name,caught,exit:run.status,expected:c.expected});fs.writeFileSync(path.join(OUT,'summary.json'),JSON.stringify(summary,null,2)+'\n');
   console.log((caught?'CAUGHT ':'ESCAPED ')+c.name);assert(caught,'mutation escaped or failed for an unrelated reason: '+c.name);
  }
- console.log(summary.filter(x=>x.caught).length+'/'+cases.length+' browser mutations caught; worktree inputs untouched.');
+ console.log(summary.filter(x=>x.caught).length+'/'+selected.length+' browser mutations caught; worktree inputs untouched.');
 }finally{fs.rmSync(COPY,{recursive:true,force:true});}

@@ -3441,10 +3441,9 @@ class TestEveryLabBuilds(unittest.TestCase):
 # -- as every package so far has, which is why nothing here is relaxed to
 # accommodate one.
 
-# The light palette, one value per token. Contrast against --bg #edf4f8:
-# cyan 4.98, cyan-2 5.43, green 4.94, red 5.14, amber 5.33, purple 5.44,
-# blue 5.64, muted 4.91 -- all >= 4.5:1. A page declares only the tokens it
-# actually uses, but a token it DOES declare carries exactly this value.
+# The light palette is checked on rendered backgrounds, including tinted
+# panels and page glows. A bare --bg contrast calculation is insufficient.
+# A page declares only the tokens it uses; shared values remain pinned.
 LIGHT_PALETTE = {
     "--bg": "#edf4f8",
     "--bg-2": "#f9fbfd",
@@ -3453,13 +3452,13 @@ LIGHT_PALETTE = {
     "--panel-2": "#f3f8fb",
     "--panel-3": "#eaf2f7",
     "--text": "#102433",
-    "--muted": "#586c7c",
+    "--muted": "#4f6373",
     "--line": "rgba(24, 62, 88, 0.13)",
     "--line-strong": "rgba(24, 62, 88, 0.24)",
-    "--cyan": "#0e7382",
+    "--cyan": "#0b6875",
     "--cyan-2": "#0b6d79",
-    "--green": "#10784f",
-    "--red": "#c22a34",
+    "--green": "#0d6e48",
+    "--red": "#b9242e",
     "--amber": "#8a5a06",
     "--purple": "#6b46d6",
     "--blue": "#1d5fd0",
@@ -3483,25 +3482,15 @@ CSS_VARIABLE_RE = re.compile(r"(--[A-Za-z0-9_-]+)\s*:\s*([^;{}]+);")
 # The lesson pager, verbatim. Class names are exactly lesson-nav /
 # lesson-link prev / lesson-link next; the retired families below are the ones
 # the courses shipped separately and must never come back.
-LESSON_NAV_MARKUP = '<nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Lesson navigation">'
+LESSON_NAV_MARKUP = '<nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">'
 LESSON_NAV_RE = re.compile(r"<nav class=\"lesson-nav\"[^>]*>(.*?)</nav>", re.S)
 PAGER_ANCHOR_RE = re.compile(r"<a\s+([^>]*?)>(.*?)</a>", re.S)
 ATTRIBUTE_RE = re.compile(r"([A-Za-z_:][-\w:.]*)\s*=\s*\"([^\"]*)\"")
-# The <strong> body is pinned to "NN &middot; Title", not merely "something".
-# Spec B mandates that exact shape, and a bare `.+?` let the separator drift to
-# "-" or "|" across courses without a single test noticing -- the precise class
-# of cross-course drift TestPinnedConventions exists to stop.
+# Document links display the kind and literal destination title. Adjacency
+# metadata preserves existing URLs without prescribing a curriculum order.
 PAGER_BODY_RE = re.compile(
     r"\A\s*<span>([^<]+)</span>\s*<strong>(.+?)</strong>\s*\Z", re.S
 )
-# The <strong> label has exactly two legitimate shapes, and both are pinned so
-# the separator cannot drift to "-" or "|" across courses -- a bare `.+?` here
-# let precisely that happen once already.
-#   lesson -> lesson            "NN &middot; Title"
-#   last lesson -> course home  a plain label with no ordinal, because the
-#                               course home is not lesson number anything.
-PAGER_LABEL_RE = re.compile(r"\A\s*\d{2}\s*&middot;\s*\S.*\Z", re.S)
-PAGER_TERMINAL_LABEL_RE = re.compile(r"\A\s*[^<&]*\S[^<]*\Z", re.S)
 RETIRED_PAGER_MARKUP = (
     "lesson-pager", "pager-link",
     'class="prev"', 'class="next"', 'class="dir"', 'class="name"',
@@ -3764,18 +3753,19 @@ class TestPinnedConventions(SiteFixture):
                         self.assertRegex(
                             body,
                             PAGER_BODY_RE,
-                            "a pager anchor is <span>direction</span> then "
+                            "a pager anchor is <span>kind</span> then "
                             "<strong>label</strong>; no other elements",
                         )
-                        label = PAGER_BODY_RE.match(body).group(2)
+                        kind, label = PAGER_BODY_RE.match(body).groups()
                         terminal = attrs.get("href") == "../"
-                        self.assertRegex(
-                            label,
-                            PAGER_TERMINAL_LABEL_RE if terminal else PAGER_LABEL_RE,
-                            "a lesson-to-lesson pager label is pinned to "
-                            "'NN &middot; Title'; only the link out to the course "
-                            "home may use a plain label (href=%r)" % attrs.get("href"),
-                        )
+                        self.assertEqual("Course" if terminal else "Lesson", kind,
+                                         "neutral taxonomic document kind")
+                        target = by_url[urllib.parse.urljoin(url, attrs["href"])]
+                        from test_course_ui import Elements, words
+                        heading = Elements(target.text).find("title")
+                        self.assertEqual(1, len(heading))
+                        self.assertEqual(words(heading[0]).split(" | " + kind + " | ")[0], html.unescape(label),
+                                         "neutral literal document title; no pager ordinal")
 
     def test_pager_rel_asserts_only_true_document_relationships(self):
         """rel=prev/next inside a course; no rel on the link out of one.
@@ -3871,11 +3861,11 @@ class TestPinnedConventions(SiteFixture):
         )
 
         anchors = pager_anchors(
-            '<nav class="lesson-nav" aria-label="Lesson navigation">'
+            '<nav class="lesson-nav" aria-label="Course and lesson links">'
             '<a class="lesson-link prev" href="../a/" rel="prev">'
-            "<span>Previous lesson</span><strong>01 &middot; A</strong></a>"
+            "<span>Lesson</span><strong>A</strong></a>"
             '<a class="lesson-link next" href="../">'
-            "<span>Next</span><strong>Course home</strong></a></nav>"
+            "<span>Course</span><strong>Course home</strong></a></nav>"
         )
         self.assertEqual(
             ["lesson-link prev", "lesson-link next"],

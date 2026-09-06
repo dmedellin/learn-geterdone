@@ -74,13 +74,13 @@
         --panel-2: #f3f8fb;
         --panel-3: #eaf2f7;
         --text: #102433;
-        --muted: #586c7c;
+        --muted: #4f6373;
         --line: rgba(24, 62, 88, 0.13);
         --line-strong: rgba(24, 62, 88, 0.24);
-        --cyan: #0e7382;
+        --cyan: #0b6875;
         --cyan-2: #0b6d79;
-        --green: #10784f;
-        --red: #c22a34;
+        --green: #0d6e48;
+        --red: #b9242e;
         --amber: #8a5a06;
         --purple: #6b46d6;
         --blue: #1d5fd0;
@@ -100,13 +100,13 @@
       --panel-2: #f3f8fb;
       --panel-3: #eaf2f7;
       --text: #102433;
-      --muted: #586c7c;
+      --muted: #4f6373;
       --line: rgba(24, 62, 88, 0.13);
       --line-strong: rgba(24, 62, 88, 0.24);
-      --cyan: #0e7382;
+      --cyan: #0b6875;
       --cyan-2: #0b6d79;
-      --green: #10784f;
-      --red: #c22a34;
+      --green: #0d6e48;
+      --red: #b9242e;
       --amber: #8a5a06;
       --purple: #6b46d6;
       --blue: #1d5fd0;
@@ -1138,6 +1138,11 @@
     [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
     body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
     body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
     /* Lab controls share the same hit-box floor as the navigation, including
        buttons created after load by quizzes and interactive tables. */
     body[data-page-kind] button, body[data-page-kind] [role="button"],
@@ -1263,7 +1268,7 @@
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock">P(A | B) = P(A ∩ B) / P(B)        requires P(B) &gt; 0
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">P(A | B) = P(A ∩ B) / P(B)        requires P(B) &gt; 0
 P(A ∩ B) = P(A | B) · P(B)        the multiplication rule
 P(A | B) ≠ P(B | A)               in general
 conditioning SHRINKS the sample space to B</div>
@@ -1276,7 +1281,7 @@ conditioning SHRINKS the sample space to B</div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>Conditioning</h2></div><p>The definition, why it is a definition rather than a theorem, and the standard traps.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Conditional probability</span><p>For events <span class="math">A</span>, <span class="math">B</span> with <span class="math">P(B) &gt; 0</span>, <span class="math">P(A | B) = P(A ∩ B) / P(B)</span>.</p></div><p>In the equally-likely model this is transparent: <span class="math">P(A|B) = (|A ∩ B|/|S|)/(|B|/|S|) = |A ∩ B|/|B|</span>. The outcomes outside <span class="math">B</span> have been discarded, and <span class="math">B</span> is now the sample space.</p><div class="thm"><span class="label">Theorem &middot; Conditional probability is a probability</span><p>For fixed <span class="math">B</span> with <span class="math">P(B) &gt; 0</span>, the function <span class="math">A ↦ P(A|B)</span> satisfies all three axioms. So every theorem about probability holds for conditional probability too.</p></div><div class="thm"><span class="label">Theorem &middot; Multiplication rule</span><p><span class="math">P(A ∩ B) = P(A|B)P(B) = P(B|A)P(A)</span>, and more generally <span class="math">P(A₁ ∩ ⋯ ∩ A_n) = P(A₁)P(A₂|A₁)P(A₃|A₁∩A₂)⋯</span>.</p></div><div class="example"><span class="label">Example &middot; Sequential draws</span><p>Two cards from a deck without replacement. <span class="math">P(both aces) = P(first ace) · P(second ace | first ace) = (4/52)(3/51) = 1/221</span>. Conditioning is exactly what handles "without replacement": the second probability changes because the first draw changed the deck.</p></div><h3>The two conditionals are different</h3><div class="example"><span class="label">Example &middot; Dice</span><p>Roll two dice. <span class="math">P(sum is 7 | first die is 4) = 1/6</span>, since among the six outcomes with a 4 first, exactly one has sum 7. But <span class="math">P(first die is 4 | sum is 7) = 1/6</span> too &mdash; a coincidence arising from symmetry, not a rule.</p></div><div class="example"><span class="label">Example &middot; Where they differ wildly</span><p><span class="math">P(is a mammal | is a dog) = 1</span>, while <span class="math">P(is a dog | is a mammal)</span> is small. The two conditionals share a numerator <span class="math">P(A ∩ B)</span> and have different denominators, and the ratio of the denominators is exactly how much they differ.</p></div><h3>The Monty Hall problem</h3><p>Three doors, a prize behind one. You pick door 1. The host, who knows where the prize is, opens a different door with no prize behind it &mdash; say door 3 &mdash; and offers you a switch. Should you?</p><div class="mathblock">prize behind  your choice  host must open   switching wins?
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Conditional probability</span><p>For events <span class="math">A</span>, <span class="math">B</span> with <span class="math">P(B) &gt; 0</span>, <span class="math">P(A | B) = P(A ∩ B) / P(B)</span>.</p></div><p>In the equally-likely model this is transparent: <span class="math">P(A|B) = (|A ∩ B|/|S|)/(|B|/|S|) = |A ∩ B|/|B|</span>. The outcomes outside <span class="math">B</span> have been discarded, and <span class="math">B</span> is now the sample space.</p><div class="thm"><span class="label">Theorem &middot; Conditional probability is a probability</span><p>For fixed <span class="math">B</span> with <span class="math">P(B) &gt; 0</span>, the function <span class="math">A ↦ P(A|B)</span> satisfies all three axioms. So every theorem about probability holds for conditional probability too.</p></div><div class="thm"><span class="label">Theorem &middot; Multiplication rule</span><p><span class="math">P(A ∩ B) = P(A|B)P(B) = P(B|A)P(A)</span>, and more generally <span class="math">P(A₁ ∩ ⋯ ∩ A_n) = P(A₁)P(A₂|A₁)P(A₃|A₁∩A₂)⋯</span>.</p></div><div class="example"><span class="label">Example &middot; Sequential draws</span><p>Two cards from a deck without replacement. <span class="math">P(both aces) = P(first ace) · P(second ace | first ace) = (4/52)(3/51) = 1/221</span>. Conditioning is exactly what handles "without replacement": the second probability changes because the first draw changed the deck.</p></div><h3>The two conditionals are different</h3><div class="example"><span class="label">Example &middot; Dice</span><p>Roll two dice. <span class="math">P(sum is 7 | first die is 4) = 1/6</span>, since among the six outcomes with a 4 first, exactly one has sum 7. But <span class="math">P(first die is 4 | sum is 7) = 1/6</span> too &mdash; a coincidence arising from symmetry, not a rule.</p></div><div class="example"><span class="label">Example &middot; Where they differ wildly</span><p><span class="math">P(is a mammal | is a dog) = 1</span>, while <span class="math">P(is a dog | is a mammal)</span> is small. The two conditionals share a numerator <span class="math">P(A ∩ B)</span> and have different denominators, and the ratio of the denominators is exactly how much they differ.</p></div><h3>The Monty Hall problem</h3><p>Three doors, a prize behind one. You pick door 1. The host, who knows where the prize is, opens a different door with no prize behind it &mdash; say door 3 &mdash; and offers you a switch. Should you?</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">prize behind  your choice  host must open   switching wins?
    door 1        door 1     door 2 or 3          NO
    door 2        door 1     door 3              YES
    door 3        door 1     door 2              YES
@@ -1292,7 +1297,7 @@ Each row has probability 1/3, so switching wins with probability 2/3.</div><p>Th
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>in A</span><span class="tone-purple"><i class="legend-swatch"></i>in B</span><span class="tone-green"><i class="legend-swatch"></i>in both</span></div>
       </div>
       <div class="lab-stage"><div id="prSpace"></div></div>
-      <div class="table-wrap" style="margin-top:12px;"><table class="tt" id="prTable"></table></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="prTable"></table></div>
       <div class="status-banner" id="prStatus" style="margin-top:12px;"></div>
         </article>
         <aside class="card side-panel" aria-live="polite">
@@ -1336,7 +1341,7 @@ Each row has probability 1/3, so switching wins with probability 2/3.</div><p>Th
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>The two-child problem</h3><p>A family has two children. The sample space is <span class="math">{BB, BG, GB, GG}</span>, equally likely.</p><div class="mathblock">&quot;At least one is a boy.&quot;  What is P(both boys)?
+      <article class="card card-pad prose"><h3>The two-child problem</h3><p>A family has two children. The sample space is <span class="math">{BB, BG, GB, GG}</span>, equally likely.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">&quot;At least one is a boy.&quot;  What is P(both boys)?
 
    B = {BB, BG, GB}          |B| = 3
    A ∩ B = {BB}              |A ∩ B| = 1
@@ -1367,9 +1372,9 @@ Same family, two different pieces of information, two answers.</div><p>The diffe
         <a href="../../progress/">Carry it to another device</a>.</p>
     </div>
 
-    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Lesson navigation">
-      <a class="lesson-link prev" href="../probability-axioms/" rel="prev"><span>Previous lesson</span><strong>03 &middot; The Probability Axioms</strong></a>
-      <a class="lesson-link next" href="../independence/" rel="next"><span>Next lesson</span><strong>05 &middot; Independence</strong></a>
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../probability-axioms/" rel="prev"><span>Lesson</span><strong>The Probability Axioms</strong></a>
+      <a class="lesson-link next" href="../independence/" rel="next"><span>Lesson</span><strong>Independence</strong></a>
     </nav>
 
     <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"

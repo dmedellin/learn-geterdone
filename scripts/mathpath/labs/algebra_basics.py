@@ -57,7 +57,7 @@ FORMAT_JS = r"""
   function rowhead(text) { return '<th class="rowhead">' + text + '</th>'; }
   function tr(cells, cls) { return '<tr' + (cls ? ' class="' + cls + '"' : '') + '>' + cells.join('') + '</tr>'; }
   function table(caption, rows) {
-    return '<div class="table-wrap"><table class="tt"><caption>' + caption + '</caption><tbody>'
+    return '<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>' + caption + '</caption><tbody>'
       + rows.join('') + '</tbody></table></div>';
   }
   function step(label, detail) { return tr([rowhead(label), tdl(detail)]); }

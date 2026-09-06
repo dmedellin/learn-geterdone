@@ -74,13 +74,13 @@
         --panel-2: #f3f8fb;
         --panel-3: #eaf2f7;
         --text: #102433;
-        --muted: #586c7c;
+        --muted: #4f6373;
         --line: rgba(24, 62, 88, 0.13);
         --line-strong: rgba(24, 62, 88, 0.24);
-        --cyan: #0e7382;
+        --cyan: #0b6875;
         --cyan-2: #0b6d79;
-        --green: #10784f;
-        --red: #c22a34;
+        --green: #0d6e48;
+        --red: #b9242e;
         --amber: #8a5a06;
         --purple: #6b46d6;
         --blue: #1d5fd0;
@@ -100,13 +100,13 @@
       --panel-2: #f3f8fb;
       --panel-3: #eaf2f7;
       --text: #102433;
-      --muted: #586c7c;
+      --muted: #4f6373;
       --line: rgba(24, 62, 88, 0.13);
       --line-strong: rgba(24, 62, 88, 0.24);
-      --cyan: #0e7382;
+      --cyan: #0b6875;
       --cyan-2: #0b6d79;
-      --green: #10784f;
-      --red: #c22a34;
+      --green: #0d6e48;
+      --red: #b9242e;
       --amber: #8a5a06;
       --purple: #6b46d6;
       --blue: #1d5fd0;
@@ -1138,6 +1138,11 @@
     [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
     body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
     body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
     /* Lab controls share the same hit-box floor as the navigation, including
        buttons created after load by quizzes and interactive tables. */
     body[data-page-kind] button, body[data-page-kind] [role="button"],
@@ -1263,7 +1268,7 @@
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock">OPTIMAL SUBSTRUCTURE  an optimal solution contains optimal sub-solutions
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">OPTIMAL SUBSTRUCTURE  an optimal solution contains optimal sub-solutions
 OVERLAPPING SUBPROBLEMS  the same subproblem recurs
 memoise (top down) or fill a table (bottom up)
 naive Fibonacci: ~1.6ⁿ calls.  With memoisation: n.</div>
@@ -1276,21 +1281,21 @@ naive Fibonacci: ~1.6ⁿ calls.  With memoisation: n.</div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>Dynamic programming</h2></div><p>The two conditions, three worked examples, and the problem it cannot help.</p></div>
-      <article class="card card-pad prose"><h3>The motivating case</h3><p>The naive recursive Fibonacci makes about <span class="math">1.6ⁿ</span> calls because it recomputes the same values exponentially often: <span class="math">F(5)</span> calls <span class="math">F(3)</span> twice, <span class="math">F(2)</span> three times, and so on. Storing each value when first computed reduces the count to <span class="math">n</span>.</p><div class="mathblock">n        naive calls        memoised calls
+      <article class="card card-pad prose"><h3>The motivating case</h3><p>The naive recursive Fibonacci makes about <span class="math">1.6ⁿ</span> calls because it recomputes the same values exponentially often: <span class="math">F(5)</span> calls <span class="math">F(3)</span> twice, <span class="math">F(2)</span> three times, and so on. Storing each value when first computed reduces the count to <span class="math">n</span>.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">n        naive calls        memoised calls
 10               177                    10
 30           2 692 537                  30
-50    ~ 40 000 000 000                  50</div><div class="defbox"><span class="label">Definition &middot; The two conditions</span><p><strong>Optimal substructure</strong>: an optimal solution is built from optimal solutions to subproblems. <strong>Overlapping subproblems</strong>: the recursion revisits the same subproblems many times.</p></div><p>Both are required. Merge sort has optimal substructure and no overlap, so it is divide-and-conquer and memoisation would help nothing. A problem with overlap and no optimal substructure cannot be solved by combining sub-solutions at all.</p><h3>Coin change</h3><div class="mathblock">best[0] = 0
+50    ~ 40 000 000 000                  50</div><div class="defbox"><span class="label">Definition &middot; The two conditions</span><p><strong>Optimal substructure</strong>: an optimal solution is built from optimal solutions to subproblems. <strong>Overlapping subproblems</strong>: the recursion revisits the same subproblems many times.</p></div><p>Both are required. Merge sort has optimal substructure and no overlap, so it is divide-and-conquer and memoisation would help nothing. A problem with overlap and no optimal substructure cannot be solved by combining sub-solutions at all.</p><h3>Coin change</h3><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">best[0] = 0
 best[v] = 1 + min{ best[v − c] : c a coin, c ≤ v }
 
 coins {1,3,4}, target 6:
    best[1]=1  best[2]=2  best[3]=1  best[4]=1  best[5]=2  best[6]=2
    best[6] = 1 + min(best[5], best[3], best[2]) = 1 + 1 = 2
-   the two coins are 3 + 3 — which greedy missed</div><p>The recurrence is the optimal substructure written down: the best way to make <span class="math">v</span> uses some coin <span class="math">c</span>, and the rest must be the best way to make <span class="math">v − c</span>. Filling the table costs <span class="math">Θ(v · |coins|)</span>, and the greedy failure of lesson 9 disappears.</p><h3>Longest common subsequence</h3><div class="mathblock">L[i][j] = length of the longest common subsequence of the first i
+   the two coins are 3 + 3 — which greedy missed</div><p>The recurrence is the optimal substructure written down: the best way to make <span class="math">v</span> uses some coin <span class="math">c</span>, and the rest must be the best way to make <span class="math">v − c</span>. Filling the table costs <span class="math">Θ(v · |coins|)</span>, and the greedy failure of lesson 9 disappears.</p><h3>Longest common subsequence</h3><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">L[i][j] = length of the longest common subsequence of the first i
           characters of X and the first j of Y
 
 L[i][j] = 0                              if i = 0 or j = 0
         = L[i−1][j−1] + 1                if X[i] = Y[j]
-        = max(L[i−1][j], L[i][j−1])      otherwise</div><p>Cost <span class="math">Θ(mn)</span>, against exponential for the naive recursion. This is the algorithm behind <span class="math">diff</span>, behind version-control merges, and behind sequence alignment in bioinformatics.</p><h3>Where it does not apply</h3><div class="example"><span class="label">Example &middot; Longest simple path</span><p>Finding the longest path with no repeated vertex has no optimal substructure: the longest path from <span class="math">a</span> to <span class="math">c</span> need not consist of the longest path from <span class="math">a</span> to <span class="math">b</span> plus the longest from <span class="math">b</span> to <span class="math">c</span>, because those may share vertices and the concatenation would not be simple. The problem is NP-hard, and no dynamic program for it exists.</p></div><p>Contrast with the SHORTEST path, which does have optimal substructure &mdash; any subpath of a shortest path is shortest &mdash; and is solved in polynomial time by Dijkstra's algorithm from Graphs and Trees. Two problems whose statements differ by one word, on opposite sides of tractability.</p><h3>Top-down or bottom-up</h3><div class="mathblock">MEMOISED (top down)      recursion + a cache
+        = max(L[i−1][j], L[i][j−1])      otherwise</div><p>Cost <span class="math">Θ(mn)</span>, against exponential for the naive recursion. This is the algorithm behind <span class="math">diff</span>, behind version-control merges, and behind sequence alignment in bioinformatics.</p><h3>Where it does not apply</h3><div class="example"><span class="label">Example &middot; Longest simple path</span><p>Finding the longest path with no repeated vertex has no optimal substructure: the longest path from <span class="math">a</span> to <span class="math">c</span> need not consist of the longest path from <span class="math">a</span> to <span class="math">b</span> plus the longest from <span class="math">b</span> to <span class="math">c</span>, because those may share vertices and the concatenation would not be simple. The problem is NP-hard, and no dynamic program for it exists.</p></div><p>Contrast with the SHORTEST path, which does have optimal substructure &mdash; any subpath of a shortest path is shortest &mdash; and is solved in polynomial time by Dijkstra's algorithm from Graphs and Trees. Two problems whose statements differ by one word, on opposite sides of tractability.</p><h3>Top-down or bottom-up</h3><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">MEMOISED (top down)      recursion + a cache
                          computes only the subproblems needed
                          natural to write from the recurrence
 
@@ -1307,7 +1312,7 @@ TABULATED (bottom up)    fill a table in dependency order
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>measured</span><span class="tone-purple"><i class="legend-swatch"></i>predicted</span><span class="tone-amber"><i class="legend-swatch"></i>crossover</span></div>
       </div>
       <div class="lab-stage"><svg id="alPlot" viewBox="0 0 520 230" role="img" aria-label="Operation counts plotted against input size."></svg></div>
-      <div class="table-wrap" style="margin-top:12px;"><table class="tt" id="alTable"></table></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="alTable"></table></div>
       <div class="status-banner" id="alStatus" style="margin-top:12px;"></div>
         </article>
         <aside class="card side-panel" aria-live="polite">
@@ -1389,7 +1394,7 @@ TABULATED (bottom up)    fill a table in dependency order
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>Coin change with <span class="math">{1, 3, 4}</span></h3><p>Filling the table from 0 upward.</p><div class="mathblock">v:      0   1   2   3   4   5   6   7   8
+      <article class="card card-pad prose"><h3>Coin change with <span class="math">{1, 3, 4}</span></h3><p>Filling the table from 0 upward.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">v:      0   1   2   3   4   5   6   7   8
 best:   0   1   2   1   1   2   2   2   2
 
 best[6] = 1 + min( best[5], best[3], best[2] )
@@ -1420,9 +1425,9 @@ Cost: Θ(v · number of coins) — here 6 × 3 = 18 comparisons.</div><p>Every e
         <a href="../../progress/">Carry it to another device</a>.</p>
     </div>
 
-    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Lesson navigation">
-      <a class="lesson-link prev" href="../greedy-algorithms/" rel="prev"><span>Previous lesson</span><strong>09 &middot; Greedy Algorithms</strong></a>
-      <a class="lesson-link next" href="../complexity-classes/" rel="next"><span>Next lesson</span><strong>11 &middot; P, NP and NP-Completeness</strong></a>
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../greedy-algorithms/" rel="prev"><span>Lesson</span><strong>Greedy Algorithms</strong></a>
+      <a class="lesson-link next" href="../complexity-classes/" rel="next"><span>Lesson</span><strong>P, NP and NP-Completeness</strong></a>
     </nav>
 
     <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"

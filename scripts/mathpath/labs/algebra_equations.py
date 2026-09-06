@@ -52,7 +52,7 @@ FORM_JS = r"""
       + '</th><td style="text-align:left;">' + detail + '</td></tr>';
   }
   function ttable(caption, rows) {
-    return '<div class="table-wrap"><table class="tt"><caption>' + caption
+    return '<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>' + caption
       + '</caption><tbody>' + rows.join('') + '</tbody></table></div>';
   }
   function chip(text, kind) { return '<span class="chip ' + kind + '">' + text + '</span>'; }
@@ -62,7 +62,7 @@ FORM_JS = r"""
       + items.map(function (t) { return '<td style="text-align:left;">' + t + '</td>'; }).join('') + '</tr>';
   }
   function tgrid(caption, head, rows) {
-    return '<div class="table-wrap"><table class="tt"><caption>' + caption + '</caption><thead><tr>'
+    return '<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>' + caption + '</caption><thead><tr>'
       + head.map(function (t) { return '<th>' + t + '</th>'; }).join('')
       + '</tr></thead><tbody>' + rows.join('') + '</tbody></table></div>';
   }

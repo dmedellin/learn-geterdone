@@ -309,7 +309,7 @@ def noscript(message):
 
 # The lesson pager, in the library's pinned form. Class names are exactly
 # lesson-nav / lesson-link prev / lesson-link next; each anchor carries only
-# class, href and rel; the body is <span>direction</span><strong>label</strong>.
+# class, href and rel; the body is <span>kind</span><strong>literal title</strong>.
 # The FIRST lesson omits the prev anchor entirely rather than shipping a
 # disabled one, and the LAST lesson's forward link points at the course home
 # and carries NO rel, because the course home is not the next document.
@@ -319,18 +319,18 @@ def pager(*, prev=None, next=None):
         href, label = prev
         rows.append(
             '      <a class="lesson-link prev" href="%s" rel="prev">'
-            "<span>Previous lesson</span><strong>%s</strong></a>" % (esc(href), label)
+            "<span>Lesson</span><strong>%s</strong></a>" % (esc(href), label)
         )
     if next:
         href, label, is_terminal = next
         rel = "" if is_terminal else ' rel="next"'
-        direction = "Course overview" if is_terminal else "Next lesson"
+        direction = "Course" if is_terminal else "Lesson"
         rows.append(
             '      <a class="lesson-link next" href="%s"%s>'
             "<span>%s</span><strong>%s</strong></a>" % (esc(href), rel, direction, label)
         )
     return (
-        '\n    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Lesson navigation">\n'
+        '\n    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">\n'
         + "\n".join(rows)
         + "\n    </nav>\n"
     )
@@ -360,3 +360,44 @@ def footer(lead_html, material):
 def close(scripts):
     return "  <script>%s%s%s  </script>\n</body>\n</html>\n" % (
         THEME_SCRIPT, SIGNIN_SCRIPT, scripts)
+
+
+def name_horizontal_scrollers(text):
+    """Give authored table/notation overflow owners a keyboard stop and name.
+
+    Parse actual tags so JavaScript strings and instructional examples stay
+    untouched. Existing names and native keyboard semantics take precedence.
+    """
+    from html.parser import HTMLParser
+
+    offsets = [0]
+    for line in text.splitlines(keepends=True):
+        offsets.append(offsets[-1] + len(line))
+    edits = []
+
+    class Scrollers(HTMLParser):
+        def handle_starttag(self, tag, attrs):
+            attrs = dict(attrs)
+            classes = attrs.get('class', '').split()
+            label = next((name for cls, name in (
+                ('mathblock', 'Mathematical notation'), ('table-wrap', 'Data table'),
+                ('data-table', 'Data table'), ('heatmap-wrap', 'Sensitivity grid'),
+                ('calc-table', 'Calculation table'), ('schema-output', 'Exported plan data'),
+                ('footprint', 'Bid and ask volume by price')
+            ) if cls in classes), None)
+            if not label:
+                return
+            extra = ''
+            if 'tabindex' not in attrs:
+                extra += ' tabindex="0"'
+            if not any(k in attrs for k in ('aria-label', 'aria-labelledby')):
+                extra += (' role="region"' if tag != 'table' else '') + ' aria-label="%s"' % label
+            if extra:
+                line, column = self.getpos()
+                at = offsets[line - 1] + column + len(self.get_starttag_text()) - 1
+                edits.append((at, extra))
+
+    Scrollers().feed(text)
+    for at, extra in reversed(edits):
+        text = text[:at] + extra + text[at:]
+    return text

@@ -226,7 +226,7 @@ NUMERIC_JS = r"""
     var head = heads.length
       ? '<thead><tr>' + heads.map(function (h) { return '<th>' + h + '</th>'; }).join('') + '</tr></thead>'
       : '';
-    return '<div class="table-wrap"><table class="tt"><caption>' + caption + '</caption>'
+    return '<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>' + caption + '</caption>'
       + head + '<tbody>' + rows.join('') + '</tbody></table></div>';
   }
   /* The two-column "step / what it says" table the exemplar uses. */

@@ -74,13 +74,13 @@
         --panel-2: #f3f8fb;
         --panel-3: #eaf2f7;
         --text: #102433;
-        --muted: #586c7c;
+        --muted: #4f6373;
         --line: rgba(24, 62, 88, 0.13);
         --line-strong: rgba(24, 62, 88, 0.24);
-        --cyan: #0e7382;
+        --cyan: #0b6875;
         --cyan-2: #0b6d79;
-        --green: #10784f;
-        --red: #c22a34;
+        --green: #0d6e48;
+        --red: #b9242e;
         --amber: #8a5a06;
         --purple: #6b46d6;
         --blue: #1d5fd0;
@@ -100,13 +100,13 @@
       --panel-2: #f3f8fb;
       --panel-3: #eaf2f7;
       --text: #102433;
-      --muted: #586c7c;
+      --muted: #4f6373;
       --line: rgba(24, 62, 88, 0.13);
       --line-strong: rgba(24, 62, 88, 0.24);
-      --cyan: #0e7382;
+      --cyan: #0b6875;
       --cyan-2: #0b6d79;
-      --green: #10784f;
-      --red: #c22a34;
+      --green: #0d6e48;
+      --red: #b9242e;
       --amber: #8a5a06;
       --purple: #6b46d6;
       --blue: #1d5fd0;
@@ -1138,6 +1138,11 @@
     [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
     body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
     body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
     /* Lab controls share the same hit-box floor as the navigation, including
        buttons created after load by quizzes and interactive tables. */
     body[data-page-kind] button, body[data-page-kind] [role="button"],
@@ -1263,7 +1268,7 @@
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock">DECIDABLE     some algorithm always terminates with the right answer
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">DECIDABLE     some algorithm always terminates with the right answer
 UNDECIDABLE   no such algorithm exists — proved, not merely unknown
 the HALTING PROBLEM is undecidable                (Turing, 1936)
 Rice: every nontrivial semantic property is undecidable</div>
@@ -1276,7 +1281,7 @@ Rice: every nontrivial semantic property is undecidable</div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>The limits of computation</h2></div><p>Decidability, the halting problem, the proof, and what follows.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Decidable</span><p>A decision problem is <strong>decidable</strong> if some algorithm terminates on every input with the correct yes/no answer. Otherwise it is <strong>undecidable</strong>.</p></div><p>Note what undecidable does not mean. Not "hard", not "exponential", not "nobody has managed it". It means no algorithm exists and none ever will, and the statement is a theorem.</p><div class="thm"><span class="label">Theorem &middot; The halting problem is undecidable (Turing, 1936)</span><p>There is no algorithm <span class="math">H(P, x)</span> that, for every program <span class="math">P</span> and input <span class="math">x</span>, terminates and correctly reports whether <span class="math">P</span> halts on <span class="math">x</span>.</p></div><div class="proof"><p>Suppose such an <span class="math">H</span> exists. Build a program <span class="math">D</span> that takes one input <span class="math">P</span> &mdash; the source of a program &mdash; and does the following: run <span class="math">H(P, P)</span>; if <span class="math">H</span> says <span class="math">P</span> halts on input <span class="math">P</span>, then loop forever; if <span class="math">H</span> says <span class="math">P</span> does not halt, then halt immediately.</p><p><span class="math">D</span> is a perfectly ordinary program: it calls <span class="math">H</span>, which by assumption always terminates, and then branches.</p><p>Now ask what <span class="math">D</span> does on input <span class="math">D</span>.</p><p>If <span class="math">D</span> halts on <span class="math">D</span>, then <span class="math">H(D, D)</span> reported "halts", so by construction <span class="math">D</span> loops forever. Contradiction.</p><p>If <span class="math">D</span> does not halt on <span class="math">D</span>, then <span class="math">H(D, D)</span> reported "does not halt", so by construction <span class="math">D</span> halts immediately. Contradiction.</p><p>Both cases are impossible, so <span class="math">H</span> cannot exist.</p><p><span class="qed">&#9633;</span></p></div><p>The structure is exactly Sets, Relations, and Functions lesson 13's diagonal argument: assume a complete listing or a complete decider, construct the object that differs from every entry, and derive a contradiction. Cantor used it against enumerations of the reals; Turing used it against deciders.</p><p>It is also the self-reference Logic and Proof lesson 1 excluded from propositions, reappearing where it cannot be excluded: programs can take programs as input, and <span class="math">D</span> is applied to itself. That is not a trick, it is what makes computation universal.</p><h3>Rice&#x27;s theorem</h3><div class="thm"><span class="label">Theorem &middot; Rice&#x27;s theorem</span><p>Every nontrivial property of the function a program computes is undecidable. "Nontrivial" means some programs have it and some do not.</p></div><p>So all of the following are undecidable: does this program ever output 0? do these two programs compute the same function? does this program ever access an unallocated address? is this code reachable? does this loop terminate?</p><p>This is why static analysis tools are necessarily conservative. A compiler warning about unreachable code, a type system, a linter and a verifier all approximate: they may report a problem that does not exist or miss one that does, and Rice's theorem says no tool can do otherwise for every program.</p><h3>Other undecidable problems</h3><ul><li><strong>The Post correspondence problem.</strong> Given two lists of strings, can a sequence of indices be found making the concatenations equal? A purely combinatorial question with no algorithm.</li><li><strong>Hilbert's tenth problem.</strong> Does a given polynomial equation have integer solutions? Shown undecidable by Matiyasevich in 1970 &mdash; arithmetic itself is not fully mechanisable.</li><li><strong>Program equivalence.</strong> Do two programs compute the same function? Undecidable by Rice, which is why compiler optimisations are verified by construction rather than by comparison.</li></ul><h3>The hierarchy</h3><div class="mathblock">P                       solvable efficiently
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Decidable</span><p>A decision problem is <strong>decidable</strong> if some algorithm terminates on every input with the correct yes/no answer. Otherwise it is <strong>undecidable</strong>.</p></div><p>Note what undecidable does not mean. Not "hard", not "exponential", not "nobody has managed it". It means no algorithm exists and none ever will, and the statement is a theorem.</p><div class="thm"><span class="label">Theorem &middot; The halting problem is undecidable (Turing, 1936)</span><p>There is no algorithm <span class="math">H(P, x)</span> that, for every program <span class="math">P</span> and input <span class="math">x</span>, terminates and correctly reports whether <span class="math">P</span> halts on <span class="math">x</span>.</p></div><div class="proof"><p>Suppose such an <span class="math">H</span> exists. Build a program <span class="math">D</span> that takes one input <span class="math">P</span> &mdash; the source of a program &mdash; and does the following: run <span class="math">H(P, P)</span>; if <span class="math">H</span> says <span class="math">P</span> halts on input <span class="math">P</span>, then loop forever; if <span class="math">H</span> says <span class="math">P</span> does not halt, then halt immediately.</p><p><span class="math">D</span> is a perfectly ordinary program: it calls <span class="math">H</span>, which by assumption always terminates, and then branches.</p><p>Now ask what <span class="math">D</span> does on input <span class="math">D</span>.</p><p>If <span class="math">D</span> halts on <span class="math">D</span>, then <span class="math">H(D, D)</span> reported "halts", so by construction <span class="math">D</span> loops forever. Contradiction.</p><p>If <span class="math">D</span> does not halt on <span class="math">D</span>, then <span class="math">H(D, D)</span> reported "does not halt", so by construction <span class="math">D</span> halts immediately. Contradiction.</p><p>Both cases are impossible, so <span class="math">H</span> cannot exist.</p><p><span class="qed">&#9633;</span></p></div><p>The structure is exactly Sets, Relations, and Functions lesson 13's diagonal argument: assume a complete listing or a complete decider, construct the object that differs from every entry, and derive a contradiction. Cantor used it against enumerations of the reals; Turing used it against deciders.</p><p>It is also the self-reference Logic and Proof lesson 1 excluded from propositions, reappearing where it cannot be excluded: programs can take programs as input, and <span class="math">D</span> is applied to itself. That is not a trick, it is what makes computation universal.</p><h3>Rice&#x27;s theorem</h3><div class="thm"><span class="label">Theorem &middot; Rice&#x27;s theorem</span><p>Every nontrivial property of the function a program computes is undecidable. "Nontrivial" means some programs have it and some do not.</p></div><p>So all of the following are undecidable: does this program ever output 0? do these two programs compute the same function? does this program ever access an unallocated address? is this code reachable? does this loop terminate?</p><p>This is why static analysis tools are necessarily conservative. A compiler warning about unreachable code, a type system, a linter and a verifier all approximate: they may report a problem that does not exist or miss one that does, and Rice's theorem says no tool can do otherwise for every program.</p><h3>Other undecidable problems</h3><ul><li><strong>The Post correspondence problem.</strong> Given two lists of strings, can a sequence of indices be found making the concatenations equal? A purely combinatorial question with no algorithm.</li><li><strong>Hilbert's tenth problem.</strong> Does a given polynomial equation have integer solutions? Shown undecidable by Matiyasevich in 1970 &mdash; arithmetic itself is not fully mechanisable.</li><li><strong>Program equivalence.</strong> Do two programs compute the same function? Undecidable by Rice, which is why compiler optimisations are verified by construction rather than by comparison.</li></ul><h3>The hierarchy</h3><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">P                       solvable efficiently
 NP                      verifiable efficiently
 NP-complete             the hardest in NP
 EXPTIME                 solvable, but exponentially
@@ -1292,7 +1297,7 @@ UNDECIDABLE             no algorithm exists</div><p>Logic and Proof makes statem
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>measured</span><span class="tone-purple"><i class="legend-swatch"></i>predicted</span><span class="tone-amber"><i class="legend-swatch"></i>crossover</span></div>
       </div>
       <div class="lab-stage"><svg id="alPlot" viewBox="0 0 520 230" role="img" aria-label="Operation counts plotted against input size."></svg></div>
-      <div class="table-wrap" style="margin-top:12px;"><table class="tt" id="alTable"></table></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="alTable"></table></div>
       <div class="status-banner" id="alStatus" style="margin-top:12px;"></div>
         </article>
         <aside class="card side-panel" aria-live="polite">
@@ -1374,7 +1379,7 @@ UNDECIDABLE             no algorithm exists</div><p>Logic and Proof makes statem
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>The proof, in seven lines</h3><p>Short enough to reconstruct from memory, and worth being able to.</p><div class="mathblock">Assume H(P, x) exists and always answers correctly.
+      <article class="card card-pad prose"><h3>The proof, in seven lines</h3><p>Short enough to reconstruct from memory, and worth being able to.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">Assume H(P, x) exists and always answers correctly.
 
 Define    D(P):
               if H(P, P) says &quot;halts&quot;:  loop forever
@@ -1404,9 +1409,9 @@ Both branches contradict.  H cannot exist.               ∎</div><p>The whole p
         <a href="../../progress/">Carry it to another device</a>.</p>
     </div>
 
-    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Lesson navigation">
-      <a class="lesson-link prev" href="../complexity-classes/" rel="prev"><span>Previous lesson</span><strong>11 &middot; P, NP and NP-Completeness</strong></a>
-      <a class="lesson-link next" href="../"><span>Course overview</span><strong>Algorithms and Complexity</strong></a>
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../complexity-classes/" rel="prev"><span>Lesson</span><strong>P, NP and NP-Completeness</strong></a>
+      <a class="lesson-link next" href="../"><span>Course</span><strong>Algorithms and Complexity</strong></a>
     </nav>
 
     <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"

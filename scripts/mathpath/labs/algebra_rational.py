@@ -431,7 +431,7 @@ RF_SCRIPT = r"""
     return '<tr class="focus"><th class="rowhead">' + label + '</th><td style="text-align:left;">' + detail + '</td></tr>';
   }
   function table(caption, rows) {
-    return '<div class="table-wrap"><table class="tt"><caption>' + caption
+    return '<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>' + caption
       + '</caption><tbody>' + rows.join('') + '</tbody></table></div>';
   }
   function chip(kind, text) { return '<span class="chip ' + kind + '">' + text + '</span>'; }
@@ -1754,7 +1754,7 @@ CX_SCRIPT = r"""
     return '<tr class="focus"><th class="rowhead">' + label + '</th><td style="text-align:left;">' + detail + '</td></tr>';
   }
   function table(caption, rows) {
-    return '<div class="table-wrap"><table class="tt"><caption>' + caption
+    return '<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>' + caption
       + '</caption><tbody>' + rows.join('') + '</tbody></table></div>';
   }
   function chip(kind, text) { return '<span class="chip ' + kind + '">' + text + '</span>'; }

@@ -81,7 +81,7 @@ FORMAT_JS = r"""
   function table(caption, heads, rows) {
     var head = (heads && heads.length)
       ? '<thead>' + tr(heads.map(function (h) { return th(h); })) + '</thead>' : '';
-    return '<div class="table-wrap"><table class="tt"><caption>' + caption + '</caption>'
+    return '<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>' + caption + '</caption>'
       + head + '<tbody>' + rows.join('') + '</tbody></table></div>';
   }
   /* The two-column "what was done / what it produced" table. The exemplar's

@@ -41,11 +41,11 @@
     --bg: #edf4f8;
     --panel: rgba(255, 255, 255, 0.94);
     --text: #102433;
-    --muted: #586c7c;
+    --muted: #4f6373;
     --line: rgba(24, 62, 88, 0.13);
-    --cyan: #0e7382;
-    --green: #10784f;
-    --red: #c22a34;
+    --cyan: #0b6875;
+    --green: #0d6e48;
+    --red: #b9242e;
     --amber: #8a5a06;
     --purple: #6b46d6;
     --blue: #1d5fd0;
@@ -64,11 +64,11 @@
   --bg: #edf4f8;
   --panel: rgba(255, 255, 255, 0.94);
   --text: #102433;
-  --muted: #586c7c;
+  --muted: #4f6373;
   --line: rgba(24, 62, 88, 0.13);
-  --cyan: #0e7382;
-  --green: #10784f;
-  --red: #c22a34;
+  --cyan: #0b6875;
+  --green: #0d6e48;
+  --red: #b9242e;
   --amber: #8a5a06;
   --purple: #6b46d6;
   --blue: #1d5fd0;
@@ -278,7 +278,7 @@ input[type=range]{width:100%;accent-color:var(--cyan)}.segmented{display:grid;gr
 }
 /* --- end chrome ---------------------------------------------------------- */
     /* progress-marks:begin */
-:root { --panel-2: var(--panel2); --line-strong: var(--line2); }
+:root { --cyan2: var(--cyan); --panel-2: var(--panel2); --line-strong: var(--line2); }
 :root { --on-accent: var(--bg); }
 
     .lesson-feedback {
@@ -504,6 +504,11 @@ input[type=range]{width:100%;accent-color:var(--cyan)}.segmented{display:grid;gr
     [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
     body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
     body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
     /* Lab controls share the same hit-box floor as the navigation, including
        buttons created after load by quizzes and interactive tables. */
     body[data-page-kind] button, body[data-page-kind] [role="button"],
@@ -652,9 +657,9 @@ input[type=range]{width:100%;accent-color:var(--cyan)}.segmented{display:grid;gr
         <a href="../../progress/">Carry it to another device</a>.</p>
     </div>
 
-  <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Lesson navigation">
-      <a class="lesson-link prev" href="../benchmarking-and-risk-adjusted-performance/" rel="prev"><span>Previous lesson</span><strong>12 &middot; Benchmarking and Risk-Adjusted Performance</strong></a>
-      <a class="lesson-link next" href="../walk-forward-testing/" rel="next"><span>Next lesson</span><strong>14 &middot; Walk-Forward Testing</strong></a>
+  <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../benchmarking-and-risk-adjusted-performance/" rel="prev"><span>Lesson</span><strong>Benchmarking and Risk-Adjusted Performance</strong></a>
+      <a class="lesson-link next" href="../walk-forward-testing/" rel="next"><span>Lesson</span><strong>Walk-Forward Testing</strong></a>
     </nav>
 
     <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
@@ -910,9 +915,9 @@ function initLabSpecific(){let lookback=18,trainPct=50,validatePct=25,revealed=f
   function segmentedBars(){const specs=[['bull',130,401],['range',65,403],['reversal',65,405]],out=[];let last=100;specs.forEach(([reg,n,seed])=>{const seg=makeBars(reg,n,seed),shift=last-seg[0].o;seg.forEach(x=>out.push({...x,o:x.o+shift,h:x.h+shift,l:x.l+shift,c:x.c+shift,t:out.length}));last=out.at(-1).c});return out}
   function evaluate(bars,p){const r=strategyBreakout(bars,p,8,.08,'long'),s=computeTradeStats(r.trades,r.equity);return{s,r}}
   const draw=()=>{const bars=segmentedBars(),n=bars.length,t1=Math.round(n*trainPct/100),t2=Math.round(n*(trainPct+validatePct)/100),train=evaluate(bars.slice(0,t1),lookback),valid=evaluate(bars.slice(t1,t2),lookback),test=evaluate(bars.slice(t2),lookback),full=evaluate(bars,lookback),c=colors();let eq=full.r.equity.slice();if(!revealed)for(let i=t2;i<eq.length;i++)eq[i]=null;drawLines([{values:eq,color:c.cyan}],{formatter:v=>'$'+Math.round(v/1000)+'k',length:n,regions:[{start:0,end:t1,label:'IN-SAMPLE',color:c.cyan},{start:t1,end:t2,label:'VALIDATION',color:c.amber},{start:t2,end:n,label:'OUT-OF-SAMPLE',color:c.purple}]});setBadge(revealed?'ALL DATA SPLITS REVEALED':'OUT-OF-SAMPLE RESULT HIDDEN');setKPIs([['In-sample',pct(train.s.returnPct,1)],['Validation',pct(valid.s.returnPct,1)],['Out-of-sample',revealed?pct(test.s.returnPct,1):'Hidden']]);if(!revealed)marketRead('warn','The final market period remains unavailable to parameter selection.','Training captures buyer continuation, while validation shows more balanced price behavior. The system must be frozen before the later reversal is scored.');else if(test.s.returnPct<train.s.returnPct)marketRead('bear','Seller control appears in the final period and the training parameter loses effectiveness.','The performance gap shows that the rule depended partly on the earlier bullish regime.');else marketRead('bull','The frozen rule continues to capture directional progress in unseen data.','The out-of-sample result is stronger evidence because this period did not select the parameter.');const rows=candidates.map(p=>({p,tr:evaluate(bars.slice(0,t1),p).s,va:evaluate(bars.slice(t1,t2),p).s,te:evaluate(bars.slice(t2),p).s}));const bestTr=rows.reduce((b,r)=>r.tr.returnPct>b.tr.returnPct?r:b,rows[0]),bestVa=rows.reduce((b,r)=>r.va.returnPct>b.va.returnPct?r:b,rows[0]);
-  $('#extraVisual').innerHTML=`<div class="split-strip" style="grid-template-columns:${trainPct}fr ${validatePct}fr ${100-trainPct-validatePct}fr"><span class="train">Train ${trainPct}%</span><span class="validate">Validate ${validatePct}%</span><span class="test">Test ${100-trainPct-validatePct}%</span></div><table class="data-table"><tr><th>Dataset</th><th>Bars</th><th>Trades</th><th>Net return</th><th>Purpose</th></tr><tr><td>In-sample</td><td>${t1}</td><td>${train.s.count}</td><td>${pct(train.s.returnPct,1)}</td><td>Develop</td></tr><tr><td>Validation</td><td>${t2-t1}</td><td>${valid.s.count}</td><td>${pct(valid.s.returnPct,1)}</td><td>Select</td></tr><tr><td>Out-of-sample</td><td>${n-t2}</td><td>${revealed?test.s.count:'—'}</td><td>${revealed?pct(test.s.returnPct,1):'Hidden'}</td><td>Final estimate</td></tr></table><pre class="code-output">Split: ${n} bars × ${trainPct}% = ${t1} in-sample, × ${validatePct}% = ${t2-t1} validation, the remaining ${n-t2} out-of-sample — chosen before any candidate was scored.
+  $('#extraVisual').innerHTML=`<div class="split-strip" style="grid-template-columns:${trainPct}fr ${validatePct}fr ${100-trainPct-validatePct}fr"><span class="train">Train ${trainPct}%</span><span class="validate">Validate ${validatePct}%</span><span class="test">Test ${100-trainPct-validatePct}%</span></div><table class="data-table" tabindex="0" aria-label="Data table"><tr><th>Dataset</th><th>Bars</th><th>Trades</th><th>Net return</th><th>Purpose</th></tr><tr><td>In-sample</td><td>${t1}</td><td>${train.s.count}</td><td>${pct(train.s.returnPct,1)}</td><td>Develop</td></tr><tr><td>Validation</td><td>${t2-t1}</td><td>${valid.s.count}</td><td>${pct(valid.s.returnPct,1)}</td><td>Select</td></tr><tr><td>Out-of-sample</td><td>${n-t2}</td><td>${revealed?test.s.count:'—'}</td><td>${revealed?pct(test.s.returnPct,1):'Hidden'}</td><td>Final estimate</td></tr></table><pre class="code-output">Split: ${n} bars × ${trainPct}% = ${t1} in-sample, × ${validatePct}% = ${t2-t1} validation, the remaining ${n-t2} out-of-sample — chosen before any candidate was scored.
 Selecting a lookback: the in-sample winner is ${bestTr.p} bars (${pct(bestTr.tr.returnPct,1)}); on validation it makes ${pct(bestTr.va.returnPct,1)}. The validation winner is ${bestVa.p} bars (${pct(bestVa.va.returnPct,1)}, ${bestVa.va.count} trade${bestVa.va.count===1?'':'s'}).
-${bestTr.p===bestVa.p?'They agree, which is the exception, not the rule.':'They disagree, which is the ordinary case: the in-sample winner was fitted to the in-sample period.'} ${revealed?`Out of sample, ${lookback} bars made ${pct(test.s.returnPct,1)} on ${test.s.count} trade${test.s.count===1?'':'s'} — that is one number, not a distribution, and it is the only one that was not used to choose.`:'The out-of-sample column is hidden until you freeze a choice; every look at it before then is a selection you are making on the final test.'}</pre><table class="data-table"><tr><th>Lookback</th><th>In-sample</th><th>Trades</th><th>Validation</th><th>Trades</th><th>Out-of-sample</th></tr>${rows.map(r=>`<tr${r.p===lookback?' style="font-weight:800"':''}><td>${r.p} bars${r.p===lookback?' (selected)':''}</td><td class="${r.tr.returnPct>=0?'good':'bad'}">${pct(r.tr.returnPct,1)}</td><td>${r.tr.count}</td><td class="${r.va.returnPct>=0?'good':'bad'}">${pct(r.va.returnPct,1)}</td><td>${r.va.count}</td><td>${revealed?pct(r.te.returnPct,1):'hidden'}</td></tr>`).join('')}</table>`};
+${bestTr.p===bestVa.p?'They agree, which is the exception, not the rule.':'They disagree, which is the ordinary case: the in-sample winner was fitted to the in-sample period.'} ${revealed?`Out of sample, ${lookback} bars made ${pct(test.s.returnPct,1)} on ${test.s.count} trade${test.s.count===1?'':'s'} — that is one number, not a distribution, and it is the only one that was not used to choose.`:'The out-of-sample column is hidden until you freeze a choice; every look at it before then is a selection you are making on the final test.'}</pre><table class="data-table" tabindex="0" aria-label="Data table"><tr><th>Lookback</th><th>In-sample</th><th>Trades</th><th>Validation</th><th>Trades</th><th>Out-of-sample</th></tr>${rows.map(r=>`<tr${r.p===lookback?' style="font-weight:800"':''}><td>${r.p} bars${r.p===lookback?' (selected)':''}</td><td class="${r.tr.returnPct>=0?'good':'bad'}">${pct(r.tr.returnPct,1)}</td><td>${r.tr.count}</td><td class="${r.va.returnPct>=0?'good':'bad'}">${pct(r.va.returnPct,1)}</td><td>${r.va.count}</td><td>${revealed?pct(r.te.returnPct,1):'hidden'}</td></tr>`).join('')}</table>`};
   function optimize(){const bars=segmentedBars(),t1=Math.round(bars.length*trainPct/100);let best={p:lookback,r:-Infinity};candidates.forEach(p=>{const r=evaluate(bars.slice(0,t1),p).s.returnPct;if(r>best.r)best={p,r}});lookback=best.p;$('#dsLookback').value=lookback;$('#dsLookbackOut').textContent=lookback+' bars';revealed=false;draw()}
   $('#controls').innerHTML=rangeControl('dsLookback','Breakout lookback',5,45,lookback,1,' bars')+rangeControl('dsTrain','In-sample allocation',40,65,trainPct,5,'%')+rangeControl('dsValid','Validation allocation',15,30,validatePct,5,'%')+'<button class="btn" id="dsOptimize" style="width:100%;margin-bottom:9px">Select best in-sample parameter</button><button class="btn primary" id="dsReveal" style="width:100%">Reveal out-of-sample result</button>';
   bindRange('dsLookback',v=>{lookback=v;revealed=false;draw()},' bars');bindRange('dsTrain',v=>{trainPct=v;if(trainPct+validatePct>85){validatePct=85-trainPct;$('#dsValid').value=validatePct;$('#dsValidOut').textContent=validatePct+'%'}revealed=false;draw()},'%');bindRange('dsValid',v=>{validatePct=v;if(trainPct+validatePct>85){trainPct=85-validatePct;$('#dsTrain').value=trainPct;$('#dsTrainOut').textContent=trainPct+'%'}revealed=false;draw()},'%');$('#dsOptimize').addEventListener('click',optimize);$('#dsReveal').addEventListener('click',()=>{revealed=true;draw()});draw();return resizeHandler(draw)}

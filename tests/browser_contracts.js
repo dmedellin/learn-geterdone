@@ -31,7 +31,15 @@ function targets() {
   return {rows,exclusions,failures};
 }
 function svgGeometry(scope=document) {
-  const rows=[],failures=[];
+  const rows=[],failures=[],capabilities=[],svgs=[...scope.querySelectorAll('svg')];
+  for(const svg of scope.querySelectorAll('svg')) {
+    if(!visible(svg))continue; // inactive slides are not visible capabilities
+    const labels=[...svg.querySelectorAll('text')].filter(e=>e.textContent.trim());
+    if(!labels.length)continue; // a genuinely text-free illustration
+    const readable=labels.filter(visible);
+    capabilities.push({svg:svg.id,svgIndex:svgs.indexOf(svg),semantic:labels.length,readable:readable.length});
+    if(!readable.length)failures.push({reason:'no readable semantic SVG labels',svg:svg.id,semantic:labels.length});
+  }
   for(const e of scope.querySelectorAll('svg text')) {
     if(!visible(e)||!e.textContent.trim()) continue;
     const b=e.getBoundingClientRect(), clips=[e.ownerSVGElement.getBoundingClientRect()];
@@ -50,7 +58,7 @@ function svgGeometry(scope=document) {
           top:['hidden','clip'].includes(s.overflowY)?pb.top:-Infinity,
           bottom:['hidden','clip'].includes(s.overflowY)?pb.bottom:Infinity});
     }
-    const row={text:e.textContent,svg:e.ownerSVGElement.id,rect:b.toJSON(),clipped:false,offscale:false,entity:/&(?:#\d+|#x[\da-f]+|[a-z]+);/i.test(e.textContent)};
+    const row={text:e.textContent,svg:e.ownerSVGElement.id,svgIndex:svgs.indexOf(e.ownerSVGElement),rect:b.toJSON(),clipped:false,offscale:false,entity:/&(?:#\d+|#x[\da-f]+|[a-z]+);/i.test(e.textContent)};
     const c={left:Math.max(...clips.map(c=>c.left)),top:Math.max(...clips.map(c=>c.top)),
       right:Math.min(...clips.map(c=>c.right)),bottom:Math.min(...clips.map(c=>c.bottom))};
     row.offscale=b.right<=c.left||b.left>=c.right||b.bottom<=c.top||b.top>=c.bottom;
@@ -59,7 +67,11 @@ function svgGeometry(scope=document) {
     if(row.clipped||row.offscale||row.entity) failures.push(row);
     rows.push(row);
   }
-  return {rows,failures};
+  for(const item of capabilities) {
+    const measured=rows.filter(r=>r.svgIndex===item.svgIndex&&!r.clipped&&!r.offscale);
+    if(item.readable&&!measured.length)failures.push({reason:'no readable semantic SVG labels',...item});
+  }
+  return {rows,capabilities,failures};
 }
 function capstone() {
   const failures=[],slides=[...document.querySelectorAll('.slide')],isDeck=slides.length>0;
@@ -100,13 +112,124 @@ function capstone() {
   return {slides:slides.length,print,failures};
 }
 function rootLayout() {
-  const failures=[];
+  const failures=[],rows=[];
   for(const e of [document.documentElement,document.body]) {
     const c=getComputedStyle(e);
-    if(['hidden','clip'].includes(c.overflowX))failures.push({reason:'root masking',tag:e.tagName});
+    if(['hidden','clip'].includes(c.overflowX)||['hidden','clip'].includes(c.overflowY))failures.push({reason:'root masking',tag:e.tagName});
     if(e.scrollWidth>document.documentElement.clientWidth)failures.push({reason:'root overflow',tag:e.tagName,width:e.scrollWidth});
   }
-  return {failures};
+  for(const e of document.querySelectorAll('main,article,section,[role="main"],[data-ui],.content,.main-content')) {
+    if(!visible(e))continue;
+    const s=getComputedStyle(e),row={tag:e.tagName,id:e.id,class:e.className,width:e.clientWidth,scrollWidth:e.scrollWidth,height:e.clientHeight,scrollHeight:e.scrollHeight};
+    rows.push(row);
+    const clipX=['hidden','clip'].includes(s.overflowX),clipY=['hidden','clip'].includes(s.overflowY);
+    if((clipX&&e.scrollWidth>e.clientWidth+1)||(clipY&&e.scrollHeight>e.clientHeight+1)) {
+      const b=e.getBoundingClientRect(),walker=document.createTreeWalker(e,NodeFilter.SHOW_TEXT),bounds=[];
+      while(walker.nextNode()){
+        const node=walker.currentNode;if(!node.textContent.trim()||!visible(node.parentElement)||node.parentElement.closest('script,style'))continue;
+        const range=document.createRange();range.selectNode(node);bounds.push(...range.getClientRects());
+      }
+      for(const item of e.querySelectorAll('canvas,svg,input,select,textarea,button'))if(visible(item))bounds.push(item.getBoundingClientRect());
+      // Pseudo-element glows may intentionally extend beyond their card.
+      // Only clipped content, not decorative paint, makes an owner fail.
+      if(bounds.some(r=>(clipX&&(r.left<b.left-1||r.right>b.right+1))||(clipY&&(r.top<b.top-1||r.bottom>b.bottom+1))))
+        failures.push({reason:'clipped content owner',...row});
+    }
+  }
+  // Horizontal overflow must remain reachable and named; hiding it at the
+  // document root cannot turn a broken content owner into a valid layout.
+  for(const e of document.querySelectorAll('main *')) {
+    if(!visible(e)||e.scrollWidth<=e.clientWidth+1)continue;
+    const s=getComputedStyle(e);
+    if(!['auto','scroll'].includes(s.overflowX))continue;
+    const named=e.getAttribute('aria-label')||e.getAttribute('aria-labelledby')?.split(/\s+/).map(id=>document.getElementById(id)?.textContent||'').join('').trim();
+    if(e.tabIndex<0||!named)failures.push({reason:'unnamed or unfocusable horizontal scroller',tag:e.tagName,id:e.id,class:e.getAttribute('class')});
+  }
+  if(!rows.length)failures.push({reason:'no visible content owners'});
+  return {rows,failures};
+}
+
+function contrastRatio(foreground,background) {
+  const lum=c=>c.slice(0,3).map(x=>x/255).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4).reduce((n,x,i)=>n+x*[.2126,.7152,.0722][i],0);
+  const a=lum(foreground),b=lum(background);
+  return (Math.max(a,b)+.05)/(Math.min(a,b)+.05);
+}
+
+function renderedContrast(scope=document) {
+  const rows=[],failures=[],exclusions=[];
+  const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d',{willReadFrequently:true});canvas.width=canvas.height=1;
+  const cache=new Map();
+  function color(value){
+    if(cache.has(value))return cache.get(value);
+    ctx.clearRect(0,0,1,1);ctx.fillStyle=value;ctx.fillRect(0,0,1,1);
+    const p=[...ctx.getImageData(0,0,1,1).data];p[3]/=255;cache.set(value,p);return p;
+  }
+  const over=(fg,bg)=>{const a=fg[3]+bg[3]*(1-fg[3]);return [...fg.slice(0,3).map((x,i)=>a?(x*fg[3]+bg[i]*bg[3]*(1-fg[3]))/a:0),a];};
+  // Resolved gradient stops give a conservative contrast bound. Every stop
+  // (including translucent stops) is composited in paint order; interpolation
+  // is sampled as well. We report the bound, never an invented point sample.
+  function paints(s){
+    const image=s.backgroundImage;
+    if(image==='none'||s.backgroundClip==='text')return [];
+    if(/url\(/.test(image))throw Error('unresolved background image');
+    const layers=image.match(/(?:repeating-)?(?:linear|radial|conic)-gradient\((?:[^()]|\([^()]*\))*\)/g);
+    if(!layers)throw Error('unresolved background paint: '+image);
+    return layers.map(layer=>{
+      const stops=(layer.match(/(?:rgba?|color)\([^)]*\)/g)||[]).map(color);
+      if(!stops.length)throw Error('gradient has no resolved color stops');
+      return stops.flatMap((c,i)=>i?[c,...[.25,.5,.75].map(t=>c.map((x,k)=>x*t+stops[i-1][k]*(1-t)))]:[c]);
+    }).reverse();
+  }
+  function backgrounds(e){
+    const lineage=[];for(let p=e;p;p=p.parentElement)lineage.unshift(p);
+    let colors=[[255,255,255,1]],gradient=false;
+    for(const p of lineage){const s=getComputedStyle(p),solid=color(s.backgroundColor);
+      colors=solid[3]===1?[solid]:colors.map(bg=>over(solid,bg));
+      for(const layer of paints(s)){gradient=true;colors=colors.flatMap(bg=>layer.map(fg=>over(fg,bg)));}
+      // Retain extrema by luminance and hue, bounding a bounded paint stack.
+      if(colors.length>512){colors.sort((a,b)=>contrastRatio(a,[0,0,0])-contrastRatio(b,[0,0,0]));colors=colors.filter((_,i)=>i%Math.ceil(colors.length/256)===0||i===colors.length-1);}
+    }
+    return {colors,gradient};
+  }
+  const walker=document.createTreeWalker(scope,NodeFilter.SHOW_TEXT),nodes=[];
+  while(walker.nextNode())if(walker.currentNode.textContent.trim())nodes.push(walker.currentNode);
+  window.learnContrastNodes=nodes;
+  window.learnContrastOpacityGroups={};
+  for(const [nodeIndex,node] of nodes.entries()){
+    const e=node.parentElement,text=node.textContent.trim();
+    if(!e||e.closest('script,style,noscript,template')||!visible(e))continue;
+    if(e.closest('[disabled]')){exclusions.push({text,reason:'inactive control'});continue;}
+    // A hidden tick or separator with no linguistic content is decoration.
+    // aria-hidden alone does not exempt words, numbers or meaningful labels.
+    if(!/[\p{L}\p{N}]/u.test(text)&&e.closest('[aria-hidden="true"]')){exclusions.push({text,reason:'decorative glyph'});continue;}
+    const s=getComputedStyle(e),row={nodeIndex,tag:e.tagName,id:e.id,class:e.getAttribute('class'),text:text.slice(0,120),fontSize:parseFloat(s.fontSize),fontWeight:s.fontWeight};
+    row.threshold=row.fontSize>=24||(row.fontSize>=18.6667&&parseFloat(row.fontWeight)>=700)?3:4.5;
+    try{
+      const bg=backgrounds(e);let inks;
+      if(e instanceof SVGElement&&s.paintOrder.split(/\s+/)[0]==='stroke'&&parseFloat(s.strokeWidth)>=2&&s.stroke!=='none'){
+        const halo=color(s.stroke);halo[3]*=Number(s.strokeOpacity);
+        if(halo[3]===1){row.halo=halo;bg.colors=[halo];bg.gradient=false;}
+      }
+      if(s.backgroundClip==='text'){
+        inks=(s.backgroundImage.match(/(?:rgba?|color)\([^)]*\)/g)||[]).map(color);
+        if(!inks.length)throw Error('unresolved text gradient');
+        row.gradientInk=true;
+      }else inks=[color(e instanceof SVGElement?s.fill:s.color)];
+      let opacity=1;const opacityGroups=[];
+      for(let p=e;p;p=p.parentElement){const value=Number(getComputedStyle(p).opacity);opacity*=value;if(value!==1)opacityGroups.unshift([p,value]);}
+      window.learnContrastOpacityGroups[nodeIndex]=opacityGroups;
+      row.inks=inks;
+      row.requiresRaster=(e instanceof SVGElement&&!row.halo)||opacity!==1;
+      row.rasterGroup=e instanceof SVGElement?'svg:'+Array.from(document.querySelectorAll('svg')).indexOf(e.ownerSVGElement):'node:'+nodeIndex;
+      const ratios=inks.flatMap(ink=>bg.colors.map(background=>({ratio:contrastRatio(over([...ink.slice(0,3),ink[3]*opacity],background),background),foreground:over([...ink.slice(0,3),ink[3]*opacity],background),background})));
+      const worst=ratios.reduce((a,b)=>a.ratio<b.ratio?a:b);
+      Object.assign(row,worst,{bound:bg.gradient||!!row.gradientInk});
+      if(row.ratio+1e-6<row.threshold)failures.push({reason:'text contrast below threshold',...row});
+    }catch(error){failures.push({reason:'text contrast measurement error',...row,error:error.message});}
+    rows.push(row);
+  }
+  if(!rows.length)failures.push({reason:'no meaningful text contrast samples'});
+  return {rows,exclusions,failures};
 }
 function themeState(expected) {
   const failures=[],explicit=document.documentElement.dataset.theme||null,
@@ -118,6 +241,8 @@ function themeState(expected) {
      (expected==='explicit-light'&&explicit!=='light')||(expected==='dark'&&explicit!=='dark'))failures.push({reason:'actual theme policy',expected,actual});
   if(actual.background!==(light?'rgb(237, 244, 248)':'rgb(7, 16, 25)')||
      (light&&(actual.text!=='rgb(16, 36, 51)'||actual.bodyText!=='rgb(16, 36, 51)')))failures.push({reason:'resolved theme colors',expected,actual});
+  const rgb=value=>value.match(/[\d.]+/g).map(Number),ratio=contrastRatio(rgb(actual.text),rgb(actual.background));
+  if(ratio<4.5)failures.push({reason:'theme text contrast below threshold',ratio,threshold:4.5,actual});
   return {actual,failures};
 }
-module.exports={visible,targets,svgGeometry,capstone,rootLayout,themeState};
+module.exports={visible,targets,svgGeometry,capstone,rootLayout,contrastRatio,renderedContrast,themeState};

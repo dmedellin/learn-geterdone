@@ -34,7 +34,7 @@ from html import unescape
 from html.parser import HTMLParser
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from mathpath import chrome, feedback, progress
+from mathpath import capstone, chrome, feedback, progress
 from mathpath.theme import UI_CSS  # noqa: E402
 
 SITE = pathlib.Path(__file__).resolve().parent.parent / "site"
@@ -280,7 +280,20 @@ def ensure_css(text):
     # its unpatched text, which is what keeps this idempotent.
     text = re.sub(r"[ \t]*" + re.escape(CSS_BEGIN) + r".*?" + re.escape(CSS_END) + r"\n?",
                   lambda _m: "", text, flags=re.S)
+    # Refresh the former shared light inks in stylesheet declarations only.
+    # Both light paths keep the same source-owned palette as generated pages.
+    from mathpath.theme import LIGHT_TOKENS
+    for token, old in (("--muted", "#586c7c"), ("--cyan", "#0e7382"),
+                       ("--green", "#10784f"), ("--red", "#c22a34")):
+        value = re.search(re.escape(token) + r"\s*:\s*([^;]+)", LIGHT_TOKENS)[1]
+        text = re.sub(r"(<style[^>]*>)(.*?)(</style>)",
+                      lambda m: m[1] + re.sub(r"(" + re.escape(token) + r"\s*:\s*)" + old + r"\b",
+                                             lambda ink: ink[1] + value, m[2]) + m[3], text, flags=re.S)
     aliases = []
+    # Legacy cyan2 was dark-only. Follow the shared accent in both themes;
+    # capstones already supply their own renewable semantic accent alias.
+    if re.search(r"--cyan2\s*:\s*#[\da-fA-F]+", text):
+        aliases.append("--cyan2: var(--cyan);")
     for canonical, legacy in (("--panel-2", "--panel2"), ("--line-strong", "--line2")):
         if not re.search(re.escape(canonical) + r"\s*:", text):
             if not re.search(re.escape(legacy) + r"\s*:", text):
@@ -419,6 +432,10 @@ def normalize_capstone_ui(text, relative):
     Content, data and deck-specific screen/print styling stay authored in HTML.
     Only shared chrome is regenerated on subsequent normalization passes.
     """
+    text = capstone.normalize_palette(text)
+    # Refresh aliases after the authoritative palette has been materialized;
+    # the first migration and every later pass must produce identical bytes.
+    text = ensure_css(text)
     slides = bool(re.search(r'<main\b[^>]*class="deck"', text))
     kind = 'slides' if slides else 'supplemental'
     body = element(text, 'body')
@@ -561,7 +578,7 @@ def normalize_lesson_ui(text, relative, course, lesson):
     index = next(i for i, item in enumerate(course["lessons"]) if item["slug"] == lesson["slug"])
     def neighbor(i):
         item = course["lessons"][i]
-        return ("../%s/" % item["slug"], "%02d &middot; %s" % (i + 1, esc(item["title"])))
+        return ("../%s/" % item["slug"], esc(item["title"]))
     previous = neighbor(index - 1) if index else None
     following = (*neighbor(index + 1), False) if index + 1 < len(course["lessons"]) else ("../", esc(course["title"]), True)
     text = replace_element(text, element(text, "nav", cls="lesson-nav"), chrome.pager(prev=previous, next=following).strip())
@@ -965,6 +982,12 @@ def main():
 
     def save(relative, text, before):
         nonlocal changed, touched
+        text = chrome.name_horizontal_scrollers(text)
+        # Authored JavaScript recreates the same content owners on redraw.
+        # Normalize only their literal opening tags, preserving all expressions,
+        # attributes, arithmetic and export payloads around those tags.
+        text = re.sub(r'<(?:div|table|pre)\b[^<>]*\bclass="(?:data-table|calc-table|heatmap-wrap|schema-output|footprint)"[^<>]*>',
+                      lambda m: chrome.name_horizontal_scrollers(m[0]), text)
         touched += 1
         if text != before:
             pending.append((SITE / relative, text))

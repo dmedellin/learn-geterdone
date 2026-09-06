@@ -128,7 +128,7 @@ def quadratic_lab(cfg):
     return '<tr><td style="text-align:left;">' + label + '</td><td style="text-align:left;">' + detail + '</td></tr>';
   }
   function table(caption, rows) {
-    return '<div class="table-wrap"><table class="tt"><caption>' + caption + '</caption><tbody>'
+    return '<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>' + caption + '</caption><tbody>'
       + rows.join('') + '</tbody></table></div>';
   }
 

@@ -74,13 +74,13 @@
         --panel-2: #f3f8fb;
         --panel-3: #eaf2f7;
         --text: #102433;
-        --muted: #586c7c;
+        --muted: #4f6373;
         --line: rgba(24, 62, 88, 0.13);
         --line-strong: rgba(24, 62, 88, 0.24);
-        --cyan: #0e7382;
+        --cyan: #0b6875;
         --cyan-2: #0b6d79;
-        --green: #10784f;
-        --red: #c22a34;
+        --green: #0d6e48;
+        --red: #b9242e;
         --amber: #8a5a06;
         --purple: #6b46d6;
         --blue: #1d5fd0;
@@ -100,13 +100,13 @@
       --panel-2: #f3f8fb;
       --panel-3: #eaf2f7;
       --text: #102433;
-      --muted: #586c7c;
+      --muted: #4f6373;
       --line: rgba(24, 62, 88, 0.13);
       --line-strong: rgba(24, 62, 88, 0.24);
-      --cyan: #0e7382;
+      --cyan: #0b6875;
       --cyan-2: #0b6d79;
-      --green: #10784f;
-      --red: #c22a34;
+      --green: #0d6e48;
+      --red: #b9242e;
       --amber: #8a5a06;
       --purple: #6b46d6;
       --blue: #1d5fd0;
@@ -1138,6 +1138,11 @@
     [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
     body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
     body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
     /* Lab controls share the same hit-box floor as the navigation, including
        buttons created after load by quizzes and interactive tables. */
     body[data-page-kind] button, body[data-page-kind] [role="button"],
@@ -1263,7 +1268,7 @@
         <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
       </div>
       <div class="hero-visual">
-        <div class="mathblock">O(g)   f ≤ C·g   for n ≥ k          upper bound
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">O(g)   f ≤ C·g   for n ≥ k          upper bound
 Ω(g)   f ≥ C·g   for n ≥ k          lower bound
 Θ(g)   both                          tight
 the proof IS the pair (C, k)</div>
@@ -1276,7 +1281,7 @@ the proof IS the pair (C, k)</div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>The three notations</h2></div><p>Definitions, worked proofs, and the properties that shorten later work.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Big-O</span><p><span class="math">f(n) = O(g(n))</span> means there are constants <span class="math">C &gt; 0</span> and <span class="math">k</span> such that <span class="math">|f(n)| ≤ C|g(n)|</span> for every <span class="math">n ≥ k</span>. The pair <span class="math">(C, k)</span> is a <strong>witness</strong>.</p></div><div class="defbox"><span class="label">Definition &middot; Big-Omega and Big-Theta</span><p><span class="math">f(n) = Ω(g(n))</span> means <span class="math">|f(n)| ≥ C|g(n)|</span> for some <span class="math">C &gt; 0</span> and all <span class="math">n ≥ k</span>. <span class="math">f(n) = Θ(g(n))</span> means both, so <span class="math">f</span> and <span class="math">g</span> grow at the same rate.</p></div><p>The <span class="math">=</span> is traditional and misleading: these are set memberships, and <span class="math">O(g)</span> is the class of functions bounded above by a multiple of <span class="math">g</span>. <span class="math">f(n) = O(g(n))</span> should be read "<span class="math">f</span> is in <span class="math">O(g)</span>", and it is not symmetric.</p><h3>Proving a bound</h3><div class="example"><span class="label">Example &middot; <span class="math">3n² + 5n + 100 = O(n²)</span></span><p>For <span class="math">n ≥ 1</span> we have <span class="math">n ≤ n²</span> and <span class="math">1 ≤ n²</span>, so <span class="math">3n² + 5n + 100 ≤ 3n² + 5n² + 100n² = 108n²</span>. The witnesses are <span class="math">C = 108</span> and <span class="math">k = 1</span>. Sharper choices exist &mdash; at <span class="math">n ≥ 10</span>, <span class="math">C = 5</span> works &mdash; and any valid pair proves the claim.</p></div><div class="example"><span class="label">Example &middot; <span class="math">n² ≠ O(n)</span></span><p>Suppose <span class="math">n² ≤ Cn</span> for all <span class="math">n ≥ k</span>. Dividing by <span class="math">n</span> gives <span class="math">n ≤ C</span> for all <span class="math">n ≥ k</span>, which is false for <span class="math">n &gt; max(C, k)</span>. No pair of witnesses exists.</p></div><p>That is the shape of a disproof: assume witnesses and derive a contradiction. It is a direct proof of a negation, and Logic and Proof lesson 13 is the technique.</p><h3>Useful properties</h3><div class="mathblock">transitive       f = O(g),  g = O(h)   ⟹   f = O(h)
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Big-O</span><p><span class="math">f(n) = O(g(n))</span> means there are constants <span class="math">C &gt; 0</span> and <span class="math">k</span> such that <span class="math">|f(n)| ≤ C|g(n)|</span> for every <span class="math">n ≥ k</span>. The pair <span class="math">(C, k)</span> is a <strong>witness</strong>.</p></div><div class="defbox"><span class="label">Definition &middot; Big-Omega and Big-Theta</span><p><span class="math">f(n) = Ω(g(n))</span> means <span class="math">|f(n)| ≥ C|g(n)|</span> for some <span class="math">C &gt; 0</span> and all <span class="math">n ≥ k</span>. <span class="math">f(n) = Θ(g(n))</span> means both, so <span class="math">f</span> and <span class="math">g</span> grow at the same rate.</p></div><p>The <span class="math">=</span> is traditional and misleading: these are set memberships, and <span class="math">O(g)</span> is the class of functions bounded above by a multiple of <span class="math">g</span>. <span class="math">f(n) = O(g(n))</span> should be read "<span class="math">f</span> is in <span class="math">O(g)</span>", and it is not symmetric.</p><h3>Proving a bound</h3><div class="example"><span class="label">Example &middot; <span class="math">3n² + 5n + 100 = O(n²)</span></span><p>For <span class="math">n ≥ 1</span> we have <span class="math">n ≤ n²</span> and <span class="math">1 ≤ n²</span>, so <span class="math">3n² + 5n + 100 ≤ 3n² + 5n² + 100n² = 108n²</span>. The witnesses are <span class="math">C = 108</span> and <span class="math">k = 1</span>. Sharper choices exist &mdash; at <span class="math">n ≥ 10</span>, <span class="math">C = 5</span> works &mdash; and any valid pair proves the claim.</p></div><div class="example"><span class="label">Example &middot; <span class="math">n² ≠ O(n)</span></span><p>Suppose <span class="math">n² ≤ Cn</span> for all <span class="math">n ≥ k</span>. Dividing by <span class="math">n</span> gives <span class="math">n ≤ C</span> for all <span class="math">n ≥ k</span>, which is false for <span class="math">n &gt; max(C, k)</span>. No pair of witnesses exists.</p></div><p>That is the shape of a disproof: assume witnesses and derive a contradiction. It is a direct proof of a negation, and Logic and Proof lesson 13 is the technique.</p><h3>Useful properties</h3><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">transitive       f = O(g),  g = O(h)   ⟹   f = O(h)
 sum              f₁ = O(g₁), f₂ = O(g₂) ⟹ f₁+f₂ = O(max(g₁,g₂))
 product          f₁ = O(g₁), f₂ = O(g₂) ⟹ f₁·f₂ = O(g₁·g₂)
 constants        c·f = O(f)   for any constant c &gt; 0
@@ -1292,7 +1297,7 @@ logs             log_a n = Θ(log_b n)   — the base is a constant factor</div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>measured</span><span class="tone-purple"><i class="legend-swatch"></i>predicted</span><span class="tone-amber"><i class="legend-swatch"></i>crossover</span></div>
       </div>
       <div class="lab-stage"><svg id="alPlot" viewBox="0 0 520 230" role="img" aria-label="Operation counts plotted against input size."></svg></div>
-      <div class="table-wrap" style="margin-top:12px;"><table class="tt" id="alTable"></table></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="alTable"></table></div>
       <div class="status-banner" id="alStatus" style="margin-top:12px;"></div>
         </article>
         <aside class="card side-panel" aria-live="polite">
@@ -1374,7 +1379,7 @@ logs             log_a n = Θ(log_b n)   — the base is a constant factor</div>
         <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
         <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
       </article>
-      <article class="card card-pad prose"><h3>Two proofs</h3><p>One positive, one negative.</p><div class="mathblock">CLAIM   n² + 2n + 1 = O(n²)
+      <article class="card card-pad prose"><h3>Two proofs</h3><p>One positive, one negative.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">CLAIM   n² + 2n + 1 = O(n²)
 
    for n ≥ 1:   2n ≤ 2n²   and   1 ≤ n²
    so  n² + 2n + 1 ≤ n² + 2n² + n² = 4n²
@@ -1405,9 +1410,9 @@ CLAIM   2ⁿ ≠ O(n¹⁰⁰)
         <a href="../../progress/">Carry it to another device</a>.</p>
     </div>
 
-    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Lesson navigation">
-      <a class="lesson-link prev" href="../growth-of-functions/" rel="prev"><span>Previous lesson</span><strong>03 &middot; The Growth of Functions</strong></a>
-      <a class="lesson-link next" href="../analysing-iterative-algorithms/" rel="next"><span>Next lesson</span><strong>05 &middot; Analysing Iterative Algorithms</strong></a>
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../growth-of-functions/" rel="prev"><span>Lesson</span><strong>The Growth of Functions</strong></a>
+      <a class="lesson-link next" href="../analysing-iterative-algorithms/" rel="next"><span>Lesson</span><strong>Analysing Iterative Algorithms</strong></a>
     </nav>
 
     <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"

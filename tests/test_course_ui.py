@@ -187,7 +187,7 @@ class TestGeneratedLessonUI(unittest.TestCase):
         doc = Elements(markup)
         self.assertIn("Check your understanding", [words(n) for n in doc.find("h3")])
         terminal = doc.find("a", **{"class": "lesson-link next"})[0]
-        self.assertEqual("Course overview", words(terminal["children"][0]))
+        self.assertEqual("Course", words(terminal["children"][0]))
         self.assertNotIn("rel", terminal["attrs"])
         self.assertEqual("../", terminal["attrs"]["href"])
         self.assertIn(build_paths.render.inline(lesson["standard"][1]), markup,
@@ -277,7 +277,7 @@ class TestTradingIntakeUI(unittest.TestCase):
         self.assertEqual(["Learn library","Trading","Options Trading",lesson.title],
             [words(n) for n in breadcrumb["children"] if n["attrs"].get("aria-hidden") != "true"])
         terminal=Elements(intake_course.build_pager(ctx)).find("a")[0]
-        self.assertEqual("Course overview",words(terminal["children"][0]))
+        self.assertEqual("Course",words(terminal["children"][0]))
         self.assertNotIn("rel",terminal["attrs"])
 
 
