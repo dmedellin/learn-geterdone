@@ -104,7 +104,7 @@ def main():
         # Shared inventory fixtures reject dropping input kinds and losing label ownership.
         source = Path(__file__).with_name('interactive_targets.js').read_text()
         for old, new in [('input:not([type="hidden"])', 'input[type="button"]'),
-                         ("new Set(['checkbox', 'radio'])", "new Set()")]:
+                         ("new Set(['checkbox', 'radio', 'file'])", "new Set()")]:
             assert old in source
             with tempfile.TemporaryDirectory(prefix='learn-inventory-mutation-') as tmp:
                 target = Path(tmp) / 'targets.js'; target.write_text(source.replace(old, new, 1))

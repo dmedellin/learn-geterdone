@@ -1113,10 +1113,11 @@
       border: 1px solid var(--line); border-radius: 16px;
       background: var(--panel); color: var(--text);
     }
-    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 0; }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
     [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
     [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
     [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
     [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
     [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
     [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
@@ -1177,6 +1178,30 @@
     [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
     [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
     body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    @media (max-width: 920px) {
+      body[data-page-kind="supplemental"] [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
     @media (max-width: 720px) {
       [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
       [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
@@ -1956,6 +1981,27 @@ answer   3x² + 2x + 8</div><p>The two signs that flipped were on <span class="m
     });
   }
 
+  /* Position the complete rendered glyph box, not an estimate from character
+     count. Curves keep their mathematical coordinates and their original clip.
+     Text too large for the region is intentionally absent. */
+  function plotText(parent, attrs, text, bounds) {
+    var t = svgel('text', attrs);
+    t.textContent = text;
+    parent.appendChild(t);
+    // Arithmetic-only harnesses have no font/layout engine. Browser contracts
+    // exercise this branch with the actual shipped fonts and SVG geometry.
+    if (typeof t.getBBox !== 'function') return t;
+    var b = t.getBBox(), gap = 2;
+    if (b.width > bounds[2] - bounds[0] - 2 * gap || b.height > bounds[3] - bounds[1] - 2 * gap) {
+      t.remove(); return null;
+    }
+    var dx = Math.max(bounds[0] + gap - b.x, Math.min(0, bounds[2] - gap - b.x - b.width));
+    var dy = Math.max(bounds[1] + gap - b.y, Math.min(0, bounds[3] - gap - b.y - b.height));
+    t.setAttribute('x', Number(attrs.x) + dx);
+    t.setAttribute('y', Number(attrs.y) + dy);
+    return t;
+  }
+
   function Plot(svg, win) {
     var xmin = win.xmin, xmax = win.xmax, ymin = win.ymin, ymax = win.ymax;
     var iw = PLOT_W - PAD_L - PAD_R, ih = PLOT_H - PAD_T - PAD_B;
@@ -1973,6 +2019,8 @@ answer   3x² + 2x + 8</div><p>The two signs that flipped were on <span class="m
     svg.appendChild(defs);
 
     var plotted = svgel('g', { 'clip-path': 'url(#plotclip)' });
+    var textBounds = [PAD_L, PAD_T, PAD_L + iw, PAD_T + ih];
+    function inWindow(x, y) { return isFinite(x) && isFinite(y) && x >= xmin && x <= xmax && y >= ymin && y <= ymax; }
 
     var api = {
       sx: sx, sy: sy, win: win,
@@ -1980,13 +2028,14 @@ answer   3x² + 2x + 8</div><p>The two signs that flipped were on <span class="m
       frame: function () {
         var gx = nicestep(xmax - xmin), gy = nicestep(ymax - ymin);
         var g = svgel('g', {});
+        svg.appendChild(g);
         var start = Math.ceil(xmin / gx) * gx, v;
-        for (v = start; v <= xmax + gx / 2; v += gx) {
+        for (v = start; v <= xmax; v += gx) {
           if (Math.abs(v) < gx / 1000) continue;
           g.appendChild(svgel('line', { class: 'plot-grid', x1: sx(v), y1: PAD_T, x2: sx(v), y2: PAD_T + ih }));
         }
         start = Math.ceil(ymin / gy) * gy;
-        for (v = start; v <= ymax + gy / 2; v += gy) {
+        for (v = start; v <= ymax; v += gy) {
           if (Math.abs(v) < gy / 1000) continue;
           g.appendChild(svgel('line', { class: 'plot-grid', x1: PAD_L, y1: sy(v), x2: PAD_L + iw, y2: sy(v) }));
         }
@@ -1997,18 +2046,13 @@ answer   3x² + 2x + 8</div><p>The two signs that flipped were on <span class="m
         var ax = xmin <= 0 && xmax >= 0 ? sx(0) : (xmin > 0 ? PAD_L : PAD_L + iw);
         g.appendChild(svgel('line', { class: 'plot-axis', x1: PAD_L, y1: ay, x2: PAD_L + iw, y2: ay }));
         g.appendChild(svgel('line', { class: 'plot-axis', x1: ax, y1: PAD_T, x2: ax, y2: PAD_T + ih }));
-        for (v = Math.ceil(xmin / gx) * gx; v <= xmax + gx / 2; v += gx) {
-          var tx = svgel('text', { class: 'plot-tick', x: sx(v), y: PAD_T + ih + 15, 'text-anchor': 'middle' });
-          tx.textContent = ticktext(v, gx);
-          g.appendChild(tx);
+        for (v = Math.ceil(xmin / gx) * gx; v <= xmax; v += gx) {
+          plotText(g, { class: 'plot-tick', x: sx(v), y: PAD_T + ih + 15, 'text-anchor': 'middle' }, ticktext(v, gx), [0, 0, PLOT_W, PLOT_H]);
         }
-        for (v = Math.ceil(ymin / gy) * gy; v <= ymax + gy / 2; v += gy) {
+        for (v = Math.ceil(ymin / gy) * gy; v <= ymax; v += gy) {
           if (Math.abs(v) < gy / 1000) continue;
-          var ty = svgel('text', { class: 'plot-tick', x: PAD_L - 7, y: sy(v) + 3.5, 'text-anchor': 'end' });
-          ty.textContent = ticktext(v, gy);
-          g.appendChild(ty);
+          plotText(g, { class: 'plot-tick', x: PAD_L - 7, y: sy(v) + 3.5, 'text-anchor': 'end' }, ticktext(v, gy), [0, 0, PLOT_W, PLOT_H]);
         }
-        svg.appendChild(g);
         svg.appendChild(plotted);
         return api;
       },
@@ -2040,10 +2084,8 @@ answer   3x² + 2x + 8</div><p>The two signs that flipped were on <span class="m
       point: function (x, y, cls, label) {
         if (!isFinite(x) || !isFinite(y)) return api;
         plotted.appendChild(svgel('circle', { class: cls || 'plot-point', cx: sx(x), cy: sy(y), r: 5 }));
-        if (label) {
-          var t = svgel('text', { class: 'plot-label', x: sx(x) + 9, y: sy(y) - 8 });
-          t.textContent = label;
-          plotted.appendChild(t);
+        if (label && inWindow(x, y)) {
+          plotText(plotted, { class: 'plot-label', x: sx(x) + 9, y: sy(y) - 8 }, label, textBounds);
         }
         return api;
       },
@@ -2054,19 +2096,15 @@ answer   3x² + 2x + 8</div><p>The two signs that flipped were on <span class="m
       },
       vline: function (x, cls, label) {
         plotted.appendChild(svgel('line', { class: cls || 'plot-asym', x1: sx(x), y1: PAD_T, x2: sx(x), y2: PAD_T + ih }));
-        if (label) {
-          var t = svgel('text', { class: 'plot-label', x: sx(x) + 6, y: PAD_T + 14 });
-          t.textContent = label;
-          plotted.appendChild(t);
+        if (label && x >= xmin && x <= xmax) {
+          plotText(plotted, { class: 'plot-label', x: sx(x) + 6, y: PAD_T + 14 }, label, textBounds);
         }
         return api;
       },
       hline: function (y, cls, label) {
         plotted.appendChild(svgel('line', { class: cls || 'plot-asym', x1: PAD_L, y1: sy(y), x2: PAD_L + iw, y2: sy(y) }));
-        if (label) {
-          var t = svgel('text', { class: 'plot-label', x: PAD_L + 6, y: sy(y) - 6 });
-          t.textContent = label;
-          plotted.appendChild(t);
+        if (label && y >= ymin && y <= ymax) {
+          plotText(plotted, { class: 'plot-label', x: PAD_L + 6, y: sy(y) - 6 }, label, textBounds);
         }
         return api;
       },
@@ -2092,9 +2130,7 @@ answer   3x² + 2x + 8</div><p>The two signs that flipped were on <span class="m
         return api;
       },
       label: function (x, y, text, cls) {
-        var t = svgel('text', { class: cls || 'plot-label', x: sx(x), y: sy(y) });
-        t.textContent = text;
-        plotted.appendChild(t);
+        if (inWindow(x, y)) plotText(plotted, { class: cls || 'plot-label', x: sx(x), y: sy(y) }, text, textBounds);
         return api;
       },
       describe: function (text) { svg.setAttribute('aria-label', text); return api; }
@@ -2111,11 +2147,9 @@ answer   3x² + 2x + 8</div><p>The two signs that flipped were on <span class="m
     function sx(x) { return pad + (x - lo) / (hi - lo) * iw; }
     svg.appendChild(svgel('line', { class: 'plot-axis', x1: pad, y1: 44, x2: W - pad, y2: 44 }));
     var step = nicestep(hi - lo);
-    for (var v = Math.ceil(lo / step) * step; v <= hi + step / 2; v += step) {
+    for (var v = Math.ceil(lo / step) * step; v <= hi; v += step) {
       svg.appendChild(svgel('line', { class: 'plot-tickmark', x1: sx(v), y1: 38, x2: sx(v), y2: 50 }));
-      var t = svgel('text', { class: 'plot-tick', x: sx(v), y: 68, 'text-anchor': 'middle' });
-      t.textContent = ticktext(v, step);
-      svg.appendChild(t);
+      plotText(svg, { class: 'plot-tick', x: sx(v), y: 68, 'text-anchor': 'middle' }, ticktext(v, step), [0, 0, W, H]);
     }
     return {
       sx: sx,

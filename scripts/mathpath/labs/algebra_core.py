@@ -515,6 +515,27 @@ PLOT_JS = r"""
     });
   }
 
+  /* Position the complete rendered glyph box, not an estimate from character
+     count. Curves keep their mathematical coordinates and their original clip.
+     Text too large for the region is intentionally absent. */
+  function plotText(parent, attrs, text, bounds) {
+    var t = svgel('text', attrs);
+    t.textContent = text;
+    parent.appendChild(t);
+    // Arithmetic-only harnesses have no font/layout engine. Browser contracts
+    // exercise this branch with the actual shipped fonts and SVG geometry.
+    if (typeof t.getBBox !== 'function') return t;
+    var b = t.getBBox(), gap = 2;
+    if (b.width > bounds[2] - bounds[0] - 2 * gap || b.height > bounds[3] - bounds[1] - 2 * gap) {
+      t.remove(); return null;
+    }
+    var dx = Math.max(bounds[0] + gap - b.x, Math.min(0, bounds[2] - gap - b.x - b.width));
+    var dy = Math.max(bounds[1] + gap - b.y, Math.min(0, bounds[3] - gap - b.y - b.height));
+    t.setAttribute('x', Number(attrs.x) + dx);
+    t.setAttribute('y', Number(attrs.y) + dy);
+    return t;
+  }
+
   function Plot(svg, win) {
     var xmin = win.xmin, xmax = win.xmax, ymin = win.ymin, ymax = win.ymax;
     var iw = PLOT_W - PAD_L - PAD_R, ih = PLOT_H - PAD_T - PAD_B;
@@ -532,6 +553,8 @@ PLOT_JS = r"""
     svg.appendChild(defs);
 
     var plotted = svgel('g', { 'clip-path': 'url(#plotclip)' });
+    var textBounds = [PAD_L, PAD_T, PAD_L + iw, PAD_T + ih];
+    function inWindow(x, y) { return isFinite(x) && isFinite(y) && x >= xmin && x <= xmax && y >= ymin && y <= ymax; }
 
     var api = {
       sx: sx, sy: sy, win: win,
@@ -539,13 +562,14 @@ PLOT_JS = r"""
       frame: function () {
         var gx = nicestep(xmax - xmin), gy = nicestep(ymax - ymin);
         var g = svgel('g', {});
+        svg.appendChild(g);
         var start = Math.ceil(xmin / gx) * gx, v;
-        for (v = start; v <= xmax + gx / 2; v += gx) {
+        for (v = start; v <= xmax; v += gx) {
           if (Math.abs(v) < gx / 1000) continue;
           g.appendChild(svgel('line', { class: 'plot-grid', x1: sx(v), y1: PAD_T, x2: sx(v), y2: PAD_T + ih }));
         }
         start = Math.ceil(ymin / gy) * gy;
-        for (v = start; v <= ymax + gy / 2; v += gy) {
+        for (v = start; v <= ymax; v += gy) {
           if (Math.abs(v) < gy / 1000) continue;
           g.appendChild(svgel('line', { class: 'plot-grid', x1: PAD_L, y1: sy(v), x2: PAD_L + iw, y2: sy(v) }));
         }
@@ -556,18 +580,13 @@ PLOT_JS = r"""
         var ax = xmin <= 0 && xmax >= 0 ? sx(0) : (xmin > 0 ? PAD_L : PAD_L + iw);
         g.appendChild(svgel('line', { class: 'plot-axis', x1: PAD_L, y1: ay, x2: PAD_L + iw, y2: ay }));
         g.appendChild(svgel('line', { class: 'plot-axis', x1: ax, y1: PAD_T, x2: ax, y2: PAD_T + ih }));
-        for (v = Math.ceil(xmin / gx) * gx; v <= xmax + gx / 2; v += gx) {
-          var tx = svgel('text', { class: 'plot-tick', x: sx(v), y: PAD_T + ih + 15, 'text-anchor': 'middle' });
-          tx.textContent = ticktext(v, gx);
-          g.appendChild(tx);
+        for (v = Math.ceil(xmin / gx) * gx; v <= xmax; v += gx) {
+          plotText(g, { class: 'plot-tick', x: sx(v), y: PAD_T + ih + 15, 'text-anchor': 'middle' }, ticktext(v, gx), [0, 0, PLOT_W, PLOT_H]);
         }
-        for (v = Math.ceil(ymin / gy) * gy; v <= ymax + gy / 2; v += gy) {
+        for (v = Math.ceil(ymin / gy) * gy; v <= ymax; v += gy) {
           if (Math.abs(v) < gy / 1000) continue;
-          var ty = svgel('text', { class: 'plot-tick', x: PAD_L - 7, y: sy(v) + 3.5, 'text-anchor': 'end' });
-          ty.textContent = ticktext(v, gy);
-          g.appendChild(ty);
+          plotText(g, { class: 'plot-tick', x: PAD_L - 7, y: sy(v) + 3.5, 'text-anchor': 'end' }, ticktext(v, gy), [0, 0, PLOT_W, PLOT_H]);
         }
-        svg.appendChild(g);
         svg.appendChild(plotted);
         return api;
       },
@@ -599,10 +618,8 @@ PLOT_JS = r"""
       point: function (x, y, cls, label) {
         if (!isFinite(x) || !isFinite(y)) return api;
         plotted.appendChild(svgel('circle', { class: cls || 'plot-point', cx: sx(x), cy: sy(y), r: 5 }));
-        if (label) {
-          var t = svgel('text', { class: 'plot-label', x: sx(x) + 9, y: sy(y) - 8 });
-          t.textContent = label;
-          plotted.appendChild(t);
+        if (label && inWindow(x, y)) {
+          plotText(plotted, { class: 'plot-label', x: sx(x) + 9, y: sy(y) - 8 }, label, textBounds);
         }
         return api;
       },
@@ -613,19 +630,15 @@ PLOT_JS = r"""
       },
       vline: function (x, cls, label) {
         plotted.appendChild(svgel('line', { class: cls || 'plot-asym', x1: sx(x), y1: PAD_T, x2: sx(x), y2: PAD_T + ih }));
-        if (label) {
-          var t = svgel('text', { class: 'plot-label', x: sx(x) + 6, y: PAD_T + 14 });
-          t.textContent = label;
-          plotted.appendChild(t);
+        if (label && x >= xmin && x <= xmax) {
+          plotText(plotted, { class: 'plot-label', x: sx(x) + 6, y: PAD_T + 14 }, label, textBounds);
         }
         return api;
       },
       hline: function (y, cls, label) {
         plotted.appendChild(svgel('line', { class: cls || 'plot-asym', x1: PAD_L, y1: sy(y), x2: PAD_L + iw, y2: sy(y) }));
-        if (label) {
-          var t = svgel('text', { class: 'plot-label', x: PAD_L + 6, y: sy(y) - 6 });
-          t.textContent = label;
-          plotted.appendChild(t);
+        if (label && y >= ymin && y <= ymax) {
+          plotText(plotted, { class: 'plot-label', x: PAD_L + 6, y: sy(y) - 6 }, label, textBounds);
         }
         return api;
       },
@@ -651,9 +664,7 @@ PLOT_JS = r"""
         return api;
       },
       label: function (x, y, text, cls) {
-        var t = svgel('text', { class: cls || 'plot-label', x: sx(x), y: sy(y) });
-        t.textContent = text;
-        plotted.appendChild(t);
+        if (inWindow(x, y)) plotText(plotted, { class: cls || 'plot-label', x: sx(x), y: sy(y) }, text, textBounds);
         return api;
       },
       describe: function (text) { svg.setAttribute('aria-label', text); return api; }
@@ -670,11 +681,9 @@ PLOT_JS = r"""
     function sx(x) { return pad + (x - lo) / (hi - lo) * iw; }
     svg.appendChild(svgel('line', { class: 'plot-axis', x1: pad, y1: 44, x2: W - pad, y2: 44 }));
     var step = nicestep(hi - lo);
-    for (var v = Math.ceil(lo / step) * step; v <= hi + step / 2; v += step) {
+    for (var v = Math.ceil(lo / step) * step; v <= hi; v += step) {
       svg.appendChild(svgel('line', { class: 'plot-tickmark', x1: sx(v), y1: 38, x2: sx(v), y2: 50 }));
-      var t = svgel('text', { class: 'plot-tick', x: sx(v), y: 68, 'text-anchor': 'middle' });
-      t.textContent = ticktext(v, step);
-      svg.appendChild(t);
+      plotText(svg, { class: 'plot-tick', x: sx(v), y: 68, 'text-anchor': 'middle' }, ticktext(v, step), [0, 0, W, H]);
     }
     return {
       sx: sx,

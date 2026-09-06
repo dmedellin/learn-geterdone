@@ -753,10 +753,13 @@ def main():
     for relative, canonical, up, title, description, body, script, extra_css in pages:
         target = ROOT / relative
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(page(title=title, description=description,
-                               canonical_path=canonical, up=up, body=body, script=script,
-                               extra_css=extra_css),
-                          encoding="utf-8")
+        rendered = page(title=title, description=description,
+                        canonical_path=canonical, up=up, body=body, script=script,
+                        extra_css=extra_css)
+        if target.is_file() and target.read_text(encoding="utf-8") == rendered:
+            print("current site/%s (0 rewritten)" % relative)
+            continue
+        target.write_text(rendered, encoding="utf-8")
         print("wrote site/%s (%d bytes)" % (relative, target.stat().st_size))
 
 

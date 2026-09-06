@@ -5,7 +5,7 @@
  */
 (function(root) {
   const SELECTOR = 'a[href],button,input:not([type="hidden"]),select,textarea,summary,[role="button"],[role="checkbox"],[role="radio"],[role="slider"],[role="switch"],[role="tab"],[role="link"],[role="textbox"],[role="combobox"],[tabindex],[contenteditable="true"]';
-  const LABEL_OWNER_TYPES = new Set(['checkbox', 'radio']);
+  const LABEL_OWNER_TYPES = new Set(['checkbox', 'radio', 'file']);
   function inventory(scope = document) {
     return Array.from(scope.querySelectorAll(SELECTOR), control => {
       const labels = Array.from(control.labels || []);
@@ -16,9 +16,16 @@
     });
   }
   const api = {SELECTOR, inventory};
-  if (typeof module !== 'undefined') module.exports = api;
+  // Window named properties may be DOM elements called process or module.
+  // Only the actual Node/CommonJS boundary may export or run the CLI fixtures.
+  const nodeModule = typeof process === 'object' && process !== null &&
+    Object.prototype.toString.call(process) === '[object process]' &&
+    Array.isArray(process.argv) && process.release?.name === 'node' &&
+    typeof require === 'function' && typeof module === 'object' && module !== null &&
+    module instanceof require('node:module') && typeof module.exports === 'object';
+  if (nodeModule) module.exports = api;
   root.learnInteractiveTargets = api;
-  if (typeof process !== 'undefined' && process.argv.includes('--test')) {
+  if (nodeModule && process.argv.includes('--test')) {
     const assert = require('node:assert/strict');
     // Assert selector categories independently, including types absent from the
     // current site (radio). Runtime-generated cells are covered by role/button.
@@ -33,7 +40,7 @@
     for (const item of results) {
       assert.equal(item.control, controls[results.indexOf(item)]);
       assert.ok(item.owners.includes(item.control));
-      if (['checkbox','radio'].includes(item.kind)) {
+      if (['checkbox','radio','file'].includes(item.kind)) {
         assert.ok(item.owners.includes(item.labels[0]), 'associated label must own a possible hit area');
         assert.equal(item.ownerPolicy, 'native control or associated label');
       } else assert.deepEqual(item.owners, [item.control]);

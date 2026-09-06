@@ -413,6 +413,53 @@ def annotate(text, tag, name, *, cls=None, identity=None):
     return text[:node["start"]] + opening[:-1] + ' data-ui="%s">' % name + text[node["open_end"]:]
 
 
+def normalize_capstone_ui(text, relative):
+    """Shared identity around the two authoritative supplemental documents.
+
+    Content, data and deck-specific screen/print styling stay authored in HTML.
+    Only shared chrome is regenerated on subsequent normalization passes.
+    """
+    slides = bool(re.search(r'<main\b[^>]*class="deck"', text))
+    kind = 'slides' if slides else 'supplemental'
+    body = element(text, 'body')
+    text = text[:body['start']] + '<body data-page-kind="%s">' % kind + text[body['open_end']:]
+    up = up_to_root(relative)
+    if any(n['attrs'].get('data-ui') == 'masthead' for n in ElementSpans(text).elements):
+        text = replace_element(text, element(text, 'header', cls='topbar'), chrome.masthead(up).strip())
+        if not slides and not any(n['tag'] == 'a' and n['attrs'].get('href') == 'slides/' for n in ElementSpans(text).elements):
+            actions = element(text, 'div', cls='hero-actions')
+            text = text[:actions['close_start']] + '<a class="btn" href="slides/">Open slide deck</a>' + text[actions['close_start']:]
+        return text
+    crumbs = chrome.crumbs([
+        ('Learn library', up), ('Trading', '../../' if slides else '../'),
+        ('IREN, August 16, 2026' + (' · Slide deck' if slides else ''), None)])
+    skip = '<a class="skip-link" href="#main">Skip to content</a>'
+    if slides:
+        text = replace_element(text, element(text, 'div', cls='deck-top'),
+                               skip + '<div class="deck-header">' + chrome.masthead(up) + crumbs + '</div>')
+        text = text.replace('<main class="deck">', '<main class="deck" id="main">', 1)
+        text = text.replace('<span class="kicker">IREN · Extra analysis lab</span>',
+                            '<span class="kicker" data-ui="page-kind">Slide deck · IREN supplemental lab</span>', 1)
+        text = annotate(text, 'footer', 'footer', cls='deck-footer')
+    else:
+        shell = element(text, 'main', cls='shell')
+        text = replace_element(text, shell, '<div class="shell">' + text[shell['open_end']:shell['close_start']] + '</div>')
+        text = replace_element(text, element(text, 'header', cls='topbar'), skip + chrome.masthead(up))
+        text = replace_element(text, element(text, 'nav', cls='crumbs'), crumbs)
+        asof = element(text, 'section', identity='as-of')
+        text = text[:asof['start']] + '<main id="main">' + text[asof['start']:]
+        foot = element(text, 'footer')
+        text = text[:foot['start']] + '</main>' + text[foot['start']:]
+        text = annotate(text, 'section', 'hero', cls='hero')
+        text = annotate(text, 'div', 'primary-actions', cls='hero-actions')
+        text = annotate(text, 'footer', 'footer')
+        text = text.replace('<span class="eyebrow"><i class="pulse"></i> Extra Lab',
+                            '<span class="eyebrow" data-ui="page-kind"><i class="pulse"></i> Supplemental lab', 1)
+        actions = element(text, 'div', cls='hero-actions')
+        text = text[:actions['close_start']] + '<a class="btn" href="slides/">Open slide deck</a>' + text[actions['close_start']:]
+    return text
+
+
 def normalize_taxonomy_copy(text, courses, *, lesson=False):
     """Change curriculum references in prose and accessible copy, never code or URLs."""
     parsed = ElementSpans(text)
@@ -965,7 +1012,7 @@ def main():
             continue
         before = (SITE / relative).read_text(encoding="utf-8")
         text = ensure_css(before)
-        text = ensure_masthead(text, relative)
+        text = normalize_capstone_ui(text, relative)
         text = ensure_script(text, SIGNIN_JS)
         text = normalize_taxonomy_copy(text, courses)
         save(relative, text, before)

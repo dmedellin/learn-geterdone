@@ -1748,7 +1748,7 @@ def logarithm_lab(cfg):
     plot.vline(0, 'plot-asym', 'x = 0');
     plot.curve(function (t) { return t > 0 ? Math.log(t) / Math.LN10 : NaN; });
     plot.curve(function (t) { return t > 0 ? Math.log(t) : NaN; }, 'plot-curve alt');
-    plot.point(xv, log10, 'plot-point', 'log_10 &asymp; ' + log10.toFixed(4));
+    plot.point(xv, log10, 'plot-point', 'log_10 ≈ ' + log10.toFixed(4));
     plot.point(xv, ln, 'plot-point vertex');
     plot.describe('y = log_10(x) and y = ln(x) with x = ' + Rtext(x) + ' marked on both.');
 
@@ -2024,7 +2024,7 @@ def logarithm_lab(cfg):
     plot.curve(f);
     if (solved !== null) plot.point(Rfloat(solved), kv, 'plot-point root', 'x = ' + Rtext(solved));
     else if (Rsign(rhs) > 0 && !Rzero(c) && isFinite(centre)) {
-      plot.point(centre, kv, 'plot-point root', 'x &asymp; ' + centre.toFixed(4));
+      plot.point(centre, kv, 'plot-point root', 'x ≈ ' + centre.toFixed(4));
     }
     plot.describe('y = ' + expr + ' and the horizontal line y = ' + Rtext(k)
       + (Rsign(rhs) <= 0 ? ', which the curve never reaches.' : ', meeting at the solution.'));
