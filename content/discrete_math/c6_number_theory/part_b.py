@@ -593,10 +593,7 @@ LESSONS = [
                      "multiplicative on coprime arguments, so "
                      "`φ(mn) = φ(m)φ(n)` when `gcd(m,n) = 1`. In general "
                      "`φ(n) = n Π_{p | n} (1 − 1/p)`.")),
-            ("p", "The multiplicativity is the Chinese remainder theorem in disguise: "
-                  "`ℤ_{mn} ≅ ℤ_m × ℤ_n` for coprime moduli, and an element is invertible in "
-                  "the product exactly when both components are. The product formula is "
-                  "inclusion and exclusion over the prime divisors, from course 4 lesson 9."),
+            ("p", "The multiplicativity is the Chinese remainder theorem in disguise: `ℤ_{mn} ≅ ℤ_m × ℤ_n` for coprime moduli, and an element is invertible in the product exactly when both components are. The product formula is inclusion and exclusion over the prime divisors, from Combinatorics and Counting lesson 9."),
             ("math", [
                 "φ(7)  = 6              prime",
                 "φ(9)  = 9 − 3 = 6      = 3² − 3",
@@ -775,10 +772,7 @@ LESSONS = [
             ("def", ("Hash function",
                      "A function `h` mapping a large key space into `{0, 1, …, m−1}`. The "
                      "simplest is `h(k) = k mod m`.")),
-            ("p", "Since the key space is larger than the range, collisions are "
-                  "unavoidable: by the pigeonhole principle of course 2 lesson 14, some "
-                  "slot receives more than one key. A hash table is therefore designed "
-                  "around collisions &mdash; by chaining, or by probing for another slot."),
+            ("p", "Since the key space is larger than the range, collisions are unavoidable: by the pigeonhole principle of Sets, Relations, and Functions lesson 14, some slot receives more than one key. A hash table is therefore designed around collisions &mdash; by chaining, or by probing for another slot."),
             ("thm", ("Why the modulus should be prime",
                      "If `m = 2^r`, then `k mod m` depends only on the low `r` bits of `k`. "
                      "Keys sharing those bits &mdash; addresses aligned to a boundary, "
@@ -788,11 +782,7 @@ LESSONS = [
                          "Hashing memory addresses with `m = 16` when every address is a "
                          "multiple of 16 sends every key to slot 0. With `m = 17` the same "
                          "keys spread across all seventeen slots.")),
-            ("p", "The birthday problem of course 5 lesson 2 gives the collision rate: with "
-                  "`m` slots and `n` keys, collisions become likely once `n` is around "
-                  "`√m`. A table of a million slots sees its first collision after about a "
-                  "thousand insertions, which is why load factors are managed rather than "
-                  "collisions avoided."),
+            ("p", "The birthday problem of Discrete Probability lesson 2 gives the collision rate: with `m` slots and `n` keys, collisions become likely once `n` is around `√m`. A table of a million slots sees its first collision after about a thousand insertions, which is why load factors are managed rather than collisions avoided."),
             ("h3", "Linear congruential generators"),
             ("def", ("LCG",
                      "`x_{n+1} = (a·x_n + c) mod m`, from a seed `x₀`. The parameters "
@@ -881,11 +871,7 @@ LESSONS = [
                    "Modular arithmetic is imprecise",
                    "They are avoidable with a prime modulus"],
              "c": 1,
-             "why": "A map from a larger set to a smaller one cannot be injective "
-                    "(course 2 lesson 14), so the design question is how collisions are "
-                    "handled. A better hash function spreads them and cannot remove them; "
-                    "modular arithmetic is exact; and a prime modulus changes which keys "
-                    "collide, not whether some do."},
+             "why": "A map from a larger set to a smaller one cannot be injective (Sets, Relations, and Functions lesson 14), so the design question is how collisions are handled. A better hash function spreads them and cannot remove them; modular arithmetic is exact; and a prime modulus changes which keys collide, not whether some do."},
             {"q": "`h(k) = k mod 2^r` is a poor choice because:",
              "a": ["it is slow",
                    "it uses only the low `r` bits of the key",
@@ -1336,7 +1322,7 @@ LESSONS = [
                      "it, and then factor `n` to recover `d`. With `e = 3` you should find "
                      "`n = 391`, `φ(n) = 352` and `d = 235`. Doing the attack yourself is "
                      "what makes the security argument concrete rather than asserted."),
-        "note": "This course ends where cryptographic engineering begins. Padding schemes, "
+        "note": "Padding schemes, "
                 "key management, side-channel resistance and protocol design are all "
                 "essential and none of them is number theory. What number theory supplies "
                 "is the core operation and an honest account of what it does and does not "

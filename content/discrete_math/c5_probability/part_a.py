@@ -20,16 +20,14 @@ LESSONS = [
         ],
         "key_label": "Two objects, one assumption",
         "concepts_intro": (
-            "Getting the sample space right is most of the work. The arithmetic that "
-            "follows is course 4."
+            "Getting the sample space right is most of the work. The arithmetic that follows is Combinatorics and Counting."
         ),
         "concepts": [
             ("An outcome is a complete result",
              "For two dice the outcomes are ordered pairs, not sums. Choosing the wrong "
              "granularity is the first and most damaging error."),
             ("An event is a subset",
-             "\"The sum is 7\" is the set of six pairs that sum to 7. Set operations from "
-             "course 2 apply unchanged: `∪` is \"or\", `∩` is \"and\", complement is \"not\"."),
+             "\"The sum is 7\" is the set of six pairs that sum to 7. Set operations from Sets, Relations, and Functions apply unchanged: `∪` is \"or\", `∩` is \"and\", complement is \"not\"."),
             ("Equally likely is a modelling choice",
              "It is justified by symmetry of the physical situation, and it must be "
              "checked. Sums of two dice are not equally likely; pairs are."),
@@ -41,11 +39,7 @@ LESSONS = [
                      "The <strong>sample space</strong> `S` is the set of all possible "
                      "outcomes of an experiment. An <strong>outcome</strong> is one "
                      "element of `S`; an <strong>event</strong> is a subset of `S`.")),
-            ("p", "The outcomes must be <strong>mutually exclusive</strong> (no two "
-                  "happen together) and <strong>exhaustive</strong> (at least one "
-                  "happens), so that exactly one happens. Those are the two obligations "
-                  "a proof by cases carries in course 1 lesson 14 &mdash; overlap nowhere, "
-                  "cover everything &mdash; and they fail in the same ways."),
+            ("p", "The outcomes must be <strong>mutually exclusive</strong> (no two happen together) and <strong>exhaustive</strong> (at least one happens), so that exactly one happens. Those are the two obligations a proof by cases carries in Logic and Proof lesson 14 &mdash; overlap nowhere, cover everything &mdash; and they fail in the same ways."),
             ("example", ("Two dice, two models",
                          "Model A: `S` is the 36 ordered pairs `(1,1)` through `(6,6)`, all "
                          "equally likely. Model B: `S` is the 11 sums `2, …, 12`. Both are "
@@ -66,13 +60,9 @@ LESSONS = [
                 "exactly one of A, B      A △ B",
                 "A and B cannot both      A ∩ B = ∅     (mutually exclusive)",
             ]),
-            ("p", "Every identity from course 2 lesson 4 therefore applies, and De Morgan "
-                  "is used constantly: \"not (A or B)\" is \"neither A nor B\", which is "
-                  "usually the easier event to count."),
+            ("p", "Every identity from Sets, Relations, and Functions lesson 4 therefore applies, and De Morgan is used constantly: \"not (A or B)\" is \"neither A nor B\", which is usually the easier event to count."),
             ("def", ("Probability of an event (equally likely case)",
-                     "When the outcomes of a finite `S` are equally likely, "
-                     "`P(E) = |E| / |S|`. Every probability in this course's early lessons "
-                     "is this ratio, computed with course 4's tools.")),
+                     "When the outcomes of a finite `S` are equally likely, `P(E) = |E| / |S|`. Every probability in this course's early lessons is this ratio, computed with tools from Combinatorics and Counting.")),
             ("example", ("Choosing a granularity",
                          "Flip three coins and ask for the probability of exactly two "
                          "heads. Outcomes as ordered triples: 8 equally likely, of which "
@@ -107,8 +97,7 @@ LESSONS = [
              "\"At least one 6\" is a specific set of pairs. Writing it out is what makes "
              "the count possible."),
             ("Count and divide",
-             "Course 4 supplies the counting. The division is the only new step in this "
-             "lesson."),
+             "Combinatorics and Counting supplies the counting. The division is the only new step in this lesson."),
         ],
         "worked": {
             "title": "Two dice, three events",
@@ -195,9 +184,7 @@ LESSONS = [
         "module": "The model",
         "one_line": "Counting the event, counting the space, dividing.",
         "summary": (
-            "With equally likely outcomes, every probability is a ratio of two counts, "
-            "so course 4 is the whole technique. Complementary counting is as useful "
-            "here as it was there."
+            "With equally likely outcomes, every probability is a ratio of two counts, so Combinatorics and Counting is the whole technique. Complementary counting is as useful here as it was there."
         ),
         "key": [
             "P(E) = |E| / |S|",
@@ -207,16 +194,14 @@ LESSONS = [
         ],
         "key_label": "Two counts and a division",
         "concepts_intro": (
-            "Nothing new is needed beyond course 4. What is new is that the answer must "
-            "lie between 0 and 1, which is a free check."
+            "Nothing new is needed beyond Combinatorics and Counting. What is new is that the answer must lie between 0 and 1, which is a free check."
         ),
         "concepts": [
             ("Count with the same tools",
              "Permutations, combinations, complements and inclusion&ndash;exclusion. The "
              "denominator is a count too and is often the easier one."),
             ("The complement rule saves work",
-             "`P(at least one) = 1 − P(none)`, exactly as in course 4 lesson 2 and for "
-             "the same reason."),
+             "`P(at least one) = 1 − P(none)`, exactly as in Combinatorics and Counting lesson 2 and for the same reason."),
             ("The answer is bounded",
              "Any probability outside `[0, 1]` is a counting error, and that check costs "
              "nothing."),
@@ -264,11 +249,7 @@ LESSONS = [
                   "<em>pairs</em>: 23 people form `C(23,2) = 253` pairs, and each has about "
                   "a `1/365` chance of matching. The intuition that fails is comparing 23 "
                   "with 365 rather than 253 with 365."),
-            ("p", "This is a different question from the pigeonhole statement in course 2 "
-                  "lesson 14. "
-                  "That one said 367 people <em>guarantee</em> a match; this one says 23 "
-                  "make it likely. Certainty and probability are different claims and "
-                  "neither implies the other."),
+            ("p", "This is a different question from the pigeonhole statement in Sets, Relations, and Functions lesson 14. That one said 367 people <em>guarantee</em> a match; this one says 23 make it likely. Certainty and probability are different claims and neither implies the other."),
             ("h3", "When outcomes are not equally likely"),
             ("p", "Then probabilities are assigned to outcomes directly, subject to being "
                   "non-negative and summing to 1, and `P(E) = Σ_{s ∈ E} P(s)`. A loaded "
@@ -296,7 +277,7 @@ LESSONS = [
              "This confirms what an outcome is. If `|S|` is hard to write down, the model "
              "is probably wrong."),
             ("Count the event",
-             "Using course 4. Classify by order and repetition exactly as there."),
+             "Using Combinatorics and Counting. Classify by order and repetition exactly as there."),
             ("Consider the complement",
              "\"At least one\" and \"not all\" almost always count more easily the other "
              "way round."),
@@ -323,9 +304,7 @@ LESSONS = [
                 " = 1712304 + 778320 + 103776 + 4512 + 48  =  2 598 960     ✓",
             ],
             "after": [
-                "The check is Vandermonde's identity from course 4 lesson 5, appearing as "
-                "a probability check: the five disjoint cases must exhaust the hands. It "
-                "would catch a wrong `C(48,3)` immediately."
+                "The check is Vandermonde's identity from Combinatorics and Counting lesson 5, appearing as a probability check: the five disjoint cases must exhaust the hands. It would catch a wrong `C(48,3)` immediately."
             ],
         },
         "quiz_title": "Computing probabilities",
@@ -366,8 +345,7 @@ LESSONS = [
             ("Counting \"at least one\" directly",
              "It produces overlapping cases. `1 − P(none)` cannot double-count."),
             ("Confusing certainty with high probability",
-             "367 people guarantee a shared birthday; 23 make it likely. Course 2's "
-             "pigeonhole and this lesson answer different questions."),
+             "367 people guarantee a shared birthday; 23 make it likely. the pigeonhole result from Sets, Relations, and Functions and this lesson answer different questions."),
         ],
         "standard": ("Finish when you check your answer against a complementary count.",
                      "Compute the probability that a five-card hand contains at least one "
@@ -408,8 +386,7 @@ LESSONS = [
              "`P(Ē) = 1 − P(E)` and `P(A ∪ B) = P(A) + P(B) − P(A ∩ B)` are proved, not "
              "assumed."),
             ("Additivity needs disjointness",
-             "For overlapping events the general rule is inclusion and exclusion, which is "
-             "course 4 lesson 9 with probabilities in place of counts."),
+             "For overlapping events the general rule is inclusion and exclusion, which is Combinatorics and Counting lesson 9 with probabilities in place of counts."),
         ],
         "read_title": "The axioms and what follows",
         "read_intro": "The three rules, then six theorems derived from them.",

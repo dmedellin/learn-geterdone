@@ -20,8 +20,7 @@ LESSONS = [
         ],
         "key_label": "One structure, two descriptions",
         "concepts_intro": (
-            "This is the first theorem on the path that says two apparently different "
-            "things are the same thing."
+            "This theorem says two apparently different things are the same thing."
         ),
         "concepts": [
             ("Equivalence generalises equality",
@@ -74,11 +73,7 @@ LESSONS = [
                      "classes; a partition gives the relation \"lies in the same block\"; "
                      "and each construction undoes the other.")),
             ("example", ("Congruence modulo 3",
-                         "On `ℤ`, define `a ∼ b` when `3 | (a − b)`. It is reflexive "
-                         "(`3 | 0`), symmetric (`3 | (a−b)` gives `3 | (b−a)`) and "
-                         "transitive (`3 | (a−b)` and `3 | (b−c)` give `3 | (a−c)`). The "
-                         "three classes are the integers leaving remainder 0, 1 and 2. "
-                         "Course 6 builds on nothing else.")),
+                         "On `ℤ`, define `a ∼ b` when `3 | (a − b)`. It is reflexive (`3 | 0`), symmetric (`3 | (a−b)` gives `3 | (b−a)`) and transitive (`3 | (a−b)` and `3 | (b−c)` give `3 | (a−c)`). The three classes are the integers leaving remainder 0, 1 and 2. Number Theory and Cryptography builds on nothing else.")),
             ("p", "The utility is that a class can be treated as one object. Arithmetic "
                   "modulo 3 works because `+` and `×` respect the classes: adding any "
                   "member of `[1]` to any member of `[2]` always lands in `[0]`. That "
@@ -126,13 +121,10 @@ LESSONS = [
                 "[−1] = [3]",
                 "",
                 "Four classes, pairwise disjoint, union ℤ.  This partition is",
-                "written ℤ/4ℤ, and course 6 does arithmetic in it.",
+                "written ℤ/4ℤ, and Number Theory and Cryptography does arithmetic in it.",
             ],
             "after": [
-                "`[4] = [0]` is the point at which representatives stop mattering. A class "
-                "has many names and one identity, which is why a definition made through a "
-                "representative has to be checked for independence of the choice &mdash; "
-                "the well-definedness question course 6 raises for modular arithmetic."
+                "`[4] = [0]` is the point at which representatives stop mattering. A class has many names and one identity, which is why a definition made through a representative has to be checked for independence of the choice &mdash; the well-definedness question Number Theory and Cryptography raises for modular arithmetic."
             ],
         },
         "quiz_title": "Equivalence",
@@ -172,10 +164,7 @@ LESSONS = [
                      "Take the partition `{{1,4}, {2}, {3,5}}` of `{1,…,5}`, write the "
                      "relation it induces as a set of pairs, and verify all three "
                      "properties. Then read the classes back off the relation."),
-        "note": "The number of partitions of an `n`-element set is the Bell number `Bₙ`: "
-                "1, 1, 2, 5, 15, 52, 203. It grows faster than exponentially and has no "
-                "simple closed form, which is a first sign that counting problems can be "
-                "hard in ways course 4 makes precise.",
+        "note": "The number of partitions of an `n`-element set is the Bell number `Bₙ`: 1, 1, 2, 5, 15, 52, 203. It grows faster than exponentially and has no simple closed form, which is a first sign that counting problems can be hard in ways Combinatorics and Counting makes precise.",
     },
     # ---------------------------------------------------------------- 09
     {
@@ -262,11 +251,7 @@ LESSONS = [
                   "distinct elements could each precede the other and both count as least, "
                   "and the notion would be useless."),
             ("def", ("Topological sort",
-                     "A <strong>topological sort</strong> of a finite poset is a total "
-                     "order extending it: a listing of the elements in which every element "
-                     "appears after everything below it. Every finite poset has at least "
-                     "one, and course 7 lesson 8 notes that a depth-first traversal of "
-                     "the directed graph produces one.")),
+                     "A <strong>topological sort</strong> of a finite poset is a total order extending it: a listing of the elements in which every element appears after everything below it. Every finite poset has at least one, and Graphs and Trees lesson 8 notes that a depth-first traversal of the directed graph produces one.")),
         ],
         "lab": ("relation", {
             "size": 5, "preset": "div",
@@ -364,12 +349,7 @@ LESSONS = [
                      "Eight vertices in four levels, with edges only between sets differing "
                      "by one element. Then identify the least, the greatest, and a pair of "
                      "incomparable elements in the middle two levels."),
-        "note": "Topological sorting is the practical face of this lesson: build "
-                "dependencies, course prerequisites and spreadsheet recalculation all "
-                "extend a partial order to a total one. Course 7 lesson 8's depth-first "
-                "search is where the algorithm comes from, and it fails exactly when the "
-                "dependencies contain a cycle "
-                "&mdash; which is to say, when they were not a partial order at all.",
+        "note": "Topological sorting is the practical face of this lesson: build dependencies, course prerequisites and spreadsheet recalculation all extend a partial order to a total one. Graphs and Trees lesson 8's depth-first search is where the algorithm comes from, and it fails exactly when the dependencies contain a cycle &mdash; which is to say, when they were not a partial order at all.",
     },
     # ---------------------------------------------------------------- 10
     {
@@ -448,10 +428,7 @@ LESSONS = [
                   "every `T`; it may be empty. The inverse <em>function</em> `f⁻¹` exists "
                   "only when `f` is a bijection, which is lesson 12."),
             ("def", ("Some standard functions",
-                     "`⌊x⌋` is the largest integer `≤ x`; `⌈x⌉` the smallest integer "
-                     "`≥ x`. The <strong>identity</strong> `id_A(a) = a`. A "
-                     "<strong>sequence</strong> is a function `ℕ → A`, which is why "
-                     "course 3's recurrences are functions on the naturals.")),
+                     "`⌊x⌋` is the largest integer `≤ x`; `⌈x⌉` the smallest integer `≥ x`. The <strong>identity</strong> `id_A(a) = a`. A <strong>sequence</strong> is a function `ℕ → A`, which is why Induction and Recursion's recurrences are functions on the naturals.")),
         ],
         "lab": ("function", {
             "panel_title": "Assign each input an output",
@@ -535,8 +512,7 @@ LESSONS = [
              "`1/x` is a perfectly good function &mdash; on `ℝ \\ {0}`. The rule and the "
              "domain together make the function."),
             ("Defining a function on classes without checking well-definedness",
-             "Any rule stated through a representative owes this check. It is the most "
-             "commonly skipped step in course 6."),
+             "Any rule stated through a representative owes this check. It is the most commonly skipped step in Number Theory and Cryptography."),
         ],
         "standard": ("Finish when you can state domain, codomain and image separately for "
                      "any function you meet.",
@@ -889,11 +865,7 @@ LESSONS = [
                      "With `f(x) = 3x + 1` and `g(x) = x − 4` on `ℝ`, compute `g ∘ f` and "
                      "`(g ∘ f)⁻¹` directly, then check the answer equals `f⁻¹ ∘ g⁻¹`. If "
                      "the two agree you have the order right."),
-        "note": "Bijections from a set to itself are called permutations, and under "
-                "composition they form a group: associative, with identity, and every "
-                "element invertible. Course 4 counts them &mdash; there are `n!` &mdash; "
-                "and that count is the reason permutations appear everywhere in "
-                "combinatorics.",
+        "note": "Bijections from a set to itself are called permutations, and under composition they form a group: associative, with identity, and every element invertible. Combinatorics and Counting counts them &mdash; there are `n!` &mdash; and that count is the reason permutations appear everywhere in combinatorics.",
     },
     # ---------------------------------------------------------------- 13
     {
@@ -1148,10 +1120,7 @@ LESSONS = [
             ]),
             ("h3", "Four applications"),
             ("example", ("Shared birthdays",
-                         "Among 367 people, two share a birthday. Boxes are the 366 "
-                         "possible dates; objects are the people. No assumption about "
-                         "distribution is needed &mdash; this is certainty, not probability, "
-                         "and is a different claim from the birthday problem of course 5.")),
+                         "Among 367 people, two share a birthday. Boxes are the 366 possible dates; objects are the people. No assumption about distribution is needed &mdash; this is certainty, not probability, and is a different claim from the birthday problem of Discrete Probability.")),
             ("example", ("A repeated remainder",
                          "Among any `n + 1` integers, two leave the same remainder on "
                          "division by `n`. The boxes are the `n` possible remainders "
@@ -1257,18 +1226,13 @@ LESSONS = [
             ("Rounding the generalised bound down",
              "It is `⌈n/k⌉`. With 20 objects and 6 boxes the guarantee is 4, not 3."),
             ("Reading the conclusion as probabilistic",
-             "Pigeonhole gives certainty. \"Two of 367 people share a birthday\" is not "
-             "likely; it is unavoidable, and course 5's birthday problem is a genuinely "
-             "different question."),
+             "Pigeonhole gives certainty. \"Two of 367 people share a birthday\" is not likely; it is unavoidable, and Discrete Probability's birthday problem is a genuinely different question."),
         ],
         "standard": ("Finish when you can invent the boxes yourself.",
                      "Prove that among any 10 distinct integers between 1 and 100, two "
                      "different subsets have the same sum. The objects are subsets and the "
                      "boxes are possible sums &mdash; count both and the argument writes "
                      "itself, which is the skill this lesson is for."),
-        "note": "Course 4 lesson 11 returns to the generalised principle with harder "
-                "applications, and course 7 uses it to prove that a graph on `n` vertices "
-                "with more than `n − 1` edges must contain a cycle. It is the most "
-                "reusable single fact on this path.",
+        "note": "Combinatorics and Counting lesson 11 returns to the generalised principle with harder applications, and Graphs and Trees uses it to prove that a graph on `n` vertices with more than `n − 1` edges must contain a cycle. It is a reusable fact in discrete mathematics.",
     },
 ]

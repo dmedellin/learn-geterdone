@@ -27,9 +27,7 @@ LESSONS = [
         ),
         "concepts": [
             ("A rational expression is a quotient of polynomials",
-             "`(3x + 1)/(x² − 5)` is one; so is `x + 2`, with denominator `1`. What is "
-             "<em>not</em> one is anything with a variable under a root or in an "
-             "exponent &mdash; those arrive in lesson 8 and in course 7."),
+             "`(3x + 1)/(x² − 5)` is one; so is `x + 2`, with denominator `1`. What is <em>not</em> one is anything with a variable under a root or in an exponent &mdash; those arrive in lesson 8 and in Exponential and Logarithmic Functions."),
             ("The denominator alone decides the domain",
              "The numerator may be anything, zero included. `(x − 4)/(x + 1)` is "
              "perfectly well defined at `x = 4`, where its value is `0`. It is `x = −1` "
@@ -287,8 +285,7 @@ LESSONS = [
         "steps_intro": "The order is fixed: exclusions are recorded before anything is struck out.",
         "steps": [
             ("Factor the numerator and the denominator",
-             "Completely, and separately. Greatest common factor first, then the "
-             "patterns from course 4 &mdash; difference of squares, trinomials, grouping."),
+             "Completely, and separately. Greatest common factor first, then the patterns from Polynomials and Factoring &mdash; difference of squares, trinomials, grouping."),
             ("Write down the excluded values",
              "From the factored denominator, before you cancel. This is the only moment "
              "at which they are visible."),
@@ -380,11 +377,7 @@ LESSONS = [
                      "numerator and the denominator. If you cannot name it, you have not "
                      "cancelled &mdash; you have invented a rule that happens to work on "
                      "this example."),
-        "note": "A numerical check is not a proof, and on this path it is never offered "
-                "as one: an identity can survive a lucky value. But a single "
-                "disagreement is conclusive in the other direction, and that is what "
-                "makes the habit worth having &mdash; it cannot confirm your answer, and "
-                "it will reliably refute a wrong one.",
+        "note": "A numerical check is not a proof, and it is not offered here as one: an identity can survive a lucky value. But a single disagreement is conclusive in the other direction, and that is what makes the habit worth having &mdash; it cannot confirm your answer, and it will reliably refute a wrong one.",
     },
     # ---------------------------------------------------------------- 03
     {
@@ -981,9 +974,7 @@ LESSONS = [
         ),
         "concepts": [
             ("Clearing denominators is the whole method",
-             "Multiply every term on both sides by the LCD. The denominators cancel and "
-             "you are left with a linear equation from course 2 or a factorable quadratic "
-             "from course 4."),
+             "Multiply every term on both sides by the LCD. The denominators cancel and you are left with a linear equation from Linear Equations and Inequalities or a factorable quadratic from Polynomials and Factoring."),
             ("The step only runs one way",
              "If `A = B` then `A·M = B·M`, for any `M` at all. The converse needs "
              "`M ≠ 0`, because `A·0 = B·0` holds for every `A` and `B`. So solutions of "
@@ -1058,9 +1049,7 @@ LESSONS = [
              "Every term on both sides, including terms that are not fractions. Bracket "
              "each numerator as you go, exactly as in lesson 4."),
             ("Solve the polynomial equation",
-             "Use course 2 for a linear result and course 4 factoring for the quadratics "
-             "chosen in this course. The quadratic formula arrives in course 6 and is "
-             "not required here."),
+             "Use Linear Equations and Inequalities for a linear result and the factoring methods from Polynomials and Factoring for the quadratics chosen in this course. The quadratic formula arrives in Quadratics and Complex Numbers and is not required here."),
             ("Test every candidate in the original",
              "Any candidate on the exclusion list is extraneous and is discarded. State "
              "the surviving solution set, which may be empty."),
@@ -1094,9 +1083,7 @@ LESSONS = [
                 "`x(x − 2)` is zero, so it is exactly the value at which multiplying "
                 "through stopped being reversible. The method predicts where its own "
                 "failures will appear, which is why the exclusion list is written first.",
-                "Course 5 does this twice: lesson 11 squares both sides of a radical "
-                "equation, which is legal in the same one-way manner and produces "
-                "extraneous roots for the same structural reason.",
+                "Rational and Radical Expressions does this twice: lesson 11 squares both sides of a radical equation, which is legal in the same one-way manner and produces extraneous roots for the same structural reason.",
                 "For a faded solve, take `1/(x − 1) + 1/(x + 1) = "
                 "(x² − x + 2)/(x² − 1)`. The supplied LCD is `(x − 1)(x + 1)` and "
                 "the exclusions are `x ≠ −1, 1`. Clear every term, factor the resulting "

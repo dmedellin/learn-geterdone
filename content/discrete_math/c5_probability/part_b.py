@@ -38,10 +38,7 @@ LESSONS = [
         "read_intro": "The definition, the distribution, and how several variables interact.",
         "body": [
             ("def", ("Random variable",
-                     "A <strong>random variable</strong> on a sample space `S` is a "
-                     "function `X : S → ℝ` &mdash; a function in course 2 lesson 10's "
-                     "sense, one value for each element of the domain `S`. The event "
-                     "`X = k` is `{s ∈ S : X(s) = k}`, and `P(X = k)` is its probability.")),
+                     "A <strong>random variable</strong> on a sample space `S` is a function `X : S → ℝ` &mdash; a function in Sets, Relations, and Functions lesson 10's sense, one value for each element of the domain `S`. The event `X = k` is `{s ∈ S : X(s) = k}`, and `P(X = k)` is its probability.")),
             ("p", "The name is doubly misleading, as is traditional. `X` is a function and "
                   "it is completely determined; what varies is which outcome occurs. "
                   "Reading `X` as a function on outcomes removes most of the confusion this "
@@ -101,8 +98,7 @@ LESSONS = [
              "\"The number of heads\", \"the sum\", \"1 if it rains\". A random variable "
              "with no stated rule is not defined."),
             ("Collect the outcomes by value",
-             "`P(X = k)` is the probability of the set of outcomes giving `k`. This is "
-             "course 4's counting again."),
+             "`P(X = k)` is the probability of the set of outcomes giving `k`. This again uses counting from Combinatorics and Counting."),
             ("Check the distribution sums to 1",
              "Every outcome contributes to exactly one value, so the probabilities must "
              "total 1. A free check that catches missed cases."),
@@ -426,10 +422,7 @@ LESSONS = [
                          "`E[X] = n · (1/n) = 1`, for every `n`. The indicators are "
                          "dependent &mdash; knowing `n − 1` elements are fixed forces the "
                          "last &mdash; and linearity does not care.")),
-            ("p", "That result is worth pausing on. On average exactly one person gets "
-                  "their own hat back, whether there are 5 people or 5 million. Computing "
-                  "it from the derangement distribution of course 4 would be considerably "
-                  "harder."),
+            ("p", "That result is worth pausing on. On average exactly one person gets their own hat back, whether there are 5 people or 5 million. Computing it from the derangement distribution of Combinatorics and Counting would be considerably harder."),
             ("example", ("The coupon collector",
                          "There are `n` distinct coupons, one per box at random. How many "
                          "boxes to collect them all? Let `Xᵢ` be the number of boxes bought "
@@ -490,7 +483,7 @@ LESSONS = [
                 "Linearity does not care.",
                 "",
                 "Computing this from the distribution of X would require the",
-                "derangement numbers of course 4 lesson 10 — for one number.",
+                "derangement numbers of Combinatorics and Counting lesson 10 — for one number.",
             ],
             "after": [
                 "The answer is 1 for every `n`, which connects directly to derangements: "
@@ -794,9 +787,7 @@ LESSONS = [
                 "trials succeed, which is `C(n,k)`.",
                 "The sequences are disjoint events, so the sum rule gives the product.",
             ]),
-            ("p", "The distribution sums to 1 by the binomial theorem of course 4 lesson 6: "
-                  "`Σ_k C(n,k)p^k(1−p)^{n−k} = (p + (1−p))ⁿ = 1`. That is the theorem doing "
-                  "genuine work, not an analogy."),
+            ("p", "The distribution sums to 1 by the binomial theorem of Combinatorics and Counting lesson 6: `Σ_k C(n,k)p^k(1−p)^{n−k} = (p + (1−p))ⁿ = 1`. That is the theorem doing genuine work, not an analogy."),
             ("thm", ("Mean and variance",
                      "`E[X] = np` and `Var(X) = np(1−p)`.")),
             ("proof", [
@@ -980,8 +971,7 @@ LESSONS = [
             ("proof", [
                 "The first success on trial `k` means `k − 1` failures followed by a "
                 "success. By independence that probability is `(1−p)^{k−1}p`.",
-                "These sum to 1 by the geometric series of course 3 lesson 3: "
-                "`Σ_{k≥1} (1−p)^{k−1}p = p/(1 − (1−p)) = 1`.",
+                "These sum to 1 by the geometric series of Induction and Recursion lesson 3: `Σ_{k≥1} (1−p)^{k−1}p = p/(1 − (1−p)) = 1`.",
             ]),
             ("thm", ("Mean and variance",
                      "`E[X] = 1/p` and `Var(X) = (1−p)/p²`.")),
@@ -1137,7 +1127,7 @@ LESSONS = [
                      "and head-head (`1/4`) finishes in two. Solve "
                      "`E = ½(E + 1) + ¼(E + 2) + ¼·2` and check that you get `6`. No series "
                      "was available, and the argument did not need one."),
-        "note": "This course ends where several others begin. The geometric distribution "
+        "note": "The geometric distribution "
                 "is the discrete analogue of the exponential, memorylessness characterises "
                 "both, and the coupon collector is the first example most people meet of a "
                 "process whose expected time is dominated by its final stages.",

@@ -82,11 +82,7 @@ LESSONS = [
                   "induction with two recursive parts &mdash; the structural analogue of "
                   "the two-term recurrence that forced strong induction in lesson 5."),
             ("h3", "Formulas"),
-            ("p", "The well-formed formulas of course 1 are a recursively defined set: a "
-                  "variable is a formula; if `A` is a formula so is `¬A`; if `A` and `B` "
-                  "are, so is `(A ∧ B)`, and similarly for the other binary connectives. "
-                  "Structural induction over that definition proves the syntactic facts "
-                  "course 1 used without proof."),
+            ("p", "The well-formed formulas of Logic and Proof are a recursively defined set: a variable is a formula; if `A` is a formula so is `¬A`; if `A` and `B` are, so is `(A ∧ B)`, and similarly for the other binary connectives. Structural induction over that definition proves the syntactic facts Logic and Proof used without proof."),
             ("example", ("Parentheses balance in every formula",
                          "Base: a variable has none of either. Negation adds none. Each "
                          "binary clause adds one of each. So every well-formed formula has "
@@ -134,9 +130,7 @@ LESSONS = [
                 "has an odd number of nodes.        ∎",
             ],
             "after": [
-                "The parity argument is course 1 lesson 12's result reused: the sum of two "
-                "odd integers is even. Structural induction supplied the two odd numbers; "
-                "elementary arithmetic finished the job."
+                "The parity argument is Logic and Proof lesson 12's result reused: the sum of two odd integers is even. Structural induction supplied the two odd numbers; elementary arithmetic finished the job."
             ],
         },
         "quiz_title": "Structural induction",
@@ -335,10 +329,7 @@ LESSONS = [
                 "Cost: at most 2·log₂ n calls — two odd steps never occur in a row.",
             ],
             "after": [
-                "Strong induction is essential here: the even branch reaches back to `n/2`, "
-                "not to `n − 1`. Ordinary induction would give a hypothesis about the wrong "
-                "value. Course 6 lesson 8 uses this algorithm as modular exponentiation, "
-                "where the saving is the difference between feasible and impossible."
+                "Strong induction is essential here: the even branch reaches back to `n/2`, not to `n − 1`. Ordinary induction would give a hypothesis about the wrong value. Number Theory and Cryptography lesson 8 uses this algorithm as modular exponentiation, where the saving is the difference between feasible and impossible."
             ],
         },
         "quiz_title": "Recursive correctness",
@@ -380,15 +371,8 @@ LESSONS = [
              "used but not stated is a proof of a different theorem."),
         ],
         "standard": ("Finish when you can discharge both obligations in a paragraph.",
-                     "Write a recursive algorithm computing the `n`th Fibonacci number, "
-                     "prove it terminates and prove it correct. Then count the calls it "
-                     "makes: the naive version makes exponentially many &mdash; about `φⁿ`, "
-                     "the root lesson 10 finds for this recurrence &mdash; and course 8 "
-                     "lesson 10 returns to fix that."),
-        "note": "The naive recursive Fibonacci makes about `1.6ⁿ` calls because it "
-                "recomputes the same subproblems repeatedly. Storing results &mdash; "
-                "memoisation &mdash; drops it to `n` calls, and that observation is the "
-                "whole idea of dynamic programming in course 8 lesson 10.",
+                     "Write a recursive algorithm computing the `n`th Fibonacci number, prove it terminates and prove it correct. Then count the calls it makes: the naive version makes exponentially many &mdash; about `φⁿ`, the root lesson 10 finds for this recurrence &mdash; and Algorithms and Complexity lesson 10 returns to fix that."),
+        "note": "The naive recursive Fibonacci makes about `1.6ⁿ` calls because it recomputes the same subproblems repeatedly. Storing results &mdash; memoisation &mdash; drops it to `n` calls, and that observation is the whole idea of dynamic programming in Algorithms and Complexity lesson 10.",
     },
     # ---------------------------------------------------------------- 09
     {
@@ -566,8 +550,7 @@ LESSONS = [
              "Order `k` needs `k` of them. Fewer leaves the sequence undetermined; more "
              "may be inconsistent with the recurrence."),
             ("Treating an unrolled pattern as proved",
-             "Unrolling produces a conjecture. The induction proof is what turns it into a "
-             "solution, and course 1 lesson 14 explains why that step is not a formality."),
+             "Unrolling produces a conjecture. The induction proof is what turns it into a solution, and Logic and Proof lesson 14 explains why that step is not a formality."),
         ],
         "standard": ("Finish when you can derive a recurrence and verify its first terms "
                      "by hand.",
@@ -833,21 +816,12 @@ LESSONS = [
                   "greater than 1, and `a/bᵈ` compared with 1 is `log_b a` compared with "
                   "`d`. That is the whole theorem."),
             ("def", ("The Θ notation, as much as is needed here",
-                     "`T(n) = Θ(g(n))` means `T(n)` is trapped between two positive "
-                     "constant multiples of `g(n)` for all large enough `n`: "
-                     "`c₁ g(n) ≤ T(n) ≤ c₂ g(n)` once `n` is past some threshold. It names "
-                     "a growth rate and discards the constants. Course 8 lesson 4 makes "
-                     "this precise and works with it; here it is only the shape of the "
-                     "answer the theorem reports.")),
+                     "`T(n) = Θ(g(n))` means `T(n)` is trapped between two positive constant multiples of `g(n)` for all large enough `n`: `c₁ g(n) ≤ T(n) ≤ c₂ g(n)` once `n` is past some threshold. It names a growth rate and discards the constants. Algorithms and Complexity lesson 4 makes this precise and works with it; here it is only the shape of the answer the theorem reports.")),
             ("thm", ("Master theorem (polynomial form)",
                      "Let `T(n) = aT(n/b) + Θ(nᵈ)` with `a ≥ 1`, `b &gt; 1`, `d ≥ 0`. Then "
                      "`T(n) = Θ(nᵈ)` if `log_b a &lt; d`; `T(n) = Θ(nᵈ log n)` if "
                      "`log_b a = d`; and `T(n) = Θ(n^{log_b a})` if `log_b a &gt; d`.")),
-            ("p", "The cases are numbered here in the order of the comparison &mdash; "
-                  "less, equal, greater &mdash; so case 1 is the root dominating and case "
-                  "3 the leaves, and the lab below and course 8 use the same numbering. "
-                  "Some texts number them the other way round. When there is any doubt, "
-                  "name a case by what dominates rather than by its number."),
+            ("p", "The cases are numbered here in the order of the comparison &mdash; less, equal, greater &mdash; so case 1 is the root dominating and case 3 the leaves, and the lab below and Algorithms and Complexity use the same numbering. Some texts number them the other way round. When there is any doubt, name a case by what dominates rather than by its number."),
             ("example", ("Merge sort",
                          "`T(n) = 2T(n/2) + n`: `a = 2`, `b = 2`, `d = 1`, `log₂2 = 1 = d`. "
                          "Balanced case, so `Θ(n log n)`. Every level does `n` units of "
@@ -1077,16 +1051,7 @@ LESSONS = [
         "lab": ("algorithm", {
             "mode": "sort", "n": 20,
             "panel_title": "Insertion sort, counted",
-            "panel_intro": "This lab counts comparisons, which is course 8's question and "
-                           "not a proof of anything &mdash; a wrong sort could make exactly "
-                           "as many. What it does show is the inner `while` loop of the "
-                           "insertion sort above stopping at the gap: at `n = 20` on the "
-                           "lab's fixed shuffle, bubble sort makes `190 = 20 · 19 / 2` "
-                           "comparisons, insertion sort 112 and merge sort 66, and only the "
-                           "middle figure would change on a different permutation. The "
-                           "invariant is indifferent to it: `A[0..j]` is sorted and holds "
-                           "the same elements however many comparisons the inner loop took "
-                           "to find the gap.",
+            "panel_intro": "This lab counts comparisons, which is Algorithms and Complexity's question and not a proof of anything &mdash; a wrong sort could make exactly as many. What it does show is the inner `while` loop of the insertion sort above stopping at the gap: at `n = 20` on the lab's fixed shuffle, bubble sort makes `190 = 20 · 19 / 2` comparisons, insertion sort 112 and merge sort 66, and only the middle figure would change on a different permutation. The invariant is indifferent to it: `A[0..j]` is sorted and holds the same elements however many comparisons the inner loop took to find the gap.",
         }),
         "steps_title": "Proving a loop correct",
         "steps_intro": "State the invariant before writing anything else.",
@@ -1107,7 +1072,7 @@ LESSONS = [
         ],
         "worked": {
             "title": "Euclid's algorithm",
-            "intro": ["Course 6 lesson 5 uses this; here it is the correctness argument."],
+            "intro": ["Number Theory and Cryptography lesson 5 uses this; here it is the correctness argument."],
             "lines": [
                 "GCD(a, b):",
                 "    while b ≠ 0:",
@@ -1178,9 +1143,6 @@ LESSONS = [
                      "invariant. Then check that at exit the invariant plus the loop "
                      "condition gives exactly `result = xⁿ` &mdash; if it needs an extra "
                      "sentence, the invariant was too weak."),
-        "note": "This is the whole of Hoare logic in miniature: preconditions, "
-                "postconditions and invariants, with a proof rule for each construct. "
-                "Course 8 lesson 2 returns to correctness as a property to be established "
-                "before efficiency is worth measuring.",
+        "note": "This is the whole of Hoare logic in miniature: preconditions, postconditions and invariants, with a proof rule for each construct. Algorithms and Complexity lesson 2 returns to correctness as a property to be established before efficiency is worth measuring.",
     },
 ]

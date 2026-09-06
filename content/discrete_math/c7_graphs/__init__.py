@@ -12,9 +12,11 @@ COURSE = {
         "shortest paths, trees, spanning trees, colouring and planarity."
     ),
     "blurb": (
-        "The discrete structure that models everything with a relation on it: networks, "
-        "dependencies, maps, molecules, schedules. Every theorem in this course is a "
-        "claim about all graphs, and the lab lets you try to break each one."
+        (
+        "Use graphs to model relations among objects, test structural properties, run "
+        "traversal and shortest-path algorithms, work with trees, and study colouring and "
+        "planarity."
+    )
     ),
     "key": [
         "Σ deg(v) = 2|E|                     the handshake theorem",
@@ -22,7 +24,7 @@ COURSE = {
         "Euler circuit  ⟺  connected and every degree even",
         "|V| − |E| + |F| = 2                 Euler's formula, planar graphs",
     ],
-    "assumes_short": "Courses 1–4",
+    "assumes_short": "Proof, sets, and counting",
     "assumes_long": "proof, sets, relations and counting",
     "outcomes_intro": (
         "By the end you can model a problem as a graph, run the standard algorithms, "
@@ -62,8 +64,11 @@ COURSE = {
         "has them, and the panel quotes the figures you should see before you change "
         "anything. Lessons 9 and 12 carry weights; lesson 4 names the bridges, lesson 11 "
         "prints all four traversal orders, and lesson 14 runs the planarity counts.",
-        "Notice which criteria are one-pass checks and which are searches. That "
-        "distinction is what course 8 formalises, and it is visible here first.",
+        (
+            "Notice which criteria are one-pass checks and which are searches. That "
+            "distinction is what Algorithms and Complexity formalises, and it is visible here "
+            "first."
+        ),
     ],
     "not_covered": [
         "Directed graphs beyond passing mentions. Everything here is undirected unless "

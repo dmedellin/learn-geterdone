@@ -68,7 +68,7 @@ LESSONS = [
                 "        repeat n−1 times: result = result · x",
                 "",
                 "B.  repeated squaring                about 2·log₂ n multiplications",
-                "        as in course 6 lesson 8",
+                "        as in Number Theory and Cryptography lesson 8",
                 "",
                 "C.  addition-chain exponentiation    slightly fewer than B, sometimes",
                 "        precompute an optimal chain of products",
@@ -107,8 +107,7 @@ LESSONS = [
              "No step may require judgement. If it does, it is a subproblem needing its own "
              "algorithm."),
             ("Check it terminates on every valid input",
-             "Exhibit a quantity that strictly decreases and is bounded below, as in "
-             "course 3 lesson 8."),
+             "Exhibit a quantity that strictly decreases and is bounded below, as in Induction and Recursion lesson 8."),
             ("Only then consider the cost",
              "Count the dominant operation as a function of the input size. That is "
              "lesson 5."),
@@ -208,8 +207,7 @@ LESSONS = [
         ],
         "key_label": "Two obligations",
         "concepts_intro": (
-            "This is course 3 lesson 12 applied to algorithms, and the split is what "
-            "makes the proofs short."
+            "This is Induction and Recursion lesson 12 applied to algorithms, and the split is what makes the proofs short."
         ),
         "concepts": [
             ("The two are independent",
@@ -303,7 +301,7 @@ LESSONS = [
         ],
         "worked": {
             "title": "Exponentiation by squaring, both obligations",
-            "intro": ["Course 6's algorithm, proved."],
+            "intro": ["Number Theory and Cryptography's algorithm, proved."],
             "lines": [
                 "POWER(x, n):",
                 "    result = 1;  base = x;  m = n",
@@ -619,9 +617,7 @@ LESSONS = [
                          "Suppose `n² ≤ Cn` for all `n ≥ k`. Dividing by `n` gives `n ≤ C` "
                          "for all `n ≥ k`, which is false for `n &gt; max(C, k)`. No pair "
                          "of witnesses exists.")),
-            ("p", "That is the shape of a disproof: assume witnesses and derive a "
-                  "contradiction. It is a direct proof of a negation, and course 1 lesson "
-                  "13 is the technique."),
+            ("p", "That is the shape of a disproof: assume witnesses and derive a contradiction. It is a direct proof of a negation, and Logic and Proof lesson 13 is the technique."),
             ("h3", "Useful properties"),
             ("math", [
                 "transitive       f = O(g),  g = O(h)   ⟹   f = O(h)",
@@ -760,9 +756,7 @@ LESSONS = [
         "module": "Analysis",
         "one_line": "Count the dominant operation as a function of the input size.",
         "summary": (
-            "Nested loops multiply, sequential blocks take the maximum, and a loop whose "
-            "bound depends on the outer index gives a sum &mdash; which is course 3's "
-            "summation formulas doing the work."
+            "Nested loops multiply, sequential blocks take the maximum, and a loop whose bound depends on the outer index gives a sum &mdash; which is Induction and Recursion's summation formulas doing the work."
         ),
         "key": [
             "sequential blocks     add, so the class is the MAXIMUM",
@@ -772,8 +766,7 @@ LESSONS = [
         ],
         "key_label": "Three loop patterns",
         "concepts_intro": (
-            "Analysis of a loop is counting how many times the body runs, which is "
-            "usually a sum course 3 already evaluated."
+            "Analysis of a loop is counting how many times the body runs, which is usually a sum Induction and Recursion already evaluated."
         ),
         "concepts": [
             ("Choose one dominant operation",
@@ -783,8 +776,7 @@ LESSONS = [
              "Two independent nested loops give the product; two blocks in sequence give "
              "the sum, which asymptotically is the larger."),
             ("A dependent inner bound gives a sum",
-             "`for i = 1 to n: for j = 1 to i` runs `Σ i = n(n+1)/2` times, which is "
-             "`Θ(n²)` &mdash; course 3 lesson 3's formula."),
+             "`for i = 1 to n: for j = 1 to i` runs `Σ i = n(n+1)/2` times, which is `Θ(n²)` &mdash; Induction and Recursion lesson 3's formula."),
         ],
         "read_title": "Counting operations",
         "read_intro": "The three patterns, the case distinction, and four worked analyses.",
@@ -815,10 +807,7 @@ LESSONS = [
                 "",
                 "total  Σ_{i=1}^{n} i  =  n(n+1)/2  =  Θ(n²)",
             ]),
-            ("p", "The constant differs from the independent case &mdash; half as many "
-                  "iterations &mdash; and the class does not. This is where course 3 "
-                  "lesson 3's summation formulas earn their place, and where a triple "
-                  "dependent nest gives `Σ i² = Θ(n³)`."),
+            ("p", "The constant differs from the independent case &mdash; half as many iterations &mdash; and the class does not. This is where Induction and Recursion lesson 3's summation formulas earn their place, and where a triple dependent nest gives `Σ i² = Θ(n³)`."),
             ("h3", "Loops that multiply or divide"),
             ("math", [
                 "i = 1",
@@ -881,8 +870,7 @@ LESSONS = [
             ("Count the innermost loop's iterations",
              "As a function of the outer indices. This is where the dependence shows."),
             ("Work outward, summing or multiplying",
-             "Independent bounds multiply; a dependent bound gives a sum to evaluate with "
-             "course 3's formulas."),
+             "Independent bounds multiply; a dependent bound gives a sum to evaluate with Induction and Recursion's formulas."),
             ("State which case you have analysed",
              "Worst, best or average, and for the average say what distribution. An "
              "unqualified bound is ambiguous."),
@@ -908,9 +896,7 @@ LESSONS = [
                 "    total  Θ(n log n)",
             ],
             "after": [
-                "B is the one worth checking: reindexing the sum by `m = n − i + 1` turns "
-                "it into `Σ m`, which course 3 evaluated. Recognising that substitution is "
-                "most of the technique for dependent nests."
+                "B is the one worth checking: reindexing the sum by `m = n − i + 1` turns it into `Σ m`, which Induction and Recursion evaluated. Recognising that substitution is most of the technique for dependent nests."
             ],
         },
         "quiz_title": "Iterative analysis",
@@ -1040,10 +1026,7 @@ LESSONS = [
                 "comparison with two outcomes, and each leaf is one possible output "
                 "ordering. To sort correctly the tree must have at least `n!` leaves, one "
                 "per permutation of the input.",
-                "A binary tree of height `h` has at most `2^h` leaves &mdash; course 7 "
-                "lesson 10's bound of `2^{h+1} − 1` vertices, restricted to the last "
-                "level &mdash; so a tree with `L` leaves has height at least `log₂ L`, "
-                "and this one has height at least `log₂(n!)`.",
+                "A binary tree of height `h` has at most `2^h` leaves &mdash; Graphs and Trees lesson 10's bound of `2^{h+1} − 1` vertices, restricted to the last level &mdash; so a tree with `L` leaves has height at least `log₂ L`, and this one has height at least `log₂(n!)`.",
                 "The largest `n/2` factors of `n!` are each at least `n/2`, so "
                 "`n! ≥ (n/2)^{n/2}` and `log₂(n!) ≥ (n/2) log₂(n/2)`, which is "
                 "`Ω(n log n)`. The height is the worst-case number of comparisons, and "
@@ -1051,11 +1034,7 @@ LESSONS = [
                 "`log₂(n!) ≈ n log₂ n − 1.44n`, but the crude bound is all the theorem "
                 "needs.)",
             ]),
-            ("p", "This is a genuine impossibility result and it is worth distinguishing "
-                  "from a failure of ingenuity: no comparison sort will ever beat "
-                  "`n log n`, and merge sort therefore achieves the optimum. Course 4's "
-                  "count of permutations and course 7's tree height bound are both doing "
-                  "work in the proof."),
+            ("p", "This is a genuine impossibility result and it is worth distinguishing from a failure of ingenuity: no comparison sort will ever beat `n log n`, and merge sort therefore achieves the optimum. the permutation count from Combinatorics and Counting and the tree-height bound from Graphs and Trees are both doing work in the proof."),
             ("p", "Sorts that beat the bound exist and they do not compare. Counting sort "
                   "and radix sort use the values themselves as indices and run in `Θ(n)` "
                   "under assumptions about the key range. They do not contradict the "
@@ -1153,9 +1132,7 @@ LESSONS = [
              "that is worth more than a better asymptotic class."),
         ],
         "standard": ("Finish when you can state the lower bound and why it holds.",
-                     "Explain in three sentences why `n!` leaves force `Θ(n log n)` height. "
-                     "The argument uses course 4's permutation count and course 7's tree "
-                     "bound, and it is the cleanest impossibility proof on this path."),
+                     "Explain in three sentences why `n!` leaves force `Θ(n log n)` height. The argument uses the permutation count from Combinatorics and Counting and the tree bound from Graphs and Trees, and it is an impossibility proof."),
         "note": "Timsort, the default sort in Python and Java, is merge sort with insertion "
                 "sort for small runs and special handling for existing sorted runs. Every "
                 "element of that design is a response to something in this lesson.",

@@ -172,10 +172,7 @@ LESSONS = [
                      "Translate \"every positive even integer greater than 2 is composite\" "
                      "and \"some composite number is odd\" into symbols, and say for each "
                      "why the connective inside had to be what it is."),
-        "note": "The lab uses a four-element domain so that both quantifiers can be "
-                "checked exhaustively. That is a luxury of finiteness: over `ℕ` no "
-                "amount of checking settles a `∀`, which is the whole motivation for "
-                "course 3.",
+        "note": "The lab uses a four-element domain so that both quantifiers can be checked exhaustively. That is a luxury of finiteness: over `ℕ` no amount of checking settles a `∀`, which is the whole motivation for Induction and Recursion.",
     },
     # ---------------------------------------------------------------- 09
     {
@@ -788,15 +785,7 @@ LESSONS = [
         "lab": ("induction", {
             "statement": "div6",
             "panel_title": "Check a claim before you try to prove it",
-            "panel_intro": "`n³ − n` is divisible by 6 for every `n` the slider reaches, and "
-                           "the table is evidence about those `n` and nothing more. Try the "
-                           "direct proof after this lesson: `n³ − n = (n − 1) n (n + 1)`, "
-                           "and the attempt stalls at \"one of three consecutive integers "
-                           "is a multiple of 3\", which needs a split into cases. A stall "
-                           "like that is diagnostic &mdash; lesson 13 is about reading it "
-                           "&mdash; and lesson 14 finishes this claim. Ignore the "
-                           "\"inductive step\" line under the table for now: it is course "
-                           "3's vocabulary.",
+            "panel_intro": "`n³ − n` is divisible by 6 for every `n` the slider reaches, and the table is evidence about those `n` and nothing more. Try the direct proof after this lesson: `n³ − n = (n − 1) n (n + 1)`, and the attempt stalls at \"one of three consecutive integers is a multiple of 3\", which needs a split into cases. A stall like that is diagnostic &mdash; lesson 13 is about reading it &mdash; and lesson 14 finishes this claim. Ignore the \"inductive step\" line under the table for now: it is Induction and Recursion's vocabulary.",
         }),
         "steps_title": "Writing a direct proof",
         "steps_intro": "The first two steps are where proofs are won or lost.",
@@ -930,12 +919,7 @@ LESSONS = [
                 "an integer.",
                 "The contrapositive holds, so the original statement holds.",
             ]),
-            ("p", "Compare with the direct attempt. Assuming `n²` is even gives "
-                  "`n² = 2m`, and there is nowhere useful to go: extracting information "
-                  "about `n` from a statement about `n²` requires the unique "
-                  "factorisation of course 6. The contrapositive hands you `n` itself, "
-                  "in a form you can compute with. That asymmetry is the whole reason to "
-                  "choose it."),
+            ("p", "Compare with the direct attempt. Assuming `n²` is even gives `n² = 2m`, and there is nowhere useful to go: extracting information about `n` from a statement about `n²` requires the unique factorisation of Number Theory and Cryptography. The contrapositive hands you `n` itself, in a form you can compute with. That asymmetry is the whole reason to choose it."),
             ("h3", "Proof by contradiction"),
             ("def", ("Proof by contradiction",
                      "To prove `s`, assume `¬s` and derive a statement known to be false. "
@@ -1073,10 +1057,7 @@ LESSONS = [
                      "Prove \"if `n` is an integer and `n² + 5` is odd then `n` is even\" "
                      "&mdash; and be able to say, before starting, which technique you "
                      "will use and why the other would be harder."),
-        "note": "Constructive mathematics rejects proof by contradiction for existence "
-                "claims: knowing that no counterexample exists is not the same as being "
-                "able to produce an example. That distinction has no consequences on this "
-                "path, but Euclid's proof above is worth revisiting with it in mind.",
+        "note": "Constructive mathematics rejects proof by contradiction for existence claims: knowing that no counterexample exists is not the same as being able to produce an example. That distinction has no consequences for the arguments here, but Euclid's proof above is worth revisiting with it in mind.",
     },
     # ---------------------------------------------------------------- 14
     {
@@ -1097,7 +1078,7 @@ LESSONS = [
         ],
         "key_label": "The last three techniques",
         "concepts_intro": (
-            "Two more techniques, and then the standard everything on this path is held to."
+            "Two more techniques, and then the standard every proof here is held to."
         ),
         "concepts": [
             ("Cases must be exhaustive",
@@ -1154,8 +1135,7 @@ LESSONS = [
                          "the sum of at most four squares &mdash; is Lagrange's theorem, "
                          "and needs a real proof.")),
             ("h3", "Why checking is not proving"),
-            ("p", "This is the point the whole course has been building toward, and "
-                  "course 3 exists because of it."),
+            ("p", "Induction and Recursion develops methods for proving such statements."),
             ("thm", ("Two statements that survive dozens of checks and are false",
                      "`n² + n + 41` is prime for every `n` from 0 to 39, and composite at "
                      "`n = 40`, where it equals `1681 = 41²`. And `n` points on a circle "
@@ -1186,11 +1166,7 @@ LESSONS = [
         "lab": ("induction", {
             "statement": "prime41",
             "panel_title": "Two false statements to find",
-            "panel_intro": "Two entries in the list are false and pass every check a "
-                           "careful person would run. Push the slider until each breaks, "
-                           "and note how far it went first. The \"inductive step\" line "
-                           "under the table is course 3's answer to the problem this page "
-                           "poses; read it as a preview.",
+            "panel_intro": "Two entries in the list are false and pass every check a careful person would run. Push the slider until each breaks, and note how far it went first. The \"inductive step\" line under the table is Induction and Recursion's answer to the problem this page poses; read it as a preview.",
         }),
         "steps_title": "Cases and counterexamples",
         "steps_intro": "Coverage for cases; a single instance for a counterexample.",
@@ -1262,25 +1238,11 @@ LESSONS = [
              "It is the most common way a real gap gets past a reader, because it reads "
              "like rigour. If the other case needs a different argument, write it."),
             ("Offering many examples in place of a proof",
-             "Twenty confirming instances and zero counterexamples is not weak evidence "
-             "for a universal claim &mdash; it is not evidence of the right kind at all. "
-             "Course 3 supplies what is."),
+             "Twenty confirming instances and zero counterexamples is not weak evidence for a universal claim &mdash; it is not evidence of the right kind at all. Induction and Recursion supplies what is."),
         ],
         "standard": ("Finish when you can state, for any claim, what would refute it, "
                      "and prove one claim by cases.",
-                     "That single habit &mdash; asking what a counterexample would look "
-                     "like before trying to prove anything &mdash; is what this course "
-                     "was for. It tells you whether to hunt for a proof or for a "
-                     "counterexample, and it is the mechanical negation of lesson 10 put "
-                     "to work. Then prove the claim lesson 12's lab showed you: for every "
-                     "integer `n`, `n³ − n` is divisible by 3. Write "
-                     "`n³ − n = (n − 1) n (n + 1)`, split into `n = 3k`, `n = 3k + 1` and "
-                     "`n = 3k + 2`, and say in each case which factor is the multiple of "
-                     "3. Divisibility by 6 adds the parity of this lesson's theorem and a "
-                     "fact about 2 and 3 that course 6 proves."),
-        "note": "Course 3 supplies the technique this lesson leaves missing: induction "
-                "proves a statement for every natural number by proving one implication "
-                "rather than infinitely many cases. It is the answer to \"checking is not "
-                "proving\", and it is two courses away.",
+                     "Before attempting a proof, identify what would count as a counterexample. It tells you whether to hunt for a proof or for a counterexample, and it is the mechanical negation of lesson 10 put to work. Then prove the claim lesson 12's lab showed you: for every integer `n`, `n³ − n` is divisible by 3. Write `n³ − n = (n − 1) n (n + 1)`, split into `n = 3k`, `n = 3k + 1` and `n = 3k + 2`, and say in each case which factor is the multiple of 3. Divisibility by 6 adds the parity of this lesson's theorem and a fact about 2 and 3 that Number Theory and Cryptography proves."),
+        "note": "Induction and Recursion supplies the technique this lesson leaves missing: induction proves a statement for every natural number by proving one implication rather than infinitely many cases. It is the answer to \"checking is not proving\".",
     },
 ]

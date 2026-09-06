@@ -10,7 +10,11 @@ COURSE = {
         "Algebraic fractions and roots: domains and the values that break them, simplifying and operating on rational expressions, complex fractions, rational equations and the extraneous solutions they produce, asymptotes, radical arithmetic and radical equations."
     ),
     "blurb": (
-        "What happens when a variable lands in a denominator or under a root. Both put values out of bounds, both create solutions that are not solutions, and both need the domain written down before the algebra starts."
+        (
+        "Find domain restrictions before simplifying rational and radical expressions. Solve "
+        "equations, check extraneous candidates, and identify holes and asymptotes from "
+        "factored form."
+    )
     ),
     "key": [
         "a/b · c/d = ac/bd        a/b ÷ c/d = a/b · d/c",
@@ -18,7 +22,7 @@ COURSE = {
         "squaring both sides can INVENT a solution",
         "degree of top vs bottom  ⟹  the horizontal asymptote",
     ],
-    "assumes_short": "Courses 1–4",
+    "assumes_short": "Factoring and functions",
     "assumes_long": "factoring, domain inequalities, and function notation",
     "outcomes_intro": (
         "By the end you can handle an expression with a variable in a denominator or under a root without losing the values that were never allowed."
@@ -44,7 +48,11 @@ COURSE = {
     "not_covered": [
         "Partial fractions, which are a technique for integration and belong to calculus.",
         "Oblique and curvilinear asymptotes beyond a brief mention where long division makes one visible.",
-        "Radicals of complex numbers, and roots of negative numbers generally. Course 6 introduces `i`; here `sqrt(-4)` is outside the domain and is treated as such.",
+        (
+            "Radicals of complex numbers, and roots of negative numbers generally. Quadratics "
+            "and Complex Numbers introduces `i`; here `sqrt(-4)` is outside the domain and is "
+            "treated as such."
+        ),
     ],
     "footer_lead": (
         "Domains, asymptotes and holes on this course are computed from the factored form in exact arithmetic, and every solution a lab reports has been substituted back into the ORIGINAL equation in front of you. An extraneous root is shown failing that check rather than quietly dropped."

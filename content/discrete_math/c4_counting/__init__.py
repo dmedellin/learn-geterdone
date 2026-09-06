@@ -13,9 +13,11 @@ COURSE = {
         "combinatorial proof."
     ),
     "blurb": (
-        "How many? The two basic rules, the four ways to choose `r` from `n`, what "
-        "changes when repetition is allowed, how to correct an over-count, and the "
-        "double-counting arguments that prove identities without algebra."
+        (
+        "Choose a counting method by deciding whether order matters and whether repetition is "
+        "allowed, then handle restrictions, over-counting, generating functions, and "
+        "double-counting proofs."
+    )
     ),
     "key": [
         "P(n, r) = n!/(n−r)!            ordered, no repetition",
@@ -23,7 +25,7 @@ COURSE = {
         "C(n+r−1, r)                    unordered, with repetition",
         "|A ∪ B ∪ C| = ΣA − Σ(pairs) + |A∩B∩C|",
     ],
-    "assumes_short": "Courses 1–3",
+    "assumes_short": "Sets, functions, and induction",
     "assumes_long": "sets, functions and induction",
     "outcomes_intro": (
         "By the end you can choose the right rule, justify the choice, check the "

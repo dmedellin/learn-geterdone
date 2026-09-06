@@ -54,10 +54,7 @@ LESSONS = [
                   "value of `x`. The system asks for the pairs the two equations have "
                   "in common, so the solution set of the system is the "
                   "<em>intersection</em> of the two solution sets, never their union."),
-            ("p", "Course 3 established that the graph of `ax + by = c` is a line. So "
-                  "the solution set of a two-equation system is the set of points lying "
-                  "on both lines, and the question \"how many solutions\" becomes the "
-                  "question \"how do two lines meet\"."),
+            ("p", "Lines, Functions and Graphs established that the graph of `ax + by = c` is a line. So the solution set of a two-equation system is the set of points lying on both lines, and the question \"how many solutions\" becomes the question \"how do two lines meet\"."),
             ("thm", ("Two lines meet in nothing, one point, or a whole line",
                      "Two lines in the plane share no point, exactly one point, or every "
                      "point of the line. No other count is possible &mdash; in "
@@ -260,8 +257,7 @@ LESSONS = [
              "entire justification, and it is why the expression must go into the "
              "equation you have not used."),
             ("The target is one equation in one unknown",
-             "Everything else is bookkeeping. Course 2 already solves any linear "
-             "equation in one variable; this lesson is about manufacturing one."),
+             "Everything else is bookkeeping. Linear Equations and Inequalities already solves any linear equation in one variable; this lesson is about manufacturing one."),
             ("What you isolate is a free choice with consequences",
              "A variable whose coefficient is `1` or `−1` isolates with no division. "
              "Any other choice produces a fraction, which is survivable &mdash; "
@@ -320,11 +316,7 @@ LESSONS = [
                   "expression in the first place. Information comes from the equation "
                   "that has not yet been spent."),
             ("h3", "When the variable disappears"),
-            ("p", "Sometimes the substitution removes both variables and leaves a "
-                  "statement about numbers. Course 2 met these as contradictions and "
-                  "identities, and they mean here exactly what they meant there: a "
-                  "false statement means no pair works, a true one means the equation "
-                  "placed no new restriction and the whole line survives."),
+            ("p", "Sometimes the substitution removes both variables and leaves a statement about numbers. Linear Equations and Inequalities met these as contradictions and identities, and they mean here exactly what they meant there: a false statement means no pair works, a true one means the equation placed no new restriction and the whole line survives."),
             ("math", [
                 "x − 2y = 3     →   x = 2y + 3",
                 "2x − 4y = 1        2(2y + 3) − 4y = 1   →   4y + 6 − 4y = 1   →   6 = 1",
@@ -378,8 +370,7 @@ LESSONS = [
         "worked": {
             "title": "5x − 2y = 4 and 3x + y = 9",
             "intro": [
-                "The second equation has a `y` with coefficient `1`, so that is what to "
-                "isolate. Everything after that is one-variable algebra from course 2."
+                "The second equation has a `y` with coefficient `1`, so that is what to isolate. Everything after that is one-variable algebra from Linear Equations and Inequalities."
             ],
             "lines": [
                 "5x − 2y = 4",
@@ -499,11 +490,7 @@ LESSONS = [
              "equation back. Multiplying by `0` is forbidden: `0 = 0` is satisfied by "
              "every pair, and there is no operation that recovers what was there."),
             ("The new system is equivalent, not merely implied",
-             "Replacing the second equation by second plus `k` times first can be "
-             "undone by subtracting `k` times the first. Nothing is lost and nothing is "
-             "invented. Operations that cannot be undone &mdash; squaring both sides, "
-             "in course 5 &mdash; are exactly the ones that produce solutions that were "
-             "never there."),
+             "Replacing the second equation by second plus `k` times first can be undone by subtracting `k` times the first. Nothing is lost and nothing is invented. Operations that cannot be undone &mdash; squaring both sides, in Rational and Radical Expressions &mdash; are exactly the ones that produce solutions that were never there."),
         ],
         "read_title": "Elimination, and why the new system is equivalent",
         "read_intro": "Two operations, the theorem that licenses them, and the three endings.",
@@ -606,9 +593,7 @@ LESSONS = [
              "equation the sign that makes them opposites. Choosing the cheaper "
              "variable here is the whole of the skill."),
             ("Add the equations and solve what is left",
-             "One variable, one equation, course 2. If both variables vanish, read the "
-             "numeric statement instead: false means no solution, true means infinitely "
-             "many and the answer is a line."),
+             "One variable, one equation, Linear Equations and Inequalities. If both variables vanish, read the numeric statement instead: false means no solution, true means infinitely many and the answer is a line."),
             ("Back-substitute into an original equation, then check in both",
              "Use an equation you were given rather than one you multiplied &mdash; "
              "fewer chances to carry a stray factor. Then test the pair in both "
@@ -1454,9 +1439,7 @@ LESSONS = [
         ),
         "concepts": [
             ("Addition is entrywise and needs matching sizes",
-             "`A + B` exists only when `A` and `B` have the same number of rows and the "
-             "same number of columns, and then it is what it looks like. Every rule of "
-             "addition from course 1 carries over, one position at a time."),
+             "`A + B` exists only when `A` and `B` have the same number of rows and the same number of columns, and then it is what it looks like. Every rule of addition from Foundations of Algebra carries over, one position at a time."),
             ("The product runs rows against columns",
              "Multiply each entry of row `i` of `A` by the matching entry of column `j` "
              "of `B` and add the results. The row length of `A` must equal the column "

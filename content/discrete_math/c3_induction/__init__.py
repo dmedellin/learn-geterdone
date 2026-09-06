@@ -13,10 +13,11 @@ COURSE = {
         "divide-and-conquer recurrences, and loop invariants."
     ),
     "blurb": (
-        "Course 1 ended by showing that checking cases is not proving. This is the "
-        "answer: prove `P(k) → P(k+1)` once and the claim holds for every `n` you "
-        "could ever check and every one you could not. Then the same idea applied to "
-        "definitions, to data, to algorithms and to recurrences."
+        (
+        "Checking examples can test a claim but cannot prove it for every natural number. "
+        "Induction combines a base case with an inductive step; related recursive methods "
+        "apply to definitions, data, algorithms, and recurrences."
+    )
     ),
     "key": [
         "P(base)   and   ∀k ≥ base. P(k) → P(k+1)      ⟹   ∀n ≥ base. P(n)",
@@ -24,11 +25,13 @@ COURSE = {
         "aₙ = c₁aₙ₋₁ + c₂aₙ₋₂   ⟹  characteristic equation r² = c₁r + c₂",
         "T(n) = aT(n/b) + nᵈ    ⟹  compare log_b a with d",
     ],
-    "assumes_short": "Courses 1–2",
+    "assumes_short": "Proof and set notation",
     "assumes_long": "proof technique and set notation",
     "outcomes_intro": (
-        "By the end you can prove a statement about every natural number, solve the "
-        "recurrences course 8 will produce, and prove an algorithm does what it claims."
+        (
+        "Prove statements about natural numbers and recursive objects, solve recurrences, and "
+        "prove algorithm correctness."
+    )
     ),
     "outcomes": [
         ("Write a correct induction proof",
@@ -67,9 +70,11 @@ COURSE = {
     "not_covered": [
         "Transfinite induction and induction over ordinals. Everything here is "
         "induction over `ℕ` or over a well-founded recursive structure.",
-        "Generating functions as a recurrence-solving technique. Course 4 lesson 12 "
-        "introduces them for counting; using them to solve recurrences is a natural "
-        "next step this path does not take.",
+        (
+            "Generating functions as a recurrence-solving technique. Combinatorics and "
+            "Counting lesson 12 introduces them for counting; using them to solve recurrences "
+            "is not covered here."
+        ),
         "Formal verification tools. Lesson 12 writes loop invariants as mathematics, "
         "not as annotations a checker consumes.",
     ],

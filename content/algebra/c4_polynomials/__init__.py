@@ -13,7 +13,10 @@ COURSE = {
         "factor theorems, rational roots and polynomial graphs."
     ),
     "blurb": (
-        "Multiply out, then learn to go back. The factored form is the one that answers questions &mdash; where a graph crosses, when a product is zero &mdash; and this course is about producing it reliably rather than by inspection."
+        (
+        "Expand polynomial products and reverse the process by factoring. Factored form "
+        "reveals zeros and supports division, root tests, and graph analysis."
+    )
     ),
     "key": [
         "(a + b)(a − b) = a² − b²",
@@ -21,7 +24,7 @@ COURSE = {
         "f(c) = 0   ⟺   (x − c) is a factor",
         "root p/q  ⟹  p | a₀  and  q | aₙ",
     ],
-    "assumes_short": "Courses 1–3",
+    "assumes_short": "Expressions and functions",
     "assumes_long": "exponents, distribution, function notation",
     "outcomes_intro": (
         "By the end you can carry out polynomial arithmetic, factor the standard "
@@ -47,16 +50,19 @@ COURSE = {
         "term count and pattern. Lessons 10 to 13 divide, find roots and then sketch."
     ),
     "how_to": [
-        "Always look for a common factor first. The lab's decision list starts there because skipping it is what turns a one-line problem into an unfactorable-looking mess.",
-        "Expand your factored answer to check it. Factoring is the only topic on this path where checking is faster than the work itself.",
-        "After each complete example, cover the answer and do the faded rehearsal on "
-        "paper. The first decision is supplied; the remaining algebra and the expansion "
-        "or substitution check are yours before you answer the quiz.",
+        "Look for a common factor before choosing a factoring method.",
+        "Expand your factored answer to check that it equals the original polynomial.",
+        (
+            "Use the worked examples and rehearsals to practise the algebra and an "
+            "independent expansion or substitution check."
+        )
     ],
     "not_covered": [
-        "Factoring quadratics with irrational or complex coefficients. Course 6 teaches "
-        "the discriminant, the quadratic formula and `i`; this course stops after proving "
-        "that no rational factor exists.",
+        (
+            "Factoring quadratics with irrational or complex coefficients. Quadratics and "
+            "Complex Numbers teaches the discriminant, the quadratic formula and `i`; this "
+            "course stops after proving that no rational factor exists."
+        ),
         "A complete factorisation algorithm for arbitrary polynomials of degree 4 or "
         "more. No rational root rules out rational linear factors, but a quartic may "
         "still split into two quadratics.",

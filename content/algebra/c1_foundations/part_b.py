@@ -235,10 +235,7 @@ LESSONS = [
                      "with that negative exponent, and answer why `x^(1/2)` is a square "
                      "root rather than half of `x`: the exponent law leaves no alternative, "
                      "and convention only chooses which root the notation names."),
-        "note": "Every radical you meet from here on can be written as a rational power, "
-                "and it is usually worth doing. Course 5 simplifies expressions like "
-                "`√(x⁵)` by rewriting them as `x^(5/2)` and using the laws you already "
-                "have, rather than by inventing separate rules for radicals.",
+        "note": "Every radical you meet from here on can be written as a rational power, and it is usually worth doing. Rational and Radical Expressions simplifies expressions like `√(x⁵)` by rewriting them as `x^(5/2)` and using the laws you already have, rather than by inventing separate rules for radicals.",
     },
     # --------------------------------------------- algebraic-expressions-and-terms
     {
@@ -279,12 +276,7 @@ LESSONS = [
         "read_title": "The parts of an expression",
         "read_intro": "Variable, term, coefficient, factor and degree, each defined once and then used.",
         "body": [
-            ("p", "An expression is a recipe for a number: it says what to do, and given "
-                  "values for the letters it produces a value. It does not claim anything. "
-                  "`2x + 5` is an expression; `2x + 5 = 11` is an equation, which does "
-                  "make a claim and is course 2's subject. The distinction matters "
-                  "immediately, because you can solve an equation and you cannot solve an "
-                  "expression."),
+            ("p", "An expression is a recipe for a number: it says what to do, and given values for the letters it produces a value. It does not claim anything. `2x + 5` is an expression; `2x + 5 = 11` is an equation, which does make a claim and is a topic in Linear Equations and Inequalities. The distinction matters immediately, because you can solve an equation and you cannot solve an expression."),
             ("def", ("Variable, constant, expression",
                      "A <strong>variable</strong> is a letter standing for a number whose "
                      "value is not fixed. A <strong>constant</strong> is a number written "
@@ -325,10 +317,7 @@ LESSONS = [
                   "coefficient is `−1`. Neither is zero and neither is absent; the `1` is "
                   "simply not printed, because writing it would add nothing."),
             ("h3", "Terms and factors are different things"),
-            ("p", "Terms are what an expression is added out of. <strong>Factors</strong> "
-                  "are what a term is multiplied out of. `4xy` is a single term with "
-                  "factors `4`, `x` and `y`. Confusing the two is what makes people "
-                  "cancel across a plus sign, and it causes real damage in course 5."),
+            ("p", "Terms are what an expression is added out of. <strong>Factors</strong> are what a term is multiplied out of. `4xy` is a single term with factors `4`, `x` and `y`. Confusing the two is what makes people cancel across a plus sign, and it causes real damage in Rational and Radical Expressions."),
             ("p", "A bracket makes this visible. `5(x + 2)` is one term, because there is "
                   "no top-level `+` or `−` anywhere in it: it is a product of the two "
                   "factors `5` and `(x + 2)`. Multiply it out and you get `5x + 10`, "
@@ -360,12 +349,7 @@ LESSONS = [
         "lab": ("expression", {
             "mode": "terms",
             "panel_title": "Take an expression apart",
-            "panel_intro": "Type an expression and the lab splits it at its top-level `+` "
-                           "and `−` signs, naming the coefficient and degree of each term. "
-                           "It also expands the expression and counts the terms again, so "
-                           "feed it `5(x + 2)` and predict the as-written count first. The "
-                           "expanded count previews lesson 10; the degree column previews "
-                           "course 4 and is not part of this lesson's completion standard.",
+            "panel_intro": "Type an expression and the lab splits it at its top-level `+` and `−` signs, naming the coefficient and degree of each term. It also expands the expression and counts the terms again, so feed it `5(x + 2)` and predict the as-written count first. The expanded count previews lesson 10; the degree column previews Polynomials and Factoring and is not part of this lesson's completion standard.",
         }),
         "steps_title": "Reading an expression correctly",
         "steps_intro": "Four passes. Do them in order; the bracket pass changes everything after it.",
@@ -466,10 +450,7 @@ LESSONS = [
                      "coefficient of each monomial term, and every factor of the bracketed "
                      "term. Do not expand it: lesson 10 owns that move. The reading is "
                      "finished when another reader can point to the same pieces."),
-        "note": "The vocabulary here is not decoration. \"Combine like terms\" in lesson "
-                "11, \"cancel a common factor\" in course 5 and \"the leading "
-                "coefficient\" in course 4 are all instructions that name one of these "
-                "parts, and following them requires having found the right part first.",
+        "note": "The vocabulary here is not decoration. \"Combine like terms\" in lesson 11, \"cancel a common factor\" in Rational and Radical Expressions and \"the leading coefficient\" in Polynomials and Factoring are all instructions that name one of these parts, and following them requires having found the right part first.",
     },
     # --------------------------------------------------------- the-distributive-law
     {
@@ -549,10 +530,7 @@ LESSONS = [
                 "               =  x² − 3x + 2x − 6",
                 "               =  x² − x − 6                 then collect",
             ]),
-            ("p", "The second line is the law used twice: once to split `(x + 2)` off, "
-                  "and once inside each piece. There is no separate rule for multiplying "
-                  "two brackets; there is this law, applied again. Course 4 does this at "
-                  "length and gives it a name."),
+            ("p", "The second line is the law used twice: once to split `(x + 2)` off, and once inside each piece. There is no separate rule for multiplying two brackets; there is this law, applied again. Polynomials and Factoring does this at length and gives it a name."),
             ("h3", "Four things that are not the distributive law"),
             ("ul", [
                 "<strong>Squaring over a sum.</strong> `(a + b)²` is not `a² + b²`. At "
@@ -575,11 +553,7 @@ LESSONS = [
                   "times `1/(x + 6)`, and `1/(x + 6)` is not `1/x + 1/6`. A sum you are "
                   "dividing splits; a sum you are dividing <em>by</em> does not."),
             ("example", ("The law read right to left",
-                         "`ab + ac = a(b + c)` is the same statement written backwards, "
-                         "and read that way it is called factoring. `6x + 15` is "
-                         "`3(2x + 5)`, because both terms share a factor of `3`. Course 4 "
-                         "is largely the study of how to find the `a` when nobody tells "
-                         "you what it is.")),
+                         "`ab + ac = a(b + c)` is the same statement written backwards, and read that way it is called factoring. `6x + 15` is `3(2x + 5)`, because both terms share a factor of `3`. Polynomials and Factoring is largely the study of how to find the `a` when nobody tells you what it is.")),
         ],
         "lab": ("expression", {
             "mode": "distribute",
@@ -681,15 +655,8 @@ LESSONS = [
              "wrong every time except in special cases such as `b = 0`."),
         ],
         "standard": ("Finish when `−(x − 3)` gives `−x + 3` with no pause and no doubt.",
-                     "Expand `−4(3x − 2y + 5)` and `(2x − 3)(x + 4)`, showing one product "
-                     "for every grid cell. Then use a numerical counterexample to explain "
-                     "why `12/(x + 6)` cannot split although `(x + 6)/2` can. That shape "
-                     "distinction is what keeps course 5 from becoming guesswork."),
-        "note": "Read the law right to left and it becomes factoring, which is most of "
-                "course 4. Read it left to right with two brackets and it becomes "
-                "polynomial multiplication. Both directions are this one property, which "
-                "is a reasonable argument for spending more time on it than it appears to "
-                "deserve.",
+                     "Expand `−4(3x − 2y + 5)` and `(2x − 3)(x + 4)`, showing one product for every grid cell. Then use a numerical counterexample to explain why `12/(x + 6)` cannot split although `(x + 6)/2` can. That shape distinction is what keeps Rational and Radical Expressions from becoming guesswork."),
+        "note": "Read the law right to left and it becomes factoring, which is most of Polynomials and Factoring. Read it left to right with two brackets and it becomes polynomial multiplication. Both directions are this one property, which is a reasonable argument for spending more time on it than it appears to deserve.",
     },
     # --------------------------------------------------------- combining-like-terms
     {
@@ -888,15 +855,8 @@ LESSONS = [
              "cannot happen."),
         ],
         "standard": ("Finish when you can say instantly whether two terms may be added, and why.",
-                     "Expand and collect `3(2x − y) − x + 4y − 7`, marking every group by "
-                     "its variable part before adding coefficients. Justify each merge by "
-                     "the distributive law read backwards and explain why an unlike term "
-                     "stays. Course 2 collects on each side of an equation and preserves "
-                     "every sign error made here."),
-        "note": "This is the last of the three reading skills. Lesson 3 found the terms, "
-                "lesson 10 got them out of their brackets, and this lesson decides which "
-                "may be merged. Course 4 does the same three things to polynomials and "
-                "calls it addition.",
+                     "Expand and collect `3(2x − y) − x + 4y − 7`, marking every group by its variable part before adding coefficients. Justify each merge by the distributive law read backwards and explain why an unlike term stays. Linear Equations and Inequalities collects on each side of an equation and preserves every sign error made here."),
+        "note": "This is the last of the three reading skills. Lesson 3 found the terms, lesson 10 got them out of their brackets, and this lesson decides which may be merged. Polynomials and Factoring does the same three things to polynomials and calls it addition.",
     },
     # --------------------------------------------------------- evaluating-expressions
     {
@@ -933,9 +893,7 @@ LESSONS = [
              "throughout a single evaluation; if two quantities can differ, they need two "
              "letters."),
             ("Not every expression has a value at every number",
-             "`1/(x − 2)` has a value at every `x` except `2`, where the substitution "
-             "produces a division by zero. \"Undefined\" is a legitimate and complete "
-             "answer, and course 3 gives the set of numbers that do work a name."),
+             "`1/(x − 2)` has a value at every `x` except `2`, where the substitution produces a division by zero. \"Undefined\" is a legitimate and complete answer, and Lines, Functions and Graphs gives the set of numbers that do work a name."),
         ],
         "read_title": "Substituting a number for a letter",
         "read_intro": "One discipline, and the three places it is what saves you.",
@@ -994,11 +952,7 @@ LESSONS = [
                 "5 − 2x     at  x = −4            →   5 − 2(−4)      =  5 + 8  =  13",
                 "1/(x − 2)  at  x = 2             →   1/(2 − 2)  =  1/0,  undefined",
             ]),
-            ("p", "The third line is not a failure of the method. Division by zero has no "
-                  "value, so the expression has no value at `x = 2`, and the correct "
-                  "answer to \"evaluate it there\" is that you cannot. Every other real "
-                  "number works. Course 3 calls the set of inputs that work the domain "
-                  "and makes finding it a routine step."),
+            ("p", "The third line is not a failure of the method. Division by zero has no value, so the expression has no value at `x = 2`, and the correct answer to \"evaluate it there\" is that you cannot. Every other real number works. Lines, Functions and Graphs calls the set of inputs that work the domain and makes finding it a routine step."),
             ("example", ("A fraction substituted",
                          "`2x² − 3x + 1` at `x = −1/2`. In brackets: "
                          "`2(−1/2)² − 3(−1/2) + 1`. The square is `1/4`, so the first "
@@ -1105,10 +1059,7 @@ LESSONS = [
              "correct one."),
         ],
         "standard": ("Finish when the brackets go in without you deciding to put them there.",
-                     "Evaluate `4x² − 3xy + y²` at `x = −1/2`, `y = −3`, writing every "
-                     "substitution in brackets and keeping exact fractions. Then explain "
-                     "how `−x²`, `(−x)²` and `−2x²` differ before evaluating any of them. "
-                     "Course 3 repeats this act under the name `f(x)`."),
+                     "Evaluate `4x² − 3xy + y²` at `x = −1/2`, `y = −3`, writing every substitution in brackets and keeping exact fractions. Then explain how `−x²`, `(−x)²` and `−2x²` differ before evaluating any of them. Lines, Functions and Graphs repeats this act under the name `f(x)`."),
         "note": "Evaluating at a single value is also the cheapest check you have. If two "
                 "expressions are supposed to be equal and they disagree at one number, "
                 "one of them is wrong &mdash; a complete disproof from one line of "
@@ -1141,10 +1092,7 @@ LESSONS = [
         ),
         "concepts": [
             ("Name the unknown before writing anything",
-             "\"Let `n` be the number of quarters\" is a definition you can check against "
-             "later. \"Let `n` be the quarters\" is not, because it does not say whether "
-             "`n` counts coins or measures money. Half the errors in course 2 are made in "
-             "this sentence and inherited by everything after it."),
+             "\"Let `n` be the number of quarters\" is a definition you can check against later. \"Let `n` be the quarters\" is not, because it does not say whether `n` counts coins or measures money. Half the errors in Linear Equations and Inequalities are made in this sentence and inherited by everything after it."),
             ("Addition and multiplication do not care about order; subtraction and division do",
              "`n + 5` and `5 + n` are the same expression, so no phrase involving \"sum\" "
              "can be got wrong by ordering. `n − 5` and `5 − n` are different, so every "
@@ -1359,9 +1307,6 @@ LESSONS = [
                      "and choose a value that separates it from the common product-of-the-"
                      "whole-sum error. Then translate \"four less than three times the sum "
                      "of a number and two\" and test the nearest rival reading."),
-        "note": "This is the last lesson of the course, and it is the one that gets used "
-                "first. Course 2 turns these expressions into equations by setting two of "
-                "them equal, and every technique it teaches for solving is worthless if "
-                "the equation was written from a misread sentence.",
+        "note": "Linear Equations and Inequalities turns these expressions into equations by setting two of them equal. Solving an equation requires first translating the stated relationship correctly.",
     },
 ]

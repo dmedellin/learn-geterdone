@@ -48,9 +48,7 @@ LESSONS = [
                      "the first and, for each of those, `n₂` ways to make the second, then "
                      "there are `n₁n₂` ways in total. For `k` stages the count is the "
                      "product of the stage counts.")),
-            ("p", "The product rule is where `|A × B| = |A| · |B|` came from in course 2, "
-                  "and where truth tables get their `2ⁿ` rows: `n` successive independent "
-                  "binary choices."),
+            ("p", "The product rule is where `|A × B| = |A| · |B|` came from in Sets, Relations, and Functions, and where truth tables get their `2ⁿ` rows: `n` successive independent binary choices."),
             ("example", ("Both rules in one problem",
                          "How many strings of length 3 over `{a,…,z}` start with a vowel or "
                          "end with `z`? Vowel first: `5 · 26 · 26 = 3380`. Ending `z`: "
@@ -172,10 +170,7 @@ LESSONS = [
                      "Count the 4-digit PINs with at least two identical digits. Do it by "
                      "complement, and say in one sentence why the direct count would be "
                      "harder. That sentence is the skill."),
-        "note": "Both rules are theorems about sets: the sum rule is additivity of "
-                "cardinality over disjoint unions, and the product rule is "
-                "`|A × B| = |A| · |B|` from course 2 lesson 5. Counting is set theory with "
-                "the sets kept small enough to measure.",
+        "note": "Both rules are theorems about sets: the sum rule is additivity of cardinality over disjoint unions, and the product rule is `|A × B| = |A| · |B|` from Sets, Relations, and Functions lesson 5. Counting is set theory with the sets kept small enough to measure.",
     },
     # ---------------------------------------------------------------- 02
     {
@@ -204,8 +199,7 @@ LESSONS = [
              "If the first digit cannot be 0, choose it first (9 ways) and then the rest "
              "freely. Choosing left to right regardless is what creates the difficulty."),
             ("Split into cases when the count varies",
-             "Cases must be disjoint and exhaustive &mdash; the same discipline as a proof "
-             "by cases in course 1 lesson 14."),
+             "Cases must be disjoint and exhaustive &mdash; the same discipline as a proof by cases in Logic and Proof lesson 14."),
             ("Complement when the restriction says \"at least\"",
              "The complement of \"at least one\" is \"none\", which is a single "
              "unrestricted count."),
@@ -435,10 +429,7 @@ LESSONS = [
                   "produces a different seating, nothing is identified, and the count is "
                   "`n!`. Say which situation you are in before dividing; the question "
                   "decides it, not the shape of the table."),
-            ("p", "The division-by-symmetry argument is the pattern to remember: when "
-                  "several arrangements are considered the same, count them all and divide "
-                  "by the size of the equivalence class. That is course 2's equivalence "
-                  "relation doing combinatorial work, and lesson 7 uses it again."),
+            ("p", "The division-by-symmetry argument is the pattern to remember: when several arrangements are considered the same, count them all and divide by the size of the equivalence class. That is the equivalence relation from Sets, Relations, and Functions doing combinatorial work, and lesson 7 uses it again."),
             ("h3", "The size of factorials"),
             ("math", [
                 "  5! =                        120",
@@ -446,10 +437,7 @@ LESSONS = [
                 " 20! =  2 432 902 008 176 640 000",
                 " 52! ≈ 8.07 × 10⁶⁷",
             ]),
-            ("p", "`52!` is about `10¹⁸` times the number of atoms in the Earth, which is "
-                  "roughly `10⁵⁰`. Any algorithm that examines all permutations of a modest "
-                  "input is not slow &mdash; it is impossible, and course 8 lesson 11 gives "
-                  "that observation a name."),
+            ("p", "`52!` is about `10¹⁸` times the number of atoms in the Earth, which is roughly `10⁵⁰`. Any algorithm that examines all permutations of a modest input is not slow &mdash; it is impossible, and Algorithms and Complexity lesson 11 gives that observation a name."),
         ],
         "lab": ("counting", {
             "n": 5, "r": 3, "rule": "p",
@@ -540,10 +528,7 @@ LESSONS = [
                      "Count the ways to seat 6 people around a round table with two "
                      "specific people not adjacent. Do it by complement, and state exactly "
                      "why the circular count is `5!` rather than `6!`."),
-        "note": "A permutation is also a bijection from a set to itself, which is course 2 "
-                "lesson 12's remark. There are `n!` of them, and under composition they "
-                "form the symmetric group &mdash; the object most of finite group theory "
-                "is about.",
+        "note": "A permutation is also a bijection from a set to itself, which is Sets, Relations, and Functions lesson 12's remark. There are `n!` of them, and under composition they form the symmetric group &mdash; the object most of finite group theory is about.",
     },
     # ---------------------------------------------------------------- 04
     {
@@ -575,8 +560,7 @@ LESSONS = [
              "Choosing which `r` to include is the same as choosing which `n−r` to leave "
              "out, so `C(n,r) = C(n,n−r)`."),
             ("The subsets sum to `2ⁿ`",
-             "Every subset has exactly one size, so summing `C(n,r)` over all `r` counts "
-             "every subset once &mdash; and course 2 lesson 2 already knew the total."),
+             "Every subset has exactly one size, so summing `C(n,r)` over all `r` counts every subset once &mdash; and Sets, Relations, and Functions lesson 2 already knew the total."),
         ],
         "read_title": "Choosing without order",
         "read_intro": "The derivation, the identities, and the standard applications.",
@@ -618,11 +602,7 @@ LESSONS = [
                 "Directly: each element is independently in or out, giving `2ⁿ`.",
             ]),
             ("example", ("Poker hands",
-                         "A 5-card hand from 52 is `C(52,5) = 2 598 960`, since the order "
-                         "cards arrive in does not matter. Hands containing all four aces: "
-                         "choose the four aces (1 way) and one more card from 48, giving 48. "
-                         "So the probability is `48/2598960 ≈ 0.0000185` &mdash; course 5 "
-                         "makes that division legitimate.")),
+                         "A 5-card hand from 52 is `C(52,5) = 2 598 960`, since the order cards arrive in does not matter. Hands containing all four aces: choose the four aces (1 way) and one more card from 48, giving 48. So the probability is `48/2598960 ≈ 0.0000185` &mdash; Discrete Probability makes that division legitimate.")),
             ("example", ("Lattice paths",
                          "Paths from `(0,0)` to `(m,n)` using unit steps right and up: each "
                          "path is a sequence of `m + n` steps of which `m` are right, so "
@@ -752,8 +732,7 @@ LESSONS = [
              "Count the `k`-subsets of an `n`-set by whether they contain a fixed element. "
              "Those that do, and those that do not, are exactly the two terms."),
             ("Row sums are the power set",
-             "Summing across a row counts every subset once, which course 2 already showed "
-             "is `2ⁿ`."),
+             "Summing across a row counts every subset once, which Sets, Relations, and Functions already showed is `2ⁿ`."),
             ("The triangle is a computation, not a picture",
              "Pascal's rule gives every entry from the previous row using only addition, "
              "which is how the values are produced without factorials."),
@@ -917,10 +896,7 @@ LESSONS = [
                      "many of its members come from the first half. Say why the three "
                      "classes are disjoint and exhaustive, and check the identity at "
                      "`n = 3`, where the left side is 15."),
-        "note": "Pascal's triangle mod 2 reproduces the Sierpiński triangle, because "
-                "`C(n,k)` is odd exactly when the binary digits of `k` are a subset of "
-                "those of `n` &mdash; Lucas's theorem, read modulo 2. Course 6's modular arithmetic is "
-                "what makes that statement precise.",
+        "note": "Pascal's triangle mod 2 reproduces the Sierpiński triangle, because `C(n,k)` is odd exactly when the binary digits of `k` are a subset of those of `n` &mdash; Lucas's theorem, read modulo 2. Number Theory and Cryptography's modular arithmetic is what makes that statement precise.",
     },
     # ---------------------------------------------------------------- 06
     {
@@ -974,9 +950,7 @@ LESSONS = [
             ("p", "This explains the name: the binomial coefficients are the coefficients "
                   "in a binomial expansion, and they count subsets because expanding is "
                   "choosing. The two facts are not analogous &mdash; they are the same fact."),
-            ("p", "An induction proof using Pascal's rule is also available and is a good "
-                  "exercise for course 3's technique. It verifies the theorem; the counting "
-                  "argument explains it."),
+            ("p", "An induction proof using Pascal's rule is also available and is a good exercise for Induction and Recursion's technique. It verifies the theorem; the counting argument explains it."),
             ("h3", "Corollaries by substitution"),
             ("math", [
                 "x = 1, y = 1     Σ_k C(n,k)          = 2ⁿ",

@@ -12,7 +12,11 @@ COURSE = {
         "Several equations at once, and the array that makes solving them mechanical: substitution, elimination, three-variable systems, row operations, Gaussian elimination, matrix arithmetic, determinants, inverses, and linear programming."
     ),
     "blurb": (
-        "Solve for several unknowns together, then find the notation that removes the bookkeeping. A matrix is elimination with the letters deleted, which is why this course does elimination by hand first and only then writes it down as rows."
+        (
+        "Solve systems by substitution and elimination, then represent the same operations "
+        "with matrices. Classify solution sets, compute determinants and inverses, and "
+        "optimize a linear objective."
+    )
     ),
     "key": [
         "one solution, none, or infinitely many  —  and nothing else",
@@ -20,7 +24,7 @@ COURSE = {
         "det A = 0   ⟺   A has no inverse",
         "the optimum of a linear objective sits at a corner",
     ],
-    "assumes_short": "Courses 1\u20137",
+    "assumes_short": "Linear equations and functions",
     "assumes_long": "lines, functions, and exact fraction arithmetic",
     "outcomes_intro": (
         "By the end you can choose and carry out an exact method for the two- and "

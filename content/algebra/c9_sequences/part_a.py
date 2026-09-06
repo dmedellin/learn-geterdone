@@ -21,8 +21,7 @@ LESSONS = [
         ],
         "key_label": "One sequence, two ways to define it",
         "concepts_intro": (
-            "There is one genuinely new idea here and it is the notation. The object "
-            "itself is a function, and functions were course 3."
+            "There is one genuinely new idea here and it is the notation. The object itself is a function, and functions were Lines, Functions and Graphs."
         ),
         "concepts": [
             ("A sequence is a function on integer positions",
@@ -101,12 +100,7 @@ LESSONS = [
                   "every pair by a chord with no three chords meeting at a point, and "
                   "count the regions the disc is cut into. For `n = 1` through `5` the "
                   "counts are `1, 2, 4, 8, 16`. For `n = 6` the count is `31`."),
-            ("p", "So a formula that matches the first five terms of a recursion is a "
-                  "candidate, not a fact. Establishing that it matches for every `n` "
-                  "requires mathematical induction, which this path does not cover: it "
-                  "is the subject of the Induction and Recursion course on the Discrete "
-                  "Mathematics path. Within this course, say \"this formula agrees with "
-                  "the first six terms\" and mean exactly that."),
+            ("p", "So a formula that matches the first five terms of a recursion is a candidate, not a fact. Establishing that it matches for every `n` requires mathematical induction, which is covered in Induction and Recursion under Discrete Mathematics. Within this course, say \"this formula agrees with the first six terms\" and mean exactly that."),
         ],
         "lab": ("sequence", {
             "mode": "define",
@@ -164,11 +158,7 @@ LESSONS = [
                 "The `n = 6` line is the only one doing real work. The first two use "
                 "terms the guess was built from; the third predicts a term first and "
                 "then checks it, which is the only kind of test that can fail.",
-                "It still is not a proof. What would settle it is the argument that "
-                "assumes `aₖ = 2ᵏ⁺¹ - 1` and shows the recurrence forces "
-                "`aₖ₊₁ = 2(2ᵏ⁺¹ - 1) + 1 = 2ᵏ⁺² - 1`, so that the formula, once true "
-                "anywhere, is true for ever after. That is induction, and it is the "
-                "Discrete Mathematics path's business rather than this one's.",
+                "It still is not a proof. What would settle it is the argument that assumes `aₖ = 2ᵏ⁺¹ - 1` and shows the recurrence forces `aₖ₊₁ = 2(2ᵏ⁺¹ - 1) + 1 = 2ᵏ⁺² - 1`, so that the formula, once true anywhere, is true for ever after. That is induction, the subject of Induction and Recursion rather than this lesson.",
                 "For a faded conversion, take `b₁ = 2` and `bₙ = 3bₙ₋₁ + 2` for "
                 "`n ≥ 2`. The supplied first move is to compute `b₁ + 1` and "
                 "`b₂ + 1` rather than the terms alone. Generate through `b₅`, propose "
@@ -565,10 +555,7 @@ LESSONS = [
                      "`d = (aₙ - a₁)/(n - 1)`, which recovers the common difference "
                      "from the first term and any one other term. From two terms in "
                      "general positions it is `d = (aₙ - aₘ)/(n - m)`.")),
-            ("p", "Plotted, an arithmetic sequence is a row of dots lying on a straight "
-                  "line of slope `d` &mdash; course 3's slope, sampled at the integers. "
-                  "`aₙ = a₁ + (n - 1)d` is `y = mx + c` with the letters renamed, which "
-                  "is why a sequence with a constant difference is called linear."),
+            ("p", "Plotted, an arithmetic sequence is a row of dots lying on a straight line of slope `d` &mdash; the slope from Lines, Functions and Graphs, sampled at the integers. `aₙ = a₁ + (n - 1)d` is `y = mx + c` with the letters renamed, which is why a sequence with a constant difference is called linear."),
             ("def", ("Series and partial sum",
                      "A <strong>series</strong> is the sum of the terms of a sequence. "
                      "The sum of the first `n` terms is the <strong>n-th partial "
@@ -787,12 +774,7 @@ LESSONS = [
                      "`aₙ = a₁rⁿ⁻¹` for every `n ≥ 1`. Getting from `a₁` to `aₙ` is "
                      "`n - 1` multiplications by `r`, exactly as getting there in an "
                      "arithmetic sequence was `n - 1` additions of `d`.")),
-            ("p", "For `r &gt; 0`, the plotted terms lie on an exponential curve: "
-                  "`a₁rⁿ⁻¹` is course 7's `a·bˣ` sampled at the integers. For "
-                  "`r &lt; 0`, no real exponential curve has that negative base; the "
-                  "magnitudes follow `|a₁||r|ⁿ⁻¹` while the signs alternate. "
-                  "`|r| &gt; 1` grows in magnitude, `0 &lt; |r| &lt; 1` decays in magnitude, "
-                  "`r = 1` is constant, and `r = 0` becomes zero after the first term."),
+            ("p", "For `r &gt; 0`, the plotted terms lie on an exponential curve: `a₁rⁿ⁻¹` is the `a·bˣ` form from Exponential and Logarithmic Functions sampled at the integers. For `r &lt; 0`, no real exponential curve has that negative base; the magnitudes follow `|a₁||r|ⁿ⁻¹` while the signs alternate. `|r| &gt; 1` grows in magnitude, `0 &lt; |r| &lt; 1` decays in magnitude, `r = 1` is constant, and `r = 0` becomes zero after the first term."),
             ("def", ("Geometric series",
                      "The sum of the terms of a geometric sequence. `Sₙ` denotes the "
                      "sum of the first `n` terms, `a₁ + a₁r + … + a₁rⁿ⁻¹`.")),
@@ -1303,13 +1285,7 @@ LESSONS = [
                 "If `a₁ = 0`, the recurrence multiplies `0` at every step and the "
                 "partial sums are `0, 0, 0, …`, which already proves the stated exception. "
                 "Now take `a₁ ≠ 0`.",
-                "For `r = 0`, the partial sums are `a₁, a₁, a₁, …`, so they converge to "
-                "`a₁ = a₁/(1 - 0)`. For `0 &lt; |r| &lt; 1`, Course 7's exponential-decay "
-                "result says the positive sequence `|r|ⁿ` approaches `0`. Since "
-                "`|rⁿ| = |r|ⁿ`, the signed power `rⁿ` does too, alternating when "
-                "`r &lt; 0`. In "
-                "`Sₙ = a₁/(1 - r) - [a₁/(1 - r)]rⁿ`, the second piece therefore "
-                "approaches `0`, leaving `a₁/(1 - r)`.",
+                "For `r = 0`, the partial sums are `a₁, a₁, a₁, …`, so they converge to `a₁ = a₁/(1 - 0)`. For `0 &lt; |r| &lt; 1`, the exponential-decay result from Exponential and Logarithmic Functions says the positive sequence `|r|ⁿ` approaches `0`. Since `|rⁿ| = |r|ⁿ`, the signed power `rⁿ` does too, alternating when `r &lt; 0`. In `Sₙ = a₁/(1 - r) - [a₁/(1 - r)]rⁿ`, the second piece therefore approaches `0`, leaving `a₁/(1 - r)`.",
                 "Suppose instead `|r| &gt; 1`. Then `|aₙ| = |a₁||r|ⁿ⁻¹` grows without "
                 "bound, and by lesson 5 the gap between consecutive partial sums is "
                 "`aₙ`. Partial sums moving further and further apart cannot be settling "
@@ -1494,11 +1470,6 @@ LESSONS = [
                      "terms bring a partial sum within a stated distance of the limit, "
                      "and name what goes wrong in each of the three divergent cases "
                      "`|r| &gt; 1`, `r = 1` and `r = -1`."),
-        "note": "Lesson 7 turns this into a machine for repeating decimals. `0.4272727…` "
-                "is `0.4` plus a geometric series with `r = 1/100`, and the fraction it "
-                "equals falls out of `a₁/(1 - r)`. It is the same formula with `|r|` far "
-                "enough below `1` that convergence is never in doubt &mdash; which is "
-                "the argument behind course 1's claim that a repeating decimal is always "
-                "rational.",
+        "note": "Lesson 7 turns this into a machine for repeating decimals. `0.4272727…` is `0.4` plus a geometric series with `r = 1/100`, and the fraction it equals falls out of `a₁/(1 - r)`. It is the same formula with `|r|` far enough below `1` that convergence is never in doubt &mdash; which is the argument behind Foundations of Algebra's claim that a repeating decimal is always rational.",
     },
 ]

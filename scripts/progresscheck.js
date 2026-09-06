@@ -86,14 +86,25 @@ function check(name, got, want) {
   else console.log('ok    ' + name);
 }
 
+// Count subjects with marks from the displayed lesson meters, without showing a subject total.
+function markedSubjects(els) {
+  return (els.paths.innerHTML.match(/(\d+) of \d+ lessons/g) || [])
+    .filter(s => Number(/(\d+) of/.exec(s)[1]) > 0).length;
+}
+
 /* 1. Nothing marked. */
 let e = run({});
+check('UI: completion is described as marks', /<dt>Courses fully marked<\/dt>/.test(html), true);
+check('UI: subject catalog totals are not displayed', /id="statPaths(?:Of)?"/.test(html), false);
+check('UI: aggregate footer has no algebra warning', /a step that gives the right answer here/.test(html), false);
+check('UI: course rows have no ordinal badges', /class="pg-num"/.test(e.paths.innerHTML), false);
+check('UI: subject headings link to subject courses', /href="\.\.\/paths\/trading\/"/.test(e.paths.innerHTML), true);
 check('empty: ring reads 0%', e.ringPct.textContent, '0%');
 check('empty: ring sub names the whole library', e.ringSub.textContent, '0 OF ' + TOTAL);
 check('empty: lessons ticked', e.statLessons.textContent, '0');
-check('empty: denominator is the tickable library', e.statLessonsOf.textContent, 'of ' + TOTAL + ' tickable');
+check('empty: denominator is the tickable library', e.statLessonsOf.textContent, 'of ' + TOTAL + ' lessons');
 check('empty: courses finished', e.statCourses.textContent, '0');
-check('empty: subjects started', e.statPaths.textContent, '0');
+check('empty: subjects started', String(markedSubjects(e)), '0');
 check('empty: last marked is a dash', e.statLast.textContent, '—');
 check('empty: recent invites a first tick', /Nothing marked yet/.test(e.recent.innerHTML), true);
 
@@ -107,10 +118,10 @@ check('full: ring reads 100%', e.ringPct.textContent, '100%');
 check('full: ring sub', e.ringSub.textContent, TOTAL + ' OF ' + TOTAL);
 check('full: lessons ticked', e.statLessons.textContent, String(TOTAL));
 check('full: every course finished', e.statCourses.textContent, String(TOTAL_COURSES));
-check('full: every subject started', e.statPaths.textContent, String(LIBRARY.length));
+check('full: every subject started', String(markedSubjects(e)), String(LIBRARY.length));
 check('full: ring is fully drawn (offset 0)', Number(e.ringFill.getAttribute('stroke-dashoffset')), 0);
 check('full: the ring states its value to a screen reader',
-      e.ring.getAttribute('aria-label'), TOTAL + ' of ' + TOTAL + ' lessons complete (100%)');
+      e.ring.getAttribute('aria-label'), TOTAL + ' of ' + TOTAL + ' lessons marked complete (100%)');
 
 /* 3. One whole course, and nothing else. This is the case the old page could
  *    not express at all: it knew a mark existed but not what it was part of. */
@@ -120,7 +131,7 @@ c0.lessons.forEach(l => { oneCourse[c0.slug + '/' + l[0]] = '2026-08-02'; });
 e = run(oneCourse);
 check('one course: lessons ticked', e.statLessons.textContent, String(c0.lessons.length));
 check('one course: exactly one course finished', e.statCourses.textContent, '1');
-check('one course: exactly one subject started', e.statPaths.textContent, '1');
+check('one course: exactly one subject started', String(markedSubjects(e)), '1');
 check('one course: that course row shows full', 
       new RegExp('>' + c0.lessons.length + ' / ' + c0.lessons.length + '<').test(e.paths.innerHTML), true);
 check('one course: the finished row is marked done', /pg-course is-done/.test(e.paths.innerHTML), true);
@@ -148,7 +159,7 @@ LIBRARY.forEach(p => p.courses.forEach(c => c.lessons.forEach(l => {
   if (scattered[c.slug + '/' + l[0]]) touched.add(p.slug);
 })));
 check('scattered: every subject with a mark counts as started',
-      e.statPaths.textContent, String(touched.size));
+      String(markedSubjects(e)), String(touched.size));
 check('scattered: latest date wins the "last marked" stat', e.statLast.textContent, '2026-08-04');
 
 /* 4b. The trading path. Its 118 lessons were hand-written and untickable
@@ -162,7 +173,7 @@ if (trading.length) {
   const one = {}; one[tc.slug + '/' + tc.lessons[0][0]] = '2026-08-19';
   const te = run(one);
   check('trading: a trading tick counts toward the headline', te.statLessons.textContent, '1');
-  check('trading: it starts the trading subject', te.statPaths.textContent, '1');
+  check('trading: it starts the trading subject', String(markedSubjects(te)), '1');
   check('trading: it is not treated as a stale mark',
         /no longer in the library/.test(te.recent.innerHTML), false);
   check('trading: the lesson is named, not slugified',

@@ -49,12 +49,7 @@ LESSONS = [
                      "form `f(x) = a·b^x` with `a ≠ 0`, `b &gt; 0` and `b ≠ 1`. The "
                      "number `b` is the <strong>base</strong>, and `a` is the value "
                      "at `x = 0`.")),
-            ("p", "Course 1 gave `b^x` a meaning for every rational `x`: whole "
-                  "exponents by repeated multiplication, negative ones by "
-                  "reciprocal, and `b^(p/q)` as the `q`-th root of `b^p`. For an "
-                  "irrational exponent &mdash; `2^√2` &mdash; the value is the number "
-                  "that the rational exponents close in on. This course takes that "
-                  "for granted and treats the domain as every real number."),
+            ("p", "Foundations of Algebra gave `b^x` a meaning for every rational `x`: whole exponents by repeated multiplication, negative ones by reciprocal, and `b^(p/q)` as the `q`-th root of `b^p`. For an irrational exponent &mdash; `2^√2` &mdash; the value is the number that the rational exponents close in on. This course takes that for granted and treats the domain as every real number."),
             ("h3", "Why the base must be positive"),
             ("p", "Take `b = −4`. Then `b^1 = −4` and `b^2 = 16` are perfectly good "
                   "numbers, and so is `b^(1/3) = −∛4`. But `b^(1/2) = √(−4)` is not "
@@ -951,13 +946,7 @@ LESSONS = [
         "read_intro": "Why the reflection is the whole picture, and what can be read "
                       "off it before anything is plotted.",
         "body": [
-            ("p", "Course 3 defined an inverse function: `g` undoes `f` when "
-                  "`g(f(x)) = x` and `f(g(x)) = x`, and a function has one only if it "
-                  "is one-to-one. `f(x) = b^x` is strictly increasing when `b &gt; 1` "
-                  "and strictly decreasing when `0 &lt; b &lt; 1`, so it never repeats "
-                  "a value and the inverse exists without any restriction of the "
-                  "domain &mdash; which is unusual, and is why logarithms are as "
-                  "well-behaved as they are."),
+            ("p", "Lines, Functions and Graphs defined an inverse function: `g` undoes `f` when `g(f(x)) = x` and `f(g(x)) = x`, and a function has one only if it is one-to-one. `f(x) = b^x` is strictly increasing when `b &gt; 1` and strictly decreasing when `0 &lt; b &lt; 1`, so it never repeats a value and the inverse exists without any restriction of the domain &mdash; which is unusual, and is why logarithms are as well-behaved as they are."),
             ("def", ("Logarithmic function",
                      "For `b &gt; 0` with `b ≠ 1`, the <strong>logarithmic "
                      "function</strong> with base `b` is `g(x) = log_b(x)`, defined "
@@ -1154,10 +1143,7 @@ LESSONS = [
         "module": "Logarithms",
         "one_line": "Expand or condense logarithmic expressions while preserving their domain.",
         "summary": (
-            "Three laws turn a product into a sum, a quotient into a difference, and "
-            "a power into a multiple. Each one is a single exponent law from course 1 "
-            "written in the other notation, and each is proved in two lines from the "
-            "definition. Two more rules that look like laws are not."
+            "Three laws turn a product into a sum, a quotient into a difference, and a power into a multiple. Each one is a single exponent law from Foundations of Algebra written in the other notation, and each is proved in two lines from the definition. Two more rules that look like laws are not."
         ),
         "key": [
             "log_b(M·N)  =  log_b M + log_b N      from   b^m · b^n = b^(m+n)",

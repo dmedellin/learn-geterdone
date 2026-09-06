@@ -11,16 +11,18 @@ COURSE = {
     "title": "Logic and Proof",
     "level": "Beginner",
     "summary": (
-        "Propositional and predicate logic from truth values to written proofs: "
-        "connectives, truth tables, equivalence, normal forms, quantifiers and their "
-        "negations, rules of inference, and the four proof techniques the rest of the "
-        "path uses."
+        (
+        "Propositional and predicate logic from truth values to written proofs: connectives, "
+        "truth tables, equivalence, normal forms, quantifiers and their negations, inference "
+        "rules, and direct, contrapositive, contradiction, and case proofs."
+    )
     ),
     "blurb": (
-        "Make a statement precise enough to be true or false, then establish it. "
-        "Connectives and truth tables, logical equivalence, quantifiers and the order "
-        "they come in, valid inference, and direct, contrapositive, contradiction and "
-        "case proofs written out in full."
+        (
+        "Translate statements into propositional and predicate logic, test equivalence, "
+        "negate quantified claims, check inferences, and write proofs that another reader can "
+        "verify."
+    )
     ),
     "key": [
         "p → q   ≡   ¬p ∨ q            the conditional, in disjunctive form",
@@ -28,7 +30,7 @@ COURSE = {
         "¬∀x P(x)  ≡  ∃x ¬P(x)         negation flips the quantifier",
         "p → q   ≡   ¬q → ¬p           contraposition: the basis of a proof method",
     ],
-    "assumes_short": "Nothing",
+    "assumes_short": "School algebra",
     "assumes_long": "school algebra is enough",
     "outcomes_intro": (
         "By the end you can read a theorem statement exactly as written, and write a "
@@ -53,19 +55,22 @@ COURSE = {
         "turn all of it into proofs."
     ),
     "how_to": [
-        "Work forward. Lesson 5 assumes you can build a truth table; lesson 13 assumes "
-        "you know what the contrapositive is and why it is equivalent.",
-        "Use the labs adversarially. Most of them let you type your own formula or edit "
-        "the predicate. The fastest way to understand a claim is to spend two minutes "
-        "trying to make it false and finding out you cannot.",
-        "Write the proofs out. Lesson 11 ends with an argument to check, and lessons 12 "
-        "to 14 each end with a claim to prove yourself. Reading a proof and producing one "
-        "are different skills, and only the second transfers to the rest of the path.",
-        "Do not be put off by the continuity and convergence definitions in lessons 9 "
-        "and 10. They are there because they are the hardest quantifier strings most "
-        "people ever meet, and the point of those lessons is that you can read and "
-        "negate them mechanically without knowing what they mean. Nothing on this path "
-        "needs the calculus.",
+        (
+            "Use truth tables to check equivalences, and distinguish an implication from its "
+            "contrapositive."
+        ),
+        (
+            "Try your own formulas and predicates in the labs. Look for an assignment that "
+            "makes a proposed equivalence false."
+        ),
+        (
+            "Write the practice proofs out. Reading an argument and producing one exercise "
+            "different skills."
+        ),
+        (
+            "The continuity and convergence examples practise reading and negating "
+            "quantifiers; they do not require calculus."
+        )
     ],
     "not_covered": [
         "Formal proof systems. This course teaches proof as mathematicians write it "
@@ -78,11 +83,11 @@ COURSE = {
         "two-valued: every proposition is either true or false, and `p ∨ ¬p` always holds.",
     ],
     "footer_lead": (
-        "Truth tables, equivalences and quantifier evaluations on this course are "
-        "computed in your browser by evaluating the formula under every assignment, so "
-        "a column is right because the evaluation is right. Verifying a statement on "
-        "the cases shown is not a proof of it &mdash; lesson 14 and course 3 are about "
-        "exactly that gap."
+        (
+        "Truth tables, equivalences and quantifier evaluations are computed in your browser "
+        "under every assignment. Checking finitely many cases does not prove a claim over an "
+        "infinite domain."
+    )
     ),
     "lessons": part_a.LESSONS + part_b.LESSONS,
 }

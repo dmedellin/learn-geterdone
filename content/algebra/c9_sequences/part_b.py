@@ -143,13 +143,7 @@ LESSONS = [
                          "six. `3/40 = 0.075` exactly, because `40 = 2³·5` and a "
                          "denominator built only from `2`s and `5`s can be turned into "
                          "a power of ten: `3/40 = 75/1000`.")),
-            ("p", "Putting the two directions together: a number is rational exactly "
-                  "when its decimal expansion terminates or repeats. Course 1 sorted "
-                  "the reals into rational and irrational and asserted this; the "
-                  "geometric series is what turns the assertion into an argument. It "
-                  "also gives a way to write down an irrational number on demand &mdash; "
-                  "`0.101001000100001…` , with one more zero in each gap, never repeats "
-                  "and so cannot be a fraction."),
+            ("p", "Putting the two directions together: a number is rational exactly when its decimal expansion terminates or repeats. Foundations of Algebra sorted the reals into rational and irrational and asserted this; the geometric series is what turns the assertion into an argument. It also gives a way to write down an irrational number on demand &mdash; `0.101001000100001…` , with one more zero in each gap, never repeats and so cannot be a fraction."),
         ],
         "lab": ("sequence", {
             "mode": "repeating",
@@ -688,11 +682,7 @@ LESSONS = [
                 "`k` from the other `n - 1`, and there are `N(n-1,k)`. No selection is "
                 "in both groups and none is outside them, so "
                 "`N(n,k) = N(n-1,k-1) + N(n-1,k)`.",
-                "So `N` starts as the triangle does and grows by the same rule, which "
-                "forces the two tables to agree row by row. Stating that last step "
-                "properly is what mathematical induction is for, and the Discrete "
-                "Mathematics path does it; the two rules and the two starting rows are "
-                "what this course checks.",
+                "So `N` starts as the triangle does and grows by the same rule, which forces the two tables to agree row by row. Stating that last step properly is what mathematical induction is for, and Induction and Recursion supplies that proof; the two rules and the two starting rows are what this course checks.",
             ]),
             ("p", "There is a second count in the same picture. Start at the apex and "
                   "walk down, going left or right at each step. The number of routes "
@@ -892,10 +882,7 @@ LESSONS = [
         "read_title": "Pascal's triangle and the binomial theorem",
         "read_intro": "The coefficients, the formula that produces them, and the reason they are counts.",
         "body": [
-            ("p", "Course 4 expanded `(a + b)²` and `(a + b)³` by hand. `(a + b)⁵` is "
-                  "possible with patience, and `(a + b)¹²` is not: multiplying out "
-                  "twelve brackets means `2¹² = 4096` products before any collecting "
-                  "starts. The theorem below skips all of it."),
+            ("p", "Polynomials and Factoring expanded `(a + b)²` and `(a + b)³` by hand. `(a + b)⁵` is possible with patience, and `(a + b)¹²` is not: multiplying out twelve brackets means `2¹² = 4096` products before any collecting starts. The theorem below skips all of it."),
             ("math", [
                 "(a + b)⁰ = 1",
                 "(a + b)¹ = a + b",
@@ -1078,17 +1065,7 @@ LESSONS = [
                      "row 5, compute a binomial coefficient by cancelling factorials, "
                      "and expand `(2x - 3)⁴` correctly including signs. For a complete "
                      "expansion, the `x = 1` check should be automatic."),
-        "note": "This theorem is the last new identity of the course. Lesson 11 "
-                "specialises it into a method for picking a single term out of an "
-                "expansion without writing the rest, and "
-                "it ends where counting begins: `C(n,k)` was defined here as a formula and used "
-                "as a count, and the Combinatorics and Counting course on the Discrete "
-                "Mathematics path takes it up as a subject in its own right. The "
-                "algebra was the point, though. Every step of this path &mdash; "
-                "elimination, row reduction, the determinant and the corner points in "
-                "course 8, the two sequence families here &mdash; was legal because "
-                "some property of the real numbers said so, which is the thing "
-                "course 1 opened with.",
+        "note": "The binomial-coefficients lesson specialises this identity into a method for picking a single term out of an expansion without writing the rest. `C(n,k)` was defined here as a formula and used as a count; Combinatorics and Counting develops its counting interpretation. Elimination, row reduction, determinants, corner points, and the two sequence families each use properties of the real numbers introduced in Foundations of Algebra.",
     },
     # ---------------------------------------------------------------- 11
     {
@@ -1345,12 +1322,6 @@ LESSONS = [
                      "plainly when no such term exists. Getting `C(n,k)` from a row of "
                      "the triangle or from the factorial formula, and the sign from "
                      "`(-1)ᵏ`, should be routine by now."),
-        "note": "That closes the course. It began with a sequence as a function on the "
-                "positive integers, moved to the sums of their terms, and needed a "
-                "limit of partial sums before an infinite one could mean anything; it ends "
-                "with a coefficient that is a count. The three habits worth keeping are "
-                "the ones the course kept insisting on: derive the closed form rather "
-                "than reciting it, check the condition before applying the formula, and "
-                "say exactly what a check has established and what it has not.",
+        "note": "The course treats sequences as functions on the positive integers, finite sums, convergence of partial sums, and binomial coefficients as counts. Derive each closed form, check its conditions before applying it, and state what a check establishes and what it does not.",
     },
 ]

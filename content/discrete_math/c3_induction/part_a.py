@@ -132,9 +132,7 @@ LESSONS = [
                 "So 0 ≤ r < d and a = dq + r.        ∎",
             ],
             "after": [
-                "Course 6 opens with this theorem and uses it in every lesson. Here it is "
-                "an example of the technique; there it is the foundation of modular "
-                "arithmetic. The uniqueness of `q` and `r` needs a separate short argument."
+                "Number Theory and Cryptography opens with this theorem and uses it in every lesson. Here it is an example of the technique; there it is the foundation of modular arithmetic. The uniqueness of `q` and `r` needs a separate short argument."
             ],
         },
         "quiz_title": "Well-ordering",
@@ -995,17 +993,10 @@ LESSONS = [
                          "else is in `E`. That last sentence is not optional &mdash; "
                          "without it the definition permits any superset.")),
             ("example", ("Well-formed parenthesis strings",
-                         "BASE: the empty string is well formed. RECURSIVE: if `s` is well "
-                         "formed then so is `(s)`, and if `s` and `t` are well formed then "
-                         "so is `st`. This generates `()`, `(())`, `()()`, `(()())` and "
-                         "nothing else. The Catalan numbers count them, and this path "
-                         "does not reach those.")),
+                         "BASE: the empty string is well formed. RECURSIVE: if `s` is well formed then so is `(s)`, and if `s` and `t` are well formed then so is `st`. This generates `()`, `(())`, `()()`, `(()())` and nothing else. The Catalan numbers count them, but they are outside this lesson's scope.")),
             ("h3", "Recursively defined structures"),
             ("example", ("Binary trees",
-                         "BASE: the empty tree is a binary tree. RECURSIVE: if `L` and `R` "
-                         "are binary trees and `v` is a value, then the tree with root `v`, "
-                         "left subtree `L` and right subtree `R` is a binary tree. Course 7 "
-                         "lesson 11 traverses exactly this object.")),
+                         "BASE: the empty tree is a binary tree. RECURSIVE: if `L` and `R` are binary trees and `v` is a value, then the tree with root `v`, left subtree `L` and right subtree `R` is a binary tree. Graphs and Trees lesson 11 traverses exactly this object.")),
             ("p", "This is where recursion earns its place. A binary tree has no obvious "
                   "\"size parameter\" to induct on, but it does have a structure, and "
                   "lesson 7's structural induction proves things about it directly."),

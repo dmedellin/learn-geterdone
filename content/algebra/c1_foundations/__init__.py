@@ -36,7 +36,10 @@ COURSE = {
         "from a stated quantity to an expression."
     ),
     "blurb": (
-        "Arithmetic, made general. Why a letter can stand for a number, which rearrangements are always allowed and which only look allowed, and the exponent and radical rules that everything after this course leans on."
+        (
+        "Variables represent numbers, named properties justify rearrangements, and exponent "
+        "and radical rules preserve the meaning of an expression."
+    )
     ),
     "key": [
         "a(b + c) = ab + ac                 the distributive law",
@@ -47,8 +50,10 @@ COURSE = {
     "assumes_short": "Arithmetic",
     "assumes_long": "fractions, negatives, and long division",
     "outcomes_intro": (
-        "By the end you can read, evaluate and simplify the real-number expressions the "
-        "next courses use, with a stated reason for every rearrangement."
+        (
+        "Evaluate and simplify expressions using the properties of real numbers, exponent "
+        "rules, and radical notation."
+    )
     ),
     "outcomes": [
         ("Evaluate without ambiguity",
@@ -72,13 +77,20 @@ COURSE = {
         "Do the arithmetic yourself before you read the answer. Every lab shows its steps, and the steps are worth more than the result &mdash; the result you could have got from a calculator.",
         "Take the property lessons seriously even if the arithmetic is easy. Lesson 4 is "
         "the reason `-(x - 3)` is `-x + 3`, and that single sign is the most common error "
-        "in the next two courses.",
+        "in equation-solving and function work.",
         "When a lab disagrees with you, find which step differs rather than which answer. The step is the thing you will repeat a thousand times.",
     ],
     "not_covered": [
         "Proof of the field axioms. This course states the properties of the real numbers and uses them; constructing the reals from the rationals belongs to analysis.",
-        "Complex numbers. `sqrt(-4)` has no value on this course and is said to have none; course 6 introduces `i` and gives it one.",
-        "Trigonometry and logarithms. Logarithms arrive in course 7, where exponentials make them necessary; trigonometry is not on this path at all.",
+        (
+            "Complex numbers. `sqrt(-4)` has no value on this course and is said to have "
+            "none; Quadratics and Complex Numbers introduces `i` and gives it one."
+        ),
+        (
+            "Trigonometry and logarithms. Logarithms arrive in Exponential and Logarithmic "
+            "Functions, where exponentials make them necessary; trigonometry is not covered "
+            "in these courses."
+        ),
     ],
     "footer_lead": (
         "Every value on this course is computed in your browser by applying the rule the lesson states, and the arithmetic is exact &mdash; a third is `1/3` through every step, not `0.3333`. Where a lesson is about approximation it says so and shows the rounding it did."

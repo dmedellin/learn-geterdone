@@ -201,7 +201,7 @@ def esc(text):
 
 
 def head(*, title, description, canonical_path, favicon, og_description=None,
-         extra_css=""):
+         extra_css="", page_kind="auth"):
     """The <head> of any page on this path.
 
     canonical_path is the published directory URL ("/paths/discrete-math/").
@@ -243,7 +243,7 @@ def head(*, title, description, canonical_path, favicon, og_description=None,
 
 {prepaint}
 </head>
-<body>
+<body data-page-kind="{page_kind}">
   <a class="skip-link" href="#main">Skip to content</a>
 """.format(
         title=esc(title),
@@ -254,47 +254,31 @@ def head(*, title, description, canonical_path, favicon, og_description=None,
         css=stylesheet(),
         extra_css=extra_css,
         prepaint=PREPAINT,
+        page_kind=esc(page_kind),
     )
 
 
-def topbar(*, home_href, home_label, mark, strong, sub, nav=None,
-           signin_href=None, signin_current=False):
-    """The masthead: brand link home, optional in-page nav, theme toggle."""
-    # A mark that is already markup passes through: an SVG logo, or a bare
-    # character entity. Escaping "&#10003;" is what put the literal text
-    # "&#10003;" in the masthead of both sign-in pages.
-    if mark.startswith("<") or (mark.startswith("&") and mark.endswith(";")):
-        mark_markup = mark
-    else:
-        mark_markup = esc(mark)
-    nav_markup = ""
-    if nav:
-        links = "".join(
-            '\n        <a href="%s"%s>%s</a>'
-            % (esc(href), ' aria-current="page"' if current else "", esc(label))
-            for label, href, current in nav
-        )
-        nav_markup = (
-            '\n      <nav class="topnav" aria-label="Primary">%s\n      </nav>\n' % links
-        )
-    return """  <div class="shell">
-    <header class="topbar">
-      <a class="brand" href="{home_href}" aria-label="{home_label}">
-        <span class="brand-mark" aria-hidden="true">{mark}</span>
-        <span class="brand-copy"><strong>{strong}</strong><span>{sub}</span></span>
+def masthead(up, *, current=False):
+    """Global navigation. Page identity belongs in the breadcrumb and hero."""
+    return """    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="{up}" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
       </a>
-{nav}      <div class="topbar-actions">{signin}{toggle}</div>
+      <nav class="topnav" aria-label="Primary">
+        <a href="{up}#paths">Subjects</a>
+        <a href="{up}#courses">Courses</a>
+        <a href="{up}progress/"{current}>Progress</a>
+      </nav>
+      <div class="topbar-actions">{signin}{toggle}</div>
     </header>
-""".format(
-        home_href=esc(home_href),
-        home_label=esc(home_label),
-        mark=mark_markup,
-        strong=esc(strong),
-        sub=esc(sub),
-        nav=nav_markup,
-        signin=signin_control(signin_href, current=signin_current),
-        toggle=THEME_TOGGLE,
-    )
+""".format(up=esc(up), current=' aria-current="page"' if current else "",
+           signin=signin_control(up + "progress/", current=current), toggle=THEME_TOGGLE)
+
+
+def topbar(*, up, current=False):
+    """Open the shared shell and its global masthead."""
+    return '  <div class="shell">\n' + masthead(up, current=current)
 
 
 def crumbs(trail):
@@ -310,7 +294,7 @@ def crumbs(trail):
         else:
             parts.append('<a href="%s">%s</a>' % (esc(href), esc(label)))
     return (
-        '    <nav class="crumbs" aria-label="Breadcrumb">\n      '
+        '    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">\n      '
         + "\n      ".join(parts)
         + "\n    </nav>\n"
     )
@@ -340,13 +324,13 @@ def pager(*, prev=None, next=None):
     if next:
         href, label, is_terminal = next
         rel = "" if is_terminal else ' rel="next"'
-        direction = "Finish the course" if is_terminal else "Next lesson"
+        direction = "Course overview" if is_terminal else "Next lesson"
         rows.append(
             '      <a class="lesson-link next" href="%s"%s>'
             "<span>%s</span><strong>%s</strong></a>" % (esc(href), rel, direction, label)
         )
     return (
-        '\n    <nav class="lesson-nav" aria-label="Lesson navigation">\n'
+        '\n    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Lesson navigation">\n'
         + "\n".join(rows)
         + "\n    </nav>\n"
     )
@@ -364,7 +348,7 @@ def footer(lead_html, material):
     forgetting to state its own.
     """
     return """
-    <footer class="footer">
+    <footer class="footer" data-ui="footer">
       <p>{lead}</p>
       <p>{licence}</p>
       <p><a href="{origin}">learn.geterdone.io</a></p>

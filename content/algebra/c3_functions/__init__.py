@@ -34,7 +34,10 @@ COURSE = {
         "The plane, the line, and the idea of a function: slope and the forms of a linear equation, parallel and perpendicular, what makes a rule a function, domain and range, piecewise definitions, transformations, composition and inverses."
     ),
     "blurb": (
-        "Put algebra on a picture. Slope and every form of a line, then the definition that organises the rest of the path &mdash; a function &mdash; with its notation, its domain, the transformations that move its graph, and its inverse."
+        (
+        "Connect algebra to the coordinate plane through slope and common forms of a line, "
+        "then study functions, domains, transformations, composition, and inverses."
+    )
     ),
     "key": [
         "m = (y₂ − y₁)/(x₂ − x₁)",
@@ -42,7 +45,7 @@ COURSE = {
         "m₁m₂ = −1         perpendicular",
         "(f ∘ g)(x) = f(g(x))         f⁻¹(f(x)) = x",
     ],
-    "assumes_short": "Courses 1–2",
+    "assumes_short": "Linear equations",
     "assumes_long": "solving and rearranging linear equations",
     "outcomes_intro": (
         "By the end you can turn a linear equation or function rule into a checked "
@@ -80,7 +83,10 @@ COURSE = {
     ],
     "not_covered": [
         "Continuity and limits. The word \"smooth\" is used informally here; making it precise is calculus.",
-        "Polynomial and rational graphs beyond lines, which need factoring and arrive in courses 4 and 5.",
+        (
+            "Polynomial and rational graphs beyond lines, which need factoring and arrive in "
+            "Polynomials and Factoring and Rational and Radical Expressions."
+        ),
         "Conic sections. Circles and ellipses are not functions of `x`, and this course is about functions.",
     ],
     "footer_lead": (

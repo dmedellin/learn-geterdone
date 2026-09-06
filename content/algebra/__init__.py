@@ -39,22 +39,12 @@ PATH = {
     "slug": "algebra",
     "title": "Algebra",
     "level": "Beginner → Advanced",
-    "level_note": "arithmetic is the only prerequisite",
+    "level_note": "arithmetic with fractions and negative numbers",
     "tagline": (
-        "The language the rest of mathematics is written in: expressions and the "
-        "rules for rearranging them, equations and what it means to solve one, "
-        "functions and their graphs, polynomials and factoring, quadratics and the "
-        "complex numbers they force into existence, exponentials and logarithms, and "
-        "systems solved several unknowns at a time, and the sums of ordered lists. Nine courses, taken front to back."
+        "Expressions, equations, functions, polynomials, rational and radical expressions, quadratics, complex numbers, exponentials, logarithms, systems, matrices, sequences, and series."
     ),
     "description": (
-        "The Algebra path: nine courses in one deliberate order, from the real numbers "
-        "and the properties that license every rearrangement, through linear equations "
-        "and inequalities, lines and functions, polynomials and factoring, rational and "
-        "radical expressions, quadratics and complex numbers, exponentials and "
-        "logarithms, to systems and matrices, and sequences and series. All nine courses and 112 "
-        "lessons are available. Every lesson is one self-contained page whose figures "
-        "are computed in your browser."
+        "Algebra courses with explanations, worked examples, practice questions, and interactive tools for expressions, equations, functions, systems, matrices, sequences, and series."
     ),
     "key": [
         "a(b + c) = ab + ac              the law behind almost every rearrangement",
@@ -64,42 +54,18 @@ PATH = {
         "aₙ = a₁r^(n−1)                  Sₙ = a₁(1 − rⁿ)/(1 − r)",
     ],
     "sequence_intro": (
-        "Each course assumes the ones before it and nothing else. Course 4 factors the "
-        "expressions course 1 taught you to build; course 5 cannot start until you can "
-        "factor; course 6 needs both, and course 8 needs all of them."
+        "Choose a course by topic. Each course lists recommended background and its lessons."
     ),
     "why_order": [
-        "Foundations comes first because algebra is arithmetic with the numbers "
-        "withheld, and every later move is one of a small set of properties applied to "
-        "an expression. A reader who cannot say why `-(x - 3)` is `-x + 3` will make "
-        "that error in every course that follows, and will not know they made it.",
-        "Equations come second, and functions third, in that order rather than the "
-        "reverse. Solving is a mechanical skill built on the properties; a function is "
-        "an idea, and it is far easier to meet once you can already manipulate the "
-        "formula that defines one.",
-        "Factoring sits in the middle of the path because it is the bottleneck. "
-        "Rational expressions, quadratics, and every polynomial graph after course 4 "
-        "are stated in terms of factors, and none of those techniques applies to a sum. "
-        "It is placed where there is still time to practise it.",
-        "Exponentials and logarithms come seventh because a logarithm is an inverse "
-        "function, and inverse functions are course 3. Systems and matrices come last "
-        "because row reduction is elimination performed on exact fractions, and it is "
-        "unreadable to anyone not already fluent in both.",
-    ],
+    "Expressions and equations describe quantities and relationships. Function notation and graphs connect those relationships to their inputs and outputs.",
+    "Factoring supports rational expressions, quadratics, and polynomial graphs. Exponentials and logarithms describe constant-ratio change and its inverse.",
+    "Systems and matrices describe simultaneous constraints. Sequences and series describe indexed terms and their sums."
+],
     "prerequisites": [
-        "Arithmetic, and specifically arithmetic with fractions and negative numbers. "
-        "If `-3 - (-5)` and `2/3 ÷ 4/9` are not automatic, do those first &mdash; every "
-        "course here runs on them, and course 8 runs on them for pages at a time.",
-        "No prior algebra. Course 1 starts from what a variable is. If you have met "
-        "some of this before, the labs are still worth opening: they show the step "
-        "list, and a wrong step list survives a lot of correct answers.",
-        "No calculus, and none is used. Course 6 finds a maximum with the vertex of a "
-        "parabola rather than a derivative, which is the honest algebraic method and "
-        "not a workaround.",
-        "No programming. Nothing here asks you to write code. The labs run so that you "
-        "can change a coefficient and watch what moves, which is the one thing a "
-        "printed page cannot do.",
-    ],
+    "Arithmetic with fractions and negative numbers is useful throughout these courses.",
+    "Foundations of Algebra introduces variables and algebraic notation. Individual courses list more specific recommended background.",
+    "The interactive tools require no programming. Calculus and trigonometry are not required."
+],
     # The hazard of learning THIS subject from interactive examples is not the
     # same one. Algebra's characteristic error is the invented law -- cancelling
     # a term rather than a factor, log(M + N), (a + b)^2 = a^2 + b^2 -- and each
@@ -110,12 +76,7 @@ PATH = {
         "and a step that gives the right answer here is not thereby a valid rule."
     ),
     "footer_lead": (
-        "<strong>Educational course material.</strong> Every figure on this path is "
-        "computed in your browser from the definition the lesson states, and the "
-        "arithmetic is exact &mdash; coefficients, solutions and steps are carried as "
-        "fractions, so `1/3` is `1/3` after twenty operations rather than `0.333`. "
-        "Curves are drawn by evaluating the function, never from a stored shape. Where "
-        "a quantity is genuinely irrational the lab says where it rounded."
+        "Algebra explanations, worked examples, practice questions, and interactive calculations."
     ),
     "courses": COURSES,
 }

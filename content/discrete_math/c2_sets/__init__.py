@@ -7,16 +7,18 @@ COURSE = {
     "title": "Sets, Relations, and Functions",
     "level": "Beginner",
     "summary": (
-        "The vocabulary the rest of the path is written in: sets and their algebra, "
-        "power sets and Cartesian products, relations and the two kinds that matter "
-        "(equivalence and order), functions and the three properties they may have, "
-        "cardinality, and the pigeonhole principle."
+        (
+        "Sets and their algebra, power sets and Cartesian products, relations and the "
+        "structures they define, functions and their mapping properties, cardinality, and the "
+        "pigeonhole principle."
+    )
     ),
     "blurb": (
-        "Sets, the operations on them and the identities those obey; relations and "
-        "the two structures they produce &mdash; partitions and orderings; functions, "
-        "injections, surjections and bijections; countable and uncountable; and the "
-        "counting principle that follows from all of it."
+        (
+        "Use set operations and identities, test relation properties, distinguish injections, "
+        "surjections, and bijections, compare cardinalities, and apply the pigeonhole "
+        "principle."
+    )
     ),
     "key": [
         "A ⊆ B        ⟺  ∀x (x ∈ A → x ∈ B)",
@@ -24,11 +26,13 @@ COURSE = {
         "equivalence relation  ⟺  partition",
         "|A| = |B|    ⟺  a bijection A → B exists",
     ],
-    "assumes_short": "Course 1",
+    "assumes_short": "Logic and proof",
     "assumes_long": "quantifiers and proof technique",
     "outcomes_intro": (
-        "By the end you have the objects every later course manipulates, and the "
-        "proof habits from course 1 applied to them."
+        (
+        "Use set notation and proof techniques to reason about relations, functions, and "
+        "cardinality."
+    )
     ),
     "outcomes": [
         ("Prove a set identity",
@@ -48,8 +52,10 @@ COURSE = {
          "a smaller, into a pigeonhole proof by inventing the boxes yourself."),
     ],
     "syllabus_intro": (
-        "Lessons 1 to 5 are sets, 6 to 9 relations, 10 to 12 functions, and 13 and 14 "
-        "the counting consequences that course 4 builds on."
+        (
+        "The lessons cover sets, relations, functions, cardinality, and the pigeonhole "
+        "principle."
+    )
     ),
     "how_to": [
         "Do the set proofs by double inclusion at least once each, even when a chain "
@@ -71,8 +77,10 @@ COURSE = {
         "arithmetic beyond countable versus uncountable are a separate subject.",
         "Russell's paradox is mentioned where it explains a restriction, but the "
         "resolution &mdash; separating sets from classes &mdash; is not developed.",
-        "Ordinals, transfinite induction, and the continuum hypothesis. Lesson 13 "
-        "stops at the two cardinalities the rest of the path uses.",
+        (
+            "Ordinals, transfinite induction, and the continuum hypothesis. Lesson 13 stops "
+            "at the two cardinalities these courses use."
+        ),
     ],
     "footer_lead": (
         "The set, relation and function labs on this course decide every property by "

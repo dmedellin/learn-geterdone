@@ -36,11 +36,7 @@ LESSONS = [
              "Every occurrence of `x` becomes `(−2)`, brackets and all. The brackets "
              "are what stop `(−2)²` from collapsing to `−4`."),
             ("Evaluate and solve are opposite questions",
-             "`f(3)` hands you an input and asks for the output; there is exactly one "
-             "answer. `g(x) = 5` for `g(x) = 3x − 7` hands you an output and asks "
-             "which input produced it; course 2's linear method gives `x = 4`. On a "
-             "table or graph there may be none, one or several such inputs. Confusing "
-             "the two questions is the most common error in this lesson."),
+             "`f(3)` hands you an input and asks for the output; there is exactly one answer. `g(x) = 5` for `g(x) = 3x − 7` hands you an output and asks which input produced it; the linear method from Linear Equations and Inequalities gives `x = 4`. On a table or graph there may be none, one or several such inputs. Confusing the two questions is the most common error in this lesson."),
         ],
         "read_title": "Reading and using the notation",
         "read_intro": "What the symbol means, how to substitute safely, and the two questions it can pose.",
@@ -146,8 +142,7 @@ LESSONS = [
         ],
         "worked": {
             "title": "Two functions, four different requests",
-            "intro": ["Use `f(x) = x² − 4x + 5` for substitution and "
-                      "`g(x) = 3x − 7` for a solve that needs only Course 2."],
+            "intro": ["Use `f(x) = x² − 4x + 5` for substitution and `g(x) = 3x − 7` for a solve that needs only Linear Equations and Inequalities."],
             "lines": [
                 "1.  f(3)                 (3)^2 - 4(3) + 5                    = 2",
                 "",
@@ -265,10 +260,7 @@ LESSONS = [
              "domain is stated, the convention is the largest set of real numbers for "
              "which the formula gives a real value."),
             ("Two checks cover every formula in this lesson",
-             "Among the formulas used here, a real input fails for one of two reasons: it makes a "
-             "denominator zero, or it puts a negative number under a square root or "
-             "another even root. Logarithms add a new condition in course 7; for now, "
-             "adding, multiplying, cubing and taking an odd root accept every real number."),
+             "Among the formulas used here, a real input fails for one of two reasons: it makes a denominator zero, or it puts a negative number under a square root or another even root. Logarithms add a new condition in Exponential and Logarithmic Functions; for now, adding, multiplying, cubing and taking an odd root accept every real number."),
             ("The range is what actually comes out",
              "The domain can be read off the formula by inspection. The range usually "
              "cannot: it needs a graph landmark or an argument about which outputs are "
@@ -292,11 +284,7 @@ LESSONS = [
                   "naming a smaller set."),
             ("h3", "The two exclusions"),
             ("ul", [
-                "<strong>A zero denominator.</strong> Division by zero is undefined, "
-                "so set every denominator equal to zero, solve, and exclude the "
-                "solutions. For `(x + 2)/((x − 2)(x − 3))`, the denominator is "
-                "already displayed as factors, so the excluded inputs are `2` and `3`. "
-                "Producing such a factorisation is course 4 work, not a hidden prerequisite here.",
+                "<strong>A zero denominator.</strong> Division by zero is undefined, so set every denominator equal to zero, solve, and exclude the solutions. For `(x + 2)/((x − 2)(x − 3))`, the denominator is already displayed as factors, so the excluded inputs are `2` and `3`. Producing such a factorisation is Polynomials and Factoring work, not a hidden prerequisite here.",
                 "<strong>An even root of a negative.</strong> `√(2x − 7)` needs "
                 "`2x − 7 ≥ 0`, so `x ≥ 7/2`. Write the exact fraction, not `3.5`. "
                 "Fourth roots, sixth roots and so on behave the same way; cube roots "
@@ -318,12 +306,7 @@ LESSONS = [
                 "",
                 "k(x) = sqrt(9 - x^2)              9 - x^2 >= 0  ->  -3 <= x <= 3",
             ]),
-            ("p", "The last one is worth slowing down for. `9 − x² ≥ 0` is `x² ≤ 9`, "
-                  "and the inputs whose square is at most `9` are those between `−3` "
-                  "and `3` inclusive. Taking a square root of both sides of `x² ≤ 9` "
-                  "and writing `x ≤ 3` loses the whole left half of the answer; this "
-                  "is the absolute value inequality from course 2, lesson 12, in a "
-                  "new costume."),
+            ("p", "The last one is worth slowing down for. `9 − x² ≥ 0` is `x² ≤ 9`, and the inputs whose square is at most `9` are those between `−3` and `3` inclusive. Taking a square root of both sides of `x² ≤ 9` and writing `x ≤ 3` loses the whole left half of the answer; this is the absolute value inequality from Linear Equations and Inequalities, lesson 12, in a new costume."),
             ("h3", "Why the range is harder"),
             ("p", "The domain is a question about the formula: which inputs does it "
                   "choke on. The range is a question about the function's behaviour "
@@ -349,12 +332,7 @@ LESSONS = [
                          "the range excludes `7`. Copying the input restriction into "
                          "the range confuses the two axes.")),
             ("h3", "Writing the answer"),
-            ("p", "Interval notation from course 2, lesson 13, is the expected form. "
-                  "A square bracket includes the endpoint, a round bracket excludes "
-                  "it, and `∞` always takes a round bracket because it is not a "
-                  "number that can be attained. Use `∪` to join the pieces when an "
-                  "excluded point splits the domain, and list the pieces in "
-                  "increasing order."),
+            ("p", "Interval notation from Linear Equations and Inequalities, lesson 13, is the expected form. A square bracket includes the endpoint, a round bracket excludes it, and `∞` always takes a round bracket because it is not a number that can be attained. Use `∪` to join the pieces when an excluded point splits the domain, and list the pieces in increasing order."),
             ("p", "One habit is worth building: after writing a domain, test a value "
                   "just inside each end and one value that should be excluded. For "
                   "`[−4, 1) ∪ (1, ∞)` try `x = −4`, which gives `0/(−5) = 0`, and "
@@ -380,10 +358,7 @@ LESSONS = [
         "steps_intro": "Scan for each exclusion separately, then combine. Combining first is where answers go missing.",
         "steps": [
             ("List every denominator",
-             "Including denominators buried inside a root or a compound fraction. Set "
-             "each to zero, solve, and mark those inputs as excluded. This lesson "
-             "supplies denominators already factored when there is more than one "
-             "zero; course 4 teaches how to produce the factorisation."),
+             "Including denominators buried inside a root or a compound fraction. Set each to zero, solve, and mark those inputs as excluded. This lesson supplies denominators already factored when there is more than one zero; Polynomials and Factoring teaches how to produce the factorisation."),
             ("List every even root",
              "Square roots, fourth roots, and any rational exponent with an even "
              "denominator. Each contributes an inequality of the form "
@@ -437,9 +412,7 @@ LESSONS = [
                 "parts of the expression, and the left end is closed while the "
                 "interior point is open. Reading `[−4, 1) ∪ (1, ∞)` back out loud as "
                 "\"from `−4` inclusive, everything except `1`\" is a fair test.",
-                "Lines 5 and 6 use facts already taught in Course 1: a square and an "
-                "absolute value are non-negative. Subtracting `2` changes every output "
-                "of `|x|` and therefore changes the range endpoint, not the domain.",
+                "Lines 5 and 6 use facts already taught in Foundations of Algebra: a square and an absolute value are non-negative. Subtracting `2` changes every output of `|x|` and therefore changes the range endpoint, not the domain.",
                 "For a faded domain, take `s(x) = √(x + 2)/(x − 4)`. The root condition "
                 "`x ≥ −2` is supplied. Find the denominator exclusion, intersect the "
                 "conditions, write the intervals, and test both `−2` and `4`. Then find "
@@ -559,11 +532,7 @@ LESSONS = [
                      "so each input selects exactly one piece. Overlap is also legal "
                      "when every formula that applies gives the same output; conflicting "
                      "outputs are what violate the function definition.")),
-            ("p", "The most familiar example was written down long before the "
-                  "notation was: absolute value. `|x|` is `x` when `x` is at least "
-                  "zero and `−x` when `x` is negative, which is two formulas and a "
-                  "condition. Course 1, lesson 4 called the two cases a definition; "
-                  "the piecewise brace is that definition typeset."),
+            ("p", "The most familiar example was written down long before the notation was: absolute value. `|x|` is `x` when `x` is at least zero and `−x` when `x` is negative, which is two formulas and a condition. Foundations of Algebra, lesson 4 called the two cases a definition; the piecewise brace is that definition typeset."),
             ("math", [
                 "          x      if x >= 0",
                 "|x| =",
@@ -1464,9 +1433,7 @@ LESSONS = [
              "the reflection in `y = x` carried out on the equation, and it is the "
              "only step where the two letters change roles."),
             ("Solve for y",
-             "Use Course 2 rearranging for a line. When a square appears, the `±` "
-             "arrives here, and the restriction from step 1 decides which sign can "
-             "return inputs from the retained half."),
+             "Use the rearranging methods from Linear Equations and Inequalities for a line. When a square appears, the `±` arrives here, and the restriction from step 1 decides which sign can return inputs from the retained half."),
             ("State the domain, and verify both compositions",
              "The domain of `f⁻¹` is the range of `f`, which is a check as much as a "
              "statement: if the two do not match, something earlier is wrong. Then "
@@ -1581,11 +1548,7 @@ LESSONS = [
                      "the sign choice forced by the restriction, and verify both "
                      "compositions. Rational-function inverses and shifted quadratics "
                      "wait for the courses that teach their algebra."),
-        "note": "That completes the toolkit the course promised: notation, domain, "
-                "shape, composition and inverse. The path can now use function "
-                "notation and inverse reasoning without smuggling in factoring, "
-                "rational-function algebra or the quadratic formula before their "
-                "own courses teach them.",
+        "note": "The course covers notation, domain, shape, composition and inverse. Function notation and inverse reasoning rest on explicit definitions, without assuming factoring, rational-function algebra, or the quadratic formula.",
     },
 
     # ---------------------------------------------------------------- 14
@@ -1687,11 +1650,7 @@ LESSONS = [
                   "needing the rearrangement at all, which is why it is the more "
                   "reliable method."),
             ("thm", ("Multiplying or dividing by a negative reverses the sign",
-                     "If `a &lt; b` and `c` is negative then `ac &gt; bc`. This is "
-                     "the single rule from course 2, lesson 9 that survives into two "
-                     "variables, and it is where a correct boundary line ends up with "
-                     "the wrong side shaded. Adding or subtracting anything, and "
-                     "multiplying by a positive, leave the direction alone.")),
+                     "If `a &lt; b` and `c` is negative then `ac &gt; bc`. This is the single rule from Linear Equations and Inequalities, lesson 9 that survives into two variables, and it is where a correct boundary line ends up with the wrong side shaded. Adding or subtracting anything, and multiplying by a positive, leave the direction alone.")),
             ("h3", "When the boundary passes through the origin"),
             ("p", "`y &lt; 3x` has the origin on its boundary, so `(0, 0)` cannot be "
                   "the test point: it satisfies the equation, not the inequality, and "
@@ -1708,12 +1667,7 @@ LESSONS = [
                          "worth pausing on: it would be a solution if the symbol were "
                          "`≥`.")),
             ("h3", "Reading a region back into an inequality"),
-            ("p", "The reverse direction appears in modelling and in course 8. Find "
-                  "the boundary line's equation from two of its points, choose `≤` or "
-                  "`&lt;` from whether the line is solid or dashed, and then fix the "
-                  "direction by testing a point taken from inside the shaded region. "
-                  "The last step is the same substitution as before, run with the "
-                  "answer known and the symbol unknown."),
+            ("p", "The reverse direction appears in modelling and in Systems and Matrices. Find the boundary line's equation from two of its points, choose `≤` or `&lt;` from whether the line is solid or dashed, and then fix the direction by testing a point taken from inside the shaded region. The last step is the same substitution as before, run with the answer known and the symbol unknown."),
         ],
         "lab": ("system", {
             "mode": "inequalities",
@@ -1728,12 +1682,7 @@ LESSONS = [
                  "eq": ["x >= -2", "", "", ""]},
             ],
             "panel_title": "Boundary, then side",
-            "panel_intro": "Each preset uses one constraint box and leaves the others "
-                           "empty. The lab draws the boundary and shaded half-plane; it "
-                           "does not accept a clicked test point, so predict and "
-                           "substitute your own point before revealing the graph. Any "
-                           "multi-constraint corner summary is a Course 8 preview, not "
-                           "completion work here.",
+            "panel_intro": "Each preset uses one constraint box and leaves the others empty. The lab draws the boundary and shaded half-plane; it does not accept a clicked test point, so predict and substitute your own point before revealing the graph. Any multi-constraint corner summary is a Systems and Matrices preview, not completion work here.",
         }),
         "steps_title": "Graphing a linear inequality",
         "steps_intro": "Boundary, style, test, shade. Doing the test before choosing a side keeps the symbol from misleading you.",
@@ -1867,10 +1816,6 @@ LESSONS = [
                      "`y`. You should also handle a boundary through the origin by "
                      "choosing a different test point, and read an inequality back off "
                      "a shaded picture."),
-        "note": "That closes the line block. The next lesson changes the question from "
-                "which pairs solve a statement to whether each input has exactly one "
-                "output. Course 8 later stacks several shaded regions on one set of axes; "
-                "the overlap of the shaded half-planes is the feasible set that "
-                "linear programming optimises over.",
+        "note": "That closes the line block. The next lesson changes the question from which pairs solve a statement to whether each input has exactly one output. Systems and Matrices later stacks several shaded regions on one set of axes; the overlap of the shaded half-planes is the feasible set that linear programming optimises over.",
     },
 ]

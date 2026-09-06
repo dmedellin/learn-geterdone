@@ -435,9 +435,7 @@ LESSONS = [
              "by, not a decoration on the term, and this is the single most common "
              "arithmetic slip in the lesson."),
             ("Rounding an exact answer to a decimal",
-             "`x = 7/3` is the answer; `2.33` is a nearby number that fails the check. "
-             "Fractions are exact, they are not harder to substitute, and the rest of this "
-             "path expects them."),
+             "`x = 7/3` is the answer; `2.33` is a nearby number that fails the check. Fractions are exact, they are not harder to substitute, and algebraic work relies on them."),
         ],
         "standard": ("Finish when you can name every operation you apply and check the result without being asked.",
                      "Solve `9 − 4x = −6` without the lab: name each operation, keep the "
@@ -772,11 +770,7 @@ LESSONS = [
                   "reversible: divide by it and you are back where you started. The "
                   "solution set therefore cannot change, and no candidate needs to be "
                   "thrown out afterwards."),
-            ("p", "That guarantee depends on the multiplier being a number. When a "
-                  "denominator contains the variable &mdash; `3/(x − 2)` &mdash; the "
-                  "multiplier is zero for one value of `x`, the move is not reversible "
-                  "there, and a candidate can appear that solves nothing. Lesson 7 meets "
-                  "the first case of that, and course 5 treats it properly."),
+            ("p", "That guarantee depends on the multiplier being a number. When a denominator contains the variable &mdash; `3/(x − 2)` &mdash; the multiplier is zero for one value of `x`, the move is not reversible there, and a candidate can appear that solves nothing. Lesson 7 meets the first case of that, and Rational and Radical Expressions treats it properly."),
             ("example", ("When the fractions cancel completely",
                          "`x/6 + x/3 = x/2`, multiplied through by 6, becomes "
                          "`x + 2x = 3x`, that is `3x = 3x`. Every `x` cancels and `0 = 0` "
@@ -874,10 +868,7 @@ LESSONS = [
                    "Because fractions and whole numbers have the same solutions",
                    "It can change them, which is why the answer must be checked"],
              "c": 1,
-             "why": "Reversibility is the whole argument, and it needs only that the "
-                    "multiplier is not zero. Being least is a convenience. The last option "
-                    "describes what happens when the multiplier contains the variable, "
-                    "which is a different situation and belongs to lesson 7 and course 5."},
+             "why": "Reversibility is the whole argument, and it needs only that the multiplier is not zero. Being least is a convenience. The last option describes what happens when the multiplier contains the variable, which is a different situation and belongs to lesson 7 and Rational and Radical Expressions."},
         ],
         "mistakes": [
             ("Multiplying only the terms that have denominators",
@@ -1016,13 +1007,7 @@ LESSONS = [
                   "`C = S/(1 + r)` the forbidden value is `r = −1`, not `r = 0`, because "
                   "it is `1 + r` that gets divided by. Read the divisor, not the letter."),
             ("example", ("A formula this method cannot rearrange",
-                         "`A = s²` solved for `s` is not a rearrangement of this kind. "
-                         "Adding, subtracting, multiplying and dividing undo a linear "
-                         "relationship, and `s²` is not linear in `s`. Undoing a square "
-                         "needs a square root, and for `A &gt; 0` it produces two answers, "
-                         "`s = ±√A`, which is course 6's subject &mdash; and for a length "
-                         "one of the two is then discarded on physical grounds, not "
-                         "algebraic ones.")),
+                         "`A = s²` solved for `s` is not a rearrangement of this kind. Adding, subtracting, multiplying and dividing undo a linear relationship, and `s²` is not linear in `s`. Undoing a square needs a square root, and for `A &gt; 0` it produces two answers, `s = ±√A`, which is Quadratics and Complex Numbers's subject &mdash; and for a length one of the two is then discarded on physical grounds, not algebraic ones.")),
         ],
         "lab": ("equation", {
             "mode": "literal",
@@ -1228,11 +1213,7 @@ LESSONS = [
                   "Both misreadings come from the same habit &mdash; expecting the last "
                   "line of the working to have the shape `x = ` something."),
             ("h3", "The picture"),
-            ("p", "Draw each side as a graph, as the lab does. A conditional equation is "
-                  "two lines crossing at one point; an identity is one line drawn twice; a "
-                  "contradiction is two parallel lines that never meet. The graphs are a "
-                  "preview &mdash; lines are course 3 &mdash; and the argument above does "
-                  "not depend on them."),
+            ("p", "Draw each side as a graph, as the lab does. A conditional equation is two lines crossing at one point; an identity is one line drawn twice; a contradiction is two parallel lines that never meet. The graphs are a preview &mdash; lines are Lines, Functions and Graphs &mdash; and the argument above does not depend on them."),
             ("p", "Two cautions about identities. First, an identity is what you are "
                   "proving every time you expand a bracket, so they are not exotic. "
                   "Second, `x/2 + x/3 = (5/6)x` is an identity because "
@@ -1360,10 +1341,7 @@ LESSONS = [
                      "simplified remainder and write either the value, every real number, "
                      "or no solution. Then use `px = q` to explain why no linear equation "
                      "has exactly two solutions."),
-        "note": "Every method later on can produce these two lines, and they always mean "
-                "the same thing. In course 8 a system of equations collapsing to `0 = 0` "
-                "means the two equations were the same line, and one collapsing to `0 = 5` "
-                "means the lines are parallel &mdash; the same reading, one dimension up.",
+        "note": "Every method later on can produce these two lines, and they always mean the same thing. In Systems and Matrices a system of equations collapsing to `0 = 0` means the two equations were the same line, and one collapsing to `0 = 5` means the lines are parallel &mdash; the same reading, one dimension up.",
     },
     # ---------------------------------------------------------------- 07
     {
@@ -1394,10 +1372,7 @@ LESSONS = [
              "such numbers are equal, so it is an ordinary equation and every move you "
              "already have applies to it."),
             ("Cross-multiplying is one multiplication, not a rule of its own",
-             "Multiply both sides of `a/b = c/d` by `bd` and the denominators cancel, "
-             "leaving `ad = bc`. Knowing that is what tells you when it is allowed: `b` "
-             "and `d` must not be zero. Completion work here uses numerical denominators; "
-             "variable-denominator equations belong to course 5."),
+             "Multiply both sides of `a/b = c/d` by `bd` and the denominators cancel, leaving `ad = bc`. Knowing that is what tells you when it is allowed: `b` and `d` must not be zero. Completion work here uses numerical denominators; variable-denominator equations belong to Rational and Radical Expressions."),
             ("Percent is a ratio with denominator 100",
              "`15%` is the number `15/100`, that is `3/20`. Every percent question is "
              "`part/whole = p/100` with one of the three quantities missing, and the only "
@@ -1423,12 +1398,7 @@ LESSONS = [
                 "Dividing `ad = bc` by the nonzero number `bd` returns `a/b = c/d`, so the "
                 "move is reversible and the two statements have the same solutions.",
             ]),
-            ("p", "The proof is where the conditions come from. In this lesson the "
-                  "denominators in the proportions you solve are stated nonzero numbers, "
-                  "so checking the condition is immediate. If a denominator contains the "
-                  "variable, multiplying by it may create a candidate at a value where the "
-                  "original quotient is undefined; that is a rational-equation issue, and "
-                  "course 5 supplies the full method."),
+            ("p", "The proof is where the conditions come from. In this lesson the denominators in the proportions you solve are stated nonzero numbers, so checking the condition is immediate. If a denominator contains the variable, multiplying by it may create a candidate at a value where the original quotient is undefined; that is a rational-equation issue, and Rational and Radical Expressions supplies the full method."),
             ("h3", "Setting one up"),
             ("p", "The two ratios must be built the same way round: if the left side is "
                   "kilometres over litres, so is the right. A car covers 150 km on 12 L; "
@@ -1470,11 +1440,7 @@ LESSONS = [
                          "The two percentages are taken on different bases. This is not a "
                          "trick question &mdash; it is the reason a percent is meaningless "
                          "until you say what it is a percent of.")),
-            ("p", "<strong>Preview, not completion work.</strong> The proportion lab can "
-                  "also accept a variable in a denominator and can show a candidate that "
-                  "makes that denominator zero. Use those presets to preview course 5 if "
-                  "you wish; they are not evidence that the domain method has been mastered "
-                  "here, and a quadratic cross product is outside this course."),
+            ("p", "<strong>Preview, not completion work.</strong> The proportion lab can also accept a variable in a denominator and can show a candidate that makes that denominator zero. Use those presets to preview Rational and Radical Expressions if you wish; they are not evidence that the domain method has been mastered here, and a quadratic cross product is outside this course."),
         ],
         "lab": ("equation", {
             "mode": "proportion",
@@ -1492,9 +1458,7 @@ LESSONS = [
              "proportion built out of order is a correctly solved answer to the wrong "
              "question."),
             ("Write down any value that would make a denominator zero",
-             "For this lesson both denominators are nonzero numbers, so this is a short "
-             "check rather than a new solve. A variable denominator starts the rational-"
-             "equation method deferred to course 5."),
+             "For this lesson both denominators are nonzero numbers, so this is a short check rather than a new solve. A variable denominator starts the rational-equation method deferred to Rational and Radical Expressions."),
             ("Multiply both sides by both denominators and solve",
              "This is cross-multiplication, and it produces `ad = bc`. What follows is a "
              "linear equation of the kind lesson 3 handles."),
@@ -1563,10 +1527,7 @@ LESSONS = [
         ],
         "mistakes": [
             ("Treating a variable-denominator preview as an ordinary proportion",
-             "A denominator containing `x` can be zero for a candidate, so multiplying by "
-             "it is not automatically reversible. The lab can display that warning, but "
-             "course 5 owns the exclusion-and-check method; completion here uses stated "
-             "nonzero numerical denominators."),
+             "A denominator containing `x` can be zero for a candidate, so multiplying by it is not automatically reversible. The lab can display that warning, but Rational and Radical Expressions owns the exclusion-and-check method; completion here uses stated nonzero numerical denominators."),
             ("Building the two ratios in opposite orders",
              "`150/12 = d/18` compares km per litre on both sides. `150/12 = 18/d` "
              "compares km per litre with litres per km, and gives `d = 36/25` &mdash; a "
@@ -1582,9 +1543,6 @@ LESSONS = [
                      "cost? Label both ratio units, cross-multiply and check the exact "
                      "answer. Then solve `45/w = 18/100` and say why `w`, rather than 45, "
                      "is the whole. Variable-denominator equations remain course-5 work."),
-        "note": "Lesson 8 takes the same step &mdash; turning a described situation into "
-                "an equation &mdash; without the proportion to hang it on, which makes "
-                "naming the unknown the main decision. The excluded-value habit built here "
-                "returns in course 5, where every rational equation begins with it.",
+        "note": "Lesson 8 takes the same step &mdash; turning a described situation into an equation &mdash; without the proportion to hang it on, which makes naming the unknown the main decision. The excluded-value habit built here returns in Rational and Radical Expressions, where every rational equation begins with it.",
     },
 ]

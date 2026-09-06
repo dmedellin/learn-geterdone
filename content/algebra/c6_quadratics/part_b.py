@@ -36,28 +36,17 @@ LESSONS = [
              "complex numbers that respects the arithmetic, so `3 + 2i &lt; 5` is not "
              "a false statement, it is not a statement at all."),
             ("The conjugate turns a denominator real",
-             "`(a + bi)(a - bi) = a² + b²`, with no `i` left. That one fact is the "
-             "whole of complex division, and it is the same cancellation that cleared "
-             "`2 + √3` from a denominator in course 5."),
+             "`(a + bi)(a - bi) = a² + b²`, with no `i` left. That one fact is the whole of complex division, and it is the same cancellation that cleared `2 + √3` from a denominator in Rational and Radical Expressions."),
         ],
         "read_title": "Arithmetic in a + bi",
         "read_intro": "Four operations, and the one substitution they all come down to.",
         "body": [
-            ("p", "Lesson 7 defined `i` by `i² = -1` and called `a + bi` a complex "
-                  "number, with real part `a` and imaginary part `b`, both of them real "
-                  "numbers. The arithmetic below is arranged so that every law from "
-                  "course 1 &mdash; commutativity, associativity, distribution "
-                  "&mdash; keeps working unchanged. That was the design goal when the "
-                  "system was built, and it is why there is so little to learn here."),
+            ("p", "Lesson 7 defined `i` by `i² = -1` and called `a + bi` a complex number, with real part `a` and imaginary part `b`, both of them real numbers. The arithmetic below is arranged so that every law from Foundations of Algebra &mdash; commutativity, associativity, distribution &mdash; keeps working unchanged. That was the design goal when the system was built, and it is why there is so little to learn here."),
             ("def", ("Addition and subtraction",
                      "`(a + bi) + (c + di) = (a + c) + (b + d)i`, and "
                      "`(a + bi) - (c + di) = (a - c) + (b - d)i`. Real parts combine "
                      "with real parts, imaginary parts with imaginary parts.")),
-            ("p", "Nothing is being asserted beyond collecting like terms: `bi` and "
-                  "`di` are both multiples of `i`, so they add the way `3t` and `5t` "
-                  "do. `(2 - 7i) - (5 + 3i) = -3 - 10i`, and the minus sign has to "
-                  "reach both parts of the second bracket &mdash; the same place a "
-                  "sign goes missing when polynomials are subtracted in course 4."),
+            ("p", "Nothing is being asserted beyond collecting like terms: `bi` and `di` are both multiples of `i`, so they add the way `3t` and `5t` do. `(2 - 7i) - (5 + 3i) = -3 - 10i`, and the minus sign has to reach both parts of the second bracket &mdash; the same place a sign goes missing when polynomials are subtracted in Polynomials and Factoring."),
             ("def", ("Multiplication",
                      "`(a + bi)(c + di) = (ac - bd) + (ad + bc)i`. Do not memorise "
                      "that. Expand the two brackets, replace `i²` by `-1`, and "
@@ -83,11 +72,7 @@ LESSONS = [
             ("p", "So `iⁿ` depends only on the remainder of `n` on division by 4. "
                   "`i²³` has `23 = 4·5 + 3`, remainder 3, so `i²³ = -i`. Written out: "
                   "`i²³ = (i⁴)⁵ · i³ = 1 · i³ = -i`."),
-            ("p", "One law from course 1 does <strong>not</strong> extend. "
-                  "`√a · √b = √(ab)` is stated for non-negative `a` and `b`, and it "
-                  "fails here: `√-4 · √-9` is `2i · 3i = 6i² = -6`, not `√36 = 6`. "
-                  "Convert every root of a negative number to `i` first, then "
-                  "multiply."),
+            ("p", "One law from Foundations of Algebra does <strong>not</strong> extend. `√a · √b = √(ab)` is stated for non-negative `a` and `b`, and it fails here: `√-4 · √-9` is `2i · 3i = 6i² = -6`, not `√36 = 6`. Convert every root of a negative number to `i` first, then multiply."),
             ("def", ("Complex conjugate",
                      "The conjugate of `a + bi` is `a - bi`: same real part, opposite "
                      "imaginary part. Conjugating twice returns the original number, "
@@ -136,9 +121,7 @@ LESSONS = [
         "steps_intro": "Four steps. The second is the whole method; the rest is arithmetic.",
         "steps": [
             ("Write the quotient as a fraction",
-             "`(3 + 2i) ÷ (1 - 4i)` becomes `(3 + 2i)/(1 - 4i)`. Nothing can be "
-             "cancelled yet, and cancelling a term rather than a factor is as illegal "
-             "here as it was in course 5."),
+             "`(3 + 2i) ÷ (1 - 4i)` becomes `(3 + 2i)/(1 - 4i)`. Nothing can be cancelled yet, and cancelling a term rather than a factor is as illegal here as it was in Rational and Radical Expressions."),
             ("Multiply top and bottom by the conjugate of the denominator",
              "The conjugate of `1 - 4i` is `1 + 4i`. You are multiplying by "
              "`(1 + 4i)/(1 + 4i)`, which is `1`, so the value cannot change."),
@@ -240,12 +223,7 @@ LESSONS = [
                      "reduce a power of `i`, without looking anything up. The check on "
                      "a quotient is multiplying it back by the divisor: three lines, "
                      "and it catches the sign slips this arithmetic invites."),
-        "note": "The conjugate is doing here exactly what it did in course 5 when a "
-                "denominator like `2 + √3` had to be cleared: multiply by the thing "
-                "that makes the cross terms cancel. The next lesson turns it into a "
-                "statement about solutions &mdash; a quadratic with real coefficients "
-                "that has one non-real root has that root's conjugate as its other "
-                "one.",
+        "note": "The conjugate is doing here exactly what it did in Rational and Radical Expressions when a denominator like `2 + √3` had to be cleared: multiply by the thing that makes the cross terms cancel. The next lesson turns it into a statement about solutions &mdash; a quadratic with real coefficients that has one non-real root has that root's conjugate as its other one.",
     },
     # ---------------------------------------------------------------- 09
     {
@@ -333,12 +311,7 @@ LESSONS = [
                      "numbers. Without that hypothesis it fails: `x² - ix = 0` factors "
                      "as `x(x - i) = 0`, so its solutions are `0` and `i`, which are "
                      "not conjugates of one another.")),
-            ("p", "With the pair in hand the quadratic factors, just not over the "
-                  "reals: `x² - 6x + 13 = (x - 3 - 2i)(x - 3 + 2i)`. Expanding "
-                  "confirms it, since `(x - 3)² - (2i)² = x² - 6x + 9 + 4`. Course 4 "
-                  "called such a quadratic irreducible; that word always means "
-                  "irreducible <em>over some system</em>, and over the complex numbers "
-                  "no quadratic is."),
+            ("p", "With the pair in hand the quadratic factors, just not over the reals: `x² - 6x + 13 = (x - 3 - 2i)(x - 3 + 2i)`. Expanding confirms it, since `(x - 3)² - (2i)² = x² - 6x + 9 + 4`. Polynomials and Factoring called such a quadratic irreducible; that word always means irreducible <em>over some system</em>, and over the complex numbers no quadratic is."),
             ("p", "The sum and product survive as a check. For `3 ± 2i` the sum is "
                   "`6 = -b/a` and the product is `(3 + 2i)(3 - 2i) = 9 + 4 = 13 = "
                   "c/a`. Both come out real, as they must: the imaginary parts cancel "
@@ -536,10 +509,7 @@ LESSONS = [
                   "the steepness: at `x = 2`, `y = x²` is at height 4, `y = 2x²` at 8 "
                   "and `y = (1/2)x²` at 2, so a larger `|a|` gives a narrower curve. "
                   "The three parabolas are otherwise identical in shape."),
-            ("p", "The y-intercept is `f(0) = c`, and there is exactly one of them, "
-                  "because `f` is a function and course 3 fixed that a function "
-                  "assigns one output to the input `0`. No vertical line can meet the "
-                  "graph twice, including the y-axis."),
+            ("p", "The y-intercept is `f(0) = c`, and there is exactly one of them, because `f` is a function and Lines, Functions and Graphs fixed that a function assigns one output to the input `0`. No vertical line can meet the graph twice, including the y-axis."),
             ("p", "The x-intercepts are the values of `x` with `f(x) = 0` &mdash; the "
                   "real solutions of the quadratic equation. So the discriminant of "
                   "lesson 6 counts them before any drawing: `D &gt; 0` gives two "
@@ -780,9 +750,7 @@ LESSONS = [
                 "If `a &gt; 0`, multiplying `(x - h)² ≥ 0` by `a` preserves the "
                 "inequality: `a(x - h)² ≥ 0`. Adding `k` to both sides gives "
                 "`f(x) ≥ k`, with equality exactly when `(x - h)² = 0`.",
-                "If `a &lt; 0`, multiplying by `a` reverses it &mdash; the one rule "
-                "of course 2, lesson 9 &mdash; so `a(x - h)² ≤ 0` and `f(x) ≤ k`, "
-                "again with equality exactly at `x = h`.",
+                "If `a &lt; 0`, multiplying by `a` reverses it &mdash; the one rule of Linear Equations and Inequalities, lesson 9 &mdash; so `a(x - h)² ≤ 0` and `f(x) ≤ k`, again with equality exactly at `x = h`.",
             ]),
             ("p", "That proof is worth more than the form. It says the vertex is the "
                   "optimum without any appeal to a picture, and lesson 12 uses it on "
@@ -835,11 +803,7 @@ LESSONS = [
                          "halves and quarters; keep them. Multiplying through by 4 to "
                          "clear them would define a different function, four times as "
                          "tall.")),
-            ("p", "Vertex form is also the transformation form of course 3, lesson 11. "
-                  "`y = a(x - h)² + k` is the parabola `y = x²` stretched by a factor "
-                  "`a`, shifted `h` to the right and `k` up &mdash; which is why every "
-                  "parabola really is the same curve, seen at a different size and in "
-                  "a different place."),
+            ("p", "Vertex form is also the transformation form of Lines, Functions and Graphs, lesson 11. `y = a(x - h)² + k` is the parabola `y = x²` stretched by a factor `a`, shifted `h` to the right and `k` up &mdash; which is why every parabola really is the same curve, seen at a different size and in a different place."),
         ],
         "lab": ("quadratic", {
             "mode": "vertex",
@@ -939,9 +903,7 @@ LESSONS = [
              "factor of `2`, so it emerges as `-18`. Writing `2(x - 3)² - 9 + 13` puts "
              "the vertex 9 units too high, and `f(3)` disagrees at once."),
             ("Reading h with the wrong sign",
-             "`(x + 3)²` has its vertex at `x = -3`. The subtraction is part of the "
-             "form, so a plus inside the bracket means a negative `h` &mdash; the same "
-             "reversal that catches everyone in the transformations of course 3."),
+             "`(x + 3)²` has its vertex at `x = -3`. The subtraction is part of the form, so a plus inside the bracket means a negative `h` &mdash; the same reversal that catches everyone in the transformations of Lines, Functions and Graphs."),
             ("Adjusting one side of a function definition only",
              "`y + 9 = x² + 6x + 10` is still `y = x² + 6x + 1`, since subtracting 9 "
              "from both sides returns it, and `4y = 4x² + 24x + 4` divides back to it "
@@ -1357,9 +1319,7 @@ LESSONS = [
              "&mdash; `0` whenever it is available. The sign of the expression there "
              "is its sign on the whole piece."),
             ("Write the set, then settle the endpoints",
-             "Use interval notation from course 2, lesson 13. A square bracket for a "
-             "root that satisfies the inequality, a round one for a root that does "
-             "not, and \"or\" between two separate intervals."),
+             "Use interval notation from Linear Equations and Inequalities, lesson 13. A square bracket for a root that satisfies the inequality, a round one for a root that does not, and \"or\" between two separate intervals."),
         ],
         "worked": {
             "title": "x² - x - 6 ≤ 0",
@@ -1447,11 +1407,7 @@ LESSONS = [
                      "notation, then say what changes if the `≥` becomes `&gt;`. If "
                      "the endpoint decision needs re-solving rather than one look at "
                      "the sign, the two halves of the method have run together."),
-        "note": "Sign analysis is the same tool course 5 used on rational expressions, "
-                "with one addition there: the sign can also change where a denominator "
-                "is zero, and that value is excluded rather than included. Here the "
-                "expression is defined everywhere, so the roots are the only critical "
-                "values.",
+        "note": "Sign analysis is the same tool Rational and Radical Expressions used on rational expressions, with one addition there: the sign can also change where a denominator is zero, and that value is excluded rather than included. Here the expression is defined everywhere, so the roots are the only critical values.",
     },
     # ---------------------------------------------------------------- 14
     {
@@ -1483,22 +1439,16 @@ LESSONS = [
              "general pattern is `a[f(x)]² + b[f(x)] + c`: the repeated object may be "
              "a whole expression such as `x² - 3`, not merely a power."),
             ("u is a temporary name, not the answer",
-             "The substitution renames part of the equation so that a known method "
-             "applies. The question was about `x`, so the last step is always the "
-             "return journey, and an answer left in terms of `u` is half an answer."),
+             "The substitution renames part of the equation so that a known method applies. The question was about `x`, so the last step is always to substitute back for x, and an answer left in terms of `u` is half an answer."),
             ("Some values of u give no real x",
              "If `u = x²` then `u` cannot be negative, and if `u = √x` then `u` cannot "
              "be negative either. A negative solution for `u` is discarded, so two "
              "values of `u` need not give four values of `x`."),
         ],
         "read_title": "Substitution into quadratic form",
-        "read_intro": "The shape, the substitution, and the return journey.",
+        "read_intro": "The shape, the substitution, and the back-substitution.",
         "body": [
-            ("p", "A quartic has no formula in this course, and course 4's rational "
-                  "root search is a general tool that can miss irrational roots "
-                  "entirely. But a quartic with no odd powers is not really a quartic: "
-                  "it is a quadratic wearing `x²` where a quadratic wears `x`, and "
-                  "renaming that part is enough to finish it exactly."),
+            ("p", "A quartic has no formula in this course, and Polynomials and Factoring's rational root search is a general tool that can miss irrational roots entirely. But a quartic with no odd powers is not really a quartic: it is a quadratic wearing `x²` where a quadratic wears `x`, and renaming that part is enough to finish it exactly."),
             ("def", ("Quadratic form",
                      "An equation is in <strong>quadratic form</strong> if it can be "
                      "written `au² + bu + c = 0` with `a ≠ 0`, where `u = f(x)` is "
@@ -1544,12 +1494,7 @@ LESSONS = [
                          "check: `4 - 10 + 6 = 0` and `9 - 15 + 6 = 0`.",
                          "The domain is `x ≥ 0` throughout, since `√x` is defined "
                          "nowhere else, and both answers respect it.")),
-            ("p", "The restriction earns its keep in `x + √x - 6 = 0`. There "
-                  "`u² + u - 6 = (u + 3)(u - 2) = 0` gives `u = 2` or `u = -3`, but "
-                  "`√x` is never negative, so `u = -3` is discarded before it is "
-                  "squared. Squaring it anyway would produce `x = 9`, and "
-                  "`9 + 3 - 6 = 6`, not `0` &mdash; an extraneous solution of exactly "
-                  "the kind course 5 warned about."),
+            ("p", "The restriction earns its keep in `x + √x - 6 = 0`. There `u² + u - 6 = (u + 3)(u - 2) = 0` gives `u = 2` or `u = -3`, but `√x` is never negative, so `u = -3` is discarded before it is squared. Squaring it anyway would produce `x = 9`, and `9 + 3 - 6 = 6`, not `0` &mdash; an extraneous solution of exactly the kind Rational and Radical Expressions warned about."),
             ("example", ("x⁻² - x⁻¹ - 6 = 0",
                          "Put `u = x⁻¹ = 1/x`, so `u² = x⁻²` and "
                          "`u² - u - 6 = (u - 3)(u + 2) = 0`, giving `u = 3` or "
@@ -1569,11 +1514,7 @@ LESSONS = [
                   "returns `x² = 4` and silently loses `x = 0`. Dividing by something "
                   "that might be zero deletes solutions, in this course and in every "
                   "later one."),
-            ("p", "A last check worth making: course 4 fixed that a polynomial of "
-                  "degree `n` has at most `n` real solutions. A quartic that comes back "
-                  "with five, or a solution that fails when substituted, means the "
-                  "return journey went wrong &mdash; usually by squaring a rejected "
-                  "`u` or by forgetting a `±`."),
+            ("p", "A last check worth making: Polynomials and Factoring fixed that a polynomial of degree `n` has at most `n` real solutions. A quartic that comes back with five, or a solution that fails when substituted, means the back-substitution went wrong &mdash; usually by squaring a rejected `u` or by forgetting a `±`."),
         ],
         "lab": ("quadratic", {
             "mode": "reducible",
@@ -1634,12 +1575,7 @@ LESSONS = [
                 "`u`, which is the only way to test the substitution itself. A degree "
                 "4 equation has at most four real solutions, and this one has four, so "
                 "there is nothing left to find.",
-                "For a faded return journey, solve `2x⁴ - 5x² + 2 = 0` over the reals. "
-                "The supplied substitution is `u = x²` with `u ≥ 0`. Factor the "
-                "quadratic in `u`, send both permitted values back through `x² = u` "
-                "and check one root from each pair in the original quartic. Compare "
-                "with `x = ±√2` and `x = ±√2/2`; returning only the two positive "
-                "values means the square root property lost its `±`.",
+                "For a faded back-substitution exercise, solve `2x⁴ - 5x² + 2 = 0` over the reals. The supplied substitution is `u = x²` with `u ≥ 0`. Factor the quadratic in `u`, send both permitted values back through `x² = u` and check one root from each pair in the original quartic. Compare with `x = ±√2` and `x = ±√2/2`; returning only the two positive values means the square root property lost its `±`.",
             ],
         },
         "quiz_title": "Substitutions",
@@ -1688,10 +1624,6 @@ LESSONS = [
                      "has and why. Two lines of setup &mdash; `u = x²` and `u ≥ 0` "
                      "&mdash; make the rest routine; skipping them is what turns a "
                      "four-solution problem into a two-solution answer."),
-        "note": "This is the end of the course, and the technique is the one that "
-                "travels furthest. Course 7 solves `4ˣ - 5·2ˣ + 4 = 0` by putting "
-                "`u = 2ˣ`, which is the same move on a different expression: recognise "
-                "that one power is the square of another, name the smaller one, and a "
-                "quadratic appears where there was none.",
+        "note": "Exponential and Logarithmic Functions solves `4ˣ - 5·2ˣ + 4 = 0` by putting `u = 2ˣ`, which applies the same substitution to a different expression: recognise that one power is the square of another, name the smaller one, and obtain a quadratic.",
     },
 ]

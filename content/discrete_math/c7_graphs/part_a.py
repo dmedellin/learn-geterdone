@@ -25,8 +25,7 @@ LESSONS = [
         ),
         "concepts": [
             ("A graph is a relation, drawn",
-             "Course 2's symmetric irreflexive relation on `V` is exactly a simple graph. "
-             "The picture adds nothing mathematically and a great deal practically."),
+             "The symmetric irreflexive relation from Sets, Relations, and Functions on `V` is exactly a simple graph. The picture adds nothing mathematically and a great deal practically."),
             ("The drawing is not the graph",
              "Position and edge shape carry no information. Two very different pictures "
              "can be the same graph, which is lesson 5's subject."),
@@ -71,14 +70,10 @@ LESSONS = [
                   "obstructions to drawing a graph in the plane without crossings."),
             ("h3", "Four models"),
             ("ul", [
-                "<strong>Social networks.</strong> Vertices are people, edges are "
-                "acquaintance. Course 2's pigeonhole result &mdash; two people share a "
-                "degree &mdash; is a statement about this graph.",
+                "<strong>Social networks.</strong> Vertices are people, edges are acquaintance. the pigeonhole result from Sets, Relations, and Functions &mdash; two people share a degree &mdash; is a statement about this graph.",
                 "<strong>Road networks.</strong> Vertices are junctions, edges are roads, "
                 "weights are distances. Shortest paths are lesson 9.",
-                "<strong>Dependencies.</strong> Vertices are tasks, directed edges are "
-                "\"must precede\". A valid schedule exists exactly when there is no cycle, "
-                "which is course 2's partial order again.",
+                "<strong>Dependencies.</strong> Vertices are tasks, directed edges are \"must precede\". A valid schedule exists exactly when there is no cycle, which is the partial-order structure from Sets, Relations, and Functions again.",
                 "<strong>Molecules.</strong> Vertices are atoms, edges are bonds. Two "
                 "molecules with the same formula and different structures are non-isomorphic "
                 "graphs, which is lesson 5.",
@@ -91,9 +86,7 @@ LESSONS = [
                      "A simple graph on `n` vertices has at most `C(n,2) = n(n−1)/2` edges, "
                      "with equality exactly for `Kₙ`.")),
             ("proof", [
-                "Each edge is an unordered pair of distinct vertices, and no pair may "
-                "repeat, so the edges form a subset of the `C(n,2)` pairs. Course 4 lesson "
-                "4 counts them.",
+                "Each edge is an unordered pair of distinct vertices, and no pair may repeat, so the edges form a subset of the `C(n,2)` pairs. Combinatorics and Counting lesson 4 counts them.",
             ]),
         ],
         "lab": ("graph", {
@@ -126,7 +119,7 @@ LESSONS = [
         ],
         "worked": {
             "title": "Counting edges in the standard families",
-            "intro": ["Each count is a small application of course 4."],
+            "intro": ["Each count is a small application of Combinatorics and Counting."],
             "lines": [
                 "Kₙ        every pair joined            C(n,2) = n(n−1)/2",
                 "          K₅ has 10 edges,  K₁₀ has 45",
@@ -246,9 +239,7 @@ LESSONS = [
                 "By edge: each edge has exactly two ends, giving `2|E|`.",
                 "One set counted twice, so the two expressions are equal.",
             ]),
-            ("p", "This is a combinatorial proof in the sense of course 4 lesson 13, and "
-                  "it is the cleanest example on the path: name the objects, count them "
-                  "two ways, conclude."),
+            ("p", "This is a combinatorial proof in the sense of Combinatorics and Counting lesson 13, and it is an example of the method: name the objects, count them two ways, conclude."),
             ("thm", ("The handshake corollary",
                      "In any graph, the number of vertices of odd degree is even.")),
             ("proof", [
@@ -431,10 +422,7 @@ LESSONS = [
                 "add an edge                      O(1)          O(1)",
                 "iterate all edges                O(n²)         Θ(n + |E|)",
             ]),
-            ("p", "The `O` and `Θ` in the table are course 3 lesson 11's notation: "
-                  "`Θ(n + |E|)` means proportional to `n + |E|` up to a constant factor, "
-                  "and `O(1)` means bounded by a constant. Course 8 lesson 4 makes both "
-                  "precise; here they are read as \"linear\" and \"constant\"."),
+            ("p", "The `O` and `Θ` in the table are Induction and Recursion lesson 11's notation: `Θ(n + |E|)` means proportional to `n + |E|` up to a constant factor, and `O(1)` means bounded by a constant. Algorithms and Complexity lesson 4 makes both precise; here they are read as \"linear\" and \"constant\"."),
             ("p", "The traversals of lesson 8 iterate neighbours constantly, so an "
                   "adjacency list gives breadth-first search a running time of "
                   "`Θ(n + |E|)` while a matrix gives `Θ(n²)`. On a sparse graph that is "
@@ -604,8 +592,7 @@ LESSONS = [
              "A walk may repeat anything; a path repeats no vertex; a cycle is a path "
              "that returns to its start."),
             ("Reachability is an equivalence relation",
-             "Reflexive, symmetric and transitive, so by course 2 lesson 8 it partitions "
-             "the vertices &mdash; and the blocks are the components."),
+             "Reflexive, symmetric and transitive, so by Sets, Relations, and Functions lesson 8 it partitions the vertices &mdash; and the blocks are the components."),
             ("Connectivity needs at least `n − 1` edges",
              "Each edge can reduce the component count by at most one, and you start with "
              "`n` components."),
@@ -641,8 +628,7 @@ LESSONS = [
                 "Reflexive: the length-0 walk joins `v` to itself. Symmetric: reverse the "
                 "path. Transitive: concatenate two walks and extract a path by the theorem "
                 "above.",
-                "By course 2 lesson 8 the classes partition `V`, and each class induces a "
-                "maximal connected subgraph.",
+                "By Sets, Relations, and Functions lesson 8 the classes partition `V`, and each class induces a maximal connected subgraph.",
             ]),
             ("thm", ("The edge bound",
                      "A connected graph on `n` vertices has at least `n − 1` edges.")),
@@ -790,8 +776,7 @@ LESSONS = [
         ],
         "key_label": "Same graph, different labels",
         "concepts_intro": (
-            "Isomorphism is course 2's bijection with a structure-preserving condition "
-            "attached."
+            "Isomorphism is the bijection from Sets, Relations, and Functions with a structure-preserving condition attached."
         ),
         "concepts": [
             ("It is a bijection that preserves adjacency",
@@ -861,10 +846,7 @@ LESSONS = [
                   "few natural problems occupy. Babai announced a quasi-polynomial "
                   "algorithm in 2015 &mdash; running in time `exp((log n)^{O(1)})`, faster "
                   "than exponential and slower than polynomial."),
-            ("p", "In practice, isomorphism testers handle graphs with thousands of "
-                  "vertices routinely, because real graphs have structure the worst case "
-                  "does not. This is the same gap between worst-case hardness and practical "
-                  "difficulty that course 1 noted for SAT."),
+            ("p", "In practice, isomorphism testers handle graphs with thousands of vertices routinely, because real graphs have structure the worst case does not. This is the same gap between worst-case hardness and practical difficulty that Logic and Proof noted for SAT."),
         ],
         "lab": ("graph", {
             "algo": "degree", "preset": "lesson", "n": 6,
@@ -1156,9 +1138,7 @@ LESSONS = [
                      "Two-colour a graph of your own until it fails, then trace the paths "
                      "from the root to both ends of the offending edge. Together with the "
                      "edge they form the odd cycle."),
-        "note": "The gap between 2-colouring and 3-colouring is one of the sharpest in "
-                "complexity theory: the first is linear time and the second is NP-complete. "
-                "Lesson 13 returns to it, and course 8 explains what NP-complete means.",
+        "note": "The gap between 2-colouring and 3-colouring is one of the sharpest in complexity theory: the first is linear time and the second is NP-complete. Lesson 13 returns to it, and Algorithms and Complexity explains what NP-complete means.",
     },
     # ---------------------------------------------------------------- 07
     {
@@ -1190,8 +1170,7 @@ LESSONS = [
              "Every visit to a vertex uses two edge-ends, one in and one out. So a circuit "
              "requires every degree even."),
             ("Hamilton has no such criterion",
-             "Only sufficient conditions (Dirac, Ore) and no characterisation. Deciding it "
-             "is NP-complete, which course 8 defines."),
+             "Only sufficient conditions (Dirac, Ore) and no characterisation. Deciding it is NP-complete, which Algorithms and Complexity defines."),
         ],
         "read_title": "Euler and Hamilton",
         "read_intro": "Both definitions, Euler's theorem with its proof, and the contrast.",
@@ -1364,8 +1343,6 @@ LESSONS = [
                      "For a graph of your own, decide the Euler question by counting "
                      "degrees, then attempt Hamilton by hand and notice what changes: one "
                      "is a check, the other is a search."),
-        "note": "The travelling salesman problem is Hamilton with weights: find the "
-                "cheapest Hamilton circuit. It is the canonical hard optimisation problem, "
-                "and course 8 lesson 11 places it precisely.",
+        "note": "The travelling salesman problem is Hamilton with weights: find the cheapest Hamilton circuit. It is the canonical hard optimisation problem, and Algorithms and Complexity lesson 11 places it precisely.",
     },
 ]

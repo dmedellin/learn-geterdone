@@ -10,7 +10,10 @@ COURSE = {
         "Growth that compounds, and the function that undoes it: exponential functions and their graphs, decay, the number e, the logarithm as an inverse, the three laws, change of base, solving equations of both kinds, and the scales built on logarithms."
     ),
     "blurb": (
-        "The variable moves into the exponent, and ordinary algebra stops working. A logarithm is the tool that brings it back down &mdash; defined as an inverse, with three laws that are the exponent laws read backwards."
+        (
+        "Model constant-ratio growth and decay with exponential functions. Define logarithms "
+        "as inverses, apply their laws, solve equations, and interpret logarithmic scales."
+    )
     ),
     "key": [
         "log_b(x) = y   ⟺   b^y = x",
@@ -18,7 +21,7 @@ COURSE = {
         "log(M^p) = p·log M              the law that solves equations",
         "A = P·e^(rt)        e = 2.71828…",
     ],
-    "assumes_short": "Courses 1–6",
+    "assumes_short": "Functions and exponents",
     "assumes_long": "exponents, inverse functions, and graphing",
     "outcomes_intro": (
         "By the end you can model constant-ratio change, use logarithms as inverse "
@@ -58,7 +61,10 @@ COURSE = {
         "Curve fitting and regression on transformed data, which is a statistics topic.",
     ],
     "footer_lead": (
-        "Exponential and logarithmic values are irrational, so this is the one course on the path where the labs show rounded decimals &mdash; and they say where they rounded. The exact statements, the laws and the domains, are computed exactly and the rounding never enters them."
+        (
+        "The labs identify rounded exponential and logarithmic values. Domain conditions and "
+        "symbolic laws are checked separately from those decimal approximations."
+    )
     ),
     "lessons": part_a.LESSONS + part_b.LESSONS,
 }

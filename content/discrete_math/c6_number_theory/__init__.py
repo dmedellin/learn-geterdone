@@ -13,9 +13,11 @@ COURSE = {
         "remainder theorem, Fermat and Euler, and public-key encryption."
     ),
     "blurb": (
-        "Everything follows from one theorem about division with remainder. Primes, "
-        "gcds, congruences and modular inverses build up to RSA &mdash; which is "
-        "generated, used and then broken here on primes small enough to check by hand."
+        (
+        "Develop primes, greatest common divisors, congruences, and modular inverses from "
+        "division with remainder, then use them to generate, apply, and factor small RSA "
+        "keys."
+    )
     ),
     "key": [
         "a = qb + r,  0 ≤ r < b            unique q and r",
@@ -23,7 +25,7 @@ COURSE = {
         "a^{p−1} ≡ 1 (mod p)               Fermat, for prime p ∤ a",
         "ed ≡ 1 (mod φ(n))  ⟹  m^{ed} ≡ m  (mod n)     RSA",
     ],
-    "assumes_short": "Courses 1–3",
+    "assumes_short": "Proof and induction",
     "assumes_long": "proof technique and induction",
     "outcomes_intro": (
         "By the end you can compute in modular arithmetic confidently, judge the "

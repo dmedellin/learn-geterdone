@@ -63,10 +63,7 @@ LESSONS = [
                   "moment sentences may talk about their own truth, the two-valued system "
                   "breaks."),
             ("thm", ("Bivalence",
-                     "Every proposition has exactly one of the two truth values `T`, `F`. "
-                     "This is an assumption of classical logic, not a theorem within it, "
-                     "and it is what licenses `p ∨ ¬p` &mdash; the law of the excluded "
-                     "middle &mdash; used throughout this path.")),
+                     "Every proposition has exactly one of the two truth values `T`, `F`. This is an assumption of classical logic, not a theorem within it, and it is what licenses `p ∨ ¬p` &mdash; the law of the excluded middle &mdash; used throughout these lessons.")),
             ("p", "Unknown is not a third value. \"There are infinitely many twin primes\" "
                   "is a proposition whose value nobody currently knows; the sentence is "
                   "true or it is false, and our ignorance is a fact about us."),
@@ -165,10 +162,7 @@ LESSONS = [
                      "specific reason for each exclusion: not declarative, open, "
                      "self-referential, or vague. \"It's not a proposition\" without the "
                      "reason is the answer that does not transfer to lesson 8."),
-        "note": "The truth table lab appears here with a single variable on purpose. "
-                "Two rows for one proposition, four for two, `2ⁿ` for `n` &mdash; the "
-                "doubling is worth noticing now, because lesson 3 depends on it and "
-                "course 4 counts it.",
+        "note": "The truth table lab appears here with a single variable on purpose. Two rows for one proposition, four for two, `2ⁿ` for `n` &mdash; the doubling is worth noticing now, because lesson 3 depends on it and Combinatorics and Counting counts it.",
     },
     # ---------------------------------------------------------------- 02
     {
@@ -322,9 +316,7 @@ LESSONS = [
                      "The test is not reciting the tables: it is being handed \"either "
                      "`p` or `q`\" in a sentence and deciding correctly whether both "
                      "holding keeps it true."),
-        "note": "`⊕` is the parity connective: `p ⊕ q ⊕ r` is true when an odd number of "
-                "them are true. That is why it appears in checksums and error-detecting "
-                "codes, and why course 6 meets it again as addition modulo 2.",
+        "note": "`⊕` is the parity connective: `p ⊕ q ⊕ r` is true when an odd number of them are true. That is why it appears in checksums and error-detecting codes, and why Number Theory and Cryptography meets it again as addition modulo 2.",
     },
     # ---------------------------------------------------------------- 03
     {
@@ -361,11 +353,7 @@ LESSONS = [
         "read_title": "Building a truth table",
         "read_intro": "Rows first, then columns, then read the answer off the last one.",
         "body": [
-            ("p", "A truth table for a formula with variables `p₁ … pₙ` has one row per "
-                  "assignment of truth values to those variables. Since each variable "
-                  "takes two values independently, there are `2ⁿ` rows &mdash; a fact "
-                  "that is really the product rule of counting, which course 4 makes "
-                  "explicit."),
+            ("p", "A truth table for a formula with variables `p₁ … pₙ` has one row per assignment of truth values to those variables. Since each variable takes two values independently, there are `2ⁿ` rows &mdash; a fact that is really the product rule of counting, which Combinatorics and Counting makes explicit."),
             ("p", "The conventional row order lists `T` before `F` and varies the "
                   "rightmost variable fastest, so with two variables the rows read "
                   "`TT`, `TF`, `FT`, `FF`. Any order works; a consistent one lets two "
@@ -387,10 +375,7 @@ LESSONS = [
                      "always true, is it ever true, is it equivalent to this other one "
                      "&mdash; is answered by its truth table. There is no propositional "
                      "question a table leaves open.")),
-            ("p", "The catch is size, not correctness. Ten variables give 1024 rows and "
-                  "twenty give over a million; deciding whether a large formula is "
-                  "satisfiable is the canonical hard problem of computer science, and "
-                  "course 8 returns to it by name."),
+            ("p", "The catch is size, not correctness. Ten variables give 1024 rows and twenty give over a million; deciding whether a large formula is satisfiable is the canonical hard problem of computer science, and Algorithms and Complexity returns to it by name."),
         ],
         "lab": ("truth_table", {
             "formulas": ["~(p & q)", "~p | ~q", "~p | (q & r)", "(p | q) & ~(q & r)",
@@ -813,8 +798,7 @@ LESSONS = [
              "`p ≡ q` is a claim about two formulas; `p ↔ q` is a formula. Writing "
              "`(p ≡ q) ∧ r` is a category error."),
             ("Checking a few rows and concluding equivalence",
-             "Agreement on the rows you looked at is not agreement on all of them. This "
-             "is the same gap course 3 spends a whole course closing."),
+             "Agreement on the rows you looked at is not agreement on all of them. Induction and Recursion studies methods for proving claims over an unbounded domain."),
         ],
         "standard": ("Finish when you can simplify a four-connective formula by named "
                      "laws and justify each step.",
@@ -883,11 +867,7 @@ LESSONS = [
                   "&mdash; that is `2³⁰⁰` rows, more than there are atoms in the "
                   "observable universe, and no faster general method is known."),
             ("thm", ("SAT is NP-complete (Cook, 1971)",
-                     "The problem of deciding whether a propositional formula is "
-                     "satisfiable was the first problem shown NP-complete. Course 8 "
-                     "defines the term; what matters here is that this lesson's innocent "
-                     "question is the reference point against which computational "
-                     "hardness is measured.")),
+                     "The problem of deciding whether a propositional formula is satisfiable was the first problem shown NP-complete. Algorithms and Complexity defines the term; what matters here is that this lesson's innocent question is the reference point against which computational hardness is measured.")),
             ("p", "The practical situation is stranger than the theory suggests. Modern "
                   "SAT solvers routinely handle formulas with millions of variables, "
                   "because real instances have structure that the worst case does not. "
@@ -962,9 +942,7 @@ LESSONS = [
                    "Truth tables give wrong answers for large formulas",
                    "Satisfiability is undecidable"],
              "c": 1,
-             "why": "It is perfectly decidable &mdash; just exponentially so by the "
-                    "obvious method. Undecidability is a different phenomenon, and course "
-                    "8 lesson 12 meets it."},
+             "why": "It is perfectly decidable &mdash; just exponentially so by the obvious method. Undecidability is a different phenomenon, and Algorithms and Complexity lesson 12 meets it."},
             {"q": "Which assignment shows that `(p ∨ q) → (p ∧ q)` is not a tautology?",
              "a": ["`p = T, q = T`", "`p = T, q = F`", "`p = F, q = F`",
                    "None &mdash; it is a tautology"],
@@ -1177,9 +1155,6 @@ LESSONS = [
                      "Take `(p ⊕ q) ∧ r`, build the table, and produce the canonical DNF "
                      "and CNF. Check the term count against the number of true and false "
                      "rows &mdash; they must match exactly."),
-        "note": "Course 8's discussion of NP-completeness uses CNF-SAT specifically. The "
-                "restriction to CNF costs nothing there, because any formula can be "
-                "converted to an equisatisfiable CNF in linear time by naming its "
-                "subformulas &mdash; the Tseytin transformation.",
+        "note": "Algorithms and Complexity's discussion of NP-completeness uses CNF-SAT specifically. The restriction to CNF costs nothing there, because any formula can be converted to an equisatisfiable CNF in linear time by naming its subformulas &mdash; the Tseytin transformation.",
     },
 ]

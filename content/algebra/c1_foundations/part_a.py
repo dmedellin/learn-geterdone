@@ -57,10 +57,7 @@ LESSONS = [
                      "Whether `0` counts as a natural number is a convention and it "
                      "differs between books. This course starts the naturals at `1` and "
                      "nothing later depends on the choice.")),
-            ("p", "\"Can be written\" is the operative phrase, exactly as it will be for "
-                  "polynomials in course 4. `4` is rational because `4 = 4/1`. `0.25` is "
-                  "rational because `0.25 = 1/4`. You do not have to be shown the "
-                  "fraction; it has to exist."),
+            ("p", "\"Can be written\" is the operative phrase, exactly as it will be for polynomials in Polynomials and Factoring. `4` is rational because `4 = 4/1`. `0.25` is rational because `0.25 = 1/4`. You do not have to be shown the fraction; it has to exist."),
             ("h3", "Decimals tell you which kind you have"),
             ("p", "Every rational number has a decimal expansion that either stops or "
                   "falls into a repeating block, and every such decimal is a rational. An "
@@ -217,11 +214,7 @@ LESSONS = [
                      "denominator or for squaring, not for a decimal expansion. That habit "
                      "is what makes lesson 8 &mdash; where `√72` becomes `6√2` &mdash; an "
                      "exact calculation rather than an approximate one."),
-        "note": "The line reappears twice on this course. Lesson 5 measures distance along "
-                "it, which is what absolute value is, and course 3 crosses two copies of "
-                "it to get the coordinate plane. Nothing about it is decorative: `a &lt; b` "
-                "means one point is left of another, and every inequality you solve in "
-                "course 2 is a statement about a stretch of this line.",
+        "note": "The line reappears twice on this course. Lesson 5 measures distance along it, which is what absolute value is, and Lines, Functions and Graphs crosses two copies of it to get the coordinate plane. Nothing about it is decorative: `a &lt; b` means one point is left of another, and every inequality you solve in Linear Equations and Inequalities is a statement about a stretch of this line.",
     },
     # ---------------------------------------------- properties-of-the-real-numbers
     {
@@ -230,11 +223,7 @@ LESSONS = [
         "module": "The number system",
         "one_line": "Commutativity, associativity, distribution, identities, inverses.",
         "summary": (
-            "Five kinds of permission &mdash; commutativity, associativity, distribution, "
-            "identities and inverses &mdash; are all the licence you have to rearrange an expression. "
-            "Everything later in this path is one of them applied to a longer expression. "
-            "Subtraction and division have none of them, and that omission is where most "
-            "sign errors come from."
+            "Five kinds of permission &mdash; commutativity, associativity, distribution, identities and inverses &mdash; are all the licence you have to rearrange an expression. The algebraic rearrangements here apply these properties to longer expressions. Subtraction and division have none of them, and that omission is where most sign errors come from."
         ),
         "key": [
             "a + b  =  b + a                 commutative",
@@ -297,9 +286,7 @@ LESSONS = [
             ("h3", "Identities and inverses"),
             ("def", ("Identities",
                      "`a + 0 = a` for every real `a`, and `a · 1 = a` for every real `a`.",
-                     "`0` is the additive identity and `1` the multiplicative identity. "
-                     "Multiplying by `1` in a chosen disguise &mdash; by `3/3`, say "
-                     "&mdash; is how every common denominator in course 2 is built.")),
+                     "`0` is the additive identity and `1` the multiplicative identity. Multiplying by `1` in a chosen disguise &mdash; by `3/3`, say &mdash; is how every common denominator in Linear Equations and Inequalities is built.")),
             ("def", ("Inverses",
                      "Every real `a` has an additive inverse `−a` with `a + (−a) = 0`. "
                      "Every real `a` <em>except</em> `0` has a multiplicative inverse "
@@ -317,10 +304,7 @@ LESSONS = [
                 "Add the additive inverse of `a · 0` to both sides. The left becomes `0` "
                 "and the right becomes `a · 0`. So `a · 0 = 0`.",
             ]),
-            ("p", "That theorem is why `0` has no reciprocal: `0 · x` is `0` for every `x` "
-                  "and so is never `1`. It is also the engine of every quadratic you "
-                  "solve in course 6, where a product being zero forces one of its factors "
-                  "to be zero."),
+            ("p", "That theorem is why `0` has no reciprocal: `0 · x` is `0` for every `x` and so is never `1`. It is also the engine of every quadratic you solve in Quadratics and Complex Numbers, where a product being zero forces one of its factors to be zero."),
             ("h3", "Properties that do not exist"),
             ("p", "The errors in this course are almost all invented properties &mdash; "
                   "rules that have the shape of a real one. Each is killed by a single "
@@ -448,7 +432,7 @@ LESSONS = [
             ("Letting a minus sign reach only the first term",
              "`−(x − 3)` is `−x + 3`, not `−x − 3`. The `−1` multiplies every term inside "
              "the bracket, and `(−1)(−3) = 3`. This one error will outnumber all the "
-             "others in the next two courses."),
+             "others in equation-solving and function work."),
         ],
         "standard": ("Finish when you can name the property behind every line of a rearrangement.",
                      "Simplify `7 − 4(2 − z)` and annotate it, one property per line, with "
@@ -659,11 +643,7 @@ LESSONS = [
              "the typed line does."),
         ],
         "standard": ("Finish when your value and a calculator's value agree on the awkward expressions, not just the easy ones.",
-                     "Evaluate `−6² + 24 / 3 / 2`, `(−6)² + 24 / (3/2)`, and a fraction "
-                     "whose numerator and denominator each contain a sum. Rewrite the whole "
-                     "expression after every operation and label the invisible grouping made "
-                     "by the fraction bar. These shapes account for nearly every arithmetic "
-                     "disagreement later in the path."),
+                     "Evaluate `−6² + 24 / 3 / 2`, `(−6)² + 24 / (3/2)`, and a fraction whose numerator and denominator each contain a sum. Rewrite the whole expression after every operation and label the invisible grouping made by the fraction bar. These shapes account for many arithmetic disagreements in algebra."),
         "note": "This convention is why a polynomial can be written `3x² + 5x + 7` with no "
                 "brackets at all: the exponent level binds before the multiplication level, "
                 "which binds before the addition level, so the expression reads as "
@@ -699,9 +679,7 @@ LESSONS = [
              "`−x` as \"a negative number\" makes the definition look as though it "
              "sometimes returns a negative absolute value, which it never does."),
             ("Distance is the meaning; the cases are the machinery",
-             "`|x|` is how far `x` is from `0`, and `|x − y|` is how far `x` is from `y`. "
-             "Every later use &mdash; the equations and inequalities in course 2, the "
-             "error bounds in any applied subject &mdash; reads as a distance."),
+             "`|x|` is how far `x` is from `0`, and `|x − y|` is how far `x` is from `y`. Every later use &mdash; the equations and inequalities in Linear Equations and Inequalities, the error bounds in any applied subject &mdash; reads as a distance."),
             ("An absolute value equation has two solutions, one, or none",
              "`|x| = 3` has two, `|x| = 0` has one, `|x| = −1` has none. Which case you "
              "are in is decided by the number on the right before any algebra happens, and "
@@ -869,24 +847,15 @@ LESSONS = [
              "`|x| = −x` when `x &lt; 0` gives a positive answer, because `−x` is the "
              "inverse of a negative number. At `x = −7` it reads `|−7| = −(−7) = 7`."),
             ("Keeping only the positive solution",
-             "`|x| = 3` has solutions `3` and `−3`. Dropping the second is the same "
-             "omission as writing `√` where `±` is needed in course 6, and it loses half "
-             "the answer every time."),
+             "`|x| = 3` has solutions `3` and `−3`. Dropping the second is the same omission as writing `√` where `±` is needed in Quadratics and Complex Numbers, and it loses half the answer every time."),
             ("Splitting the bars over a sum",
              "`|a + b|` is not `|a| + |b|`. At `a = 3` and `b = −5` those are `2` and `8`. "
              "Products are different: `|ab| = |a| · |b|` really does hold, which is why the "
              "false version looks plausible."),
         ],
         "standard": ("Finish when both cases of the definition are automatic and \"no solution\" is an answer you will write.",
-                     "Evaluate `|−8|`, `−|−8|` and `|−3 − 5|` from the definition; then "
-                     "mark the points described by `|x + 3| = 4` using distance alone and "
-                     "reject `|2x − 1| = −4` on sight. Course 2 later supplies the general "
-                     "equation method; it assumes the meaning of the bars is automatic."),
-        "note": "The two-case shape returns in course 3 as a piecewise function &mdash; "
-                "`|x|` is the standard first example of one &mdash; and again in lesson 8 "
-                "here, where `√(x²)` is `|x|` rather than `x`. The reason is "
-                "the same both times: a formula that has to work for inputs of either sign "
-                "needs a branch.",
+                     "Evaluate `|−8|`, `−|−8|` and `|−3 − 5|` from the definition; then mark the points described by `|x + 3| = 4` using distance alone and reject `|2x − 1| = −4` on sight. Linear Equations and Inequalities later supplies the general equation method; it assumes the meaning of the bars is automatic."),
+        "note": "The two-case shape returns in Lines, Functions and Graphs as a piecewise function &mdash; `|x|` is the standard first example of one &mdash; and again in lesson 8 here, where `√(x²)` is `|x|` rather than `x`. The reason is the same both times: a formula that has to work for inputs of either sign needs a branch.",
     },
     # ------------------------------------------------------------ integer-exponents
     {
@@ -1020,9 +989,7 @@ LESSONS = [
              "adding `−6` and `−1` is easier than manipulating two nested fractions. Move "
              "factors across the bar only once the exponents are final."),
             ("State the restrictions",
-             "Every quotient law and every negative exponent needs its base to be nonzero. "
-             "Writing `x ≠ 0` beside the answer is not pedantry; in course 5 the excluded "
-             "values become the first thing you are asked for."),
+             "Every quotient law and every negative exponent needs its base to be nonzero. Writing `x ≠ 0` beside the answer is not pedantry; in Rational and Radical Expressions the excluded values become the first thing you are asked for."),
         ],
         "worked": {
             "title": "One expression, every law used once",
@@ -1109,11 +1076,7 @@ LESSONS = [
                      "simplify `(2a⁻³b²)² · 3ab⁻¹` with restrictions stated. The test is "
                      "whether each addition or multiplication of exponents can be tied to "
                      "one law, not whether the final expression looks compact."),
-        "note": "Lesson 7 uses these laws on powers of ten and nothing else, which makes "
-                "them concrete. Lesson 9 pushes the exponent out of the integers "
-                "altogether: if `x^(1/2) · x^(1/2)` is to equal `x¹`, then `x^(1/2)` has no "
-                "choice but to be a square root. Every extension of the exponent on this "
-                "path is made by that same argument.",
+        "note": "Lesson 7 uses these laws on powers of ten and nothing else, which makes them concrete. Lesson 9 pushes the exponent out of the integers altogether: if `x^(1/2) · x^(1/2)` is to equal `x¹`, then `x^(1/2)` has no choice but to be a square root. Each extension of exponent notation here uses that argument.",
     },
     # ---------------------------------------------------------- scientific-notation
     {
@@ -1328,11 +1291,7 @@ LESSONS = [
                      "and divide them by handling mantissas and exponents separately. Use "
                      "magnitude, not signed order, to justify each exponent, and check that "
                      "the final mantissa satisfies `1 ≤ |a| &lt; 10`."),
-        "note": "The split into a mantissa and an exponent is exactly what a calculator "
-                "shows as `6.02E23`, and it is the reason logarithms in course 7 turn "
-                "multiplication into addition: the exponent of a number in this form is "
-                "very nearly its base-10 logarithm, and adding exponents is what you did "
-                "here every time you multiplied.",
+        "note": "The split into a mantissa and an exponent is exactly what a calculator shows as `6.02E23`, and it is the reason logarithms in Exponential and Logarithmic Functions turn multiplication into addition: the exponent of a number in this form is very nearly its base-10 logarithm, and adding exponents is what you did here every time you multiplied.",
     },
     # ------------------------------------------------------------ roots-and-radicals
     {
@@ -1376,15 +1335,8 @@ LESSONS = [
         "body": [
             ("def", ("Principal square root",
                      "For `x ≥ 0`, `√x` is the unique number `r` with `r ≥ 0` and `r² = x`.",
-                     "`√0 = 0`. For `x &lt; 0` there is no real `r` with `r² = x`, because "
-                     "the square of any real number is `≥ 0`. On this course such a "
-                     "radical has no value and is said to have none; course 6 introduces "
-                     "`i` and gives it one.")),
-            ("p", "So `√9 = 3`, and `√9 = ±3` is wrong as written. The `±` belongs to "
-                  "solving an equation: `x² = 9` gives `x = ±3`, and the `±` is put there "
-                  "explicitly because `√` alone would only have supplied the positive "
-                  "root. That is also why the quadratic formula in course 6 carries a `±` "
-                  "in front of its radical."),
+                     "`√0 = 0`. For `x &lt; 0` there is no real `r` with `r² = x`, because the square of any real number is `≥ 0`. On this course such a radical has no value and is said to have none; Quadratics and Complex Numbers introduces `i` and gives it one.")),
+            ("p", "So `√9 = 3`, and `√9 = ±3` is wrong as written. The `±` belongs to solving an equation: `x² = 9` gives `x = ±3`, and the `±` is put there explicitly because `√` alone would only have supplied the positive root. That is also why the quadratic formula in Quadratics and Complex Numbers carries a `±` in front of its radical."),
             ("def", ("n-th root",
                      "For an integer `n ≥ 2`, an n-th root of `x` is a number `r` with "
                      "`rⁿ = x`. The `n` is called the <strong>index</strong>.",
@@ -1438,12 +1390,7 @@ LESSONS = [
                 "",
                 "the 3rd root of 54  =  the 3rd root of (3³ · 2)  =  3 · (3rd root of 2)",
             ]),
-            ("p", "Fractions come apart the same way: `√(18/25) = √18 / √25 = 3√2 / 5`. "
-                  "When the denominator is not a perfect square, `√(1/2) = 1/√2`; the "
-                  "numerical standard form clears that radical by multiplying top and "
-                  "bottom by `√2`, giving `√2/2`. The lab performs this numerical step. "
-                  "Course 5 teaches the general rationalising method for variable and "
-                  "multi-term denominators."),
+            ("p", "Fractions come apart the same way: `√(18/25) = √18 / √25 = 3√2 / 5`. When the denominator is not a perfect square, `√(1/2) = 1/√2`; the numerical standard form clears that radical by multiplying top and bottom by `√2`, giving `√2/2`. The lab performs this numerical step. Rational and Radical Expressions teaches the general rationalising method for variable and multi-term denominators."),
             ("example", ("Which of these are real",
                          "`√16 = 4`. `√(−16)` has no real value. The 3rd root of `−27` is "
                          "`−3`, because `(−3)³ = −27`. The 4th root of `81` is `3`, because "
@@ -1509,11 +1456,7 @@ LESSONS = [
                 "it takes one more observation to know it is <em>the</em> principal root: "
                 "`6√2` and `3√2 / 5` are both positive, and positivity is the second half "
                 "of the definition.",
-                "Line 2 keeps the minus sign outside the radical throughout, which is the "
-                "tidy way to handle an odd index over a negative radicand. Line 3 leaves no "
-                "root below the bar because `25` is a perfect square. A non-square numerical "
-                "denominator uses the clearing step shown by the lab's `sqrt(1/2)` preset; "
-                "course 5 generalises it to variable and multi-term denominators.",
+                "Line 2 keeps the minus sign outside the radical throughout, which is the tidy way to handle an odd index over a negative radicand. Line 3 leaves no root below the bar because `25` is a perfect square. A non-square numerical denominator uses the clearing step shown by the lab's `sqrt(1/2)` preset; Rational and Radical Expressions generalises it to variable and multi-term denominators.",
                 "Now leave one line for yourself: `√108`. Repeated division gives "
                 "`108 = 2² · 3³`; take one `2` and one `3` out, then stop because a single "
                 "`3` remains. The result is `6√3`. `6√9` failed to remove a complete pair, "
@@ -1546,9 +1489,7 @@ LESSONS = [
         ],
         "mistakes": [
             ("Writing that the square root of 9 is plus or minus 3",
-             "The symbol names one number. The `±` is written by hand when you solve "
-             "`x² = 9`, precisely because the radical would otherwise supply only the "
-             "positive root. Losing that distinction loses a solution in course 6."),
+             "The symbol names one number. The `±` is written by hand when you solve `x² = 9`, precisely because the radical would otherwise supply only the positive root. Losing that distinction loses a solution in Quadratics and Complex Numbers."),
             ("Splitting a root over a sum",
              "`√(9 + 16)` is `√25 = 5`, not `3 + 4`. The product rule `√(ab) = √a · √b` is "
              "real and the sum version is not, which is what makes the false one look "

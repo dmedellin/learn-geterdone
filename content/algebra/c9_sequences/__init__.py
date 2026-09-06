@@ -12,10 +12,11 @@ COURSE = {
         "Ordered lists and the sums of their terms: recursive and closed forms, sigma notation, arithmetic and geometric families, partial sums, infinite geometric series and when they converge, repeating decimals, annuities, Pascal's triangle and the binomial theorem."
     ),
     "blurb": (
-        "A sequence is a function whose input is a position. Arithmetic and geometric "
-        "families make that idea calculable: both have closed forms for a term and a "
-        "finite sum, some geometric sums have a limit, and the same indexed notation "
-        "leads to Pascal's triangle and binomial expansion."
+        (
+        "Represent sequences recursively and explicitly, use sigma notation, calculate "
+        "arithmetic and geometric sums, and apply geometric series to decimals and payments. "
+        "Construct binomial expansions using Pascal's triangle."
+    )
     ),
     "key": [
         "aₙ = a₁ + (n − 1)d          aₙ = a₁rⁿ⁻¹",
@@ -23,7 +24,7 @@ COURSE = {
         "S∞ = a₁/(1 − r)      a₁ ≠ 0 needs |r| < 1; the zero series sums to 0",
         "(a + b)ⁿ = Σ C(n,k) aⁿ⁻ᵏ bᵏ",
     ],
-    "assumes_short": "Courses 1\u20137",
+    "assumes_short": "Functions and exponents",
     "assumes_long": "exponents, functions, and exact fractions",
     "outcomes_intro": (
         "By the end you can generate and classify sequences, compute finite and infinite "
@@ -63,7 +64,11 @@ COURSE = {
     "not_covered": [
         "Convergence tests for series in general. Only the geometric case is settled here, and it is settled completely; the rest belongs to calculus.",
         "Sequences of functions, power series and Taylor series.",
-        "Mathematical induction as a proof technique. Several formulas on this course are proved by other means and stated as proved by induction elsewhere; the Discrete Mathematics path devotes a course to it.",
+        (
+            "Mathematical induction as a proof technique. Several formulas on this course are "
+            "proved by other means and stated as proved by induction elsewhere; Induction and "
+            "Recursion covers it."
+        ),
     ],
     "footer_lead": (
         "Every sum on this course is computed twice &mdash; once by adding the terms up and once by the closed form &mdash; and both are printed, so the formula arrives as something checked rather than something asserted. Terms and sums are exact fractions; where an infinite sum exists the lab shows the partial sums approaching it rather than jumping to the answer."

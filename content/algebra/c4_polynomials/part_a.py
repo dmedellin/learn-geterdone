@@ -54,14 +54,9 @@ LESSONS = [
             ("p", "Three kinds of expression fail the definition, each for the same "
                   "underlying reason: the exponent is not a whole number."),
             ("ul", [
-                "<strong>Negative exponents.</strong> `2/x` is `2x⁻¹`, and `−1` is not a "
-                "whole number. Expressions like this are <em>rational</em>, and course 5 "
-                "handles them.",
-                "<strong>Fractional exponents.</strong> `√x` is `x^(1/2)`. This is a "
-                "<em>radical</em> expression, also course 5.",
-                "<strong>The variable in the exponent.</strong> `2ˣ` has a constant base "
-                "and a variable exponent, which is the exact reverse of `x²`. That is an "
-                "<em>exponential</em>, and course 7 is about it.",
+                "<strong>Negative exponents.</strong> `2/x` is `2x⁻¹`, and `−1` is not a whole number. Expressions like this are <em>rational</em>, and Rational and Radical Expressions handles them.",
+                "<strong>Fractional exponents.</strong> `√x` is `x^(1/2)`. This is a <em>radical</em> expression, also Rational and Radical Expressions.",
+                "<strong>The variable in the exponent.</strong> `2ˣ` has a constant base and a variable exponent, which is the exact reverse of `x²`. That is an <em>exponential</em>, and Exponential and Logarithmic Functions is about it.",
             ]),
             ("p", "A polynomial may contain more than one variable: `4x²y − 3xy + y³` is "
                   "a polynomial in `x` and `y`. The same restriction applies to every "
@@ -180,11 +175,7 @@ LESSONS = [
              "is currently printed."),
         ],
         "standard": ("Finish when you can reject a non-polynomial and name the exponent that spoils it.",
-                     "Given a mixed list you should sort it without hesitating, and for "
-                     "each rejection point at the specific exponent &mdash; negative, "
-                     "fractional, or variable &mdash; that fails the definition. That "
-                     "habit is what stops you applying a factoring technique to `1/x + x` "
-                     "in course 5 and getting nonsense."),
+                     "Given a mixed list you should sort it without hesitating, and for each rejection point at the specific exponent &mdash; negative, fractional, or variable &mdash; that fails the definition. That habit is what stops you applying a factoring technique to `1/x + x` in Rational and Radical Expressions and getting nonsense."),
         "note": "The lab reports the degree after combining, which is why it is worth "
                 "typing in something that cancels. Degree is the number this whole course "
                 "steers by: it bounds how many roots a polynomial can have (lesson 13) and "
@@ -402,9 +393,7 @@ LESSONS = [
         ),
         "concepts": [
             ("Coefficients multiply, exponents add",
-             "`(3x²)(4x⁵) = 12x⁷`. The coefficients are just numbers, so they multiply. "
-             "The powers add because `x²·x⁵` is two `x`s times five `x`s &mdash; seven "
-             "`x`s. That is course 1's exponent law, unchanged."),
+             "`(3x²)(4x⁵) = 12x⁷`. The coefficients are just numbers, so they multiply. The powers add because `x²·x⁵` is two `x`s times five `x`s &mdash; seven `x`s. That is Foundations of Algebra's exponent law, unchanged."),
             ("The distributive law is the entire method",
              "Multiply each term of the first polynomial by each term of the second, then "
              "collect like terms. Every layout &mdash; FOIL, the grid, the vertical "
@@ -786,9 +775,7 @@ LESSONS = [
         ),
         "concepts": [
             ("Factoring is multiplication in reverse",
-             "Every factorisation can be verified by expanding it. This is the only topic "
-             "on the path where checking your answer is faster than producing it, so "
-             "there is never a reason to submit an unchecked one."),
+             "Every factorisation can be verified by expanding it. For factoring, checking an answer by expansion is often faster than producing it, so there is never a reason to submit an unchecked one."),
             ("The GCF must divide EVERY term",
              "Not most of them. A factor shared by two terms out of three is not a common "
              "factor of the polynomial, and pulling it out anyway leaves a fraction "

@@ -256,10 +256,7 @@ LESSONS = [
                   "`⌊100/24⌋ = 4` undercounts. The lab computes every intersection "
                   "through the lcm for exactly this reason."),
             ("thm", ("Euler's totient",
-                     "The count of integers in `1, …, n` coprime to `n` is "
-                     "`φ(n) = n·Π(1 − 1/p)` over the distinct primes `p` dividing `n`. "
-                     "That product is inclusion and exclusion over the prime divisors, "
-                     "multiplied out. Course 6 uses `φ` throughout.")),
+                     "The count of integers in `1, …, n` coprime to `n` is `φ(n) = n·Π(1 − 1/p)` over the distinct primes `p` dividing `n`. That product is inclusion and exclusion over the prime divisors, multiplied out. Number Theory and Cryptography uses `φ` throughout.")),
             ("thm", ("Counting surjections",
                      "The number of surjections from an `m`-set onto an `n`-set is "
                      "`Σ_{k=0}^{n} (−1)^k C(n,k)(n−k)^m` &mdash; total functions minus "
@@ -364,10 +361,7 @@ LESSONS = [
                      "Count the permutations of `1, …, 6` in which no element stays in its "
                      "own position. Define `Aᵢ` as \"element `i` is fixed\", compute the "
                      "intersections, and alternate. Lesson 10 is that answer in general."),
-        "note": "The principle generalises far beyond counting: the same alternating "
-                "structure appears in Möbius inversion, in the sieve methods of analytic "
-                "number theory, and in the probabilistic version course 5 uses for "
-                "`P(A ∪ B)`.",
+        "note": "The principle generalises far beyond counting: the same alternating structure appears in Möbius inversion, in the sieve methods of analytic number theory, and in the probabilistic version Discrete Probability uses for `P(A ∪ B)`.",
     },
     # ---------------------------------------------------------------- 10
     {
@@ -446,16 +440,9 @@ LESSONS = [
                 "derangement of `n − 1` items: `Dₙ₋₁` ways.",
                 "So `Dₙ = (n−1)(Dₙ₋₂ + Dₙ₋₁)`.",
             ]),
-            ("p", "Two derivations of the same numbers, by different techniques. The "
-                  "recurrence is a case split of the kind course 3 lesson 9 taught; the "
-                  "formula came from inclusion and exclusion. Agreement between them is a "
-                  "genuine check, and both are worth having."),
+            ("p", "Two derivations of the same numbers, by different techniques. The recurrence is a case split of the kind Induction and Recursion lesson 9 taught; the formula came from inclusion and exclusion. Agreement between them is a genuine check, and both are worth having."),
             ("example", ("The hat-check problem",
-                         "`n` people check hats and receive them back at random. The "
-                         "probability nobody gets their own is `Dₙ/n!`, which for `n ≥ 7` "
-                         "is 0.3679 to four places whatever `n` is &mdash; at `n = 5` it is "
-                         "still 0.3667 and at 6 it is 0.3681. Course 5 makes the division "
-                         "into a probability statement.")),
+                         "`n` people check hats and receive them back at random. The probability nobody gets their own is `Dₙ/n!`, which for `n ≥ 7` is 0.3679 to four places whatever `n` is &mdash; at `n = 5` it is still 0.3667 and at 6 it is 0.3681. Discrete Probability makes the division into a probability statement.")),
         ],
         "lab": ("derangement", {
             "n": 6,
@@ -561,9 +548,7 @@ LESSONS = [
         "module": "Corrections",
         "one_line": "`⌈n/k⌉` in a box, and what that proves.",
         "summary": (
-            "With `n` objects in `k` boxes, some box holds at least `⌈n/k⌉`. Course 2 "
-            "stated it; here it is applied to monotone subsequences and to the Ramsey "
-            "number `R(3,3) = 6`."
+            "With `n` objects in `k` boxes, some box holds at least `⌈n/k⌉`. Sets, Relations, and Functions stated it; here it is applied to monotone subsequences and to the Ramsey number `R(3,3) = 6`."
         ),
         "key": [
             "n objects, k boxes  ⟹  some box has ≥ ⌈n/k⌉",
@@ -692,10 +677,7 @@ LESSONS = [
                 "           sⱼ − sᵢ = a_{i+1} + … + aⱼ ≡ 0 (mod n).           ∎",
             ],
             "after": [
-                "The classification is \"remainder mod `n`\", and case 1 is what reduces "
-                "the box count from `n` to `n − 1` &mdash; the same move as the "
-                "acquaintance-count argument in course 2. Creating a surplus by ruling out "
-                "one box is the recurring trick."
+                "The classification is \"remainder mod `n`\", and case 1 is what reduces the box count from `n` to `n − 1` &mdash; the same move as the acquaintance-count argument in Sets, Relations, and Functions. Creating a surplus by ruling out one box is the recurring trick."
             ],
         },
         "quiz_title": "Generalised pigeonhole",
@@ -825,10 +807,7 @@ LESSONS = [
                   "For `aₙ = 3aₙ₋₁` with `a₀ = 1`, write `G(x) = Σ aₙxⁿ`. Multiplying the "
                   "recurrence by `xⁿ` and summing gives `G(x) − 1 = 3xG(x)`, so "
                   "`G(x) = 1/(1 − 3x)`, whose coefficients are `3ⁿ`."),
-            ("p", "The same method handles Fibonacci: `G(x) = x/(1 − x − x²)`, and a "
-                  "partial-fraction decomposition recovers Binet's formula from course 3 "
-                  "lesson 10. The method is more general than characteristic roots, and it "
-                  "extends to recurrences those cannot touch."),
+            ("p", "The same method handles Fibonacci: `G(x) = x/(1 − x − x²)`, and a partial-fraction decomposition recovers Binet's formula from Induction and Recursion lesson 10. The method is more general than characteristic roots, and it extends to recurrences those cannot touch."),
             ("thm", ("Formal manipulation is legitimate",
                      "Addition, multiplication and (when `a₀ ≠ 0`) inversion of formal power "
                      "series are well defined coefficient by coefficient, with no "
@@ -980,10 +959,7 @@ LESSONS = [
                      "gives `A` and another way gives `B`. Since `S` has one size, "
                      "`A = B`.")),
             ("example", ("Handshakes",
-                         "In any graph, `Σ_v deg(v) = 2|E|`. Count the incidences "
-                         "&mdash; pairs (vertex, edge at that vertex). By vertex: each "
-                         "contributes its degree. By edge: each has two endpoints. Course "
-                         "7 lesson 2 opens with this.")),
+                         "In any graph, `Σ_v deg(v) = 2|E|`. Count the incidences &mdash; pairs (vertex, edge at that vertex). By vertex: each contributes its degree. By edge: each has two endpoints. Graphs and Trees lesson 2 opens with this.")),
             ("example", ("Pascal's rule, again",
                          "`C(n,k) = C(n−1,k−1) + C(n−1,k)`: count `k`-subsets by whether "
                          "they contain a fixed element. One set, two classifications.")),
@@ -999,9 +975,7 @@ LESSONS = [
                   "a known double count in disguise, and recognising which is the skill."),
             ("h3", "Bijective proof"),
             ("thm", ("The method",
-                     "To prove `|A| = |B|`, construct an explicit bijection `f : A → B`. "
-                     "Course 2 lesson 11's criteria apply: injective and surjective, both "
-                     "argued.")),
+                     "To prove `|A| = |B|`, construct an explicit bijection `f : A → B`. Sets, Relations, and Functions lesson 11's criteria apply: injective and surjective, both argued.")),
             ("example", ("Symmetry of binomial coefficients",
                          "`C(n,k) = C(n,n−k)` via complementation: send each `k`-subset to "
                          "its complement. It is its own inverse, hence a bijection.")),
@@ -1325,8 +1299,6 @@ LESSONS = [
                      "select before computing anything; they should land on four different "
                      "rules and one multiset. Then verify the doughnuts by listing. That "
                      "sequence &mdash; classify, compute, check &mdash; is the whole course."),
-        "note": "Course 5 turns these counts into probabilities by dividing by the size of "
-                "the sample space, so every classification error here becomes a wrong "
-                "probability there. The counting is the hard part; the division is not.",
+        "note": "Discrete Probability turns these counts into probabilities by dividing by the size of the sample space, so every classification error here becomes a wrong probability there. The counting is the hard part; the division is not.",
     },
 ]

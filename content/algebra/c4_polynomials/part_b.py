@@ -397,12 +397,7 @@ LESSONS = [
                      "should factor the first three on sight and say of the fourth that "
                      "the conjugate pattern does not apply; because it stays positive, it "
                      "also has no real linear factor. Neither conclusion is a failure to spot something."),
-        "note": "These patterns matter beyond factoring. Course 5 cancels a difference "
-                "of squares out of a rational expression on almost every page, and "
-                "course 6 returns to `a² + b²` once `i` exists and factors it properly. "
-                "This lesson factors over rational coefficients unless it explicitly says "
-                "otherwise. Course 6 enlarges the coefficient system; naming the system is "
-                "part of every claim that a factor does or does not exist.",
+        "note": "These patterns matter beyond factoring. Rational and Radical Expressions cancels a difference of squares out of a rational expression on almost every page, and Quadratics and Complex Numbers returns to `a² + b²` once `i` exists and factors it properly. This lesson factors over rational coefficients unless it explicitly says otherwise. Quadratics and Complex Numbers enlarges the coefficient system; naming the system is part of every claim that a factor does or does not exist.",
     },
     # ---------------------------------------------------------------- 10
     {
@@ -917,10 +912,7 @@ LESSONS = [
              "Evaluate `f` at each, by synthetic division so that a hit hands you the "
              "quotient immediately. `f(c) = 0` means `(x - c)` is a factor."),
             ("Repeat on the quotient, and stop at degree 2",
-             "The quotient is one degree lower; search it the same way. Once it is a "
-             "quadratic, use the pair or ac method already taught. If those searches are "
-             "empty, record that no rational linear factor remains; Course 6 classifies "
-             "its irrational or complex roots."),
+             "The quotient is one degree lower; search it the same way. Once it is a quadratic, use the pair or ac method already taught. If those searches are empty, record that no rational linear factor remains; Quadratics and Complex Numbers classifies its irrational or complex roots."),
         ],
         "worked": {
             "title": "Factoring 2x³ - 3x² - 8x - 3",
@@ -1011,11 +1003,7 @@ LESSONS = [
                      "factors, and state of `x³ - 2` that it has no rational root "
                      "&mdash; citing the four tested candidates as the reason rather "
                      "than reporting that you could not find one."),
-        "note": "This is the lesson the course was arranged around. Course 5 needs "
-                "factored denominators, course 6 needs the roots of quadratics, and "
-                "lesson 13 needs the factored form to draw a graph. All three are "
-                "downstream of a search that either produces exact factors or proves "
-                "there are none.",
+        "note": "Rational and Radical Expressions uses factored denominators, Quadratics and Complex Numbers uses the roots of quadratics, and the polynomial-graphs lesson uses the factored form to draw a graph. Each application requires a search that either produces exact factors or proves there are none.",
     },
     # ---------------------------------------------------------------- 13
     {
@@ -1101,11 +1089,7 @@ LESSONS = [
             ("p", "The y-intercept is always `f(0)`, which is the constant term in "
                   "standard form and the product of the constants in factored form. It "
                   "anchors the sign intervals to one exact point away from the roots."),
-            ("p", "A touch forces a local turn at its even-multiplicity root, but these "
-                  "data do not locate any other turning points. Exact turning-point "
-                  "locations require calculus; Course 6 handles the one case algebra can "
-                  "do on its own, the vertex of a parabola. Draw a qualitative sketch "
-                  "here and let the evaluated lab supply the metric picture."),
+            ("p", "A touch forces a local turn at its even-multiplicity root, but these data do not locate any other turning points. Exact turning-point locations require calculus; Quadratics and Complex Numbers handles the one case algebra can do on its own, the vertex of a parabola. Draw a qualitative sketch here and let the evaluated lab supply the metric picture."),
         ],
         "lab": ("grapher", {
             "mode": "polynomial",

@@ -752,10 +752,7 @@ LESSONS = [
         ),
         "concepts": [
             ("Absolute value is a distance",
-             "`|X|` is how far `X` lies from zero, with no direction attached. Course 1 "
-             "defined it in two cases; here the distance reading is the useful one, "
-             "because `|X| = 5` then says that `X` is 5 away from 0, and there are "
-             "exactly two such places."),
+             "`|X|` is how far `X` lies from zero, with no direction attached. Foundations of Algebra defined it in two cases; here the distance reading is the useful one, because `|X| = 5` then says that `X` is 5 away from 0, and there are exactly two such places."),
             ("Two cases means two equations, joined by or",
              "`|x − 3| = 5` becomes `x − 3 = 5` or `x − 3 = −5`. Both get solved and both "
              "answers count. This is not a choice between two possibilities; it is two "
@@ -828,11 +825,7 @@ LESSONS = [
                          "`x = −2/3`; then the left side is `|−7/3| = 7/3` and the right "
                          "side is `−2/3 + 3 = 7/3`. Both check, and the solution set has "
                          "two members.")),
-            ("p", "A candidate thrown out by the check is called <strong>extraneous</strong>. "
-                  "It is not the mark of an arithmetic slip: the splitting step can produce "
-                  "equations with solutions the original never had, and only substitution "
-                  "finds out which. The same phenomenon returns in course 5, when both "
-                  "sides of an equation get squared."),
+            ("p", "A candidate thrown out by the check is called <strong>extraneous</strong>. It is not the mark of an arithmetic slip: the splitting step can produce equations with solutions the original never had, and only substitution finds out which. The same phenomenon returns in Rational and Radical Expressions, when both sides of an equation get squared."),
         ],
         "lab": ("equation", {
             "mode": "absolute",
@@ -1284,11 +1277,7 @@ LESSONS = [
                   "`0`: `{ 0 }` is a set with one element in it, and `∅` is a set with "
                   "none. An inequality with no solutions has solution set `∅`, and writing "
                   "`0` claims that `0` is a solution."),
-            ("p", "`(2, 5)` is also how a point in the plane is written, in course 3. The "
-                  "two notations share their symbols and are told apart by context: an "
-                  "interval is a set of numbers on a line, and a point is a pair of "
-                  "coordinates. Where both are in play, saying which you mean is worth the "
-                  "words."),
+            ("p", "`(2, 5)` is also how a point in the plane is written, in Lines, Functions and Graphs. The two notations share their symbols and are told apart by context: an interval is a set of numbers on a line, and a point is a pair of coordinates. Where both are in play, saying which you mean is worth the words."),
             ("example", ("Reading a set back",
                          "`(−∞, −2] ∪ [5, ∞)`. Two pieces. The left one runs for ever "
                          "downward and stops at `−2`, which it includes. The right one "
@@ -1415,11 +1404,6 @@ LESSONS = [
                      "Then list `{ n ∈ ℤ : −2 &lt; n ≤ 2 }` and explain why the same condition "
                      "over `ℝ` cannot be listed. Every later solution set is expected in "
                      "one of these exact forms."),
-        "note": "This closes the course. Every solution set of an inequality here has been "
-                "an interval or a union of two intervals, because each statement reduces to "
-                "at most two linear ones and a linear statement changes from true to false "
-                "at most once along the line. Course 6 solves quadratic inequalities, where "
-                "the answer is regularly the two pieces lying outside a pair of roots, and "
-                "this notation is what keeps those answers readable.",
+        "note": "This closes the course. Every solution set of an inequality here has been an interval or a union of two intervals, because each statement reduces to at most two linear ones and a linear statement changes from true to false at most once along the line. Quadratics and Complex Numbers solves quadratic inequalities, where the answer is regularly the two pieces lying outside a pair of roots, and this notation is what keeps those answers readable.",
     },
 ]

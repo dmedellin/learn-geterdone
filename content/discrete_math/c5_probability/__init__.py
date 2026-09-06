@@ -12,10 +12,11 @@ COURSE = {
         "and its linearity, variance, and the binomial and geometric distributions."
     ),
     "blurb": (
-        "Counting with a denominator. Every probability here is a ratio of counts, so "
-        "course 4 does most of the work &mdash; and the parts that go wrong, "
-        "conditioning and independence, go wrong for reasons that have nothing to do "
-        "with arithmetic."
+        (
+        "For equally likely finite outcomes, probability is a ratio of counts. Conditioning "
+        "and independence depend on defining events and the conditioned sample space "
+        "correctly."
+    )
     ),
     "key": [
         "P(E) = |E| / |S|                 equally likely outcomes",
@@ -23,7 +24,7 @@ COURSE = {
         "independent  ⟺  P(A ∩ B) = P(A)·P(B)",
         "E[X + Y] = E[X] + E[Y]           always, independent or not",
     ],
-    "assumes_short": "Courses 1–4",
+    "assumes_short": "Counting, sets, and functions",
     "assumes_long": "counting, sets and functions",
     "outcomes_intro": (
         "By the end you can compute a probability exactly, condition correctly, say "
@@ -32,8 +33,10 @@ COURSE = {
     ),
     "outcomes": [
         ("Compute a probability from a sample space",
-         "Identify the outcomes, check they are equally likely, count the event, and "
-         "divide &mdash; with the counting techniques of course 4."),
+         (
+             "Identify the outcomes, check they are equally likely, count the event, and "
+             "divide &mdash; with the counting techniques of Combinatorics and Counting."
+         )),
         ("Condition without falling into the standard traps",
          "`P(A|B)` and `P(B|A)` are different numbers, and the base rate is what "
          "separates them."),

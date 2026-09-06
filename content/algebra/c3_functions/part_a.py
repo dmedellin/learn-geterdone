@@ -20,9 +20,7 @@ LESSONS = [
         ],
         "key_label": "The plane in four lines",
         "concepts_intro": (
-            "Course 2 solved equations in one unknown, and an answer there was a "
-            "number on a line. An equation in two unknowns has pairs for answers, "
-            "and pairs need two dimensions to be drawn."
+            "Linear Equations and Inequalities solved equations in one unknown, and an answer there was a number on a line. An equation in two unknowns has pairs for answers, and pairs need two dimensions to be drawn."
         ),
         "concepts": [
             ("A point is an ordered pair",
@@ -217,9 +215,7 @@ LESSONS = [
         ],
         "key_label": "Drawing a line from its equation",
         "concepts_intro": (
-            "In course 2 an equation in one unknown usually had one answer. The same "
-            "sentence with a second unknown has endlessly many, and the graph is how "
-            "you hold all of them at once."
+            "In Linear Equations and Inequalities an equation in one unknown usually had one answer. The same sentence with a second unknown has endlessly many, and the graph is how you hold all of them at once."
         ),
         "concepts": [
             ("A linear equation has infinitely many solutions",
@@ -231,9 +227,7 @@ LESSONS = [
              "Plot a third anyway: if it misses, one of the three is wrong, and you "
              "find out now rather than in the next lesson."),
             ("Intercepts are the cheapest two points",
-             "Setting `y = 0` and then `x = 0` each collapses the equation to one "
-             "unknown, which is the case course 2 already solved. No other pair of "
-             "points is easier to get."),
+             "Setting `y = 0` and then `x = 0` each collapses the equation to one unknown, which is the case Linear Equations and Inequalities already solved. No other pair of points is easier to get."),
         ],
         "read_title": "Turning an equation into a line",
         "read_intro": "A table always works. Intercepts are faster. Two shapes are special.",
@@ -242,12 +236,7 @@ LESSONS = [
                      "An equation that can be written `ax + by = c` with `a` and `b` not "
                      "both zero. Its graph is a straight line, and every straight line "
                      "is the graph of such an equation.")),
-            ("p", "The word linear earns its name here rather than in course 2: what is "
-                  "straight is the graph. The defining feature on the algebra side is "
-                  "that `x` and `y` each appear to the first power only, never "
-                  "multiplied together, never inside a root or a denominator. `xy = 6` "
-                  "and `y = x²` are equations in two variables that are not linear, and "
-                  "their graphs are not lines."),
+            ("p", "The word linear earns its name here rather than in Linear Equations and Inequalities: what is straight is the graph. The defining feature on the algebra side is that `x` and `y` each appear to the first power only, never multiplied together, never inside a root or a denominator. `xy = 6` and `y = x²` are equations in two variables that are not linear, and their graphs are not lines."),
             ("h3", "The table method"),
             ("p", "Choose a value for `x`, substitute, solve the resulting one-unknown "
                   "equation for `y`, and record the pair. Repeat. This never fails and "
@@ -290,10 +279,7 @@ LESSONS = [
                 "<strong>`y = b`</strong> &mdash; every point with y-coordinate `b`, "
                 "whatever `x` is. A <em>horizontal</em> line.",
             ]),
-            ("p", "Both are genuine linear equations under the definition above: `x = a` "
-                  "is `1·x + 0·y = a`. The instinct that `x = −2` should be a single "
-                  "point comes from course 2, where it was one; with a second variable "
-                  "present, `y` is unconstrained and the solution set is a whole line."),
+            ("p", "Both are genuine linear equations under the definition above: `x = a` is `1·x + 0·y = a`. The instinct that `x = −2` should be a single point comes from Linear Equations and Inequalities, where it was one; with a second variable present, `y` is unconstrained and the solution set is a whole line."),
             ("p", "Keep `x = −2` in view. It is the one shape that will fail the test in "
                   "lesson 8, and knowing what it looks like now is what makes that test "
                   "obvious later."),
@@ -314,8 +300,7 @@ LESSONS = [
              "If only `x` appears the line is vertical; if only `y`, horizontal. Draw it "
              "and stop &mdash; no table is needed."),
             ("Set y = 0 and solve for x",
-             "This is a one-unknown equation of the kind course 2 handled. The result is "
-             "the x-intercept `(x, 0)`."),
+             "This is a one-unknown equation of the kind Linear Equations and Inequalities handled. The result is the x-intercept `(x, 0)`."),
             ("Set x = 0 and solve for y",
              "Same again, giving `(0, y)`. If both intercepts came out at the origin, "
              "pick any other `x` and get a second point from the equation."),
@@ -394,9 +379,7 @@ LESSONS = [
              "Two points always look consistent, because two points always lie on a "
              "line. The third point is the only one that can reveal an error."),
             ("Reading `x = −2` as a point",
-             "With two variables in play the equation constrains `x` and says nothing "
-             "about `y`, so the solution set is a vertical line. The one-variable habit "
-             "from course 2 is what needs unlearning."),
+             "With two variables in play the equation constrains `x` and says nothing about `y`, so the solution set is a vertical line. The one-variable habit from Linear Equations and Inequalities is what needs unlearning."),
         ],
         "standard": ("Finish when you can graph any `ax + by = c` from its intercepts and "
                      "know when to fall back on a table.",
@@ -646,9 +629,7 @@ LESSONS = [
              "the y-intercept. No work is required to extract them &mdash; which is the "
              "entire reason for rearranging into this shape."),
             ("Getting there is one goal: isolate y",
-             "Whatever the equation looks like, the procedure is course 2's: undo the "
-             "additions, then undo the multiplication. The only new demand is finishing "
-             "in exactly the shape `mx + b`."),
+             "Whatever the equation looks like, the procedure is the one from Linear Equations and Inequalities: undo the additions, then undo the multiplication. The only new demand is finishing in exactly the shape `mx + b`."),
             ("Every non-vertical line has one such equation",
              "Vertical lines are the sole exception, since they cannot be solved for `y` "
              "at all. That exception is not an inconvenience; it is a signal, and lesson "
@@ -666,10 +647,7 @@ LESSONS = [
                   "`x = 0` the height is `b`, at `x = 1` it is `m + b`, so a run of 1 "
                   "produces a rise of `m`."),
             ("h3", "Rearranging into the form"),
-            ("p", "The work is course 2's, applied to an equation that keeps `x` around "
-                  "as a passenger. Move every term that is not `y` to the other side, "
-                  "then divide by whatever multiplies `y` &mdash; dividing the "
-                  "<em>whole</em> side, every term:"),
+            ("p", "The work uses methods from Linear Equations and Inequalities, applied to an equation that keeps `x` around as a passenger. Move every term that is not `y` to the other side, then divide by whatever multiplies `y` &mdash; dividing the <em>whole</em> side, every term:"),
             ("math", [
                 "2x + 3y = 12",
                 "     3y = -2x + 12          subtract 2x from both sides",
@@ -848,9 +826,7 @@ LESSONS = [
              "seeing once so that a mismatch with a textbook answer does not read as an "
              "error."),
             ("Standard form is symmetric, and that is its use",
-             "`Ax + By = C` treats the two variables alike, so it covers vertical lines, "
-             "hands you both intercepts cheaply, and is the shape course 8 needs for "
-             "elimination. It hides the slope, which is the price."),
+             "`Ax + By = C` treats the two variables alike, so it covers vertical lines, hands you both intercepts cheaply, and is the shape Systems and Matrices needs for elimination. It hides the slope, which is the price."),
         ],
         "read_title": "Two forms and the choice between them",
         "read_intro": "Where each comes from, what each makes easy, and how to convert.",
@@ -908,10 +884,7 @@ LESSONS = [
                   "line: `x = 5` is `1·x + 0·y = 5`. Point-slope needs a slope to exist "
                   "and slope-intercept needs to be solvable for `y`, so both fail on "
                   "vertical lines, while standard form does not notice the difference."),
-            ("p", "Choosing between the forms is part of the skill. Point and slope, or "
-                  "two points, go to point-slope. A question about shape, steepness or "
-                  "comparison goes to slope-intercept. Intercepts, or a system to be "
-                  "solved by elimination in course 8, go to standard."),
+            ("p", "Choosing between the forms is part of the skill. Point and slope, or two points, go to point-slope. A question about shape, steepness or comparison goes to slope-intercept. Intercepts, or a system to be solved by elimination in Systems and Matrices, go to standard."),
         ],
         "lab": ("line", {
             "mode": "pointslope",
@@ -1236,11 +1209,7 @@ LESSONS = [
                      "should produce both companions for each and justify the vertical "
                      "case in words. Knowing why the product test does not apply there is "
                      "the difference between using a theorem and reciting it."),
-        "note": "Course 8 solves pairs of linear equations. The three possible outcomes "
-                "there &mdash; one solution, none, or infinitely many &mdash; are exactly "
-                "the three cases here: different slopes, equal slopes with different "
-                "intercepts, and the same line twice. The algebra in that course is "
-                "counting what this lesson sees.",
+        "note": "Systems and Matrices solves pairs of linear equations. The three possible outcomes there &mdash; one solution, none, or infinitely many &mdash; are exactly the three cases here: different slopes, equal slopes with different intercepts, and the same line twice. The algebra in that course is counting what this lesson sees.",
     },
     # ---------------------------------------------------------------- 07
     {

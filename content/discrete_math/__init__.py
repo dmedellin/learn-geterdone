@@ -39,19 +39,10 @@ PATH = {
     "level": "Beginner → Advanced",
     "level_note": "no calculus required",
     "tagline": (
-        "The mathematics of things you can count, list and check: statements that "
-        "are true or false, sets and the relations between them, proof by "
-        "induction, counting without enumerating, probability over finite "
-        "outcomes, the arithmetic of remainders, graphs, and the analysis of the "
-        "algorithms that run on all of it. Eight courses, taken front to back."
+        "Logic, proof, sets, relations, functions, induction, counting, discrete probability, number theory, graphs, and algorithm analysis."
     ),
     "description": (
-        "The Discrete Mathematics path: eight courses in one deliberate order, from "
-        "propositional logic and proof through sets, relations and functions, "
-        "induction and recursion, combinatorics, discrete probability, number theory "
-        "and cryptography, graphs and trees, and the analysis of algorithms. All "
-        "eight courses and 106 lessons are available. Every lesson is one "
-        "self-contained page whose figures are computed in your browser."
+        "Discrete Mathematics courses with definitions, proofs, worked examples, practice questions, and interactive tools for logic, counting, number theory, graphs, and algorithms."
     ),
     "key": [
         "∀n ∈ ℕ.  P(n)          proved by induction, not by checking",
@@ -62,45 +53,18 @@ PATH = {
         "T(n) = 2T(n/2) + n  ⟹  T(n) = Θ(n log n)",
     ],
     "sequence_intro": (
-        "Each course assumes the ones before it and nothing else. Course 3 proves "
-        "things about the sets built in course 2; course 5 counts the outcomes "
-        "course 4 taught you to count; course 8 analyses the structures course 7 "
-        "built."
+        "Choose a course by topic. Each course lists recommended background and its lessons."
     ),
     "why_order": [
-        "Logic comes first because everything after it is a claim that has to be "
-        "stated precisely enough to be true or false. A reader who has not settled "
-        "what `∀x ∃y P(x, y)` means cannot read a single theorem in the later "
-        "courses, and will silently misread several.",
-        "Sets, relations and functions come second because they are the vocabulary. "
-        "An equivalence relation, a bijection and a partial order each appear in "
-        "four of the six courses that follow; they are introduced once.",
-        "Induction is third rather than last because it is the proof technique the "
-        "rest of the path depends on. Counting arguments, recurrence solutions, "
-        "graph theorems and algorithm correctness are all induction wearing "
-        "different clothes.",
-        "Counting, probability and number theory then apply that machinery to three "
-        "specific worlds, and graphs give it an object to act on. Algorithms and "
-        "complexity comes last because it needs all of them: recurrences from "
-        "course 3, counting from course 4, and graphs from course 7.",
-    ],
+    "Logic and proof provide methods for stating and checking mathematical arguments. Sets, relations, and functions describe the objects those arguments concern.",
+    "Induction and recursion connect definitions, proofs, and algorithms. Counting supports discrete probability; divisibility and modular arithmetic support number theory.",
+    "Graphs represent relationships and support traversal, optimization, and structural analysis. Algorithm analysis uses counting, recurrences, and proofs to study running time and correctness."
+],
     "prerequisites": [
-        "School algebra, and nothing beyond it. You need to be comfortable "
-        "rearranging an equation, working with exponents, and reading summation "
-        "notation &mdash; the first course that uses `Σ` explains it where it "
-        "first appears.",
-        "No calculus. Nothing on this path takes a limit, a derivative or an "
-        "integral. Where a growth rate is compared to another, it is compared by "
-        "an explicit constant and threshold rather than by a limit.",
-        "No programming. Course 8 reads pseudocode and course 6 walks through "
-        "algorithms step by step, but nothing asks you to write or run code. The "
-        "labs execute in your browser so that you can watch an algorithm rather "
-        "than implement it.",
-        "Patience with definitions. The single largest difficulty in this subject "
-        "is that its words are used precisely: <em>or</em> is inclusive, "
-        "<em>some</em> means at least one, and a <em>graph</em> is not a plot. "
-        "Every one of those is stated where it first matters.",
-    ],
+    "School algebra, including rearranging equations and working with exponents, is useful.",
+    "Logic and Proof introduces the logical notation and proof techniques used across these courses. Individual courses list more specific recommended background.",
+    "No calculus or programming is required to use the interactive tools."
+],
     # The hazard of learning THIS subject from interactive examples: a widget
     # that checks a claim for n = 1..40 has demonstrated nothing about n = 41,
     # and course 3 is about exactly that.
@@ -109,12 +73,7 @@ PATH = {
         "and a worked example is not a proof."
     ),
     "footer_lead": (
-        "<strong>Educational course material.</strong> Every figure on this path is "
-        "computed in your browser from the definition the lesson states &mdash; the "
-        "counting is done in exact integer arithmetic and the probabilities as exact "
-        "fractions, so the numbers are not approximations. What the labs cannot do is "
-        "prove anything: checking a statement for the cases on screen is evidence "
-        "about those cases and nothing more, which is the subject of course 3."
+        "Discrete Mathematics definitions, proofs, examples, and interactive calculations."
     ),
     "courses": COURSES,
 }

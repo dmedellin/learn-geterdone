@@ -278,11 +278,7 @@ LESSONS = [
                      "root. When `n` is odd, `ⁿ√a` denotes the unique real root, which has "
                      "the same sign as `a`. When `n` is even and `a &lt; 0`, `ⁿ√a` is not "
                      "a real number.")),
-            ("p", "That last clause is the radical half's version of \"the denominator is "
-                  "not zero\". It is a restriction on the domain, it is decided before any "
-                  "algebra happens, and no manipulation later can be allowed to lose it. "
-                  "`√(−4)` is treated here as undefined; course 6 introduces `i` and "
-                  "gives it a value."),
+            ("p", "That last clause is the radical half's version of \"the denominator is not zero\". It is a restriction on the domain, it is decided before any algebra happens, and no manipulation later can be allowed to lose it. `√(−4)` is treated here as undefined; Quadratics and Complex Numbers introduces `i` and gives it a value."),
             ("thm", ("The identity that catches everyone",
                      "For every real `x`, `√(x²) = |x|`.",
                      "The left side is non-negative by definition of the principal root, "
@@ -505,9 +501,7 @@ LESSONS = [
             ("thm", ("The conjugate product",
                      "`(a + √b)(a − √b) = a² − b`, and more generally "
                      "`(√a + √b)(√a − √b) = a − b` for `a, b ≥ 0`.",
-                     "It is the difference of two squares from course 4, and squaring is "
-                     "exactly what removes a square root. The result contains no radical "
-                     "at all &mdash; which is the whole reason lesson 10 works.")),
+                     "It is the difference of two squares from Polynomials and Factoring, and squaring is exactly what removes a square root. The result contains no radical at all &mdash; which is the whole reason lesson 10 works.")),
             ("example", ("Two products, one with a middle term and one without",
                          "`(2 + √3)(2 − √3) = 4 − 3 = 1`: the cross terms "
                          "`−2√3` and `+2√3` cancel. But `(√5 + √2)² = 5 + 2√10 + 2 = "
@@ -936,8 +930,7 @@ LESSONS = [
              "squaring does not add a second layer of extraneous risk beyond what the "
              "final check handles."),
             ("Solve the resulting equation",
-             "It is usually linear or quadratic, and the factoring from course 4 "
-             "handles it. These are candidates, not yet solutions."),
+             "It is usually linear or quadratic, and the factoring from Polynomials and Factoring handles it. These are candidates, not yet solutions."),
             ("Substitute every candidate into the ORIGINAL equation",
              "Keep the ones that make it true and discard the rest. State the discarded "
              "ones as extraneous &mdash; an answer of \"no solution\" is a legitimate and "
@@ -1070,14 +1063,11 @@ LESSONS = [
         ],
         "key_label": "Three functions, three domains",
         "concepts_intro": (
-            "The course ends where it began: with the values that are not allowed, "
-            "found before anything is drawn."
+            "Find the values that are not allowed before drawing the graph."
         ),
         "concepts": [
             ("The domain is the solution of an inequality",
-             "For an even index, `f(x) = ⁿ√(g(x))` is defined exactly where `g(x) ≥ 0`. "
-             "Finding the domain is therefore an inequality problem from course 2, and "
-             "when `g` is a quadratic it is a sign-analysis problem from course 4."),
+             "For an even index, `f(x) = ⁿ√(g(x))` is defined exactly where `g(x) ≥ 0`. Finding the domain is therefore an inequality problem from Linear Equations and Inequalities, and when `g` is a quadratic it is a sign-analysis problem from Polynomials and Factoring."),
             ("Odd indices have no domain restriction",
              "`∛x` is defined for every real number, negatives included, and its range "
              "is every real number too. The whole difficulty of this lesson is a feature "
@@ -1100,10 +1090,7 @@ LESSONS = [
                   "inequality. A denominator excludes isolated points; an even radical "
                   "excludes whole intervals."),
             ("example", ("Three domains",
-                         "`√(x − 3)` needs `x − 3 ≥ 0`, so `x ≥ 3`. "
-                         "`√(5 − x)` needs `5 − x ≥ 0`, so `x ≤ 5` &mdash; the "
-                         "inequality reverses, exactly as in course 2. `∛(x − 3)` "
-                         "needs nothing: its domain is all real numbers.")),
+                         "`√(x − 3)` needs `x − 3 ≥ 0`, so `x ≥ 3`. `√(5 − x)` needs `5 − x ≥ 0`, so `x ≤ 5` &mdash; the inequality reverses, exactly as in Linear Equations and Inequalities. `∛(x − 3)` needs nothing: its domain is all real numbers.")),
             ("h3", "When the radicand is a quadratic"),
             ("p", "For `h(x) = √(x² − 9)` the requirement is `x² − 9 ≥ 0`, "
                   "that is `(x − 3)(x + 3) ≥ 0`. A product of two factors is "
@@ -1121,20 +1108,12 @@ LESSONS = [
                      "It is the reflection of `y = x²` restricted to `x ≥ 0` in the line "
                      "`y = x`, which is what makes it that function's inverse &mdash; and "
                      "why the restriction is needed at all.")),
-            ("p", "The transformations from course 3 apply unchanged. In "
-                  "`y = a·√(x − h) + k` the graph starts at `(h, k)` instead of the "
-                  "origin; `h` shifts the domain to `x ≥ h`, `k` shifts the range to "
-                  "`y ≥ k`, and a negative `a` flips it downwards so the range becomes "
-                  "`y ≤ k`. The endpoint is the one point worth plotting exactly."),
+            ("p", "The transformations from Lines, Functions and Graphs apply unchanged. In `y = a·√(x − h) + k` the graph starts at `(h, k)` instead of the origin; `h` shifts the domain to `x ≥ h`, `k` shifts the range to `y ≥ k`, and a negative `a` flips it downwards so the range becomes `y ≤ k`. The endpoint is the one point worth plotting exactly."),
             ("p", "One last connection back to lesson 8. The function `f(x) = √(x²)` is "
                   "defined for every real `x`, since `x²` is never negative &mdash; but "
                   "its graph is not the line `y = x`. It is `y = |x|`, a V with its "
                   "vertex at the origin. The identity from lesson 8, drawn."),
-            ("p", "Everywhere in this course `√(−4)` has been outside the domain, "
-                  "and every domain here has been a set of real numbers. Course 6 "
-                  "introduces `i` and gives negative radicands values; nothing in this "
-                  "course anticipates that, and the domains stated here are the correct "
-                  "ones for real-valued functions."),
+            ("p", "Everywhere in this course `√(−4)` has been outside the domain, and every domain here has been a set of real numbers. Quadratics and Complex Numbers introduces `i` and gives negative radicands values; nothing in this course anticipates that, and the domains stated here are the correct ones for real-valued functions."),
         ],
         "lab": ("grapher", {
             "mode": "radical",
@@ -1246,8 +1225,7 @@ LESSONS = [
              "The inequality `x² − 9 ≥ 0` is the only thing that reveals the gap "
              "between `−3` and `3`."),
             ("Forgetting to reverse the inequality",
-             "`5 − x ≥ 0` gives `x ≤ 5`, not `x ≥ 5`. Dividing or multiplying an "
-             "inequality by a negative flips it, exactly as in course 2."),
+             "`5 − x ≥ 0` gives `x ≤ 5`, not `x ≥ 5`. Dividing or multiplying an inequality by a negative flips it, exactly as in Linear Equations and Inequalities."),
             ("Excluding the endpoint",
              "The condition is radicand `≥ 0`, not `&gt; 0`. `√0 = 0` is defined, so the "
              "endpoint belongs to the domain and the graph starts with a closed point."),
@@ -1260,10 +1238,6 @@ LESSONS = [
                      "points you chose to be exact. A graph drawn before the domain is "
                      "known is a graph that will be drawn over an interval where the "
                      "function does not exist."),
-        "note": "That closes the course, and it closes it on the sentence it opened with: "
-                "find the values that are not allowed, and find them first. A denominator "
-                "gave isolated exclusions, an even radical gives whole intervals, and both "
-                "are invisible in an answer that was simplified before the domain was "
-                "written down.",
+        "note": "Identify excluded values before simplifying. A denominator gives isolated exclusions, an even radical gives whole intervals, and both can be lost from an answer simplified before the domain was written down.",
     },
 ]

@@ -2454,10 +2454,12 @@ def step_theme_script(text, ctx):
 
 def build_breadcrumb(ctx, indent="    "):
     lesson = ctx["lesson"]
-    label = "Lesson %s &middot; %s" % (lesson.ordinal, text_escape(lesson.title))
+    label = text_escape(lesson.title)
     return (
         '{i}<nav class="crumbs" aria-label="Breadcrumb">\n'
         '{i}  <a href="../../">Learn library</a>\n'
+        '{i}  <span class="crumb-sep" aria-hidden="true">/</span>\n'
+        '{i}  <a href="../../paths/trading/">Trading</a>\n'
         '{i}  <span class="crumb-sep" aria-hidden="true">/</span>\n'
         '{i}  <a href="../">{course}</a>\n'
         '{i}  <span class="crumb-sep" aria-hidden="true">/</span>\n'
@@ -2509,7 +2511,7 @@ def build_pager(ctx, indent="    "):
         # out of the course carries no rel and no ordinal in its label.
         rows.append(
             '{i}  <a class="lesson-link next" href="../">'
-            "<span>Next</span><strong>Course home</strong></a>".format(i=indent)
+            "<span>Course overview</span><strong>{course}</strong></a>".format(i=indent, course=text_escape(ctx["course_title"]))
         )
     return "%s%s\n%s\n%s</nav>" % (indent, LESSON_NAV_MARKUP, "\n".join(rows), indent)
 

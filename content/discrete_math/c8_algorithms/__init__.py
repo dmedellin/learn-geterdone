@@ -13,9 +13,10 @@ COURSE = {
         "classes, and the limits of computation."
     ),
     "blurb": (
-        "The course the rest of the path was building toward. Recurrences from course 3, "
-        "counting from course 4 and graphs from course 7 all reappear as the running "
-        "time of something &mdash; and the last two lessons say what no algorithm can do."
+        (
+        "Use recurrences, counting, and graphs to analyze running time, compare algorithm "
+        "designs, and distinguish tractable, intractable, and undecidable problems."
+    )
     ),
     "key": [
         "f(n) = O(g(n))   ⟺   ∃C, k.  f(n) ≤ C·g(n)  for all n ≥ k",
@@ -23,7 +24,7 @@ COURSE = {
         "P ⊆ NP;  whether the inclusion is strict is open",
         "some problems have NO algorithm at all",
     ],
-    "assumes_short": "Courses 1–7",
+    "assumes_short": "Induction, recurrences, and graphs",
     "assumes_long": "especially induction, recurrences and graphs",
     "outcomes_intro": (
         "By the end you can analyse an algorithm you are shown and recognise when a "

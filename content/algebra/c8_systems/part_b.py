@@ -542,10 +542,7 @@ LESSONS = [
         "read_title": "Feasible regions and the corner point theorem",
         "read_intro": "Shading by test point, finding corners by elimination, and the theorem that says corners are enough.",
         "body": [
-            ("p", "Course 3 ended with a single linear inequality in two variables: draw "
-                  "the boundary line, decide which side, shade it. Everything here is "
-                  "that, done several times on one set of axes, and then asked a "
-                  "question."),
+            ("p", "Lines, Functions and Graphs ended with a single linear inequality in two variables: draw the boundary line, decide which side, shade it. Everything here is that, done several times on one set of axes, and then asked a question."),
             ("def", ("Solution of a linear inequality in two variables",
                      "The set of points `(x, y)` making the statement true. For a "
                      "linear inequality it is a <strong>half-plane</strong>: everything "
@@ -757,10 +754,6 @@ LESSONS = [
                      "point and its value. For an unbounded region, exhibit a feasible "
                      "ray or a global bound instead of citing the bounded theorem. Saying "
                      "\"the maximum is 34\" without saying where is half an answer."),
-        "note": "Everything expensive in this lesson was elimination: each corner is a "
-                "2 by 2 system, solved exactly as in lesson 3. That is the course's "
-                "first half in service of a question it could not have asked. This is "
-                "the last lesson of the course; course 9 takes up objects that are "
-                "ordered lists rather than solution sets.",
+        "note": "Each corner in this lesson is a 2 by 2 system, solved by elimination. Sequences and Series studies objects that are ordered lists rather than solution sets.",
     },
 ]

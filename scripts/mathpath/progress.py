@@ -44,7 +44,7 @@ PROGRESS_JS = r"""
 
 # The control a LESSON page carries, in the pager region.
 LESSON_MARKUP = """
-    <div class="progress-bar">
+    <div class="progress-bar" data-ui="progress">
       <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
         <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
       </button>
@@ -63,7 +63,7 @@ LESSON_JS = """
       var on = window.learnProgress.done(id);
       button.classList.toggle('is-done', on);
       button.setAttribute('aria-pressed', on ? 'true' : 'false');
-      label.textContent = on ? 'Completed' : 'Mark this lesson complete';
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
     }
     button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
     paint();
@@ -82,6 +82,8 @@ COURSE_JS = """
       items.forEach(function (item) {
         var on = window.learnProgress.done(item.getAttribute('data-lesson'));
         item.classList.toggle('is-done', on);
+        var state = item.querySelector('.lesson-state');
+        if (state) state.textContent = on ? 'Marked complete' : 'Not marked';
         if (on) n += 1;
       });
       if (out) {
@@ -106,7 +108,7 @@ PATH_JS = """
       var n = Object.keys(marks).filter(function (k) { return k.indexOf(slug + '/') === 0; }).length;
       var out = item.querySelector('.spine-progress');
       if (!out || !total) return;
-      out.textContent = n ? n + ' of ' + total + ' done' : '';
+      out.textContent = n ? n + ' of ' + total + ' lessons marked complete' : '';
       item.classList.toggle('is-started', n > 0);
       item.classList.toggle('is-complete', n >= total);
     });
