@@ -583,6 +583,15 @@
       overflow-x: auto;
     }
     .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
 
     /* ---------- Graphs ----------
        Tokens only. A component override scoped to [data-theme="light"] would
@@ -1040,6 +1049,7 @@
       font-size: 0.9rem;
       resize: vertical;
     }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
     .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
     .fb-actions {
       display: flex;
@@ -1132,6 +1142,7 @@
     [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
     [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
     [data-ui="hero"] .eyebrow { display: block; color: var(--muted); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
     [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
     [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
     [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
@@ -1176,7 +1187,7 @@
     }
     [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
     [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
-    [data-ui="lesson-list"] .lesson-link { min-height: 44px; }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
     body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
     body[data-page-kind] .is-done .lesson-state { color: var(--green); }
     [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
@@ -1297,13 +1308,13 @@ row 2, col 1 :   3(2)  + (−1)(0) +  4(5)  =  26
 row 2, col 2 :   3(1)  + (−1)(−3) + 4(2)  =  14
 
 CD =    2  −5             DC exists too, and is 3 × 3
-       26  14</div><p>The definition looks arbitrary until a system is written with it. Take the coefficient matrix of the lesson-4 system, a column of the three unknowns, and a column of the three constants. The product of the first two is a column whose entries are the left-hand sides of the three equations, so the whole system is the single statement <span class="math">Ax = b</span>.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation"> 1   1   1     x            6
+       26  14</div><p>The definition looks arbitrary until a system is written with it. Take the coefficient matrix of the “Systems in Three Variables” system, a column of the three unknowns, and a column of the three constants. The product of the first two is a column whose entries are the left-hand sides of the three equations, so the whole system is the single statement <span class="math">Ax = b</span>.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation"> 1   1   1     x            6
  2  −1   3     y     =      9
 −1   2   4     z           15
 
 at (1, 2, 3):    1(1) + 1(2) + 1(3)  =   6    ✓
                  2(1) − 1(2) + 3(3)  =   9    ✓
-                −1(1) + 2(2) + 4(3)  =  15    ✓</div><p>Even when both products exist, order must be preserved: <span class="math">AB</span> and <span class="math">BA</span> can have different sizes or different entries. The arithmetic lesson here is deliberately narrow &mdash; decide existence, state the output size, and build each entry from the named row and column. Lesson 9 introduces the identity and inverse when a system needs a matrix operation to be undone.</p></article>
+                −1(1) + 2(2) + 4(3)  =  15    ✓</div><p>Even when both products exist, order must be preserved: <span class="math">AB</span> and <span class="math">BA</span> can have different sizes or different entries. The arithmetic lesson here is deliberately narrow &mdash; decide existence, state the output size, and build each entry from the named row and column. “Inverse Matrices” introduces the identity and inverse when a system needs a matrix operation to be undone.</p></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>Matrix arithmetic</h2></div><p>Sum, difference, scalar multiple and product, with every entry derived</p></div>
@@ -1380,7 +1391,7 @@ BA =   3   4
     <section class="section">
       <div class="grid-2">
         <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Multiplying entry by entry</strong><span>The matrix of products of matching entries is a real operation with real uses, and it is not <span class="math">AB</span>. For the two matrices in the worked example it would give <span class="math">0</span>, <span class="math">2</span>, <span class="math">3</span>, <span class="math">0</span>, which is neither product.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Putting a correct number in the wrong position</strong><span>An entry is named before it is computed: row <span class="math">i</span> of the left matrix against column <span class="math">j</span> of the right. Using the right row with the wrong column can produce impeccable arithmetic in a matrix that answers a different product.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Assuming AB exists because BA does</strong><span>A <span class="math">3 × 2</span> times a <span class="math">2 × 5</span> is fine; the same two matrices in the other order pair <span class="math">5</span> against <span class="math">3</span> and there is no product at all. Write the two sizes down before reaching for the arithmetic.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when the size of the answer is the first thing you write.</strong><p>Before computing a single entry, write <span class="math">m × p</span> down. It catches an impossible product before any arithmetic happens, it tells you how many entries you owe, and it is the habit that makes <span class="math">Ax = b</span> in lesson 9 read as one equation rather than as three.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Writing a system as <span class="math">Ax = b</span> invites the obvious move: divide by <span class="math">A</span>. There is no division of matrices, but there is sometimes a matrix that undoes multiplication by <span class="math">A</span>. Lesson 8 produces the single number that decides whether such a matrix exists, and lesson 9 defines it as <span class="math">A⁻¹</span>, constructs it by row reduction, and turns the system into <span class="math">x = A⁻¹b</span> &mdash; which is the reason this course did lesson 6 first.</div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when the size of the answer is the first thing you write.</strong><p>Before computing a single entry, write <span class="math">m × p</span> down. It catches an impossible product before any arithmetic happens, it tells you how many entries you owe, and it is the habit that makes <span class="math">Ax = b</span> in “Inverse Matrices” read as one equation rather than as three.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Writing a system as <span class="math">Ax = b</span> invites the obvious move: divide by <span class="math">A</span>. There is no division of matrices, but there is sometimes a matrix that undoes multiplication by <span class="math">A</span>. “Determinants and Cramer's Rule” produces the single number that decides whether such a matrix exists, and “Inverse Matrices” defines it as <span class="math">A⁻¹</span>, constructs it by row reduction, and turns the system into <span class="math">x = A⁻¹b</span> &mdash; which is why constructing an inverse requires the row-reduction method of “Gaussian Elimination”.</div></article>
       </div>
     </section>
     </main>

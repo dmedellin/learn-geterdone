@@ -8,10 +8,7 @@ LESSONS = [
         "module": "Exponents and radicals",
         "one_line": "Why x^(1/n) must mean the n-th root if the laws are to hold.",
         "summary": (
-            "Nothing so far says what `x^(1/2)` means. Rather than invent a meaning, ask "
-            "which meaning keeps the exponent laws of lesson 6 true &mdash; and there is "
-            "only one. That answer is the n-th root, and everything about rational "
-            "exponents follows from it."
+            'The integer-exponent laws do not define what `x^(1/2)` means. Rather than invent a meaning, ask which meaning keeps the exponent laws of “Integer Exponents” true &mdash; and there is only one. That answer is the n-th root, and everything about rational exponents follows from it.'
         ),
         "key": [
             "(x^(1/n))ⁿ  =  x^(n·(1/n))  =  x¹  =  x   so x^(1/n) is an n-th root",
@@ -27,10 +24,7 @@ LESSONS = [
         ),
         "concepts": [
             ("The laws come first, the definition second",
-             "Lesson 6 established `x^m · x^n = x^(m+n)` for whole numbers. If that "
-             "sentence is to survive when `m` and `n` are fractions, then `x^(1/n)` "
-             "raised to the power `n` has to be `x`. There is nothing left to choose "
-             "about it."),
+             '“Integer Exponents” established `x^m · x^n = x^(m+n)` for whole numbers. If that sentence is to survive when `m` and `n` are fractions, then `x^(1/n)` raised to the power `n` has to be `x`. There is nothing left to choose about it.'),
             ("A rational exponent is a root and a power, in either order",
              "`x^(p/q)` is the `q`-th root of `x`, raised to `p` &mdash; and it is also "
              "the `q`-th root of `x^p`. The two routes give the same number, and one of "
@@ -44,13 +38,7 @@ LESSONS = [
         "read_title": "What the exponent laws force",
         "read_intro": "One derivation, one definition, and the single restriction the definition needs.",
         "body": [
-            ("p", "Lesson 6 gave the exponent laws for whole-number exponents, and "
-                  "extended them to `0` and to negatives by the same argument each time: "
-                  "define the new symbol so that the old law keeps working. `x⁰ = 1` "
-                  "because `x^n · x⁰` has to be `x^n`; `x^(−n) = 1/x^n` because "
-                  "`x^n · x^(−n)` has to be `x⁰ = 1`. `x^(1/2)` is the next gap, and it "
-                  "is filled the same way: ask what the laws would require of it, and "
-                  "see whether anything is left over to decide."),
+            ("p", '“Integer Exponents” gave the exponent laws for whole-number exponents, and extended them to `0` and to negatives by the same argument each time: define the new symbol so that the old law keeps working. `x⁰ = 1` because `x^n · x⁰` has to be `x^n`; `x^(−n) = 1/x^n` because `x^n · x^(−n)` has to be `x⁰ = 1`. `x^(1/2)` is the next gap, and it is filled the same way: ask what the laws would require of it, and see whether anything is left over to decide.'),
             ("thm", ("What a unit fraction exponent has to be",
                      "Let `n` be a whole number with `n ≥ 2`. If the law "
                      "`x^m · x^n = x^(m+n)` is to hold for fractional exponents, then "
@@ -61,9 +49,7 @@ LESSONS = [
                 "is `x` raised to `1/n + 1/n + ... + 1/n`, with `n` terms.",
                 "That sum is `n · (1/n) = 1`, so the product is `x¹ = x`.",
             ]),
-            ("p", "So `x^(1/n)` is a number whose `n`-th power is `x`. That is exactly "
-                  "the definition of an `n`-th root of `x`, from lesson 8. The notation "
-                  "was not chosen to be memorable; it was forced."),
+            ("p", 'So `x^(1/n)` is a number whose `n`-th power is `x`. That is exactly the definition of an `n`-th root of `x`, from “Roots and Radicals”. The notation was not chosen to be memorable; it was forced.'),
             ("p", "One thing is still open. When `n` is even and `x` is positive there "
                   "are <em>two</em> real numbers whose `n`-th power is `x` &mdash; `2` and "
                   "`−2` both give `16` when raised to the fourth. The argument above "
@@ -78,9 +64,7 @@ LESSONS = [
                      "By the power-of-a-power law this is also `(x^p)^(1/q)`, the `q`-th "
                      "root of `x^p`. Both descriptions name the same number, so you may "
                      "take whichever is easier to compute.",
-                     "For a negative exponent and `x &gt; 0`, `x^(−p/q) = 1 / x^(p/q)`, "
-                     "exactly as in lesson 6. The minus sign produces a reciprocal, never "
-                     "a negative number. At `x = 0` that reciprocal has no value.")),
+                     'For a negative exponent and `x &gt; 0`, `x^(−p/q) = 1 / x^(p/q)`, exactly as in “Integer Exponents”. The minus sign produces a reciprocal, never a negative number. At `x = 0` that reciprocal has no value.')),
             ("math", [
                 "8^(2/3)      root first    cube root of 8 = 2,   then 2² = 4",
                 "             power first   8² = 64,              then cube root of 64 = 4",
@@ -108,8 +92,7 @@ LESSONS = [
                   "source, and it costs nothing: when you genuinely want the cube root of "
                   "`−8` you write it as a root, where it is unambiguously `−2`."),
             ("h3", "The laws, unchanged"),
-            ("p", "The payoff is that every law from lesson 6 now applies to fractional "
-                  "exponents with no new cases:"),
+            ("p", 'The payoff is that every law from “Integer Exponents” now applies to fractional exponents with no new cases:'),
             ("math", [
                 "x^(1/2) · x^(1/3)  =  x^(1/2 + 1/3)  =  x^(5/6)",
                 "(x⁶)^(1/3)         =  x^(6/3)        =  x²",
@@ -178,10 +161,7 @@ LESSONS = [
             "after": [
                 "Line 3 is the argument for taking the root first, in one line of "
                 "evidence: `3⁴` is arithmetic you can do in your head, and `27⁴` is not.",
-                "The two routes agreeing is a check on this particular calculation and "
-                "nothing more. What guarantees they always agree, for `x ≥ 0`, is the "
-                "power-of-a-power law from lesson 6 &mdash; a general statement, proved "
-                "there, which these three examples illustrate but do not establish.",
+                'The two routes agreeing is a check on this particular calculation and nothing more. What guarantees they always agree, for `x ≥ 0`, is the power-of-a-power law from “Integer Exponents” &mdash; a general statement, proved there, which these three examples illustrate but do not establish.',
                 "Fade the two-route table for `27^(2/3)`: write only \"cube root first\" "
                 "and finish it yourself. The root is `3` and the square gives `9`. An "
                 "answer of `6` treats the exponent as multiplication; `729` takes the "
@@ -235,7 +215,7 @@ LESSONS = [
                      "with that negative exponent, and answer why `x^(1/2)` is a square "
                      "root rather than half of `x`: the exponent law leaves no alternative, "
                      "and convention only chooses which root the notation names."),
-        "note": "Every radical you meet from here on can be written as a rational power, and it is usually worth doing. Rational and Radical Expressions simplifies expressions like `√(x⁵)` by rewriting them as `x^(5/2)` and using the laws you already have, rather than by inventing separate rules for radicals.",
+        "note": 'Radicals can be written as rational powers, and it is usually worth doing. Rational and Radical Expressions simplifies expressions like `√(x⁵)` by rewriting them as `x^(5/2)` and using the laws you already have, rather than by inventing separate rules for radicals.',
     },
     # --------------------------------------------- algebraic-expressions-and-terms
     {
@@ -256,14 +236,11 @@ LESSONS = [
         ],
         "key_label": "Reading an expression",
         "concepts_intro": (
-            "Almost every error in the next four lessons is an error of reading rather "
-            "than of arithmetic: the wrong piece was treated as a unit."
+            'Almost every error in distributing, combining like terms, evaluating and translating expressions is an error of reading rather than of arithmetic: the wrong piece was treated as a unit.'
         ),
         "concepts": [
             ("A letter is a number whose value is not being supplied",
-             "It is not a new kind of object and it obeys no new rules. Everything in "
-             "the arithmetic prerequisite and the reading convention of lesson 2 applies "
-             "to `x`, because whatever number `x` is, those statements remain true."),
+             'It is not a new kind of object and it obeys no new rules. Everything in the arithmetic prerequisite and the reading convention of “Order of Operations” applies to `x`, because whatever number `x` is, those statements remain true.'),
             ("Terms are separated by plus and minus signs, at the top level",
              "That is the whole rule for finding them, and it is why brackets matter so "
              "much: a plus sign inside a bracket does not separate terms. `5(x + 2)` is "
@@ -300,10 +277,7 @@ LESSONS = [
                 "        term 2   −5x          the minus sign belongs to it",
                 "        term 3   7",
             ]),
-            ("p", "Writing the subtraction as an addition once, as above, is worth the "
-                  "line. Lesson 4 will license reordering these terms by commutativity of "
-                  "addition. For now the reading skill is narrower: if a term eventually "
-                  "moves, its attached sign must move with it."),
+            ("p", 'Writing the subtraction as an addition once, as above, is worth the line. “Properties of the Real Numbers” licenses reordering these terms by commutativity of addition. The reading skill here is narrower: if a term eventually moves, its attached sign must move with it.'),
             ("def", ("Coefficient and variable part",
                      "A term that is a number times a product of variables splits into a "
                      "<strong>coefficient</strong> &mdash; the numerical factor, sign "
@@ -318,14 +292,7 @@ LESSONS = [
                   "simply not printed, because writing it would add nothing."),
             ("h3", "Terms and factors are different things"),
             ("p", "Terms are what an expression is added out of. <strong>Factors</strong> are what a term is multiplied out of. `4xy` is a single term with factors `4`, `x` and `y`. Confusing the two is what makes people cancel across a plus sign, and it causes real damage in Rational and Radical Expressions."),
-            ("p", "A bracket makes this visible. `5(x + 2)` is one term, because there is "
-                  "no top-level `+` or `−` anywhere in it: it is a product of the two "
-                  "factors `5` and `(x + 2)`. Multiply it out and you get `5x + 10`, "
-                  "which is two terms. Both expressions have the same value for every "
-                  "`x`; lesson 10 proves that with distribution. They do not have the same "
-                  "number of terms. So \"how many terms\" "
-                  "is a question about a particular way of writing, and the honest answer "
-                  "names the form: one as written, two expanded."),
+            ("p", 'A bracket makes this visible. `5(x + 2)` is one term, because there is no top-level `+` or `−` anywhere in it: it is a product of the two factors `5` and `(x + 2)`. Multiply it out and you get `5x + 10`, which is two terms. Both expressions have the same value for every `x`; “The Distributive Law” proves that with distribution. They do not have the same number of terms. So "how many terms" is a question about a particular way of writing, and the honest answer names the form: one as written, two expanded.'),
             ("def", ("Degree",
                      "The <strong>degree of a term</strong> is the sum of the exponents "
                      "on its variables. The <strong>degree of an expression</strong> is "
@@ -333,11 +300,7 @@ LESSONS = [
                      "combined.",
                      "`4xy` has degree `1 + 1 = 2`. A constant term such as `7` has "
                      "degree `0`, since `7 = 7x⁰`.")),
-            ("p", "The qualification about combining is a preview of lesson 11. In "
-                  "`5x − 5x + 4` the "
-                  "highest degree written on the page is `1`, but the two `x` terms sum "
-                  "to `0` and the expression is `4`, of degree `0`. Degree describes the "
-                  "expression, not the ink."),
+            ("p", 'The qualification about combining is explained in “Combining Like Terms”. In `5x − 5x + 4` the highest degree written on the page is `1`, but the two `x` terms sum to `0` and the expression is `4`, of degree `0`. Degree describes the expression, not the ink.'),
             ("example", ("Two expressions, read part by part",
                          "`4xy − y² + 2` has three terms. Their coefficients are `4`, "
                          "`−1` and `2`; their degrees are `2`, `2` and `0`; the "
@@ -349,7 +312,7 @@ LESSONS = [
         "lab": ("expression", {
             "mode": "terms",
             "panel_title": "Take an expression apart",
-            "panel_intro": "Type an expression and the lab splits it at its top-level `+` and `−` signs, naming the coefficient and degree of each term. It also expands the expression and counts the terms again, so feed it `5(x + 2)` and predict the as-written count first. The expanded count previews lesson 10; the degree column previews Polynomials and Factoring and is not part of this lesson's completion standard.",
+            "panel_intro": "Type an expression and the lab splits it at its top-level `+` and `−` signs, naming the coefficient and degree of each term. It also expands the expression and counts the terms again, so feed it `5(x + 2)` and predict the as-written count first. The expanded count illustrates “The Distributive Law”; the degree column illustrates a topic in Polynomials and Factoring and is not part of this lesson's completion standard.",
         }),
         "steps_title": "Reading an expression correctly",
         "steps_intro": "Four passes. Do them in order; the bracket pass changes everything after it.",
@@ -391,10 +354,7 @@ LESSONS = [
                 "        combined     4,  a single term of degree 0",
             ],
             "after": [
-                "The coefficient `−1` in the first line is the one people leave blank or "
-                "call `0`. It is neither. `−x` contributes `−1` of an `x` to every sum it "
-                "is in, and in lesson 11 that `−1` has to be added to other coefficients "
-                "like any other number.",
+                'The coefficient `−1` in the first line is the one people leave blank or call `0`. It is neither. `−x` contributes `−1` of an `x` to every sum it is in, and in “Combining Like Terms” that `−1` has to be added to other coefficients like any other number.',
                 "The last line shows why degree is read after combining and not before. "
                 "Nothing about `5x − 5x + 4` looks like a constant until the middle step "
                 "is done.",
@@ -446,11 +406,8 @@ LESSONS = [
              "three terms, because the leading `−` separates nothing."),
         ],
         "standard": ("Finish when you can point at every term, sign included, without pausing.",
-                     "For `−4x²y + y − 2(x + 1)`, name the terms as written, the sign and "
-                     "coefficient of each monomial term, and every factor of the bracketed "
-                     "term. Do not expand it: lesson 10 owns that move. The reading is "
-                     "finished when another reader can point to the same pieces."),
-        "note": "The vocabulary here is not decoration. \"Combine like terms\" in lesson 11, \"cancel a common factor\" in Rational and Radical Expressions and \"the leading coefficient\" in Polynomials and Factoring are all instructions that name one of these parts, and following them requires having found the right part first.",
+                     'For `−4x²y + y − 2(x + 1)`, name the terms as written, the sign and coefficient of each monomial term, and every factor of the bracketed term. Do not expand it: “The Distributive Law” owns that move. The reading is finished when another reader can point to the same pieces.'),
+        "note": 'The vocabulary here is not decoration. "Combine like terms" in “Combining Like Terms”, "cancel a common factor" in Rational and Radical Expressions and "the leading coefficient" in Polynomials and Factoring are all instructions that name one of these parts, and following them requires having found the right part first.',
     },
     # --------------------------------------------------------- the-distributive-law
     {
@@ -477,10 +434,7 @@ LESSONS = [
         ),
         "concepts": [
             ("It is an axiom, not a consequence",
-             "Nothing proves `a(b + c) = ab + ac` from the other properties &mdash; it is "
-             "one of the assumed properties of the real numbers, stated in lesson 4. That "
-             "is worth knowing, because it means the law is exactly as broad as it is "
-             "stated and not one case broader."),
+             'Nothing proves `a(b + c) = ab + ac` from the other properties &mdash; it is one of the assumed properties of the real numbers, stated in “Properties of the Real Numbers”. That is worth knowing, because it means the law is exactly as broad as it is stated and not one case broader.'),
             ("The factor outside reaches every term inside",
              "Every term, not the first one. When the factor is an invisible `−1`, as in "
              "`−(x − 7)`, this is the single most common error in school algebra and it "
@@ -513,11 +467,7 @@ LESSONS = [
                 "−(x − 7)     =  (−1)·x + (−1)·(−7) =  −x + 7",
                 "(1/2)(4x − 6) = (1/2)(4x) + (1/2)(−6) = 2x − 3",
             ]),
-            ("p", "Line three is the one to study. A minus sign in front of a bracket is "
-                  "a factor of `−1`, and it multiplies <em>every</em> term inside. "
-                  "`−(x − 7)` is `−x + 7`; it is not `−x − 7`. Nothing here is being "
-                  "remembered &mdash; each sign is computed, and `(−1)(−7) = +7` is a "
-                  "fact from lesson 4."),
+            ("p", 'Line three is the one to study. A minus sign in front of a bracket is a factor of `−1`, and it multiplies <em>every</em> term inside. `−(x − 7)` is `−x + 7`; it is not `−x − 7`. Nothing here is being remembered &mdash; each sign is computed, and `(−1)(−7) = +7` is a fact from “Properties of the Real Numbers”.'),
             ("p", "The habit worth forming is to write the `−1` in. It costs a symbol and "
                   "converts a sign question into a multiplication, which you can do."),
             ("h3", "More terms, and more factors"),
@@ -706,17 +656,12 @@ LESSONS = [
                      "letters match but the exponents are attached to different ones. "
                      "Constant terms are all alike, since each has an empty variable "
                      "part.")),
-            ("p", "The order in which the letters are written does not affect anything, "
-                  "because multiplication is commutative (lesson 4). `3xy` and `2yx` have "
-                  "the same variable part written two ways, and they are like terms. "
-                  "Sorting the letters alphabetically inside every term is a cheap habit "
-                  "that makes this visible instead of a judgement call."),
+            ("p", 'The order in which the letters are written does not affect anything, because multiplication is commutative (“Properties of the Real Numbers”). `3xy` and `2yx` have the same variable part written two ways, and they are like terms. Sorting the letters alphabetically inside every term is a cheap habit that makes this visible instead of a judgement call.'),
             ("thm", ("Why like terms combine",
                      "For any numbers `a` and `b` and any variable part `v`, "
                      "`av + bv = (a + b)v`.")),
             ("proof", [
-                "This is the distributive law `ac + bc = (a + b)c` of lesson 10, read "
-                "from right to left, with `c` taken to be the variable part `v`.",
+                'This is the distributive law `ac + bc = (a + b)c` of “The Distributive Law”, read from right to left, with `c` taken to be the variable part `v`.',
                 "The law holds for all real numbers, and `v` stands for a real number "
                 "whatever value the letters in it take, so the statement holds for every "
                 "value of every variable involved.",
@@ -729,9 +674,7 @@ LESSONS = [
                 "",
                 "  answer   :   2x + 6y",
             ]),
-            ("p", "The `−x` contributes `−1`, not `−0` and not `+1`. This is the "
-                  "invisible coefficient from lesson 3 doing real work: `3 − 1 = 2`, and "
-                  "a reader who treats `−x` as contributing nothing gets `3x` instead."),
+            ("p", 'The `−x` contributes `−1`, not `−0` and not `+1`. This is the invisible coefficient from “Variables, Expressions, and Terms” doing real work: `3 − 1 = 2`, and a reader who treats `−x` as contributing nothing gets `3x` instead.'),
             ("h3", "Four ways two terms fail to be alike"),
             ("ul", [
                 "<strong>Different exponent on the same letter.</strong> `x²` and `x³`. "
@@ -772,8 +715,7 @@ LESSONS = [
         "steps_intro": "Step 1 is skipped more often than it is done, and step 1 is what makes the rest safe.",
         "steps": [
             ("Expand every bracket first",
-             "Terms inside a bracket are not available to be collected. Distribute, using "
-             "lesson 10, and only then look at what you have."),
+             'Terms inside a bracket are not available to be collected. Distribute, using “The Distributive Law”, and only then look at what you have.'),
             ("Attach every sign to the term that follows it",
              "Rewrite the expression as a sum of signed terms if that helps. A term "
              "carried across the page without its sign is the commonest way a correct "
@@ -842,9 +784,7 @@ LESSONS = [
         ],
         "mistakes": [
             ("Adding the exponents instead of the coefficients",
-             "`3x² + 5x² = 8x²`. Exponents add when powers are <em>multiplied</em>, which "
-             "is lesson 6. Adding like terms leaves the variable part exactly as it was, "
-             "and only the coefficients change."),
+             '`3x² + 5x² = 8x²`. Exponents add when powers are <em>multiplied</em>, as explained in “Integer Exponents”. Adding like terms leaves the variable part exactly as it was, and only the coefficients change.'),
             ("Writing `3x + 4y = 7xy`",
              "There is nothing to combine: the variable parts differ, so no common factor "
              "can be taken out. Testing at `x = 1, y = 1` gives `7` on both sides and "
@@ -856,7 +796,7 @@ LESSONS = [
         ],
         "standard": ("Finish when you can say instantly whether two terms may be added, and why.",
                      "Expand and collect `3(2x − y) − x + 4y − 7`, marking every group by its variable part before adding coefficients. Justify each merge by the distributive law read backwards and explain why an unlike term stays. Linear Equations and Inequalities collects on each side of an equation and preserves every sign error made here."),
-        "note": "This is the last of the three reading skills. Lesson 3 found the terms, lesson 10 got them out of their brackets, and this lesson decides which may be merged. Polynomials and Factoring does the same three things to polynomials and calls it addition.",
+        "note": 'These three reading skills work together. “Variables, Expressions, and Terms” finds the terms, “The Distributive Law” gets them out of their brackets, and this lesson decides which may be merged. Polynomials and Factoring does the same three things to polynomials and calls it addition.',
     },
     # --------------------------------------------------------- evaluating-expressions
     {
@@ -865,10 +805,7 @@ LESSONS = [
         "module": "Building expressions",
         "one_line": "Substitution done carefully, brackets and all.",
         "summary": (
-            "Evaluating means replacing every occurrence of a letter with the same "
-            "number and then doing arithmetic under the rules of lesson 2. One discipline "
-            "removes almost every error: write the substituted value inside brackets, "
-            "every time, whether it looks necessary or not."
+            'Evaluating means replacing every occurrence of a letter with the same number and then doing arithmetic under the rules of “Order of Operations”. One discipline removes almost every error: write the substituted value inside brackets, every time, whether it looks necessary or not.'
         ),
         "key": [
             "x²    at x = −3    →   (−3)²   =    9",
@@ -899,10 +836,7 @@ LESSONS = [
         "read_intro": "One discipline, and the three places it is what saves you.",
         "body": [
             ("def", ("Evaluate",
-                     "To <strong>evaluate</strong> an expression at given values is to "
-                     "replace every occurrence of each variable by its value and then "
-                     "carry out the arithmetic, using the order of operations from "
-                     "lesson 2.",
+                     'To <strong>evaluate</strong> an expression at given values is to replace every occurrence of each variable by its value and then carry out the arithmetic, using the order of operations from “Order of Operations”.',
                      "The result is a single number, or else a statement that the "
                      "expression has no value there.")),
             ("p", "The discipline: <strong>write the value inside brackets</strong>. Not "
@@ -916,10 +850,7 @@ LESSONS = [
                 "  with brackets     (−3)²   =  (−3)·(−3)  =   9        correct",
                 "  without them      −3²     =  −(3·3)     =  −9        a different value",
             ]),
-            ("p", "The second line is not a slip of the pen; it is a correct evaluation "
-                  "of a different string. In `−3²` the exponent binds more tightly than "
-                  "the minus sign, so it means `−(3²)`. Lesson 2 settled that, and "
-                  "substitution is where the ruling has consequences."),
+            ("p", 'The second line is not a slip of the pen; it is a correct evaluation of a different string. In `−3²` the exponent binds more tightly than the minus sign, so it means `−(3²)`. “Order of Operations” settled that, and substitution is where the ruling has consequences.'),
             ("h3", "The minus sign that is part of the expression"),
             ("p", "Compare two expressions that differ only by brackets. At `x = −3`:"),
             ("math", [
@@ -981,9 +912,7 @@ LESSONS = [
              "two digits written next to each other, a multiplication sign has gone "
              "missing."),
             ("Work out the value under the order of operations",
-             "Brackets, then exponents, then multiplication and division left to right, "
-             "then addition and subtraction left to right. Lesson 2 gave the rule; "
-             "substitution does not amend it."),
+             'Brackets, then exponents, then multiplication and division left to right, then addition and subtraction left to right. “Order of Operations” gave the rule; substitution does not amend it.'),
             ("Say so if there is no value",
              "A division by zero, or an even root of a negative number, means the "
              "expression is undefined at that input. Write that down rather than "

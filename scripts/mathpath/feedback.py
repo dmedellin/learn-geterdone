@@ -56,6 +56,7 @@ CSS = """
       font-size: 0.9rem;
       resize: vertical;
     }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
     .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
     .fb-actions {
       display: flex;

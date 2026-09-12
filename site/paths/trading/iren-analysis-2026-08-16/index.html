@@ -24,6 +24,8 @@
 <style>/* capstone-palette:begin */
 :root { --capstone-accent: #98f5ff; --capstone-muted: #aec1d2; --on-accent: #041116; }
 body { --muted: var(--capstone-muted); }
+/* Each wrapped gradient fragment owns enough paint area for glyph overhang. */
+body[data-page-kind="supplemental"] .gradient { padding: .1em; box-decoration-break: clone; -webkit-box-decoration-break: clone; }
 /* capstone-palette:end */
 
 :root{
@@ -190,6 +192,7 @@ button,input,select{font:inherit}button{color:inherit}a{color:inherit}.shell{wid
       font-size: 0.9rem;
       resize: vertical;
     }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
     .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
     .fb-actions {
       display: flex;
@@ -348,6 +351,27 @@ button,input,select{font:inherit}button{color:inherit}a{color:inherit}.shell{wid
       .signin-btn { padding: 0; width: 38px; justify-content: center; }
     }
 
+    /* Trading charts use a 960-unit plotting frame. Keep that authored scale
+       instead of shrinking 11-unit axis text to roughly 3 CSS pixels on a
+       phone. The named keyboard scroll owner exposes the complete chart. */
+    @media screen {
+      .market-chart-scroll {
+        contain: inline-size;
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        overscroll-behavior-inline: contain;
+      }
+      .market-chart-scroll > svg.market-chart {
+        display: block;
+        width: 100%;
+        min-width: 960px;
+      }
+    }
+
     body[data-page-kind] {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 16px;
@@ -381,6 +405,7 @@ button,input,select{font:inherit}button{color:inherit}a{color:inherit}.shell{wid
     [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
     [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
     [data-ui="hero"] .eyebrow { display: block; color: var(--muted); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
     [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
     [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
     [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
@@ -425,7 +450,7 @@ button,input,select{font:inherit}button{color:inherit}a{color:inherit}.shell{wid
     }
     [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
     [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
-    [data-ui="lesson-list"] .lesson-link { min-height: 44px; }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
     body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
     body[data-page-kind] .is-done .lesson-state { color: var(--green); }
     [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
@@ -478,7 +503,243 @@ button,input,select{font:inherit}button{color:inherit}a{color:inherit}.shell{wid
 </style>
   </noscript>
 
-  <script>
+  <script data-canvas-text="v1">
+/* Learn canvas text contract v1. Inlined by the authored-page normalizer. */
+(()=>{
+ 'use strict';
+ const roles=Object.freeze({axis:4.5,annotation:4.5,value:4.5,status:4.5,date:4.5});
+ const tokens=new WeakMap(),sites=new Map(),contexts=new WeakMap(),pending=new Map(),completed=new Map(),gutters=new WeakMap();
+ const nativeFill=CanvasRenderingContext2D.prototype.fillText;
+ const paintObjects=new WeakMap();
+ let depth=0,active=null,probe=null,execution=0;
+ const fail=message=>{throw Object.assign(Error('canvas contract: '+message),{code:'LEARN_CANVAS_SEMANTIC',assertion:message})};
+ const finite=values=>values.every(Number.isFinite);
+ const stable=value=>JSON.stringify(value,Object.keys(value).sort());
+ function site(definition){
+  if(!definition||typeof definition!=='object')fail('missing descriptor');
+  if(['guide','decorative'].includes(definition.role))fail('decorative guide used as semantic text');
+  const keys=['id','role','minimumContrast','region','collision','formatter','family','mode','dependencies'];
+  if(Object.keys(definition).sort().join()!==keys.sort().join()||typeof definition.id!=='string'||!/^[a-zA-Z0-9_.:-]+$/.test(definition.id)||typeof definition.role!=='string'||!Object.hasOwn(roles,definition.role)||!Number.isFinite(definition.minimumContrast)||definition.minimumContrast!==roles[definition.role]||!['axis-right','axis-left','axis-bottom','title-top','annotation','date-left','date-bottom-left','date-bottom-right','label-left','value-right','status'].includes(definition.region)||!['separate','fixed'].includes(definition.collision)||['formatter','family','mode'].some(k=>typeof definition[k]!=='string'||!definition[k])||!Array.isArray(definition.dependencies)||definition.dependencies.some(d=>typeof d!=='string'||!d)||new Set(definition.dependencies).size!==definition.dependencies.length||['frame.width','frame.height','theme'].some(d=>!definition.dependencies.includes(d)))fail('invalid semantic descriptor');
+  const key=stable(definition),prior=sites.get(definition.id);
+  if(prior){if(prior.key!==key)fail('conflicting descriptor '+definition.id);return prior.token;}
+  const descriptor=Object.freeze({...definition,dependencies:Object.freeze([...definition.dependencies])}),token=Object.freeze(Object.create(null));
+  tokens.set(token,descriptor);sites.set(descriptor.id,{key,descriptor,token});return token;
+ }
+ function rolePaint(canvas,role){
+  if(typeof role!=='string'||!Object.hasOwn(roles,role))fail('decorative guide used as semantic text');
+  for(let e=canvas;e;e=e.parentElement){const s=getComputedStyle(e);if(Number(s.opacity)!==1||s.filter!=='none'||s.mixBlendMode!=='normal')fail('unprovable canvas ancestor paint');}
+  const style=getComputedStyle(canvas),foreground=style.getPropertyValue('--text').trim(),background=style.getPropertyValue('--panel-2').trim();
+  const pixel=document.createElement('canvas');pixel.width=pixel.height=1;const c=pixel.getContext('2d',{willReadFrequently:true});
+  const resolve=color=>{if(!CSS.supports('color',color))fail('unresolved semantic paint');c.clearRect(0,0,1,1);c.fillStyle=color;c.fillRect(0,0,1,1);const rgba=[...c.getImageData(0,0,1,1).data];if(rgba[3]!==255)fail('semantic role paint must be opaque');return rgba.slice(0,3)};
+  const fg=resolve(foreground),bg=resolve(background);
+  const luminance=rgb=>rgb.map(v=>v/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4).reduce((sum,v,i)=>sum+v*[.2126,.7152,.0722][i],0);
+  const a=luminance(fg),b=luminance(bg),ratio=(Math.max(a,b)+.05)/(Math.min(a,b)+.05);
+  if(ratio<roles[role])fail('text contrast below threshold');
+  return {foreground,background,fg,bg,ratio};
+ }
+ function traceValue(value){
+  if(value===null||typeof value==='string'||typeof value==='boolean')return value;
+  if(value===undefined)return {undefined:true};
+  if(typeof value==='number'&&Number.isFinite(value))return value;
+  if(Array.isArray(value)){const items=[];for(let i=0;i<value.length;i++){if(!Object.hasOwn(value,i))fail('unprovable canvas trace value');items.push(traceValue(value[i]));}return {array:items};}
+  const paint=value&&typeof value==='object'?paintObjects.get(value):null;
+  if(paint)return {gradient:paint.kind,id:paint.id,arguments:paint.args,stops:paint.stops.map(s=>s.slice())};
+  fail('unprovable canvas trace value');
+ }
+ function trackedGradient(raw,kind,args,frame){
+  const record={raw,kind,id:++frame.paintSequence,frame,args:args.map(traceValue),stops:[],proxy:null};
+  const proxy=new Proxy(Object.create(null),{get(_target,key){const target=raw;
+   if(key!=='addColorStop')fail('unprovable canvas gradient access');
+   return (...args)=>{if(frame.status!=='geometry'||pending.get(frame.canvas)!==frame)fail('gradient mutation outside canvas frame');if(args.length!==2)fail('unprovable canvas gradient stop');const stop=args.map(traceValue);target.addColorStop(...args);record.stops.push(stop);frame.trace.push(['gradient-stop',record.id,record.kind,record.args,stop]);};
+  },defineProperty(){fail('canvas gradient reflection mutation')},deleteProperty(){fail('canvas gradient reflection mutation')},setPrototypeOf(){fail('canvas gradient reflection mutation')},preventExtensions(){fail('canvas gradient reflection mutation')},set(){fail('canvas gradient reflection mutation')}});
+  record.proxy=proxy;paintObjects.set(raw,record);paintObjects.set(proxy,record);return proxy;
+ }
+ const operationMethods=new Set(['save','restore','reset','setTransform','resetTransform','transform','translate','rotate','scale','setLineDash','getLineDash','beginPath','moveTo','lineTo','bezierCurveTo','quadraticCurveTo','arc','arcTo','ellipse','rect','roundRect','closePath','fill','stroke','fillRect','strokeRect','clearRect','clip','measureText','getTransform','getImageData','createImageData','putImageData','drawImage','createLinearGradient','createRadialGradient','createConicGradient','isPointInPath','isPointInStroke','getContextAttributes','isContextLost']);
+ const stateProperties=new Set(['direction','fillStyle','filter','font','fontKerning','fontStretch','fontVariantCaps','globalAlpha','globalCompositeOperation','imageSmoothingEnabled','imageSmoothingQuality','lang','letterSpacing','lineCap','lineDashOffset','lineJoin','lineWidth','miterLimit','shadowBlur','shadowColor','shadowOffsetX','shadowOffsetY','strokeStyle','textAlign','textBaseline','textRendering','wordSpacing']);
+ const paintMethods=new Set(['reset','clearRect','fillRect','strokeRect','fill','stroke','drawImage','putImageData','fillText','strokeText']);
+ function begin(canvas,width,height,dpr){
+  if(!depth)fail('frame missing');
+  if(!(canvas instanceof HTMLCanvasElement)||!finite([width,height,dpr])||width<=0||height<=0||dpr<=0)fail('invalid canvas dimensions');
+  if(pending.has(canvas))fail('canvas begun twice without finalization');
+  const raw=canvas.getContext('2d');if(!raw)fail('2D context missing');
+  const frame={canvas,raw,width,height,dpr,execution:++execution,status:'geometry',commands:[],trace:[],labels:[],paintSequence:0,clipDepth:0,clipStack:[]};
+  pending.set(canvas,frame);
+  if(canvas.width!==Math.round(width*dpr))canvas.width=Math.round(width*dpr);if(canvas.height!==Math.round(height*dpr))canvas.height=Math.round(height*dpr);
+  raw.reset();raw.setTransform(dpr,0,0,dpr,0,0);
+  const proxy=new Proxy(Object.create(null),{
+   get(_target,key){const target=raw;
+    const value=Reflect.get(target,key,target);
+    if(typeof value!=='function')return paintObjects.get(value)?.proxy||value;
+    return (...args)=>{
+     if(key==='fillText'||key==='strokeText')fail('uncontracted native text');
+     if(!operationMethods.has(key))fail('unsupported canvas operation '+String(key));
+     if(paintMethods.has(key)&&frame.status!=='geometry')fail('paint after text finalization');
+     frame.trace.push([String(key),args.map(traceValue)]);
+     const result=value.apply(target,args);
+     return ['createLinearGradient','createRadialGradient','createConicGradient'].includes(key)?trackedGradient(result,key,args,frame):result;
+    };
+   },
+   defineProperty(){fail('canvas context reflection mutation')},deleteProperty(){fail('canvas context reflection mutation')},setPrototypeOf(){fail('canvas context reflection mutation')},preventExtensions(){fail('canvas context reflection mutation')},
+   set(_target,key,value){if(!stateProperties.has(key))fail('unsupported canvas state property '+String(key));const target=raw;const paint=paintObjects.get(value);if(paint&&paint.frame!==frame)fail('gradient used outside canvas frame');frame.trace.push(['set',String(key),traceValue(value)]);return Reflect.set(target,key,paint?.raw||value,target)}
+  });
+  contexts.set(proxy,frame);pending.set(canvas,frame);return proxy;
+ }
+ function region(frame,name){
+  const w=frame.width,h=frame.height,gutter=gutters.get(frame.canvas)||0;
+  const regions={'axis-bottom':[6,h-29,w-6,h-2],'title-top':[6,4,w-6,44],'axis-right':[w-(gutter||68),4,w-4,h-4],'axis-left':[2,4,46,h-30],'date-bottom-left':[42,h-28,w/2,h-2],'date-bottom-right':[w/2,h-28,w-8,h-2],'label-left':[6,6,168,h-6],annotation:[6,44,w-Math.max(74,gutter+8),h-30],'date-left':[6,6,Math.min(116,w/3),h-6],'value-right':[w-116,6,w-6,h-6],status:[6,48,w-6,h-6]};
+  const r=regions[name];if(!r||r[0]<0||r[1]<0||r[2]>w||r[3]>h||r[0]>=r[2]||r[1]>=r[3])fail('invalid descriptor region');
+  return {left:r[0],top:r[1],right:r[2],bottom:r[3]};
+ }
+ function text(context,token,value,x,y,maxWidth){
+  if(arguments.length<5||arguments.length>6)fail('arbitrary semantic paint arguments');
+  const descriptor=tokens.get(token),frame=contexts.get(context);
+  if(!descriptor)fail('unbound site token');if(!frame||frame.status!=='geometry'||!pending.has(frame.canvas))fail('semantic text outside frame');
+  if(frame.clipDepth)fail('unprovable semantic clip');
+  const raw=frame.raw,label=String(value);if(!label.trim())fail('empty semantic text');
+  if(!finite([x,y])||maxWidth!==undefined&&(!Number.isFinite(maxWidth)||maxWidth<=0))fail('nonfinite semantic geometry');
+  if(raw.globalAlpha!==1)fail('semantic alpha below one');
+  if(raw.globalCompositeOperation!=='source-over')fail('unsupported semantic composite');
+  if(typeof raw.fillStyle!=='string')fail('gradient or pattern used for semantic text');
+  if(raw.filter!=='none'||raw.shadowBlur||raw.shadowOffsetX||raw.shadowOffsetY||!['rgba(0, 0, 0, 0)','transparent','#00000000'].includes(raw.shadowColor))fail('unprovable semantic shadow or filter');
+  let matrix=raw.getTransform();if(!matrix.is2D||!finite([matrix.a,matrix.b,matrix.c,matrix.d,matrix.e,matrix.f])||Math.abs(matrix.a*matrix.d-matrix.b*matrix.c)<1e-12)fail('unprovable semantic transform');
+  // Chromium normalizes a six-number setTransform differently from an
+  // accumulated rotate/translate matrix. Measure the transform that the
+  // final flush will actually apply, leaving graph drawing state intact.
+  raw.save();raw.setTransform(matrix.a,matrix.b,matrix.c,matrix.d,matrix.e,matrix.f);matrix=raw.getTransform();raw.restore();
+  for(const property of ['letterSpacing','wordSpacing'])if(raw[property]!==undefined){if(raw[property]!==''&&raw[property]!=='0px')fail('unprovable semantic font spacing');raw[property]='1px';raw[property]='0px';if(raw[property]!=='0px')fail('unresolved semantic font spacing');}
+  raw.fontKerning='none';raw.direction=raw.direction==='inherit'?getComputedStyle(frame.canvas).direction:raw.direction;
+  const font=/^(?:(italic|oblique) )?(?:(normal|bold|[1-9]00) )?([0-9.]+)px (.+)$/.exec(raw.font);if(!font)fail('unresolved semantic font');
+  raw.font=(font[1]?font[1]+' ':'')+Math.max(600,font[2]==='bold'?700:Number(font[2])||400)+' '+Math.max(12,Number(font[3]))+'px '+font[4];
+  const metrics=raw.measureText(label),required=['width','actualBoundingBoxLeft','actualBoundingBoxRight','actualBoundingBoxAscent','actualBoundingBoxDescent'];
+  if(!finite(required.map(k=>metrics[k])))fail('incomplete text metrics');
+  const command={descriptor,token,text:label,x,y,maxWidth,metrics:Object.fromEntries(required.map(k=>[k,metrics[k]])),matrix:[matrix.a,matrix.b,matrix.c,matrix.d,matrix.e,matrix.f],font:raw.font,align:raw.textAlign,baseline:raw.textBaseline,direction:raw.direction,paint:rolePaint(frame.canvas,descriptor.role),region:region(frame,descriptor.region)};
+  frame.commands.push(command);
+ }
+ function bounds(command,frame,x=command.x,y=command.y){
+  const m=command.metrics,compress=command.maxWidth===undefined||!m.width?1:Math.min(1,command.maxWidth/m.width),matrix=new DOMMatrix(command.matrix);
+  const corners=[[x-m.actualBoundingBoxLeft*compress,y-m.actualBoundingBoxAscent],[x+m.actualBoundingBoxRight*compress,y-m.actualBoundingBoxAscent],[x+m.actualBoundingBoxRight*compress,y+m.actualBoundingBoxDescent],[x-m.actualBoundingBoxLeft*compress,y+m.actualBoundingBoxDescent]].map(([x,y])=>{const p=matrix.transformPoint({x,y});return {x:p.x/frame.dpr,y:p.y/frame.dpr}});
+  return {left:Math.min(...corners.map(p=>p.x)),right:Math.max(...corners.map(p=>p.x)),top:Math.min(...corners.map(p=>p.y)),bottom:Math.max(...corners.map(p=>p.y)),corners};
+ }
+ const intersects=(a,b)=>a.left<b.right&&b.left<a.right&&a.top<b.bottom&&b.top<a.bottom;
+ const inside=(a,b)=>a.left>=b.left&&a.right<=b.right&&a.top>=b.top&&a.bottom<=b.bottom;
+ function finish(frame){
+  if(frame.status!=='geometry')fail('duplicate finalization');
+  if(frame.clipDepth)fail('unprovable semantic clip at finalization');
+  const placed=[];
+  for(const command of frame.commands){
+   const initial=bounds(command,frame),pad=2,inkWidth=initial.right-initial.left,inkHeight=initial.bottom-initial.top,r=command.region;
+   if(inkWidth<=0||inkHeight<=0||inkWidth+2*pad>r.right-r.left||inkHeight+2*pad>r.bottom-r.top)fail('unplaceable semantic text '+command.descriptor.id);
+   let left=Math.max(r.left+pad,Math.min(initial.left,r.right-pad-inkWidth)),top=Math.max(r.top+pad,Math.min(initial.top,r.bottom-pad-inkHeight));
+   const candidate=(left,top)=>({left:left-pad,right:left+inkWidth+pad,top:top-pad,bottom:top+inkHeight+pad});
+   let box=candidate(left,top);
+   if(command.descriptor.collision==='separate'&&placed.some(p=>intersects(box,p.box))){
+    const choices=[];
+    for(let y=r.top+pad;y<=r.bottom-pad-inkHeight;y+=inkHeight+2*pad+1)for(let x=r.left+pad;x<=r.right-pad-inkWidth;x+=inkWidth+2*pad+1)choices.push({x,y,d:(x-left)**2+(y-top)**2});
+    choices.sort((a,b)=>a.d-b.d||a.y-b.y||a.x-b.x);
+    const spot=choices.find(p=>!placed.some(q=>intersects(candidate(p.x,p.y),q.box)));
+    if(!spot)fail('unplaceable semantic collision '+command.descriptor.id);left=spot.x;top=spot.y;box=candidate(left,top);
+   }
+   if(placed.some(p=>intersects(box,p.box)))fail('semantic bounds overlap');
+   const inverse=new DOMMatrix(command.matrix).inverse(),shift=inverse.transformPoint({x:(left-initial.left)*frame.dpr,y:(top-initial.top)*frame.dpr,w:0});
+   const x=command.x+shift.x,y=command.y+shift.y,ink=bounds(command,frame,x,y);
+   if(!inside(ink,r)||ink.corners.some(p=>p.x<0||p.y<0||p.x>frame.width||p.y>frame.height))fail('transformed semantic corner outside region');
+   placed.push({command,x,y,ink,box});
+  }
+  frame.placed=placed;frame.status='text';const raw=frame.raw;
+  for(const p of placed){
+   const c=p.command;raw.save();raw.setTransform(frame.dpr,0,0,frame.dpr,0,0);raw.globalAlpha=1;raw.globalCompositeOperation='source-over';raw.filter='none';raw.shadowColor='transparent';raw.fillStyle=c.paint.background;raw.fillRect(p.box.left,p.box.top,p.box.right-p.box.left,p.box.bottom-p.box.top);raw.restore();
+  }
+  const expectedNativeCount=placed.filter(p=>probe?.suppress!==p.command.descriptor.id).length;let nativeOrdinal=0;
+  for(const [instance,p] of placed.entries()){
+   const c=p.command;
+   const label={site:c.descriptor.id,descriptor:c.descriptor,instance,text:c.text,font:c.font,align:c.align,baseline:c.baseline,matrix:c.matrix,maxWidth:c.maxWidth??null,ink:p.ink,region:c.region,backing:p.box,paint:c.paint};frame.labels.push(label);
+   if(probe?.suppress===c.descriptor.id)continue;
+   raw.save();raw.setTransform(...c.matrix);raw.font=c.font;raw.fontKerning='none';raw.letterSpacing='0px';raw.wordSpacing='0px';raw.textAlign=c.align;raw.textBaseline=c.baseline;raw.direction=c.direction;raw.fillStyle=c.paint.foreground;raw.globalAlpha=1;raw.globalCompositeOperation='source-over';raw.filter='none';raw.shadowColor='transparent';
+   const geometry=Object.freeze({width:frame.width,height:frame.height,dpr:frame.dpr,region:Object.freeze({...c.region}),ink:Object.freeze({left:p.ink.left,right:p.ink.right,top:p.ink.top,bottom:p.ink.bottom})});
+   active=Object.freeze({token:c.token,descriptor:c.descriptor,canvas:frame.canvas,instance,execution:frame.execution,ordinal:nativeOrdinal++,count:expectedNativeCount,text:c.text,geometry});
+   try{if(c.maxWidth===undefined)nativeFill.call(raw,c.text,p.x,p.y);else nativeFill.call(raw,c.text,p.x,p.y,c.maxWidth)}finally{active=null;raw.restore()}
+  }
+  frame.status='final';pending.delete(frame.canvas);completed.set(frame.canvas,frame);
+ }
+ function frame(callback){
+  if(depth){depth++;try{const result=callback();if(result&&typeof result.then==='function')fail('asynchronous frame unsupported');return result}finally{depth--;}}
+  const clear=()=>{for(const f of pending.values()){f.status='failed';completed.delete(f.canvas);}pending.clear()};
+  for(let pass=0;pass<3;pass++){
+   let result;depth=1;
+   try{result=callback();if(result&&typeof result.then==='function')fail('asynchronous frame unsupported');}
+   catch(error){clear();throw error}finally{depth=0}
+   try{
+    let reflow=false;
+    for(const f of pending.values()){
+     const axes=f.commands.filter(c=>c.descriptor.region==='axis-right');
+     // Reserve the measured axis lane before graph geometry is finalized.
+     const lane=axes.length?Math.max(68,...axes.map(c=>{const b=bounds(c,f);return Math.ceil(b.right-b.left+16)})):0;
+     if(axes.length&&f.width-lane<160)fail('unplaceable semantic axis lane');
+     if((gutters.get(f.canvas)||0)!==lane){gutters.set(f.canvas,lane);reflow=true;}
+    }
+    if(reflow){clear();continue;}
+    for(const f of [...pending.values()])finish(f);
+    return result;
+   }finally{clear();}
+  }
+  fail('canvas lane allocation did not converge');
+ }
+ function isolated(canvas,siteID,color){
+  const original=completed.get(canvas);
+  if(!original||original.status!=='final'||!original.labels.some(l=>l.site===siteID)||!['#000000','#ffffff'].includes(color))fail('invalid isolated ink request');
+  const mask=document.createElement('canvas');mask.width=canvas.width;mask.height=canvas.height;const raw=mask.getContext('2d');
+  raw.fillStyle='#7f7f7f';raw.fillRect(0,0,mask.width,mask.height);
+  for(const [instance,p] of original.placed.entries()){
+   const c=p.command;if(c.descriptor.id!==siteID)continue;
+   raw.save();raw.setTransform(...c.matrix);raw.font=c.font;raw.fontKerning='none';raw.letterSpacing='0px';raw.wordSpacing='0px';raw.textAlign=c.align;raw.textBaseline=c.baseline;raw.direction=c.direction;raw.fillStyle=color;
+   active=Object.freeze({token:c.token,descriptor:c.descriptor,canvas:mask,owner:canvas,instance,execution:original.execution,text:c.text,diagnostic:true});
+   try{if(c.maxWidth===undefined)nativeFill.call(raw,c.text,p.x,p.y);else nativeFill.call(raw,c.text,p.x,p.y,c.maxWidth)}finally{active=null;raw.restore()}
+  }
+  return {width:mask.width,height:mask.height,data:mask.toDataURL('image/png')};
+ }
+ const api=Object.freeze({site,text,begin,frame,isolated,plotWidth:(ctx,width,rightMargin)=>{const f=contexts.get(ctx);if(!f||!finite([width,rightMargin])||width<=0||rightMargin<0)fail('unprovable plot allocation');const result=width-Math.max(0,(gutters.get(f.canvas)||0)+4-rightMargin);if(result<=0)fail('unplaceable plot beside semantic lane');return result;},
+  nativeToken:()=>active,
+  phase:canvas=>(pending.get(canvas)||completed.get(canvas))?.status||null,
+  inspect:()=>JSON.parse(JSON.stringify([...completed.values()].filter(f=>f.canvas.isConnected).map(f=>({canvas:f.canvas.id,width:f.width,height:f.height,dpr:f.dpr,status:f.status,trace:f.trace,labels:f.labels})))),
+  descriptors:()=>[...sites.values()].map(s=>s.descriptor),
+  probe:settings=>{if(settings!==null&&(!settings||Object.keys(settings).some(k=>k!=='suppress')||settings.suppress!==null&&typeof settings.suppress!=='string'))fail('invalid capture probe');probe=settings},
+  pending:()=>pending.size
+ });
+ // Install before all authored scripts. Public native methods never receive
+ // semantic authority; only the private captured nativeFill can paint text.
+ const prototypes=[CanvasRenderingContext2D.prototype];if(window.OffscreenCanvasRenderingContext2D)prototypes.push(OffscreenCanvasRenderingContext2D.prototype);
+ for(const prototype of prototypes){
+  for(const method of ['fillText','strokeText'])Object.defineProperty(prototype,method,{configurable:false,writable:false,value:function(){fail('uncontracted native text')}});
+  for(const method of ['save','restore','clip','clearRect','fillRect','strokeRect','fill','stroke','drawImage','putImageData','reset']){
+   const original=prototype[method];
+   Object.defineProperty(prototype,method,{configurable:false,writable:false,value:function(...args){
+    const f=pending.get(this.canvas)||completed.get(this.canvas);
+    if(f?.status==='final'&&!['save','restore'].includes(method))fail('paint after text finalization');
+    if(f&&pending.has(this.canvas)){
+     if(method==='save')f.clipStack.push(f.clipDepth);
+     if(method==='restore')f.clipDepth=f.clipStack.pop()??f.clipDepth;
+     if(method==='clip')f.clipDepth++;
+     if(method==='reset'){f.clipDepth=0;f.clipStack=[];}
+    }
+    return original.apply(this,args);
+   }});
+  }
+ }
+ // Assigning either bitmap dimension clears the canvas, including assigning
+ // its current value. Treat that reset as paint after a completed frame.
+ for(const property of ['width','height']){
+  const descriptor=Object.getOwnPropertyDescriptor(HTMLCanvasElement.prototype,property);
+  Object.defineProperty(HTMLCanvasElement.prototype,property,{...descriptor,configurable:false,set(value){
+   const current=pending.get(this)||completed.get(this);
+   if(current?.status==='final')fail('paint after text finalization');
+   return descriptor.set.call(this,value);
+  }});
+ }
+ if(Object.prototype.hasOwnProperty.call(window,'CanvasText'))fail('duplicate helper');
+ Object.defineProperty(window,'CanvasText',{value:api,writable:false,configurable:false});
+})();
+</script>
+<script>
     /* Applied before first paint so an explicit theme choice never flashes the
        other theme. This is why it lives LAST in <head> and not with the rest of
        the page script at the bottom of <body>: that runs after the first paint.
@@ -495,6 +756,9 @@ button,input,select{font:inherit}button{color:inherit}a{color:inherit}.shell{wid
       } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
     })();
   </script>
+<style data-canvas-scroll="v1">
+[data-canvas-scroll="v1"]{overflow:auto;max-width:100%;min-width:0}[data-canvas-scroll="v1"] canvas{display:block;min-width:520px}.card:has(>[data-canvas-scroll="v1"]){min-width:0}.lab:has([data-canvas-scroll="v1"]),.chart-wrap:has(>[data-canvas-scroll="v1"]){overflow:visible}.chart-wrap:has(>[data-canvas-scroll="v1"])>:is(.chart-badge,.chart-label){position:relative;display:table;left:auto;top:auto;margin:14px}@media print{[data-canvas-scroll="v1"]{overflow:visible}[data-canvas-scroll="v1"] canvas{min-width:0}}
+</style>
 </head>
 <body data-page-kind="supplemental"><div class="shell">
 <a class="skip-link" href="#main">Skip to content</a>    <header class="topbar" data-ui="masthead">
@@ -559,7 +823,7 @@ button,input,select{font:inherit}button{color:inherit}a{color:inherit}.shell{wid
 
 <section class="section"><div class="callout"><strong>Data boundary:</strong> Sunday, August 16 is not a regular U.S. equity session. The analysis uses the August 14 close of $44.06 and the $44.1685 after-hours snapshot. Historical studies use 50 completed sessions from June 4 through August 14. These backtests are exploratory, selected in-sample, exclude costs and have small samples. Historical volume differs slightly by market-data provider; prices are consistent. [S1][S2]</div></section>
 
-<section class="section" id="timeframes"><div class="section-head"><div><span class="eyebrow">Interactive lab 1</span><h2>Multi-timeframe structure</h2></div><p>Change the view and keep the conclusions separate.</p></div><div class="lab"><div class="lab-head"><div><h3>IREN actual OHLCV</h3><span>50 daily sessions and derived weekly bars</span></div><div class="seg" id="tfSeg"><button data-v="5">5D</button><button data-v="10">10D</button><button data-v="20" class="active">20D</button><button data-v="50">50D</button><button data-v="weekly">Weekly</button></div></div><div class="lab-body"><div class="chart-pane"><div class="chart-wrap"><span class="chart-label">Candles · volume · optional moving averages</span><canvas id="tfChart"></canvas></div><div class="legend"><span><i class="dot green"></i>Up candle</span><span><i class="dot red"></i>Down candle</span><span><i class="dot cyan"></i>SMA 5</span><span><i class="dot purple"></i>SMA 10 / bands</span><span><i class="dot amber"></i>SMA 20</span></div><p class="provider-note"><strong>Volume differs by provider.</strong> The historical bars use the consistent StockAnalysis / S&amp;P Global Market Intelligence series; the current-session snapshot uses WSJ market data. Volume totals can differ by provider and market coverage. Price levels are aligned across the cited sources.</p></div><aside class="controls"><div class="control"><label>Indicators</label><label style="display:flex;gap:8px;align-items:center;text-transform:none"><input id="maToggle" type="checkbox" checked> Moving averages</label><label style="display:flex;gap:8px;align-items:center;text-transform:none;margin-top:7px"><input id="bollToggle" type="checkbox"> Bollinger bands</label></div><div class="read bull"><small>What the market is doing</small><strong id="tfTitle"></strong><p id="tfText"></p></div><div class="grid2" id="tfKpi" style="margin-top:12px"></div></aside></div></div></section>
+<section class="section" id="timeframes"><div class="section-head"><div><span class="eyebrow">Interactive lab 1</span><h2>Multi-timeframe structure</h2></div><p>Change the view and keep the conclusions separate.</p></div><div class="lab"><div class="lab-head"><div><h3>IREN actual OHLCV</h3><span>50 daily sessions and derived weekly bars</span></div><div class="seg" id="tfSeg"><button data-v="5">5D</button><button data-v="10">10D</button><button data-v="20" class="active">20D</button><button data-v="50">50D</button><button data-v="weekly">Weekly</button></div></div><div class="lab-body"><div class="chart-pane"><div class="chart-wrap"><span class="chart-label">Candles · volume · optional moving averages</span><div data-canvas-scroll="v1" tabindex="0" role="region" aria-label="IREN actual OHLCV chart"><canvas id="tfChart"></canvas></div></div><div class="legend"><span><i class="dot green"></i>Up candle</span><span><i class="dot red"></i>Down candle</span><span><i class="dot cyan"></i>SMA 5</span><span><i class="dot purple"></i>SMA 10 / bands</span><span><i class="dot amber"></i>SMA 20</span></div><p class="provider-note"><strong>Volume differs by provider.</strong> The historical bars use the consistent StockAnalysis / S&amp;P Global Market Intelligence series; the current-session snapshot uses WSJ market data. Volume totals can differ by provider and market coverage. Price levels are aligned across the cited sources.</p></div><aside class="controls"><div class="control"><label>Indicators</label><label style="display:flex;gap:8px;align-items:center;text-transform:none"><input id="maToggle" type="checkbox" checked> Moving averages</label><label style="display:flex;gap:8px;align-items:center;text-transform:none;margin-top:7px"><input id="bollToggle" type="checkbox"> Bollinger bands</label></div><div class="read bull"><small>What the market is doing</small><strong id="tfTitle"></strong><p id="tfText"></p></div><div class="grid2" id="tfKpi" style="margin-top:12px"></div></aside></div></div></section>
 
 <section class="section"><div class="section-head"><div><span class="eyebrow">Current dashboard</span><h2>Technical state at the August 14 close</h2></div><p>Short-term trend is constructive; intermediate trend and immediate candle behavior remain mixed.</p></div><div class="grid4">
 <div class="kpi"><span>SMA 5</span><strong>$42.20</strong><small>Close is above</small></div><div class="kpi"><span>SMA 10</span><strong>$40.96</strong><small>Close is above</small></div><div class="kpi"><span>SMA 20</span><strong>$39.23</strong><small>Close is above</small></div><div class="kpi"><span>SMA 50</span><strong>$44.89</strong><small>Close is slightly below</small></div>
@@ -573,7 +837,7 @@ button,input,select{font:inherit}button{color:inherit}a{color:inherit}.shell{wid
 <article class="scenario bull"><div class="weight">+5.66%</div><h3>After −8% days</h3><p>Average next-session return was +5.66% across 8 observations. The stock repeatedly mean-reverted after large selloffs.</p></article>
 <article class="scenario range"><div class="weight">0%</div><h3>After 3 up closes</h3><p>Neither of the 2 valid events was positive the next session; August 13 triggered this pattern and August 14 fell 1.56%.</p><div class="caveat"><strong>Two valid events &mdash; descriptive only.</strong> The three-consecutive-up-closes study requires three complete positive close-to-close returns, so the incomplete rolling windows at the start of the sample are excluded. That leaves <strong>two valid events</strong> in the 50-session sample. The result is descriptive only and is <strong>not statistically reliable</strong>: do not read a direction into two observations. The count on this card was published before that revision (the dataset beside this page carries revision 2026-08-16-r2); the interactive panel above reads the revised dataset and reports two.</div></article></div></section>
 
-<section class="section"><div class="section-head"><div><span class="eyebrow">Interactive lab 3</span><h2>Nearest historical states</h2></div><p>Similarity uses standardized return, RSI, close location and relative-volume features inside the same 50-session window.</p></div><div class="grid2"><div class="card"><canvas id="analogChart" style="width:100%;height:320px"></canvas></div><div class="card"><div class="grid2"><div class="kpi"><span>Analog count</span><strong>8</strong></div><div class="kpi"><span>Positive next day</span><strong>50%</strong></div><div class="kpi"><span>Average next day</span><strong class="pos">+1.56%</strong></div><div class="kpi"><span>Median next day</span><strong class="pos">+0.52%</strong></div></div><div class="read warn" style="margin-top:12px"><small>Meaning</small><strong>No strong directional edge</strong><p>The outcomes were evenly split and very dispersed. The analog median maps to roughly $44.29, but this is not a forecast.</p></div></div></div></section>
+<section class="section"><div class="section-head"><div><span class="eyebrow">Interactive lab 3</span><h2>Nearest historical states</h2></div><p>Similarity uses standardized return, RSI, close location and relative-volume features inside the same 50-session window.</p></div><div class="grid2"><div class="card"><div data-canvas-scroll="v1" tabindex="0" role="region" aria-label="Nearest historical states chart"><canvas id="analogChart" style="width:100%;height:320px"></canvas></div></div><div class="card"><div class="grid2"><div class="kpi"><span>Analog count</span><strong>8</strong></div><div class="kpi"><span>Positive next day</span><strong>50%</strong></div><div class="kpi"><span>Average next day</span><strong class="pos">+1.56%</strong></div><div class="kpi"><span>Median next day</span><strong class="pos">+0.52%</strong></div></div><div class="read warn" style="margin-top:12px"><small>Meaning</small><strong>No strong directional edge</strong><p>The outcomes were evenly split and very dispersed. The analog median maps to roughly $44.29, but this is not a forecast.</p></div></div></div></section>
 
 <section class="section"><div class="section-head"><div><span class="eyebrow">Company context</span><h2>Catalysts and risks affecting the chart</h2></div><p>Price is responding to both operating milestones and the financing required to deliver them.</p></div><div class="grid2">
 <div><h3>Recent catalysts</h3><div class="grid2"><article class="card"><div class="num">08-13</div><h3>Horizon 1 delivered to and accepted by Microsoft; NVIDIA Exemplar Cloud status achieved</h3><p>The first of four 50MW deployments under the five-year $9.7bn Microsoft cloud-services contract was delivered. The release also cited 480MW gross AI Cloud capacity targeted for 2026 and 1.2GW for 2027.</p></article><article class="card"><div class="num">08-13</div><h3>FY26 results scheduled for August 27, 2026</h3><p>The scheduled report can increase event risk and implied expectations even before the release.</p></article><article class="card"><div class="num">08-04</div><h3>Mirantis acquisition completed</h3><p>IREN said the acquisition strengthens software, orchestration, monitoring and customer support; consideration included approximately 12.6m shares plus other consideration.</p></article><article class="card"><div class="num">07-20</div><h3>New AI Cloud contracts and higher ARR target</h3><p>IREN announced $2.8bn of new contracts and raised its year-end 2026 AI Cloud ARR target to more than $4bn, with about 85% under contract.</p></article></div></div>
@@ -635,12 +899,12 @@ if(themeQuery){
   if(themeQuery.addEventListener)themeQuery.addEventListener("change",onSystemThemeChange);
   else if(themeQuery.addListener)themeQuery.addListener(onSystemThemeChange);
 }
-function sizeCanvas(c,h=455){const d=Math.min(devicePixelRatio||1,2),r=c.getBoundingClientRect(),w=Math.max(320,r.width);c.width=w*d;c.height=h*d;c.style.height=h+'px';const x=c.getContext('2d');x.setTransform(d,0,0,d,0,0);return{x,w,h}}
+function sizeCanvas(c,h=455){const d=2,r=c.getBoundingClientRect(),w=Math.max(520,r.width);c.style.height=h+'px';const x=CanvasText.begin(c,w,h,d);return{x,w,h}}
 function colors(){return{grid:css('--line'),text:css('--muted'),green:css('--green'),red:css('--red'),cyan:css('--cyan'),purple:css('--purple'),amber:css('--amber'),panel:css('--panel')}}
-function drawCandles(canvas,rows,opt={}){const {x,w,h}=sizeCanvas(canvas,opt.height||455),c=colors();x.clearRect(0,0,w,h);const m={l:48,r:15,t:25,b:30},volH=opt.volume===false?0:82,gap=volH?16:0,bottom=h-m.b-volH-gap;let lo=Math.min(...rows.map(d=>d.low)),hi=Math.max(...rows.map(d=>d.high));const overlays=[];if(opt.ma){for(const key of opt.ma)overlays.push({key,color:key==='sma5'?c.cyan:key==='sma10'?c.purple:key==='sma20'?c.amber:c.text})}for(const o of overlays)for(const d of rows)if(Number.isFinite(d[o.key])){lo=Math.min(lo,d[o.key]);hi=Math.max(hi,d[o.key])}if(opt.boll){for(const d of rows){if(Number.isFinite(d.bb_up)){lo=Math.min(lo,d.bb_lo);hi=Math.max(hi,d.bb_up)}}}const pad=(hi-lo)*.08||1;lo-=pad;hi+=pad;const sx=i=>m.l+(w-m.l-m.r)*(i+.5)/rows.length,sy=v=>bottom-(v-lo)/(hi-lo)*(bottom-m.t),bw=Math.max(3,(w-m.l-m.r)/rows.length*.58);x.strokeStyle=c.grid;x.fillStyle=c.text;x.font='10px system-ui';x.textAlign='right';x.textBaseline='middle';for(let j=0;j<5;j++){const yy=m.t+(bottom-m.t)*j/4,v=hi-(hi-lo)*j/4;x.beginPath();x.moveTo(m.l,yy);x.lineTo(w-m.r,yy);x.stroke();x.fillText(fmt(v,1),m.l-6,yy)}if(volH){const maxV=Math.max(...rows.map(d=>d.volume));rows.forEach((d,i)=>{const vh=volH*d.volume/maxV;x.fillStyle=(d.close>=d.open?c.green:c.red)+'99';x.fillRect(sx(i)-bw/2,h-m.b-vh,bw,vh)})}rows.forEach((d,i)=>{const up=d.close>=d.open,col=up?c.green:c.red,xx=sx(i);x.strokeStyle=col;x.beginPath();x.moveTo(xx,sy(d.high));x.lineTo(xx,sy(d.low));x.stroke();x.fillStyle=col;const yo=sy(d.open),yc=sy(d.close);x.fillRect(xx-bw/2,Math.min(yo,yc),bw,Math.max(1.5,Math.abs(yc-yo)))});
+function drawCandles(canvas,rows,opt={}){return CanvasText.frame(()=>{const {x,w,h}=sizeCanvas(canvas,opt.height||455),c=colors();x.clearRect(0,0,w,h);const m={l:48,r:15,t:25,b:30},volH=opt.volume===false?0:82,gap=volH?16:0,bottom=h-m.b-volH-gap;let lo=Math.min(...rows.map(d=>d.low)),hi=Math.max(...rows.map(d=>d.high));const overlays=[];if(opt.ma){for(const key of opt.ma)overlays.push({key,color:key==='sma5'?c.cyan:key==='sma10'?c.purple:key==='sma20'?c.amber:c.text})}for(const o of overlays)for(const d of rows)if(Number.isFinite(d[o.key])){lo=Math.min(lo,d[o.key]);hi=Math.max(hi,d[o.key])}if(opt.boll){for(const d of rows){if(Number.isFinite(d.bb_up)){lo=Math.min(lo,d.bb_lo);hi=Math.max(hi,d.bb_up)}}}const pad=(hi-lo)*.08||1;lo-=pad;hi+=pad;const sx=i=>m.l+(w-m.l-m.r)*(i+.5)/rows.length,sy=v=>bottom-(v-lo)/(hi-lo)*(bottom-m.t),bw=Math.max(3,(w-m.l-m.r)/rows.length*.58);x.strokeStyle=c.grid;x.fillStyle=c.text;x.font='10px system-ui';x.textAlign='right';x.textBaseline='middle';for(let j=0;j<5;j++){const yy=m.t+(bottom-m.t)*j/4,v=hi-(hi-lo)*j/4;x.beginPath();x.moveTo(m.l,yy);x.lineTo(w-m.r,yy);x.stroke();CanvasText.text(x,CanvasText.site({"id":"iren-supplemental.drawCandles.1","role":"axis","minimumContrast":4.5,"region":"axis-left","collision":"separate","formatter":"fmt(v,1)","family":"iren-supplemental","mode":"drawCandles","dependencies":["frame.width","frame.height","theme","parameter.canvas","parameter.rows","parameter.opt"]}),fmt(v,1),m.l-6,yy)}if(volH){const maxV=Math.max(...rows.map(d=>d.volume));rows.forEach((d,i)=>{const vh=volH*d.volume/maxV;x.fillStyle=(d.close>=d.open?c.green:c.red)+'99';x.fillRect(sx(i)-bw/2,h-m.b-vh,bw,vh)})}rows.forEach((d,i)=>{const up=d.close>=d.open,col=up?c.green:c.red,xx=sx(i);x.strokeStyle=col;x.beginPath();x.moveTo(xx,sy(d.high));x.lineTo(xx,sy(d.low));x.stroke();x.fillStyle=col;const yo=sy(d.open),yc=sy(d.close);x.fillRect(xx-bw/2,Math.min(yo,yc),bw,Math.max(1.5,Math.abs(yc-yo)))});
 function line(key,col,dash=[]){x.strokeStyle=col;x.lineWidth=2;x.setLineDash(dash);x.beginPath();let started=false;rows.forEach((d,i)=>{const v=d[key];if(!Number.isFinite(v)){started=false;return}if(!started){x.moveTo(sx(i),sy(v));started=true}else x.lineTo(sx(i),sy(v))});x.stroke();x.setLineDash([])}
 overlays.forEach(o=>line(o.key,o.color));if(opt.boll){line('bb_up',c.purple,[5,4]);line('bb_lo',c.purple,[5,4])}
-const last=rows.at(-1);x.fillStyle=c.text;x.textAlign='left';x.fillText(rows[0].date,m.l,h-9);x.textAlign='right';x.fillText(last.date,w-m.r,h-9);return{lo,hi}}
+const last=rows.at(-1);x.fillStyle=c.text;x.textAlign='left';CanvasText.text(x,CanvasText.site({"id":"iren-supplemental.drawCandles.2","role":"date","minimumContrast":4.5,"region":"date-bottom-left","collision":"separate","formatter":"rows[0].date","family":"iren-supplemental","mode":"drawCandles","dependencies":["frame.width","frame.height","theme","parameter.canvas","parameter.rows","parameter.opt"]}),rows[0].date,m.l,h-9);x.textAlign='right';CanvasText.text(x,CanvasText.site({"id":"iren-supplemental.drawCandles.3","role":"date","minimumContrast":4.5,"region":"date-bottom-right","collision":"separate","formatter":"last.date","family":"iren-supplemental","mode":"drawCandles","dependencies":["frame.width","frame.height","theme","parameter.canvas","parameter.rows","parameter.opt"]}),last.date,w-m.r,h-9);return{lo,hi}});}
 let tf='20',showMA=true,showBoll=false;
 const tfText={
 '5':{title:'5-session view: rebound with Friday cooling',text:'Price gained 6.9% from the prior Friday close. Buyers restored short-term structure, but the August 13 and 14 candles both rejected higher prices.'},
@@ -656,7 +920,7 @@ $('#maToggle').onchange=e=>{showMA=e.target.checked;renderTF()};$('#bollToggle')
 let pattern='large_up',horizon='1';
 function renderPattern(){const p=DATA.patterns[pattern],s=p.stats[horizon],events=p.events.filter(e=>e['fwd'+horizon]!==null);$('#patternTitle').textContent=p.name;$('#patternText').textContent=p.interpretation;$('#patternKpi').innerHTML=`<div class="kpi"><span>Usable samples</span><strong>${s.n}</strong></div><div class="kpi"><span>Average forward return</span><strong class="${s.avg>=0?'pos':'neg'}">${s.avg===null?'—':pct(s.avg,2)}</strong></div><div class="kpi"><span>Median forward return</span><strong class="${s.median>=0?'pos':'neg'}">${s.median===null?'—':pct(s.median,2)}</strong></div><div class="kpi"><span>Positive outcomes</span><strong>${s.positive===null?'—':fmt(s.positive,1)+'%'}</strong></div>`;const max=Math.max(1,...events.map(e=>Math.abs(e['fwd'+horizon])));$('#patternBars').innerHTML=events.map(e=>{const v=e['fwd'+horizon];return `<div class="bar-row"><span>${e.date.slice(5)}</span><div class="track"><div class="fill ${v>=0?'pos':'neg'}" style="width:${Math.abs(v)/max*100}%"></div></div><b class="${v>=0?'pos':'neg'}">${pct(v,2)}</b></div>`}).join('');$('#eventTable').innerHTML=events.slice().reverse().map(e=>`<tr><td>${e.date}</td><td>${money(e.close)}</td><td class="${e.signal_return>=0?'pos':'neg'}">${e.signal_return===null?'—':pct(e.signal_return,2)}</td><td class="${e['fwd'+horizon]>=0?'pos':'neg'}">${pct(e['fwd'+horizon],2)}</td></tr>`).join('');}
 $('#patternSelect').onchange=e=>{pattern=e.target.value;renderPattern()};$('#horizonSelect').onchange=e=>{horizon=e.target.value;renderPattern()};
-function drawAnalog(){const c=$('#analogChart'),{x,w,h}=sizeCanvas(c,320),co=colors(),rows=DATA.analogs.rows,max=Math.max(...rows.map(r=>Math.abs(r.fwd1)));x.clearRect(0,0,w,h);const m={l:100,r:50,t:28,b:30},bh=(h-m.t-m.b)/rows.length;x.strokeStyle=co.grid;x.beginPath();x.moveTo((w+m.l-m.r)/2,m.t);x.lineTo((w+m.l-m.r)/2,h-m.b);x.stroke();rows.forEach((r,i)=>{const cy=m.t+i*bh+bh/2,center=(w+m.l-m.r)/2,span=(w-m.l-m.r)/2-10,bw=Math.abs(r.fwd1)/max*span;x.fillStyle=r.fwd1>=0?co.green:co.red;x.fillRect(r.fwd1>=0?center:center-bw,cy-7,bw,14);x.fillStyle=co.text;x.textAlign='right';x.fillText(r.date,m.l-8,cy+4);x.textAlign=r.fwd1>=0?'left':'right';x.fillText(pct(r.fwd1,2),r.fwd1>=0?center+bw+5:center-bw-5,cy+4)})}
+function drawAnalog(){return CanvasText.frame(()=>{const c=$('#analogChart'),{x,w,h}=sizeCanvas(c,320),co=colors(),rows=DATA.analogs.rows,max=Math.max(...rows.map(r=>Math.abs(r.fwd1)));x.clearRect(0,0,w,h);const m={l:100,r:50,t:28,b:30},bh=(h-m.t-m.b)/rows.length;x.strokeStyle=co.grid;x.beginPath();x.moveTo((w+m.l-m.r)/2,m.t);x.lineTo((w+m.l-m.r)/2,h-m.b);x.stroke();rows.forEach((r,i)=>{const cy=m.t+i*bh+bh/2,center=(w+m.l-m.r)/2,span=(w-m.l-m.r)/2-10,bw=Math.abs(r.fwd1)/max*span;x.fillStyle=r.fwd1>=0?co.green:co.red;x.fillRect(r.fwd1>=0?center:center-bw,cy-7,bw,14);x.fillStyle=co.text;x.textAlign='right';CanvasText.text(x,CanvasText.site({"id":"iren-supplemental.drawAnalog.1","role":"date","minimumContrast":4.5,"region":"date-left","collision":"separate","formatter":"r.date","family":"iren-supplemental","mode":"drawAnalog","dependencies":["frame.width","frame.height","theme"]}),r.date,m.l-8,cy+4);x.textAlign='right';CanvasText.text(x,CanvasText.site({"id":"iren-supplemental.drawAnalog.2","role":"value","minimumContrast":4.5,"region":"value-right","collision":"separate","formatter":"pct(r.fwd1,2)","family":"iren-supplemental","mode":"drawAnalog","dependencies":["frame.width","frame.height","theme"]}),pct(r.fwd1,2),w-8,cy+4)})});}
 /* Sources are cited, not linked: every page in this library loads nothing
    from outside the site, and the location is printed so a reader can go to
    it themselves. */

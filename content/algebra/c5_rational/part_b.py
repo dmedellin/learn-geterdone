@@ -47,12 +47,7 @@ LESSONS = [
                      "of two polynomials with `q` not the zero polynomial. Its domain is "
                      "every real number except the zeros of `q` &mdash; and that is decided "
                      "by the ORIGINAL `q`, before any cancelling.")),
-            ("p", "Lesson 1 established the domain rule and lesson 2 established that you "
-                  "may cancel a common <em>factor</em>. Put them together and a question "
-                  "appears: if `x = 3` was excluded and the factor `(x − 3)` then "
-                  "cancels, what does the graph do at `x = 3`? It does something quite "
-                  "specific, and it is not the same as what it does at a zero of the "
-                  "denominator that survives."),
+            ("p", '“Rational Expressions and Their Domains” established the domain rule and “Simplifying Rational Expressions” established that you may cancel a common <em>factor</em>. Put them together and a question appears: if `x = 3` was excluded and the factor `(x − 3)` then cancels, what does the graph do at `x = 3`? It does something quite specific, and it is not the same as what it does at a zero of the denominator that survives.'),
             ("def", ("Vertical asymptote",
                      "If, after cancelling every common factor, `(x − a)` still "
                      "divides the denominator and does not divide the numerator, the "
@@ -65,11 +60,7 @@ LESSONS = [
                      "value there. The numerator may contain the same multiplicity or a "
                      "larger one. The graph is the reduced graph with the single point "
                      "`(a, r(a))` removed &mdash; a <strong>hole</strong>.")),
-            ("p", "The hole is the honest picture of what cancelling did. The reduced "
-                  "expression `r(x)` agrees with `f(x)` at every point of `f`'s domain "
-                  "and is defined at one point more. Two functions that differ at one "
-                  "point are different functions, which is exactly why lesson 1 insisted "
-                  "the excluded values be written down before the algebra started."),
+            ("p", "The hole is the honest picture of what cancelling did. The reduced expression `r(x)` agrees with `f(x)` at every point of `f`'s domain and is defined at one point more. Two functions that differ at one point are different functions, which is exactly why “Rational Expressions and Their Domains” insisted the excluded values be written down before the algebra started."),
             ("thm", ("Horizontal asymptotes by degree",
                      "Let `n` be the degree of the numerator and `m` the degree of the "
                      "denominator, with leading coefficients `a` and `b`.",
@@ -84,11 +75,7 @@ LESSONS = [
                          "`(3x² + 1)/(x² − 4)` has a tie, so `y = 3/1 = 3`. "
                          "`(x² + 1)/(x − 1)` has `2 &gt; 1`, so no horizontal "
                          "asymptote at all.")),
-            ("p", "In that last case long division writes the function as "
-                  "`x + 1 + 2/(x − 1)`, and the graph approaches the line "
-                  "`y = x + 1`. That is a slant asymptote. It is mentioned here because "
-                  "the division makes it visible; this course does not pursue it, and "
-                  "nothing later depends on it."),
+            ("p", 'In that last case long division writes the function as `x + 1 + 2/(x − 1)`, and the graph approaches the line `y = x + 1`. That is a slant asymptote. It is mentioned here because the division makes it visible; this course does not pursue it, and no method here depends on it.'),
             ("h3", "Zeros, and the one condition on them"),
             ("p", "A rational function is zero exactly where its numerator is zero AND "
                   "the point is in the domain. `x = 3` makes the numerator of our example "
@@ -220,11 +207,7 @@ LESSONS = [
                      "the end behaviour &mdash; and say which line of the factorisation "
                      "each one came from. A sketch that is right by accident does not "
                      "transfer to the next function."),
-        "note": "This is the last lesson on rational expressions. The pattern it leaves "
-                "you with &mdash; write the domain down first, then simplify, and expect "
-                "the simplified form to have forgotten something &mdash; is exactly the "
-                "pattern the radical half of the course repeats from lesson 8, with "
-                "squaring in place of cancelling.",
+        "note": 'The rational-expression pattern &mdash; write the domain down first, then simplify, and expect the simplified form to have forgotten something &mdash; also applies to radical expressions and equations, with squaring in place of cancelling.',
     },
     # ---------------------------------------------------------------- 08
     {
@@ -233,10 +216,7 @@ LESSONS = [
         "module": "Radicals",
         "one_line": "Decide the real domain and simplify an nth-root expression, using absolute value when an even root requires it.",
         "summary": (
-            "The second half of the course opens the way the first did: with the values "
-            "that are not allowed. An even root demands a non-negative radicand, the "
-            "principal root is a single number rather than two, and both facts show up "
-            "in the identity `√(x²) = |x|`."
+            'Radical expressions, like rational expressions, require the values that are not allowed to be stated. An even root demands a non-negative radicand, the principal root is a single number rather than two, and both facts show up in the identity `√(x²) = |x|`.'
         ),
         "key": [
             "√(a²) = |a|            not a",
@@ -278,7 +258,7 @@ LESSONS = [
                      "root. When `n` is odd, `ⁿ√a` denotes the unique real root, which has "
                      "the same sign as `a`. When `n` is even and `a &lt; 0`, `ⁿ√a` is not "
                      "a real number.")),
-            ("p", "That last clause is the radical half's version of \"the denominator is not zero\". It is a restriction on the domain, it is decided before any algebra happens, and no manipulation later can be allowed to lose it. `√(−4)` is treated here as undefined; Quadratics and Complex Numbers introduces `i` and gives it a value."),
+            ("p", 'That last clause is the radical-domain counterpart of "the denominator is not zero". It is a restriction on the domain, it is decided before any algebra happens, and no manipulation later can be allowed to lose it. `√(−4)` is treated here as undefined; Quadratics and Complex Numbers introduces `i` and gives it a value.'),
             ("thm", ("The identity that catches everyone",
                      "For every real `x`, `√(x²) = |x|`.",
                      "The left side is non-negative by definition of the principal root, "
@@ -295,16 +275,12 @@ LESSONS = [
                      "The condition is not fine print. Without it one could write "
                      "`√(−4) · √(−9) = √36 = 6`, and the left side is not a real "
                      "number at all.")),
-            ("p", "Notice what is absent: there is no rule for `ⁿ√(a + b)`. Roots "
-                  "distribute over multiplication and division and over nothing else. "
-                  "`√(9 + 16)` is `√25 = 5`, while `√9 + √16` is `7`. This is the same "
-                  "shape of error as cancelling a term rather than a factor in lesson 2."),
+            ("p", 'Notice what is absent: there is no rule for `ⁿ√(a + b)`. Roots distribute over multiplication and division and over nothing else. `√(9 + 16)` is `√25 = 5`, while `√9 + √16` is `7`. This is the same shape of error as cancelling a term rather than a factor in “Simplifying Rational Expressions”.'),
             ("h3", "Simplified form"),
             ("ul", [
                 "<strong>No perfect nth power left under the radical.</strong> `√72` "
                 "becomes `6√2` because `72 = 36 · 2`.",
-                "<strong>No fraction under the radical</strong> and no radical in a "
-                "denominator &mdash; lesson 10 handles the second half of that.",
+                '<strong>No fraction under the radical</strong> and no radical in a denominator &mdash; “Rationalizing Denominators” handles the second half of that.',
             ]),
             ("example", ("Variables under an even root",
                          "`√(50x³)` simplifies to `5x√(2x)`. No absolute value is needed: "
@@ -364,12 +340,7 @@ LESSONS = [
                 "index been even, there would have been nothing to do &mdash; the "
                 "expression would not name a real number and the work would stop at the "
                 "first line.",
-                "In (c) the domain restriction was written before simplifying, exactly "
-                "as in lesson 1, and it makes `√(3x)` defined. The extracted factor is "
-                "`x²`, already non-negative, so `√(x⁴) = x²` needs no bars. The bars are "
-                "genuinely at stake in the earlier `√(50x³) = 5x√(2x)`: extracting "
-                "`√(x²)` first gives `|x|`, and only the domain condition `x ≥ 0` lets "
-                "that become `x`.",
+                'In (c) the domain restriction was written before simplifying, exactly as in “Rational Expressions and Their Domains”, and it makes `√(3x)` defined. The extracted factor is `x²`, already non-negative, so `√(x⁴) = x²` needs no bars. The bars are genuinely at stake in the earlier `√(50x³) = 5x√(2x)`: extracting `√(x²)` first gives `|x|`, and only the domain condition `x ≥ 0` lets that become `x`.',
                 "For a faded variable pass, simplify `√(18t²)`. The supplied "
                 "factorisation is `18t² = 9 · 2 · t²`; decide the domain, extract both "
                 "square factors and preserve the principal-root sign. Check against "
@@ -428,10 +399,7 @@ LESSONS = [
                      "simplify it exactly, and justify each extraction by the product or "
                      "quotient rule with its hypothesis checked. Knowing that `√200 = 10√2` "
                      "matters less than knowing why `√(−4) · √(−9)` is not `6`."),
-        "note": "Everything in the next four lessons rests on this one. Adding radicals "
-                "needs simplified form to see which are alike, rationalizing needs the "
-                "product rule, and radical equations need the domain restriction that "
-                "the even index imposes here.",
+        "note": 'Operations with radicals, rationalizing denominators, radical equations and radical functions rely on radical simplification and its conditions. Adding radicals needs simplified form to see which are alike, rationalizing needs the product rule, and radical equations need the domain restriction that the even index imposes here.',
     },
     # ---------------------------------------------------------------- 09
     {
@@ -466,10 +434,7 @@ LESSONS = [
              "`√8` and `√18` look unrelated and are both multiples of `√2`. Any judgement "
              "about which radicals combine, made before simplifying, is a guess."),
             ("Multiplication has no such restriction",
-             "`√2 · √3 = √6` needs nothing to match, only the product rule and "
-             "non-negative radicands. Sums are the difficult direction, which is why "
-             "the conjugate trick &mdash; turning a sum into a product &mdash; is worth "
-             "so much in lesson 10."),
+             '`√2 · √3 = √6` needs nothing to match, only the product rule and non-negative radicands. Sums are the difficult direction, which is why the conjugate trick &mdash; turning a sum into a product &mdash; is worth so much in “Rationalizing Denominators”.'),
         ],
         "read_title": "Combining radicals, and the two ways it goes wrong",
         "read_intro": "Addition first, because it is the one with a condition; then multiplication and the two special products.",
@@ -501,16 +466,13 @@ LESSONS = [
             ("thm", ("The conjugate product",
                      "`(a + √b)(a − √b) = a² − b`, and more generally "
                      "`(√a + √b)(√a − √b) = a − b` for `a, b ≥ 0`.",
-                     "It is the difference of two squares from Polynomials and Factoring, and squaring is exactly what removes a square root. The result contains no radical at all &mdash; which is the whole reason lesson 10 works.")),
+                     'It is the difference of two squares from Polynomials and Factoring, and squaring is exactly what removes a square root. The result contains no radical at all &mdash; which is the whole reason “Rationalizing Denominators” works.')),
             ("example", ("Two products, one with a middle term and one without",
                          "`(2 + √3)(2 − √3) = 4 − 3 = 1`: the cross terms "
                          "`−2√3` and `+2√3` cancel. But `(√5 + √2)² = 5 + 2√10 + 2 = "
                          "7 + 2√10`: here the cross terms are equal and ADD. Squaring a "
                          "binomial never loses its middle term.")),
-            ("p", "That contrast is worth holding on to. `(a + b)² = a² + b²` is false for "
-                  "numbers and stays false for radicals, and lesson 11 turns on it: "
-                  "squaring `√x + 1` gives `x + 2√x + 1`, so squaring an equation with two "
-                  "terms on a side does not remove the root."),
+            ("p", 'That contrast is worth holding on to. `(a + b)² = a² + b²` is false for numbers and stays false for radicals, and “Solving Radical Equations” turns on it: squaring `√x + 1` gives `x + 2√x + 1`, so squaring an equation with two terms on a side does not remove the root.'),
         ],
         "lab": ("radicals", {
             "mode": "operate",
@@ -562,10 +524,7 @@ LESSONS = [
                 "In (c) the answer `12√12` is correct and unfinished. A radical answer is "
                 "not simplified until nothing extractable remains under the sign, and "
                 "`√12` still hides a `4`.",
-                "Compare (d) with `(2 + √3)(2 − √3) = 1`. Same shape of expression, "
-                "opposite outcome: with a conjugate the middle terms cancel and the root "
-                "vanishes, with a square they reinforce and the root survives. Lesson 10 "
-                "uses the first; lesson 11 is made difficult by the second.",
+                'Compare (d) with `(2 + √3)(2 − √3) = 1`. Same shape of expression, opposite outcome: with a conjugate the middle terms cancel and the root vanishes, with a square they reinforce and the root survives. “Rationalizing Denominators” uses the first; “Solving Radical Equations” is made difficult by the second.',
                 "For a faded operation pass, first simplify `√12 + 2√27 − √75`; the "
                 "supplied start is `√12 = 2√3`. Finish the other two extractions and "
                 "combine to `3√3`. Then expand `(√6 + √2)(√6 − √2)` from the supplied "
@@ -620,9 +579,7 @@ LESSONS = [
                      "simplify every term, combine exactly the like ones, and leave the "
                      "rest alone without discomfort. `7 + 2√10` is a finished answer, and "
                      "treating it as unfinished is what produces an invented step."),
-        "note": "The conjugate product proved here is used immediately. Lesson 10 needs a "
-                "multiplier that clears a two-term radical denominator, and the "
-                "difference of squares is the only thing that does it in one step.",
+        "note": 'The conjugate product proved here provides the multiplier for rationalizing. “Rationalizing Denominators” needs a multiplier that clears a two-term radical denominator, and the difference of squares is the only thing that does it in one step.',
     },
     # ---------------------------------------------------------------- 10
     {
@@ -650,9 +607,7 @@ LESSONS = [
         ),
         "concepts": [
             ("Multiplying by a form of 1 changes the form, not the value",
-             "`√7/√7` is `1`, so `(3/√7)·(√7/√7)` is the same number as `3/√7`. This is "
-             "the same licence used to build a common denominator in lesson 4; nothing "
-             "is being added to or removed from the expression."),
+             '`√7/√7` is `1`, so `(3/√7)·(√7/√7)` is the same number as `3/√7`. This is the same licence used to build a common denominator in “Adding and Subtracting Rational Expressions”; nothing is being added to or removed from the expression.'),
             ("Choose the multiplier to complete a perfect power",
              "For `√7` you need one more `√7` to make `7`. For `∛2` you need `∛4`, "
              "because `∛2 · ∛4 = ∛8 = 2`. The question is always: what does this "
@@ -814,14 +769,8 @@ LESSONS = [
         ],
         "standard": ("Finish when the simplified shape of a numerical denominator tells you the multiplier "
                      "immediately.",
-                     "Given any of the three shapes you should be able to name the form "
-                     "of `1` before doing any arithmetic, and say what the denominator "
-                     "will become. You should also be able to say why this step, unlike "
-                     "the next lesson's, can never affect a solution set."),
-        "note": "Rationalizing is the last technique in this course that is a pure "
-                "rewriting &mdash; guaranteed to preserve value and domain. Lesson 11 "
-                "uses a step that preserves neither, and the contrast is the point of "
-                "meeting them in this order.",
+                     'Given any of the three shapes you should be able to name the form of `1` before doing any arithmetic, and say what the denominator will become. You should also be able to say why this step, unlike squaring in “Solving Radical Equations”, can never affect a solution set.'),
+        "note": 'Rationalizing is a pure rewriting &mdash; guaranteed to preserve value and domain. The squaring step in “Solving Radical Equations” preserves neither, which is why rewriting an expression and solving an equation need different checks.',
     },
     # ---------------------------------------------------------------- 11
     {
@@ -864,10 +813,7 @@ LESSONS = [
         "read_title": "Solving equations that contain a radical",
         "read_intro": "The method, the reason it needs a check, and the case of two radicals.",
         "body": [
-            ("p", "Lesson 6 met extraneous solutions when clearing denominators: "
-                  "multiplying by an expression that could be zero can create a root. "
-                  "This lesson meets them again from a different direction, and the cure "
-                  "is identical &mdash; substitute into the original."),
+            ("p", '“Solving Rational Equations” met extraneous solutions when clearing denominators: multiplying by an expression that could be zero can create a root. This lesson meets them again from a different direction, and the cure is identical &mdash; substitute into the original.'),
             ("def", ("Radical equation",
                      "A <strong>radical equation</strong> is one in which the variable "
                      "appears under a radical sign. `√(x + 7) = x − 5` is one; "
@@ -894,10 +840,7 @@ LESSONS = [
                          "entirely extraneous. The equation was unsolvable before the "
                          "first step.")),
             ("h3", "Two radicals"),
-            ("p", "Isolate one radical on its own side before squaring, even if another "
-                  "remains. Squaring a side with two terms is where lesson 9's middle "
-                  "term returns: `(1 + √x)² = 1 + 2√x + x` still contains a root, so "
-                  "nothing has been gained."),
+            ("p", "Isolate one radical on its own side before squaring, even if another remains. Squaring a side with two terms is where “Adding, Subtracting and Multiplying Radicals”'s middle term returns: `(1 + √x)² = 1 + 2√x + x` still contains a root, so nothing has been gained."),
             ("p", "For `√(x + 5) − √x = 1`, move `√x` across to get "
                   "`√(x + 5) = 1 + √x`. Squaring gives `x + 5 = 1 + 2√x + x`, so "
                   "`4 = 2√x` and `√x = 2`, hence `x = 4`. Check in the original: "
@@ -972,10 +915,7 @@ LESSONS = [
                 "solution of the squared equation and not of the original, because "
                 "squaring merged `√(x + 7) = x − 5` with "
                 "`√(x + 7) = −(x − 5)` &mdash; and `2` solves the second one.",
-                "There is a shortcut worth noticing in (a): the left side is a principal "
-                "square root, so it is never negative, so `x − 5 ≥ 0` and `x ≥ 5` "
-                "before any work is done. That condition alone rejects `x = 2`. Writing "
-                "the domain restriction first is the same habit lesson 1 asked for.",
+                'There is a shortcut worth noticing in (a): the left side is a principal square root, so it is never negative, so `x − 5 ≥ 0` and `x ≥ 5` before any work is done. That condition alone rejects `x = 2`. Writing the domain restriction first is the same habit “Rational Expressions and Their Domains” asked for.',
                 "For a faded solve, take `√(2x + 3) = x`. The supplied sign condition is "
                 "`x ≥ 0`, because a principal square root cannot equal a negative right "
                 "side. Square, factor the resulting quadratic and check both candidates "
@@ -1038,10 +978,7 @@ LESSONS = [
                      "candidates in the original, and name the equation the extraneous "
                      "root actually satisfies. You should also be able to spot, before "
                      "starting, when a sign condition makes some candidates impossible."),
-        "note": "This lesson and lesson 6 are the same lesson in two costumes. Clearing a "
-                "denominator and squaring both sides are both legal, both irreversible, "
-                "and both handled by the identical discipline: solve, then test every "
-                "candidate against the equation you were given.",
+        "note": 'This lesson and “Solving Rational Equations” are the same lesson in two costumes. Clearing a denominator and squaring both sides are both legal, both irreversible, and both handled by the identical discipline: solve, then test every candidate against the equation you were given.',
     },
     # ---------------------------------------------------------------- 12
     {
@@ -1084,11 +1021,7 @@ LESSONS = [
                      "A <strong>radical function</strong> is one whose rule places the "
                      "variable under a radical: `f(x) = ⁿ√(g(x))`. For even `n` its "
                      "domain is `{ x : g(x) ≥ 0 }`; for odd `n` it is the domain of `g`.")),
-            ("p", "Compare this with lesson 1. There the domain was found by setting a "
-                  "denominator equal to zero and excluding the roots &mdash; an equation. "
-                  "Here it is found by requiring a radicand to be non-negative &mdash; an "
-                  "inequality. A denominator excludes isolated points; an even radical "
-                  "excludes whole intervals."),
+            ("p", 'Compare this with “Rational Expressions and Their Domains”. There the domain was found by setting a denominator equal to zero and excluding the roots &mdash; an equation. Here it is found by requiring a radicand to be non-negative &mdash; an inequality. A denominator excludes isolated points; an even radical excludes whole intervals.'),
             ("example", ("Three domains",
                          "`√(x − 3)` needs `x − 3 ≥ 0`, so `x ≥ 3`. `√(5 − x)` needs `5 − x ≥ 0`, so `x ≤ 5` &mdash; the inequality reverses, exactly as in Linear Equations and Inequalities. `∛(x − 3)` needs nothing: its domain is all real numbers.")),
             ("h3", "When the radicand is a quadratic"),
@@ -1109,10 +1042,7 @@ LESSONS = [
                      "`y = x`, which is what makes it that function's inverse &mdash; and "
                      "why the restriction is needed at all.")),
             ("p", "The transformations from Lines, Functions and Graphs apply unchanged. In `y = a·√(x − h) + k` the graph starts at `(h, k)` instead of the origin; `h` shifts the domain to `x ≥ h`, `k` shifts the range to `y ≥ k`, and a negative `a` flips it downwards so the range becomes `y ≤ k`. The endpoint is the one point worth plotting exactly."),
-            ("p", "One last connection back to lesson 8. The function `f(x) = √(x²)` is "
-                  "defined for every real `x`, since `x²` is never negative &mdash; but "
-                  "its graph is not the line `y = x`. It is `y = |x|`, a V with its "
-                  "vertex at the origin. The identity from lesson 8, drawn."),
+            ("p", 'A connection with “Simplifying Radical Expressions”. The function `f(x) = √(x²)` is defined for every real `x`, since `x²` is never negative &mdash; but its graph is not the line `y = x`. It is `y = |x|`, a V with its vertex at the origin. The identity from “Simplifying Radical Expressions”, drawn.'),
             ("p", "Everywhere in this course `√(−4)` has been outside the domain, and every domain here has been a set of real numbers. Quadratics and Complex Numbers introduces `i` and gives negative radicands values; nothing in this course anticipates that, and the domains stated here are the correct ones for real-valued functions."),
         ],
         "lab": ("grapher", {

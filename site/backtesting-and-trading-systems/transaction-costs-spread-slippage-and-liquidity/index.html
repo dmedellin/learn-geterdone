@@ -307,6 +307,7 @@ input[type=range]{width:100%;accent-color:var(--cyan)}.segmented{display:grid;gr
       font-size: 0.9rem;
       resize: vertical;
     }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
     .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
     .fb-actions {
       display: flex;
@@ -465,6 +466,27 @@ input[type=range]{width:100%;accent-color:var(--cyan)}.segmented{display:grid;gr
       .signin-btn { padding: 0; width: 38px; justify-content: center; }
     }
 
+    /* Trading charts use a 960-unit plotting frame. Keep that authored scale
+       instead of shrinking 11-unit axis text to roughly 3 CSS pixels on a
+       phone. The named keyboard scroll owner exposes the complete chart. */
+    @media screen {
+      .market-chart-scroll {
+        contain: inline-size;
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        overscroll-behavior-inline: contain;
+      }
+      .market-chart-scroll > svg.market-chart {
+        display: block;
+        width: 100%;
+        min-width: 960px;
+      }
+    }
+
     body[data-page-kind] {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 16px;
@@ -498,6 +520,7 @@ input[type=range]{width:100%;accent-color:var(--cyan)}.segmented{display:grid;gr
     [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
     [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
     [data-ui="hero"] .eyebrow { display: block; color: var(--muted); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
     [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
     [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
     [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
@@ -542,7 +565,7 @@ input[type=range]{width:100%;accent-color:var(--cyan)}.segmented{display:grid;gr
     }
     [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
     [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
-    [data-ui="lesson-list"] .lesson-link { min-height: 44px; }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
     body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
     body[data-page-kind] .is-done .lesson-state { color: var(--green); }
     [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
@@ -595,7 +618,243 @@ input[type=range]{width:100%;accent-color:var(--cyan)}.segmented{display:grid;gr
 </style>
   </noscript>
 
-  <script>
+  <script data-canvas-text="v1">
+/* Learn canvas text contract v1. Inlined by the authored-page normalizer. */
+(()=>{
+ 'use strict';
+ const roles=Object.freeze({axis:4.5,annotation:4.5,value:4.5,status:4.5,date:4.5});
+ const tokens=new WeakMap(),sites=new Map(),contexts=new WeakMap(),pending=new Map(),completed=new Map(),gutters=new WeakMap();
+ const nativeFill=CanvasRenderingContext2D.prototype.fillText;
+ const paintObjects=new WeakMap();
+ let depth=0,active=null,probe=null,execution=0;
+ const fail=message=>{throw Object.assign(Error('canvas contract: '+message),{code:'LEARN_CANVAS_SEMANTIC',assertion:message})};
+ const finite=values=>values.every(Number.isFinite);
+ const stable=value=>JSON.stringify(value,Object.keys(value).sort());
+ function site(definition){
+  if(!definition||typeof definition!=='object')fail('missing descriptor');
+  if(['guide','decorative'].includes(definition.role))fail('decorative guide used as semantic text');
+  const keys=['id','role','minimumContrast','region','collision','formatter','family','mode','dependencies'];
+  if(Object.keys(definition).sort().join()!==keys.sort().join()||typeof definition.id!=='string'||!/^[a-zA-Z0-9_.:-]+$/.test(definition.id)||typeof definition.role!=='string'||!Object.hasOwn(roles,definition.role)||!Number.isFinite(definition.minimumContrast)||definition.minimumContrast!==roles[definition.role]||!['axis-right','axis-left','axis-bottom','title-top','annotation','date-left','date-bottom-left','date-bottom-right','label-left','value-right','status'].includes(definition.region)||!['separate','fixed'].includes(definition.collision)||['formatter','family','mode'].some(k=>typeof definition[k]!=='string'||!definition[k])||!Array.isArray(definition.dependencies)||definition.dependencies.some(d=>typeof d!=='string'||!d)||new Set(definition.dependencies).size!==definition.dependencies.length||['frame.width','frame.height','theme'].some(d=>!definition.dependencies.includes(d)))fail('invalid semantic descriptor');
+  const key=stable(definition),prior=sites.get(definition.id);
+  if(prior){if(prior.key!==key)fail('conflicting descriptor '+definition.id);return prior.token;}
+  const descriptor=Object.freeze({...definition,dependencies:Object.freeze([...definition.dependencies])}),token=Object.freeze(Object.create(null));
+  tokens.set(token,descriptor);sites.set(descriptor.id,{key,descriptor,token});return token;
+ }
+ function rolePaint(canvas,role){
+  if(typeof role!=='string'||!Object.hasOwn(roles,role))fail('decorative guide used as semantic text');
+  for(let e=canvas;e;e=e.parentElement){const s=getComputedStyle(e);if(Number(s.opacity)!==1||s.filter!=='none'||s.mixBlendMode!=='normal')fail('unprovable canvas ancestor paint');}
+  const style=getComputedStyle(canvas),foreground=style.getPropertyValue('--text').trim(),background=style.getPropertyValue('--panel-2').trim();
+  const pixel=document.createElement('canvas');pixel.width=pixel.height=1;const c=pixel.getContext('2d',{willReadFrequently:true});
+  const resolve=color=>{if(!CSS.supports('color',color))fail('unresolved semantic paint');c.clearRect(0,0,1,1);c.fillStyle=color;c.fillRect(0,0,1,1);const rgba=[...c.getImageData(0,0,1,1).data];if(rgba[3]!==255)fail('semantic role paint must be opaque');return rgba.slice(0,3)};
+  const fg=resolve(foreground),bg=resolve(background);
+  const luminance=rgb=>rgb.map(v=>v/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4).reduce((sum,v,i)=>sum+v*[.2126,.7152,.0722][i],0);
+  const a=luminance(fg),b=luminance(bg),ratio=(Math.max(a,b)+.05)/(Math.min(a,b)+.05);
+  if(ratio<roles[role])fail('text contrast below threshold');
+  return {foreground,background,fg,bg,ratio};
+ }
+ function traceValue(value){
+  if(value===null||typeof value==='string'||typeof value==='boolean')return value;
+  if(value===undefined)return {undefined:true};
+  if(typeof value==='number'&&Number.isFinite(value))return value;
+  if(Array.isArray(value)){const items=[];for(let i=0;i<value.length;i++){if(!Object.hasOwn(value,i))fail('unprovable canvas trace value');items.push(traceValue(value[i]));}return {array:items};}
+  const paint=value&&typeof value==='object'?paintObjects.get(value):null;
+  if(paint)return {gradient:paint.kind,id:paint.id,arguments:paint.args,stops:paint.stops.map(s=>s.slice())};
+  fail('unprovable canvas trace value');
+ }
+ function trackedGradient(raw,kind,args,frame){
+  const record={raw,kind,id:++frame.paintSequence,frame,args:args.map(traceValue),stops:[],proxy:null};
+  const proxy=new Proxy(Object.create(null),{get(_target,key){const target=raw;
+   if(key!=='addColorStop')fail('unprovable canvas gradient access');
+   return (...args)=>{if(frame.status!=='geometry'||pending.get(frame.canvas)!==frame)fail('gradient mutation outside canvas frame');if(args.length!==2)fail('unprovable canvas gradient stop');const stop=args.map(traceValue);target.addColorStop(...args);record.stops.push(stop);frame.trace.push(['gradient-stop',record.id,record.kind,record.args,stop]);};
+  },defineProperty(){fail('canvas gradient reflection mutation')},deleteProperty(){fail('canvas gradient reflection mutation')},setPrototypeOf(){fail('canvas gradient reflection mutation')},preventExtensions(){fail('canvas gradient reflection mutation')},set(){fail('canvas gradient reflection mutation')}});
+  record.proxy=proxy;paintObjects.set(raw,record);paintObjects.set(proxy,record);return proxy;
+ }
+ const operationMethods=new Set(['save','restore','reset','setTransform','resetTransform','transform','translate','rotate','scale','setLineDash','getLineDash','beginPath','moveTo','lineTo','bezierCurveTo','quadraticCurveTo','arc','arcTo','ellipse','rect','roundRect','closePath','fill','stroke','fillRect','strokeRect','clearRect','clip','measureText','getTransform','getImageData','createImageData','putImageData','drawImage','createLinearGradient','createRadialGradient','createConicGradient','isPointInPath','isPointInStroke','getContextAttributes','isContextLost']);
+ const stateProperties=new Set(['direction','fillStyle','filter','font','fontKerning','fontStretch','fontVariantCaps','globalAlpha','globalCompositeOperation','imageSmoothingEnabled','imageSmoothingQuality','lang','letterSpacing','lineCap','lineDashOffset','lineJoin','lineWidth','miterLimit','shadowBlur','shadowColor','shadowOffsetX','shadowOffsetY','strokeStyle','textAlign','textBaseline','textRendering','wordSpacing']);
+ const paintMethods=new Set(['reset','clearRect','fillRect','strokeRect','fill','stroke','drawImage','putImageData','fillText','strokeText']);
+ function begin(canvas,width,height,dpr){
+  if(!depth)fail('frame missing');
+  if(!(canvas instanceof HTMLCanvasElement)||!finite([width,height,dpr])||width<=0||height<=0||dpr<=0)fail('invalid canvas dimensions');
+  if(pending.has(canvas))fail('canvas begun twice without finalization');
+  const raw=canvas.getContext('2d');if(!raw)fail('2D context missing');
+  const frame={canvas,raw,width,height,dpr,execution:++execution,status:'geometry',commands:[],trace:[],labels:[],paintSequence:0,clipDepth:0,clipStack:[]};
+  pending.set(canvas,frame);
+  if(canvas.width!==Math.round(width*dpr))canvas.width=Math.round(width*dpr);if(canvas.height!==Math.round(height*dpr))canvas.height=Math.round(height*dpr);
+  raw.reset();raw.setTransform(dpr,0,0,dpr,0,0);
+  const proxy=new Proxy(Object.create(null),{
+   get(_target,key){const target=raw;
+    const value=Reflect.get(target,key,target);
+    if(typeof value!=='function')return paintObjects.get(value)?.proxy||value;
+    return (...args)=>{
+     if(key==='fillText'||key==='strokeText')fail('uncontracted native text');
+     if(!operationMethods.has(key))fail('unsupported canvas operation '+String(key));
+     if(paintMethods.has(key)&&frame.status!=='geometry')fail('paint after text finalization');
+     frame.trace.push([String(key),args.map(traceValue)]);
+     const result=value.apply(target,args);
+     return ['createLinearGradient','createRadialGradient','createConicGradient'].includes(key)?trackedGradient(result,key,args,frame):result;
+    };
+   },
+   defineProperty(){fail('canvas context reflection mutation')},deleteProperty(){fail('canvas context reflection mutation')},setPrototypeOf(){fail('canvas context reflection mutation')},preventExtensions(){fail('canvas context reflection mutation')},
+   set(_target,key,value){if(!stateProperties.has(key))fail('unsupported canvas state property '+String(key));const target=raw;const paint=paintObjects.get(value);if(paint&&paint.frame!==frame)fail('gradient used outside canvas frame');frame.trace.push(['set',String(key),traceValue(value)]);return Reflect.set(target,key,paint?.raw||value,target)}
+  });
+  contexts.set(proxy,frame);pending.set(canvas,frame);return proxy;
+ }
+ function region(frame,name){
+  const w=frame.width,h=frame.height,gutter=gutters.get(frame.canvas)||0;
+  const regions={'axis-bottom':[6,h-29,w-6,h-2],'title-top':[6,4,w-6,44],'axis-right':[w-(gutter||68),4,w-4,h-4],'axis-left':[2,4,46,h-30],'date-bottom-left':[42,h-28,w/2,h-2],'date-bottom-right':[w/2,h-28,w-8,h-2],'label-left':[6,6,168,h-6],annotation:[6,44,w-Math.max(74,gutter+8),h-30],'date-left':[6,6,Math.min(116,w/3),h-6],'value-right':[w-116,6,w-6,h-6],status:[6,48,w-6,h-6]};
+  const r=regions[name];if(!r||r[0]<0||r[1]<0||r[2]>w||r[3]>h||r[0]>=r[2]||r[1]>=r[3])fail('invalid descriptor region');
+  return {left:r[0],top:r[1],right:r[2],bottom:r[3]};
+ }
+ function text(context,token,value,x,y,maxWidth){
+  if(arguments.length<5||arguments.length>6)fail('arbitrary semantic paint arguments');
+  const descriptor=tokens.get(token),frame=contexts.get(context);
+  if(!descriptor)fail('unbound site token');if(!frame||frame.status!=='geometry'||!pending.has(frame.canvas))fail('semantic text outside frame');
+  if(frame.clipDepth)fail('unprovable semantic clip');
+  const raw=frame.raw,label=String(value);if(!label.trim())fail('empty semantic text');
+  if(!finite([x,y])||maxWidth!==undefined&&(!Number.isFinite(maxWidth)||maxWidth<=0))fail('nonfinite semantic geometry');
+  if(raw.globalAlpha!==1)fail('semantic alpha below one');
+  if(raw.globalCompositeOperation!=='source-over')fail('unsupported semantic composite');
+  if(typeof raw.fillStyle!=='string')fail('gradient or pattern used for semantic text');
+  if(raw.filter!=='none'||raw.shadowBlur||raw.shadowOffsetX||raw.shadowOffsetY||!['rgba(0, 0, 0, 0)','transparent','#00000000'].includes(raw.shadowColor))fail('unprovable semantic shadow or filter');
+  let matrix=raw.getTransform();if(!matrix.is2D||!finite([matrix.a,matrix.b,matrix.c,matrix.d,matrix.e,matrix.f])||Math.abs(matrix.a*matrix.d-matrix.b*matrix.c)<1e-12)fail('unprovable semantic transform');
+  // Chromium normalizes a six-number setTransform differently from an
+  // accumulated rotate/translate matrix. Measure the transform that the
+  // final flush will actually apply, leaving graph drawing state intact.
+  raw.save();raw.setTransform(matrix.a,matrix.b,matrix.c,matrix.d,matrix.e,matrix.f);matrix=raw.getTransform();raw.restore();
+  for(const property of ['letterSpacing','wordSpacing'])if(raw[property]!==undefined){if(raw[property]!==''&&raw[property]!=='0px')fail('unprovable semantic font spacing');raw[property]='1px';raw[property]='0px';if(raw[property]!=='0px')fail('unresolved semantic font spacing');}
+  raw.fontKerning='none';raw.direction=raw.direction==='inherit'?getComputedStyle(frame.canvas).direction:raw.direction;
+  const font=/^(?:(italic|oblique) )?(?:(normal|bold|[1-9]00) )?([0-9.]+)px (.+)$/.exec(raw.font);if(!font)fail('unresolved semantic font');
+  raw.font=(font[1]?font[1]+' ':'')+Math.max(600,font[2]==='bold'?700:Number(font[2])||400)+' '+Math.max(12,Number(font[3]))+'px '+font[4];
+  const metrics=raw.measureText(label),required=['width','actualBoundingBoxLeft','actualBoundingBoxRight','actualBoundingBoxAscent','actualBoundingBoxDescent'];
+  if(!finite(required.map(k=>metrics[k])))fail('incomplete text metrics');
+  const command={descriptor,token,text:label,x,y,maxWidth,metrics:Object.fromEntries(required.map(k=>[k,metrics[k]])),matrix:[matrix.a,matrix.b,matrix.c,matrix.d,matrix.e,matrix.f],font:raw.font,align:raw.textAlign,baseline:raw.textBaseline,direction:raw.direction,paint:rolePaint(frame.canvas,descriptor.role),region:region(frame,descriptor.region)};
+  frame.commands.push(command);
+ }
+ function bounds(command,frame,x=command.x,y=command.y){
+  const m=command.metrics,compress=command.maxWidth===undefined||!m.width?1:Math.min(1,command.maxWidth/m.width),matrix=new DOMMatrix(command.matrix);
+  const corners=[[x-m.actualBoundingBoxLeft*compress,y-m.actualBoundingBoxAscent],[x+m.actualBoundingBoxRight*compress,y-m.actualBoundingBoxAscent],[x+m.actualBoundingBoxRight*compress,y+m.actualBoundingBoxDescent],[x-m.actualBoundingBoxLeft*compress,y+m.actualBoundingBoxDescent]].map(([x,y])=>{const p=matrix.transformPoint({x,y});return {x:p.x/frame.dpr,y:p.y/frame.dpr}});
+  return {left:Math.min(...corners.map(p=>p.x)),right:Math.max(...corners.map(p=>p.x)),top:Math.min(...corners.map(p=>p.y)),bottom:Math.max(...corners.map(p=>p.y)),corners};
+ }
+ const intersects=(a,b)=>a.left<b.right&&b.left<a.right&&a.top<b.bottom&&b.top<a.bottom;
+ const inside=(a,b)=>a.left>=b.left&&a.right<=b.right&&a.top>=b.top&&a.bottom<=b.bottom;
+ function finish(frame){
+  if(frame.status!=='geometry')fail('duplicate finalization');
+  if(frame.clipDepth)fail('unprovable semantic clip at finalization');
+  const placed=[];
+  for(const command of frame.commands){
+   const initial=bounds(command,frame),pad=2,inkWidth=initial.right-initial.left,inkHeight=initial.bottom-initial.top,r=command.region;
+   if(inkWidth<=0||inkHeight<=0||inkWidth+2*pad>r.right-r.left||inkHeight+2*pad>r.bottom-r.top)fail('unplaceable semantic text '+command.descriptor.id);
+   let left=Math.max(r.left+pad,Math.min(initial.left,r.right-pad-inkWidth)),top=Math.max(r.top+pad,Math.min(initial.top,r.bottom-pad-inkHeight));
+   const candidate=(left,top)=>({left:left-pad,right:left+inkWidth+pad,top:top-pad,bottom:top+inkHeight+pad});
+   let box=candidate(left,top);
+   if(command.descriptor.collision==='separate'&&placed.some(p=>intersects(box,p.box))){
+    const choices=[];
+    for(let y=r.top+pad;y<=r.bottom-pad-inkHeight;y+=inkHeight+2*pad+1)for(let x=r.left+pad;x<=r.right-pad-inkWidth;x+=inkWidth+2*pad+1)choices.push({x,y,d:(x-left)**2+(y-top)**2});
+    choices.sort((a,b)=>a.d-b.d||a.y-b.y||a.x-b.x);
+    const spot=choices.find(p=>!placed.some(q=>intersects(candidate(p.x,p.y),q.box)));
+    if(!spot)fail('unplaceable semantic collision '+command.descriptor.id);left=spot.x;top=spot.y;box=candidate(left,top);
+   }
+   if(placed.some(p=>intersects(box,p.box)))fail('semantic bounds overlap');
+   const inverse=new DOMMatrix(command.matrix).inverse(),shift=inverse.transformPoint({x:(left-initial.left)*frame.dpr,y:(top-initial.top)*frame.dpr,w:0});
+   const x=command.x+shift.x,y=command.y+shift.y,ink=bounds(command,frame,x,y);
+   if(!inside(ink,r)||ink.corners.some(p=>p.x<0||p.y<0||p.x>frame.width||p.y>frame.height))fail('transformed semantic corner outside region');
+   placed.push({command,x,y,ink,box});
+  }
+  frame.placed=placed;frame.status='text';const raw=frame.raw;
+  for(const p of placed){
+   const c=p.command;raw.save();raw.setTransform(frame.dpr,0,0,frame.dpr,0,0);raw.globalAlpha=1;raw.globalCompositeOperation='source-over';raw.filter='none';raw.shadowColor='transparent';raw.fillStyle=c.paint.background;raw.fillRect(p.box.left,p.box.top,p.box.right-p.box.left,p.box.bottom-p.box.top);raw.restore();
+  }
+  const expectedNativeCount=placed.filter(p=>probe?.suppress!==p.command.descriptor.id).length;let nativeOrdinal=0;
+  for(const [instance,p] of placed.entries()){
+   const c=p.command;
+   const label={site:c.descriptor.id,descriptor:c.descriptor,instance,text:c.text,font:c.font,align:c.align,baseline:c.baseline,matrix:c.matrix,maxWidth:c.maxWidth??null,ink:p.ink,region:c.region,backing:p.box,paint:c.paint};frame.labels.push(label);
+   if(probe?.suppress===c.descriptor.id)continue;
+   raw.save();raw.setTransform(...c.matrix);raw.font=c.font;raw.fontKerning='none';raw.letterSpacing='0px';raw.wordSpacing='0px';raw.textAlign=c.align;raw.textBaseline=c.baseline;raw.direction=c.direction;raw.fillStyle=c.paint.foreground;raw.globalAlpha=1;raw.globalCompositeOperation='source-over';raw.filter='none';raw.shadowColor='transparent';
+   const geometry=Object.freeze({width:frame.width,height:frame.height,dpr:frame.dpr,region:Object.freeze({...c.region}),ink:Object.freeze({left:p.ink.left,right:p.ink.right,top:p.ink.top,bottom:p.ink.bottom})});
+   active=Object.freeze({token:c.token,descriptor:c.descriptor,canvas:frame.canvas,instance,execution:frame.execution,ordinal:nativeOrdinal++,count:expectedNativeCount,text:c.text,geometry});
+   try{if(c.maxWidth===undefined)nativeFill.call(raw,c.text,p.x,p.y);else nativeFill.call(raw,c.text,p.x,p.y,c.maxWidth)}finally{active=null;raw.restore()}
+  }
+  frame.status='final';pending.delete(frame.canvas);completed.set(frame.canvas,frame);
+ }
+ function frame(callback){
+  if(depth){depth++;try{const result=callback();if(result&&typeof result.then==='function')fail('asynchronous frame unsupported');return result}finally{depth--;}}
+  const clear=()=>{for(const f of pending.values()){f.status='failed';completed.delete(f.canvas);}pending.clear()};
+  for(let pass=0;pass<3;pass++){
+   let result;depth=1;
+   try{result=callback();if(result&&typeof result.then==='function')fail('asynchronous frame unsupported');}
+   catch(error){clear();throw error}finally{depth=0}
+   try{
+    let reflow=false;
+    for(const f of pending.values()){
+     const axes=f.commands.filter(c=>c.descriptor.region==='axis-right');
+     // Reserve the measured axis lane before graph geometry is finalized.
+     const lane=axes.length?Math.max(68,...axes.map(c=>{const b=bounds(c,f);return Math.ceil(b.right-b.left+16)})):0;
+     if(axes.length&&f.width-lane<160)fail('unplaceable semantic axis lane');
+     if((gutters.get(f.canvas)||0)!==lane){gutters.set(f.canvas,lane);reflow=true;}
+    }
+    if(reflow){clear();continue;}
+    for(const f of [...pending.values()])finish(f);
+    return result;
+   }finally{clear();}
+  }
+  fail('canvas lane allocation did not converge');
+ }
+ function isolated(canvas,siteID,color){
+  const original=completed.get(canvas);
+  if(!original||original.status!=='final'||!original.labels.some(l=>l.site===siteID)||!['#000000','#ffffff'].includes(color))fail('invalid isolated ink request');
+  const mask=document.createElement('canvas');mask.width=canvas.width;mask.height=canvas.height;const raw=mask.getContext('2d');
+  raw.fillStyle='#7f7f7f';raw.fillRect(0,0,mask.width,mask.height);
+  for(const [instance,p] of original.placed.entries()){
+   const c=p.command;if(c.descriptor.id!==siteID)continue;
+   raw.save();raw.setTransform(...c.matrix);raw.font=c.font;raw.fontKerning='none';raw.letterSpacing='0px';raw.wordSpacing='0px';raw.textAlign=c.align;raw.textBaseline=c.baseline;raw.direction=c.direction;raw.fillStyle=color;
+   active=Object.freeze({token:c.token,descriptor:c.descriptor,canvas:mask,owner:canvas,instance,execution:original.execution,text:c.text,diagnostic:true});
+   try{if(c.maxWidth===undefined)nativeFill.call(raw,c.text,p.x,p.y);else nativeFill.call(raw,c.text,p.x,p.y,c.maxWidth)}finally{active=null;raw.restore()}
+  }
+  return {width:mask.width,height:mask.height,data:mask.toDataURL('image/png')};
+ }
+ const api=Object.freeze({site,text,begin,frame,isolated,plotWidth:(ctx,width,rightMargin)=>{const f=contexts.get(ctx);if(!f||!finite([width,rightMargin])||width<=0||rightMargin<0)fail('unprovable plot allocation');const result=width-Math.max(0,(gutters.get(f.canvas)||0)+4-rightMargin);if(result<=0)fail('unplaceable plot beside semantic lane');return result;},
+  nativeToken:()=>active,
+  phase:canvas=>(pending.get(canvas)||completed.get(canvas))?.status||null,
+  inspect:()=>JSON.parse(JSON.stringify([...completed.values()].filter(f=>f.canvas.isConnected).map(f=>({canvas:f.canvas.id,width:f.width,height:f.height,dpr:f.dpr,status:f.status,trace:f.trace,labels:f.labels})))),
+  descriptors:()=>[...sites.values()].map(s=>s.descriptor),
+  probe:settings=>{if(settings!==null&&(!settings||Object.keys(settings).some(k=>k!=='suppress')||settings.suppress!==null&&typeof settings.suppress!=='string'))fail('invalid capture probe');probe=settings},
+  pending:()=>pending.size
+ });
+ // Install before all authored scripts. Public native methods never receive
+ // semantic authority; only the private captured nativeFill can paint text.
+ const prototypes=[CanvasRenderingContext2D.prototype];if(window.OffscreenCanvasRenderingContext2D)prototypes.push(OffscreenCanvasRenderingContext2D.prototype);
+ for(const prototype of prototypes){
+  for(const method of ['fillText','strokeText'])Object.defineProperty(prototype,method,{configurable:false,writable:false,value:function(){fail('uncontracted native text')}});
+  for(const method of ['save','restore','clip','clearRect','fillRect','strokeRect','fill','stroke','drawImage','putImageData','reset']){
+   const original=prototype[method];
+   Object.defineProperty(prototype,method,{configurable:false,writable:false,value:function(...args){
+    const f=pending.get(this.canvas)||completed.get(this.canvas);
+    if(f?.status==='final'&&!['save','restore'].includes(method))fail('paint after text finalization');
+    if(f&&pending.has(this.canvas)){
+     if(method==='save')f.clipStack.push(f.clipDepth);
+     if(method==='restore')f.clipDepth=f.clipStack.pop()??f.clipDepth;
+     if(method==='clip')f.clipDepth++;
+     if(method==='reset'){f.clipDepth=0;f.clipStack=[];}
+    }
+    return original.apply(this,args);
+   }});
+  }
+ }
+ // Assigning either bitmap dimension clears the canvas, including assigning
+ // its current value. Treat that reset as paint after a completed frame.
+ for(const property of ['width','height']){
+  const descriptor=Object.getOwnPropertyDescriptor(HTMLCanvasElement.prototype,property);
+  Object.defineProperty(HTMLCanvasElement.prototype,property,{...descriptor,configurable:false,set(value){
+   const current=pending.get(this)||completed.get(this);
+   if(current?.status==='final')fail('paint after text finalization');
+   return descriptor.set.call(this,value);
+  }});
+ }
+ if(Object.prototype.hasOwnProperty.call(window,'CanvasText'))fail('duplicate helper');
+ Object.defineProperty(window,'CanvasText',{value:api,writable:false,configurable:false});
+})();
+</script>
+<script>
     /* Applied before first paint so an explicit theme choice never flashes the
        other theme. This is why it lives LAST in <head> and not with the rest of
        the page script at the bottom of <body>: that runs after the first paint.
@@ -612,6 +871,9 @@ input[type=range]{width:100%;accent-color:var(--cyan)}.segmented{display:grid;gr
       } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
     })();
   </script>
+<style data-canvas-scroll="v1">
+[data-canvas-scroll="v1"]{overflow:auto;max-width:100%;min-width:0}[data-canvas-scroll="v1"] canvas{display:block;min-width:520px}.card:has(>[data-canvas-scroll="v1"]){min-width:0}.lab:has([data-canvas-scroll="v1"]),.chart-wrap:has(>[data-canvas-scroll="v1"]){overflow:visible}.chart-wrap:has(>[data-canvas-scroll="v1"])>:is(.chart-badge,.chart-label){position:relative;display:table;left:auto;top:auto;margin:14px}@media print{[data-canvas-scroll="v1"]{overflow:visible}[data-canvas-scroll="v1"] canvas{min-width:0}}
+</style>
 </head>
 <body data-page-kind="lesson">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -643,7 +905,7 @@ input[type=range]{width:100%;accent-color:var(--cyan)}.segmented{display:grid;gr
     <aside class="hero-card" aria-label="Market behavior summary"><div class="state-row"><span class="state-tag">Market behavior · Net performance</span><span class="market-icon">−</span></div><div class="behavior-copy"><h3>Gross edge must be large enough to survive the cost of executing the strategy.</h3><p>In a range, buyers and sellers trade repeatedly without sustained price progress. A high-turnover strategy can lose to spread and slippage even before its signals fail.</p></div><div class="pressure"><div class="pressure-labels"><span>Assumption</span><span>Evidence</span></div><div class="pressure-track"><i class="pressure-pin" style="left:35%"></i></div></div></aside>
   </section>
   <section class="section" id="concepts"><div class="section-head"><div><span class="eyebrow">Core concepts</span><h2>What to understand</h2></div><p>Keep each definition operational so it can be implemented and tested.</p></div><div class="grid-3"><article class="card"><div class="card-num">1</div><h3>Explicit cost</h3><p>Commissions, exchange fees, and regulatory charges are directly deducted.</p></article><article class="card"><div class="card-num">2</div><h3>Spread and slippage</h3><p>The executable price differs from the chart midpoint or signal price.</p></article><article class="card"><div class="card-num">3</div><h3>Market impact</h3><p>Larger orders can consume available liquidity and move the average fill.</p></article></div></section>
-  <section class="section" id="lab"><div class="section-head"><div><span class="eyebrow">Interactive lab</span><h2>Gross Versus Net Performance Lab</h2></div><p>Increase turnover, spread, slippage, and order size. Compare gross and net equity curves.</p></div><div class="lab"><div class="lab-head"><div><h3>Gross Versus Net Performance Lab</h3><p>Deterministic synthetic educational data · no live market connection</p></div><button class="btn small" type="button" onclick="window.initLab()">Reset</button></div><div class="lab-body"><div class="chart-pane"><div class="chart-wrap"><span class="chart-badge" id="chartBadge">BACKTEST MODEL</span><canvas id="chart" aria-label="Interactive backtesting chart"></canvas></div><div id="extraVisual"></div><div class="kpis" id="kpis"></div><div class="market-read" id="marketRead"></div></div><aside class="controls" id="controls"></aside></div></div></section>
+  <section class="section" id="lab"><div class="section-head"><div><span class="eyebrow">Interactive lab</span><h2>Gross Versus Net Performance Lab</h2></div><p>Increase turnover, spread, slippage, and order size. Compare gross and net equity curves.</p></div><div class="lab"><div class="lab-head"><div><h3>Gross Versus Net Performance Lab</h3><p>Deterministic synthetic educational data · no live market connection</p></div><button class="btn small" type="button" onclick="window.initLab()">Reset</button></div><div class="lab-body"><div class="chart-pane"><div class="chart-wrap"><span class="chart-badge" id="chartBadge">BACKTEST MODEL</span><div data-canvas-scroll="v1" tabindex="0" role="region" aria-label="Interactive backtesting chart"><canvas id="chart" aria-label="Interactive backtesting chart"></canvas></div></div><div id="extraVisual"></div><div class="kpis" id="kpis"></div><div class="market-read" id="marketRead"></div></div><aside class="controls" id="controls"></aside></div></div></section>
   <section class="section"><div class="section-head"><div><span class="eyebrow">Process</span><h2>Charge costs at the event</h2></div><p>Do not subtract an arbitrary amount only at the end.</p></div><div class="reading-grid"><article class="reading"><b>1</b><div><h3>Estimate</h3><p>Define instrument- and regime-specific cost assumptions.</p></div></article><article class="reading"><b>2</b><div><h3>Apply</h3><p>Charge both entry and exit, including partial fills and rebalances.</p></div></article><article class="reading"><b>3</b><div><h3>Stress</h3><p>Retest with wider spreads, higher volatility, and lower liquidity.</p></div></article></div></section>
   <section class="section"><div class="section-head"><div><span class="eyebrow">Knowledge check</span><h2>Check your understanding</h2></div><p>Select one answer for each question. Feedback appears immediately.</p></div><div class="quiz"><article class="question" data-correct="0"><h3>1. A round trip normally crosses costs:</h3><div class="choices"><button class="choice" type="button">On both entry and exit</button><button class="choice" type="button" data-why="Costs are charged by the fill, not by the outcome; the losing trade paid its spread and slippage too.">Only on winning trades</button><button class="choice" type="button" data-why="Every entry and every exit crosses the spread; an annual deduction hides which trades the costs actually consumed.">Only once per year</button></div><div class="feedback">Each executed side can incur fees, spread, and slippage.</div></article><article class="question" data-correct="0"><h3>2. Which strategy is most sensitive to small per-trade costs?</h3><div class="choices"><button class="choice" type="button">High turnover with small average edge</button><button class="choice" type="button" data-why="A large edge on a single trade leaves the cost as a small fraction of it; costs matter most where the edge per trade is smallest.">One trade with a large edge</button><button class="choice" type="button" data-why="A strategy that never trades pays nothing and earns nothing; it is not sensitive to costs because it has no fills.">A strategy that never executes</button></div><div class="feedback">Frequent small edges can be fully consumed by execution costs.</div></article><article class="question" data-correct="0"><h3>3. Market impact generally becomes more relevant when:</h3><div class="choices"><button class="choice" type="button">Order size grows relative to available liquidity</button><button class="choice" type="button" data-why="The bar interval is a display and aggregation choice; impact comes from order size against the liquidity available at the price.">The chart uses daily bars</button><button class="choice" type="button" data-why="Win rate is about outcomes; impact is about how much of the available volume an order consumes.">Win rate is exactly 50%</button></div><div class="feedback">Capacity is constrained by the volume available near the desired price.</div></article><article class="question" data-correct="0"><h3>4. Commission 1 bps, spread 8 bps, slippage 5 bps per side and impact 2.2 bps, against a 14 bps gross edge per trade. The net edge per trade is:</h3><div class="choices"><button class="choice" type="button">−7.2 bps</button><button class="choice" type="button" data-why="That counts slippage once; it is paid on each side, so 5 bps per side is 10 bps per round trip.">−2.2 bps</button><button class="choice" type="button" data-why="That subtracts commission, spread and one side of slippage and forgets the impact and the other side.">+3.8 bps</button></div><div class="feedback">1 + 8 + 2 × 5 + 2.2 = 21.2 bps per round trip; 14 − 21.2 = −7.2 bps. The lab's range setting shows what 90 trades of that do to an account.</div></article></div></section>
   <section class="section"><div class="two-col"><article class="list-card good"><h3>Practical rules</h3><ul><li>Report gross and net performance separately.</li><li>Use conservative costs for stressed conditions.</li><li>Measure turnover and capacity with the tested order size.</li></ul></article><article class="list-card bad"><h3>Common mistakes</h3><ul><li>Using midpoint prices for every fill.</li><li>Applying costs only to losses.</li><li>Assuming zero slippage in volatile or illiquid markets.</li></ul></article></div></section>
@@ -730,11 +992,11 @@ $$('.question').forEach(q=>{const correct=Number(q.dataset.correct);$$('.choice'
 function rng(seed){let x=(seed||1234567)>>>0;return()=>{x^=x<<13;x^=x>>>17;x^=x<<5;return((x>>>0)%1000000)/1000000}}
 function normal(r){let u=0,v=0;while(u===0)u=r();while(v===0)v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
 function colors(){return{bg:css('--bg'),panel:css('--panel'),panel2:css('--panel2'),text:css('--text'),muted:css('--muted'),line:css('--line'),line2:css('--line2'),cyan:css('--cyan'),green:css('--green'),red:css('--red'),amber:css('--amber'),purple:css('--purple'),blue:css('--blue')}}
-function canvasContext(){const canvas=$('#chart'),rect=canvas.getBoundingClientRect(),dpr=Math.min(2,window.devicePixelRatio||1),w=Math.max(320,rect.width),h=Math.max(310,rect.height);if(canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(h*dpr)){canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr)}const ctx=canvas.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);return{ctx,w,h}}
+function canvasContext(){const canvas=$('#chart'),rect=canvas.getBoundingClientRect(),dpr=2,w=Math.max(520,rect.width),h=Math.max(310,rect.height);const ctx=CanvasText.begin(canvas,w,h,dpr);return{ctx,w,h}}
 function grid(ctx,x,y,w,h,c,rows=5,cols=7){ctx.save();ctx.strokeStyle=c.line;ctx.lineWidth=1;for(let i=0;i<=rows;i++){const yy=y+h*i/rows;ctx.beginPath();ctx.moveTo(x,yy);ctx.lineTo(x+w,yy);ctx.stroke()}for(let i=0;i<=cols;i++){const xx=x+w*i/cols;ctx.beginPath();ctx.moveTo(xx,y);ctx.lineTo(xx,y+h);ctx.stroke()}ctx.restore()}
-function label(ctx,text,x,y,color){ctx.save();ctx.font='800 10px system-ui';const width=ctx.measureText(text).width+12;ctx.globalAlpha=.17;ctx.fillStyle=color;ctx.fillRect(x,y-11,width,22);ctx.globalAlpha=1;ctx.strokeStyle=color;ctx.strokeRect(x,y-11,width,22);ctx.fillStyle=color;ctx.textBaseline='middle';ctx.fillText(text,x+6,y);ctx.restore()}
+function label(ctx,text,x,y,color){ctx.save();ctx.font='800 10px system-ui';const width=ctx.measureText(text).width+12;ctx.globalAlpha=.17;ctx.fillStyle=color;ctx.fillRect(x,y-11,width,22);ctx.globalAlpha=1;ctx.strokeStyle=color;ctx.strokeRect(x,y-11,width,22);ctx.fillStyle=color;ctx.textBaseline='middle';CanvasText.text(ctx,CanvasText.site({"id":"backtesting-and-trading-systems.label.1","role":"annotation","minimumContrast":4.5,"region":"annotation","collision":"separate","formatter":"text","family":"backtesting-and-trading-systems","mode":"label","dependencies":["frame.width","frame.height","theme","parameter.text","parameter.x","parameter.y"]}),text,x+6,y);ctx.restore()}
 function hline(ctx,y,x1,x2,color,text){ctx.save();ctx.strokeStyle=color;ctx.setLineDash([6,5]);ctx.beginPath();ctx.moveTo(x1,y);ctx.lineTo(x2,y);ctx.stroke();ctx.setLineDash([]);if(text)label(ctx,text,x1+5,y-14,color);ctx.restore()}
-function axes(ctx,area,min,max,c,formatter=v=>fmt(v,0)){ctx.save();ctx.fillStyle=c.muted;ctx.font='11px system-ui';ctx.textBaseline='middle';for(let i=0;i<=4;i++){const v=max-(max-min)*i/4;ctx.fillText(formatter(v),area.x+area.w+7,area.y+area.h*i/4)}ctx.restore()}
+function axes(ctx,area,min,max,c,formatter=v=>fmt(v,0)){ctx.save();ctx.fillStyle=c.muted;ctx.font='11px system-ui';ctx.textBaseline='middle';for(let i=0;i<=4;i++){const v=max-(max-min)*i/4;CanvasText.text(ctx,CanvasText.site({"id":"backtesting-and-trading-systems.axes.1","role":"axis","minimumContrast":4.5,"region":"axis-right","collision":"separate","formatter":"formatter(v)","family":"backtesting-and-trading-systems","mode":"axes","dependencies":["frame.width","frame.height","theme","parameter.area","parameter.min","parameter.max","parameter.formatter"]}),formatter(v),area.x+area.w+7,area.y+area.h*i/4)}ctx.restore()}
 function setBadge(t){$('#chartBadge').textContent=t}
 function setKPIs(items){$('#kpis').innerHTML=items.map(([k,v])=>`<div class="kpi"><span>${k}</span><strong>${v}</strong></div>`).join('')}
 /* ---------------------------------------------------------------------------
@@ -903,16 +1165,16 @@ function strategyMA(bars,fast=10,slow=30,costPct=0,shorts=false){
 }
 function strategyBreakout(bars,lookback=20,hold=10,costPct=0,side='long'){const p=closes(bars);let eq=100000,pos=null,trades=[],signals=[],equity=[eq];for(let i=lookback;i<bars.length;i++){if(!pos){const trigger=side==='long'?p[i]>rollingHigh(p,lookback,i):p[i]<rollingLow(p,lookback,i);if(trigger&&i+1<bars.length){const dir=side==='long'?1:-1,fill=bars[i+1].o*(1+dir*costPct/100);pos={dir,entry:fill,start:i+1};signals.push({i:i+1,type:'entry',side:dir,price:fill})}}else{const age=i-pos.start;if(age>=hold){const fill=bars[i].o*(1-pos.dir*costPct/100),ret=pos.dir*(fill-pos.entry)/pos.entry;eq*=1+ret;trades.push({entryIndex:pos.start,exitIndex:i,side:pos.dir,ret,pnlR:ret*12});signals.push({i,type:'exit',side:pos.dir,price:fill});pos=null}}if(pos){equity.push(eq*(1+pos.dir*(bars[i].c-pos.entry)/pos.entry))}else equity.push(eq)}while(equity.length<bars.length)equity.unshift(100000);if(pos){const i=bars.length-1,fill=bars[i].c*(1-pos.dir*costPct/100),ret=pos.dir*(fill-pos.entry)/pos.entry;eq*=1+ret;trades.push({entryIndex:pos.start,exitIndex:i,side:pos.dir,ret,pnlR:ret*12});signals.push({i,type:'exit',side:pos.dir,price:fill});equity[equity.length-1]=eq}return{equity,trades,signals}}
 function computeTradeStats(trades,equity){const wins=trades.filter(t=>t.ret>0),losses=trades.filter(t=>t.ret<=0),grossWin=sum(wins.map(t=>t.ret)),grossLoss=Math.abs(sum(losses.map(t=>t.ret))),dd=maxDrawdown(equity);return{count:trades.length,winRate:trades.length?wins.length/trades.length:0,avgWin:wins.length?mean(wins.map(t=>t.ret)):0,avgLoss:losses.length?Math.abs(mean(losses.map(t=>t.ret))):0,profitFactor:grossLoss?grossWin/grossLoss:(grossWin?99:0),returnPct:(equity.at(-1)/equity[0]-1)*100,maxDD:dd.max*100}}
-function drawLines(lines,opts={}){const {ctx,w,h}=canvasContext(),c=colors(),area={x:24,y:24,w:w-86,h:h-58};const all=lines.flatMap(x=>x.values.filter(v=>v!=null&&Number.isFinite(v)));let mn=opts.min??Math.min(...all),mx=opts.max??Math.max(...all);if(!Number.isFinite(mn)||!Number.isFinite(mx)){mn=0;mx=1}if(mx===mn){mx+=1;mn-=1}const pad=(mx-mn)*.07;mn-=pad;mx+=pad;grid(ctx,area.x,area.y,area.w,area.h,c);if(opts.regions){opts.regions.forEach(r=>{ctx.save();ctx.globalAlpha=.08;ctx.fillStyle=r.color;ctx.fillRect(area.x+area.w*r.start/opts.length,area.y,area.w*(r.end-r.start)/opts.length,area.h);ctx.restore();label(ctx,r.label,area.x+area.w*r.start/opts.length+5,area.y+15,r.color)})}const sx=(i,n)=>area.x+area.w*i/Math.max(1,n-1),sy=v=>area.y+(mx-v)/(mx-mn)*area.h;lines.forEach((s,idx)=>{ctx.save();ctx.strokeStyle=s.color||[c.cyan,c.amber,c.purple,c.green,c.red][idx%5];ctx.lineWidth=s.width||2.4;ctx.setLineDash(s.dash||[]);ctx.beginPath();let started=false;s.values.forEach((v,i)=>{if(v==null||!Number.isFinite(v)){started=false;return}const x=sx(i,s.values.length),y=sy(v);if(!started){ctx.moveTo(x,y);started=true}else ctx.lineTo(x,y)});ctx.stroke();ctx.restore()});if(opts.hlines)opts.hlines.forEach(x=>hline(ctx,sy(x.value),area.x,area.x+area.w,x.color||c.amber,x.label));axes(ctx,area,mn,mx,c,opts.formatter||((v)=>fmt(v,1)));return{ctx,c,area,sy,sx:(i,n)=>sx(i,n),min:mn,max:mx}}
-function drawCandles(bars,opts={}){const {ctx,w,h}=canvasContext(),c=colors(),area={x:20,y:22,w:w-82,h:h-54};let mn=Math.min(...bars.map(d=>d.l)),mx=Math.max(...bars.map(d=>d.h));const pad=(mx-mn)*.08;mn-=pad;mx+=pad;grid(ctx,area.x,area.y,area.w,area.h,c);const sy=v=>area.y+(mx-v)/(mx-mn)*area.h,step=area.w/bars.length,bw=Math.max(2,Math.min(8,step*.62));bars.forEach((d,i)=>{const x=area.x+step*(i+.5),col=d.c>=d.o?c.green:c.red;ctx.strokeStyle=col;ctx.beginPath();ctx.moveTo(x,sy(d.h));ctx.lineTo(x,sy(d.l));ctx.stroke();ctx.fillStyle=col;ctx.fillRect(x-bw/2,Math.min(sy(d.o),sy(d.c)),bw,Math.max(1.5,Math.abs(sy(d.o)-sy(d.c))))});if(opts.lines)opts.lines.forEach(s=>{ctx.save();ctx.strokeStyle=s.color||c.amber;ctx.lineWidth=s.width||1.7;ctx.setLineDash(s.dash||[]);ctx.beginPath();let started=false;s.values.forEach((v,i)=>{if(v==null){started=false;return}const x=area.x+step*(i+.5),y=sy(v);if(!started){ctx.moveTo(x,y);started=true}else ctx.lineTo(x,y)});ctx.stroke();ctx.restore()});if(opts.levels)opts.levels.forEach(x=>hline(ctx,sy(x.value),area.x,area.x+area.w,x.color||c.amber,x.label));if(opts.markers)opts.markers.forEach(m=>{if(m.i<0||m.i>=bars.length)return;const x=area.x+step*(m.i+.5),y=sy(m.price??bars[m.i].c),col=m.color||((m.type==='entry')?c.cyan:c.amber);ctx.save();ctx.fillStyle=col;ctx.beginPath();if(m.type==='entry'){ctx.moveTo(x,y+12);ctx.lineTo(x-6,y+21);ctx.lineTo(x+6,y+21)}else{ctx.moveTo(x,y-12);ctx.lineTo(x-6,y-21);ctx.lineTo(x+6,y-21)}ctx.closePath();ctx.fill();ctx.restore()});axes(ctx,area,mn,mx,c,v=>fmt(v,1));return{ctx,c,area,sy,sx:i=>area.x+step*(i+.5),min:mn,max:mx}}
-function drawHistogram(vals,opts={}){const {ctx,w,h}=canvasContext(),c=colors(),area={x:26,y:24,w:w-80,h:h-58};const bins=opts.bins||18,mn=Math.min(...vals),mx=Math.max(...vals),counts=Array(bins).fill(0);vals.forEach(v=>counts[Math.min(bins-1,Math.max(0,Math.floor((v-mn)/Math.max(.000001,mx-mn)*bins)))]++);const ymax=Math.max(1,...counts);grid(ctx,area.x,area.y,area.w,area.h,c,4,6);counts.forEach((n,i)=>{const bw=area.w/bins*.78,x=area.x+area.w*i/bins+area.w/bins*.11,y=area.y+area.h*(1-n/ymax),mid=mn+(i+.5)*(mx-mn)/bins;ctx.fillStyle=mid<(opts.threshold??mean(vals))?c.red:c.cyan;ctx.globalAlpha=.72;ctx.fillRect(x,y,bw,area.y+area.h-y);ctx.globalAlpha=1});axes(ctx,area,mn,mx,c,opts.formatter||((v)=>fmt(v,1)));return{ctx,c,area,mn,mx}}
+function drawLines(lines,opts={}){return CanvasText.frame(()=>{const {ctx,w,h}=canvasContext(),c=colors(),area={x:24,y:24,w:CanvasText.plotWidth(ctx,w-86,62),h:h-58};const all=lines.flatMap(x=>x.values.filter(v=>v!=null&&Number.isFinite(v)));let mn=opts.min??Math.min(...all),mx=opts.max??Math.max(...all);if(!Number.isFinite(mn)||!Number.isFinite(mx)){mn=0;mx=1}if(mx===mn){mx+=1;mn-=1}const pad=(mx-mn)*.07;mn-=pad;mx+=pad;grid(ctx,area.x,area.y,area.w,area.h,c);if(opts.regions){opts.regions.forEach(r=>{ctx.save();ctx.globalAlpha=.08;ctx.fillStyle=r.color;ctx.fillRect(area.x+area.w*r.start/opts.length,area.y,area.w*(r.end-r.start)/opts.length,area.h);ctx.restore();label(ctx,r.label,area.x+area.w*r.start/opts.length+5,area.y+15,r.color)})}const sx=(i,n)=>area.x+area.w*i/Math.max(1,n-1),sy=v=>area.y+(mx-v)/(mx-mn)*area.h;lines.forEach((s,idx)=>{ctx.save();ctx.strokeStyle=s.color||[c.cyan,c.amber,c.purple,c.green,c.red][idx%5];ctx.lineWidth=s.width||2.4;ctx.setLineDash(s.dash||[]);ctx.beginPath();let started=false;s.values.forEach((v,i)=>{if(v==null||!Number.isFinite(v)){started=false;return}const x=sx(i,s.values.length),y=sy(v);if(!started){ctx.moveTo(x,y);started=true}else ctx.lineTo(x,y)});ctx.stroke();ctx.restore()});if(opts.hlines)opts.hlines.forEach(x=>hline(ctx,sy(x.value),area.x,area.x+area.w,x.color||c.amber,x.label));axes(ctx,area,mn,mx,c,opts.formatter||((v)=>fmt(v,1)));return{ctx,c,area,sy,sx:(i,n)=>sx(i,n),min:mn,max:mx}});}
+function drawCandles(bars,opts={}){return CanvasText.frame(()=>{const {ctx,w,h}=canvasContext(),c=colors(),area={x:20,y:22,w:CanvasText.plotWidth(ctx,w-82,62),h:h-54};let mn=Math.min(...bars.map(d=>d.l)),mx=Math.max(...bars.map(d=>d.h));const pad=(mx-mn)*.08;mn-=pad;mx+=pad;grid(ctx,area.x,area.y,area.w,area.h,c);const sy=v=>area.y+(mx-v)/(mx-mn)*area.h,step=area.w/bars.length,bw=Math.max(2,Math.min(8,step*.62));bars.forEach((d,i)=>{const x=area.x+step*(i+.5),col=d.c>=d.o?c.green:c.red;ctx.strokeStyle=col;ctx.beginPath();ctx.moveTo(x,sy(d.h));ctx.lineTo(x,sy(d.l));ctx.stroke();ctx.fillStyle=col;ctx.fillRect(x-bw/2,Math.min(sy(d.o),sy(d.c)),bw,Math.max(1.5,Math.abs(sy(d.o)-sy(d.c))))});if(opts.lines)opts.lines.forEach(s=>{ctx.save();ctx.strokeStyle=s.color||c.amber;ctx.lineWidth=s.width||1.7;ctx.setLineDash(s.dash||[]);ctx.beginPath();let started=false;s.values.forEach((v,i)=>{if(v==null){started=false;return}const x=area.x+step*(i+.5),y=sy(v);if(!started){ctx.moveTo(x,y);started=true}else ctx.lineTo(x,y)});ctx.stroke();ctx.restore()});if(opts.levels)opts.levels.forEach(x=>hline(ctx,sy(x.value),area.x,area.x+area.w,x.color||c.amber,x.label));if(opts.markers)opts.markers.forEach(m=>{if(m.i<0||m.i>=bars.length)return;const x=area.x+step*(m.i+.5),y=sy(m.price??bars[m.i].c),col=m.color||((m.type==='entry')?c.cyan:c.amber);ctx.save();ctx.fillStyle=col;ctx.beginPath();if(m.type==='entry'){ctx.moveTo(x,y+12);ctx.lineTo(x-6,y+21);ctx.lineTo(x+6,y+21)}else{ctx.moveTo(x,y-12);ctx.lineTo(x-6,y-21);ctx.lineTo(x+6,y-21)}ctx.closePath();ctx.fill();ctx.restore()});axes(ctx,area,mn,mx,c,v=>fmt(v,1));return{ctx,c,area,sy,sx:i=>area.x+step*(i+.5),min:mn,max:mx}});}
+function drawHistogram(vals,opts={}){return CanvasText.frame(()=>{const {ctx,w,h}=canvasContext(),c=colors(),area={x:26,y:24,w:CanvasText.plotWidth(ctx,w-80,54),h:h-58};const bins=opts.bins||18,mn=Math.min(...vals),mx=Math.max(...vals),counts=Array(bins).fill(0);vals.forEach(v=>counts[Math.min(bins-1,Math.max(0,Math.floor((v-mn)/Math.max(.000001,mx-mn)*bins)))]++);const ymax=Math.max(1,...counts);grid(ctx,area.x,area.y,area.w,area.h,c,4,6);counts.forEach((n,i)=>{const bw=area.w/bins*.78,x=area.x+area.w*i/bins+area.w/bins*.11,y=area.y+area.h*(1-n/ymax),mid=mn+(i+.5)*(mx-mn)/bins;ctx.fillStyle=mid<(opts.threshold??mean(vals))?c.red:c.cyan;ctx.globalAlpha=.72;ctx.fillRect(x,y,bw,area.y+area.h-y);ctx.globalAlpha=1});axes(ctx,area,mn,mx,c,opts.formatter||((v)=>fmt(v,1)));return{ctx,c,area,mn,mx}});}
 function downloadJSON(name,obj){const blob=new Blob([JSON.stringify(obj,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 function behaviorFor(regime){if(regime==='bull')return['bull','Buyers continue accepting higher prices.','Each pullback ends above the one before it and the sample closes well above where it opened — a property of this sample rather than of the label, and the data a rule here is judged on.'];if(regime==='bear')return['bear','Sellers continue accepting lower prices.','Rallies fail and supply keeps producing downward progress.'];if(regime==='range')return['warn','Buyers and sellers are balanced.','Price repeatedly trades both directions without sustained progress.'];if(regime==='volatile')return['warn','Price ranges are expanding quickly.','Both sides are active, fills can worsen, and stops can be crossed rapidly.'];if(regime==='breakout')return['bull','Buyers are moving through prior resistance.','Price is accepting higher levels after leaving the previous range.'];if(regime==='reversal')return['bear','Seller control replaces the prior buyer control.','The advance fails, lower prices are accepted, and rallies lose progress.'];return['warn','Market control changes across the sample.','Trending and balanced periods require the system to behave differently.']}
 
 
 function initLabSpecific(){let regime='range',tradesN=90,edge=14,commission=1,spread=8,slippage=5,sizePct=1.5;
   function simulate(){const r=rng(211),gross=[100000],net=[100000],grossReturns=[],netReturns=[];const impact=1.8*Math.sqrt(Math.max(0,sizePct));const roundTrip=commission+spread+slippage*2+impact;const regimeAdj=regime==='trend'?7:regime==='volatile'?-2:0;for(let i=0;i<tradesN;i++){const g=(edge+regimeAdj+normal(r)*45)/10000,n=(edge+regimeAdj-roundTrip+normal(r)*45)/10000;gross.push(gross.at(-1)*(1+g));net.push(net.at(-1)*(1+n));grossReturns.push(g);netReturns.push(n)}return{gross,net,grossReturns,netReturns,roundTrip,impact,regimeAdj}}
-  const draw=()=>{const x=simulate(),c=colors(),grossRet=(x.gross.at(-1)/x.gross[0]-1)*100,netRet=(x.net.at(-1)/x.net[0]-1)*100,drag=grossRet-netRet;drawLines([{values:x.gross,color:c.green},{values:x.net,color:c.cyan}],{formatter:v=>'$'+Math.round(v/1000)+'k'});setBadge('GROSS VS NET EQUITY');setKPIs([['Gross return',pct(grossRet,1)],['Net return',pct(netRet,1)],['Cost drag',fmt(drag,1)+' pts']]);if(regime==='range')marketRead(netRet<0?'bear':'warn','Buyers and sellers trade repeatedly without sustained price progress.','Frequent entries cross the spread while the average directional move remains small, so execution costs consume much of the gross edge.');else if(regime==='trend')marketRead('bull','Buyers or sellers continue accepting prices in one direction.','Longer directional moves give each trade more room to exceed the fixed cost of entering and exiting.');else marketRead('warn','Fast price movement widens the difference between expected and executable prices.','Slippage and market impact increase when volatility expands and nearby liquidity is consumed.');const total=x.roundTrip,max=Math.max(total,1),grossEdge=edge+x.regimeAdj,netEdge=grossEdge-total;
+  const draw=()=>{return CanvasText.frame(()=>{const x=simulate(),c=colors(),grossRet=(x.gross.at(-1)/x.gross[0]-1)*100,netRet=(x.net.at(-1)/x.net[0]-1)*100,drag=grossRet-netRet;drawLines([{values:x.gross,color:c.green},{values:x.net,color:c.cyan}],{formatter:v=>'$'+Math.round(v/1000)+'k'});setBadge('GROSS VS NET EQUITY');setKPIs([['Gross return',pct(grossRet,1)],['Net return',pct(netRet,1)],['Cost drag',fmt(drag,1)+' pts']]);if(regime==='range')marketRead(netRet<0?'bear':'warn','Buyers and sellers trade repeatedly without sustained price progress.','Frequent entries cross the spread while the average directional move remains small, so execution costs consume much of the gross edge.');else if(regime==='trend')marketRead('bull','Buyers or sellers continue accepting prices in one direction.','Longer directional moves give each trade more room to exceed the fixed cost of entering and exiting.');else marketRead('warn','Fast price movement widens the difference between expected and executable prices.','Slippage and market impact increase when volatility expands and nearby liquidity is consumed.');const total=x.roundTrip,max=Math.max(total,1),grossEdge=edge+x.regimeAdj,netEdge=grossEdge-total;
   $('#extraVisual').innerHTML=`<div class="bar-stack"><div class="bar-row"><span>Commission</span><div class="bar-track"><i style="width:${commission/max*100}%;background:${c.purple}"></i></div><strong>${fmt(commission,1)} bps</strong></div><div class="bar-row"><span>Spread</span><div class="bar-track"><i style="width:${spread/max*100}%;background:${c.amber}"></i></div><strong>${fmt(spread,1)} bps</strong></div><div class="bar-row"><span>Slippage</span><div class="bar-track"><i style="width:${slippage*2/max*100}%;background:${c.red}"></i></div><strong>${fmt(slippage*2,1)} bps</strong></div><div class="bar-row"><span>Size impact</span><div class="bar-track"><i style="width:${x.impact/max*100}%;background:${c.blue}"></i></div><strong>${fmt(x.impact,1)} bps</strong></div></div><div class="inline-note">Estimated round-trip execution cost: <strong>${fmt(x.roundTrip,1)} basis points</strong> per trade.</div><div class="legend-row"><span><i style="background:${c.green}"></i>Gross result</span><span><i style="background:${c.cyan}"></i>Net result</span></div><pre class="code-output">Round-trip cost, charged on every trade at the moment it happens:
   commission and fees (round trip)   ${fmt(commission,1)} bps
   bid-ask spread (crossed once)      ${fmt(spread,1)} bps
@@ -921,7 +1183,7 @@ function initLabSpecific(){let regime='range',tradesN=90,edge=14,commission=1,sp
   total                              ${fmt(total,1)} bps
 Gross edge per trade in this market: ${fmt(edge,0)}${x.regimeAdj?` ${x.regimeAdj>0?'+':'−'} ${Math.abs(x.regimeAdj)}`:''} = ${fmt(grossEdge,0)} bps (${regime==='trend'?'a trend adds room to each trade':regime==='range'?'a range adds nothing':'volatility takes some of it away'})
 Net edge per trade: ${fmt(grossEdge,0)} − ${fmt(total,1)} = ${pct(netEdge,1).replace('%','')} bps → ${netEdge>=0?'the strategy keeps '+fmt(netEdge,1)+' bps per trade after execution':'the strategy pays '+fmt(-netEdge,1)+' bps per trade to trade at all'}
-Over ${tradesN} round trips the same random draw of outcomes gives ${pct(grossRet,1)} gross and ${pct(netRet,1)} net: ${fmt(drag,1)} points of the result was the cost of executing it.</pre>`};
+Over ${tradesN} round trips the same random draw of outcomes gives ${pct(grossRet,1)} gross and ${pct(netRet,1)} net: ${fmt(drag,1)} points of the result was the cost of executing it.</pre>`});};
   $('#controls').innerHTML=controlHTML('Market behavior',segmented('tcRegime',[['trend','Trend'],['range','Range'],['volatile','Volatile']],'range'))+rangeControl('tcTrades','Round trips',20,220,tradesN,10,'')+rangeControl('tcEdge','Average gross edge',2,50,edge,1,' bps')+rangeControl('tcCommission','Commission and fees (round trip)',0,10,commission,.5,' bps')+rangeControl('tcSpread','Bid-ask spread',1,30,spread,1,' bps')+rangeControl('tcSlip','Slippage per side',0,25,slippage,1,' bps')+rangeControl('tcSize','Order size versus volume',.1,10,sizePct,.1,'%');
   bindSegment('tcRegime',v=>{regime=v;draw()});bindRange('tcTrades',v=>{tradesN=v;draw()});bindRange('tcEdge',v=>{edge=v;draw()},' bps');bindRange('tcCommission',v=>{commission=v;draw()},' bps');bindRange('tcSpread',v=>{spread=v;draw()},' bps');bindRange('tcSlip',v=>{slippage=v;draw()},' bps');bindRange('tcSize',v=>{sizePct=v;draw()},'%');draw();return resizeHandler(draw)}
 window.initLab=()=>{if(activeCleanup){activeCleanup();activeCleanup=null}$('#controls').innerHTML='';$('#extraVisual').innerHTML='';$('#kpis').innerHTML='';window.redrawLab=null;activeCleanup=initLabSpecific()};

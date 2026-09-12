@@ -322,9 +322,9 @@ def course_home(*, course, index, courses, path):
     lessons = course["lessons"]
 
     syllabus = "".join(
-        '<a class="syllabus-item" href="./%s/" data-lesson="%s/%s"><div class="num">%02d</div>'
+        '<a class="syllabus-item" href="./%s/" data-lesson="%s/%s"><div class="num" aria-hidden="true"></div>'
         '<div><strong>%s</strong><span>%s</span><span class="lesson-state">Not marked</span></div></a>'
-        % (lesson["slug"], course["slug"], lesson["slug"], i + 1,
+        % (lesson["slug"], course["slug"], lesson["slug"],
            esc(lesson["title"]), esc_inline(lesson["one_line"]))
         for i, lesson in enumerate(lessons)
     )

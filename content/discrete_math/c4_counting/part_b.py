@@ -69,10 +69,7 @@ LESSONS = [
                 "place of `r`, so the count is `C(n + (r−n) − 1, r−n) = C(r−1, r−n)`, which "
                 "equals `C(r−1, n−1)` by symmetry.",
             ]),
-            ("p", "The substitution trick generalises. A constraint `xᵢ ≥ c` is handled by "
-                  "pre-assigning `c` units to that variable and solving the reduced "
-                  "problem; an upper bound `xᵢ ≤ c` is harder and needs the inclusion and "
-                  "exclusion of lesson 9."),
+            ("p", 'The substitution trick generalises. A constraint `xᵢ ≥ c` is handled by pre-assigning `c` units to that variable and solving the reduced problem; an upper bound `xᵢ ≤ c` is harder and needs the inclusion and exclusion of “The Inclusion-Exclusion Principle”.'),
             ("h3", "The four rules, together"),
             ("math", [
                 "                        order matters     order does not",
@@ -106,8 +103,7 @@ LESSONS = [
              "`x₁ + ⋯ + x_n = r` with the constraints stated. This form makes the "
              "substitutions visible."),
             ("Handle lower bounds by substitution",
-             "`xᵢ ≥ c` becomes `yᵢ = xᵢ − c ≥ 0` with the total reduced by `c`. Upper "
-             "bounds need lesson 9."),
+             '`xᵢ ≥ c` becomes `yᵢ = xᵢ − c ≥ 0` with the total reduced by `c`. Upper bounds need “The Inclusion-Exclusion Principle”.'),
         ],
         "worked": {
             "title": "A bounded distribution",
@@ -126,10 +122,7 @@ LESSONS = [
                 "Without the constraint:  C(3 + 12 − 1, 12) = C(14,12) = 91",
             ],
             "after": [
-                "Lower bounds are free: pre-assign and shrink the total. Upper bounds are "
-                "not &mdash; counting the solutions with `xᵢ ≤ 5` requires subtracting the "
-                "violating cases and adding back the double violations, which is exactly "
-                "lesson 9."
+                'Lower bounds are free: pre-assign and shrink the total. Upper bounds are not &mdash; counting the solutions with `xᵢ ≤ 5` requires subtracting the violating cases and adding back the double violations, which is exactly “The Inclusion-Exclusion Principle”.'
             ],
         },
         "quiz_title": "Stars and bars",
@@ -162,8 +155,7 @@ LESSONS = [
              "The bars separate the groups, so there is one fewer of them than there are "
              "types. The picture makes it obvious; the formula does not."),
             ("Applying it to distinguishable items",
-             "Stars and bars needs the items interchangeable. Distributing distinct objects "
-             "into boxes is the multinomial count of lesson 7."),
+             'Stars and bars needs the items interchangeable. Distributing distinct objects into boxes is the multinomial count of “Permutations with Repetition”.'),
             ("Trying to handle an upper bound by substitution",
              "Lower bounds shift cleanly; upper bounds require subtracting the violations, "
              "which is inclusion and exclusion."),
@@ -206,9 +198,7 @@ LESSONS = [
              "times. Subtracting pairwise intersections over-corrects the triples, so "
              "they are added back."),
             ("The signs are forced",
-             "An element in exactly `m` of the sets is counted `C(m,1) − C(m,2) + C(m,3) "
-             "− ⋯`, which is 1 for every `m ≥ 1` by the alternating-sum identity of "
-             "lesson 5."),
+             "An element in exactly `m` of the sets is counted `C(m,1) − C(m,2) + C(m,3) − ⋯`, which is 1 for every `m ≥ 1` by the alternating-sum identity of “Binomial Coefficients and Pascal's Triangle”."),
             ("The complement form is usually what you want",
              "\"None of the properties\" equals the total minus the union, and that is "
              "how derangements and surjection counts are computed."),
@@ -229,8 +219,7 @@ LESSONS = [
                 "`C(m,1)` times in the first sum, `C(m,2)` times in the second, and so on, "
                 "so its net contribution is "
                 "`C(m,1) − C(m,2) + C(m,3) − ⋯ = 1 − [C(m,0) − C(m,1) + C(m,2) − ⋯]`.",
-                "The bracket is the alternating row sum, which is 0 for `m ≥ 1` (lesson 5). "
-                "So the contribution is exactly 1.",
+                "The bracket is the alternating row sum, which is 0 for `m ≥ 1` (“Binomial Coefficients and Pascal's Triangle”). So the contribution is exactly 1.",
                 "An element in none of the sets contributes 0 to every term. Hence each "
                 "element of the union is counted once and nothing else is counted.",
             ]),
@@ -358,9 +347,7 @@ LESSONS = [
              "term by term."),
         ],
         "standard": ("Finish when you can set up the sets so the intersections are easy.",
-                     "Count the permutations of `1, …, 6` in which no element stays in its "
-                     "own position. Define `Aᵢ` as \"element `i` is fixed\", compute the "
-                     "intersections, and alternate. Lesson 10 is that answer in general."),
+                     'Count the permutations of `1, …, 6` in which no element stays in its own position. Define `Aᵢ` as "element `i` is fixed", compute the intersections, and alternate. “Derangements” is that answer in general.'),
         "note": "The principle generalises far beyond counting: the same alternating structure appears in Möbius inversion, in the sieve methods of analytic number theory, and in the probabilistic version Discrete Probability uses for `P(A ∪ B)`.",
     },
     # ---------------------------------------------------------------- 10
@@ -440,7 +427,7 @@ LESSONS = [
                 "derangement of `n − 1` items: `Dₙ₋₁` ways.",
                 "So `Dₙ = (n−1)(Dₙ₋₂ + Dₙ₋₁)`.",
             ]),
-            ("p", "Two derivations of the same numbers, by different techniques. The recurrence is a case split of the kind Induction and Recursion lesson 9 taught; the formula came from inclusion and exclusion. Agreement between them is a genuine check, and both are worth having."),
+            ("p", 'Two derivations of the same numbers, by different techniques. The recurrence is a case split of the kind the “Recurrence Relations” Lesson in Induction and Recursion develops; the formula came from inclusion and exclusion. Agreement between them is a genuine check, and both are worth having.'),
             ("example", ("The hat-check problem",
                          "`n` people check hats and receive them back at random. The probability nobody gets their own is `Dₙ/n!`, which for `n ≥ 7` is 0.3679 to four places whatever `n` is &mdash; at `n = 5` it is still 0.3667 and at 6 it is 0.3681. Discrete Probability makes the division into a probability statement.")),
         ],
@@ -779,9 +766,7 @@ LESSONS = [
                 "1/(1 − x)ⁿ     = Σ_k C(n+k−1, k) xᵏ           stars and bars!",
                 "(1 − xᵐ⁺¹)/(1 − x) = 1 + x + … + xᵐ           at most m copies",
             ]),
-            ("p", "The fifth line is lesson 8 in a different notation, and that is the "
-                  "point of the method: `1/(1−x)ⁿ` encodes \"choose any number from each of "
-                  "`n` types\", and its coefficients are exactly the stars-and-bars counts."),
+            ("p", 'The fifth line is “Combinations with Repetition” in a different notation, and that is the point of the method: `1/(1−x)ⁿ` encodes "choose any number from each of `n` types", and its coefficients are exactly the stars-and-bars counts.'),
             ("h3", "Why multiplication combines choices"),
             ("p", "If `A(x)` counts the ways to pick items from source 1 and `B(x)` from "
                   "source 2, then the coefficient of `xᵏ` in `A(x)B(x)` is "
@@ -795,19 +780,13 @@ LESSONS = [
                          "dimes. The answer is the coefficient of `xⁿ` in the product. "
                          "For `n = 25` it is 12.")),
             ("example", ("A restricted selection",
-                         "How many ways to choose 10 items from 4 types with at most 3 of "
-                         "each? Each type contributes `1 + x + x² + x³`, so the answer is "
-                         "`[x¹⁰](1 + x + x² + x³)⁴`. Expanding gives 10. Check it another "
-                         "way: a selection is short of the maximum `12` by `2`, spread over "
-                         "four types, and lesson 8 counts those spreads as `C(5, 2) = 10`. "
-                         "Inclusion and exclusion would also work; the generating function "
-                         "encodes the constraint directly.")),
+                         'How many ways to choose 10 items from 4 types with at most 3 of each? Each type contributes `1 + x + x² + x³`, so the answer is `[x¹⁰](1 + x + x² + x³)⁴`. Expanding gives 10. Check it another way: a selection is short of the maximum `12` by `2`, spread over four types, and “Combinations with Repetition” counts those spreads as `C(5, 2) = 10`. Inclusion and exclusion would also work; the generating function encodes the constraint directly.')),
             ("h3", "Solving a recurrence"),
             ("p", "Generating functions solve recurrences by turning them into equations. "
                   "For `aₙ = 3aₙ₋₁` with `a₀ = 1`, write `G(x) = Σ aₙxⁿ`. Multiplying the "
                   "recurrence by `xⁿ` and summing gives `G(x) − 1 = 3xG(x)`, so "
                   "`G(x) = 1/(1 − 3x)`, whose coefficients are `3ⁿ`."),
-            ("p", "The same method handles Fibonacci: `G(x) = x/(1 − x − x²)`, and a partial-fraction decomposition recovers Binet's formula from Induction and Recursion lesson 10. The method is more general than characteristic roots, and it extends to recurrences those cannot touch."),
+            ("p", "The same method handles Fibonacci: `G(x) = x/(1 − x − x²)`, and a partial-fraction decomposition recovers Binet's formula from the “Solving Linear Recurrences” Lesson in Induction and Recursion. The method is more general than characteristic roots, and it extends to recurrences those cannot touch."),
             ("thm", ("Formal manipulation is legitimate",
                      "Addition, multiplication and (when `a₀ ≠ 0`) inversion of formal power "
                      "series are well defined coefficient by coefficient, with no "
@@ -959,7 +938,7 @@ LESSONS = [
                      "gives `A` and another way gives `B`. Since `S` has one size, "
                      "`A = B`.")),
             ("example", ("Handshakes",
-                         "In any graph, `Σ_v deg(v) = 2|E|`. Count the incidences &mdash; pairs (vertex, edge at that vertex). By vertex: each contributes its degree. By edge: each has two endpoints. Graphs and Trees lesson 2 opens with this.")),
+                         'In any graph, `Σ_v deg(v) = 2|E|`. Count the incidences &mdash; pairs (vertex, edge at that vertex). By vertex: each contributes its degree. By edge: each has two endpoints. The “Degree and the Handshake Theorem” Lesson in Graphs and Trees develops this argument.')),
             ("example", ("Pascal's rule, again",
                          "`C(n,k) = C(n−1,k−1) + C(n−1,k)`: count `k`-subsets by whether "
                          "they contain a fixed element. One set, two classifications.")),
@@ -975,7 +954,7 @@ LESSONS = [
                   "a known double count in disguise, and recognising which is the skill."),
             ("h3", "Bijective proof"),
             ("thm", ("The method",
-                     "To prove `|A| = |B|`, construct an explicit bijection `f : A → B`. Sets, Relations, and Functions lesson 11's criteria apply: injective and surjective, both argued.")),
+                     'To prove `|A| = |B|`, construct an explicit bijection `f : A → B`. the criteria in “Injective, Surjective, Bijective” in Sets, Relations, and Functions apply: injective and surjective, both argued.')),
             ("example", ("Symmetry of binomial coefficients",
                          "`C(n,k) = C(n,n−k)` via complementation: send each `k`-subset to "
                          "its complement. It is its own inverse, hence a bijection.")),
@@ -1099,15 +1078,7 @@ LESSONS = [
              "and its inverse."),
         ],
         "standard": ("Finish when you prefer the counting proof.",
-                     "Two proofs, one of each kind. First, lesson 6 obtained "
-                     "`Σ_k 2ᵏ·C(n,k) = 3ⁿ` by substitution; prove it by double counting "
-                     "instead, and say what a single object being counted is &mdash; a "
-                     "pair `A ⊆ B ⊆ S`, or a function from `S` to a three-element set; "
-                     "either works. Second, prove that the `k`-subsets of `{1, …, n}` "
-                     "containing no two consecutive integers number `C(n − k + 1, k)`, "
-                     "by a bijection: subtract `i − 1` from the `i`th smallest element, "
-                     "write down the inverse, and check the map at `n = 5`, `k = 2`, "
-                     "where both sides are 6."),
+                     'Two proofs, one of each kind. First, “The Binomial Theorem” obtains `Σ_k 2ᵏ·C(n,k) = 3ⁿ` by substitution; prove it by double counting instead, and say what a single object being counted is &mdash; a pair `A ⊆ B ⊆ S`, or a function from `S` to a three-element set; either works. Second, prove that the `k`-subsets of `{1, …, n}` containing no two consecutive integers number `C(n − k + 1, k)`, by a bijection: subtract `i − 1` from the `i`th smallest element, write down the inverse, and check the map at `n = 5`, `k = 2`, where both sides are 6.'),
         "note": "Some identities have no known combinatorial proof, which is a genuine "
                 "open kind of question: finding a bijection where only algebra is known is "
                 "an active research activity, because the bijection carries information the "
@@ -1292,13 +1263,7 @@ LESSONS = [
              "evaluate."),
         ],
         "standard": ("Finish when classification precedes computation automatically.",
-                     "Five problems from this course, without looking back: the 4-digit "
-                     "PINs, the podium from ten runners, the 5-card hands, five doughnuts "
-                     "from three kinds, and the arrangements of BANANA. For each, write "
-                     "the two answers &mdash; order? repetition? &mdash; and the rule they "
-                     "select before computing anything; they should land on four different "
-                     "rules and one multiset. Then verify the doughnuts by listing. That "
-                     "sequence &mdash; classify, compute, check &mdash; is the whole course."),
+                     'Five problems from this course, without consulting the worked solutions: the 4-digit PINs, the podium from ten runners, the 5-card hands, five doughnuts from three kinds, and the arrangements of BANANA. For each, write the two answers &mdash; order? repetition? &mdash; and the rule they select before computing anything; they should land on four different rules and one multiset. Then verify the doughnuts by listing. That sequence &mdash; classify, compute, check &mdash; is the whole course.'),
         "note": "Discrete Probability turns these counts into probabilities by dividing by the size of the sample space, so every classification error here becomes a wrong probability there. The counting is the hard part; the division is not.",
     },
 ]

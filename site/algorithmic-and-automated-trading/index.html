@@ -1074,6 +1074,7 @@
       font-size: 0.9rem;
       resize: vertical;
     }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
     .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
     .fb-actions {
       display: flex;
@@ -1232,6 +1233,27 @@
       .signin-btn { padding: 0; width: 38px; justify-content: center; }
     }
 
+    /* Trading charts use a 960-unit plotting frame. Keep that authored scale
+       instead of shrinking 11-unit axis text to roughly 3 CSS pixels on a
+       phone. The named keyboard scroll owner exposes the complete chart. */
+    @media screen {
+      .market-chart-scroll {
+        contain: inline-size;
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        overscroll-behavior-inline: contain;
+      }
+      .market-chart-scroll > svg.market-chart {
+        display: block;
+        width: 100%;
+        min-width: 960px;
+      }
+    }
+
     body[data-page-kind] {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 16px;
@@ -1265,6 +1287,7 @@
     [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
     [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
     [data-ui="hero"] .eyebrow { display: block; color: var(--muted); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
     [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
     [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
     [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
@@ -1309,7 +1332,7 @@
     }
     [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
     [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
-    [data-ui="lesson-list"] .lesson-link { min-height: 44px; }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
     body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
     body[data-page-kind] .is-done .lesson-state { color: var(--green); }
     [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
@@ -1426,7 +1449,7 @@
         <div><span class="eyebrow"><span data-ui="page-kind">Course</span> &middot; Trading</span><h1 id="hero-title">Algorithmic and Automated Trading</h1><p>Specify automated trading workflows, data and order handling, deployment controls, monitoring, and operational risk procedures.</p><div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lessons">View lessons</a><a class="btn ghost" href="#background">Recommended background</a></div></div>
 
         <div class="hero-visual">
-          <svg data-illustration="topics" class="hero-svg" viewBox="0 0 520 310" role="img" aria-label="Illustration of the course: raw market data entering a pipeline of five stages — data, signal, risk, orders and the broker — with the broker's status updates returning asynchronously on a dashed line, an amber boundary marking where the system's own authority ends, and paper trading, human approval and a kill switch named as the controls around it; below, tiles naming five Lesson groups and the Course topic — encoding the strategy for lessons 01 to 05, execution and infrastructure for 06 to 08, testing and risk controls for 09 to 11, deployment and monitoring for 12 to 14, AI and production readiness for 15 to 16 — and a tile naming automation, the Course topic.">
+          <svg data-illustration="topics" class="hero-svg" viewBox="0 0 520 310" role="img" aria-label="Illustration of the course: raw market data entering a pipeline of five stages — data, signal, risk, orders and the broker — with the broker's status updates returning asynchronously on a dashed line, an amber boundary marking where the system's own authority ends, and paper trading, human approval and a kill switch named as the controls around it; below, tiles naming five Lesson groups and the Course topic — encoding the strategy, execution and infrastructure, testing and risk controls, deployment and monitoring, AI and production readiness — and a tile naming automation, the Course topic.">
             <g class="sv-grid">
               <line x1="16" y1="30" x2="504" y2="30" />
             </g>
@@ -1517,12 +1540,12 @@
               </svg>
             </span>
             <h3>What it teaches</h3>
-            <p>How a trading system is split into parts that can be reasoned about separately — strategy rules, signal generation, risk checks, order submission and execution — and how much authority to hand each level of automation (01–02). Then the inputs: historical and streaming data validated, deduplicated and normalized into one model, with late events handled rather than assumed away; and the clock — exchange calendars, time zones, session boundaries, event windows and schedulers that behave the same way twice (03–04). Then the decision itself: a signal engine with explicit state, which is what stops a system repeating, contradicting or acting on a stale signal; and a risk engine that holds cash, positions, exposure, open orders and limits, and is consulted before an order exists (05–06). Then the outside world: a broker adapter that submits, queries, cancels and reconciles while treating every status as asynchronous; order type selection, open-order management and fill quality measured against the decision price; and the whole system run on current data with no capital at risk (07–09). Then the controls: scanning and ranking with deduplicated alerts and decisions that expire; duplicate-safe commands, bounded retries, durable state and reconciliation after a timeout; metrics and traces and an immutable audit trail; scoped credentials, separated environments, rotation and a kill switch; reproducible artifacts, gradual rollout and rollback (10–14). Lesson 15 covers AI-assisted and agentic workflows, and lesson 16 turns all of it into one versioned specification.</p>
+            <p>How a trading system is split into parts that can be reasoned about separately — strategy rules, signal generation, risk checks, order submission and execution — and how much authority to hand each level of automation. The inputs: historical and streaming data validated, deduplicated and normalized into one model, with late events handled rather than assumed away; and the clock — exchange calendars, time zones, session boundaries, event windows and schedulers that behave the same way twice. The decision itself: a signal engine with explicit state, which is what stops a system repeating, contradicting or acting on a stale signal; and a risk engine that holds cash, positions, exposure, open orders and limits, and is consulted before an order exists. The outside world: a broker adapter that submits, queries, cancels and reconciles while treating every status as asynchronous; order type selection, open-order management and fill quality measured against the decision price; and the whole system run on current data with no capital at risk. The controls: scanning and ranking with deduplicated alerts and decisions that expire; duplicate-safe commands, bounded retries, durable state and reconciliation after a timeout; metrics and traces and an immutable audit trail; scoped credentials, separated environments, rotation and a kill switch; reproducible artifacts, gradual rollout and rollback. AI-Assisted and Agentic Trading Workflows covers AI-assisted and agentic workflows, and Automated Trading System Specification and Production Readiness turns all of it into one versioned specification.</p>
           </article>
 
-          <article class="note-card"><h3>Background</h3><p>Tested trading rules, risk management, and backtesting concepts. Software examples explain their trading context.</p></article>
+          <article class="note-card"><h3>Who it is for</h3><p>Anyone who has a rule set they trust and no idea what it takes to let it run unattended. It assumes you can read a chart, and that risk per trade, position sizing, expectancy and out-of-sample validation already mean something to you — Trading Risk Management and Backtesting and Trading Systems define them. It assumes nothing about distributed systems: idempotency, reconciliation, traces, secret rotation and rollback are introduced here, from the trading problem they solve rather than from the general engineering literature. It also suits the reader who has decided NOT to automate, and wants to know what they would be signing up for: most of this course is about failure — a timeout with unknown state, a duplicate order, a stale price, a credential with more permission than it needs — and none of that goes away because the strategy is good.</p></article>
 
-          <article class="note-card"><h3>Using the lessons</h3><p>Use the explanations, examples, interactive controls, and practice questions for the topics you want to study. Completion marks are optional.</p></article>
+          <article class="note-card"><h3>Concept dependencies</h3><p>Architecture defines the boundaries across which market data and clock events travel. Strategy state and risk limits constrain what broker calls and order management may do. Reliability, observability and security work must account for order status arriving out of order. A missing response creates an uncertain state that the system must reconcile; a good strategy alone does not resolve it.</p></article>
 
           <article class="note-card span">
             <span class="note-icon" aria-hidden="true">
@@ -1595,7 +1618,7 @@
 
         <div class="stage" id="stage-encode">
           <div class="stage-head">
-            <p class="stage-badge"><b>Lessons 01–05</b></p>
+            <p class="stage-badge"><b>Lesson topics</b></p>
             <h3>Encoding the strategy</h3>
             <p>Before anything runs: what the parts of a trading system are, and how much authority each level of automation actually takes. A strategy that lives in your head produces a different trade every time; a strategy encoded as separate rules, signals, risk checks and orders produces the same decision from the same events — which is the minimum condition for everything that follows. These lessons draw the boundaries, then fill them in: the data model events arrive as, the calendar and scheduler that say when a decision is even allowed, and the signal engine whose state is explicit enough that a repeat or a stale value cannot slip through as a new trade.</p>
           </div>
@@ -1656,7 +1679,7 @@
                     </span>
                   </div>
 
-                  <h4><a class="lesson-link" href="./algorithmic-and-automated-trading-fundamentals/"><span class="lesson-ord">Lesson 01</span>Algorithmic and Automated Trading Fundamentals</a></h4>
+                  <h4><a class="lesson-link" href="./algorithmic-and-automated-trading-fundamentals/"><span class="lesson-ord" aria-hidden="true"></span>Algorithmic and Automated Trading Fundamentals</a></h4>
 
                   <p>Separate strategy rules, signal generation, risk checks, order submission, and execution, then choose the appropriate level of automation.</p>
 
@@ -1713,7 +1736,7 @@
                     </span>
                   </div>
 
-                  <h4><a class="lesson-link" href="./trading-system-architecture-and-components/"><span class="lesson-ord">Lesson 02</span>Trading System Architecture and Components</a></h4>
+                  <h4><a class="lesson-link" href="./trading-system-architecture-and-components/"><span class="lesson-ord" aria-hidden="true"></span>Trading System Architecture and Components</a></h4>
 
                   <p>Define the services, boundaries, data stores, messages, and ownership required to move from market data to an auditable trading decision.</p>
 
@@ -1773,7 +1796,7 @@
                     </span>
                   </div>
 
-                  <h4><a class="lesson-link" href="./market-data-ingestion-and-normalization/"><span class="lesson-ord">Lesson 03</span>Market Data Ingestion and Normalization</a></h4>
+                  <h4><a class="lesson-link" href="./market-data-ingestion-and-normalization/"><span class="lesson-ord" aria-hidden="true"></span>Market Data Ingestion and Normalization</a></h4>
 
                   <p>Receive historical and streaming data, validate timestamps and symbols, remove duplicates, handle late events, and expose one normalized market-data model.</p>
 
@@ -1831,7 +1854,7 @@
                     </span>
                   </div>
 
-                  <h4><a class="lesson-link" href="./time-sessions-events-and-scheduling/"><span class="lesson-ord">Lesson 04</span>Time, Sessions, Events, and Scheduling</a></h4>
+                  <h4><a class="lesson-link" href="./time-sessions-events-and-scheduling/"><span class="lesson-ord" aria-hidden="true"></span>Time, Sessions, Events, and Scheduling</a></h4>
 
                   <p>Use exchange calendars, time zones, session boundaries, event windows, and deterministic schedulers instead of assuming every day and minute is tradable.</p>
 
@@ -1890,7 +1913,7 @@
                     </span>
                   </div>
 
-                  <h4><a class="lesson-link" href="./signal-engine-and-strategy-state/"><span class="lesson-ord">Lesson 05</span>Signal Engine and Strategy State</a></h4>
+                  <h4><a class="lesson-link" href="./signal-engine-and-strategy-state/"><span class="lesson-ord" aria-hidden="true"></span>Signal Engine and Strategy State</a></h4>
 
                   <p>Convert normalized events into deterministic strategy-state transitions while preventing repeated, contradictory, or stale signals.</p>
 
@@ -1910,7 +1933,7 @@
 
         <div class="stage" id="stage-execute">
           <div class="stage-head">
-            <p class="stage-badge"><b>Lessons 06–08</b></p>
+            <p class="stage-badge"><b>Lesson topics</b></p>
             <h3>Execution and infrastructure</h3>
             <p>The part that touches money. A risk engine that owns cash, positions, exposure, open orders and limits comes first, because it has to be consulted before an order exists rather than after one is rejected. Then the broker adapter, where the comfortable assumption breaks: a submitted order is not a filled order, a response is not a state, and a status update can arrive out of order or not at all. Then the execution decisions themselves — which order type, how long to leave it working, how much of the available liquidity to take, and what the fill actually cost against the price the decision was made at.</p>
           </div>
@@ -1956,7 +1979,7 @@
                     </span>
                   </div>
 
-                  <h4><a class="lesson-link" href="./portfolio-position-and-risk-engine/"><span class="lesson-ord">Lesson 06</span>Portfolio, Position, and Risk Engine</a></h4>
+                  <h4><a class="lesson-link" href="./portfolio-position-and-risk-engine/"><span class="lesson-ord" aria-hidden="true"></span>Portfolio, Position, and Risk Engine</a></h4>
 
                   <p>Maintain authoritative cash, positions, exposure, open orders, and risk limits before any order is submitted.</p>
 
@@ -2016,7 +2039,7 @@
                     </span>
                   </div>
 
-                  <h4><a class="lesson-link" href="./broker-apis-and-order-lifecycle/"><span class="lesson-ord">Lesson 07</span>Broker APIs and Order Lifecycle</a></h4>
+                  <h4><a class="lesson-link" href="./broker-apis-and-order-lifecycle/"><span class="lesson-ord" aria-hidden="true"></span>Broker APIs and Order Lifecycle</a></h4>
 
                   <p>Submit, query, cancel, and reconcile orders through a broker adapter while treating every response and status update as asynchronous state.</p>
 
@@ -2075,7 +2098,7 @@
                     </span>
                   </div>
 
-                  <h4><a class="lesson-link" href="./order-management-and-execution/"><span class="lesson-ord">Lesson 08</span>Order Management and Execution</a></h4>
+                  <h4><a class="lesson-link" href="./order-management-and-execution/"><span class="lesson-ord" aria-hidden="true"></span>Order Management and Execution</a></h4>
 
                   <p>Select order types, manage open orders, control participation, and measure fill quality against the decision price and available liquidity.</p>
 
@@ -2095,7 +2118,7 @@
 
         <div class="stage" id="stage-controls">
           <div class="stage-head">
-            <p class="stage-badge"><b>Lessons 09–11</b></p>
+            <p class="stage-badge"><b>Lesson topics</b></p>
             <h3>Testing and risk controls</h3>
             <p>Whether the system may be trusted to run, and what happens when it is wrong. Paper trading runs the whole thing on current data with no capital at risk, which is the first place backtest assumptions meet real signal timing, real latency and real fills. Scanners, alerts and an explicit human approval step are the automation level below automatic, and they have failure modes of their own: duplicated alerts, a thesis the reader cannot reconstruct, a decision acted on an hour after it stopped being true. Then the uncomfortable one — a network that times out leaves you not knowing whether an order exists, and only duplicate-safe commands, durable state and reconciliation get you back to certainty.</p>
           </div>
@@ -2141,7 +2164,7 @@
                     </span>
                   </div>
 
-                  <h4><a class="lesson-link" href="./paper-trading-and-forward-testing/"><span class="lesson-ord">Lesson 09</span>Paper Trading and Forward Testing</a></h4>
+                  <h4><a class="lesson-link" href="./paper-trading-and-forward-testing/"><span class="lesson-ord" aria-hidden="true"></span>Paper Trading and Forward Testing</a></h4>
 
                   <p>Run the complete system on current market data without live capital, then compare backtest assumptions with observed signals, latency, and simulated fills.</p>
 
@@ -2200,7 +2223,7 @@
                     </span>
                   </div>
 
-                  <h4><a class="lesson-link" href="./scanners-alerts-and-human-approval/"><span class="lesson-ord">Lesson 10</span>Scanners, Alerts, and Human Approval</a></h4>
+                  <h4><a class="lesson-link" href="./scanners-alerts-and-human-approval/"><span class="lesson-ord" aria-hidden="true"></span>Scanners, Alerts, and Human Approval</a></h4>
 
                   <p>Screen instruments, rank candidates, deduplicate alerts, communicate the exact thesis, and expire decisions that are no longer current.</p>
 
@@ -2257,7 +2280,7 @@
                     </span>
                   </div>
 
-                  <h4><a class="lesson-link" href="./reliability-idempotency-retries-and-recovery/"><span class="lesson-ord">Lesson 11</span>Reliability, Idempotency, Retries, and Recovery</a></h4>
+                  <h4><a class="lesson-link" href="./reliability-idempotency-retries-and-recovery/"><span class="lesson-ord" aria-hidden="true"></span>Reliability, Idempotency, Retries, and Recovery</a></h4>
 
                   <p>Design duplicate-safe commands, bounded retries, durable state, reconciliation, and restart behavior for uncertain networks and asynchronous broker updates.</p>
 
@@ -2277,7 +2300,7 @@
 
         <div class="stage" id="stage-operate">
           <div class="stage-head">
-            <p class="stage-badge"><b>Lessons 12–14</b></p>
+            <p class="stage-badge"><b>Lesson topics</b></p>
             <h3>Deployment and monitoring</h3>
             <p>Running it accountably. Observability first, because a system you cannot measure is a system you are guessing about: data freshness, decision latency, broker latency, error rate, positions and risk, end-to-end traces, and an immutable record of why each decision was made. Then the credentials and the stop: scoped permissions, separated environments, rotation, audited access, and a mechanism that halts new trading immediately and does not depend on the thing it is stopping. Then getting changes into production without changing trading state by accident — reproducible artifacts, configuration separated from code, gradual rollout, and a rollback you have actually tried.</p>
           </div>
@@ -2322,7 +2345,7 @@
                     </span>
                   </div>
 
-                  <h4><a class="lesson-link" href="./observability-logging-and-auditability/"><span class="lesson-ord">Lesson 12</span>Observability, Logging, and Auditability</a></h4>
+                  <h4><a class="lesson-link" href="./observability-logging-and-auditability/"><span class="lesson-ord" aria-hidden="true"></span>Observability, Logging, and Auditability</a></h4>
 
                   <p>Measure data freshness, decision latency, broker latency, error rate, positions, risk, and end-to-end traces while preserving an immutable decision audit trail.</p>
 
@@ -2385,7 +2408,7 @@
                     </span>
                   </div>
 
-                  <h4><a class="lesson-link" href="./security-secrets-permissions-and-kill-switches/"><span class="lesson-ord">Lesson 13</span>Security, Secrets, Permissions, and Kill Switches</a></h4>
+                  <h4><a class="lesson-link" href="./security-secrets-permissions-and-kill-switches/"><span class="lesson-ord" aria-hidden="true"></span>Security, Secrets, Permissions, and Kill Switches</a></h4>
 
                   <p>Protect broker credentials, restrict execution permissions, separate environments, audit access, rotate secrets, and provide immediate mechanisms to stop new trading.</p>
 
@@ -2444,7 +2467,7 @@
                     </span>
                   </div>
 
-                  <h4><a class="lesson-link" href="./deployment-environments-and-configuration/"><span class="lesson-ord">Lesson 14</span>Deployment, Environments, and Configuration</a></h4>
+                  <h4><a class="lesson-link" href="./deployment-environments-and-configuration/"><span class="lesson-ord" aria-hidden="true"></span>Deployment, Environments, and Configuration</a></h4>
 
                   <p>Build reproducible artifacts, separate development, paper, and live configuration, validate changes, deploy gradually, and roll back without changing trading state unexpectedly.</p>
 
@@ -2464,9 +2487,9 @@
 
         <div class="stage" id="stage-finish">
           <div class="stage-head">
-            <p class="stage-badge"><b>Lessons 15–16</b></p>
+            <p class="stage-badge"><b>Lesson topics</b></p>
             <h3>AI and production readiness</h3>
-            <p>AI workflows and system specifications. Lesson 15 is where AI belongs in this system: research, extraction, classification and trade proposals — with market data, rules, risk, permissions and execution controls kept deterministic and auditable, so a proposal is an input to the risk engine and never a substitute for it. Lesson 16 collects everything the course has built — strategy, data, architecture, risk, broker, reliability, security, deployment, observability, approval and rollback — into one versioned specification, and puts a readiness gate in front of it. That specification documents the methods covered in this Course.</p>
+            <p>AI workflows and system specifications. AI-Assisted and Agentic Trading Workflows explains where AI belongs in this system: research, extraction, classification and trade proposals — with market data, rules, risk, permissions and execution controls kept deterministic and auditable, so a proposal is an input to the risk engine and never a substitute for it. Automated Trading System Specification and Production Readiness collects the system components and controls — strategy, data, architecture, risk, broker, reliability, security, deployment, observability, approval and rollback — into one versioned specification, and puts a readiness gate in front of it. That specification documents the methods covered in this Course.</p>
           </div>
 
           <ol class="course-track" role="list" start="15">
@@ -2513,7 +2536,7 @@
                     </span>
                   </div>
 
-                  <h4><a class="lesson-link" href="./ai-assisted-and-agentic-trading-workflows/"><span class="lesson-ord">Lesson 15</span>AI-Assisted and Agentic Trading Workflows</a></h4>
+                  <h4><a class="lesson-link" href="./ai-assisted-and-agentic-trading-workflows/"><span class="lesson-ord" aria-hidden="true"></span>AI-Assisted and Agentic Trading Workflows</a></h4>
 
                   <p>Use AI for research, extraction, classification, and trade proposals while keeping market data, rules, risk, permissions, and execution controls deterministic and auditable.</p>
 
@@ -2575,7 +2598,7 @@
                     </span>
                   </div>
 
-                  <h4><a class="lesson-link" href="./automated-trading-system-specification-and-production-readiness/"><span class="lesson-ord">Lesson 16</span>Automated Trading System Specification and Production Readiness</a></h4>
+                  <h4><a class="lesson-link" href="./automated-trading-system-specification-and-production-readiness/"><span class="lesson-ord" aria-hidden="true"></span>Automated Trading System Specification and Production Readiness</a></h4>
 
                   <p>Combine strategy, data, architecture, risk, broker, reliability, security, deployment, observability, approval, and rollback requirements into one versioned production specification.</p>
 
@@ -2599,7 +2622,7 @@
         <div class="section-head">
           <div>
             <p class="kicker">Interop</p>
-            <h2 id="spec-title">Lesson 16 exports a system specification</h2>
+            <h2 id="spec-title">Automated Trading System Specification and Production Readiness exports a system specification</h2>
             <p>The specification lesson documents an automated trading system. It turns the whole course into one document — what the system trades, where its data comes from, what risk it may take, which broker it speaks to, how it was validated, how it is operated, and what AI is permitted to do — and hands that document back to you as a file, so it can outlive the browser tab it was written in.</p>
           </div>
           <p class="count-chip">Format: automated-trading-system-v1</p>
@@ -2609,7 +2632,7 @@
           <article class="interop-card">
             <h3>What comes out of it</h3>
             <p>
-              Lesson 16 takes the identity and version you gave the system, the
+              Automated Trading System Specification and Production Readiness takes the identity and version you gave the system, the
               strategy section — type, timeframe, direction, and the automation
               level, which is one of <span class="mono">alert</span>,
               <span class="mono">approval</span> or
@@ -2652,7 +2675,7 @@
                     <path d="M5 4h11l3 3v13H5z" /><path d="M8.5 10h7M8.5 14h4" /><path d="M13.5 15.5l2 2 3.5-4" />
                   </svg>
                   <span>
-                    <strong>Lesson 16 · Automated Trading System Specification and Production Readiness</strong>
+                    <strong>Automated Trading System Specification and Production Readiness</strong>
                     <span>Builds the specification and exports it</span>
                   </span>
                 </a>
@@ -2675,7 +2698,7 @@
                     <rect x="4" y="7" width="16" height="12" rx="3" /><path d="M12 4v3" /><path d="M9 12h.01M15 12h.01" />
                   </svg>
                   <span>
-                    <strong>Lesson 15 · AI-Assisted and Agentic Trading Workflows</strong>
+                    <strong>AI-Assisted and Agentic Trading Workflows</strong>
                     <span>Where the specification's AI mode and direct-execution flag come from</span>
                   </span>
                 </a>
@@ -2686,7 +2709,7 @@
                     <path d="M3 6h18v12H3z" /><path d="M11 6v12M17 6v12" />
                   </svg>
                   <span>
-                    <strong>Lesson 09 · Paper Trading and Forward Testing</strong>
+                    <strong>Paper Trading and Forward Testing</strong>
                     <span>Where the paper-trading days and shadow-mode flag come from</span>
                   </span>
                 </a>

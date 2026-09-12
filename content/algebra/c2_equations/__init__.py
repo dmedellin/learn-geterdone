@@ -40,7 +40,7 @@ COURSE = {
          "Solve linear, compound and absolute-value statements, reverse the sign when and only when you must, and write the answer in interval notation."),
     ],
     "syllabus_intro": (
-        "Lessons 1 to 6 are equations, 7 and 8 apply them, and 9 to 13 are inequalities, absolute value and the notation for a solution set."
+        'Equivalent equations and solution methods support applications with ratios, proportions, percentages and models. Inequalities and absolute value describe solution sets, which interval and set-builder notation express precisely.'
     ),
     "how_to": ['After the complete example, cover its answer and do the faded rehearsal before the quiz. The supplied first move is guidance; the remaining moves and the substitution check are yours.', 'Do the fraction lessons without decimals. `x = 7/3` is the answer; `x = 2.333` is a rounding of it, and the fraction retains the exact value.', 'In the inequality lessons, test a number from your own answer against the original statement. A reversed sign is invisible in the algebra and obvious in the test.'],
     "not_covered": [

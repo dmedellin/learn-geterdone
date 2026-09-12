@@ -21,6 +21,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 import build_paths
 from mathpath import chrome
 from mathpath import progress
+from mathpath import theme
 import add_progress_marks as trading
 
 
@@ -160,6 +161,25 @@ class TestVisitorTaxonomy(unittest.TestCase):
 
 
 class TestGeneratedLessonUI(unittest.TestCase):
+    def test_only_svg_lab_stages_receive_the_finite_scroll_contract(self):
+        source = ('<main><div class="lab-stage"><svg viewBox="0 0 660 88"></svg>'
+                  '<svg viewBox="0 0 460 300"></svg></div>'
+                  '<div class="lab-stage"><p>No horizontal diagram</p></div></main>')
+        normalized = chrome.name_horizontal_scrollers(source)
+        self.assertEqual(normalized, chrome.name_horizontal_scrollers(normalized))
+        doc = Elements(normalized)
+        named = doc.find("div", **{"class": "lab-stage", "tabindex": "0"})
+        self.assertEqual(1, len(named), "only the stage with an actual SVG is a keyboard stop")
+        self.assertEqual("region", named[0]["attrs"].get("role"))
+        self.assertTrue(named[0]["attrs"].get("aria-label"))
+        stages = doc.find("div", **{"class": "lab-stage"})
+        self.assertEqual(2, len(stages))
+        self.assertEqual(1, len([stage for stage in stages if "tabindex" not in stage["attrs"]]),
+                         "the non-SVG stage remains ordinary content")
+        for width in (460, 520, 660):
+            self.assertRegex(theme.STYLESHEET,
+                r'\.lab-stage svg\[viewBox\^="0 0 %d "\][^{]*\{[^}]*min-width:\s*%dpx' % (width, width))
+
     def test_lesson_hierarchy(self):
         checked = 0
         for subject in build_paths.GENERATED_PATHS:
@@ -329,6 +349,36 @@ class TestGeneratedCatalogUI(unittest.TestCase):
 
 
 class TestTradingNormalization(unittest.TestCase):
+    def test_market_svg_scale_has_one_owned_keyboard_scroller(self):
+        source = ('<section><div class="chart-wrap"><svg id="mainChart" '
+                  'viewBox="0 0 940 480"></svg></div>'
+                  '<div class="quiz-chart-wrap"><svg id="quizChart" '
+                  'viewBox="0 0 940 450"></svg></div>'
+                  '<div class="chart-wrap"><canvas id="canvas"></canvas></div></section>')
+        normalized = trading.ensure_market_chart_scroll_owners(source)
+        self.assertEqual(normalized, trading.ensure_market_chart_scroll_owners(normalized),
+                         "market SVG ownership must be idempotent")
+        doc = Elements(normalized)
+        owners = doc.find("div", **{"class": "chart-wrap market-chart-scroll"})
+        quiz_owners = doc.find("div", **{"class": "quiz-chart-wrap market-chart-scroll"})
+        owners += quiz_owners
+        self.assertEqual(2, len(owners), "each semantic market SVG gets one scroll owner")
+        for owner in owners:
+            self.assertEqual("0", owner["attrs"].get("tabindex"))
+            self.assertEqual("region", owner["attrs"].get("role"))
+            self.assertTrue(owner["attrs"].get("aria-label"))
+        self.assertEqual(2, len(doc.find("svg", **{"class": "market-chart"})),
+                         "legacy 940-unit SVGs join the same semantic scale contract")
+        self.assertEqual(1, len(doc.find("div", **{"class": "chart-wrap"})),
+                         "an unrelated canvas wrapper must keep its existing ownership")
+        self.assertRegex(trading.CSS, r"(?s)@media\s+screen\s*\{.*\.market-chart-scroll\s*\{[^}]*contain:\s*inline-size")
+        self.assertRegex(trading.CSS, r"(?s)\.market-chart-scroll\s*\{[^}]*overflow-x:\s*auto\s*!important",
+                         "the owned scroll rule must override legacy inline overflow shorthands")
+        self.assertRegex(trading.CSS, r"(?s)\.market-chart-scroll\s*>\s*svg\.market-chart\s*\{[^}]*min-width:\s*960px")
+        with self.assertRaisesRegex(ValueError, "market-chart lacks an authored scroll owner"):
+            trading.ensure_market_chart_scroll_owners(
+                '<section><svg id="futureChart" class="market-chart"></svg></section>')
+
     def test_legacy_shells_preserve_domain_copy_and_hero_controls(self):
         course={"slug":"example-course","title":"Example Course","lessons":[{"slug":"example-lesson","title":"Example Lesson"}]}
         lesson=course["lessons"][0]

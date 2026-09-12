@@ -1222,6 +1222,7 @@ textarea { font: inherit; }
       font-size: 0.9rem;
       resize: vertical;
     }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
     .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
     .fb-actions {
       display: flex;
@@ -1380,6 +1381,27 @@ textarea { font: inherit; }
       .signin-btn { padding: 0; width: 38px; justify-content: center; }
     }
 
+    /* Trading charts use a 960-unit plotting frame. Keep that authored scale
+       instead of shrinking 11-unit axis text to roughly 3 CSS pixels on a
+       phone. The named keyboard scroll owner exposes the complete chart. */
+    @media screen {
+      .market-chart-scroll {
+        contain: inline-size;
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        overscroll-behavior-inline: contain;
+      }
+      .market-chart-scroll > svg.market-chart {
+        display: block;
+        width: 100%;
+        min-width: 960px;
+      }
+    }
+
     body[data-page-kind] {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 16px;
@@ -1413,6 +1435,7 @@ textarea { font: inherit; }
     [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
     [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
     [data-ui="hero"] .eyebrow { display: block; color: var(--muted); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
     [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
     [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
     [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
@@ -1457,7 +1480,7 @@ textarea { font: inherit; }
     }
     [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
     [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
-    [data-ui="lesson-list"] .lesson-link { min-height: 44px; }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
     body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
     body[data-page-kind] .is-done .lesson-state { color: var(--green); }
     [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
@@ -1585,7 +1608,7 @@ textarea { font: inherit; }
 <div class="lab-layout">
   <article class="card chart-card">
     <div class="chart-toolbar"><div class="chart-title"><strong>Risk-to-reward calculator</strong><span>Move entry, stop, and target to update the chart and expectancy</span></div><div class="tab-row" id="rrPresets"><button class="tab active" data-preset="balanced" type="button">Balanced example</button><button class="tab" data-preset="poor" type="button">Poor reward</button><button class="tab" data-preset="asymmetric" type="button">High asymmetry</button></div></div>
-    <div class="chart-wrap"><svg id="rrChart" class="market-chart" aria-label="Risk and reward chart"></svg><div class="chart-tooltip"></div></div>
+    <div class="chart-wrap market-chart-scroll" tabindex="0" role="region" aria-label="Interactive chart; scroll horizontally for complete chart labels"><svg id="rrChart" class="market-chart" aria-label="Risk and reward chart"></svg><div class="chart-tooltip"></div></div>
     <div class="control-strip"><div class="seg-row" id="rrDirection"><button class="seg-btn active" data-value="long" data-tone="green" type="button">Long</button><button class="seg-btn" data-value="short" data-tone="red" type="button">Short</button></div></div>
   </article>
   <aside class="card side-panel" aria-live="polite">
@@ -1607,7 +1630,7 @@ REWARD     = |104.00 − 100.00|           = 4.00
 R MULTIPLE = 4.00 ÷ 2.00                 = 2.00R
 BREAK-EVEN = 1.00 ÷ (2.00 + 1.00)        = 33.3%
 EXPECTANCY = 0.45 × 2.00 − 0.55 × 1.00 − 0.05
-           = 0.90 − 0.55 − 0.05          = +0.30R</div><div class="note" style="margin-top:12px;"><strong>Now change one input.</strong> Set the average loss to 0.50R and the break-even rate becomes 0.50 ÷ (2.00 + 0.50) = 20.0% — a system that loses less than 1R on average needs fewer wins, which the old shorthand 1 ÷ (1 + 2) could not show. Set the win rate to 30% instead and expectancy becomes 0.30 × 2.00 − 0.70 × 1.00 − 0.05 = −0.15R: the same 2R plan loses money. The ratio did not change; the estimate behind it did, and the estimate is the part that has to come from lesson 13.</div></article>
+           = 0.90 − 0.55 − 0.05          = +0.30R</div><div class="note" style="margin-top:12px;"><strong>Now change one input.</strong> Set the average loss to 0.50R and the break-even rate becomes 0.50 ÷ (2.00 + 0.50) = 20.0% — a system that loses less than 1R on average needs fewer wins, which the old shorthand 1 ÷ (1 + 2) could not show. Set the win rate to 30% instead and expectancy becomes 0.30 × 2.00 − 0.70 × 1.00 − 0.05 = −0.15R: the same 2R plan loses money. The ratio did not change; the estimate behind it did, and the estimate is the part that has to come from Backtesting.</div></article>
     </section>
     <section class="section" id="process">
       <div class="section-head"><div><h2>Risk-to-reward evaluation process</h2></div><p>Use the ratio to measure a structurally valid plan—not to invent one.</p></div>
@@ -2202,7 +2225,7 @@ setupQuiz({promptId:"rrQuizPrompt",choicesId:"rrQuizChoices",feedbackId:"rrQuizF
  {prompt:"A strategy wins 40% of trades, averages +2R on wins, and −1R on losses before costs. What is expectancy?",choices:[{value:"p2",label:"+0.20R"},{value:"p8",label:"+0.80R",why:"0.40 × 2R is +0.80R, but that is the wins alone. The 60% of trades that lose 1R each take 0.60R back: 0.80 − 0.60 = +0.20R."},{value:"m2",label:"−0.20R",why:"The sign is wrong: wins contribute 0.40 × 2 = +0.80R and losses 0.60 × 1 = −0.60R. The win side is larger, so expectancy is positive, +0.20R."},{value:"zero",label:"0R",why:"Zero would need the loss rate to equal the break-even rate, 1 ÷ (1 + 2) = 33.3% wins. At 40% the system is above break-even by 0.40 × 2 − 0.60 × 1 = +0.20R."}],answer:"p2",explanation:"0.40 × 2R − 0.60 × 1R = +0.20R before costs."},
  {prompt:"Which statement is correct?",choices:[{value:"high",label:"Higher reward-to-risk always means a better system",why:"A 4R target that is hit 15% of the time returns 0.60 − 0.85 = −0.25R per trade before costs. The ratio is one input to expectancy; on its own it says nothing about the system."},{value:"joint",label:"Reward-to-risk must be evaluated with win rate, losses, and costs"},{value:"two",label:"Every trade must target at least 2R",why:"The poor-reward preset in the lab is 0.8R and loses money at 58% wins; a 0.8R plan at 65% wins would make it. The minimum is whatever the win rate pays for — the first mistake this lesson names is fixing it at 2."},{value:"fixed",label:"Break-even win rate is always 50%",why:"50% is break-even only when the average win equals the average loss. At 2R wins against 1R losses it is 33.3%; at 0.5R wins it is 66.7%. The formula is avg loss ÷ (avg win + avg loss)."}],answer:"joint",explanation:"Payoff and hit rate interact. High-R systems can have low win rates, and low-R systems can work with sufficiently high win rates."},
  {prompt:"At an average win of 3R and average loss of 1R, the theoretical break-even win rate before costs is closest to:",choices:[{value:"25",label:"25%"},{value:"33",label:"33%",why:"33% is the break-even rate for 2R wins, not 3R. With 3R wins one win pays for three losses, so one in four — 1 ÷ (3 + 1) = 25% — breaks even."},{value:"50",label:"50%",why:"50% is break-even only when wins and losses are the same size. Here a win is three times a loss, so far fewer wins are needed: 1 ÷ (3 + 1) = 25%."},{value:"75",label:"75%",why:"75% is the loss rate at break-even, not the win rate. Three losses of 1R are paid for by one win of 3R, so the wins needed are one in four."}],answer:"25",explanation:"1 ÷ (1 + 3) = 25%. Costs raise the actual required win rate."},
- {prompt:"A target at 4R lies beyond several major resistance levels. What does the 4R calculation prove?",choices:[{value:"nothing",label:"Only the mathematical distance, not target realism"},{value:"hit",label:"The target will be hit",why:"The calculation measures a distance. Whether price crosses several levels that have each stopped it before is a question about structure, and the number 4 contains no information about it."},{value:"edge",label:"The strategy has an edge",why:"An edge is expectancy over a sample, which needs a win rate from lesson 13. A single planned ratio, on a target the chart argues against, is not evidence of anything."},{value:"size",label:"The position size is correct",why:"Size comes from the risk budget and the entry-to-stop distance, which the target does not enter. A 4R target on a poorly sized position is still poorly sized."}],answer:"nothing",explanation:"R measures planned distance. Structural realism and historical performance require separate evidence."}
+ {prompt:"A target at 4R lies beyond several major resistance levels. What does the 4R calculation prove?",choices:[{value:"nothing",label:"Only the mathematical distance, not target realism"},{value:"hit",label:"The target will be hit",why:"The calculation measures a distance. Whether price crosses several levels that have each stopped it before is a question about structure, and the number 4 contains no information about it."},{value:"edge",label:"The strategy has an edge",why:"An edge is expectancy over a sample, which needs a win rate from Backtesting. A single planned ratio, on a target the chart argues against, is not evidence of anything."},{value:"size",label:"The position size is correct",why:"Size comes from the risk budget and the entry-to-stop distance, which the target does not enter. A 4R target on a poorly sized position is still poorly sized."}],answer:"nothing",explanation:"R measures planned distance. Structural realism and historical performance require separate evidence."}
 ]});
 applyRRPreset("balanced");
 </script>

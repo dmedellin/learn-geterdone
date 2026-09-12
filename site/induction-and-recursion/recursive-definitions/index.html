@@ -583,6 +583,15 @@
       overflow-x: auto;
     }
     .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
 
     /* ---------- Graphs ----------
        Tokens only. A component override scoped to [data-theme="light"] would
@@ -1040,6 +1049,7 @@
       font-size: 0.9rem;
       resize: vertical;
     }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
     .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
     .fb-actions {
       display: flex;
@@ -1132,6 +1142,7 @@
     [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
     [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
     [data-ui="hero"] .eyebrow { display: block; color: var(--muted); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
     [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
     [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
     [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
@@ -1176,7 +1187,7 @@
     }
     [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
     [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
-    [data-ui="lesson-list"] .lesson-link { min-height: 44px; }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
     body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
     body[data-page-kind] .is-done .lesson-state { color: var(--green); }
     [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
@@ -1284,7 +1295,7 @@ Recursive definition ⟷ induction proof: the same structure.</div>
       <article class="card card-pad prose"><h3>Recursively defined sequences</h3><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">factorial     0! = 1                  n! = n·(n−1)!        n ≥ 1
 Fibonacci     F₀ = 0,  F₁ = 1         Fₙ = Fₙ₋₁ + Fₙ₋₂     n ≥ 2
 powers        a⁰ = 1                  aⁿ = a·aⁿ⁻¹          n ≥ 1
-Hanoi         H₁ = 1                  Hₙ = 2Hₙ₋₁ + 1       n ≥ 2</div><p>Fibonacci needs two base values because its recursive clause reaches back two. The number of base clauses is determined by the recursion, not chosen: one fewer and some values would be undefined, one more and the definition might contradict itself.</p><div class="defbox"><span class="label">Definition &middot; Well-formed recursive definition</span><p>A recursive definition is <strong>well formed</strong> when every object in its domain is produced by finitely many applications of the clauses starting from a base object, and the clauses do not assign two different values to one object.</p></div><div class="example"><span class="label">Example &middot; A definition that fails</span><p>"<span class="math">f(0) = 1</span> and <span class="math">f(n) = f(n+1) − 1</span>" defines nothing: computing <span class="math">f(1)</span> requires <span class="math">f(2)</span>, which requires <span class="math">f(3)</span>, and the recursion never reaches the base. The clause must decrease.</p></div><h3>Recursively defined sets</h3><p>Sets are defined the same way: name some elements outright, then give rules for building more.</p><div class="example"><span class="label">Example &middot; The set of even naturals</span><p>BASE: <span class="math">0 ∈ E</span>. RECURSIVE: if <span class="math">n ∈ E</span> then <span class="math">n + 2 ∈ E</span>. Nothing else is in <span class="math">E</span>. That last sentence is not optional &mdash; without it the definition permits any superset.</p></div><div class="example"><span class="label">Example &middot; Well-formed parenthesis strings</span><p>BASE: the empty string is well formed. RECURSIVE: if <span class="math">s</span> is well formed then so is <span class="math">(s)</span>, and if <span class="math">s</span> and <span class="math">t</span> are well formed then so is <span class="math">st</span>. This generates <span class="math">()</span>, <span class="math">(())</span>, <span class="math">()()</span>, <span class="math">(()())</span> and nothing else. The Catalan numbers count them, but they are outside these Discrete Mathematics courses.</p></div><h3>Recursively defined structures</h3><div class="example"><span class="label">Example &middot; Binary trees</span><p>BASE: the empty tree is a binary tree. RECURSIVE: if <span class="math">L</span> and <span class="math">R</span> are binary trees and <span class="math">v</span> is a value, then the tree with root <span class="math">v</span>, left subtree <span class="math">L</span> and right subtree <span class="math">R</span> is a binary tree. Graphs and Trees lesson 11 traverses exactly this object.</p></div><p>This is where recursion earns its place. A binary tree has no obvious "size parameter" to induct on, but it does have a structure, and lesson 7's structural induction proves things about it directly.</p><div class="thm"><span class="label">Theorem &middot; Recursion theorem, informally</span><p>Given a base value and a rule producing <span class="math">f(n)</span> from <span class="math">f(n−1)</span>, there is exactly one function satisfying both. Existence and uniqueness both follow from induction &mdash; which is why recursive definitions are legitimate rather than merely suggestive.</p></div></article>
+Hanoi         H₁ = 1                  Hₙ = 2Hₙ₋₁ + 1       n ≥ 2</div><p>Fibonacci needs two base values because its recursive clause reaches back two. The number of base clauses is determined by the recursion, not chosen: one fewer and some values would be undefined, one more and the definition might contradict itself.</p><div class="defbox"><span class="label">Definition &middot; Well-formed recursive definition</span><p>A recursive definition is <strong>well formed</strong> when every object in its domain is produced by finitely many applications of the clauses starting from a base object, and the clauses do not assign two different values to one object.</p></div><div class="example"><span class="label">Example &middot; A definition that fails</span><p>"<span class="math">f(0) = 1</span> and <span class="math">f(n) = f(n+1) − 1</span>" defines nothing: computing <span class="math">f(1)</span> requires <span class="math">f(2)</span>, which requires <span class="math">f(3)</span>, and the recursion never reaches the base. The clause must decrease.</p></div><h3>Recursively defined sets</h3><p>Sets are defined the same way: name some elements outright, then give rules for building more.</p><div class="example"><span class="label">Example &middot; The set of even naturals</span><p>BASE: <span class="math">0 ∈ E</span>. RECURSIVE: if <span class="math">n ∈ E</span> then <span class="math">n + 2 ∈ E</span>. Nothing else is in <span class="math">E</span>. That last sentence is not optional &mdash; without it the definition permits any superset.</p></div><div class="example"><span class="label">Example &middot; Well-formed parenthesis strings</span><p>BASE: the empty string is well formed. RECURSIVE: if <span class="math">s</span> is well formed then so is <span class="math">(s)</span>, and if <span class="math">s</span> and <span class="math">t</span> are well formed then so is <span class="math">st</span>. This generates <span class="math">()</span>, <span class="math">(())</span>, <span class="math">()()</span>, <span class="math">(()())</span> and nothing else. The Catalan numbers count them, but they are outside these Discrete Mathematics courses.</p></div><h3>Recursively defined structures</h3><div class="example"><span class="label">Example &middot; Binary trees</span><p>BASE: the empty tree is a binary tree. RECURSIVE: if <span class="math">L</span> and <span class="math">R</span> are binary trees and <span class="math">v</span> is a value, then the tree with root <span class="math">v</span>, left subtree <span class="math">L</span> and right subtree <span class="math">R</span> is a binary tree. The “Rooted Trees and Traversals” Lesson in Graphs and Trees traverses exactly this object.</p></div><p>This is where recursion earns its place. A binary tree has no obvious "size parameter" to induct on, but it does have a structure, and “Structural Induction”'s structural induction proves things about it directly.</p><div class="thm"><span class="label">Theorem &middot; Recursion theorem, informally</span><p>Given a base value and a rule producing <span class="math">f(n)</span> from <span class="math">f(n−1)</span>, there is exactly one function satisfying both. Existence and uniqueness both follow from induction &mdash; which is why recursive definitions are legitimate rather than merely suggestive.</p></div></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>Recurrence and closed form</h2></div><p>Iterated and solved, then compared</p></div>
@@ -1294,7 +1305,7 @@ Hanoi         H₁ = 1                  Hₙ = 2Hₙ₋₁ + 1       n ≥ 2</di
         <div class="lab-title"><strong>a<sub>n</sub> = c₁·a<sub>n−1</sub> + c₂·a<sub>n−2</sub> + f(n)</strong><span id="recCaption"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>iterated</span><span class="tone-purple"><i class="legend-swatch"></i>closed form</span></div>
       </div>
-      <div class="lab-stage">
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels">
         <svg id="recPlot" viewBox="0 0 520 200" role="img" aria-label="The first terms of the sequence, drawn as bars."></svg>
         <div class="table-wrap" style="margin-top:10px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="recTable"></table></div>
       </div>
@@ -1350,13 +1361,13 @@ RECURSIVE  Hₙ = 2Hₙ₋₁ + 1
 Unrolling:  1, 3, 7, 15, 31, 63, …           = 2ⁿ − 1
 
 With 64 discs and one move per second: 2⁶⁴ − 1 seconds,
-about 585 billion years.</div><p>The recursive definition came directly from the structure of the problem &mdash; the largest disc can only move once everything above it is out of the way &mdash; and the closed form came afterwards. Lesson 10 shows how to derive <span class="math">2ⁿ − 1</span> rather than guess it.</p></article>
+about 585 billion years.</div><p>The recursive definition came directly from the structure of the problem &mdash; the largest disc can only move once everything above it is out of the way &mdash; and the closed form came afterwards. “Solving Linear Recurrences” shows how to derive <span class="math">2ⁿ − 1</span> rather than guess it.</p></article>
       </div>
     </section>
     <section class="section">
       <div class="grid-2">
         <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Too few base cases</strong><span>A two-term recurrence with one base value leaves everything undefined from the second term on. Count the reach of the clause.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>A recursion that does not decrease</strong><span>Defining <span class="math">f(n)</span> in terms of <span class="math">f(n+1)</span> or <span class="math">f(n)</span> produces no values at all. Every path must terminate at a base.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Omitting the closure sentence for a set</strong><span>The clauses say what belongs; only the closure says what does not. Without it the definition does not determine a set.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can write a recursive definition and unroll it correctly.</strong><p>Define the set of binary strings with no two consecutive 1s recursively, and unroll the count for lengths 1 to 6. You should get 2, 3, 5, 8, 13, 21 &mdash; Fibonacci, which lesson 9 explains.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The correspondence between recursive definitions and induction proofs is exact and worth relying on: a definition with two base clauses is proved about by an induction with two base cases, and a clause reaching back <span class="math">k</span> places calls for strong induction.</div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can write a recursive definition and unroll it correctly.</strong><p>Define the set of binary strings with no two consecutive 1s recursively, and unroll the count for lengths 1 to 6. You should get 2, 3, 5, 8, 13, 21 &mdash; Fibonacci, which “Recurrence Relations” explains.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The correspondence between recursive definitions and induction proofs is exact and worth relying on: a definition with two base clauses is proved about by an induction with two base cases, and a clause reaching back <span class="math">k</span> places calls for strong induction.</div></article>
       </div>
     </section>
     </main>
@@ -1512,7 +1523,7 @@ about 585 billion years.</div><p>The recursive definition came directly from the
       closed: 'aₙ = n(n+1)/2',
       closedAt: function (n) { return n * (n + 1) / 2; },
       exact: function (n) { return BigInt(n) * BigInt(n + 1) / 2n; },
-      note: 'Nonhomogeneous with a linear f(n) = n, so the particular solution is quadratic. Unrolling gives the triangular numbers, which course 3 also proves by induction.'
+      note: 'Nonhomogeneous with a linear f(n) = n, so the particular solution is quadratic. Unrolling gives the triangular numbers, which “Induction with Sums and Products” also proves by induction.'
     },
     merge: {
       label: 'T(n) = 2T(n/2) + n, T(1) = 0, at n = 2ᵏ', init: [0n],

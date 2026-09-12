@@ -11,7 +11,7 @@ for(const failure of [true,false]){
  const out=path.join(OUT,failure?'in-loop':'success');assert(!fs.existsSync(out),'fresh lifecycle evidence');
  const command=[path.join(ROOT,'tests/mutate_browser_ui.js'),'--case=runtime-named-process'];
  const started=Date.now();
- const run=spawnSync(process.execPath,command,{env:{...process.env,BROWSER_EVIDENCE:out,...(failure?{NODE_OPTIONS:'--require='+hook,LIFECYCLE_CASE_DIR:out}:{})},encoding:'utf8'});
+ const run=spawnSync(process.execPath,command,{env:{...process.env,TMPDIR:'/tmp',SOURCE_ROOT:ROOT,BROWSER_EVIDENCE:out,...(failure?{NODE_OPTIONS:'--require='+hook,LIFECYCLE_CASE_DIR:out}:{})},encoding:'utf8',maxBuffer:256*1024*1024});
  fs.writeFileSync(path.join(OUT,(failure?'in-loop':'success')+'.log'),run.stdout+run.stderr);
  assert.equal(run.status,failure?1:0,'intended lifecycle exit');
  assert((run.stdout+run.stderr).includes(failure?'INJECTED after mutation case':'1/1 browser mutations caught'),'intended lifecycle reason');

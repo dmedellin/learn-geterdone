@@ -955,6 +955,7 @@
       font-size: 0.9rem;
       resize: vertical;
     }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
     .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
     .fb-actions {
       display: flex;
@@ -1113,6 +1114,27 @@
       .signin-btn { padding: 0; width: 38px; justify-content: center; }
     }
 
+    /* Trading charts use a 960-unit plotting frame. Keep that authored scale
+       instead of shrinking 11-unit axis text to roughly 3 CSS pixels on a
+       phone. The named keyboard scroll owner exposes the complete chart. */
+    @media screen {
+      .market-chart-scroll {
+        contain: inline-size;
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        overscroll-behavior-inline: contain;
+      }
+      .market-chart-scroll > svg.market-chart {
+        display: block;
+        width: 100%;
+        min-width: 960px;
+      }
+    }
+
     body[data-page-kind] {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 16px;
@@ -1146,6 +1168,7 @@
     [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
     [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
     [data-ui="hero"] .eyebrow { display: block; color: var(--muted); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
     [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
     [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
     [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
@@ -1190,7 +1213,7 @@
     }
     [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
     [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
-    [data-ui="lesson-list"] .lesson-link { min-height: 44px; }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
     body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
     body[data-page-kind] .is-done .lesson-state { color: var(--green); }
     [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
@@ -1447,8 +1470,8 @@
               <span><i></i> Swing path</span>
               <span><i class="protected"></i> Protected level</span>
             </div>
-            <div class="chart-wrap">
-              <svg id="mainChart" viewBox="0 0 940 480" role="img" aria-label="Interactive candlestick market structure chart"></svg>
+            <div class="chart-wrap market-chart-scroll" tabindex="0" role="region" aria-label="Interactive chart; scroll horizontally for complete chart labels">
+              <svg id="mainChart" viewBox="0 0 940 480" role="img" aria-label="Interactive candlestick market structure chart" class="market-chart"></svg>
             </div>
             <div class="chart-control">
               <button class="btn small" id="playBtn">▶ Play</button>
@@ -1526,7 +1549,7 @@
           <div>
             <div class="kicker">Part 4 · A first look across timeframes</div>
             <h2>One stock can show several structures at once</h2>
-            <p>Use the higher timeframe for direction and the lower timeframe for setup timing. This is a preview: lesson 03 takes the same idea at full depth.</p>
+            <p>Use the higher timeframe for direction and the lower timeframe for setup timing. Multi-Timeframe Market Structure Lab examines the same idea at full depth.</p>
           </div>
         </div>
 
@@ -1581,8 +1604,8 @@
         </div>
 
         <div class="quiz-layout">
-          <div class="panel quiz-chart-wrap">
-            <svg id="quizChart" viewBox="0 0 940 450" role="img" aria-label="Unlabeled market structure quiz chart"></svg>
+          <div class="panel quiz-chart-wrap market-chart-scroll" tabindex="0" role="region" aria-label="Interactive chart; scroll horizontally for complete chart labels">
+            <svg id="quizChart" viewBox="0 0 940 450" role="img" aria-label="Unlabeled market structure quiz chart" class="market-chart"></svg>
           </div>
           <aside class="panel quiz-side">
             <h3>What is the dominant structure?</h3>
@@ -1913,7 +1936,12 @@
         svg.innerHTML = '';
         const width = 940;
         const height = options.height || 480;
-        const m = { top: 34, right: 62, bottom: 38, left: 44 };
+        // Keep scale ticks and the current-price badge in separate named
+        // gutters. Their vertical coordinates can coincide, so sharing one
+        // right gutter lets the later badge erase a meaningful scale label.
+        const m = { top: 34, right: 118, bottom: 38, left: 44 };
+        const axisLabelX = width - m.right + 9;
+        const currentPriceX = width - 29;
         const plotW = width - m.left - m.right;
         const plotH = height - m.top - m.bottom;
 
@@ -1940,7 +1968,7 @@
           const gy = m.top + (plotH / 5) * i;
           const value = maxV - ((maxV - minV) / 5) * i;
           svg.appendChild(svgEl('line', { x1: m.left, y1: gy, x2: width - m.right, y2: gy, stroke: css('--line'), 'stroke-width': 1 }));
-          svg.appendChild(svgEl('text', { x: width - m.right + 9, y: gy + 4, fill: css('--muted'), 'font-size': 11, 'font-family': 'system-ui' }, value.toFixed(1)));
+          svg.appendChild(svgEl('text', { x: axisLabelX, y: gy + 4, fill: css('--muted'), 'font-size': 11, 'font-family': 'system-ui' }, value.toFixed(1)));
         }
 
         for (let i = 0; i <= 7; i++) {
@@ -2067,8 +2095,8 @@
         if (lastVisible) {
           const lastY = y(lastVisible.close);
           svg.appendChild(svgEl('line', { x1: x(lastCandleIndex), y1: lastY, x2: width - m.right, y2: lastY, stroke: css('--line-strong'), 'stroke-width': 1, 'stroke-dasharray': '4 5' }));
-          svg.appendChild(svgEl('rect', { x: width - m.right + 3, y: lastY - 11, width: 49, height: 22, rx: 6, fill: css('--panel-solid'), stroke: css('--line-strong') }));
-          svg.appendChild(svgEl('text', { x: width - m.right + 27, y: lastY + 4, 'text-anchor': 'middle', fill: css('--text'), 'font-size': 10.5, 'font-family': 'system-ui', 'font-weight': 800 }, lastVisible.close.toFixed(1)));
+          svg.appendChild(svgEl('rect', { x: currentPriceX - 25, y: lastY - 11, width: 50, height: 22, rx: 6, fill: css('--panel-solid'), stroke: css('--line-strong') }));
+          svg.appendChild(svgEl('text', { x: currentPriceX, y: lastY + 4, 'text-anchor': 'middle', fill: css('--text'), 'font-size': 10.5, 'font-family': 'system-ui', 'font-weight': 800 }, lastVisible.close.toFixed(1)));
         }
       }
 

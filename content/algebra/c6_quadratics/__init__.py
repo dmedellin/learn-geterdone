@@ -38,7 +38,7 @@ COURSE = {
          "Add, multiply and divide complex numbers, use the conjugate, and interpret a conjugate pair of roots as a parabola that misses the axis."),
     ],
     "syllabus_intro": (
-        "Lessons 1 to 6 solve quadratics and count their solutions; 7 to 9 build the complex numbers; 10 to 14 graph, optimise and extend."
+        'Quadratic solution methods and the discriminant determine solutions and their counts. Complex numbers and their arithmetic extend the solutions beyond the reals; graphs, vertex form, optimisation, inequalities and substitutions apply and extend quadratic methods.'
     ),
     "how_to": [
         "On each lesson, cover the complete worked example before attempting the faded rehearsal beneath it. The rehearsal supplies the first strategic decision but leaves the algebra and check to you; only then use the quiz as independent retrieval.",

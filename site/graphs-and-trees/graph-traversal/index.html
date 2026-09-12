@@ -583,6 +583,15 @@
       overflow-x: auto;
     }
     .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
 
     /* ---------- Graphs ----------
        Tokens only. A component override scoped to [data-theme="light"] would
@@ -1040,6 +1049,7 @@
       font-size: 0.9rem;
       resize: vertical;
     }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
     .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
     .fb-actions {
       display: flex;
@@ -1132,6 +1142,7 @@
     [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
     [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
     [data-ui="hero"] .eyebrow { display: block; color: var(--muted); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
     [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
     [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
     [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
@@ -1176,7 +1187,7 @@
     }
     [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
     [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
-    [data-ui="lesson-list"] .lesson-link { min-height: 44px; }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
     body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
     body[data-page-kind] .is-done .lesson-state { color: var(--green); }
     [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
@@ -1296,7 +1307,7 @@ shortest paths (unweighted)      cycle detection
 level structure / distances      topological sort
 bipartiteness testing            strongly connected components
 web crawling by depth            maze generation and solving
-                                 articulation points and bridges</div><p>Both find the components and both produce a spanning tree, and either serves for those. The distinctive uses come from the ORDER: BFS knows distances, DFS knows the nesting of the recursion, and each of those is the key to different problems.</p><h3>Cycle detection with DFS</h3><div class="thm"><span class="label">Theorem &middot; Back edges are cycles</span><p>During a depth-first search of an undirected graph, an edge to an already-visited vertex that is not the current vertex's parent closes a cycle. A graph is acyclic exactly when no such edge is found.</p></div><p>This is what makes DFS the tool for cycle detection: the search tree plus a single back edge exhibits the cycle explicitly. The parent exclusion matters &mdash; without it every edge would look like a cycle of length 2.</p><h3>Cost</h3><p>Each vertex is marked once and each edge examined twice (once from each end), so both searches cost <span class="math">Θ(n + |E|)</span> with adjacency lists and <span class="math">Θ(n²)</span> with a matrix. For a sparse graph that is the difference between linear and quadratic, which is lesson 3's trade-off arriving in practice.</p></article>
+                                 articulation points and bridges</div><p>Both find the components and both produce a spanning tree, and either serves for those. The distinctive uses come from the ORDER: BFS knows distances, DFS knows the nesting of the recursion, and each of those is the key to different problems.</p><h3>Cycle detection with DFS</h3><div class="thm"><span class="label">Theorem &middot; Back edges are cycles</span><p>During a depth-first search of an undirected graph, an edge to an already-visited vertex that is not the current vertex's parent closes a cycle. A graph is acyclic exactly when no such edge is found.</p></div><p>This is what makes DFS the tool for cycle detection: the search tree plus a single back edge exhibits the cycle explicitly. The parent exclusion matters &mdash; without it every edge would look like a cycle of length 2.</p><h3>Cost</h3><p>Each vertex is marked once and each edge examined twice (once from each end), so both searches cost <span class="math">Θ(n + |E|)</span> with adjacency lists and <span class="math">Θ(n²)</span> with a matrix. For a sparse graph that is the difference between linear and quadratic, which is “Graph Representations”'s trade-off arriving in practice.</p></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>Graph workbench</h2></div><p>Your graph, the course&#x27;s algorithms</p></div>
@@ -1306,7 +1317,7 @@ web crawling by depth            maze generation and solving
         <div class="lab-title"><strong>Build a graph, run the algorithms</strong><span id="gCaption">Click a cell in the adjacency matrix to toggle an edge</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>in the result</span><span class="tone-amber"><i class="legend-swatch"></i>visited / root</span><span class="tone-muted"><i class="legend-swatch"></i>not used</span></div>
       </div>
-      <div class="lab-stage">
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels">
         <svg id="gPlot" viewBox="0 0 460 300" role="img" aria-label="A graph drawn with its vertices evenly spaced on a circle and its edges as straight lines."></svg>
       </div>
       <div class="grid-2" style="margin-top:12px;">
@@ -1399,7 +1410,7 @@ although its true distance from 1 is 1.</div><p>That last line is the reason DFS
     <section class="section">
       <div class="grid-2">
         <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Using DFS for shortest paths</strong><span>The depth it records is an artefact of the search order. Only BFS guarantees distance.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Marking vertices on removal rather than on discovery</strong><span>A vertex can then be queued several times before it is processed, which breaks both the cost bound and the distance guarantee.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Forgetting to exclude the parent in cycle detection</strong><span>Otherwise every edge looks like a cycle back to where you came from.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can predict both visit orders on a small graph.</strong><p>Take a graph on seven vertices, write out the BFS and DFS orders by hand, and mark the tree edges of each. The two trees should look nothing alike.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Dijkstra's algorithm in the next lesson is BFS with a priority queue in place of the queue. The correspondence is exact, and it is why Dijkstra reduces to BFS when every weight is 1.</div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can predict both visit orders on a small graph.</strong><p>Take a graph on seven vertices, write out the BFS and DFS orders by hand, and mark the tree edges of each. The two trees should look nothing alike.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Dijkstra's algorithm in “Shortest Paths and Dijkstra's Algorithm” is BFS with a priority queue in place of the queue. The correspondence is exact, and it is why Dijkstra reduces to BFS when every weight is 1.</div></article>
       </div>
     </section>
     </main>
@@ -1497,7 +1508,7 @@ although its true distance from 1 is 1.</div><p>That last line is the reason DFS
         + '. Your completion ticks can follow you to another device.');
       a.classList.add('is-in');
     }());
-  var QUIZ = [{"q": "BFS uses a queue; DFS uses a:", "a": ["priority queue", "stack", "heap", "hash table"], "c": 1, "why": "Last in, first out &mdash; explicitly, or implicitly via recursion &mdash; and that single change produces a completely different tree. A priority queue is Dijkstra (lesson 9), a heap is how a priority queue is usually built, and a hash table orders nothing."}, {"q": "Which finds shortest paths in an unweighted graph?", "a": ["DFS", "BFS", "both", "neither"], "c": 1, "why": "BFS settles vertices in non-decreasing distance order, so the first time it reaches a vertex is by a shortest route. DFS may reach a near vertex by a long detour &mdash; in the worked example it reaches 3 at depth 3 &mdash; so \"both\" is wrong, and \"neither\" ignores that BFS's guarantee is the lesson's theorem."}, {"q": "Both searches cost, with adjacency lists:", "a": ["<span class=\"math\">\u0398(n\u00b2)<\/span>", "<span class=\"math\">\u0398(n + |E|)<\/span>", "<span class=\"math\">\u0398(|E|\u00b2)<\/span>", "exponential"], "c": 1, "why": "Each vertex is marked once and each edge examined from both ends: <span class=\"math\">\u0398(n + |E|)<\/span>. <span class=\"math\">\u0398(n\u00b2)<\/span> is the cost with an adjacency matrix, not with lists; <span class=\"math\">|E|\u00b2<\/span> counts pairs of edges nothing ever examines; and nothing exponential happens in a search that never revisits a vertex."}];
+  var QUIZ = [{"q": "BFS uses a queue; DFS uses a:", "a": ["priority queue", "stack", "heap", "hash table"], "c": 1, "why": "Last in, first out &mdash; explicitly, or implicitly via recursion &mdash; and that single change produces a completely different tree. A priority queue is Dijkstra (\u201cShortest Paths and Dijkstra's Algorithm\u201d), a heap is how a priority queue is usually built, and a hash table orders nothing."}, {"q": "Which finds shortest paths in an unweighted graph?", "a": ["DFS", "BFS", "both", "neither"], "c": 1, "why": "BFS settles vertices in non-decreasing distance order, so the first time it reaches a vertex is by a shortest route. DFS may reach a near vertex by a long detour &mdash; in the worked example it reaches 3 at depth 3 &mdash; so \"both\" is wrong, and \"neither\" ignores that BFS's guarantee is the lesson's theorem."}, {"q": "Both searches cost, with adjacency lists:", "a": ["<span class=\"math\">\u0398(n\u00b2)<\/span>", "<span class=\"math\">\u0398(n + |E|)<\/span>", "<span class=\"math\">\u0398(|E|\u00b2)<\/span>", "exponential"], "c": 1, "why": "Each vertex is marked once and each edge examined from both ends: <span class=\"math\">\u0398(n + |E|)<\/span>. <span class=\"math\">\u0398(n\u00b2)<\/span> is the cost with an adjacency matrix, not with lists; <span class=\"math\">|E|\u00b2<\/span> counts pairs of edges nothing ever examines; and nothing exponential happens in a search that never revisits a vertex."}];
 
   (function () {
 
@@ -2153,7 +2164,7 @@ although its true distance from 1 is 1.</div><p>That last line is the reason DFS
       status.innerHTML = r.chosen.length === N - 1
         ? 'Kruskal takes edges in increasing weight and skips any that would close a cycle. Total weight '
           + '<strong>' + r.total + '</strong>. The greedy choice is provably optimal here — which is unusual, '
-          + 'and course 8 explains what makes this problem yield to greed when most do not.'
+          + 'and “Greedy Algorithms” in Algorithms and Complexity explains what makes this problem yield to greed when most do not.'
         : 'The graph is disconnected, so Kruskal produces a minimum spanning FOREST: '
           + r.chosen.length + ' edges, weight ' + r.total + '. No set of edges can span a disconnected graph.';
     },

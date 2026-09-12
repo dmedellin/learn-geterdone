@@ -77,18 +77,9 @@ LESSONS = [
                   "incomplete in a small way &mdash; it names infinitely many "
                   "different sequences."),
             ("example", ("The same sequence, both ways",
-                         "`a₁ = 5` with `aₙ = 2aₙ₋₁` for `n ≥ 2` gives "
-                         "`5, 10, 20, 40, 80, …` . So "
-                         "does `aₙ = 5·2ⁿ⁻¹`, because doubling `n - 1` times from `5` "
-                         "is what that formula does. Lesson 4 shows this is the "
-                         "general shape of a geometric sequence.")),
+                         '`a₁ = 5` with `aₙ = 2aₙ₋₁` for `n ≥ 2` gives `5, 10, 20, 40, 80, …` . So does `aₙ = 5·2ⁿ⁻¹`, because doubling `n - 1` times from `5` is what that formula does. “Geometric Sequences and Series” shows this is the general shape of a geometric sequence.')),
             ("example", ("Two recursions worth knowing",
-                         "Fibonacci: `F₁ = 1`, `F₂ = 1`, `Fₙ = Fₙ₋₁ + Fₙ₋₂`, giving "
-                         "`1, 1, 2, 3, 5, 8, 13, 21, 34, 55, …` . It needs two initial "
-                         "terms because the rule reaches back two. "
-                         "Factorial: `0! = 1` and `n! = n·(n - 1)!`, giving "
-                         "`1, 1, 2, 6, 24, 120, …` . Lesson 10 uses the second one "
-                         "throughout.")),
+                         'Fibonacci: `F₁ = 1`, `F₂ = 1`, `Fₙ = Fₙ₋₁ + Fₙ₋₂`, giving `1, 1, 2, 3, 5, 8, 13, 21, 34, 55, …` . It needs two initial terms because the rule reaches back two. Factorial: `0! = 1` and `n! = n·(n - 1)!`, giving `1, 1, 2, 6, 24, 120, …` . “The Binomial Theorem” uses the second one throughout.')),
             ("h3", "From a recursion to a formula, and the check that is not a proof"),
             ("p", "There is no general method for turning a recursion into an explicit "
                   "formula. What there is, at this level, is a procedure: compute "
@@ -212,11 +203,7 @@ LESSONS = [
                      "error, convert between the explicit and recursive forms of a "
                      "doubling sequence, and state what your explicit formula has "
                      "actually been checked against."),
-        "note": "Two families of sequence have both forms available and a sum that can "
-                "be written down exactly. Lesson 3 takes the ones built by adding a "
-                "fixed number, lesson 4 the ones built by multiplying by a fixed "
-                "number &mdash; and the second of those has a surprise in it, which is "
-                "that infinitely many terms can add up to a finite number.",
+        "note": 'Two families of sequence have both forms available and a sum that can be written down exactly. “Arithmetic Sequences and Series” takes the ones built by adding a fixed number, “Geometric Sequences and Series” the ones built by multiplying by a fixed number &mdash; and the second of those has a surprise in it, which is that infinitely many terms can add up to a finite number.',
     },
     # ---------------------------------------------------------------- 02
     {
@@ -480,12 +467,7 @@ LESSONS = [
                      "it, write a given list of numbers in sigma notation in at least two "
                      "ways, and move a lower limit to `1` by substitution. Expanding the "
                      "first term of both forms is the check, and it costs one line."),
-        "note": "Every sum from here on is written this way. Lesson 3 finds `Σ aₖ` for "
-                "the sequences whose terms rise by a fixed amount, by pairing the list "
-                "with its own reversal; lesson 4 does it for a fixed ratio, by "
-                "subtracting `rSₙ` from `Sₙ`. Both arguments reorder the terms of a "
-                "finite sum, which is legal precisely because the sum is finite &mdash; "
-                "the point where that stops being safe is lesson 6.",
+        "note": 'The arithmetic, geometric and partial-sum work uses sigma notation. “Arithmetic Sequences and Series” finds `Σ aₖ` for the sequences whose terms rise by a fixed amount, by pairing the list with its own reversal; “Geometric Sequences and Series” does it for a fixed ratio, by subtracting `rSₙ` from `Sₙ`. Both arguments reorder the terms of a finite sum, which is legal precisely because the sum is finite &mdash; the point where that stops being safe is “Infinite Geometric Series”.',
     },
     # ---------------------------------------------------------------- 03
     {
@@ -704,12 +686,7 @@ LESSONS = [
                      "the given information calls for. The pairing argument should be "
                      "reproducible from memory: it is three lines and it is the reason "
                      "the formula is true."),
-        "note": "Replacing \"add `d`\" by \"multiply by `r`\" gives the other family of "
-                "sequences with exact formulas, and it changes the shape completely: "
-                "linear growth becomes exponential, and the sum of infinitely many "
-                "terms &mdash; which for an arithmetic sequence never settles on a "
-                "number unless every term is zero &mdash; becomes possible. That is "
-                "lesson 4.",
+        "note": 'Replacing "add `d`" by "multiply by `r`" gives the other family of sequences with exact formulas, and it changes the shape completely: linear growth becomes exponential, and the sum of infinitely many terms &mdash; which for an arithmetic sequence never settles on a number unless every term is zero &mdash; becomes possible. That is “Geometric Sequences and Series”.',
     },
     # ---------------------------------------------------------------- 04
     {
@@ -737,21 +714,13 @@ LESSONS = [
         ),
         "concepts": [
             ("For nonzero terms, find the multiplier by division",
-             "`r = a₂/a₁`, checked against `a₃/a₂` and `a₄/a₃`, whenever those "
-             "denominators are nonzero. Reaching for a "
-             "subtraction here is the reflex left over from lesson 3: `3, 6, 12, 24` "
-             "has differences `3, 6, 12` and ratios `2, 2, 2`, and only the second list "
-             "being constant makes it geometric. If zeros appear, check the "
-             "multiplication `aₙ₊₁ = raₙ` directly instead."),
+             '`r = a₂/a₁`, checked against `a₃/a₂` and `a₄/a₃`, whenever those denominators are nonzero. Reaching for a subtraction here is the reflex left over from “Arithmetic Sequences and Series”: `3, 6, 12, 24` has differences `3, 6, 12` and ratios `2, 2, 2`, and only the second list being constant makes it geometric. If zeros appear, check the multiplication `aₙ₊₁ = raₙ` directly instead.'),
             ("`rⁿ⁻¹`, for the same reason as `(n - 1)d`",
              "`a₁` has been multiplied by `r` no times, `a₂` once, `aₙ` exactly "
              "`n - 1` times. The exponent counts steps, and `a₁rⁿ` is the term after "
              "the one you wanted."),
             ("Finite sums do not require `|r| < 1`",
-             "The cancellation formula works for a growing or alternating sequence as "
-             "long as `r ≠ 1`. When `r = 1`, every term is `a₁` and direct counting gives "
-             "`Sₙ = na₁`. When `r = 0`, the sequence is `a₁, 0, 0, …` and the usual "
-             "formula works without a special case. Convergence is lesson 6's question."),
+             "The cancellation formula works for a growing or alternating sequence as long as `r ≠ 1`. When `r = 1`, every term is `a₁` and direct counting gives `Sₙ = na₁`. When `r = 0`, the sequence is `a₁, 0, 0, …` and the usual formula works without a special case. Convergence is “Infinite Geometric Series”'s question."),
         ],
         "read_title": "Constant multiplication, terms, and finite sums",
         "read_intro": "The n-th term, the sum of n terms by cancellation, and the edge cases a quotient-only definition would miss.",
@@ -895,9 +864,7 @@ LESSONS = [
              "into `a₁(1 - rⁿ)/(1 - r)` gives `0/0`, which is the trace of the division "
              "used in the derivation, not evidence that the finite sum is undefined."),
             ("Writing `a₁rⁿ` for the n-th term",
-             "That is `aₙ₊₁`, so every answer is one step too far and off by a factor "
-             "of `r`. The same check as in lesson 3 applies: your formula must return "
-             "`a₁` when `n = 1`."),
+             'That is `aₙ₊₁`, so every answer is one step too far and off by a factor of `r`. The same check as in “Arithmetic Sequences and Series” applies: your formula must return `a₁` when `n = 1`.'),
             ("Finding `r` by subtracting, or treating a quotient as the definition",
              "`2, 4, 6` and `2, 4, 8` both begin with a difference of `2` and a ratio "
              "of `2`, and the third term decides which family each belongs to. For "
@@ -910,10 +877,7 @@ LESSONS = [
                      "any finite number of terms, handle `r = 0` and `r = 1` correctly, "
                      "and reproduce the `Sₙ - rSₙ` cancellation in three lines. No "
                      "convergence claim belongs in the answer yet."),
-        "note": "A finite formula still contains `n`, so changing the stopping place "
-                "produces a new number. Lesson 5 treats `S₁, S₂, S₃, …` as a sequence "
-                "in its own right; only after that does lesson 6 ask whether the "
-                "sequence approaches a number when the stopping place keeps moving.",
+        "note": 'A finite formula still contains `n`, so changing the stopping place produces a new number. “Partial Sums and Telescoping” treats `S₁, S₂, S₃, …` as a sequence in its own right; “Infinite Geometric Series” uses that viewpoint to ask whether the sequence approaches a number when the stopping place keeps moving.',
     },
     # ---------------------------------------------------------------- 05
     {
@@ -940,20 +904,14 @@ LESSONS = [
         ),
         "concepts": [
             ("For a fixed `n`, `Sₙ` is a number; letting `n` run gives a sequence",
-             "Lesson 3 was emphatic that `S₂₀ = 860` is one number and not a list, and "
-             "that is still true. But there is an `S₁`, an `S₂`, an `S₃`, one for each "
-             "`n`, and a rule assigning one number to each positive integer is a "
-             "sequence by lesson 1's definition &mdash; recursion and all."),
+             "“Arithmetic Sequences and Series” was emphatic that `S₂₀ = 860` is one number and not a list, and that is still true. But there is an `S₁`, an `S₂`, an `S₃`, one for each `n`, and a rule assigning one number to each positive integer is a sequence by “Sequences and Recursion”'s definition &mdash; recursion and all."),
             ("The terms can be recovered from the sums",
              "`Sₙ` contains `Sₙ₋₁` plus one extra term, so `aₙ = Sₙ - Sₙ₋₁`. A formula "
              "for the sums therefore determines the sequence, and the two directions are "
              "an addition and a subtraction. The catch is `n = 1`, where there is no "
              "`Sₙ₋₁` to subtract."),
             ("Telescoping engineers the cancellation rather than hoping for it",
-             "If every term can be written as `bₖ - bₖ₊₁` for some sequence `b`, the "
-             "sum of `n` of them is `b₁ - bₙ₊₁` and everything between has cancelled in "
-             "pairs. Lesson 4's `Sₙ - rSₙ` argument was exactly this. Finding the `bₖ` "
-             "is the hard part, and there is no procedure for it."),
+             "If every term can be written as `bₖ - bₖ₊₁` for some sequence `b`, the sum of `n` of them is `b₁ - bₙ₊₁` and everything between has cancelled in pairs. “Geometric Sequences and Series”'s `Sₙ - rSₙ` argument was exactly this. Finding the `bₖ` is the hard part, and there is no procedure for it."),
         ],
         "read_title": "The sequence of partial sums, and sums that collapse",
         "read_intro": "One number for each stopping place, the subtraction that undoes the adding, and series whose middle cancels.",
@@ -1035,23 +993,8 @@ LESSONS = [
                          "`b₁ - bₙ₊₁ = 1 - 1/(n + 1) = n/(n + 1)`. For `n = 1, 2, 3, 4` "
                          "that predicts `1/2, 2/3, 3/4, 4/5`, and adding the terms by "
                          "hand gives the same four numbers.")),
-            ("p", "The geometric sum formula was a telescoping in disguise. Put "
-                  "`bₖ = a₁rᵏ⁻¹`, the `k`-th term of the sequence. Then "
-                  "`bₖ - bₖ₊₁ = a₁rᵏ⁻¹ - a₁rᵏ = a₁rᵏ⁻¹(1 - r)`, so summing from `1` to "
-                  "`n` gives `(1 - r)Sₙ` on one side and `b₁ - bₙ₊₁ = a₁ - a₁rⁿ` on the "
-                  "other. That is `Sₙ(1 - r) = a₁(1 - rⁿ)`, which is where lesson 4 "
-                  "arrived by multiplying the sum by `r` and subtracting. The two routes "
-                  "are the same cancellation described differently."),
-            ("p", "The difficulty is always finding `bₖ`, and there is no method. "
-                  "Single fractions with a factorable denominator are the usual "
-                  "candidates, and the test is whether the split recombines: if "
-                  "`bₖ - bₖ₊₁` does not simplify back to `aₖ`, the split is wrong. One "
-                  "more that works: with `bₖ = (k - 1)²`, `bₖ₊₁ - bₖ` is "
-                  "`k² - (k - 1)² = 2k - 1`, so the first `n` odd numbers sum to "
-                  "`bₙ₊₁ - b₁ = n² - 0 = n²` &mdash; a second derivation of a result "
-                  "lesson 3 reached by pairing. A useful telescope has to reveal the "
-                  "sum from a `bₖ` that can be found without already knowing the partial "
-                  "sums; manufacturing one from the unknown answer would explain nothing."),
+            ("p", 'The geometric sum formula was a telescoping in disguise. Put `bₖ = a₁rᵏ⁻¹`, the `k`-th term of the sequence. Then `bₖ - bₖ₊₁ = a₁rᵏ⁻¹ - a₁rᵏ = a₁rᵏ⁻¹(1 - r)`, so summing from `1` to `n` gives `(1 - r)Sₙ` on one side and `b₁ - bₙ₊₁ = a₁ - a₁rⁿ` on the other. That is `Sₙ(1 - r) = a₁(1 - rⁿ)`, which is where “Geometric Sequences and Series” arrived by multiplying the sum by `r` and subtracting. The two routes are the same cancellation described differently.'),
+            ("p", 'The difficulty is always finding `bₖ`, and there is no method. Single fractions with a factorable denominator are the usual candidates, and the test is whether the split recombines: if `bₖ - bₖ₊₁` does not simplify back to `aₖ`, the split is wrong. One more that works: with `bₖ = (k - 1)²`, `bₖ₊₁ - bₖ` is `k² - (k - 1)² = 2k - 1`, so the first `n` odd numbers sum to `bₙ₊₁ - b₁ = n² - 0 = n²` &mdash; a second derivation of a result “Arithmetic Sequences and Series” reached by pairing. A useful telescope has to reveal the sum from a `bₖ` that can be found without already knowing the partial sums; manufacturing one from the unknown answer would explain nothing.'),
         ],
         "lab": ("sequence", {
             "mode": "partial",
@@ -1121,9 +1064,7 @@ LESSONS = [
                 "the last is `1/n - 1/(n + 1)`, and it is the second half of that "
                 "bracket that has no partner. Writing `1 - 1/n` gives `(n - 1)/n`, wrong "
                 "by `1/(n(n + 1))` and entirely plausible on the page.",
-                "The partial sums `1/2, 2/3, 3/4, 4/5, …` climb and every one is below "
-                "`1`. Whether they add up to `1` is the next lesson's question, and "
-                "having `n/(n + 1)` in closed form is what makes it answerable.",
+                'The partial sums `1/2, 2/3, 3/4, 4/5, …` climb and every one is below `1`. Whether they add up to `1` is a convergence question of the kind defined in “Infinite Geometric Series”, and having `n/(n + 1)` in closed form is what makes it answerable.',
                 "For a faded telescope, sum `2/((2k - 1)(2k + 1))` from `k = 1` to "
                 "`k = 5`. The supplied split is "
                 "`1/(2k - 1) - 1/(2k + 1)`. Recombine it first, write all five "
@@ -1186,12 +1127,7 @@ LESSONS = [
                      "separately, and cancel a telescoping sum to two surviving values "
                      "with the right index on each. The `Σ 1/(k(k+1))` derivation should "
                      "follow from the split alone."),
-        "note": "The partial sums of `Σ 1/(k(k+1))` are `1/2, 2/3, 3/4, 4/5, …` and "
-                "every one is below `1`. Those of the geometric series with `a₁ = 4` and "
-                "`r = 1/2` are `4, 6, 7, 15/2, …` and every one is below `8`. Both have "
-                "a formula for `Sₙ` with `n` still in it, and lesson 6 asks what happens "
-                "to that formula as `n` grows without bound &mdash; a question about the "
-                "sequence `Sₙ`, not about carrying out infinitely many additions.",
+        "note": 'The partial sums of `Σ 1/(k(k+1))` are `1/2, 2/3, 3/4, 4/5, …` and every one is below `1`. Those of the geometric series with `a₁ = 4` and `r = 1/2` are `4, 6, 7, 15/2, …` and every one is below `8`. Both have a formula for `Sₙ` with `n` still in it, and “Infinite Geometric Series” asks what happens to that formula as `n` grows without bound &mdash; a question about the sequence `Sₙ`, not about carrying out infinitely many additions.',
     },
     # ---------------------------------------------------------------- 06
     {
@@ -1214,8 +1150,7 @@ LESSONS = [
         ],
         "key_label": "What S∞ means, the ratio condition, and the zero exception",
         "concepts_intro": (
-            "Lesson 4 supplied a formula for every finite stopping place. This lesson "
-            "asks whether the resulting sequence of finite sums approaches one number."
+            '“Geometric Sequences and Series” supplied a formula for every finite stopping place. This lesson asks whether the resulting sequence of finite sums approaches one number.'
         ),
         "concepts": [
             ("The sum of an infinite series is defined, not performed",
@@ -1239,9 +1174,7 @@ LESSONS = [
         "read_title": "Partial sums, limits, and the geometric case settled",
         "read_intro": "What an infinite sum is defined to be, why `|r| &lt; 1` settles every nonzero geometric series, and the zero exception.",
         "body": [
-            ("p", "Lesson 5 made `S₁, S₂, S₃, …` a sequence in its own right. This "
-                  "lesson asks one question about that sequence, and the answer to it is "
-                  "what the phrase \"the sum of an infinite series\" is defined to mean."),
+            ("p", '“Partial Sums and Telescoping” made `S₁, S₂, S₃, …` a sequence in its own right. This lesson asks one question about that sequence, and the answer to it is what the phrase "the sum of an infinite series" is defined to mean.'),
             ("def", ("Convergent and divergent series",
                      "Given `a₁ + a₂ + a₃ + …` , form the partial sums `Sₙ`. If there is "
                      "a number `S` such that the partial sums can be brought within any "
@@ -1286,12 +1219,7 @@ LESSONS = [
                 "partial sums are `0, 0, 0, …`, which already proves the stated exception. "
                 "Now take `a₁ ≠ 0`.",
                 "For `r = 0`, the partial sums are `a₁, a₁, a₁, …`, so they converge to `a₁ = a₁/(1 - 0)`. For `0 &lt; |r| &lt; 1`, the exponential-decay result from Exponential and Logarithmic Functions says the positive sequence `|r|ⁿ` approaches `0`. Since `|rⁿ| = |r|ⁿ`, the signed power `rⁿ` does too, alternating when `r &lt; 0`. In `Sₙ = a₁/(1 - r) - [a₁/(1 - r)]rⁿ`, the second piece therefore approaches `0`, leaving `a₁/(1 - r)`.",
-                "Suppose instead `|r| &gt; 1`. Then `|aₙ| = |a₁||r|ⁿ⁻¹` grows without "
-                "bound, and by lesson 5 the gap between consecutive partial sums is "
-                "`aₙ`. Partial sums moving further and further apart cannot be settling "
-                "on a number. For `r = 1`, `Sₙ = na₁`, which runs away; for `r = -1`, "
-                "`Sₙ` is `a₁, 0, a₁, 0, …` , visiting two values for ever and "
-                "approaching neither. Those three exhaust `|r| ≥ 1`.",
+                'Suppose instead `|r| &gt; 1`. Then `|aₙ| = |a₁||r|ⁿ⁻¹` grows without bound, and by “Partial Sums and Telescoping” the gap between consecutive partial sums is `aₙ`. Partial sums moving further and further apart cannot be settling on a number. For `r = 1`, `Sₙ = na₁`, which runs away; for `r = -1`, `Sₙ` is `a₁, 0, a₁, 0, …` , visiting two values for ever and approaching neither. Those three exhaust `|r| ≥ 1`.',
             ]),
             ("h3", "How close, after how many terms"),
             ("math", [
@@ -1398,11 +1326,7 @@ LESSONS = [
                 "equals `1/3`; its size halves at every step, so naming any distance "
                 "names a term beyond which every partial sum is closer than that. `1/3` "
                 "is the sum of this series in that sense and in no other.",
-                "Adding six terms by hand and computing `S₆` from the closed form agree "
-                "at `21/64`, which checks this one instance &mdash; `a₁ = 1/2`, "
-                "`r = -1/2`, `n = 6`. Lesson 4's cancellation is what makes "
-                "`Sₙ = a₁(1 - rⁿ)/(1 - r)` true in general, and `(-1/2)ⁿ` being driven "
-                "to `0` is what makes `S∞ = 1/3` true.",
+                "Adding six terms by hand and computing `S₆` from the closed form agree at `21/64`, which checks this one instance &mdash; `a₁ = 1/2`, `r = -1/2`, `n = 6`. “Geometric Sequences and Series”'s cancellation is what makes `Sₙ = a₁(1 - rⁿ)/(1 - r)` true in general, and `(-1/2)ⁿ` being driven to `0` is what makes `S∞ = 1/3` true.",
                 "Because `r` is negative, `S∞` is not larger than every partial sum: "
                 "`S₁ = 1/2` overshoots, `S₂ = 1/4` undershoots, and `1/3` stays caught "
                 "between consecutive partial sums for ever. Step 4's check has to be "
@@ -1470,6 +1394,6 @@ LESSONS = [
                      "terms bring a partial sum within a stated distance of the limit, "
                      "and name what goes wrong in each of the three divergent cases "
                      "`|r| &gt; 1`, `r = 1` and `r = -1`."),
-        "note": "Lesson 7 turns this into a machine for repeating decimals. `0.4272727…` is `0.4` plus a geometric series with `r = 1/100`, and the fraction it equals falls out of `a₁/(1 - r)`. It is the same formula with `|r|` far enough below `1` that convergence is never in doubt &mdash; which is the argument behind Foundations of Algebra's claim that a repeating decimal is always rational.",
+        "note": "“Repeating Decimals as Series” turns this into a machine for repeating decimals. `0.4272727…` is `0.4` plus a geometric series with `r = 1/100`, and the fraction it equals falls out of `a₁/(1 - r)`. It is the same formula with `|r|` far enough below `1` that convergence is never in doubt &mdash; which is the argument behind Foundations of Algebra's claim that a repeating decimal is always rational.",
     },
 ]

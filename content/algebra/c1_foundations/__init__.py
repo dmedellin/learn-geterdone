@@ -66,12 +66,9 @@ COURSE = {
          "Translate an English quantity into algebra, keeping track of what the letter stands for &mdash; which is where most word-problem errors are made."),
     ],
     "syllabus_intro": (
-        "Lessons 1 and 2 settle the numbers and how notation is read; lesson 3 names the "
-        "parts of an expression before lesson 4 licenses rearrangements. Lessons 5 to 9 "
-        "cover absolute value, exponents and radicals; lessons 10 to 13 expand, collect, "
-        "evaluate and translate expressions."
+        'Real numbers and notation explain the numbers and how expressions are read; naming the parts of an expression supports the use of properties to justify rearrangements. Absolute value, exponents and radicals describe real-number operations; distribution, collecting like terms, evaluation and translation connect expressions with their values and meanings.'
     ),
-    "how_to": ['Do the arithmetic yourself before you read the answer. Every lab shows its steps, and the steps are worth more than the result &mdash; the result you could have got from a calculator.', 'Take the property lessons seriously even if the arithmetic is easy. Lesson 4 is the reason `-(x - 3)` is `-x + 3`, and that single sign is the most common error in equation-solving and function work.', 'When a lab disagrees with you, find which step differs rather than which answer. The step is the thing you will repeat a thousand times.'],
+    "how_to": ['Do the arithmetic yourself before you read the answer. Every lab shows its steps, and the steps are worth more than the result &mdash; the result you could have got from a calculator.', 'Take the property lessons seriously even if the arithmetic is easy. “Properties of the Real Numbers” is the reason `-(x - 3)` is `-x + 3`, and that single sign is the most common error in equation-solving and function work.', 'When a lab disagrees with you, find which step differs rather than which answer. The step is the thing you will repeat a thousand times.'],
     "not_covered": [
         "Proof of the field axioms. This course states the properties of the real numbers and uses them; constructing the reals from the rationals belongs to analysis.",
         (

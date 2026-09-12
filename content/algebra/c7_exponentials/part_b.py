@@ -32,11 +32,7 @@ LESSONS = [
              "The symbol does not carry its base, the subject does, and the convention "
              "is arbitrary."),
             ("ln is the direct inverse of the compounding base",
-             "`ln x` means `log_e(x)`, with `e = 2.71828…` produced in lesson 3 by "
-             "compounding faster and faster. It removes an `e`-power in one inverse "
-             "step: `ln(e^u) = u`. Any legal logarithm could be applied to an equation "
-             "containing `e^u`; `ln` is the matched and simplest choice, not the only "
-             "legal one."),
+             '`ln x` means `log_e(x)`, with `e = 2.71828…` produced in “The Number e” by compounding faster and faster. It removes an `e`-power in one inverse step: `ln(e^u) = u`. Any legal logarithm could be applied to an equation containing `e^u`; `ln` is the matched and simplest choice, not the only legal one.'),
             ("Estimate from the base before asking for digits",
              "`10^3 &lt; 4500 &lt; 10^4` puts `log 4500` between `3` and `4`. "
              "Likewise `e² &lt; 10 &lt; e³` puts `ln 10` between `2` and `3`. A bracket "
@@ -51,15 +47,8 @@ LESSONS = [
                      "which `10` must be raised to give `x`. Its domain is `x &gt; 0`, "
                      "as for every logarithm.")),
             ("def", ("Natural logarithm",
-                     "`ln x` means `log_e(x)`, where `e = 2.71828…` is the number lesson "
-                     "3 obtained as a limit. The name is historical &mdash; "
-                     "<em>logarithmus naturalis</em> &mdash; and `e` is not a more "
-                     "natural base for arithmetic than any other. It is the base in "
-                     "which continuous growth is written, which is the only reason this "
-                     "course needs it.")),
-            ("p", "Nothing about the two definitions is new. Every statement from lesson "
-                  "4 onwards applies to them unchanged, because they are instances of "
-                  "the same definition and not a second kind of object."),
+                     '`ln x` means `log_e(x)`, where `e = 2.71828…` is the number “The Number e” obtained as a limit. The name is historical &mdash; <em>logarithmus naturalis</em> &mdash; and `e` is not a more natural base for arithmetic than any other. It is the base in which continuous growth is written, which is the only reason this course needs it.')),
+            ("p", 'Nothing about the two definitions is new. The logarithm definition, graph properties and laws apply to them unchanged, because they are instances of the same definition and not a second kind of object.'),
             ("math", [
                 "log 10 = 1              ln e = 1",
                 "log 1  = 0              ln 1 = 0",
@@ -78,12 +67,7 @@ LESSONS = [
                   "`ln(10^k) = k·ln 10`. The expressions are still exact, but a "
                   "constant scale factor remains."),
             ("example", ("One equation, two legal logarithms",
-                         "From `e^x = 12`, taking `ln` gives `x = ln 12` in one step. "
-                         "Taking a common logarithm is also legal: "
-                         "`x·log e = log 12`, so `x = log 12 / log e`. Change of base "
-                         "in lesson 8 proves those exact expressions are equal. `ln` "
-                         "is the shorter route because its base matches the power, not "
-                         "because every other logarithm is forbidden.")),
+                         'From `e^x = 12`, taking `ln` gives `x = ln 12` in one step. Taking a common logarithm is also legal: `x·log e = log 12`, so `x = log 12 / log e`. Change of base in “Change of Base” proves those exact expressions are equal. `ln` is the shorter route because its base matches the power, not because every other logarithm is forbidden.')),
             ("h3", "Estimate before asking for a decimal"),
             ("p", "The base supplies a free bracket. Since "
                   "`10^3 &lt; 4500 &lt; 10^4`, `3 &lt; log 4500 &lt; 4`. Since "
@@ -99,13 +83,8 @@ LESSONS = [
                   "needed."),
             ("thm", ("The two logarithms are proportional",
                      "For every `x &gt; 0`, `ln x = ln 10 · log x`, and `ln 10 ≈ 2.302585`.",
-                     "So the natural logarithm of a number is always about `2.3` times "
-                     "its common logarithm: `log 500 ≈ 2.6990` and `ln 500 ≈ 6.2146`. "
-                     "Lesson 8 shows that every pair of bases is related by a constant of "
-                     "exactly this kind, and derives it in two lines.")),
-            ("p", "That proportionality is also the practical reason the two keys are "
-                  "enough. A standard scientific calculator offers `log` and `ln`; "
-                  "lesson 8 computes every other base from either one."),
+                     'So the natural logarithm of a number is always about `2.3` times its common logarithm: `log 500 ≈ 2.6990` and `ln 500 ≈ 6.2146`. “Change of Base” shows that every pair of bases is related by a constant of exactly this kind, and derives it in two lines.')),
+            ("p", 'That proportionality is also the practical reason the two keys are enough. A standard scientific calculator offers `log` and `ln`; “Change of Base” computes every other base from either one.'),
         ],
         "lab": ("logarithm", {
             "mode": "common",
@@ -199,10 +178,7 @@ LESSONS = [
              "factor, so a formula carried across that boundary is wrong by that factor "
              "and looks entirely plausible."),
             ("Treating ln as a function with its own rules",
-             "`ln` is `log_e` and nothing else. Every law of lesson 6 applies to it "
-             "unchanged: `ln(MN) = ln M + ln N`, `ln(M^p) = p · ln M`. There is no "
-             "second set of laws to learn, and the invented ones are invented for `ln` "
-             "too."),
+             '`ln` is `log_e` and nothing else. Every law of “The Laws of Logarithms” applies to it unchanged: `ln(MN) = ln M + ln N`, `ln(M^p) = p · ln M`. There is no second set of laws to learn, and the invented ones are invented for `ln` too.'),
             ("Cancelling powers across different bases",
              "`ln(e^x) = x` and `log(10^x) = x` are matched inverse pairs. "
              "`log(e^x) = x·log e`, not `x`; `ln(10^x) = x·ln 10`, not `x`. Write "
@@ -213,10 +189,7 @@ LESSONS = [
                      "should cancel only the two matched pairs, keep the scale factor "
                      "on the crossed pairs, and bracket any requested decimal between "
                      "powers of the correct base before computing it."),
-        "note": "The constant `2.302585…` relating `ln` and `log` is not a special fact "
-                "about `10` and `e`. Every pair of legal bases is related by a constant "
-                "of the same shape, and the next lesson produces it from the definition "
-                "in two lines.",
+        "note": 'The constant `2.302585…` relating `ln` and `log` is not a special fact about `10` and `e`. Every pair of legal bases is related by a constant of the same shape, and “Change of Base” produces it from the definition in two lines.',
     },
     # ---------------------------------------------------------------- 08
     {
@@ -244,10 +217,7 @@ LESSONS = [
         ),
         "concepts": [
             ("The identity is a division, not a subtraction",
-             "`log_c(x) / log_c(b)` is a quotient of two logarithms. Lesson 6 has no law "
-             "for such a quotient: it is not `log_c(x/b)`, and it is not "
-             "`log_c(x) − log_c(b)`. Writing the division deliberately, with the base of "
-             "the answer underneath, is most of the work of this lesson."),
+             '`log_c(x) / log_c(b)` is a quotient of two logarithms. “The Laws of Logarithms” has no law for such a quotient: it is not `log_c(x/b)`, and it is not `log_c(x) − log_c(b)`. Writing the division deliberately, with the base of the answer underneath, is most of the work of this lesson.'),
             ("Every logarithm is a constant multiple of every other",
              "Take `c = e` and the identity reads `log_b(x) = (1 / ln b) · ln x`. So the "
              "graph of any logarithm is the graph of `ln` stretched vertically by a fixed "
@@ -270,11 +240,8 @@ LESSONS = [
                      "Let `b` and `c` be positive with `b ≠ 1` and `c ≠ 1`, and let "
                      "`x &gt; 0`. Then `log_b(x) = log_c(x) / log_c(b)`.")),
             ("proof", [
-                "Let `y = log_b(x)`. By the definition in lesson 4, that says exactly "
-                "`b^y = x`.",
-                "Equal numbers have equal logarithms, so apply `log_c` to both sides: "
-                "`log_c(b^y) = log_c(x)`. The power law of lesson 6 turns the left side "
-                "into `y · log_c(b)`.",
+                'Let `y = log_b(x)`. By the definition in “What a Logarithm Is”, that says exactly `b^y = x`.',
+                'Equal numbers have equal logarithms, so apply `log_c` to both sides: `log_c(b^y) = log_c(x)`. The power law of “The Laws of Logarithms” turns the left side into `y · log_c(b)`.',
                 "Divide both sides by `log_c(b)`. That step is legal because "
                 "`log_c(b) = 0` happens only when `b = 1`, and the hypothesis excluded "
                 "it. What is left is `y = log_c(x) / log_c(b)`, which is the claim.",
@@ -298,11 +265,7 @@ LESSONS = [
                   "`log_8(2) = 1/3` is that statement with numbers in it, and it is a "
                   "useful sanity check whenever a logarithm and its mirror image both "
                   "appear in a problem."),
-            ("p", "Put `c = e`. Then `log_b(x) = ln x / ln b = (1 / ln b) · ln x`, so "
-                  "each logarithm function is a fixed multiple of the natural one. For "
-                  "base 2 that multiple is `1 / ln 2 ≈ 1.442695`; for base 10 it is "
-                  "`1 / ln 10 ≈ 0.434294`. Lesson 7's `ln x ≈ 2.302585 · log x` is the "
-                  "same statement with the two bases swapped."),
+            ("p", "Put `c = e`. Then `log_b(x) = ln x / ln b = (1 / ln b) · ln x`, so each logarithm function is a fixed multiple of the natural one. For base 2 that multiple is `1 / ln 2 ≈ 1.442695`; for base 10 it is `1 / ln 10 ≈ 0.434294`. “Common and Natural Logarithms”'s `ln x ≈ 2.302585 · log x` is the same statement with the two bases swapped."),
             ("example", ("An exact answer stays exact",
                          "`log_8(32)` is not a decimal problem. Both numbers are powers "
                          "of `2`, so change to base 2: "
@@ -315,11 +278,7 @@ LESSONS = [
                   "expressions it is confused with are `log(40/5) = log 8 ≈ 0.903090` "
                   "and `log 40 − log 5`, which is the same `log 8`. Neither is close to "
                   "the answer, and neither is a law."),
-            ("p", "There is one more reason to know the identity even on a calculator "
-                  "that accepts any base. It is what proves that two people computing "
-                  "the same logarithm in different bases must agree, and in lesson 9 it "
-                  "is what turns `x = log_5(17)` from a name for the answer into a "
-                  "number."),
+            ("p", 'There is one more reason to know the identity even on a calculator that accepts any base. It is what proves that two people computing the same logarithm in different bases must agree, and in “Solving Exponential Equations” it is what turns `x = log_5(17)` from a name for the answer into a number.'),
         ],
         "lab": ("logarithm", {
             "mode": "base",
@@ -433,10 +392,7 @@ LESSONS = [
                      "and the power law, you cannot put `log b` on top by accident, "
                      "because the derivation shows where the denominator came from. "
                      "Memorising the fraction alone leaves a fifty-fifty guess."),
-        "note": "This identity is what makes the next lesson finish. Solving `5^x = 17` "
-                "gives `x = log_5(17)` straight from the definition, which names the "
-                "answer without evaluating it; change of base turns that name into "
-                "`ln 17 / ln 5 ≈ 1.760374`.",
+        "note": 'This identity is what makes the numerical evaluation in “Solving Exponential Equations” possible. Solving `5^x = 17` gives `x = log_5(17)` straight from the definition, which names the answer without evaluating it; change of base turns that name into `ln 17 / ln 5 ≈ 1.760374`.',
     },
     # ---------------------------------------------------------------- 09
     {
@@ -463,10 +419,7 @@ LESSONS = [
         ),
         "concepts": [
             ("An exponential function is one-to-one",
-             "For `b &gt; 0` with `b ≠ 1`, `b^u = b^v` forces `u = v`. That is what "
-             "licenses cancelling the base and comparing exponents. It is the same "
-             "property that gave the exponential an inverse in lesson 5, and it fails at "
-             "`b = 1`, where `1^u = 1^v` for every pair of exponents."),
+             'For `b &gt; 0` with `b ≠ 1`, `b^u = b^v` forces `u = v`. That is what licenses cancelling the base and comparing exponents. It is the same property that gave the exponential an inverse in “Logarithmic Functions and Their Graphs”, and it fails at `b = 1`, where `1^u = 1^v` for every pair of exponents.'),
             ("The power law is what moves the variable",
              "`log(M^p) = p · log M` takes the exponent and writes it in front. Nothing "
              "else in algebra does this: dividing, factoring and squaring all leave `x` "
@@ -482,10 +435,7 @@ LESSONS = [
         "read_title": "Bringing the variable down",
         "read_intro": "The same-base method, the logarithm method, the substitution that hides a quadratic, and the equations with no solution at all.",
         "body": [
-            ("p", "Every equation before this course put the unknown in the base: "
-                  "`x² = 9`, `x³ − x = 0`. `3^(2x − 1) = 81` puts it in the exponent, and "
-                  "no amount of dividing, factoring or root-taking will move it. Two "
-                  "methods do."),
+            ("p", 'Polynomial and radical equations put the unknown in the base: `x² = 9`, `x³ − x = 0`. `3^(2x − 1) = 81` puts it in the exponent, and no amount of dividing, factoring or root-taking will move it. Two methods do.'),
             ("thm", ("Exponentials are one-to-one",
                      "For `b &gt; 0` with `b ≠ 1`: `b^u = b^v` if and only if `u = v`.",
                      "The forward direction is what solves equations. The reverse "
@@ -519,10 +469,7 @@ LESSONS = [
                 "",
                 "check:  5^1 = 5 < 17 < 25 = 5^2,   so x lies between 1 and 2   ✓",
             ]),
-            ("p", "The exact answer is the quotient `ln 17 / ln 5`, which is "
-                  "`log_5(17)` written in a base that can be computed &mdash; lesson 8, "
-                  "doing the job it was derived for. The decimal is a rounding of it, "
-                  "and any later step should use the quotient."),
+            ("p", 'The exact answer is the quotient `ln 17 / ln 5`, which is `log_5(17)` written in a base that can be computed &mdash; “Change of Base”, doing the job it was derived for. The decimal is a rounding of it, and any later step should use the quotient.'),
             ("h3", "The unknown on both sides"),
             ("p", "When the two sides have different bases and both carry the unknown, "
                   "take a logarithm anyway and then collect. The equation that results is "
@@ -547,12 +494,7 @@ LESSONS = [
                   "because of a domain restriction on a logarithm, but because the range "
                   "of the exponential is `(0, ∞)`. From `u = 3`, `x = ln 3 ≈ 1.098612`, "
                   "and that is the whole solution set."),
-            ("p", "The same range fact settles two shapes on sight. `b^x = 0` has no "
-                  "solution: the horizontal asymptote `y = 0` from lesson 1 is "
-                  "approached and never reached. `b^x = k` with `k &lt; 0` has no "
-                  "solution either. In both cases the algebra will not object &mdash; "
-                  "`ln(−8)` simply does not exist &mdash; so the check has to be made "
-                  "before the logarithm, not after."),
+            ("p", 'The same range fact settles two shapes on sight. `b^x = 0` has no solution: the horizontal asymptote `y = 0` from “Exponential Functions” is approached and never reached. `b^x = k` with `k &lt; 0` has no solution either. In both cases the algebra will not object &mdash; `ln(−8)` simply does not exist &mdash; so the check has to be made before the logarithm, not after.'),
         ],
         "lab": ("logarithm", {
             "mode": "solveexp",
@@ -676,10 +618,7 @@ LESSONS = [
                      "answers, these need a logarithm, and these have no solution because "
                      "the isolated exponential is not positive. The sorting is the skill. "
                      "The algebra after it is one or two lines."),
-        "note": "Every equation here had the unknown in an exponent and nowhere else. "
-                "The next lesson turns the situation around &mdash; the unknown inside a "
-                "logarithm &mdash; and its second move is this lesson run backwards: "
-                "make both sides exponents of the same base.",
+        "note": 'Every equation here had the unknown in an exponent and nowhere else. “Solving Logarithmic Equations” turns the situation around &mdash; the unknown inside a logarithm &mdash; and its second move is this lesson run backwards: make both sides exponents of the same base.',
     },
     # ---------------------------------------------------------------- 10
     {
@@ -706,10 +645,7 @@ LESSONS = [
         ),
         "concepts": [
             ("Solving means undoing, not cancelling",
-             "There are two moves. Condense several logarithms into one with the laws of "
-             "lesson 6, then convert `log_b(u) = c` into `u = b^c` by the definition in "
-             "lesson 4. Nothing is cancelled and nothing is divided by; the definition "
-             "is quoted, in the direction that removes the logarithm."),
+             'There are two moves. Condense several logarithms into one with the laws of “The Laws of Logarithms”, then convert `log_b(u) = c` into `u = b^c` by the definition in “What a Logarithm Is”. Nothing is cancelled and nothing is divided by; the definition is quoted, in the direction that removes the logarithm.'),
             ("Condensing widens the domain",
              "`log M + log N` requires `M &gt; 0` and `N &gt; 0`. `log(MN)` requires only "
              "`MN &gt; 0`, which two negatives also satisfy. The two agree wherever both "
@@ -724,11 +660,7 @@ LESSONS = [
         "read_title": "Condensing, exponentiating, and the domain check",
         "read_intro": "Two solving moves, the precise reason a false answer can appear, and the three ways the solution set can come out empty.",
         "body": [
-            ("p", "In the last lesson the unknown sat in an exponent and a logarithm "
-                  "brought it down. Here the unknown sits inside a logarithm, and an "
-                  "exponential takes it out. The two lessons are the same manoeuvre in "
-                  "opposite directions, with one asymmetry: an exponential accepts every "
-                  "real number, and a logarithm does not."),
+            ("p", 'In “Solving Exponential Equations” the unknown sat in an exponent and a logarithm brought it down. Here the unknown sits inside a logarithm, and an exponential takes it out. The two lessons are the same manoeuvre in opposite directions, with one asymmetry: an exponential accepts every real number, and a logarithm does not.'),
             ("def", ("Logarithmic equation",
                      "An equation in which the unknown appears in the argument or the "
                      "base of a logarithm. Its <strong>domain</strong> is the set of "
@@ -806,9 +738,7 @@ LESSONS = [
              "because the condensed equation has forgotten what the conditions were and "
              "cannot be asked."),
             ("Condense each side to a single logarithm",
-             "Use the three laws of lesson 6 from right to left. A coefficient goes back "
-             "up as a power first: `2 log x` becomes `log(x²)`, and only then can it "
-             "join a sum."),
+             'Use the three laws of “The Laws of Logarithms” from right to left. A coefficient goes back up as a power first: `2 log x` becomes `log(x²)`, and only then can it join a sum.'),
             ("Convert, and solve what remains",
              "Two logarithms in the same base: drop both and equate the arguments. A "
              "logarithm equal to a constant: apply the definition, `u = b^c`. What is "
@@ -912,11 +842,7 @@ LESSONS = [
                      "condensing anything, and then be able to say in advance that one of "
                      "the two candidates from `x² − 3x − 10 = 0` will fail it. It does: "
                      "`x = 5` is the solution and `x = −2` is rejected."),
-        "note": "Both halves of the course now solve. Lesson 9 applied a logarithm to "
-                "both sides to bring a variable down; this lesson made both sides "
-                "exponents to lift a variable out. The last two lessons stop solving and "
-                "start applying &mdash; compound interest, and the scales that are "
-                "logarithms in ordinary clothes.",
+        "note": 'The two equation types use inverse operations. “Solving Exponential Equations” applies a logarithm to both sides to bring a variable down; this lesson makes both sides exponents to lift a variable out. “Compound Interest and Continuous Growth” and “Logarithmic Scales” apply these ideas &mdash; compound interest, and scales that are logarithms in ordinary clothes.',
     },
     # ---------------------------------------------------------------- 11
     {
@@ -925,11 +851,7 @@ LESSONS = [
         "module": "Applications",
         "one_line": "Build periodic or continuous growth models from rates, periods and units.",
         "summary": (
-            "Two formulas that look like conventions until they are built. "
-            "`A = P(1 + r/n)^(nt)` is one multiplication repeated `nt` times, and "
-            "`A = P · e^(rt)` is the value that expression settles down to as `n` grows. "
-            "The second is lesson 3's limit with letters in it, and no new fact about "
-            "money is involved."
+            "Two formulas that look like conventions until they are built. `A = P(1 + r/n)^(nt)` is one multiplication repeated `nt` times, and `A = P · e^(rt)` is the value that expression settles down to as `n` grows. The second is “The Number e”'s limit with letters in it, and no new fact about money is involved."
         ),
         "key": [
             "A = P(1 + r/n)^(nt)     n compoundings a year, over t years",
@@ -953,7 +875,7 @@ LESSONS = [
              "`$18.11`; moving from monthly to continuous gains `$1.71` more. The "
              "sequence increases with `n` but is bounded, and its limit is the "
              "continuous value."),
-            ("The continuous formula is lesson 3's limit, relabelled",
+            ("The continuous formula is “The Number e”'s limit, relabelled",
              "`(1 + 1/m)^m → e`. Put `m = n/r`, and "
              "`(1 + r/n)^(nt) = [(1 + 1/m)^m]^(rt)`, which tends to `e^(rt)`. `e` was "
              "not introduced for finance; finance is where the limit was first noticed."),
@@ -1007,20 +929,10 @@ LESSONS = [
                   "sitting against it."),
             ("thm", ("The continuous limit",
                      "As `n → ∞`, `P(1 + r/n)^(nt) → P · e^(rt)`.",
-                     "Substitute `m = n/r`, so that `r/n = 1/m` and `nt = m · rt`. The "
-                     "expression becomes `P[(1 + 1/m)^m]^(rt)`, and `m → ∞` as "
-                     "`n → ∞`. The inner bracket tends to `e` by lesson 3, so the whole "
-                     "expression tends to `P · e^(rt)`.")),
+                     'Substitute `m = n/r`, so that `r/n = 1/m` and `nt = m · rt`. The expression becomes `P[(1 + 1/m)^m]^(rt)`, and `m → ∞` as `n → ∞`. The inner bracket tends to `e` by “The Number e”, so the whole expression tends to `P · e^(rt)`.')),
             ("h3", "Solving for the other letters"),
-            ("p", "`P` and `A` come out by dividing. `r` and `t` sit in the exponent, so "
-                  "they need lesson 9. To double a balance under continuous growth, set "
-                  "`2P = P · e^(rt)`; the `P` cancels, `2 = e^(rt)`, and `rt = ln 2`, so "
-                  "`t = ln 2 / r`."),
-            ("p", "That the principal cancels is the characteristic property of "
-                  "exponential growth from lesson 2: the time to double does not depend "
-                  "on where you start. At `5%` continuous it is "
-                  "`ln 2 / 0.05 ≈ 13.86` years, and compounded yearly instead it is "
-                  "`ln 2 / ln(1.05) ≈ 14.21` years."),
+            ("p", '`P` and `A` come out by dividing. `r` and `t` sit in the exponent, so they need “Solving Exponential Equations”. To double a balance under continuous growth, set `2P = P · e^(rt)`; the `P` cancels, `2 = e^(rt)`, and `rt = ln 2`, so `t = ln 2 / r`.'),
+            ("p", 'That the principal cancels is the characteristic property of exponential growth from “Growth and Decay”: the time to double does not depend on where you start. At `5%` continuous it is `ln 2 / 0.05 ≈ 13.86` years, and compounded yearly instead it is `ln 2 / ln(1.05) ≈ 14.21` years.'),
             ("p", "The banker's shortcut follows from `ln 2 ≈ 0.6931`. Doubling time is "
                   "roughly `70` divided by the rate as a percent, which at `5%` gives "
                   "`14` years against a true `13.86`. It is an approximation of a "
@@ -1154,10 +1066,7 @@ LESSONS = [
                      "assemble `A = P(1 + r/12)^(12t)` from those two facts alone. A "
                      "recalled formula with `n` and `t` in the wrong places looks exactly "
                      "like a correct one until the money is wrong."),
-        "note": "`e` entered this course in lesson 3 as the limit of `(1 + 1/n)^n`, with "
-                "no application attached to it. This is the application, and it is also "
-                "the historical order: the limit was first met by asking what happens to "
-                "an account compounded more and more often.",
+        "note": '`e` is defined in “The Number e” as the limit of `(1 + 1/n)^n`, with no application attached to it. This is the application, and it is also the historical order: the limit was first met by asking what happens to an account compounded more and more often.',
     },
     # ---------------------------------------------------------------- 12
     {
@@ -1189,10 +1098,7 @@ LESSONS = [
              "That is why the reading moves by `1` when the quantity moves by a factor "
              "of `10`."),
             ("Equal distances are equal ratios",
-             "On a logarithmic axis the gap from `1` to `2` is the same as the gap from "
-             "`10` to `20` and from `100` to `200`, because each is `log 2 ≈ 0.30103`. "
-             "Distances add where the quantities multiply, which is the product law of "
-             "lesson 6 drawn as a picture."),
+             'On a logarithmic axis the gap from `1` to `2` is the same as the gap from `10` to `20` and from `100` to `200`, because each is `log 2 ≈ 0.30103`. Distances add where the quantities multiply, which is the product law of “The Laws of Logarithms” drawn as a picture.'),
             ("Differences are the only arithmetic that transfers",
              "Two magnitudes cannot be averaged and two pH readings cannot be added, "
              "because the quantities underneath do not combine that way. What a "
@@ -1232,9 +1138,7 @@ LESSONS = [
                      "If `S = k · log(Q / Q₀)` then "
                      "`S₂ − S₁ = k · log(Q₂ / Q₁)`, and so "
                      "`Q₂ / Q₁ = 10^((S₂ − S₁) / k)`.",
-                     "The reference cancels, by the quotient law of lesson 6. This is "
-                     "why two readings can be compared by anyone, while a single reading "
-                     "means nothing until the reference is stated.")),
+                     'The reference cancels, by the quotient law of “The Laws of Logarithms”. This is why two readings can be compared by anyone, while a single reading means nothing until the reference is stated.')),
             ("math", [
                 "decibels, k = 10",
                 "  +10 dB  →  10^1   =  10× the intensity",
@@ -1266,12 +1170,7 @@ LESSONS = [
                   "`30.1%` of the way along and the mark for `5` sits `69.9%` along, "
                   "because `log 2 ≈ 0.30103` and `log 5 ≈ 0.69897`. The identical "
                   "pattern appears between `10` and `100`, and between `100` and `1000`."),
-            ("p", "One consequence is worth carrying away. If `y = a · b^x`, then "
-                  "`log y = log a + x · log b`, which is a linear function of `x`. So an "
-                  "exponential plotted with a logarithmic vertical axis is a straight "
-                  "line, and its slope is `log b`. A straight line on such a plot is "
-                  "evidence of a constant ratio per step, which is exactly the "
-                  "definition of exponential from lesson 1."),
+            ("p", 'One consequence is worth carrying away. If `y = a · b^x`, then `log y = log a + x · log b`, which is a linear function of `x`. So an exponential plotted with a logarithmic vertical axis is a straight line, and its slope is `log b`. A straight line on such a plot is evidence of a constant ratio per step, which is exactly the definition of exponential from “Exponential Functions”.'),
             ("example", ("A number you can check",
                          "Normal conversation is about `60` dB and a jet engine at close "
                          "range about `140` dB. The gap of `80` on the scale is a factor "
@@ -1392,6 +1291,6 @@ LESSONS = [
                      "`10^((S₂ − S₁)/k)` as a factor on the quantity. If the answer "
                      "comes out carrying the units of the scale, the conversion has not "
                      "been done."),
-        "note": "Each reading on these scales is an exponent: Lesson 4's definition doing ordinary work. Every legal manipulation is one of the three laws of Lesson 6 read in the other direction. Sequences and Series studies sequences with a constant ratio between successive terms.",
+        "note": "Each reading on these scales is an exponent: “What a Logarithm Is”'s definition doing ordinary work. Every legal manipulation is one of the three laws of “The Laws of Logarithms” read in the other direction. Sequences and Series studies sequences with a constant ratio between successive terms.",
     },
 ]

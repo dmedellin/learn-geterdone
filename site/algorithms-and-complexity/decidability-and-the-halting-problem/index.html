@@ -583,6 +583,15 @@
       overflow-x: auto;
     }
     .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
 
     /* ---------- Graphs ----------
        Tokens only. A component override scoped to [data-theme="light"] would
@@ -1040,6 +1049,7 @@
       font-size: 0.9rem;
       resize: vertical;
     }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
     .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
     .fb-actions {
       display: flex;
@@ -1132,6 +1142,7 @@
     [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
     [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
     [data-ui="hero"] .eyebrow { display: block; color: var(--muted); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
     [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
     [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
     [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
@@ -1176,7 +1187,7 @@
     }
     [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
     [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
-    [data-ui="lesson-list"] .lesson-link { min-height: 44px; }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
     body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
     body[data-page-kind] .is-done .lesson-state { color: var(--green); }
     [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
@@ -1281,12 +1292,12 @@ Rice: every nontrivial semantic property is undecidable</div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>The limits of computation</h2></div><p>Decidability, the halting problem, the proof, and what follows.</p></div>
-      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Decidable</span><p>A decision problem is <strong>decidable</strong> if some algorithm terminates on every input with the correct yes/no answer. Otherwise it is <strong>undecidable</strong>.</p></div><p>Note what undecidable does not mean. Not "hard", not "exponential", not "nobody has managed it". It means no algorithm exists and none ever will, and the statement is a theorem.</p><div class="thm"><span class="label">Theorem &middot; The halting problem is undecidable (Turing, 1936)</span><p>There is no algorithm <span class="math">H(P, x)</span> that, for every program <span class="math">P</span> and input <span class="math">x</span>, terminates and correctly reports whether <span class="math">P</span> halts on <span class="math">x</span>.</p></div><div class="proof"><p>Suppose such an <span class="math">H</span> exists. Build a program <span class="math">D</span> that takes one input <span class="math">P</span> &mdash; the source of a program &mdash; and does the following: run <span class="math">H(P, P)</span>; if <span class="math">H</span> says <span class="math">P</span> halts on input <span class="math">P</span>, then loop forever; if <span class="math">H</span> says <span class="math">P</span> does not halt, then halt immediately.</p><p><span class="math">D</span> is a perfectly ordinary program: it calls <span class="math">H</span>, which by assumption always terminates, and then branches.</p><p>Now ask what <span class="math">D</span> does on input <span class="math">D</span>.</p><p>If <span class="math">D</span> halts on <span class="math">D</span>, then <span class="math">H(D, D)</span> reported "halts", so by construction <span class="math">D</span> loops forever. Contradiction.</p><p>If <span class="math">D</span> does not halt on <span class="math">D</span>, then <span class="math">H(D, D)</span> reported "does not halt", so by construction <span class="math">D</span> halts immediately. Contradiction.</p><p>Both cases are impossible, so <span class="math">H</span> cannot exist.</p><p><span class="qed">&#9633;</span></p></div><p>The structure is exactly Sets, Relations, and Functions lesson 13's diagonal argument: assume a complete listing or a complete decider, construct the object that differs from every entry, and derive a contradiction. Cantor used it against enumerations of the reals; Turing used it against deciders.</p><p>It is also the self-reference Logic and Proof lesson 1 excluded from propositions, reappearing where it cannot be excluded: programs can take programs as input, and <span class="math">D</span> is applied to itself. That is not a trick, it is what makes computation universal.</p><h3>Rice&#x27;s theorem</h3><div class="thm"><span class="label">Theorem &middot; Rice&#x27;s theorem</span><p>Every nontrivial property of the function a program computes is undecidable. "Nontrivial" means some programs have it and some do not.</p></div><p>So all of the following are undecidable: does this program ever output 0? do these two programs compute the same function? does this program ever access an unallocated address? is this code reachable? does this loop terminate?</p><p>This is why static analysis tools are necessarily conservative. A compiler warning about unreachable code, a type system, a linter and a verifier all approximate: they may report a problem that does not exist or miss one that does, and Rice's theorem says no tool can do otherwise for every program.</p><h3>Other undecidable problems</h3><ul><li><strong>The Post correspondence problem.</strong> Given two lists of strings, can a sequence of indices be found making the concatenations equal? A purely combinatorial question with no algorithm.</li><li><strong>Hilbert's tenth problem.</strong> Does a given polynomial equation have integer solutions? Shown undecidable by Matiyasevich in 1970 &mdash; arithmetic itself is not fully mechanisable.</li><li><strong>Program equivalence.</strong> Do two programs compute the same function? Undecidable by Rice, which is why compiler optimisations are verified by construction rather than by comparison.</li></ul><h3>The hierarchy</h3><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">P                       solvable efficiently
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Decidable</span><p>A decision problem is <strong>decidable</strong> if some algorithm terminates on every input with the correct yes/no answer. Otherwise it is <strong>undecidable</strong>.</p></div><p>Note what undecidable does not mean. Not "hard", not "exponential", not "nobody has managed it". It means no algorithm exists and none ever will, and the statement is a theorem.</p><div class="thm"><span class="label">Theorem &middot; The halting problem is undecidable (Turing, 1936)</span><p>There is no algorithm <span class="math">H(P, x)</span> that, for every program <span class="math">P</span> and input <span class="math">x</span>, terminates and correctly reports whether <span class="math">P</span> halts on <span class="math">x</span>.</p></div><div class="proof"><p>Suppose such an <span class="math">H</span> exists. Build a program <span class="math">D</span> that takes one input <span class="math">P</span> &mdash; the source of a program &mdash; and does the following: run <span class="math">H(P, P)</span>; if <span class="math">H</span> says <span class="math">P</span> halts on input <span class="math">P</span>, then loop forever; if <span class="math">H</span> says <span class="math">P</span> does not halt, then halt immediately.</p><p><span class="math">D</span> is a perfectly ordinary program: it calls <span class="math">H</span>, which by assumption always terminates, and then branches.</p><p>Now ask what <span class="math">D</span> does on input <span class="math">D</span>.</p><p>If <span class="math">D</span> halts on <span class="math">D</span>, then <span class="math">H(D, D)</span> reported "halts", so by construction <span class="math">D</span> loops forever. Contradiction.</p><p>If <span class="math">D</span> does not halt on <span class="math">D</span>, then <span class="math">H(D, D)</span> reported "does not halt", so by construction <span class="math">D</span> halts immediately. Contradiction.</p><p>Both cases are impossible, so <span class="math">H</span> cannot exist.</p><p><span class="qed">&#9633;</span></p></div><p>The structure is exactly the diagonal argument from “Cardinality and Countability” in Sets, Relations, and Functions: assume a complete listing or a complete decider, construct the object that differs from every entry, and derive a contradiction. Cantor used it against enumerations of the reals; Turing used it against deciders.</p><p>It is also the self-reference the “Propositions and Truth Values” Lesson in Logic and Proof excludes from propositions, reappearing where it cannot be excluded: programs can take programs as input, and <span class="math">D</span> is applied to itself. That is not a trick, it is what makes computation universal.</p><h3>Rice&#x27;s theorem</h3><div class="thm"><span class="label">Theorem &middot; Rice&#x27;s theorem</span><p>Every nontrivial property of the function a program computes is undecidable. "Nontrivial" means some programs have it and some do not.</p></div><p>So all of the following are undecidable: does this program ever output 0? do these two programs compute the same function? does this program ever access an unallocated address? is this code reachable? does this loop terminate?</p><p>This is why static analysis tools are necessarily conservative. A compiler warning about unreachable code, a type system, a linter and a verifier all approximate: they may report a problem that does not exist or miss one that does, and Rice's theorem says no tool can do otherwise for every program.</p><h3>Other undecidable problems</h3><ul><li><strong>The Post correspondence problem.</strong> Given two lists of strings, can a sequence of indices be found making the concatenations equal? A purely combinatorial question with no algorithm.</li><li><strong>Hilbert's tenth problem.</strong> Does a given polynomial equation have integer solutions? Shown undecidable by Matiyasevich in 1970 &mdash; arithmetic itself is not fully mechanisable.</li><li><strong>Program equivalence.</strong> Do two programs compute the same function? Undecidable by Rice, which is why compiler optimisations are verified by construction rather than by comparison.</li></ul><h3>The hierarchy</h3><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">P                       solvable efficiently
 NP                      verifiable efficiently
 NP-complete             the hardest in NP
 EXPTIME                 solvable, but exponentially
 DECIDABLE               solvable eventually
-UNDECIDABLE             no algorithm exists</div><p>Logic and Proof makes statements precise; Induction and Recursion supplies proof techniques; counting, probability, number theory, and graph theory supply structures and problems; and this course measures the cost of computing with them. The last two lessons say what cost cannot be paid at all &mdash; some problems are intractable, and some are outside the reach of any algorithm whatever.</p></article>
+UNDECIDABLE             no algorithm exists</div><p>Logic and Proof makes statements precise; Induction and Recursion supplies proof techniques; counting, probability, number theory, and graph theory supply structures and problems; and this course measures the cost of computing with them. “P, NP and NP-Completeness” and “Decidability and the Halting Problem” explain the limits &mdash; some problems are intractable, and some are outside the reach of any algorithm whatever.</p></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>Algorithms and growth</h2></div><p>Counts from running, not from quoting</p></div>
@@ -1296,7 +1307,7 @@ UNDECIDABLE             no algorithm exists</div><p>Logic and Proof makes statem
         <div class="lab-title"><strong id="alTitle">Algorithms and growth</strong><span id="alSub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>measured</span><span class="tone-purple"><i class="legend-swatch"></i>predicted</span><span class="tone-amber"><i class="legend-swatch"></i>crossover</span></div>
       </div>
-      <div class="lab-stage"><svg id="alPlot" viewBox="0 0 520 230" role="img" aria-label="Operation counts plotted against input size."></svg></div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Operation counts plot, scroll horizontally for the complete chart"><svg id="alPlot" style="min-width:520px" viewBox="0 0 520 230" role="img" aria-label="Operation counts plotted against input size."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="alTable"></table></div>
       <div class="status-banner" id="alStatus" style="margin-top:12px;"></div>
         </article>
@@ -1494,7 +1505,7 @@ Both branches contradict.  H cannot exist.               ∎</div><p>The whole p
         + '. Your completion ticks can follow you to another device.');
       a.classList.add('is-in');
     }());
-  var QUIZ = [{"q": "\"The halting problem is undecidable\" means:", "a": ["it is very hard", "no algorithm can solve it for all inputs \u2014 proved, not unknown", "it takes exponential time", "it has not been solved yet"], "c": 1, "why": "A theorem, not a state of ignorance: no future technique will produce the algorithm, because none can exist. \"Very hard\" and \"exponential time\" describe NP-complete problems, which do have algorithms; \"not solved yet\" describes <span class=\"math\">P<\/span> versus <span class=\"math\">NP<\/span>, an open question. This one is closed, by Turing, in 1936."}, {"q": "Rice's theorem says:", "a": ["all programs halt", "every nontrivial property of what a program computes is undecidable", "P = NP", "sorting needs <span class=\"math\">n log n<\/span>"], "c": 1, "why": "Which is why static analysis is necessarily approximate: no tool can be both sound and complete for every program. \"All programs halt\" is false outright (a loop with no exit). <span class=\"math\">P = NP<\/span> is open and not a theorem of anyone's; the sorting bound is lesson 6's theorem, true and unrelated."}, {"q": "The halting proof works by:", "a": ["exhaustive search", "constructing a program that does the opposite of what the decider predicts about it", "counting programs", "assuming P = NP"], "c": 1, "why": "A diagonal argument: build the object that differs from every entry, here by applying <span class=\"math\">D<\/span> to itself. Exhaustive search over programs cannot finish, since there are infinitely many; counting them is the route in Sets, Relations, and Functions to \"some functions have no program\", which proves existence but names no problem; and <span class=\"math\">P = NP<\/span> is not assumed anywhere &mdash; the proof needs only that <span class=\"math\">H<\/span> is an algorithm."}];
+  var QUIZ = [{"q": "\"The halting problem is undecidable\" means:", "a": ["it is very hard", "no algorithm can solve it for all inputs \u2014 proved, not unknown", "it takes exponential time", "it has not been solved yet"], "c": 1, "why": "A theorem, not a state of ignorance: no future technique will produce the algorithm, because none can exist. \"Very hard\" and \"exponential time\" describe NP-complete problems, which do have algorithms; \"not solved yet\" describes <span class=\"math\">P<\/span> versus <span class=\"math\">NP<\/span>, an open question. This one is closed, by Turing, in 1936."}, {"q": "Rice's theorem says:", "a": ["all programs halt", "every nontrivial property of what a program computes is undecidable", "P = NP", "sorting needs <span class=\"math\">n log n<\/span>"], "c": 1, "why": "Which is why static analysis is necessarily approximate: no tool can be both sound and complete for every program. \"All programs halt\" is false outright (a loop with no exit). <span class=\"math\">P = NP<\/span> is open and not a theorem of anyone's; the sorting bound is \u201cSearching and Sorting\u201d's theorem, true and unrelated."}, {"q": "The halting proof works by:", "a": ["exhaustive search", "constructing a program that does the opposite of what the decider predicts about it", "counting programs", "assuming P = NP"], "c": 1, "why": "A diagonal argument: build the object that differs from every entry, here by applying <span class=\"math\">D<\/span> to itself. Exhaustive search over programs cannot finish, since there are infinitely many; counting them is the route in Sets, Relations, and Functions to \"some functions have no program\", which proves existence but names no problem; and <span class=\"math\">P = NP<\/span> is not assumed anywhere &mdash; the proof needs only that <span class=\"math\">H<\/span> is an algorithm."}];
 
   (function () {
 
@@ -1789,12 +1800,24 @@ Both branches contradict.  H cannot exist.               ∎</div><p>The whole p
     series.forEach(function (ser) {
       var d = ser.values.map(function (v, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(v).toFixed(1); }).join(' ');
       s += '<path d="' + d + '" fill="none" stroke="' + ser.colour + '" stroke-width="2.4" opacity="0.9" />';
-      s += '<text x="' + (x(ser.values.length - 1) - 6) + '" y="' + Math.max(14, y(ser.values[ser.values.length - 1]) - 6)
-        + '" text-anchor="end" font-size="11" font-weight="700" fill="' + ser.colour + '">' + ser.label + '</text>';
     });
-    s += '<text x="26" y="216" font-size="10" fill="var(--muted)">n = ' + xs[0] + '</text>';
-    s += '<text x="500" y="216" text-anchor="end" font-size="10" fill="var(--muted)">n = ' + xs[xs.length - 1] + '</text>';
-    if (logScale) s += '<text x="30" y="24" font-size="10" fill="var(--muted)">log scale</text>';
+    // Finish every curve before placing readable endpoint labels. Keep the
+    // authored color association and halo, with bounded separation at ties.
+    var labels = series.map(function (ser, i) {
+      return {series: ser, order: i, baseline: Math.max(20, Math.min(188, y(ser.values[ser.values.length - 1]) - 6))};
+    }).sort(function (a, b) { return a.baseline - b.baseline || a.order - b.order; });
+    labels.forEach(function (label, i) { if (i) label.baseline = Math.max(label.baseline, labels[i - 1].baseline + 18); });
+    for (var i = labels.length - 1; i >= 0; i -= 1) {
+      labels[i].baseline = Math.min(labels[i].baseline, i === labels.length - 1 ? 188 : labels[i + 1].baseline - 18);
+    }
+    labels.forEach(function (label) {
+      var ser = label.series;
+      s += '<text x="' + (x(ser.values.length - 1) - 6) + '" y="' + label.baseline
+        + '" text-anchor="end" font-size="12" font-weight="700" fill="' + ser.colour + '">' + ser.label + '</text>';
+    });
+    s += '<text x="26" y="216" font-size="12" fill="var(--muted)">n = ' + xs[0] + '</text>';
+    s += '<text x="500" y="216" text-anchor="end" font-size="12" fill="var(--muted)">n = ' + xs[xs.length - 1] + '</text>';
+    if (logScale) s += '<text x="30" y="24" font-size="12" fill="var(--muted)">log scale</text>';
     plot.innerHTML = s;
   }
 
@@ -1905,8 +1928,8 @@ Both branches contradict.  H cannot exist.               ∎</div><p>The whole p
         + 'At exit m = 0, so result · base⁰ = result, and the invariant reads result = ' + x + sup(n) + ' = ' + big(t.value)
         + ': the correctness argument in one line. The loop did ' + t.squarings + ' squarings and ' + t.mults
         + ' multiplications, one for each 1 in n = ' + t.binary + '₂, against n − 1 = ' + t.naive
-        + ' for repeated multiplication — lesson 1\'s comparison, measured. The final squaring is wasted (m is 0 by then), '
-        + 'which is why course 6 lesson 8 counts bits − 1. What the lab cannot do is prove the invariant for the n it did not '
+        + ' for repeated multiplication — the comparison in “Algorithms and Pseudocode”, measured. The final squaring is wasted (m is 0 by then), '
+        + 'which is why “Modular Exponentiation” counts bits − 1. What the lab cannot do is prove the invariant for the n it did not '
         + 'run; the proof is the worked example.';
     },
     loops: function () {
@@ -1939,7 +1962,7 @@ Both branches contradict.  H cannot exist.               ∎</div><p>The whole p
         + 'Σ (n − i + 1) reindexed to Σ m; C ran ' + last.C + ' = n · ⌊log₂ n⌋, because halving reaches 1 in ⌊log₂ n⌋ steps; '
         + 'D — the standard\'s triple triangular nest, Σ_i Σ_j j — ran ' + fmt(last.D) + ' = n(n+1)(n+2)/6, one sixth of n³ '
         + 'to leading order. ' + (exact ? '<strong>Every measured column equals its formula exactly</strong>, because none of '
-        + 'these loops looks at data; the formulas are course 3 lesson 3\'s sums.' : 'A measured column disagrees with its formula.')
+        + 'these loops looks at data; the formulas are the sums in “Induction with Sums and Products”.' : 'A measured column disagrees with its formula.')
         + ' Multiplying B\'s bounds instead of summing would give n² = ' + fmt(N * N) + ', about twice the truth — the first mistake.';
     },
     search: function () {
@@ -2094,7 +2117,7 @@ Both branches contradict.  H cannot exist.               ∎</div><p>The whole p
       var detail;
       if (policy === 'double') {
         var pow2 = (n & (n - 1)) === 0;
-        detail = 'The copies are 1 + 2 + 4 + ⋯, a geometric series (course 3 lesson 3) that stays under 2n, so the total stays under 3n '
+        detail = 'The copies are 1 + 2 + 4 + ⋯, a geometric series (see “Induction with Sums and Products”) that stays under 2n, so the total stays under 3n '
           + 'whatever n is. ' + (pow2
             ? 'This n is a power of two, so the last doubling happened at insert ' + (n / 2 + 1) + ' and the copies are n − 1 = ' + r.copies
               + ': the total is just under 2n. Set n = ' + (n + 1) + ' to see the next doubling push it above 2n and still below 3n — '

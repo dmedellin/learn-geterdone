@@ -47,9 +47,7 @@ LESSONS = [
                      "`a ≠ 0`. That arrangement is called <strong>standard "
                      "form</strong>.",
                      "The condition `a ≠ 0` is what makes the equation quadratic rather than linear. If `a` were `0` the `x²` term would disappear and Linear Equations and Inequalities would already have solved what was left.")),
-            ("p", "`b` or `c` may be zero, and often are. `x² - 9 = 0` has `b = 0`; "
-                  "`x² + 3x = 0` has `c = 0`. Both are quadratic, and each of those two "
-                  "shapes gets a method of its own later in the course."),
+            ("p", '`b` or `c` may be zero, and often are. `x² - 9 = 0` has `b = 0`; `x² + 3x = 0` has `c = 0`. Both are quadratic, and those shapes are handled by the square root property and factoring out a common factor, respectively.'),
             ("thm", ("The zero product property",
                      "For real numbers `a` and `b`, `ab = 0` if and only if `a = 0` or "
                      "`b = 0`.",
@@ -79,9 +77,7 @@ LESSONS = [
                   "and substituting back gives `(12 - 3)(12 + 5) = 9 · 17 = 153`, not "
                   "`9`. That was not an arithmetic slip. It was an appeal to a theorem "
                   "whose hypothesis had not been met."),
-            ("p", "The repair is always the same: expand, move everything to one side, "
-                  "and produce a zero. `(x - 3)(x + 5) = 9` becomes `x² + 2x - 15 = 9`, "
-                  "then `x² + 2x - 24 = 0`, and lesson 2 finishes it."),
+            ("p", 'The repair is always the same: expand, move everything to one side, and produce a zero. `(x - 3)(x + 5) = 9` becomes `x² + 2x - 15 = 9`, then `x² + 2x - 24 = 0`, and “Solving by Factoring” finishes it.'),
             ("h3", "More than two factors"),
             ("p", "The property extends to any finite number of factors by being applied "
                   "repeatedly: `abc = 0` means `a = 0` or `bc = 0`, and the second case "
@@ -120,7 +116,7 @@ LESSONS = [
              "Expand any brackets, then move every term to the same side. Until the "
              "other side reads `0`, no factorisation you write down is of any use."),
             ("Factor the side that is not zero",
-             "Polynomials and Factoring supplies the techniques and lesson 2 applies them. What you need is a product of polynomials; a sum, however tidy, cannot be split by this property."),
+             'Polynomials and Factoring supplies the techniques and “Solving by Factoring” applies them. What you need is a product of polynomials; a sum, however tidy, cannot be split by this property.'),
             ("Set each factor equal to zero, separately",
              "One factor at a time, each giving its own small equation. A constant "
              "factor such as the `5` in `5(x - 2)(x + 3) = 0` yields nothing, because "
@@ -145,7 +141,7 @@ LESSONS = [
                 "    (x - 3)(x + 5) = 9",
                 "     x² + 2x - 15 = 9              expand the left side",
                 "     x² + 2x - 24 = 0              subtract 9 from both sides",
-                "     (x + 6)(x - 4) = 0            factor (lesson 2)",
+                '     (x + 6)(x - 4) = 0            factor (“Solving by Factoring”)',
                 "     x + 6 = 0      or      x - 4 = 0",
                 "     x = -6         or      x = 4",
                 "",
@@ -226,11 +222,7 @@ LESSONS = [
                      "it is not `0`. You should also be able to give the one-line "
                      "argument with the reciprocal, because that argument is what tells "
                      "you the property cannot be stretched to cover `ab = 12`."),
-        "note": "Every method in this course reaches either a product equal to zero or a "
-                "square equal to a number, and the second is the first in disguise: for "
-                "`k ≥ 0`, `x² = k` is `(x - √k)(x + √k) = 0`. Lesson 2 reaches the "
-                "product by factoring; lessons 3 to 5 reach the square instead, and this "
-                "property is what finishes every one of them.",
+        "note": 'Every method in this course reaches either a product equal to zero or a square equal to a number, and the second is the first in disguise: for `k ≥ 0`, `x² = k` is `(x - √k)(x + √k) = 0`. “Solving by Factoring” reaches the product by factoring; “The Square Root Property”, “Completing the Square” and “The Quadratic Formula” reach the square instead, and this property is what finishes every one of them.',
     },
     # ---------------------------------------------------------------- 02
     {
@@ -249,7 +241,7 @@ LESSONS = [
         ],
         "key_label": "The method, in four lines",
         "concepts_intro": (
-            "Nothing here is new. This is Polynomials and Factoring's factoring followed by lesson 1's property, plus one decision: how long to keep trying."
+            "Nothing here is new. This is Polynomials and Factoring's factoring followed by “Quadratic Equations and the Zero Product Property”'s property, plus one decision: how long to keep trying."
         ),
         "concepts": [
             ("Standard form comes first, every time",
@@ -262,15 +254,12 @@ LESSONS = [
              "convention that keeps later statements tidy; as a solution of the equation "
              "it is one number."),
             ("Factoring is a method, not the method",
-             "It is the fastest route when the coefficients cooperate and useless when "
-             "they do not. `x² - 4x + 1 = 0` has two perfectly ordinary solutions that "
-             "no integer factorisation will ever produce. Lessons 4 and 5 exist for "
-             "those."),
+             'It is the fastest route when the coefficients cooperate and useless when they do not. `x² - 4x + 1 = 0` has two perfectly ordinary solutions that no integer factorisation will ever produce. “Completing the Square” and “The Quadratic Formula” exist for those.'),
         ],
         "read_title": "From a factorisation to a solution set",
         "read_intro": "The procedure, the factors that contribute nothing, and what to do when the factoring will not come.",
         "body": [
-            ("p", "Lesson 1 supplied the licence and Polynomials and Factoring supplied the technique. Put together: write the equation as `(something)(something) = 0`, then set each factor to zero."),
+            ("p", '“Quadratic Equations and the Zero Product Property” supplied the licence and Polynomials and Factoring supplied the technique. Put together: write the equation as `(something)(something) = 0`, then set each factor to zero.'),
             ("math", [
                 "x² + 3x = 10",
                 "x² + 3x - 10 = 0            subtract 10 from both sides",
@@ -283,16 +272,12 @@ LESSONS = [
                   "down &mdash; `2`, `x` and `x - 4` &mdash; but the first contributes "
                   "nothing, because `2 = 0` is a false statement with no solutions. The "
                   "answers are `x = 0` and `x = 4`."),
-            ("p", "A constant factor never creates a solution and never destroys one. "
-                  "That is worth knowing in both directions: multiplying an equation "
-                  "through by `3` leaves its solution set alone, and so does dividing by "
-                  "`3`. Only multiplying or dividing by something that could be zero is "
-                  "dangerous, which is the warning from lesson 1."),
+            ("p", 'A constant factor never creates a solution and never destroys one. That is worth knowing in both directions: multiplying an equation through by `3` leaves its solution set alone, and so does dividing by `3`. Only multiplying or dividing by something that could be zero is dangerous, which is the warning from “Quadratic Equations and the Zero Product Property”.'),
             ("h3", "Repeated factors"),
             ("p", "`4x² - 12x + 9 = 0` is `(2x - 3)² = 0`, so the only equation to solve "
                   "is `2x - 3 = 0` and the only solution is `x = 3/2`. Substituting: "
                   "`4(9/4) - 12(3/2) + 9 = 9 - 18 + 9 = 0`."),
-            ("p", "It is standard to say this equation has a double root at `3/2`, or a root of multiplicity 2. That is a statement about the factorisation, not about the solution set &mdash; the equation has exactly one solution. The convention earns its keep in lesson 6 and in Polynomials and Factoring's lesson 13, where counting roots with multiplicity is what makes the statements come out clean."),
+            ("p", 'It is standard to say this equation has a double root at `3/2`, or a root of multiplicity 2. That is a statement about the factorisation, not about the solution set &mdash; the equation has exactly one solution. The convention earns its keep in “The Discriminant” and in the “Graphs of Polynomial Functions” Lesson in Polynomials and Factoring, where counting roots with multiplicity is what makes the statements come out clean.'),
             ("thm", ("What a factorisation says about the solutions",
                      "Suppose `ax² + bx + c = a(x - r)(x - s)` for every value of `x`, "
                      "with `a ≠ 0`. Then the solutions of `ax² + bx + c = 0` are exactly "
@@ -314,12 +299,7 @@ LESSONS = [
             ]),
             ("p", "Both answers are fractions and both are exact. `-3/2` is the solution; `-1.5` is a decimal that happens to equal it, and `4/3` has no decimal that equals it at all. Exact fractions are used here for that reason."),
             ("h3", "When the factoring will not come"),
-            ("p", "A complete search that fails is a result about integer factorisation "
-                  "and nothing more. `x² - 4x + 1 = 0` has no pair of integers with "
-                  "product `1` and sum `-4`, so it does not factor over the integers. It "
-                  "still has two solutions, `2 + √3` and `2 - √3`, which lesson 4 "
-                  "produces. \"It does not factor\" and \"it has no solutions\" are "
-                  "different sentences, and only the first one has been established."),
+            ("p", 'A complete search that fails is a result about integer factorisation and nothing more. `x² - 4x + 1 = 0` has no pair of integers with product `1` and sum `-4`, so it does not factor over the integers. It still has two solutions, `2 + √3` and `2 - √3`, which “Completing the Square” produces. "It does not factor" and "it has no solutions" are different sentences, and only the first one has been established.'),
             ("example", ("Running the method backwards",
                          "To build an equation whose solutions are `-5` and `2`, start "
                          "from `(x + 5)(x - 2) = 0` and expand: `x² + 3x - 10 = 0`. "
@@ -349,7 +329,7 @@ LESSONS = [
              "so the other reads `0`. Arrange in descending powers, so that `a`, `b` and "
              "`c` can be seen."),
             ("Factor completely, common factor first",
-             "Take out the GCF, as Polynomials and Factoring lesson 5 insists, then factor what is left. A monic trinomial needs a product-and-sum pair from lesson 7 of that course; anything else needs the AC method of lesson 8."),
+             'Take out the GCF, as “Factoring Out the Greatest Common Factor” in Polynomials and Factoring insists, then factor what is left. A monic trinomial needs a product-and-sum pair from “Factoring Simple Trinomials” in that Course; anything else needs “The AC Method”.'),
             ("Set each non-constant factor to zero and solve",
              "Each one gives a linear equation. Skip any constant factor, which can "
              "never be zero. A repeated factor gives its solution once, not twice."),
@@ -392,11 +372,7 @@ LESSONS = [
                 "given. Checking against `x² + 3x - 10 = 0` instead would agree with "
                 "itself even if the subtraction had gone wrong, which is the one thing a "
                 "check is supposed to catch.",
-                "C has one solution, and nothing was lost in getting there. `(2x - 3)²` "
-                "gives the equation `2x - 3 = 0` twice, and solving the same equation "
-                "twice returns the same number twice. Lesson 10 shows what this looks "
-                "like on a graph: a curve that touches the x-axis instead of crossing "
-                "it.",
+                'C has one solution, and nothing was lost in getting there. `(2x - 3)²` gives the equation `2x - 3 = 0` twice, and solving the same equation twice returns the same number twice. “Graphs of Quadratic Functions” shows what this looks like on a graph: a curve that touches the x-axis instead of crossing it.',
                 "For a faded AC-method solve, take `12x² - 11x - 5 = 0`. The supplied "
                 "search target is product `-60` and sum `-11`; use `-15` and `4` to "
                 "split the middle term. Group, solve both linear factors and check the "
@@ -450,16 +426,8 @@ LESSONS = [
              "about whether solutions exist."),
         ],
         "standard": ("Finish when factoring is a first attempt you abandon quickly.",
-                     "You should reach standard form without thinking, spend a few "
-                     "seconds looking for an integer factorisation, and move to lesson 4 "
-                     "or 5 without regret when none appears. Every answer checked in the "
-                     "original equation, and a repeated factor reported as one solution."),
-        "note": "Factoring is the fastest method and the least reliable, because it "
-                "works only when the coefficients were chosen to let it. The next three "
-                "lessons remove the condition a piece at a time: the square root "
-                "property handles anything with no `x` term, completing the square "
-                "handles everything, and the formula is completing the square carried "
-                "out once and kept.",
+                     'You should reach standard form without thinking, spend a few seconds looking for an integer factorisation, and move to “Completing the Square” or “The Quadratic Formula” without regret when none appears. Every answer checked in the original equation, and a repeated factor reported as one solution.'),
+        "note": 'Factoring is the fastest method and the least reliable, because it works only when the coefficients were chosen to let it. Three other methods remove that condition: the square root property handles anything with no `x` term, completing the square handles everything, and the formula is completing the square carried out once and kept.',
     },
     # ---------------------------------------------------------------- 03
     {
@@ -488,17 +456,12 @@ LESSONS = [
             ("The radical sign names one number",
              "`√25` is `5`. It is not `±5` and it is not `-5`. The symbol is defined to return the non-negative root, so that taking a square root is a function with one output, and Foundations of Algebra fixed that convention. The `±` in a solution is put there by you, deliberately."),
             ("The property is the zero product property in disguise",
-             "`x² = k` is `x² - k = 0`, and for `k ≥ 0` that is `(x - √k)(x + √k) = 0` "
-             "by the difference of squares. Nothing new is being assumed here; lesson 1 "
-             "is still doing the work, one layer down."),
+             '`x² = k` is `x² - k = 0`, and for `k ≥ 0` that is `(x - √k)(x + √k) = 0` by the difference of squares. Nothing new is being assumed here; “Quadratic Equations and the Zero Product Property” is still doing the work, one layer down.'),
             ("A negative on the right means no real solution",
-             "The square of any real number is `0` or positive, so `x² = -9` cannot hold "
-             "for a real `x`. It is not that the answer is hard to find &mdash; there is "
-             "none among the real numbers. Lesson 7 builds a system in which there is "
-             "one."),
+             'The square of any real number is `0` or positive, so `x² = -9` cannot hold for a real `x`. It is not that the answer is hard to find &mdash; there is none among the real numbers. “Complex Numbers” builds a system in which there is one.'),
         ],
         "read_title": "Undoing a square",
-        "read_intro": "The property, its proof, why the plus-or-minus lives outside the symbol, and the shifted form lesson 4 needs.",
+        "read_intro": 'The property, its proof, why the plus-or-minus lives outside the symbol, and the shifted form “Completing the Square” needs.',
         "body": [
             ("thm", ("The square root property",
                      "Let `k` be a real number. The equation `x² = k` has two real "
@@ -506,11 +469,7 @@ LESSONS = [
                      "solution `x = 0` when `k = 0`; and no real solution when "
                      "`k &lt; 0`.")),
             ("proof", [
-                "Suppose `k &gt; 0`. Then `√k` is defined and positive, and "
-                "`k = (√k)²`. So `x² = k` is `x² - (√k)² = 0`, which factors as "
-                "`(x - √k)(x + √k) = 0` by the difference of squares. Lesson 1 splits "
-                "it into `x = √k` or `x = -√k`, and those are two different numbers "
-                "because `√k` is not `0`.",
+                'Suppose `k &gt; 0`. Then `√k` is defined and positive, and `k = (√k)²`. So `x² = k` is `x² - (√k)² = 0`, which factors as `(x - √k)(x + √k) = 0` by the difference of squares. “Quadratic Equations and the Zero Product Property” splits it into `x = √k` or `x = -√k`, and those are two different numbers because `√k` is not `0`.',
                 "If `k = 0` the same factorisation reads `x · x = 0`, so `x = 0` is the "
                 "only solution &mdash; the two brackets have collapsed onto each other.",
                 "If `k &lt; 0`, suppose some real `x` satisfied `x² = k`. Every real "
@@ -542,10 +501,7 @@ LESSONS = [
                   "order that keeps the arithmetic in plain sight, and it is the one to "
                   "use."),
             ("h3", "The shifted form"),
-            ("p", "The property does not care what is being squared. If `(x - h)² = k` "
-                  "then `x - h` is one of the two square roots of `k`, so `x - h = ±√k` "
-                  "and `x = h ± √k`. That is the form every completed square arrives at, "
-                  "which is why the whole of lesson 4 depends on this one."),
+            ("p", 'The property does not care what is being squared. If `(x - h)² = k` then `x - h` is one of the two square roots of `k`, so `x - h = ±√k` and `x = h ± √k`. That is the form every completed square arrives at, which is why the whole of “Completing the Square” depends on this one.'),
             ("example", ("A shifted square, with a radical to simplify",
                          "`(x - 4)² = 20`. So `x - 4 = ±√20`, and `√20 = √(4 · 5) = 2√5` by Rational and Radical Expressions. The solutions are `x = 4 + 2√5` and `x = 4 - 2√5`, usually written together as `x = 4 ± 2√5`.",
                          "Check the first: `(4 + 2√5 - 4)² = (2√5)² = 4 · 5 = 20`. The "
@@ -556,11 +512,7 @@ LESSONS = [
                          "`x² + 9 = 0` gives `x² = -9`, and no real number squares to a "
                          "negative. The complete and honest answer at this point in the "
                          "course is \"no real solution\".",
-                         "Lesson 7 introduces the number system needed to continue, and "
-                         "lesson 9 solves the quadratics this lesson has to set aside. "
-                         "The answer there is again a pair produced by this property; "
-                         "no unexplained symbol is needed to finish the real-number "
-                         "work here.")),
+                         '“Complex Numbers” introduces the number system needed to continue, and “Complex Roots of Quadratics” solves the quadratics this lesson has to set aside. The answer there is again a pair produced by this property; no unexplained symbol is needed to finish the real-number work here.')),
         ],
         "lab": ("quadratic", {
             "mode": "sqrt",
@@ -574,9 +526,7 @@ LESSONS = [
         "steps_intro": "The method applies when there is no loose x term, or when the square is already assembled.",
         "steps": [
             ("Check the shape",
-             "`4x² - 9 = 0` and `2(x + 1)² = 18` both qualify: a square, a constant, and "
-             "no separate `x` term. `x² + 6x - 7 = 0` does not, and lesson 4 exists to "
-             "convert it into one that does."),
+             '`4x² - 9 = 0` and `2(x + 1)² = 18` both qualify: a square, a constant, and no separate `x` term. `x² + 6x - 7 = 0` does not, and “Completing the Square” exists to convert it into one that does.'),
             ("Isolate the squared quantity",
              "Undo the additions and subtractions first, then the multiplication, exactly as Linear Equations and Inequalities did with linear equations. What is left must read `(something)² = k`, with nothing else on that side."),
             ("Write both roots, with the ± in place",
@@ -617,11 +567,7 @@ LESSONS = [
             ],
             "after": [
                 "In C the denominator was cleared by Rational and Radical Expressions's method: `√5/√2 = (√5 · √2)/2 = √10/2`. Leaving the answer as `-3 ± √(5/2)` is not wrong, but `√10/2` is the standard form, and standard form is what makes two answers comparable.",
-                "A produced a symmetric pair and B and C did not. The reason is "
-                "structural: A involves only `x²`, so the equation cannot tell `x` from "
-                "`-x` and its solutions must be negatives of one another. In B and C the "
-                "square is shifted, and the pair is symmetric about `4` and about `-3` "
-                "instead. Lesson 11 gives that centre a name.",
+                'A produced a symmetric pair and B and C did not. The reason is structural: A involves only `x²`, so the equation cannot tell `x` from `-x` and its solutions must be negatives of one another. In B and C the square is shifted, and the pair is symmetric about `4` and about `-3` instead. “Vertex Form and the Axis of Symmetry” gives that centre a name.',
                 "For a faded shifted-square solve, take `3(x - 2)² = 14`. The supplied "
                 "first line is `(x - 2)² = 14/3`. Take both roots, rationalize and "
                 "simplify before solving for `x`, then check by showing the shift "
@@ -663,11 +609,7 @@ LESSONS = [
              "`(x + 2)² = 9` gives `x = 1` or `x = -5`, so solving `x + 2 = 3` and then "
              "writing `x = ±1` produces one right answer and one wrong one."),
             ("Writing `√9 = ±3`",
-             "The radical sign is a function and returns a single value. The second "
-             "solution of `x² = 9` comes from the property, which supplies the sign; the "
-             "symbol never does. Keeping them apart matters in lesson 5, where the "
-             "formula writes the `±` explicitly in front of the radical for exactly this "
-             "reason."),
+             'The radical sign is a function and returns a single value. The second solution of `x² = 9` comes from the property, which supplies the sign; the symbol never does. Keeping them apart matters in “The Quadratic Formula”, where the formula writes the `±` explicitly in front of the radical for exactly this reason.'),
             ("Taking the root of each term separately",
              "From `x² + 9 = 25` you may not conclude `x + 3 = 5`. The correct route "
              "gives `x² = 16` and `x = ±4`, and the shortcut's answer `x = 2` fails the "
@@ -679,11 +621,7 @@ LESSONS = [
                      "one written step, simplify the radical exactly, and check. You "
                      "should also be able to say why `√k` on its own is not the answer: "
                      "the symbol is a function, and the equation has two solutions."),
-        "note": "This property looks narrow, because it needs an equation with no `x` "
-                "term, and lesson 4 makes it universal. Completing the square turns any "
-                "quadratic into `(x - h)² = k`, and from there this is the property that "
-                "finishes it. Everything in the next lesson exists to reach the shape "
-                "this one can already solve.",
+        "note": 'This property looks narrow, because it needs an equation with no `x` term, and “Completing the Square” makes it universal. Completing the square turns any quadratic into `(x - h)² = k`, and from there this is the property that finishes it. Completing the square reaches the shape that the square root property solves.',
     },
     # ---------------------------------------------------------------- 04
     {
@@ -728,9 +666,7 @@ LESSONS = [
         "read_title": "Manufacturing a perfect square",
         "read_intro": "Where the constant comes from, the procedure on an equation, the extra step when a is not 1, and the difference between an equation and an expression.",
         "body": [
-            ("p", "Lesson 3 solves `(x - h)² = k` in two lines. Completing the square is "
-                  "the process that puts an arbitrary quadratic into that shape, so that "
-                  "those two lines are always available."),
+            ("p", '“The Square Root Property” solves `(x - h)² = k` in two lines. Completing the square is the process that puts an arbitrary quadratic into that shape, so that those two lines are always available.'),
             ("h3", "The constant that completes the square"),
             ("math", [
                 "(x + p)²  =  x² + 2px + p²",
@@ -752,7 +688,7 @@ LESSONS = [
                 "x² + 6x = 7                  move the constant to the right",
                 "x² + 6x + 9 = 7 + 9          add 9 to BOTH sides",
                 "(x + 3)² = 16                the left side is now a square",
-                "x + 3 = ±4                   square root property, lesson 3",
+                'x + 3 = ±4                   square root property, “The Square Root Property”',
                 "x = 1   or   x = -7",
             ]),
             ("p", "The `+ 9` on the right is what keeps the equation true. Adding `9` to "
@@ -866,11 +802,7 @@ LESSONS = [
                 "        no real solution",
             ],
             "after": [
-                "B is the general case and A is the lucky one. Half of an odd number is "
-                "a fraction, its square has a `4` underneath, and the right-hand side "
-                "then needs a common denominator. None of that is a mistake; it is what "
-                "the method does. Lesson 5 performs exactly this arithmetic once, with "
-                "letters, so that it never has to be performed again.",
+                'B is the general case and A is the lucky one. Half of an odd number is a fraction, its square has a `4` underneath, and the right-hand side then needs a common denominator. None of that is a mistake; it is what the method does. “The Quadratic Formula” performs exactly this arithmetic once, with letters, so that it never has to be performed again.',
                 "D stopped at `(x - 1)² = -2/3`, and that was the complete answer. No "
                 "real number squares to a negative, so there is nothing further to try. "
                 "The method reported the absence of a real solution; it did not fail to "
@@ -924,16 +856,8 @@ LESSONS = [
              "without the `-9` gives `10`."),
         ],
         "standard": ("Finish when an odd b does not slow you down.",
-                     "Take a quadratic with `a ≠ 1` and an odd `b`, complete the square "
-                     "in exact fractions, and finish with the square root property. If "
-                     "you can do that reliably you can also derive the quadratic "
-                     "formula, which is the next lesson and is this procedure carried "
-                     "out once on `ax² + bx + c = 0`."),
-        "note": "This is the most valuable procedure in the course, and it pays twice. "
-                "Run it on `ax² + bx + c = 0` and it produces the quadratic formula, in "
-                "lesson 5. Run it on `y = ax² + bx + c`, using the add-and-subtract form "
-                "so that the left side stays as `y`, and it produces the vertex, in "
-                "lesson 11.",
+                     'Take a quadratic with `a ≠ 1` and an odd `b`, complete the square in exact fractions, and finish with the square root property. If you can do that reliably you can also derive the quadratic formula, the subject of “The Quadratic Formula”, by using this procedure carried out once on `ax² + bx + c = 0`.'),
+        "note": 'This is the most valuable procedure in the course, and it pays twice. Run it on `ax² + bx + c = 0` and it produces the quadratic formula, in “The Quadratic Formula”. Run it on `y = ax² + bx + c`, using the add-and-subtract form so that the left side stays as `y`, and it produces the vertex, in “Vertex Form and the Axis of Symmetry”.',
     },
     # ---------------------------------------------------------------- 05
     {
@@ -955,8 +879,7 @@ LESSONS = [
         ],
         "key_label": "One formula, for every quadratic",
         "concepts_intro": (
-            "The formula is a theorem with a proof you can carry out yourself, and the "
-            "proof is lesson 4 done with letters."
+            'The formula is a theorem with a proof you can carry out yourself, and the proof is “Completing the Square” done with letters.'
         ),
         "concepts": [
             ("Standard form is part of the formula",
@@ -969,17 +892,12 @@ LESSONS = [
              "they catch them in opposite directions: one drops a sign that should "
              "survive, the other keeps a sign that should not."),
             ("It finishes, and it says when there is nothing to find",
-             "If `b² - 4ac` is negative the formula asks for the square root of a "
-             "negative number, and no real number supplies one. That is not a breakdown "
-             "&mdash; it is the formula reporting that there is no real solution, which "
-             "lesson 6 learns to read off before any work is done."),
+             'If `b² - 4ac` is negative the formula asks for the square root of a negative number, and no real number supplies one. That is not a breakdown &mdash; it is the formula reporting that there is no real solution, which “The Discriminant” learns to read off before any work is done.'),
         ],
         "read_title": "Deriving the formula once",
         "read_intro": "The proof, the one subtlety inside it, and how to use the result without manufacturing sign errors.",
         "body": [
-            ("p", "Lesson 4 completes the square on any particular quadratic. Doing it "
-                  "on `ax² + bx + c = 0`, with letters in place of numbers, does it for "
-                  "all of them at once and leaves a formula behind."),
+            ("p", '“Completing the Square” completes the square on any particular quadratic. Doing it on `ax² + bx + c = 0`, with letters in place of numbers, does it for all of them at once and leaves a formula behind.'),
             ("thm", ("The quadratic formula",
                      "Let `a`, `b` and `c` be real with `a ≠ 0`. If `b² - 4ac ≥ 0`, the "
                      "real solutions of `ax² + bx + c = 0` are exactly "
@@ -1005,9 +923,7 @@ LESSONS = [
                 "Subtracting `b/(2a)` gives `x = -b/(2a) ± √(b² - 4ac)/(2a)`, and the "
                 "two terms share a denominator: `x = (-b ± √(b² - 4ac))/(2a)`.",
             ]),
-            ("p", "The quantity `b² - 4ac` appeared without being asked for, and it "
-                  "decides everything about the answer. Lesson 6 is about that quantity "
-                  "alone."),
+            ("p", 'The quantity `b² - 4ac` appeared without being asked for, and it decides everything about the answer. “The Discriminant” is about that quantity alone.'),
             ("h3", "Using it"),
             ("p", "Three things are worth doing in a fixed order every single time: "
                   "rearrange into standard form, write `a`, `b` and `c` down with their "
@@ -1055,18 +971,12 @@ LESSONS = [
                          "`x² - 9 = 0` has `b = 0`, and the formula gives "
                          "`x = ±√36 / 2 = ±3`. Correct, and slower than the square root "
                          "property, which reads `x² = 9` and stops.",
-                         "The formula always works. It is not always the shortest route, "
-                         "and one line of lesson 6 usually tells you which route to "
-                         "take.")),
+                         'The formula always works. It is not always the shortest route, and one line of “The Discriminant” usually tells you which route to take.')),
         ],
         "lab": ("quadratic", {
             "mode": "formula",
             "panel_title": "Coefficients in, exact real roots out",
-            "panel_intro": "Set `a`, `b` and `c` and watch the substitution happen with "
-                           "every sign shown. The lab keeps the answer as an exact "
-                           "radical and then reduces it when real roots exist; a negative "
-                           "discriminant stops at no real solution until complex numbers "
-                           "are defined later in the course.",
+            "panel_intro": 'Set `a`, `b` and `c` and watch the substitution happen with every sign shown. The lab keeps the answer as an exact radical and then reduces it when real roots exist; a negative discriminant reports no real solution in this lab mode; “Complex Numbers” defines the extended number system.',
         }),
         "steps_title": "Applying the quadratic formula",
         "steps_intro": "The first two steps hold the errors; the last two are arithmetic.",
@@ -1172,12 +1082,7 @@ LESSONS = [
                      "reaching the formula in six or seven lines. Then use it with `a`, "
                      "`b` and `c` written out separately every time, and reduce the "
                      "result by dividing the whole numerator."),
-        "note": "The formula is the last of the four solution methods, and it subsumes "
-                "the others rather than replacing them: factoring is faster when it "
-                "works, and the square root property is faster when `b = 0`. What the "
-                "formula adds is a guarantee that no quadratic on this course can go "
-                "unfinished &mdash; and the quantity `b² - 4ac` that fell out of the "
-                "derivation is the whole of the next lesson.",
+        "note": 'The formula is one of the four solution methods, and it subsumes the others rather than replacing them: factoring is faster when it works, and the square root property is faster when `b = 0`. What the formula adds is a guarantee that no quadratic on this course can go unfinished &mdash; and the quantity `b² - 4ac` that fell out of the derivation is the subject of “The Discriminant”.',
     },
     # ---------------------------------------------------------------- 06
     {
@@ -1233,9 +1138,7 @@ LESSONS = [
                      "solutions. If `D = 0` it has exactly one. If `D &lt; 0` it has "
                      "none.")),
             ("proof", [
-                "Lesson 5 showed the equation is equivalent to "
-                "`(x + b/(2a))² = D/(4a²)`, and `4a²` is positive, so the right-hand "
-                "side has the same sign as `D`.",
+                '“The Quadratic Formula” showed the equation is equivalent to `(x + b/(2a))² = D/(4a²)`, and `4a²` is positive, so the right-hand side has the same sign as `D`.',
                 "If `D &gt; 0` the square root property gives two solutions, "
                 "`x = -b/(2a) ± √D/(2a)`. They are distinct because `√D` is not `0` and "
                 "`2a` is not `0`.",
@@ -1248,10 +1151,7 @@ LESSONS = [
                   "discriminant always answers the question, and never answers it "
                   "twice."),
             ("h3", "What D = 0 looks like"),
-            ("p", "`4x² - 12x + 9 = 0` has `D = 144 - 144 = 0`, and its factorisation is "
-                  "`(2x - 3)²`. The two facts travel together: `D = 0` exactly when the "
-                  "quadratic is a constant times a perfect square, and then the single "
-                  "solution is the double root of lesson 2."),
+            ("p", '`4x² - 12x + 9 = 0` has `D = 144 - 144 = 0`, and its factorisation is `(2x - 3)²`. The two facts travel together: `D = 0` exactly when the quadratic is a constant times a perfect square, and then the single solution is the double root of “Solving by Factoring”.'),
             ("h3", "Perfect squares and rational solutions"),
             ("thm", ("When a quadratic with integer coefficients factors",
                      "Let `a`, `b` and `c` be integers with `a ≠ 0`. The equation "
@@ -1263,18 +1163,14 @@ LESSONS = [
                 "denominator, so both are rational.",
                 "Conversely, suppose some solution `x` is rational. Multiplying `(x + b/(2a))² = D/(4a²)` through by `4a²` gives `(2ax + b)² = D`, so `D` is the square of the rational number `2ax + b`. A rational number whose square is an integer is itself an integer &mdash; the same fact Polynomials and Factoring's rational root theorem rests on &mdash; so `2ax + b` is an integer and `D` is the square of one.",
             ]),
-            ("p", "So the search of Polynomials and Factoring, lesson 7 can be called off before it starts. `x² - 4x + 1 = 0` has `D = 16 - 4 = 12`, which is not a perfect square, so no rational factorisation exists and no amount of looking will produce one. `x² - 5x + 6 = 0` has `D = 1`, so one does, and it is `(x - 2)(x - 3)`."),
+            ("p", 'So the search of “Factoring Simple Trinomials” in Polynomials and Factoring can be called off before it starts. `x² - 4x + 1 = 0` has `D = 16 - 4 = 12`, which is not a perfect square, so no rational factorisation exists and no amount of looking will produce one. `x² - 5x + 6 = 0` has `D = 1`, so one does, and it is `(x - 2)(x - 3)`.'),
             ("h3", "What the discriminant does not tell you"),
             ("p", "It gives the number of real solutions, and for integer coefficients "
                   "whether they are rational. It does not give the solutions, it does "
                   "not say whether they are positive or negative, and its size carries "
                   "no message about difficulty: `D = 1` and `D = 10000` both mean \"two "
                   "real solutions\"."),
-            ("p", "One derived fact is worth keeping. The two solutions are "
-                  "`-b/(2a) ± √D/(2a)`, so they differ by `√D/|a|`. The gap depends on "
-                  "`a` as well: with `a` held fixed, a larger `D` puts the two answers "
-                  "further apart, which is a statement about the graph in lesson 10 "
-                  "rather than about the solving."),
+            ("p", 'One derived fact is worth keeping. The two solutions are `-b/(2a) ± √D/(2a)`, so they differ by `√D/|a|`. The gap depends on `a` as well: with `a` held fixed, a larger `D` puts the two answers further apart, which is a statement about the graph in “Graphs of Quadratic Functions” rather than about the solving.'),
             ("example", ("Four discriminants",
                          "`x² - 5x + 6`: `D = 25 - 24 = 1`, positive and a perfect "
                          "square, so two rational solutions, `2` and `3`. "
@@ -1302,8 +1198,7 @@ LESSONS = [
         "steps_intro": "One line of arithmetic, then a decision about which method to use.",
         "steps": [
             ("Reach standard form and read a, b, c with their signs",
-             "The same first step as lesson 5, for the same reason. A `D` computed from "
-             "the wrong coefficients answers a question about a different equation."),
+             'The same first step as “The Quadratic Formula”, for the same reason. A `D` computed from the wrong coefficients answers a question about a different equation.'),
             ("Compute D with brackets",
              "For `2x² - 4x - 3 = 0`, `D = (-4)² - 4(2)(-3) = 16 + 24 = 40`, not "
              "`16 - 24`. With `a` positive, a negative `c` makes `-4ac` positive, and "
@@ -1340,11 +1235,7 @@ LESSONS = [
             ],
             "after": [
                 "C is the one that pays. Polynomials and Factoring's product-and-sum search over the divisors of `1` would have been tried and would have failed, and `D = 12` says in advance that it must: `12` is not a perfect square, so no rational factorisation exists. One line replaced a search.",
-                "D was settled by a single subtraction. Lessons 7 to 9 supply the "
-                "numbers and method that continue beyond the reals. Nothing in this "
-                "lesson changes when those roots arrive &mdash; `D &lt; 0` will still "
-                "mean \"no real solution\", which is why the word <em>real</em> is worth "
-                "writing now.",
+                'D was settled by a single subtraction. “Complex Numbers”, “Operations with Complex Numbers” and “Complex Roots of Quadratics” supply the numbers and method that continue beyond the reals. Nothing in this lesson changes when complex roots are included &mdash; `D &lt; 0` will still mean "no real solution", which is why the word <em>real</em> is worth writing.',
                 "For a faded method-choice pass, classify these before doing any full "
                 "solution: `x² - 11x + 24 = 0`, `5x² - 45 = 0`, "
                 "`x² + 8x = 3`, and `2x² + x + 4 = 0`. The supplied cues are, in "
@@ -1369,10 +1260,7 @@ LESSONS = [
                    "It has two solutions that are negatives of one another",
                    "It is not really a quadratic"],
              "c": 1,
-             "why": "The formula becomes `x = (-b ± 0)/(2a)`, and both signs give "
-                    "`-b/(2a)`. The quadratic is a constant times a perfect square, and "
-                    "in lesson 10 its graph touches the x-axis once instead of crossing "
-                    "it twice."},
+             "why": 'The formula becomes `x = (-b ± 0)/(2a)`, and both signs give `-b/(2a)`. The quadratic is a constant times a perfect square, and in “Graphs of Quadratic Functions” its graph touches the x-axis once instead of crossing it twice.'},
             {"q": "`x² - 7x + 10 = 0` has `D = 9`. Beyond the count of solutions, what does that say?",
              "a": ["The two solutions are `9` apart",
                    "`9` is a perfect square, so both solutions are rational and it factors",
@@ -1407,20 +1295,14 @@ LESSONS = [
              "`D = 0` gives exactly one solution, `-b/(2a)`. It is the boundary between "
              "two and none, and it belongs to neither of them."),
             ("Saying \"no solutions\" when \"no real solutions\" is meant",
-             "Before lesson 7 the two phrases look interchangeable, and they are not. "
-             "`x² + 1 = 0` has no real solution and two complex ones. The sentence you "
-             "write today should still be true three lessons from now."),
+             'Without distinguishing real and complex numbers, the two phrases look interchangeable, and they are not. `x² + 1 = 0` has no real solution and two complex ones. The sentence you write about real solutions should still be true when the number system is extended.'),
         ],
         "standard": ("Finish when D is the first thing you compute on any quadratic.",
                      "Given the coefficients you should produce `D`, name the case, say "
                      "whether the answers will be rational, and only then pick a method. "
                      "Getting the sign of `-4ac` right when `c` is negative is the single "
                      "skill that makes the whole habit reliable."),
-        "note": "The discriminant is the last thing this course does with real numbers "
-                "alone. `D &lt; 0` is not the end of the story: lesson 7 defines a number "
-                "whose square is `-1`, lesson 9 returns to every equation this lesson "
-                "dismissed, and lesson 10 shows what a negative discriminant looks like "
-                "&mdash; a parabola that misses the x-axis entirely.",
+        "note": 'The discriminant classifies the solutions over the real numbers. `D &lt; 0` is not the end of the story: “Complex Numbers” defines a number whose square is `-1`, “Complex Roots of Quadratics” returns to every equation this lesson dismissed, and “Graphs of Quadratic Functions” shows what a negative discriminant looks like &mdash; a parabola that misses the x-axis entirely.',
     },
     # ---------------------------------------------------------------- 07
     {
@@ -1443,10 +1325,7 @@ LESSONS = [
         ),
         "concepts": [
             ("i is defined by exactly one property",
-             "`i² = -1`, and nothing else about it is assumed. Everything else &mdash; "
-             "how to add, multiply and divide with it &mdash; follows from that one "
-             "equation together with the ordinary laws of algebra, which is what lesson "
-             "8 works out."),
+             '`i² = -1`, and nothing else about it is assumed. Everything else &mdash; how to add, multiply and divide with it &mdash; follows from that one equation together with the ordinary laws of algebra, which is what “Operations with Complex Numbers” works out.'),
             ("A complex number has two real parts",
              "In `a + bi`, both `a` and `b` are real numbers. The imaginary part of "
              "`3 - 7i` is `-7`, not `-7i`: it is a real number by universal convention, "
@@ -1458,11 +1337,7 @@ LESSONS = [
         "read_title": "A number whose square is negative",
         "read_intro": "Why the extension is legitimate, what the objects are, and how to write a root of a negative number.",
         "body": [
-            ("p", "Lesson 6 ended with `D &lt; 0` and the answer \"no real solution\". "
-                  "The word carrying the weight in that phrase is <em>real</em>. "
-                  "`x² + 1 = 0` needs a number whose square is `-1`, and no point on the "
-                  "number line has one, because the square of a real number is `0` or "
-                  "positive."),
+            ("p", '“The Discriminant” ended with `D &lt; 0` and the answer "no real solution". The word carrying the weight in that phrase is <em>real</em>. `x² + 1 = 0` needs a number whose square is `-1`, and no point on the number line has one, because the square of a real number is `0` or positive.'),
             ("h3", "This has happened before"),
             ("p", "Each earlier number system was extended for the same reason: an "
                   "equation with no solution inside it."),
@@ -1511,26 +1386,15 @@ LESSONS = [
                 "denominator and therefore itself real &mdash; and `i` is not real. So "
                 "`d - b = 0`, that is `b = d`; and then `a - c = 0`, that is `a = c`.",
             ]),
-            ("p", "One equation between complex numbers is therefore two equations "
-                  "between real numbers. That is used constantly from here on, and it is "
-                  "why complex numbers behave like points in a plane: `a + bi` "
-                  "corresponds to the point `(a, b)`, with the real numbers lying along "
-                  "the horizontal axis and the pure imaginary ones up the vertical."),
-            ("p", "The plane picture also explains an absence. No ordering of the "
-                  "complex numbers is compatible with their arithmetic, so the words "
-                  "\"positive\", \"greater than\" and \"between\" are not available for "
-                  "them, and neither are the signs `&lt;` and `≤`. Points in a plane do "
-                  "not come in an order. From here on, those words are used only where "
-                  "the numbers involved are real."),
+            ("p", 'One equation between complex numbers is therefore two equations between real numbers. That equality rule is used throughout complex arithmetic, and it is why complex numbers behave like points in a plane: `a + bi` corresponds to the point `(a, b)`, with the real numbers lying along the horizontal axis and the pure imaginary ones up the vertical.'),
+            ("p", 'The plane picture also explains an absence. No ordering of the complex numbers is compatible with their arithmetic, so the words "positive", "greater than" and "between" are not available for them, and neither are the signs `&lt;` and `≤`. Points in a plane do not come in an order. Those words are used only where the numbers involved are real.'),
             ("h3", "Square roots of negative numbers"),
             ("def", ("The root of a negative number",
                      "For a positive real number `k`, `√(-k)` is defined to be `i√k`.",
                      "One line checks it: `(i√k)² = i²(√k)² = (-1)k = -k`. The other "
                      "square root of `-k` is `-i√k`, exactly as a positive number has "
                      "two real square roots and the symbol names one of them.",
-                     "Convert to `i` before doing anything else with the expression. The "
-                     "rule `√a · √b = √(ab)` is stated for non-negative `a` and `b` and "
-                     "does not survive down here, as lesson 8 shows in detail.")),
+                     'Convert to `i` before doing anything else with the expression. The rule `√a · √b = √(ab)` is stated for non-negative `a` and `b` and does not survive down here, as “Operations with Complex Numbers” shows in detail.')),
             ("math", [
                 "√(-9)  = 3i          since (3i)²  = 9i²   = -9",
                 "√(-25) = 5i          since (5i)²  = 25i²  = -25",
@@ -1541,10 +1405,7 @@ LESSONS = [
                          "something like `(-6 + √(-8))/2`. Convert the root first: "
                          "`√(-8) = 2i√2`. Then `(-6 + 2i√2)/2 = -3 + i√2`, which is "
                          "standard form with real part `-3` and imaginary part `√2`.",
-                         "Both terms of the numerator were divided by `2`, exactly as in "
-                         "lesson 5. Lesson 9 does this systematically; the point here is "
-                         "only that the result is an ordinary complex number, of the "
-                         "shape this lesson defined.")),
+                         'Both terms of the numerator were divided by `2`, exactly as in “The Quadratic Formula”. “Complex Roots of Quadratics” does this systematically; the point here is only that the result is an ordinary complex number, of the shape this lesson defined.')),
         ],
         "lab": ("complex", {
             "mode": "intro",
@@ -1563,9 +1424,7 @@ LESSONS = [
              "`bi`. A real number is `a + 0i` and a pure imaginary is `0 + bi`; both are "
              "in standard form once written that way."),
             ("Divide through if there is a denominator",
-             "`(-6 + 2i√2)/2` is `-3 + i√2`. Every term of the numerator gets divided, "
-             "which is the same reduction lesson 5 needed and the same place it goes "
-             "wrong."),
+             '`(-6 + 2i√2)/2` is `-3 + i√2`. Every term of the numerator gets divided, which is the same reduction “The Quadratic Formula” needed and the same place it goes wrong.'),
         ],
         "worked": {
             "title": "Five numbers, put into standard form",
@@ -1588,11 +1447,7 @@ LESSONS = [
                 "Line 2 is the one worth pausing on. `7` is a complex number, with "
                 "imaginary part `0`. Nothing about it changed in this lesson; the "
                 "definition was written so as to include it.",
-                "Line 5 is the square root property of lesson 3, applied where it "
-                "previously reported nothing. `x² = -49` has two solutions among the "
-                "complex numbers, and they are negatives of one another, exactly as "
-                "`x² = 49` had two real ones. Lesson 9 shows that the pairing is not a "
-                "coincidence.",
+                'Line 5 is the square root property of “The Square Root Property”, applied where it previously reported nothing. `x² = -49` has two solutions among the complex numbers, and they are negatives of one another, exactly as `x² = 49` had two real ones. “Complex Roots of Quadratics” shows that the pairing is not a coincidence.',
                 "For a faded standard-form pass, simplify `(8 + √(-32))/4`. The "
                 "supplied first move is `√(-32) = i√32`; simplify that radical and "
                 "divide both numerator terms. You should reach `2 + √2 i`, with real "
@@ -1647,10 +1502,6 @@ LESSONS = [
                      "numbers. You should also be able to say what `i` is defined by "
                      "&mdash; one equation, `i² = -1` &mdash; and resist the idea that "
                      "anything further about it has been assumed."),
-        "note": "This lesson defines the objects. Lesson 8 gives them arithmetic, and "
-                "lesson 9 sends them back to the quadratics lesson 6 had to set aside. "
-                "The pattern worth keeping in view is the one all four extensions share: "
-                "the system grows exactly enough to solve the equation that defeated it, "
-                "and nothing that was true beforehand stops being true.",
+        "note": 'This lesson defines the objects. “Operations with Complex Numbers” gives them arithmetic, and “Complex Roots of Quadratics” sends them back to the quadratics “The Discriminant” had to set aside. The pattern worth keeping in view is the one all four extensions share: the system grows exactly enough to solve the equation that defeated it, and nothing that was true beforehand stops being true.',
     },
 ]

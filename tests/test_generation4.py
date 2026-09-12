@@ -94,7 +94,7 @@ class TestMutationLifecycle(unittest.TestCase):
             hook = root / 'failure.cjs'
             hook.write_text("const fs=require('node:fs'),path=require('node:path');const mkdir=fs.mkdirSync;fs.mkdirSync=function(p,...args){if(path.basename(String(p))==='target-preflight')throw Error('INJECTED after disposable copy');return mkdir.call(this,p,...args)};")
             out = root / 'evidence'
-            run = subprocess.run(['node', str(ui.ROOT / 'tests/mutate_browser_ui.js')], env=dict(os.environ, BROWSER_EVIDENCE=str(out), NODE_OPTIONS='--require=' + str(hook)), capture_output=True, text=True)
+            run = subprocess.run(['node', str(ui.ROOT / 'tests/mutate_browser_ui.js')], env=dict(os.environ, TMPDIR='/tmp', SOURCE_ROOT=str(ui.ROOT), BROWSER_EVIDENCE=str(out), NODE_OPTIONS='--require=' + str(hook)), capture_output=True, text=True)
             # Persist diagnostic logs outside the owned export, even on RED.
             if os.environ.get('GEN4_EVIDENCE'):
                 (evidence / 'lifecycle-injected-output.log').write_text(run.stdout + run.stderr)

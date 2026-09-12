@@ -157,7 +157,7 @@ def quadratic_lab(cfg):
       var im = Rsurd(Rneg(rhs));
       return { ok: true, text: SHOW_COMPLEX
         ? 'x^2 = ' + Rtext(rhs) + ', so x = +-' + surdtext(im) + 'i'
-        : 'x^2 = ' + Rtext(rhs) + ', and no real number squares to a negative; complex roots begin in lesson 7' };
+        : 'x^2 = ' + Rtext(rhs) + ', and no real number squares to a negative; complex roots are introduced in Complex Numbers' };
     }
     var s = Rsurd(rhs);
     return { ok: true, text: 'x^2 = ' + Rtext(rhs) + ', so x = +-' + surdtext(s) };
@@ -194,7 +194,7 @@ def quadratic_lab(cfg):
       } else {
         answer = 'no real solution';
         lines.push(row('read the negative right-hand side',
-                       'no real number has square ' + Rtext(rhs) + '; complex roots begin in lesson 7'));
+                       'no real number has square ' + Rtext(rhs) + '; complex roots are introduced in Complex Numbers'));
       }
     } else {
       var s = Rsurd(rhs);
@@ -215,7 +215,7 @@ def quadratic_lab(cfg):
     if (r.kind === 'complex') {
       lines.push(row('negative, so no real root', SHOW_COMPLEX
         ? 'x = ' + pmtext(r.p, r.s, true)
-        : 'stop here; complex roots begin in lesson 7'));
+        : 'stop here; complex roots are introduced in Complex Numbers'));
     } else if (r.kind === 'double') {
       lines.push(row('zero, so one repeated root', 'x = ' + Rtext(r.p)));
     } else {
@@ -333,7 +333,7 @@ def quadratic_lab(cfg):
       row('square root property', sqp.ok ? sqp.text : '<span class="tone-muted">' + sqp.text + '</span>'),
       row('completing the square', comp.answer),
       row('the formula', r.kind === 'complex' ? (SHOW_COMPLEX
-          ? 'x = ' + pmtext(r.p, r.s, true) : 'no real solution; complex roots begin in lesson 7')
+          ? 'x = ' + pmtext(r.p, r.s, true) : 'no real solution; complex roots are introduced in Complex Numbers')
           : (r.kind === 'double' ? 'x = ' + Rtext(r.p) : 'x = ' + pmtext(r.p, r.s))),
     ]));
 
@@ -365,7 +365,7 @@ def quadratic_lab(cfg):
         + 'The parabola above never meets the x-axis. ' + (SHOW_COMPLEX
           ? 'The two solutions are the conjugate pair x = ' + pmtext(r.p, r.s, true)
             + '. Those are not "no solutions" &mdash; they are two solutions that are not real numbers.'
-          : 'There is no real solution; lesson 7 introduces the number system needed to continue.');
+          : 'There is no real solution; Complex Numbers introduces the number system needed to continue.');
     } else if (r.kind === 'double') {
       msg = '<strong>The discriminant is exactly 0.</strong> The formula gives one value, '
         + 'x = ' + Rtext(r.p) + ', and the parabola touches the axis there without crossing. '

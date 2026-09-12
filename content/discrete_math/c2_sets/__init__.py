@@ -49,7 +49,7 @@ COURSE = {
     ],
     "syllabus_intro": (
         (
-        'Lessons 1 to 5 concern sets, 6 to 9 relations, 10 to 12 functions, and 13 and 14 the counting consequences that Combinatorics and Counting builds on.'
+        'Sets, relations, functions, and the counting consequences that Combinatorics and Counting builds on.'
     )
     ),
     "how_to": [
@@ -62,9 +62,7 @@ COURSE = {
         "preset and use as few elements as the claim needs &mdash; but the elements "
         "you leave untouched still count, so reflexivity fails until every one of "
         "them has its loop.",
-        "Pay attention to lesson 13. Countability is where intuition about size stops "
-        "working, and every argument after it depends on accepting bijection as the "
-        "definition of \"same size\".",
+        'Pay attention to the “Cardinality and Countability” Lesson. Countability is where intuition about size stops working, and arguments comparing infinite cardinalities depend on accepting bijection as the definition of "same size".',
     ],
     "not_covered": [
         "Axiomatic set theory. Sets here are naive: collections of objects. The "
@@ -73,8 +71,7 @@ COURSE = {
         "Russell's paradox is mentioned where it explains a restriction, but the "
         "resolution &mdash; separating sets from classes &mdash; is not developed.",
         (
-            "Ordinals, transfinite induction, and the continuum hypothesis. Lesson 13 stops "
-            "at the two cardinalities these courses use."
+            'Ordinals, transfinite induction, and the continuum hypothesis. The “Cardinality and Countability” Lesson stops at the two cardinalities these courses use.'
         ),
     ],
     "footer_lead": (

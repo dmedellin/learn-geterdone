@@ -1238,6 +1238,7 @@ textarea { font: inherit; }
       font-size: 0.9rem;
       resize: vertical;
     }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
     .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
     .fb-actions {
       display: flex;
@@ -1396,6 +1397,27 @@ textarea { font: inherit; }
       .signin-btn { padding: 0; width: 38px; justify-content: center; }
     }
 
+    /* Trading charts use a 960-unit plotting frame. Keep that authored scale
+       instead of shrinking 11-unit axis text to roughly 3 CSS pixels on a
+       phone. The named keyboard scroll owner exposes the complete chart. */
+    @media screen {
+      .market-chart-scroll {
+        contain: inline-size;
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        overscroll-behavior-inline: contain;
+      }
+      .market-chart-scroll > svg.market-chart {
+        display: block;
+        width: 100%;
+        min-width: 960px;
+      }
+    }
+
     body[data-page-kind] {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 16px;
@@ -1429,6 +1451,7 @@ textarea { font: inherit; }
     [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
     [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
     [data-ui="hero"] .eyebrow { display: block; color: var(--muted); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
     [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
     [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
     [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
@@ -1473,7 +1496,7 @@ textarea { font: inherit; }
     }
     [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
     [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
-    [data-ui="lesson-list"] .lesson-link { min-height: 44px; }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
     body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
     body[data-page-kind] .is-done .lesson-state { color: var(--green); }
     [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
@@ -1593,7 +1616,7 @@ textarea { font: inherit; }
 
     <section class="section">
       <div class="section-head"><div><h2>Core concepts</h2></div><p>Use these concepts as explicit rules rather than changing them after seeing the outcome.</p></div>
-      <div class="grid-3"><article class="card concept-card"><div class="icon">S</div><h3>Structural objectives</h3><p>Use prior highs, lows, range edges, and other opposing levels as target references.</p></article><article class="card concept-card"><div class="icon">R</div><h3>R-multiple measurement</h3><p>One R is the distance from entry to the initial stop — the unit Market Structure introduced and lesson 10 builds on. Measure reward in it without allowing the desired ratio to invent a target.</p></article><article class="card concept-card"><div class="icon">M</div><h3>Management method</h3><p>Decide in advance whether to exit once, scale out, or trail a remainder.</p></article></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">S</div><h3>Structural objectives</h3><p>Use prior highs, lows, range edges, and other opposing levels as target references.</p></article><article class="card concept-card"><div class="icon">R</div><h3>R-multiple measurement</h3><p>One R is the distance from entry to the initial stop — the unit Market Structure explains and Risk-to-Reward uses. Measure reward in it without allowing the desired ratio to invent a target.</p></article><article class="card concept-card"><div class="icon">M</div><h3>Management method</h3><p>Decide in advance whether to exit once, scale out, or trail a remainder.</p></article></div>
     </section>
 
     <section class="section" id="lab">
@@ -1602,7 +1625,7 @@ textarea { font: inherit; }
 <div class="lab-layout">
   <article class="card chart-card">
     <div class="chart-toolbar"><div class="chart-title"><strong id="targetTitle">Long trend continuation</strong><span>The sliders start on invented 2R and 3R prices — move them to the structure</span></div><div class="tab-row" id="targetTabs"><button class="tab active" data-scenario="longTrend" type="button">Long trend</button><button class="tab" data-scenario="shortBreak" type="button">Short breakdown</button><button class="tab" data-scenario="rangeLong" type="button">Range long</button></div></div>
-    <div class="chart-wrap"><svg id="targetChart" class="market-chart" aria-label="Profit target placement chart"></svg><div class="chart-tooltip"></div></div>
+    <div class="chart-wrap market-chart-scroll" tabindex="0" role="region" aria-label="Interactive chart; scroll horizontally for complete chart labels"><svg id="targetChart" class="market-chart" aria-label="Profit target placement chart"></svg><div class="chart-tooltip"></div></div>
     <div class="reading-strip" id="targetReading" aria-live="polite"></div>
     <div class="control-strip"><div class="control-group grow"><label for="targetOne">Target 1</label><input id="targetOne" type="range" step="0.1" /><span class="range-value" id="targetOneValue">—</span></div><div class="control-group grow"><label for="targetTwo">Target 2</label><input id="targetTwo" type="range" step="0.1" /><span class="range-value" id="targetTwoValue">—</span></div></div>
   </article>
@@ -2240,7 +2263,7 @@ function resetTargets(){const s=targetScenarios[targetKey],risk=Math.abs(s.entry
 function renderTargets(){const s=targetScenarios[targetKey];const levels=[{value:s.entry,label:"Entry",tone:"cyan"},{value:s.stop,label:"Stop",tone:"red"},{value:s.levels[0],label:"First structural objective",tone:"amber"},{value:s.levels[1],label:"Extended objective",tone:"purple"},{value:target1,label:"Your Target 1",tone:"green"},{value:target2,label:"Your Target 2",tone:"blue"}];drawCandles(document.getElementById("targetChart"),candlesFromCloses(s.closes,{},90+Object.keys(targetScenarios).indexOf(targetKey)),{levels,includeValues:levels.map(l=>l.value),overlay:({svg,y,plot})=>{const entryY=y(s.entry),stopY=y(s.stop),t1Y=y(target1);svg.appendChild(svgNode("rect",{x:plot.left,y:Math.min(entryY,stopY),width:plot.width,height:Math.abs(entryY-stopY),class:"risk-zone"}));svg.appendChild(svgNode("rect",{x:plot.left,y:Math.min(entryY,t1Y),width:plot.width,height:Math.abs(entryY-t1Y),class:"reward-zone"}));}});setText("targetTitle",s.title);renderReading("targetReading",targetReadings[targetKey]);setText("targetOneValue",target1.toFixed(2));setText("targetTwoValue",target2.toFixed(2));const r1=targetR(s,target1),r2=targetR(s,target2);setText("targetR1",`${r1.toFixed(2)}R`);setText("targetR2",`${r2.toFixed(2)}R`);setText("targetObstacle",s.levels[0].toFixed(2));const pct1=clamp(num(document.getElementById("targetScalePct").value,50),0,100)/100;const blended=targetMethod==="single"?r1:pct1*r1+(1-pct1)*r2;document.getElementById("targetBlended").value=`${blended.toFixed(2)}R`;}
 bindSegment("targetMethod",value=>{targetMethod=value;document.getElementById("targetScalePct").disabled=value==="single";renderTargets();});document.getElementById("targetOne").addEventListener("input",e=>{target1=num(e.target.value);renderTargets();});document.getElementById("targetTwo").addEventListener("input",e=>{target2=num(e.target.value);renderTargets();});document.getElementById("targetScalePct").addEventListener("input",renderTargets);document.getElementById("targetTabs").addEventListener("click",event=>{const b=event.target.closest("[data-scenario]");if(!b)return;document.querySelectorAll("#targetTabs .tab").forEach(x=>x.classList.toggle("active",x===b));targetKey=b.dataset.scenario;resetTargets();});document.getElementById("evaluateTargets").addEventListener("click",()=>{const s=targetScenarios[targetKey],r1=targetR(s,target1),r2=targetR(s,target2);const directionOk=s.direction==="long"?target1>s.entry&&target2>=target1:target1<s.entry&&target2<=target1;const nearFirst=Math.abs(target1-s.levels[0])<=Math.abs(s.entry-s.stop)*.45;const extendedOk=targetMethod==="single"||Math.abs(target2-s.levels[1])<=Math.abs(s.entry-s.stop)*.75;const pass=directionOk&&nearFirst&&extendedOk&&r1>0;const st=document.getElementById("targetStatus");st.className=`status-banner ${pass?"good":directionOk?"warn":"bad"}`;st.innerHTML=pass?`<strong>Structurally grounded targets.</strong> Target 1 respects the first obstacle, and the extended plan matches the selected method.`:`<strong>Recheck target placement.</strong> The first obstacle is ${s.levels[0].toFixed(2)}, which is ${targetR(s,s.levels[0]).toFixed(2)}R from this entry and stop; a first target beyond it is a number chosen for its ratio, and one well short of it leaves reward on the table. ${targetMethod!=="single"?`The extended objective is near ${s.levels[1].toFixed(2)} (${targetR(s,s.levels[1]).toFixed(2)}R).`:""} Your Target 1 is ${r1.toFixed(2)}R and Target 2 is ${r2.toFixed(2)}R.`;});
 setupQuiz({promptId:"targetQuizPrompt",choicesId:"targetQuizChoices",feedbackId:"targetQuizFeedback",scoreId:"targetQuizScore",nextId:"targetQuizNext",questions:[
- {prompt:"A long trade has major resistance at 1.4R and no clear structure until 3R. What is the first target consideration?",choices:[{value:"res",label:"The 1.4R resistance"},{value:"force",label:"Force a 3R target",why:"Price has to get through the 1.4R level to reach 3R, and that level has already stopped an advance. A 3R target drawn past it is a ratio, not a place where anything has happened."},{value:"ignore",label:"Ignore all levels",why:"The levels are the only evidence on the chart about where price has been stopped before. A plan that ignores them is a plan with no structural target at all."},{value:"stop",label:"Move the stop to create 3R",why:"Tightening the stop to make the ratio moves invalidation inside the structure — lesson 08’s first mistake. The market does not owe a ratio, and the stop is not a dial for producing one."}],answer:"res",explanation:"The first meaningful opposing level affects available reward and should be included in the plan."},
+ {prompt:"A long trade has major resistance at 1.4R and no clear structure until 3R. What is the first target consideration?",choices:[{value:"res",label:"The 1.4R resistance"},{value:"force",label:"Force a 3R target",why:"Price has to get through the 1.4R level to reach 3R, and that level has already stopped an advance. A 3R target drawn past it is a ratio, not a place where anything has happened."},{value:"ignore",label:"Ignore all levels",why:"The levels are the only evidence on the chart about where price has been stopped before. A plan that ignores them is a plan with no structural target at all."},{value:"stop",label:"Move the stop to create 3R",why:"Tightening the stop to make the ratio moves invalidation inside the structure — the invalidation mistake in Stop-Loss Placement. The market does not owe a ratio, and the stop is not a dial for producing one."}],answer:"res",explanation:"The first meaningful opposing level affects available reward and should be included in the plan."},
  {prompt:"When is scaling out most defensible?",choices:[{value:"levels",label:"When multiple structural objectives exist"},{value:"fear",label:"Whenever a candle turns red",why:"A red candle is a feeling, not a level. Taking profit from fear is the third mistake this lesson names, and it makes the average win unmeasurable because no two exits follow the same rule."},{value:"random",label:"At random percentages",why:"Random percentages cannot be tested or repeated. Scaling is defensible only when the percentage and the level it fires at were written before the trade."},{value:"always",label:"It is always superior",why:"Scaling out gives up part of the position before the extended objective, so on a strongly trending trade it lowers the average win. It trades reward for lower variance — a choice, not a free improvement."}],answer:"levels",explanation:"Scaling should connect to predefined objectives and a tested management rule."},
  {prompt:"What is a cost of trailing a remainder?",choices:[{value:"giveback",label:"Some open profit is usually given back"},{value:"zero",label:"There is no cost",why:"A trailing stop is only hit after price has turned against the position, so the exit is always below the best price seen. That gap is the cost, paid on every trailed trade."},{value:"certainty",label:"It guarantees the maximum price",why:"It guarantees the opposite: the exit comes after the maximum, once price has pulled back to the trail. Participation in extended moves is bought with that give-back."},{value:"risk",label:"It removes all initial risk immediately",why:"A trail 1R behind price at entry is still the original stop. Risk falls only as price advances and the stop follows it — which is a milestone rule, not an immediate one."}],answer:"giveback",explanation:"A trailing method participates in extended moves by tolerating pullbacks before exit."},
  {prompt:"A target exists only because it creates exactly 2R, with resistance at 1.2R. What is wrong?",choices:[{value:"structure",label:"The target ignores visible structure"},{value:"math",label:"R multiples are mathematically invalid",why:"The arithmetic is fine — 2R is a correct measurement of the distance. What is wrong is that the distance was chosen first and the level at 1.2R was ignored to get it."},{value:"entry",label:"Every entry must target 2R",why:"That is the assumption that produced the mistake. There is no required ratio; there is a level at 1.2R that has already stopped price, and the plan pretends it is not there."},{value:"nothing",label:"Nothing",why:"Move the first target past the first obstacle on the lab and read the verdict. A target that exists only to make a number is the first mistake this lesson names."}],answer:"structure",explanation:"R is a measurement. The market does not owe a target simply because the calculation produces a preferred number."}

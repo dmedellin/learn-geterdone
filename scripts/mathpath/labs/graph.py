@@ -743,7 +743,7 @@ def graph_lab(cfg):
       status.innerHTML = r.chosen.length === N - 1
         ? 'Kruskal takes edges in increasing weight and skips any that would close a cycle. Total weight '
           + '<strong>' + r.total + '</strong>. The greedy choice is provably optimal here — which is unusual, '
-          + 'and course 8 explains what makes this problem yield to greed when most do not.'
+          + 'and “Greedy Algorithms” in Algorithms and Complexity explains what makes this problem yield to greed when most do not.'
         : 'The graph is disconnected, so Kruskal produces a minimum spanning FOREST: '
           + r.chosen.length + ' edges, weight ' + r.total + '. No set of edges can span a disconnected graph.';
     },

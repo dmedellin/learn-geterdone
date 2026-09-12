@@ -249,7 +249,7 @@ def algorithm_lab(cfg):
         <div class="lab-title"><strong id="alTitle">Algorithms and growth</strong><span id="alSub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>measured</span><span class="tone-purple"><i class="legend-swatch"></i>predicted</span><span class="tone-amber"><i class="legend-swatch"></i>crossover</span></div>
       </div>
-      <div class="lab-stage"><svg id="alPlot" viewBox="0 0 520 230" role="img" aria-label="Operation counts plotted against input size."></svg></div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Operation counts plot, scroll horizontally for the complete chart"><svg id="alPlot" style="min-width:520px" viewBox="0 0 520 230" role="img" aria-label="Operation counts plotted against input size."></svg></div>
       <div class="table-wrap" style="margin-top:12px;"><table class="tt" id="alTable"></table></div>
       <div class="status-banner" id="alStatus" style="margin-top:12px;"></div>"""
     controls = """        <div class="field">
@@ -391,12 +391,24 @@ def algorithm_lab(cfg):
     series.forEach(function (ser) {
       var d = ser.values.map(function (v, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(v).toFixed(1); }).join(' ');
       s += '<path d="' + d + '" fill="none" stroke="' + ser.colour + '" stroke-width="2.4" opacity="0.9" />';
-      s += '<text x="' + (x(ser.values.length - 1) - 6) + '" y="' + Math.max(14, y(ser.values[ser.values.length - 1]) - 6)
-        + '" text-anchor="end" font-size="11" font-weight="700" fill="' + ser.colour + '">' + ser.label + '</text>';
     });
-    s += '<text x="26" y="216" font-size="10" fill="var(--muted)">n = ' + xs[0] + '</text>';
-    s += '<text x="500" y="216" text-anchor="end" font-size="10" fill="var(--muted)">n = ' + xs[xs.length - 1] + '</text>';
-    if (logScale) s += '<text x="30" y="24" font-size="10" fill="var(--muted)">log scale</text>';
+    // Finish every curve before placing readable endpoint labels. Keep the
+    // authored color association and halo, with bounded separation at ties.
+    var labels = series.map(function (ser, i) {
+      return {series: ser, order: i, baseline: Math.max(20, Math.min(188, y(ser.values[ser.values.length - 1]) - 6))};
+    }).sort(function (a, b) { return a.baseline - b.baseline || a.order - b.order; });
+    labels.forEach(function (label, i) { if (i) label.baseline = Math.max(label.baseline, labels[i - 1].baseline + 18); });
+    for (var i = labels.length - 1; i >= 0; i -= 1) {
+      labels[i].baseline = Math.min(labels[i].baseline, i === labels.length - 1 ? 188 : labels[i + 1].baseline - 18);
+    }
+    labels.forEach(function (label) {
+      var ser = label.series;
+      s += '<text x="' + (x(ser.values.length - 1) - 6) + '" y="' + label.baseline
+        + '" text-anchor="end" font-size="12" font-weight="700" fill="' + ser.colour + '">' + ser.label + '</text>';
+    });
+    s += '<text x="26" y="216" font-size="12" fill="var(--muted)">n = ' + xs[0] + '</text>';
+    s += '<text x="500" y="216" text-anchor="end" font-size="12" fill="var(--muted)">n = ' + xs[xs.length - 1] + '</text>';
+    if (logScale) s += '<text x="30" y="24" font-size="12" fill="var(--muted)">log scale</text>';
     plot.innerHTML = s;
   }
 
@@ -507,8 +519,8 @@ def algorithm_lab(cfg):
         + 'At exit m = 0, so result · base⁰ = result, and the invariant reads result = ' + x + sup(n) + ' = ' + big(t.value)
         + ': the correctness argument in one line. The loop did ' + t.squarings + ' squarings and ' + t.mults
         + ' multiplications, one for each 1 in n = ' + t.binary + '₂, against n − 1 = ' + t.naive
-        + ' for repeated multiplication — lesson 1\'s comparison, measured. The final squaring is wasted (m is 0 by then), '
-        + 'which is why course 6 lesson 8 counts bits − 1. What the lab cannot do is prove the invariant for the n it did not '
+        + ' for repeated multiplication — the comparison in “Algorithms and Pseudocode”, measured. The final squaring is wasted (m is 0 by then), '
+        + 'which is why “Modular Exponentiation” counts bits − 1. What the lab cannot do is prove the invariant for the n it did not '
         + 'run; the proof is the worked example.';
     },
     loops: function () {
@@ -541,7 +553,7 @@ def algorithm_lab(cfg):
         + 'Σ (n − i + 1) reindexed to Σ m; C ran ' + last.C + ' = n · ⌊log₂ n⌋, because halving reaches 1 in ⌊log₂ n⌋ steps; '
         + 'D — the standard\'s triple triangular nest, Σ_i Σ_j j — ran ' + fmt(last.D) + ' = n(n+1)(n+2)/6, one sixth of n³ '
         + 'to leading order. ' + (exact ? '<strong>Every measured column equals its formula exactly</strong>, because none of '
-        + 'these loops looks at data; the formulas are course 3 lesson 3\'s sums.' : 'A measured column disagrees with its formula.')
+        + 'these loops looks at data; the formulas are the sums in “Induction with Sums and Products”.' : 'A measured column disagrees with its formula.')
         + ' Multiplying B\'s bounds instead of summing would give n² = ' + fmt(N * N) + ', about twice the truth — the first mistake.';
     },
     search: function () {
@@ -696,7 +708,7 @@ def algorithm_lab(cfg):
       var detail;
       if (policy === 'double') {
         var pow2 = (n & (n - 1)) === 0;
-        detail = 'The copies are 1 + 2 + 4 + ⋯, a geometric series (course 3 lesson 3) that stays under 2n, so the total stays under 3n '
+        detail = 'The copies are 1 + 2 + 4 + ⋯, a geometric series (see “Induction with Sums and Products”) that stays under 2n, so the total stays under 3n '
           + 'whatever n is. ' + (pow2
             ? 'This n is a power of two, so the last doubling happened at insert ' + (n / 2 + 1) + ' and the copies are n − 1 = ' + r.copies
               + ': the total is just under 2n. Set n = ' + (n + 1) + ' to see the next doubling push it above 2n and still below 3n — '

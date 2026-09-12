@@ -66,9 +66,7 @@ COURSE = {
          "line or a restricted square."),
     ],
     "syllabus_intro": (
-        "Lessons 1 to 7 are lines and the half-planes they bound. Lesson 8 defines a "
-        "function; lessons 9 to 14 develop its notation, domain and range, piecewise "
-        "rules, graph transformations, composition and inverse."
+        'Lines and the half-planes they bound connect equations and inequalities with pictures. The definition of a function supports its notation, domain and range, piecewise rules, graph transformations, composition and inverse.'
     ),
     "how_to": [
         "After each complete example, cover its answer and finish the faded rehearsal. "

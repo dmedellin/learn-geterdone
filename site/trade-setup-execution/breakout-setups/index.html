@@ -1247,6 +1247,7 @@ textarea { font: inherit; }
       font-size: 0.9rem;
       resize: vertical;
     }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
     .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
     .fb-actions {
       display: flex;
@@ -1405,6 +1406,27 @@ textarea { font: inherit; }
       .signin-btn { padding: 0; width: 38px; justify-content: center; }
     }
 
+    /* Trading charts use a 960-unit plotting frame. Keep that authored scale
+       instead of shrinking 11-unit axis text to roughly 3 CSS pixels on a
+       phone. The named keyboard scroll owner exposes the complete chart. */
+    @media screen {
+      .market-chart-scroll {
+        contain: inline-size;
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        overscroll-behavior-inline: contain;
+      }
+      .market-chart-scroll > svg.market-chart {
+        display: block;
+        width: 100%;
+        min-width: 960px;
+      }
+    }
+
     body[data-page-kind] {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 16px;
@@ -1438,6 +1460,7 @@ textarea { font: inherit; }
     [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
     [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
     [data-ui="hero"] .eyebrow { display: block; color: var(--muted); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
     [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
     [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
     [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
@@ -1482,7 +1505,7 @@ textarea { font: inherit; }
     }
     [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
     [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
-    [data-ui="lesson-list"] .lesson-link { min-height: 44px; }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
     body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
     body[data-page-kind] .is-done .lesson-state { color: var(--green); }
     [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
@@ -1611,7 +1634,7 @@ textarea { font: inherit; }
 <div class="lab-layout">
   <article class="card chart-card">
     <div class="chart-toolbar"><div class="chart-title"><strong id="breakoutTitle">Confirmed breakout</strong><span>Advance candle by candle; decide using only visible information</span></div><div class="tab-row" id="breakoutTabs"><button class="tab active" data-scenario="confirmed" type="button">Confirmed</button><button class="tab" data-scenario="retest" type="button">Breakout + retest</button><button class="tab" data-scenario="failed" type="button">Failed breakout</button><button class="tab" data-scenario="crowded" type="button">Limited room</button></div></div>
-    <div class="chart-wrap"><svg id="breakoutChart" class="market-chart" aria-label="Breakout setup replay chart"></svg><div class="chart-tooltip"></div></div>
+    <div class="chart-wrap market-chart-scroll" tabindex="0" role="region" aria-label="Interactive chart; scroll horizontally for complete chart labels"><svg id="breakoutChart" class="market-chart" aria-label="Breakout setup replay chart"></svg><div class="chart-tooltip"></div></div>
     <div class="reading-strip" id="breakoutReadingBlock" aria-live="polite"></div>
     <div class="control-strip"><button class="btn small" id="breakoutReset" type="button">Reset</button><button class="btn small primary" id="breakoutNext" type="button">Next candle</button><button class="btn small" id="breakoutPlay" type="button">Play</button><div class="control-group grow"><label for="breakoutStep">Visible candles</label><input id="breakoutStep" type="range" min="6" max="20" value="8" step="1" /><span class="range-value" id="breakoutStepValue">8 / 20</span></div></div>
   </article>
@@ -2271,7 +2294,7 @@ document.getElementById("evaluateBreakout").addEventListener("click",()=>{const 
 setupQuiz({promptId:"breakoutQuizPrompt",choicesId:"breakoutQuizChoices",feedbackId:"breakoutQuizFeedback",scoreId:"breakoutQuizScore",nextId:"breakoutQuizNext",questions:[
  {prompt:"Price closes above a range high, then the next two candles remain above it.",choices:[{value:"confirmed",label:"Breakout with acceptance"},{value:"failed",label:"Failed breakout",why:"A failed breakout closes back inside. These candles closed above and stayed above — nothing failed."},{value:"rejection",label:"Resistance rejection",why:"Rejection is a close back under the level. Price closed above it and two more candles held there, so the level did not reject anything."},{value:"none",label:"No structural event",why:"A close beyond a range high that had capped every prior advance is the structural event this lesson is about. Two further closes outside make it acceptance rather than a probe."}],answer:"confirmed",explanation:"Closes beyond the boundary followed by continued trading outside are evidence of acceptance."},
  {prompt:"Price wicks above the range high and closes back inside on the same candle.",choices:[{value:"confirmed",label:"Confirmed breakout",why:"Confirmation needs a close outside. The candle traded above and closed back inside on the same bar — the one thing a confirmed break cannot do."},{value:"failed",label:"Possible failed breakout / sweep"},{value:"retest",label:"Successful retest",why:"A retest happens after a break, from the other side of the level. Here there was no break to retest: the close never left the range."},{value:"target",label:"Target reached",why:"The range high is the boundary, not the objective. Nothing about a wick through it and a close back inside says a target was hit."}],answer:"failed",explanation:"The market tested beyond the boundary but did not accept above it."},
- {prompt:"A breakout is valid, but the next weekly resistance is only 0.4R away.",choices:[{value:"enter",label:"Enter because the breakout is valid",why:"Valid and worth taking are different questions. With resistance 0.4R away the plan risks 1R to make 0.4R before that level has to give way — the limited-room tab in the lab."},{value:"skip",label:"Skip or redesign because room is poor"},{value:"widen",label:"Widen the target through resistance",why:"Drawing the target past a level that has already stopped price does not move the level. It turns a structural target into a ratio, which is the mistake lesson 09 names."},{value:"size",label:"Increase size",why:"Size comes from the stop distance and the risk budget; it has nothing to do with room. A bigger position in a trade with 0.4R of room is a bigger version of the same poor trade."}],answer:"skip",explanation:"Setup validity and trade quality are separate. A valid break can still offer poor reward relative to risk."},
+ {prompt:"A breakout is valid, but the next weekly resistance is only 0.4R away.",choices:[{value:"enter",label:"Enter because the breakout is valid",why:"Valid and worth taking are different questions. With resistance 0.4R away the plan risks 1R to make 0.4R before that level has to give way — the limited-room tab in the lab."},{value:"skip",label:"Skip or redesign because room is poor"},{value:"widen",label:"Widen the target through resistance",why:"Drawing the target past a level that has already stopped price does not move the level. It turns a structural target into a ratio, which is the mistake Profit Targets names."},{value:"size",label:"Increase size",why:"Size comes from the stop distance and the risk budget; it has nothing to do with room. A bigger position in a trade with 0.4R of room is a bigger version of the same poor trade."}],answer:"skip",explanation:"Setup validity and trade quality are separate. A valid break can still offer poor reward relative to risk."},
  {prompt:"What is the primary invalidation for a breakout-and-retest entry?",choices:[{value:"inside",label:"Loss of the reclaimed boundary / retest structure"},{value:"time",label:"One red candle",why:"A red candle that holds above the boundary is what a retest looks like. The thesis is that the boundary now holds; it is disproved by a close back through it, not by colour."},{value:"money",label:"A fixed dollar loss unrelated to structure",why:"A dollar figure can sit inside normal variation above the boundary and stop the trade while the thesis is still intact. Invalidation is a price the chart can disprove; size is what fits the dollars to it."},{value:"news",label:"Any negative headline",why:"A headline is not a structural event. If it moves price back inside the range the boundary is lost and the trade is invalid for that reason; if it does not, nothing in the plan has changed."}],answer:"inside",explanation:"The entry thesis depends on the broken boundary holding after acceptance or retest."}
 ]});
 renderBreakout();

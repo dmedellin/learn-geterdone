@@ -28,6 +28,7 @@ in the inventory precisely because a course home links to it.
 """
 
 import pathlib
+import json
 import re
 import sys
 from html import unescape
@@ -35,6 +36,7 @@ from html.parser import HTMLParser
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from mathpath import capstone, chrome, feedback, progress
+import canvas_markup
 from mathpath.theme import UI_CSS  # noqa: E402
 
 SITE = pathlib.Path(__file__).resolve().parent.parent / "site"
@@ -152,6 +154,27 @@ CSS = feedback.CSS + """
     @media (max-width: 560px) {
       .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
       .signin-btn { padding: 0; width: 38px; justify-content: center; }
+    }
+
+    /* Trading charts use a 960-unit plotting frame. Keep that authored scale
+       instead of shrinking 11-unit axis text to roughly 3 CSS pixels on a
+       phone. The named keyboard scroll owner exposes the complete chart. */
+    @media screen {
+      .market-chart-scroll {
+        contain: inline-size;
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        overscroll-behavior-inline: contain;
+      }
+      .market-chart-scroll > svg.market-chart {
+        display: block;
+        width: 100%;
+        min-width: 960px;
+      }
     }
 """
 
@@ -433,6 +456,7 @@ def normalize_capstone_ui(text, relative):
     Only shared chrome is regenerated on subsequent normalization passes.
     """
     text = capstone.normalize_palette(text)
+    text = capstone.normalize_deck_accessibility(text)
     # Refresh aliases after the authoritative palette has been materialized;
     # the first migration and every later pass must produce identical bytes.
     text = ensure_css(text)
@@ -592,9 +616,9 @@ TRADING_OVERVIEWS = {
     "market-structure": ("Read price structure, ranges, liquidity, multi-timeframe context, entry models, invalidation, participation, and options contract selection.", "No trading background is assumed. The lessons introduce chart terminology."),
     "trade-setup-execution": ("Define trade setups, plan entries and exits, size positions, manage trades, and use records to review decisions.", "Price structure, support and resistance, pullbacks, and invalidation levels."),
     "options-trading": ("Read option contracts and chains, calculate expiration payoffs, interpret volatility and the Greeks, and evaluate options strategies.", "Trade planning, position sizing, and basic risk and reward calculations."),
-    "technical-indicators": ("Calculate and interpret trend, momentum, volatility, and volume indicators, and evaluate indicator rules.", "Price charts, trend and range structure, and trade planning."),
+    "technical-indicators": ("Calculate and interpret trend, momentum, and volatility indicators, and evaluate indicator rules.", "Chart reading is assumed; no prior indicator knowledge is needed. Volume-derived tools belong to Volume and Order Flow."),
     "volume-and-order-flow": ("Interpret volume, participation, liquidity, order flow, profiles, and execution evidence alongside price.", "Price structure, trade planning, and the distinction between a signal and a tested rule."),
-    "trading-risk-management": ("Set risk budgets, size positions, evaluate portfolio exposure and drawdowns, and document risk decisions.", "Position sizing, trade records, and basic probability and expectancy."),
+    "trading-risk-management": ("Set risk budgets, size positions, evaluate portfolio exposure and drawdowns, and document risk decisions.", "Chart reading, stop placement, and distinguishing a call from a put are assumed. No knowledge of expectancy, drawdown mathematics, margin mechanics or correlation is assumed."),
     "backtesting-and-trading-systems": ("Specify trading rules, design tests, account for data and execution limits, and evaluate system performance.", "Trading rules, risk budgets, trade records, and performance measures."),
     "algorithmic-and-automated-trading": ("Specify automated trading workflows, data and order handling, deployment controls, monitoring, and operational risk procedures.", "Tested trading rules, risk management, and backtesting concepts. Software examples explain their trading context."),
 }
@@ -721,6 +745,7 @@ def neutral_course_details(text, slug):
 def normalize_course_ui(text, course, courses, index):
     title, slug = course["title"], course["slug"]
     text = neutral_course_details(text, slug)
+    text = restore_catalog_audience(text, slug)
     if 'data-ui="overview"' in text:
         # Refresh shared controls without overwriting subsequent authored copy.
         description = next(n["attrs"]["content"] for n in ElementSpans(text).elements
@@ -799,6 +824,47 @@ def normalize_course_ui(text, course, courses, index):
     region=region.replace('The finish, and the two questions left.', 'AI workflows and system specifications.')
     region=region.replace('The last lesson is not a quiz you pass and close.', 'The specification lesson documents a trading system.')
     text=replace_element(text,main,region)
+    return restore_catalog_audience(text, slug)
+
+
+def restore_catalog_audience(text, slug):
+    """Restore the authored qualifications lost by the catalog migration."""
+    source = pathlib.Path(__file__).with_name('trading_catalog_copy.json')
+    authored = json.loads(source.read_text())[slug]
+    audience = authored['audience']
+    parsed = ElementSpans(text)
+    for card in sorted((n for n in parsed.elements if n['tag']=='article'), key=lambda n:n['start'], reverse=True):
+        region = text[card['start']:card['end']]
+        if re.search(r'<h3[^>]*>(?:Background|Who it is for)</h3>', region):
+            text = replace_element(text, card, '<article class="note-card"><h3>Who it is for</h3><p>'+esc(audience)+'</p></article>')
+        elif re.search(r'<h3[^>]*>(?:Using the lessons|How to work through it|Concept dependencies)</h3>', region):
+            text = replace_element(text, card, '<article class="note-card"><h3>Concept dependencies</h3><p>'+esc(authored['usage'])+'</p></article>')
+    if slug == 'technical-indicators':
+        text = text.replace('trend, momentum, volatility, and volume indicators', 'trend, momentum, and volatility indicators')
+        boundary = ('Volume and Order Flow covers relative volume, on-balance volume, accumulation/distribution, '
+                    'session and anchored VWAP, volume profile and value area, the tape, footprint and bid-ask delta, '
+                    'cumulative delta and the order book. Technical Indicators deliberately stops short of those '
+                    'volume-derived tools; they belong to Volume and Order Flow.')
+        text = text.replace(esc(TRADING_OVERVIEWS[slug][1]),esc(TRADING_OVERVIEWS[slug][1])+' '+esc(boundary)) if boundary not in text else text
+    if slug in ('technical-indicators', 'trading-risk-management') and 'data-ui="background"' in text:
+        region = element(text, 'section', identity='background')
+        old = text[region['start']:region['end']]
+        body = TRADING_OVERVIEWS[slug][1]+(' '+boundary if slug=='technical-indicators' else '')
+        old = re.sub(r'<p>.*?</p>', lambda m:'<p>'+esc(body)+'</p>', old, flags=re.S)
+        text = replace_element(text, region, old)
+    return text
+
+
+def neutral_catalog_links(text, course):
+    """Remove only ordinals on anchors resolving to this Course's Lessons."""
+    destinations = {'./'+lesson['slug']+'/' for lesson in course['lessons']}
+    anchors = [n for n in ElementSpans(text).elements if n['tag']=='a' and n['attrs'].get('href') in destinations]
+    for node in sorted(anchors,key=lambda n:n['start'],reverse=True):
+        fragment=text[node['start']:node['end']]
+        # Keep the completion-mark host and the authored hit target geometry.
+        fragment=re.sub(r'<span class="lesson-ord">.*?</span>', '<span class="lesson-ord" aria-hidden="true"></span>', fragment, flags=re.S)
+        fragment=re.sub(r'(?<=>)Lesson\s+\d+\s*(?:·|&middot;|&#183;)?\s*', '', fragment, flags=re.I)
+        text=replace_element(text,node,fragment)
     return text
 
 
@@ -969,6 +1035,121 @@ def prepare_lesson(before, relative, course, lesson, courses):
     return normalize_taxonomy_copy(text, courses, lesson=True)
 
 
+def ensure_market_chart_scroll_owners(text):
+    """Keep every authored Trading market chart readable and reachable.
+
+    Most charts already have a ``chart-wrap`` parent. The relative-strength
+    lesson predates that shared structure and owns two explicit wrappers here.
+    The parser assertion makes a future orphan fail normalization instead of
+    silently shrinking back to an unreadable mobile chart.
+    """
+    # The first authored structure explorer predates the market-chart class,
+    # but its 940-unit dynamic plots have the same semantic axis-label scale.
+    # Keep this identity repair in the normalizer so a later pass cannot
+    # silently return either plot to a five-pixel mobile label.
+    for chart_id in ("mainChart", "quizChart"):
+        match = re.search(r'<svg\b(?=[^>]*\bid="%s")[^>]*>' % re.escape(chart_id), text)
+        if not match:
+            continue
+        opening = match[0]
+        classes = re.search(r'\bclass="([^"]*)"', opening)
+        if classes and "market-chart" in classes[1].split():
+            continue
+        if classes:
+            replacement = (opening[:classes.start(1)] + classes[1]
+                           + (" " if classes[1] else "") + "market-chart"
+                           + opening[classes.end(1):])
+        else:
+            replacement = opening[:-1] + ' class="market-chart">'
+        text = text[:match.start()] + replacement + text[match.end():]
+
+    for chart_id in ("rsPerformanceChart", "rsRatioChart"):
+        if 'id="%s"' % chart_id not in text:
+            continue
+        owned = re.search(
+            r'<div\b[^>]*class="[^"]*\bmarket-chart-scroll\b[^"]*"[^>]*>\s*'
+            r'<svg\b[^>]*\bid="%s"' % re.escape(chart_id), text)
+        if owned:
+            continue
+        pattern = re.compile(
+            r'(<svg\b(?=[^>]*\bid="%s")(?=[^>]*\bclass="[^"]*\bmarket-chart\b[^"]*")[^>]*>\s*</svg>)'
+            % re.escape(chart_id))
+        text, count = pattern.subn(r'<div class="market-chart-scroll">\1</div>', text, count=1)
+        if count != 1:
+            raise ValueError("missing unique authored market chart %s" % chart_id)
+
+    # Promote only wrappers that own a market SVG. ``chart-wrap`` is also used
+    # by canvas labs, whose inner data-canvas-scroll element already owns that
+    # surface. Broadly making chart-wrap scrollable would create nested keyboard
+    # stops and would change unrelated canvas layout.
+    parsed = ElementSpans(text)
+    owners = {}
+    for chart in (node for node in parsed.elements
+                  if node["tag"] == "svg"
+                  and "market-chart" in node["attrs"].get("class", "").split()):
+        candidates = [node for node in parsed.elements
+                      if node["tag"] == "div"
+                      and node["start"] < chart["start"]
+                      and chart["end"] <= node["end"]
+                      and {"chart-wrap", "quiz-chart-wrap", "market-chart-scroll"}
+                      & set(node["attrs"].get("class", "").split())]
+        if not candidates:
+            raise ValueError("market-chart lacks an authored scroll owner")
+        owner = max(candidates, key=lambda node: node["start"])
+        owners[owner["start"]] = owner
+    for owner in sorted(owners.values(), key=lambda node: node["start"], reverse=True):
+        classes = owner["attrs"].get("class", "").split()
+        if "market-chart-scroll" in classes:
+            continue
+        opening = text[owner["start"]:owner["open_end"]]
+        replacement, count = re.subn(
+            r'(\bclass=")([^"]*)(")',
+            lambda match: match[1] + match[2] + " market-chart-scroll" + match[3],
+            opening, count=1)
+        if count != 1:
+            raise ValueError("market-chart owner lacks a class attribute")
+        text = text[:owner["start"]] + replacement + text[owner["open_end"]:]
+
+    text = chrome.name_horizontal_scrollers(text)
+
+    class MarketCharts(HTMLParser):
+        VOID = {"area", "base", "br", "col", "embed", "hr", "img", "input",
+                "link", "meta", "param", "source", "track", "wbr"}
+
+        def __init__(self):
+            super().__init__()
+            self.stack = []
+            self.charts = 0
+
+        def handle_starttag(self, tag, attrs):
+            values = dict(attrs)
+            classes = values.get("class", "").split()
+            if tag == "svg" and "market-chart" in classes:
+                self.charts += 1
+                owner = next((row for row in reversed(self.stack)
+                              if {"chart-wrap", "market-chart-scroll"} & row[1]), None)
+                if not owner:
+                    raise ValueError("market-chart lacks an authored scroll owner")
+                owner_attrs = owner[2]
+                if owner_attrs.get("tabindex") != "0" or not (
+                        owner_attrs.get("aria-label") or owner_attrs.get("aria-labelledby")):
+                    raise ValueError("market-chart scroll owner lacks a keyboard stop or name")
+            if tag not in self.VOID:
+                self.stack.append((tag, set(classes), values))
+
+        def handle_endtag(self, tag):
+            for index in range(len(self.stack) - 1, -1, -1):
+                if self.stack[index][0] == tag:
+                    self.stack = self.stack[:index]
+                    return
+
+    inventory = MarketCharts()
+    inventory.feed(text)
+    if 'class="market-chart"' in text and not inventory.charts:
+        raise ValueError("non-vacuous authored market-chart inventory required")
+    return text
+
+
 def main():
     courses = trading_inventory()
     identities = [c["slug"] + "/" + lesson["slug"] for c in courses for lesson in c["lessons"]]
@@ -982,12 +1163,30 @@ def main():
 
     def save(relative, text, before):
         nonlocal changed, touched
-        text = chrome.name_horizontal_scrollers(text)
+        text = ensure_market_chart_scroll_owners(text)
+        # Inactivity changes the border, while all informative text remains
+        # opaque. This shared authored component ships with each automation lab.
+        text = text.replace('.flow-node.off{opacity:.45;filter:saturate(.5)}',
+                            '.flow-node.off{border-style:dashed}')
+        # Guide lines and their annotations have different contrast policies.
+        # Preserve the faint guide; give the zero-payoff label semantic text ink.
+        text = text.replace("area.x+area.w,c.line2,'$0')", "area.x+area.w,c.line2,'$0',c.text)")
+        match = re.search(r'function hline\(ctx,y,x1,x2,color,text(?:,textColor=color)?\)\{[^\n]+', text)
+        if match and "c.line2,'$0',c.text" in text:
+            helper = match[0].replace('color,text)', 'color,text,textColor=color)').replace('ctx.fillStyle=color', 'ctx.fillStyle=textColor')
+            helper = helper.replace('label(ctx,text,x1+5,y-14,color)', 'label(ctx,text,x1+5,y-14,textColor)')
+            text = text[:match.start()] + helper + text[match.end():]
+        # Analog labels occupy dedicated date and return columns. A return's
+        # sign and bar length must not move its text into the date column.
+        text = text.replace("x.textAlign=r.fwd1>=0?'left':'right';x.fillText(pct(r.fwd1,2),r.fwd1>=0?center+bw+5:center-bw-5,cy+4)",
+                            "x.textAlign='right';x.fillText(pct(r.fwd1,2),w-8,cy+4)")
+        text = text.replace('trend, momentum, volatility, and volume indicators', 'trend, momentum, and volatility indicators')
         # Authored JavaScript recreates the same content owners on redraw.
         # Normalize only their literal opening tags, preserving all expressions,
         # attributes, arithmetic and export payloads around those tags.
         text = re.sub(r'<(?:div|table|pre)\b[^<>]*\bclass="(?:data-table|calc-table|heatmap-wrap|schema-output|footprint)"[^<>]*>',
                       lambda m: chrome.name_horizontal_scrollers(m[0]), text)
+        text = canvas_markup.normalize(text, relative, ElementSpans)
         touched += 1
         if text != before:
             pending.append((SITE / relative, text))
@@ -1006,6 +1205,7 @@ def main():
         before = (SITE / relative).read_text(encoding="utf-8")
         text = ensure_css(before)
         text = normalize_course_ui(text, course, courses, course_index)
+        text = neutral_catalog_links(text, course)
         text = ensure_course_hooks(text, course["slug"], course["lessons"])
         text = ensure_script(text, progress.PROGRESS_JS + COURSE_JS + SIGNIN_JS)
         text = normalize_taxonomy_copy(text, courses)

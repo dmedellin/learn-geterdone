@@ -583,6 +583,15 @@
       overflow-x: auto;
     }
     .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
 
     /* ---------- Graphs ----------
        Tokens only. A component override scoped to [data-theme="light"] would
@@ -1040,6 +1049,7 @@
       font-size: 0.9rem;
       resize: vertical;
     }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
     .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
     .fb-actions {
       display: flex;
@@ -1132,6 +1142,7 @@
     [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
     [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
     [data-ui="hero"] .eyebrow { display: block; color: var(--muted); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
     [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
     [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
     [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
@@ -1176,7 +1187,7 @@
     }
     [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
     [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
-    [data-ui="lesson-list"] .lesson-link { min-height: 44px; }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
     body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
     body[data-page-kind] .is-done .lesson-state { color: var(--green); }
     [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
@@ -1281,7 +1292,7 @@ coins {1,3,4}: greedy fails at 6  (4+1+1 vs 3+3)</div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>Greedy algorithms</h2></div><p>Three where it works, one where it fails, and the proof technique.</p></div>
-      <article class="card card-pad prose"><h3>Interval scheduling</h3><p>Given intervals with start and finish times, select as many non-overlapping ones as possible. The greedy rule is: repeatedly take the interval that finishes earliest among those compatible with what is already chosen.</p><div class="thm"><span class="label">Theorem &middot; Earliest finish time is optimal</span><p>The greedy algorithm selects a maximum-size set of pairwise compatible intervals.</p></div><div class="proof"><p>Let <span class="math">g₁, g₂, …</span> be the greedy selection in order and <span class="math">o₁, o₂, …</span> an optimal one, both sorted by finish time. We show by induction that <span class="math">gᵢ</span> finishes no later than <span class="math">oᵢ</span>.</p><p>For <span class="math">i = 1</span>, greedy chose the earliest-finishing interval overall. For the step, if <span class="math">gᵢ</span> finishes no later than <span class="math">oᵢ</span>, then <span class="math">o_{i+1}</span> is available to greedy at step <span class="math">i+1</span>, so <span class="math">g_{i+1}</span> finishes no later.</p><p>If the optimum had more intervals than greedy, its next interval would be compatible with everything greedy chose, so greedy would not have stopped. Hence the sizes are equal.</p><p><span class="qed">&#9633;</span></p></div><p>Other plausible rules fail. Shortest interval first fails on a short interval overlapping two long disjoint ones. Earliest start first fails on one very long interval that begins first. Only earliest finish is optimal, and the difference is not visible without the proof.</p><h3>Where greedy fails</h3><div class="example"><span class="label">Example &middot; Coin change</span><p>With <span class="math">{1, 5, 10, 25}</span> the greedy rule &mdash; largest coin first &mdash; is optimal for every amount. With <span class="math">{1, 3, 4}</span> it fails at 6: greedy gives <span class="math">4 + 1 + 1</span> (three coins) while <span class="math">3 + 3</span> uses two. "Greedy works for coin change" is a property of the coin system, not of the strategy.</p></div><div class="example"><span class="label">Example &middot; The travelling salesman</span><p>Nearest-neighbour tour construction can be arbitrarily bad: instances exist where it exceeds the optimum by any factor you like. Greedy gives a tour quickly and offers no guarantee at all.</p></div><h3>The exchange argument</h3><p>The standard proof technique has three steps. Assume an optimal solution differing from the greedy one. Find the first place they differ. Show the optimum can be modified to agree with greedy there without becoming worse. Repeating turns the optimum into the greedy solution, so greedy is optimal too.</p><p>This is exactly the argument used for the cut property in Graphs and Trees lesson 12: swapping the heavier edge for the lighter one in a minimum spanning tree does not increase the total. The technique is the same wherever greedy is correct.</p><h3>Huffman coding</h3><div class="thm"><span class="label">Theorem &middot; Huffman codes are optimal</span><p>Repeatedly merging the two least frequent symbols into a combined node produces a prefix-free binary code of minimum expected length.</p></div><p>The greedy choice is merging the two rarest symbols, and the exchange argument shows an optimal tree can always be modified to place them as siblings at the deepest level. It is the compression method behind several standard formats, and its optimality is a genuine theorem rather than an observation.</p></article>
+      <article class="card card-pad prose"><h3>Interval scheduling</h3><p>Given intervals with start and finish times, select as many non-overlapping ones as possible. The greedy rule is: repeatedly take the interval that finishes earliest among those compatible with what is already chosen.</p><div class="thm"><span class="label">Theorem &middot; Earliest finish time is optimal</span><p>The greedy algorithm selects a maximum-size set of pairwise compatible intervals.</p></div><div class="proof"><p>Let <span class="math">g₁, g₂, …</span> be the greedy selection in order and <span class="math">o₁, o₂, …</span> an optimal one, both sorted by finish time. We show by induction that <span class="math">gᵢ</span> finishes no later than <span class="math">oᵢ</span>.</p><p>For <span class="math">i = 1</span>, greedy chose the earliest-finishing interval overall. For the step, if <span class="math">gᵢ</span> finishes no later than <span class="math">oᵢ</span>, then <span class="math">o_{i+1}</span> is available to greedy at step <span class="math">i+1</span>, so <span class="math">g_{i+1}</span> finishes no later.</p><p>If the optimum had more intervals than greedy, its next interval would be compatible with everything greedy chose, so greedy would not have stopped. Hence the sizes are equal.</p><p><span class="qed">&#9633;</span></p></div><p>Other plausible rules fail. Shortest interval first fails on a short interval overlapping two long disjoint ones. Earliest start first fails on one very long interval that begins first. Only earliest finish is optimal, and the difference is not visible without the proof.</p><h3>Where greedy fails</h3><div class="example"><span class="label">Example &middot; Coin change</span><p>With <span class="math">{1, 5, 10, 25}</span> the greedy rule &mdash; largest coin first &mdash; is optimal for every amount. With <span class="math">{1, 3, 4}</span> it fails at 6: greedy gives <span class="math">4 + 1 + 1</span> (three coins) while <span class="math">3 + 3</span> uses two. "Greedy works for coin change" is a property of the coin system, not of the strategy.</p></div><div class="example"><span class="label">Example &middot; The travelling salesman</span><p>Nearest-neighbour tour construction can be arbitrarily bad: instances exist where it exceeds the optimum by any factor you like. Greedy gives a tour quickly and offers no guarantee at all.</p></div><h3>The exchange argument</h3><p>The standard proof technique has three steps. Assume an optimal solution differing from the greedy one. Find the first place they differ. Show the optimum can be modified to agree with greedy there without becoming worse. Repeating turns the optimum into the greedy solution, so greedy is optimal too.</p><p>This is exactly the argument used for the cut property in the “Spanning Trees and Minimum Spanning Trees” Lesson in Graphs and Trees: swapping the heavier edge for the lighter one in a minimum spanning tree does not increase the total. The technique is the same wherever greedy is correct.</p><h3>Huffman coding</h3><div class="thm"><span class="label">Theorem &middot; Huffman codes are optimal</span><p>Repeatedly merging the two least frequent symbols into a combined node produces a prefix-free binary code of minimum expected length.</p></div><p>The greedy choice is merging the two rarest symbols, and the exchange argument shows an optimal tree can always be modified to place them as siblings at the deepest level. It is the compression method behind several standard formats, and its optimality is a genuine theorem rather than an observation.</p></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>Algorithms and growth</h2></div><p>Counts from running, not from quoting</p></div>
@@ -1291,7 +1302,7 @@ coins {1,3,4}: greedy fails at 6  (4+1+1 vs 3+3)</div>
         <div class="lab-title"><strong id="alTitle">Algorithms and growth</strong><span id="alSub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>measured</span><span class="tone-purple"><i class="legend-swatch"></i>predicted</span><span class="tone-amber"><i class="legend-swatch"></i>crossover</span></div>
       </div>
-      <div class="lab-stage"><svg id="alPlot" viewBox="0 0 520 230" role="img" aria-label="Operation counts plotted against input size."></svg></div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Operation counts plot, scroll horizontally for the complete chart"><svg id="alPlot" style="min-width:520px" viewBox="0 0 520 230" role="img" aria-label="Operation counts plotted against input size."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="alTable"></table></div>
       <div class="status-banner" id="alStatus" style="margin-top:12px;"></div>
         </article>
@@ -1393,8 +1404,8 @@ Shortest-first fails elsewhere: intervals (0,5), (4,6), (5,10)
     </section>
     <section class="section">
       <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Assuming greedy is optimal because it seems reasonable</strong><span>Three plausible rules for interval scheduling, one correct. The proof is the only way to tell.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Testing instead of proving</strong><span>Shortest-first passes the first example and fails the second. Logic and Proof lesson 14's point applies unchanged.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Not saying which you have</strong><span>"Optimal by exchange argument" and "a heuristic" are both respectable. Presenting the second as the first is not.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you attempt the exchange argument before trusting a greedy rule.</strong><p>For the fractional knapsack problem &mdash; items may be split &mdash; show that taking items in decreasing value-per-weight order is optimal. Then observe that the 0/1 version, where items cannot be split, defeats the same rule, and lesson 10 handles it.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The structure making greed provably correct is a matroid, and the forests of a graph form one &mdash; which is why Kruskal's algorithm works. Most problems have no such structure, and dynamic programming is the usual alternative.</div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Assuming greedy is optimal because it seems reasonable</strong><span>Three plausible rules for interval scheduling, one correct. The proof is the only way to tell.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Testing instead of proving</strong><span>Shortest-first passes the first example and fails the second. The point from “Cases, Counterexamples, and Writing a Proof” in Logic and Proof applies unchanged.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Not saying which you have</strong><span>"Optimal by exchange argument" and "a heuristic" are both respectable. Presenting the second as the first is not.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you attempt the exchange argument before trusting a greedy rule.</strong><p>For the fractional knapsack problem &mdash; items may be split &mdash; show that taking items in decreasing value-per-weight order is optimal. Then observe that the 0/1 version, where items cannot be split, defeats the same rule, and “Dynamic Programming” handles it.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The structure making greed provably correct is a matroid, and the forests of a graph form one &mdash; which is why Kruskal's algorithm works. Most problems have no such structure, and dynamic programming is the usual alternative.</div></article>
       </div>
     </section>
     </main>
@@ -1787,12 +1798,24 @@ Shortest-first fails elsewhere: intervals (0,5), (4,6), (5,10)
     series.forEach(function (ser) {
       var d = ser.values.map(function (v, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(v).toFixed(1); }).join(' ');
       s += '<path d="' + d + '" fill="none" stroke="' + ser.colour + '" stroke-width="2.4" opacity="0.9" />';
-      s += '<text x="' + (x(ser.values.length - 1) - 6) + '" y="' + Math.max(14, y(ser.values[ser.values.length - 1]) - 6)
-        + '" text-anchor="end" font-size="11" font-weight="700" fill="' + ser.colour + '">' + ser.label + '</text>';
     });
-    s += '<text x="26" y="216" font-size="10" fill="var(--muted)">n = ' + xs[0] + '</text>';
-    s += '<text x="500" y="216" text-anchor="end" font-size="10" fill="var(--muted)">n = ' + xs[xs.length - 1] + '</text>';
-    if (logScale) s += '<text x="30" y="24" font-size="10" fill="var(--muted)">log scale</text>';
+    // Finish every curve before placing readable endpoint labels. Keep the
+    // authored color association and halo, with bounded separation at ties.
+    var labels = series.map(function (ser, i) {
+      return {series: ser, order: i, baseline: Math.max(20, Math.min(188, y(ser.values[ser.values.length - 1]) - 6))};
+    }).sort(function (a, b) { return a.baseline - b.baseline || a.order - b.order; });
+    labels.forEach(function (label, i) { if (i) label.baseline = Math.max(label.baseline, labels[i - 1].baseline + 18); });
+    for (var i = labels.length - 1; i >= 0; i -= 1) {
+      labels[i].baseline = Math.min(labels[i].baseline, i === labels.length - 1 ? 188 : labels[i + 1].baseline - 18);
+    }
+    labels.forEach(function (label) {
+      var ser = label.series;
+      s += '<text x="' + (x(ser.values.length - 1) - 6) + '" y="' + label.baseline
+        + '" text-anchor="end" font-size="12" font-weight="700" fill="' + ser.colour + '">' + ser.label + '</text>';
+    });
+    s += '<text x="26" y="216" font-size="12" fill="var(--muted)">n = ' + xs[0] + '</text>';
+    s += '<text x="500" y="216" text-anchor="end" font-size="12" fill="var(--muted)">n = ' + xs[xs.length - 1] + '</text>';
+    if (logScale) s += '<text x="30" y="24" font-size="12" fill="var(--muted)">log scale</text>';
     plot.innerHTML = s;
   }
 
@@ -1903,8 +1926,8 @@ Shortest-first fails elsewhere: intervals (0,5), (4,6), (5,10)
         + 'At exit m = 0, so result · base⁰ = result, and the invariant reads result = ' + x + sup(n) + ' = ' + big(t.value)
         + ': the correctness argument in one line. The loop did ' + t.squarings + ' squarings and ' + t.mults
         + ' multiplications, one for each 1 in n = ' + t.binary + '₂, against n − 1 = ' + t.naive
-        + ' for repeated multiplication — lesson 1\'s comparison, measured. The final squaring is wasted (m is 0 by then), '
-        + 'which is why course 6 lesson 8 counts bits − 1. What the lab cannot do is prove the invariant for the n it did not '
+        + ' for repeated multiplication — the comparison in “Algorithms and Pseudocode”, measured. The final squaring is wasted (m is 0 by then), '
+        + 'which is why “Modular Exponentiation” counts bits − 1. What the lab cannot do is prove the invariant for the n it did not '
         + 'run; the proof is the worked example.';
     },
     loops: function () {
@@ -1937,7 +1960,7 @@ Shortest-first fails elsewhere: intervals (0,5), (4,6), (5,10)
         + 'Σ (n − i + 1) reindexed to Σ m; C ran ' + last.C + ' = n · ⌊log₂ n⌋, because halving reaches 1 in ⌊log₂ n⌋ steps; '
         + 'D — the standard\'s triple triangular nest, Σ_i Σ_j j — ran ' + fmt(last.D) + ' = n(n+1)(n+2)/6, one sixth of n³ '
         + 'to leading order. ' + (exact ? '<strong>Every measured column equals its formula exactly</strong>, because none of '
-        + 'these loops looks at data; the formulas are course 3 lesson 3\'s sums.' : 'A measured column disagrees with its formula.')
+        + 'these loops looks at data; the formulas are the sums in “Induction with Sums and Products”.' : 'A measured column disagrees with its formula.')
         + ' Multiplying B\'s bounds instead of summing would give n² = ' + fmt(N * N) + ', about twice the truth — the first mistake.';
     },
     search: function () {
@@ -2092,7 +2115,7 @@ Shortest-first fails elsewhere: intervals (0,5), (4,6), (5,10)
       var detail;
       if (policy === 'double') {
         var pow2 = (n & (n - 1)) === 0;
-        detail = 'The copies are 1 + 2 + 4 + ⋯, a geometric series (course 3 lesson 3) that stays under 2n, so the total stays under 3n '
+        detail = 'The copies are 1 + 2 + 4 + ⋯, a geometric series (see “Induction with Sums and Products”) that stays under 2n, so the total stays under 3n '
           + 'whatever n is. ' + (pow2
             ? 'This n is a power of two, so the last doubling happened at insert ' + (n / 2 + 1) + ' and the copies are n − 1 = ' + r.copies
               + ': the total is just under 2n. Set n = ' + (n + 1) + ' to see the next doubling push it above 2n and still below 3n — '

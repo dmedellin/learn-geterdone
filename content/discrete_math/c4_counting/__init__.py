@@ -49,9 +49,7 @@ COURSE = {
          "every `n` at once."),
     ],
     "syllabus_intro": (
-        "Lessons 1 to 4 are the basic rules, 5 to 8 the binomial coefficients and "
-        "repetition, 9 to 11 corrections and bounds, and 12 to 14 the techniques that "
-        "generalise them."
+        'The basic counting rules, binomial coefficients, repetition, corrections and bounds support generating functions, combinatorial proofs and the choice of a counting method.'
     ),
     "how_to": [
         "Check every formula against an enumeration while the numbers are small. The "
@@ -60,17 +58,13 @@ COURSE = {
         "Say out loud whether order matters and whether repetition is allowed, before "
         "writing anything. Almost every wrong answer in this course is a right "
         "calculation of the wrong quantity.",
-        "Do the combinatorial proofs in lesson 13 twice: once by algebra and once by "
-        "counting. The second is shorter and tells you why the identity is true.",
+        'Do the combinatorial proofs in “Combinatorial Proof” twice: once by algebra and once by counting. The second is shorter and tells you why the identity is true.',
     ],
     "not_covered": [
-        "Advanced enumerative combinatorics: species, the transfer-matrix method, and "
-        "the deeper theory of generating functions. Lesson 12 is an introduction, not "
-        "a survey.",
+        'Advanced enumerative combinatorics: species, the transfer-matrix method, and the deeper theory of generating functions. “Generating Functions” is an introduction, not a survey.',
         "Design theory, Latin squares and error-correcting codes, which are the natural "
         "applications of this material but a separate subject.",
-        "Ramsey theory beyond the statement that `R(3,3) = 6`, which appears in lesson "
-        "11 as a pigeonhole application.",
+        'Ramsey theory beyond the statement that `R(3,3) = 6`, which appears in “The Generalised Pigeonhole Principle” as a pigeonhole application.',
     ],
     "footer_lead": (
         "Every count on this course is computed in exact big-integer arithmetic, so a "

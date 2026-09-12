@@ -1238,6 +1238,7 @@ a.brand { text-decoration: none; }
       font-size: 0.9rem;
       resize: vertical;
     }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
     .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
     .fb-actions {
       display: flex;
@@ -1396,6 +1397,27 @@ a.brand { text-decoration: none; }
       .signin-btn { padding: 0; width: 38px; justify-content: center; }
     }
 
+    /* Trading charts use a 960-unit plotting frame. Keep that authored scale
+       instead of shrinking 11-unit axis text to roughly 3 CSS pixels on a
+       phone. The named keyboard scroll owner exposes the complete chart. */
+    @media screen {
+      .market-chart-scroll {
+        contain: inline-size;
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        overscroll-behavior-inline: contain;
+      }
+      .market-chart-scroll > svg.market-chart {
+        display: block;
+        width: 100%;
+        min-width: 960px;
+      }
+    }
+
     body[data-page-kind] {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 16px;
@@ -1429,6 +1451,7 @@ a.brand { text-decoration: none; }
     [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
     [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
     [data-ui="hero"] .eyebrow { display: block; color: var(--muted); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
     [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
     [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
     [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
@@ -1473,7 +1496,7 @@ a.brand { text-decoration: none; }
     }
     [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
     [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
-    [data-ui="lesson-list"] .lesson-link { min-height: 44px; }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
     body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
     body[data-page-kind] .is-done .lesson-state { color: var(--green); }
     [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
@@ -1590,7 +1613,7 @@ a.brand { text-decoration: none; }
 <div class="lab-layout">
   <article class="card chart-card">
     <div class="chart-toolbar"><div class="chart-title"><strong id="longTitle">Long call profit and loss</strong><span>Expiration payoff and modeled value before expiration</span></div></div>
-    <div class="chart-wrap"><svg id="longChart" class="market-chart" aria-label="Long call or put profit and loss"></svg><div class="chart-tooltip"></div></div>
+    <div class="chart-wrap market-chart-scroll" tabindex="0" role="region" aria-label="Interactive chart; scroll horizontally for complete chart labels"><svg id="longChart" class="market-chart" aria-label="Long call or put profit and loss"></svg><div class="chart-tooltip"></div></div>
     <div class="chart-legend"><span class="legend-item"><span class="legend-dot"></span>Modeled exit before expiration</span><span class="legend-item"><span class="legend-dot purple"></span>Expiration P/L</span></div>
   </article>
   <aside class="card side-panel" aria-live="polite">
@@ -1782,7 +1805,7 @@ setupQuiz({promptId:'longQuizPrompt',choicesId:'longQuizChoices',feedbackId:'lon
  {prompt:'What is the maximum expiration loss for one long option purchased for $3.25?',choices:[{label:'$3.25',why:'Per share. One contract is 100 shares: $325.'},{label:'$32.50',why:'Multiplied by 10. The multiplier is 100.'},{label:'$325'},{label:'Unlimited',why:'A long option cannot lose more than was paid for it. Unlimited loss belongs to an uncovered short call.'}],answer:2,explanation:'$3.25 × 100 = $325 before fees for one standard contract.'},
  {prompt:'A 100-strike long put costs $4. What is its expiration breakeven?',choices:[{label:'$96'},{label:'$100',why:'At the strike the put is worthless and the whole $4 is lost. Profit needs the stock below the strike by more than the premium.'},{label:'$104',why:'Strike plus premium is the CALL breakeven. A put profits below the strike: 100 − 4.'},{label:'$400',why:'$400 is the contract cost. Breakeven is a stock price: $96.'}],answer:0,explanation:'Long-put expiration breakeven is strike minus premium: $100 − $4 = $96.'},
  {prompt:'You bought the 100 call for $4.50 with 45 days left. Three weeks later the stock is $103, below your $104.50 breakeven. Is the position necessarily losing?',choices:[{label:'Yes; below breakeven means a loss',why:'Expiration breakeven applies at expiration. With 24 days left the option is priced above its $3 of intrinsic value, and it may be worth more than $4.50.'},{label:'Yes; the option is only worth $3 of intrinsic value',why:'Intrinsic value is the floor while time remains, not the price. Extrinsic value is still in the quote.'},{label:'No; with 24 days and IV left the option is priced above intrinsic and can be sold for more than $4.50'},{label:'No; the breakeven moves with the stock',why:'Breakeven is fixed by strike and premium. What moves is the option’s pre-expiration value, which is what the cyan curve shows.'}],answer:2,explanation:'Before expiration the option carries extrinsic value; the expiration breakeven says nothing about an exit three weeks early.'},
- {prompt:'Before expiration, which inputs can affect a long option value?',choices:[{label:'Only the underlying price',why:'The underlying is the largest input, but time and IV move the price on their own — that is what lessons 06–09 showed.'},{label:'Underlying price, time, IV, rates, dividends, and market pricing'},{label:'Only open interest',why:'Open interest counts contracts outstanding; it is not a pricing input.'},{label:'Only strike',why:'The strike is fixed. It sets where the payoff bends, not what the option is worth today.'}],answer:1,explanation:'Several pricing inputs and market conditions affect an option before expiration.'}
+ {prompt:'Before expiration, which inputs can affect a long option value?',choices:[{label:'Only the underlying price',why:'The underlying is the largest input, but time and IV move the price on their own — Expiration and Time Decay, Implied Volatility, Delta and Gamma, and Theta and Vega explain those effects.'},{label:'Underlying price, time, IV, rates, dividends, and market pricing'},{label:'Only open interest',why:'Open interest counts contracts outstanding; it is not a pricing input.'},{label:'Only strike',why:'The strike is fixed. It sets where the payoff bends, not what the option is worth today.'}],answer:1,explanation:'Several pricing inputs and market conditions affect an option before expiration.'}
 ]});
 setupTheme();renderLong();
 </script>

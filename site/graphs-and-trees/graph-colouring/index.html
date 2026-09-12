@@ -583,6 +583,15 @@
       overflow-x: auto;
     }
     .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
 
     /* ---------- Graphs ----------
        Tokens only. A component override scoped to [data-theme="light"] would
@@ -1040,6 +1049,7 @@
       font-size: 0.9rem;
       resize: vertical;
     }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
     .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
     .fb-actions {
       display: flex;
@@ -1132,6 +1142,7 @@
     [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
     [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
     [data-ui="hero"] .eyebrow { display: block; color: var(--muted); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
     [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
     [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
     [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
@@ -1176,7 +1187,7 @@
     }
     [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
     [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
-    [data-ui="lesson-list"] .lesson-link { min-height: 44px; }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
     body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
     body[data-page-kind] .is-done .lesson-state { color: var(--green); }
     [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
@@ -1284,7 +1295,7 @@ deciding χ ≤ 3 is NP-complete;  greedy uses at most Δ + 1</div>
       <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Proper colouring, chromatic number</span><p>A <strong>proper colouring</strong> assigns a colour to each vertex so that adjacent vertices differ. The <strong>chromatic number</strong> <span class="math">χ(G)</span> is the smallest number of colours admitting one.</p></div><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">χ(Kₙ)      = n          every pair adjacent
 χ(Cₙ)      = 2 if n even, 3 if n odd
 χ(tree)    = 2          for any tree with an edge
-χ(bipartite) = 2        by definition, for a graph with an edge</div><div class="thm"><span class="label">Theorem &middot; Two colours</span><p><span class="math">χ(G) ≤ 2</span> if and only if <span class="math">G</span> is bipartite, if and only if <span class="math">G</span> has no odd cycle. Testable in <span class="math">Θ(n + |E|)</span> by lesson 6.</p></div><div class="thm"><span class="label">Theorem &middot; Greedy bound</span><p>Colouring the vertices in any order, giving each the smallest colour unused by its already-coloured neighbours, uses at most <span class="math">Δ + 1</span> colours, where <span class="math">Δ</span> is the maximum degree.</p></div><div class="proof"><p>When a vertex is coloured, it has at most <span class="math">Δ</span> neighbours, so at most <span class="math">Δ</span> colours are forbidden. Among <span class="math">Δ + 1</span> colours one is always available.</p><p><span class="qed">&#9633;</span></p></div><p>Brooks's theorem sharpens this: <span class="math">χ(G) ≤ Δ</span> unless <span class="math">G</span> is a complete graph or an odd cycle, which are the two families needing <span class="math">Δ + 1</span>.</p><p>Greedy is not optimal, and the order is what costs it. On a bipartite graph a bad order can use many colours where two suffice, which is why the algorithm is a bound rather than a solution.</p><div class="thm"><span class="label">Theorem &middot; Colouring is hard</span><p>Deciding whether <span class="math">χ(G) ≤ 3</span> is NP-complete, and computing <span class="math">χ(G)</span> exactly is NP-hard. Even approximating it well is hard.</p></div><p>The jump from 2 to 3 is an example of a problem changing character with a parameter. Nothing in the statements suggests it, and Algorithms and Complexity lesson 11 explains what NP-complete means.</p><h3>The four-colour theorem</h3><div class="thm"><span class="label">Theorem &middot; Four colours suffice</span><p>Every planar graph has <span class="math">χ(G) ≤ 4</span>.</p></div><p>Conjectured in 1852 and proved by Appel and Haken in 1976, with a proof that reduced the problem to 1936 configurations and checked them by computer. It was the first major theorem whose proof could not be verified by a human reading it, and the resulting argument about what counts as a proof has not entirely settled.</p><p>The five-colour theorem, by contrast, has a short human proof by induction using Euler's formula from lesson 14. Four is genuinely harder than five.</p><h3>Applications</h3><ul><li><strong>Exam scheduling.</strong> Vertices are exams, edges join exams sharing a student, colours are time slots. <span class="math">χ</span> is the fewest slots needed.</li><li><strong>Register allocation.</strong> Vertices are variables, edges join variables live at the same time, colours are CPU registers. Compilers do this constantly &mdash; and use heuristics, since the problem is NP-hard.</li><li><strong>Frequency assignment.</strong> Vertices are transmitters, edges join those that would interfere, colours are frequencies.</li><li><strong>Sudoku.</strong> A 9-colouring problem on a graph with 81 vertices and an edge for every row, column and box constraint.</li></ul></article>
+χ(bipartite) = 2        by definition, for a graph with an edge</div><div class="thm"><span class="label">Theorem &middot; Two colours</span><p><span class="math">χ(G) ≤ 2</span> if and only if <span class="math">G</span> is bipartite, if and only if <span class="math">G</span> has no odd cycle. Testable in <span class="math">Θ(n + |E|)</span> by “Bipartite Graphs”.</p></div><div class="thm"><span class="label">Theorem &middot; Greedy bound</span><p>Colouring the vertices in any order, giving each the smallest colour unused by its already-coloured neighbours, uses at most <span class="math">Δ + 1</span> colours, where <span class="math">Δ</span> is the maximum degree.</p></div><div class="proof"><p>When a vertex is coloured, it has at most <span class="math">Δ</span> neighbours, so at most <span class="math">Δ</span> colours are forbidden. Among <span class="math">Δ + 1</span> colours one is always available.</p><p><span class="qed">&#9633;</span></p></div><p>Brooks's theorem sharpens this: <span class="math">χ(G) ≤ Δ</span> unless <span class="math">G</span> is a complete graph or an odd cycle, which are the two families needing <span class="math">Δ + 1</span>.</p><p>Greedy is not optimal, and the order is what costs it. On a bipartite graph a bad order can use many colours where two suffice, which is why the algorithm is a bound rather than a solution.</p><div class="thm"><span class="label">Theorem &middot; Colouring is hard</span><p>Deciding whether <span class="math">χ(G) ≤ 3</span> is NP-complete, and computing <span class="math">χ(G)</span> exactly is NP-hard. Even approximating it well is hard.</p></div><p>The jump from 2 to 3 is an example of a problem changing character with a parameter. Nothing in the statements suggests it, and the “P, NP and NP-Completeness” Lesson in Algorithms and Complexity explains what NP-complete means.</p><h3>The four-colour theorem</h3><div class="thm"><span class="label">Theorem &middot; Four colours suffice</span><p>Every planar graph has <span class="math">χ(G) ≤ 4</span>.</p></div><p>Conjectured in 1852 and proved by Appel and Haken in 1976, with a proof that reduced the problem to 1936 configurations and checked them by computer. It was the first major theorem whose proof could not be verified by a human reading it, and the resulting argument about what counts as a proof has not entirely settled.</p><p>The five-colour theorem, by contrast, has a short human proof by induction using Euler's formula from “Planar Graphs and Euler's Formula”. Four is genuinely harder than five.</p><h3>Applications</h3><ul><li><strong>Exam scheduling.</strong> Vertices are exams, edges join exams sharing a student, colours are time slots. <span class="math">χ</span> is the fewest slots needed.</li><li><strong>Register allocation.</strong> Vertices are variables, edges join variables live at the same time, colours are CPU registers. Compilers do this constantly &mdash; and use heuristics, since the problem is NP-hard.</li><li><strong>Frequency assignment.</strong> Vertices are transmitters, edges join those that would interfere, colours are frequencies.</li><li><strong>Sudoku.</strong> A 9-colouring problem on a graph with 81 vertices and an edge for every row, column and box constraint.</li></ul></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>Graph workbench</h2></div><p>Your graph, the course&#x27;s algorithms</p></div>
@@ -1294,7 +1305,7 @@ deciding χ ≤ 3 is NP-complete;  greedy uses at most Δ + 1</div>
         <div class="lab-title"><strong>Build a graph, run the algorithms</strong><span id="gCaption">Click a cell in the adjacency matrix to toggle an edge</span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>in the result</span><span class="tone-amber"><i class="legend-swatch"></i>visited / root</span><span class="tone-muted"><i class="legend-swatch"></i>not used</span></div>
       </div>
-      <div class="lab-stage">
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels">
         <svg id="gPlot" viewBox="0 0 460 300" role="img" aria-label="A graph drawn with its vertices evenly spaced on a circle and its edges as straight lines."></svg>
       </div>
       <div class="grid-2" style="margin-top:12px;">
@@ -2140,7 +2151,7 @@ Three time slots:   {A, D}   {B, E}   {C}</div><p>The triangle gave the lower bo
       status.innerHTML = r.chosen.length === N - 1
         ? 'Kruskal takes edges in increasing weight and skips any that would close a cycle. Total weight '
           + '<strong>' + r.total + '</strong>. The greedy choice is provably optimal here — which is unusual, '
-          + 'and course 8 explains what makes this problem yield to greed when most do not.'
+          + 'and “Greedy Algorithms” in Algorithms and Complexity explains what makes this problem yield to greed when most do not.'
         : 'The graph is disconnected, so Kruskal produces a minimum spanning FOREST: '
           + r.chosen.length + ' edges, weight ' + r.total + '. No set of edges can span a disconnected graph.';
     },

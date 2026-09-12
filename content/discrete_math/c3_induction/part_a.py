@@ -64,11 +64,7 @@ LESSONS = [
                 "contradicting `m ∈ S`.",
                 "Therefore `S = ∅`, which is to say `P(n)` holds for every `n`.",
             ]),
-            ("p", "That proof is the entire justification for the technique the rest of "
-                  "the course uses, and it is worth reading twice. The base case rules out "
-                  "`m = 0`; the inductive step rules out every other `m`; well-ordering is "
-                  "what guarantees that if any counterexample existed, a smallest one "
-                  "would."),
+            ("p", 'That proof is the entire justification for the induction technique used to prove claims about numbers, recursive structures and algorithms, and it is worth reading twice. The base case rules out `m = 0`; the inductive step rules out every other `m`; well-ordering is what guarantees that if any counterexample existed, a smallest one would.'),
             ("h3", "Minimal counterexample as a technique"),
             ("p", "The proof above is itself a template. To show a claim holds for all "
                   "`n`, assume it fails somewhere, take the least such `n`, and derive a "
@@ -92,15 +88,7 @@ LESSONS = [
         "lab": ("induction", {
             "statement": "sum",
             "panel_title": "Checking is not proving",
-            "panel_intro": "Two of the statements in this list are FALSE and pass every "
-                           "check a careful reader would run. Find them before going on; "
-                           "the rest of this course is the technique that would have "
-                           "caught them. Read the `First failure` figure as this lesson's "
-                           "idea made visible: it is the least element of "
-                           "`S = {n : P(n) is false}`, the set the proof above takes the "
-                           "least element of, and the moment `S` is nonempty well-ordering "
-                           "says that figure exists &mdash; the lab merely finds it. The "
-                           "`Inductive step` note under the controls is lesson 2's.",
+            "panel_intro": "Two of the statements in this list are FALSE and pass every check a careful reader would run. Try to find them: an induction proof, rather than a finite check, is the technique that would have caught them. Read the `First failure` figure as this lesson's idea made visible: it is the least element of `S = {n : P(n) is false}`, the set the proof above takes the least element of, and the moment `S` is nonempty well-ordering says that figure exists &mdash; the lab merely finds it. The `Inductive step` note under the controls is “Mathematical Induction”'s.",
         }),
         "steps_title": "Using minimal counterexample",
         "steps_intro": "Assume failure, take the smallest, break it.",
@@ -132,7 +120,7 @@ LESSONS = [
                 "So 0 ≤ r < d and a = dq + r.        ∎",
             ],
             "after": [
-                "Number Theory and Cryptography opens with this theorem and uses it in every lesson. Here it is an example of the technique; there it is the foundation of modular arithmetic. The uniqueness of `q` and `r` needs a separate short argument."
+                'Number Theory and Cryptography develops this theorem in “Divisibility and the Division Algorithm” and uses it throughout the Course. Here it is an example of the technique; there it is the foundation of modular arithmetic. The uniqueness of `q` and `r` needs a separate short argument.'
             ],
         },
         "quiz_title": "Well-ordering",
@@ -174,10 +162,7 @@ LESSONS = [
              "non-negative integers precisely so the principle would apply."),
         ],
         "standard": ("Finish when you can prove induction from well-ordering unaided.",
-                     "Write the argument out: assume the set of counterexamples is "
-                     "nonempty, take its least element, and use the base case and the step "
-                     "to contradict minimality. Understanding why induction is valid makes "
-                     "the next four lessons mechanical."),
+                     'Write the argument out: assume the set of counterexamples is nonempty, take its least element, and use the base case and the step to contradict minimality. Understanding why induction is valid makes the proofs in “Mathematical Induction”, “Induction with Sums and Products”, “Induction with Inequalities and Divisibility”, and “Strong Induction” mechanical.'),
         "note": "Every set can be well-ordered &mdash; this is the well-ordering theorem, "
                 "and it is equivalent to the axiom of choice. That is a far deeper "
                 "statement than the principle here, which is only about `ℕ` and needs no "
@@ -273,14 +258,7 @@ LESSONS = [
         "lab": ("induction", {
             "statement": "odd",
             "panel_title": "The step, and the checks",
-            "panel_intro": "The inductive step for each statement is shown in the note "
-                           "below the controls. The table only checks cases &mdash; the "
-                           "step is what makes the claim general. If lesson 1's search "
-                           "did not turn up the first false statement, select "
-                           "`n² + n + 41 is prime` and push the slider to 40: it holds "
-                           "for `n = 0` to 39, and `40² + 40 + 41 = 1681 = 41²`. Its note "
-                           "reads \"there is no inductive step here\", and that absence "
-                           "is the whole difference between it and the identity above it.",
+            "panel_intro": 'The inductive step for each statement is shown in the note below the controls. The table only checks cases &mdash; the step is what makes the claim general. If “The Well-Ordering Principle”\'s search did not turn up the first false statement, select `n² + n + 41 is prime` and push the slider to 40: it holds for `n = 0` to 39, and `40² + 40 + 41 = 1681 = 41²`. Its note reads "there is no inductive step here", and that absence is the whole difference between it and the identity above it.',
         }),
         "steps_title": "Writing an induction proof",
         "steps_intro": "Four sentences, in this order, every time.",
@@ -364,10 +342,7 @@ LESSONS = [
                      "Prove `2 + 4 + ⋯ + 2n = n(n+1)` and then mark the exact substitution "
                      "that used the hypothesis. If you cannot mark it, the proof is either "
                      "not induction or not finished."),
-        "note": "Induction proves statements about `ℕ`. Extending it to other structures "
-                "&mdash; lists, trees, formulas &mdash; requires structural induction, "
-                "which is lesson 7 and is the same idea over a different well-founded "
-                "order.",
+        "note": 'Induction proves statements about `ℕ`. Extending it to other structures &mdash; lists, trees, formulas &mdash; requires structural induction, developed in “Structural Induction”, which is the same idea over a different well-founded order.',
     },
     # ---------------------------------------------------------------- 03
     {
@@ -823,11 +798,7 @@ LESSONS = [
                   "made at all. Counting the base cases correctly is the whole difficulty "
                   "of this style of proof."),
             ("h3", "Strong induction and recursion"),
-            ("p", "Strong induction is the natural partner of a recursive definition whose "
-                  "recursive calls are not on `n − 1`. Merge sort splits at `n/2`; binary "
-                  "search halves; the Fibonacci recurrence reaches back two. In every case "
-                  "the correctness proof needs a hypothesis covering all smaller values, "
-                  "which is what lesson 8 does."),
+            ("p", 'Strong induction is the natural partner of a recursive definition whose recursive calls are not on `n − 1`. Merge sort splits at `n/2`; binary search halves; the Fibonacci recurrence reaches back two. In every case the correctness proof needs a hypothesis covering all smaller values, which is what “Recursive Algorithms and Correctness” does.'),
             ("example", ("Fibonacci and strong induction",
                          "Proving a property of `Fₙ = Fₙ₋₁ + Fₙ₋₂` requires both `Fₙ₋₁` and "
                          "`Fₙ₋₂`, so it needs two base cases and a hypothesis covering two "
@@ -996,10 +967,8 @@ LESSONS = [
                          'BASE: the empty string is well formed. RECURSIVE: if `s` is well formed then so is `(s)`, and if `s` and `t` are well formed then so is `st`. This generates `()`, `(())`, `()()`, `(()())` and nothing else. The Catalan numbers count them, but they are outside these Discrete Mathematics courses.')),
             ("h3", "Recursively defined structures"),
             ("example", ("Binary trees",
-                         "BASE: the empty tree is a binary tree. RECURSIVE: if `L` and `R` are binary trees and `v` is a value, then the tree with root `v`, left subtree `L` and right subtree `R` is a binary tree. Graphs and Trees lesson 11 traverses exactly this object.")),
-            ("p", "This is where recursion earns its place. A binary tree has no obvious "
-                  "\"size parameter\" to induct on, but it does have a structure, and "
-                  "lesson 7's structural induction proves things about it directly."),
+                         'BASE: the empty tree is a binary tree. RECURSIVE: if `L` and `R` are binary trees and `v` is a value, then the tree with root `v`, left subtree `L` and right subtree `R` is a binary tree. The “Rooted Trees and Traversals” Lesson in Graphs and Trees traverses exactly this object.')),
+            ("p", 'This is where recursion earns its place. A binary tree has no obvious "size parameter" to induct on, but it does have a structure, and “Structural Induction”\'s structural induction proves things about it directly.'),
             ("thm", ("Recursion theorem, informally",
                      "Given a base value and a rule producing `f(n)` from `f(n−1)`, there "
                      "is exactly one function satisfying both. Existence and uniqueness "
@@ -1053,10 +1022,7 @@ LESSONS = [
                 "about 585 billion years.",
             ],
             "after": [
-                "The recursive definition came directly from the structure of the problem "
-                "&mdash; the largest disc can only move once everything above it is out of "
-                "the way &mdash; and the closed form came afterwards. Lesson 10 shows how "
-                "to derive `2ⁿ − 1` rather than guess it."
+                'The recursive definition came directly from the structure of the problem &mdash; the largest disc can only move once everything above it is out of the way &mdash; and the closed form came afterwards. “Solving Linear Recurrences” shows how to derive `2ⁿ − 1` rather than guess it.'
             ],
         },
         "quiz_title": "Recursive definitions",
@@ -1096,9 +1062,7 @@ LESSONS = [
         ],
         "standard": ("Finish when you can write a recursive definition and unroll it "
                      "correctly.",
-                     "Define the set of binary strings with no two consecutive 1s "
-                     "recursively, and unroll the count for lengths 1 to 6. You should get "
-                     "2, 3, 5, 8, 13, 21 &mdash; Fibonacci, which lesson 9 explains."),
+                     'Define the set of binary strings with no two consecutive 1s recursively, and unroll the count for lengths 1 to 6. You should get 2, 3, 5, 8, 13, 21 &mdash; Fibonacci, which “Recurrence Relations” explains.'),
         "note": "The correspondence between recursive definitions and induction proofs is "
                 "exact and worth relying on: a definition with two base clauses is proved "
                 "about by an induction with two base cases, and a clause reaching back "

@@ -1222,6 +1222,7 @@ textarea { font: inherit; }
       font-size: 0.9rem;
       resize: vertical;
     }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
     .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
     .fb-actions {
       display: flex;
@@ -1380,6 +1381,27 @@ textarea { font: inherit; }
       .signin-btn { padding: 0; width: 38px; justify-content: center; }
     }
 
+    /* Trading charts use a 960-unit plotting frame. Keep that authored scale
+       instead of shrinking 11-unit axis text to roughly 3 CSS pixels on a
+       phone. The named keyboard scroll owner exposes the complete chart. */
+    @media screen {
+      .market-chart-scroll {
+        contain: inline-size;
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        overscroll-behavior-inline: contain;
+      }
+      .market-chart-scroll > svg.market-chart {
+        display: block;
+        width: 100%;
+        min-width: 960px;
+      }
+    }
+
     body[data-page-kind] {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 16px;
@@ -1413,6 +1435,7 @@ textarea { font: inherit; }
     [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
     [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
     [data-ui="hero"] .eyebrow { display: block; color: var(--muted); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
     [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
     [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
     [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
@@ -1457,7 +1480,7 @@ textarea { font: inherit; }
     }
     [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
     [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
-    [data-ui="lesson-list"] .lesson-link { min-height: 44px; }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
     body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
     body[data-page-kind] .is-done .lesson-state { color: var(--green); }
     [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
@@ -1604,7 +1627,7 @@ textarea { font: inherit; }
   <div class="stack">
     <article class="card chart-card">
       <div class="chart-toolbar"><div class="chart-title"><strong id="planPayoffTitle">Long call expiration P/L</strong><span>Current plan geometry</span></div></div>
-      <div class="chart-wrap" style="min-height:300px;"><svg id="planChart" class="market-chart" aria-label="Options trade plan payoff chart"></svg><div class="chart-tooltip"></div></div>
+      <div class="chart-wrap market-chart-scroll" style="min-height:300px;" tabindex="0" role="region" aria-label="Interactive chart; scroll horizontally for complete chart labels"><svg id="planChart" class="market-chart" aria-label="Options trade plan payoff chart"></svg><div class="chart-tooltip"></div></div>
     </article>
     <article class="card card-pad" aria-live="polite">
       <div style="display:flex;justify-content:space-between;align-items:end;gap:14px;"><div><span class="small-copy">Plan quality score</span><div class="plan-score" id="planScore">—</div></div><div class="pill" id="planGrade">Not evaluated</div></div>
@@ -1822,9 +1845,9 @@ function applyPlanPreset(key){const p=planPresets[key];setText('planScenarioLabe
 document.getElementById('planScenarios').addEventListener('click',e=>{const b=e.target.closest('[data-scenario]');if(!b)return;document.querySelectorAll('#planScenarios [data-scenario]').forEach(x=>x.classList.toggle('active',x===b));applyPlanPreset(b.dataset.scenario);});document.getElementById('planEvaluate').addEventListener('click',()=>renderPlan(true));document.getElementById('planDownload').addEventListener('click',()=>{renderPlan(true);downloadJSON('options-trade-plan.json',window.currentOptionPlan);});document.querySelectorAll('#lab input,#lab select').forEach(el=>el.addEventListener('input',()=>renderPlan(false)));
 setupQuiz({promptId:'planQuizPrompt',choicesId:'planQuizChoices',feedbackId:'planQuizFeedback',scoreId:'planQuizScore',nextId:'planQuizNext',questions:[
  {prompt:'A bullish thesis may take 20 days, but the selected call has 7 DTE and a wide spread. Best classification?',choices:[{label:'Trade immediately',why:'The contract expires before the thesis is expected to play out, and the spread is paid twice. Two of the ten checks fail before the trade starts.'},{label:'Wait or reject the contract'},{label:'Increase contracts',why:'More contracts multiply the spread cost and the risk without adding a single day. Size does not fix timing.'},{label:'Ignore expiration because calls are leveraged',why:'Leverage is exactly why expiration matters: a 7-day call is worth nothing on day 8 whatever the thesis does afterwards.'}],answer:1,explanation:'The contract does not provide enough time for the stated thesis and execution friction is poor.'},
- {prompt:'Maximum position loss is $900 and the written risk budget is $500. What should happen before entry?',choices:[{label:'Enter and adjust later',why:'Course 2’s rule: risk is fixed before entry, because after entry every adjustment is made to avoid realising a loss.'},{label:'Reduce size or choose a lower-risk structure'},{label:'Raise the target only',why:'A higher target changes the reward, not the $900 at risk. The budget check compares risk with budget.'},{label:'Use a market order',why:'Order type changes what the entry costs, by cents. It does not change the $900 the structure can lose.'}],answer:1,explanation:'Position size or structure must change before entry so maximum planned risk fits the predefined budget.'},
- {prompt:'What belongs in a complete options trade plan?',choices:[{label:'Only ticker and direction',why:'That is a bias, not a plan. Course 2 asked for target, invalidation and duration before anything was bought; the option adds contract, spread, risk and exit on top.'},{label:'Underlying thesis, timing, contract, liquidity, maximum risk, event exposure, and exit conditions'},{label:'Only delta and IV',why:'Two sensitivities describe how the contract will move. They do not say why the trade exists or when it is wrong.'},{label:'Only premium',why:'The premium is the cost. A plan needs what the cost buys, when it expires, and what ends it.'}],answer:1,explanation:'A complete plan connects the underlying thesis to the instrument, execution, risk, and operational exit rules.'},
- {prompt:'You hold 100 shares at $100 with the invalidation at $96, and sell a 108 call for $2.50. Which figure does the plan’s risk budget compare?',choices:[{label:'$150: the loss if the invalidation is hit, (100 − 96 − 2.50) × 100'},{label:'$9,750: the stock-to-zero maximum',why:'That is the capital at stake, and the plan reports it separately. Planned risk, as course 2 defined it, is what the plan loses when the invalidation level is hit and the plan is exited.'},{label:'$250: the premium',why:'The premium is income received, not risk. It offsets $2.50 of the fall to the invalidation.'},{label:'$0: the premium covers the fall',why:'The premium offsets $2.50 of a $4 fall. The other $1.50 per share is the planned risk: $150.'}],answer:0,explanation:'For share-backed structures the budget check uses the loss at the invalidation level; the stock-to-zero figure is reported as capital at stake.'}
+ {prompt:'Maximum position loss is $900 and the written risk budget is $500. What should happen before entry?',choices:[{label:'Enter and adjust later',why:'Trade Setup and Execution’s rule: risk is fixed before entry, because after entry every adjustment is made to avoid realising a loss.'},{label:'Reduce size or choose a lower-risk structure'},{label:'Raise the target only',why:'A higher target changes the reward, not the $900 at risk. The budget check compares risk with budget.'},{label:'Use a market order',why:'Order type changes what the entry costs, by cents. It does not change the $900 the structure can lose.'}],answer:1,explanation:'Position size or structure must change before entry so maximum planned risk fits the predefined budget.'},
+ {prompt:'What belongs in a complete options trade plan?',choices:[{label:'Only ticker and direction',why:'That is a bias, not a plan. Trade Thesis asks for target, invalidation and duration before anything was bought; the option adds contract, spread, risk and exit on top.'},{label:'Underlying thesis, timing, contract, liquidity, maximum risk, event exposure, and exit conditions'},{label:'Only delta and IV',why:'Two sensitivities describe how the contract will move. They do not say why the trade exists or when it is wrong.'},{label:'Only premium',why:'The premium is the cost. A plan needs what the cost buys, when it expires, and what ends it.'}],answer:1,explanation:'A complete plan connects the underlying thesis to the instrument, execution, risk, and operational exit rules.'},
+ {prompt:'You hold 100 shares at $100 with the invalidation at $96, and sell a 108 call for $2.50. Which figure does the plan’s risk budget compare?',choices:[{label:'$150: the loss if the invalidation is hit, (100 − 96 − 2.50) × 100'},{label:'$9,750: the stock-to-zero maximum',why:'That is the capital at stake, and the plan reports it separately. Planned risk, as Trade Setup and Execution defines it, is what the plan loses when the invalidation level is hit and the plan is exited.'},{label:'$250: the premium',why:'The premium is income received, not risk. It offsets $2.50 of the fall to the invalidation.'},{label:'$0: the premium covers the fall',why:'The premium offsets $2.50 of a $4 fall. The other $1.50 per share is the planned risk: $150.'}],answer:0,explanation:'For share-backed structures the budget check uses the loss at the invalidation level; the stock-to-zero figure is reported as capital at stake.'}
 ]});
 setupTheme();applyPlanPreset('bull');
 </script>

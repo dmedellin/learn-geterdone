@@ -8,10 +8,7 @@ LESSONS = [
         "module": "Exponential functions",
         "one_line": "Classify exponential formulas and tables, then state their base, intercept and asymptote.",
         "summary": (
-            "In every function so far the variable sat in the base: `x²`, `x³`, "
-            "`√x`. An exponential function puts it in the exponent instead, and "
-            "that one move changes what the values do &mdash; a constant ratio "
-            "between steps, where a line has a constant difference."
+            'In power and root functions the variable is in the base: `x²`, `x³`, `√x`. An exponential function puts it in the exponent instead, and that one move changes what the values do &mdash; a constant ratio between steps, where a line has a constant difference.'
         ),
         "key": [
             "f(x) = a·b^x        a ≠ 0,   b > 0,   b ≠ 1",
@@ -57,14 +54,7 @@ LESSONS = [
                   "of rationals with no interval anywhere in it, so there is no curve "
                   "to draw. Excluding a negative base is not squeamishness; it is the "
                   "only way the function gets a domain worth having."),
-            ("p", "`b = 0` fails differently: `0^x` is `0` for every positive "
-                  "`x`, has no value at all for negative `x`, and `0^0` is a "
-                  "convention rather than something the laws force. And `b = 1` does "
-                  "not fail at all "
-                  "&mdash; `1^x = 1` for every `x` &mdash; it simply gives the "
-                  "constant function `f(x) = a`, a horizontal line. It is excluded "
-                  "because calling that exponential would make every statement in "
-                  "lesson 2 false."),
+            ("p", '`b = 0` fails differently: `0^x` is `0` for every positive `x`, has no value at all for negative `x`, and `0^0` is a convention rather than something the laws force. And `b = 1` does not fail at all &mdash; `1^x = 1` for every `x` &mdash; it simply gives the constant function `f(x) = a`, a horizontal line. It is excluded because calling that exponential would make every statement in “Growth and Decay” false.'),
             ("h3", "Constant ratio, not constant difference"),
             ("thm", ("The ratio is the base",
                      "For `f(x) = a·b^x`, the quotient `f(x + 1) / f(x)` equals `b` "
@@ -217,11 +207,7 @@ LESSONS = [
                      "first, name `b` if they are constant, and state `a`. Given a "
                      "formula you should state the base, `f(0)` and the horizontal "
                      "asymptote without drawing anything."),
-        "note": "The restrictions `b &gt; 0` and `b ≠ 1` are what make the next "
-                "four lessons possible. A positive base other than `1` takes every "
-                "positive value exactly once, which is what lets lesson 4 define a "
-                "logarithm as the exponent that produces a given number &mdash; the "
-                "exponent, singular.",
+        "note": 'The restrictions `b &gt; 0` and `b ≠ 1` are what make the logarithm definition and its graph possible. A positive base other than `1` takes every positive value exactly once, which is what lets “What a Logarithm Is” define a logarithm as the exponent that produces a given number &mdash; the exponent, singular.',
     },
     # ---------------------------------------------------------------- 02
     {
@@ -301,22 +287,9 @@ LESSONS = [
                 "`2000` as from `1` to `2`, and the doubling time is a property of "
                 "the base rather than of where you started.",
             ]),
-            ("p", "`b^n = 2` rarely has a whole-number solution. For "
-                  "`b = 101/100` the powers step across `2` between `n = 69` and "
-                  "`n = 70`: `(101/100)^69 ≈ 1.9869` and `(101/100)^70 ≈ 2.0068`, "
-                  "both rounded to four places. The exact answer is irrational, near "
-                  "`69.6607`. Solving `b^n = 2` for `n` is what lesson 9 does, and it "
-                  "needs a logarithm."),
+            ("p", '`b^n = 2` rarely has a whole-number solution. For `b = 101/100` the powers step across `2` between `n = 69` and `n = 70`: `(101/100)^69 ≈ 1.9869` and `(101/100)^70 ≈ 2.0068`, both rounded to four places. The exact answer is irrational, near `69.6607`. Solving `b^n = 2` for `n` is what “Solving Exponential Equations” does, and it needs a logarithm.'),
             ("example", ("The rule of 70",
-                         "For a rise of `r` percent a step, the doubling time is "
-                         "close to `70/r`. At 1% that gives `70` against a true "
-                         "`69.6607`; at 5% it gives `14` against `14.2067`; at 10% it "
-                         "gives `7` against `7.2725`. For now this is a checked "
-                         "shortcut, not a derived rule: lesson 9 will solve the "
-                         "doubling equation after logarithms have been defined. The "
-                         "rule runs slightly high below about 2% a step and slightly "
-                         "low above it, and by 20% a step it offers `3.5` against a "
-                         "true `3.8018`.")),
+                         'For a rise of `r` percent a step, the doubling time is close to `70/r`. At 1% that gives `70` against a true `69.6607`; at 5% it gives `14` against `14.2067`; at 10% it gives `7` against `7.2725`. Here this is a checked shortcut, not a derived rule: “Solving Exponential Equations” uses logarithms to solve the doubling equation. The rule runs slightly high below about 2% a step and slightly low above it, and by 20% a step it offers `3.5` against a true `3.8018`.')),
             ("h3", "Decay is growth reflected"),
             ("p", "`(1/b)^x = b^(−x)`, so the decay curve with base `1/b` is the "
                   "growth curve with base `b` reflected in the vertical axis. There "
@@ -435,20 +408,14 @@ LESSONS = [
              "amount you keep and the `0.05` is what is added to it; dropping the `1` "
              "converts a small rise into a near-total collapse."),
             ("Mixing the unit of the base with the unit of the exponent",
-             "If `b = 21/20` is per year, then `x = 18` means eighteen years. Going "
-             "monthly is not dividing 5% by 12: it is finding the `c` with "
-             "`c¹² = 21/20`, which is a different number. Lesson 11 gives that "
-             "distinction its own name."),
+             'If `b = 21/20` is per year, then `x = 18` means eighteen years. Going monthly is not dividing 5% by 12: it is finding the `c` with `c¹² = 21/20`, which is a different number. “Compound Interest and Continuous Growth” gives that distinction its own name.'),
         ],
         "standard": ("Finish when a sentence turns into a base without hesitation.",
                      "Given \"falls 12% an hour from 90 mg\" you should write "
                      "`A(t) = 90·(22/25)^t` with `t` in hours, say that it decays, and "
                      "say that it never reaches `0`. If the base takes you more than a "
                      "line, the percentage-to-multiplier step is what to drill."),
-        "note": "Every model here changes by a fixed factor per whole step. Lesson 3 "
-                "asks what happens when the step is cut smaller and smaller instead "
-                "&mdash; the same 100% rise, applied twice a year, then monthly, then "
-                "daily &mdash; and the answer to that question is a specific number.",
+        "note": 'Every model here changes by a fixed factor per whole step. “The Number e” asks what happens when the step is cut smaller and smaller instead &mdash; the same 100% rise, applied twice a year, then monthly, then daily &mdash; and the answer to that question is a specific number.',
     },
     # ---------------------------------------------------------------- 03
     {
@@ -548,12 +515,7 @@ LESSONS = [
                   "the exact values are `1`, `e`, `e²`, `1/e`, and those are the forms "
                   "to carry through a calculation."),
             ("example", ("The same money, two ways",
-                         "`1000` at 5% for 10 years, compounded once a year, is "
-                         "`1000·(21/20)^10 ≈ 1628.89`. Compounded continuously it is "
-                         "`1000·e^(0.05·10) = 1000·e^(1/2) ≈ 1648.72`, both rounded to "
-                         "the cent. The gap of about `19.83` is the whole of what "
-                         "continuous compounding buys over annual at this rate. Lesson "
-                         "11 derives the formula `A = P·e^(rt)` from the table above.")),
+                         '`1000` at 5% for 10 years, compounded once a year, is `1000·(21/20)^10 ≈ 1628.89`. Compounded continuously it is `1000·e^(0.05·10) = 1000·e^(1/2) ≈ 1648.72`, both rounded to the cent. The gap of about `19.83` is the whole of what continuous compounding buys over annual at this rate. “Compound Interest and Continuous Growth” derives the formula `A = P·e^(rt)` from the table above.')),
         ],
         "lab": ("expo", {
             "mode": "e",
@@ -682,11 +644,7 @@ LESSONS = [
                      "use `e^x` without pausing over the base. If `e` still reads as a "
                      "special symbol rather than a number near `2.718`, the "
                      "compounding table is the thing to redo by hand."),
-        "note": "Lesson 7 gives base `e` its own notation, `ln`, and lesson 11 derives "
-                "`A = P·e^(rt)` from exactly the table above. Why `e` and not `2` or "
-                "`10` is the natural base for calculus is a question this course "
-                "deliberately does not answer; compounding is an honest and complete "
-                "reason for algebra.",
+        "note": '“Common and Natural Logarithms” gives base `e` its own notation, `ln`, and “Compound Interest and Continuous Growth” derives `A = P·e^(rt)` from exactly the table above. Why `e` and not `2` or `10` is the natural base for calculus is a question this course deliberately does not answer; compounding is an honest and complete reason for algebra.',
     },
     # ---------------------------------------------------------------- 04
     {
@@ -695,10 +653,7 @@ LESSONS = [
         "module": "Logarithms",
         "one_line": "Convert between exponential and logarithmic form and evaluate exact logarithms.",
         "summary": (
-            "`log_b(x)` is the exponent you put on `b` to get `x`. Everything later "
-            "in this course &mdash; the graphs, the three laws, both kinds of equation "
-            "&mdash; is that one sentence applied, and nearly every error is a step "
-            "taken without it."
+            '`log_b(x)` is the exponent you put on `b` to get `x`. Every logarithmic application in this course &mdash; the graphs, the three laws, both kinds of equation &mdash; is that one sentence applied, and nearly every error is a step taken without it.'
         ),
         "key": [
             "log_b(x) = y      means exactly      b^y = x",
@@ -735,13 +690,7 @@ LESSONS = [
                      "<strong>`log_b(x)`</strong> is the unique real number `y` with "
                      "`b^y = x`. The number `b` is the <strong>base</strong> of the "
                      "logarithm and `x` is its <strong>argument</strong>.")),
-            ("p", "The word <em>unique</em> is carrying weight. Lesson 1 fenced the "
-                  "base in so that `b^y` is strictly increasing (when `b &gt; 1`) or "
-                  "strictly decreasing (when `0 &lt; b &lt; 1`). Either way it takes "
-                  "each positive value exactly once, so there is one `y` and not two. "
-                  "That is also why `b = 1` is barred: `1^y = 1` for every `y`, so "
-                  "`log_1(1)` would have every number as an answer and `log_1(5)` "
-                  "would have none."),
+            ("p", 'The word <em>unique</em> is carrying weight. “Exponential Functions” fenced the base in so that `b^y` is strictly increasing (when `b &gt; 1`) or strictly decreasing (when `0 &lt; b &lt; 1`). Either way it takes each positive value exactly once, so there is one `y` and not two. That is also why `b = 1` is barred: `1^y = 1` for every `y`, so `log_1(1)` would have every number as an answer and `log_1(5)` would have none.'),
             ("math", [
                 "exponential form         logarithmic form",
                 "────────────────────────────────────────────────",
@@ -758,12 +707,7 @@ LESSONS = [
                   "the logarithm, the result of the power becomes the argument, and "
                   "the exponent becomes the value. Nothing else happens."),
             ("thm", ("The two cancellation identities",
-                     "`b^(log_b(x)) = x` for every `x &gt; 0`, and `log_b(b^y) = y` "
-                     "for every real `y`. The first says that raising `b` to the "
-                     "exponent which produces `x` produces `x`. The second says that "
-                     "the exponent which produces `b^y` is `y`. Both are the "
-                     "definition said aloud, and lesson 5 restates them as the "
-                     "statement that the two functions are inverse.")),
+                     '`b^(log_b(x)) = x` for every `x &gt; 0`, and `log_b(b^y) = y` for every real `y`. The first says that raising `b` to the exponent which produces `x` produces `x`. The second says that the exponent which produces `b^y` is `y`. Both are the definition said aloud, and “Logarithmic Functions and Their Graphs” restates them as the statement that the two functions are inverse.')),
             ("h3", "Evaluating without a calculator"),
             ("p", "Ask the question. `log_3(81)`: three to what power is `81`? "
                   "`3⁴ = 81`, so the value is `4`. When the answer is not a whole "
@@ -779,16 +723,8 @@ LESSONS = [
                   "below `1` it is negative exactly when the argument is above `1`. "
                   "`log_5(1/25) = −2`, because `5^(−2) = 1/25`. The restriction is on "
                   "the argument; the value is free to be any real number at all."),
-            ("p", "Most logarithms are irrational. `log_2(10)` sits between `3` and "
-                  "`4`, because `2³ = 8` and `2⁴ = 16` bracket `10`, and its value is "
-                  "`3.321928…` &mdash; a number with no exact decimal form. The exact "
-                  "statement is `2^(log_2(10)) = 10`; the decimal is a rounding, and "
-                  "lesson 8 is about producing it."),
-            ("p", "Notation. The base is written as a subscript, and the argument gets "
-                  "brackets whenever there is any doubt: `log_2(x + 1)` and "
-                  "`log_2(x) + 1` are different numbers. Two bases are used so often "
-                  "that they drop the subscript &mdash; base 10 and base `e` &mdash; "
-                  "and lesson 7 introduces that shorthand."),
+            ("p", 'Most logarithms are irrational. `log_2(10)` sits between `3` and `4`, because `2³ = 8` and `2⁴ = 16` bracket `10`, and its value is `3.321928…` &mdash; a number with no exact decimal form. The exact statement is `2^(log_2(10)) = 10`; the decimal is a rounding, and “Change of Base” is about producing it.'),
+            ("p", 'Notation. The base is written as a subscript, and the argument gets brackets whenever there is any doubt: `log_2(x + 1)` and `log_2(x) + 1` are different numbers. Two bases are used so often that they drop the subscript &mdash; base 10 and base `e` &mdash; and “Common and Natural Logarithms” introduces that shorthand.'),
         ],
         "lab": ("logarithm", {
             "mode": "define",
@@ -837,10 +773,7 @@ LESSONS = [
                 "          (1/2)^(−3) = 2³ = 8                  ✓",
             ],
             "after": [
-                "The sixth line is the one that surprises people. A base below `1` "
-                "gives a negative logarithm for an argument above `1`, and a positive "
-                "one for an argument below `1` &mdash; the whole scale runs backwards, "
-                "which is exactly what lesson 5 sees as a decreasing curve.",
+                'The sixth line is the one that surprises people. A base below `1` gives a negative logarithm for an argument above `1`, and a positive one for an argument below `1` &mdash; the whole scale runs backwards, which is exactly what “Logarithmic Functions and Their Graphs” sees as a decreasing curve.',
                 "The last line is not a hard case, it is an impossible one. `7^y` is "
                 "positive for every real `y`, so no exponent gives `−7`. Logarithms of "
                 "negative numbers are not covered in this course and are not merely "
@@ -887,16 +820,10 @@ LESSONS = [
              "arriving. `log_2(0)` is undefined, and `−∞` is not a real number that "
              "can serve as an answer."),
             ("Refusing a negative logarithm",
-             "`log_5(1/25) = −2` is an ordinary value. The positivity restriction is "
-             "on the argument. The output of a logarithm runs over every real number, "
-             "negatives included, which is the range statement of lesson 5."),
+             '`log_5(1/25) = −2` is an ordinary value. The positivity restriction is on the argument. The output of a logarithm runs over every real number, negatives included, which is the range statement of “Logarithmic Functions and Their Graphs”.'),
         ],
         "standard": ("Finish when you convert between the two forms without thinking.",
-                     "Given `log_4(x) = 3/2` you should write `4^(3/2) = x` and get "
-                     "`8` in one line. Given `3^y = 1/27` you should write "
-                     "`y = log_3(1/27) = −3` in one. If either takes a moment of "
-                     "translation, the definition is not yet automatic and the laws "
-                     "in lesson 6 will feel arbitrary."),
+                     'Given `log_4(x) = 3/2` you should write `4^(3/2) = x` and get `8` in one line. Given `3^y = 1/27` you should write `y = log_3(1/27) = −3` in one. If either takes a moment of translation, the definition is not yet automatic and the laws in “The Laws of Logarithms” will feel arbitrary.'),
         "note": "Every exact logarithm the lab reports was found by searching for a "
                 "rational exponent, never by calling a logarithm function. That is the "
                 "honest shape of the subject: `log_2(8)` is `3` exactly, and "
@@ -993,10 +920,7 @@ LESSONS = [
                 "",
                 "the input is multiplied by 10 to move the output by 1",
             ]),
-            ("p", "That last line is the reason decibels, pH and earthquake magnitude "
-                  "are logarithms, which is lesson 12. It is also why a logarithmic "
-                  "curve looks flat on any drawing wide enough to be interesting "
-                  "&mdash; flat is not level, and the two are easy to confuse by eye."),
+            ("p", 'That last line is the reason decibels, pH and earthquake magnitude are logarithms, which is “Logarithmic Scales”. It is also why a logarithmic curve looks flat on any drawing wide enough to be interesting &mdash; flat is not level, and the two are easy to confuse by eye.'),
             ("h3", "Shifting the curve moves the asymptote with it"),
             ("p", "`log_b(x − h)` is the same curve moved `h` to the right, and the "
                   "asymptote goes with it to `x = h`. The domain becomes `x &gt; h`. "
@@ -1009,11 +933,7 @@ LESSONS = [
                          "and `log_3(1) = 0`, and through `(8, 1)`, because `x − 5 = 3` "
                          "and `log_3(3) = 1`. It is the standard shape, five units to "
                          "the right.")),
-            ("p", "One case worth having met early: the domain is decided by the "
-                  "argument being positive, not by `x` being positive. `log_2(x²)` is "
-                  "defined for every `x ≠ 0`, negative values included, because `x²` "
-                  "is positive there. Lesson 6 shows why that makes one of the three "
-                  "laws need a careful statement."),
+            ("p", 'One case worth examining: the domain is decided by the argument being positive, not by `x` being positive. `log_2(x²)` is defined for every `x ≠ 0`, negative values included, because `x²` is positive there. “The Laws of Logarithms” shows why that makes one of the three laws need a careful statement.'),
         ],
         "lab": ("logarithm", {
             "mode": "graph",
@@ -1038,9 +958,7 @@ LESSONS = [
              "`(1/b, −1)`. Without it the sketch tends to stop at the axis instead of "
              "diving, and the diving part is the half that carries the asymptote."),
             ("Write the domain beside the sketch",
-             "`x &gt; 0`, or whatever makes the argument positive. A logarithmic graph "
-             "without its domain is the half of the answer that gets marked wrong, and "
-             "it is the half lesson 10 depends on."),
+             '`x &gt; 0`, or whatever makes the argument positive. A logarithmic graph without its domain is the half of the answer that gets marked wrong, and it is the half “Solving Logarithmic Equations” depends on.'),
         ],
         "worked": {
             "title": "Base 2, then the same curve shifted",
@@ -1068,11 +986,7 @@ LESSONS = [
                 "  x − 5 = 1/2          x = 11/2             y = −1",
             ],
             "after": [
-                "The domain `x &gt; 5` is not a decoration on the answer. "
-                "`log_2(2 − 5) = log_2(−3)` names no real number, so the curve has "
-                "nothing at all to the left of `5`, and a candidate solution of "
-                "`x = 2` to any equation built from this expression is not a solution. "
-                "Lesson 10 is built on precisely that check.",
+                'The domain `x &gt; 5` is not a decoration on the answer. `log_2(2 − 5) = log_2(−3)` names no real number, so the curve has nothing at all to the left of `5`, and a candidate solution of `x = 2` to any equation built from this expression is not a solution. “Solving Logarithmic Equations” is built on precisely that check.',
                 "Note that the shift moved the two free points too. `(1, 0)` became "
                 "`(6, 0)` and `(2, 1)` became `(7, 1)`. Nothing about the shape "
                 "changed; every landmark moved five to the right, the asymptote "
@@ -1153,8 +1067,7 @@ LESSONS = [
         ],
         "key_label": "Three laws, and three things that are not",
         "concepts_intro": (
-            "Nothing here is new mathematics. It is the exponent laws you already "
-            "have, said in the notation of lesson 4."
+            'Nothing here is new mathematics. It is the exponent laws you already have, said in the notation of “What a Logarithm Is”.'
         ),
         "concepts": [
             ("The laws are the exponent laws in other clothes",
@@ -1219,19 +1132,9 @@ LESSONS = [
                 "log_2(8/4)    =  log_2(2)   =  1",
                 "log_2(8) / log_2(4)         =  3/2               not equal",
             ]),
-            ("p", "The first is the sum error and there is nothing to rescue in it. "
-                  "The second is more interesting, because the quotient "
-                  "`log_b(M)/log_b(N)` is not meaningless &mdash; it equals "
-                  "`log_N(M)`. Here `log_2(8)/log_2(4) = 3/2`, and `log_4(8)` is "
-                  "indeed `3/2`. A ratio of two logarithms is a change of base, which "
-                  "lesson 8 makes into a rule; it is not the logarithm of a ratio."),
+            ("p", 'The first is the sum error and there is nothing to rescue in it. The second is more interesting, because the quotient `log_b(M)/log_b(N)` is not meaningless &mdash; it equals `log_N(M)`. Here `log_2(8)/log_2(4) = 3/2`, and `log_4(8)` is indeed `3/2`. A ratio of two logarithms is a change of base, which “Change of Base” makes into a rule; it is not the logarithm of a ratio.'),
             ("h3", "Expanding and condensing"),
-            ("p", "Expanding means using the laws left to right, until every logarithm "
-                  "has a single letter inside it. Condensing means the reverse: "
-                  "coefficients go back up as exponents, sums become products, "
-                  "differences become quotients, and the whole expression ends as one "
-                  "logarithm. Both directions are needed &mdash; expanding to "
-                  "differentiate later, condensing to solve equations in lesson 10."),
+            ("p", 'Expanding means using the laws left to right, until every logarithm has a single letter inside it. Condensing means the reverse: coefficients go back up as exponents, sums become products, differences become quotients, and the whole expression ends as one logarithm. Both directions are needed &mdash; expanding for differentiation, condensing to solve equations in “Solving Logarithmic Equations”.'),
             ("example", ("A restriction that is easy to lose",
                          "`log_b(x²) = 2·log_b(x)` is true for `x &gt; 0` and false "
                          "for `x &lt; 0`. At `x = −5` the left side is `log_b(25)`, a "
@@ -1351,10 +1254,7 @@ LESSONS = [
              "There is no law for addition inside the argument, and no amount of "
              "rearranging produces one."),
             ("Turning a quotient of logarithms into a logarithm of a quotient",
-             "`log_b(M)/log_b(N)` is not `log_b(M/N)`. On numbers: "
-             "`log_2(8)/log_2(4) = 3/2` while `log_2(8/4) = 1`. The quotient of two "
-             "logarithms is a change of base &mdash; it equals `log_N(M)` &mdash; and "
-             "lesson 8 puts that to work rather than throwing it away."),
+             '`log_b(M)/log_b(N)` is not `log_b(M/N)`. On numbers: `log_2(8)/log_2(4) = 3/2` while `log_2(8/4) = 1`. The quotient of two logarithms is a change of base &mdash; it equals `log_N(M)` &mdash; and “Change of Base” puts that to work rather than throwing it away.'),
             ("Bringing down an exponent that is not on the whole argument",
              "In `log_b(x² + 1)` the square sits on `x`, so the power law does not "
              "apply and the expression does not expand at all. The law needs the "
@@ -1368,9 +1268,6 @@ LESSONS = [
                      "`x, y, z &gt; 0`, and turn it back again. If the order of the "
                      "laws is ever in doubt, work outermost first and the doubt does "
                      "not arise."),
-        "note": "Lesson 7 gives base 10 and base `e` their own notation, `log` and "
-                "`ln`, and lesson 8 turns the ratio `log_c(x)/log_c(b)` into the "
-                "change-of-base rule. These three laws hold in every base, so nothing "
-                "written here has to be relearned when the subscript disappears.",
+        "note": '“Common and Natural Logarithms” gives base 10 and base `e` their own notation, `log` and `ln`, and “Change of Base” turns the ratio `log_c(x)/log_c(b)` into the change-of-base rule. These three laws hold in every base, so nothing written here has to be relearned when the subscript disappears.',
     },
 ]

@@ -1264,6 +1264,7 @@ svg polyline{fill:none!important}
       font-size: 0.9rem;
       resize: vertical;
     }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
     .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
     .fb-actions {
       display: flex;
@@ -1422,6 +1423,27 @@ svg polyline{fill:none!important}
       .signin-btn { padding: 0; width: 38px; justify-content: center; }
     }
 
+    /* Trading charts use a 960-unit plotting frame. Keep that authored scale
+       instead of shrinking 11-unit axis text to roughly 3 CSS pixels on a
+       phone. The named keyboard scroll owner exposes the complete chart. */
+    @media screen {
+      .market-chart-scroll {
+        contain: inline-size;
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        overscroll-behavior-inline: contain;
+      }
+      .market-chart-scroll > svg.market-chart {
+        display: block;
+        width: 100%;
+        min-width: 960px;
+      }
+    }
+
     body[data-page-kind] {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 16px;
@@ -1455,6 +1477,7 @@ svg polyline{fill:none!important}
     [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
     [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
     [data-ui="hero"] .eyebrow { display: block; color: var(--muted); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
     [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
     [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
     [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
@@ -1499,7 +1522,7 @@ svg polyline{fill:none!important}
     }
     [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
     [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
-    [data-ui="lesson-list"] .lesson-link { min-height: 44px; }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
     body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
     body[data-page-kind] .is-done .lesson-state { color: var(--green); }
     [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
@@ -1616,7 +1639,7 @@ svg polyline{fill:none!important}
 <div class="lab-layout">
  <article class="card chart-card">
   <div class="chart-toolbar"><div class="chart-title"><strong>Rule event simulator</strong><span>Signals only — no profit or performance model</span></div><div class="inline-legend"><span class="tone-green"><i class="legend-swatch"></i>Entry</span><span class="tone-red"><i class="legend-swatch"></i>Exit</span><span class="tone-cyan"><i class="legend-swatch"></i>EMA filter</span></div></div>
-  <div class="chart-wrap"><svg id="rulesChart" class="market-chart" aria-label="Indicator rule entry and exit events"></svg></div>
+  <div class="chart-wrap market-chart-scroll" tabindex="0" role="region" aria-label="Interactive chart; scroll horizontally for complete chart labels"><svg id="rulesChart" class="market-chart" aria-label="Indicator rule entry and exit events"></svg></div>
   <div class="chart-note">Events are calculated on completed synthetic bars. This lesson scores rule clarity and internal consistency, not profitability.</div>
  </article>
  <aside class="card side-panel" aria-live="polite">
@@ -1845,9 +1868,9 @@ function buildRule(){
 setupQuiz({promptId:'rulesQuizPrompt',choicesId:'rulesQuizChoices',feedbackId:'rulesQuizFeedback',scoreId:'rulesQuizScore',nextId:'rulesQuizNext',questions:[
  {prompt:'Which condition is deterministic?',choices:[{label:'Momentum looks strong',why:'“Strong” has no number.'},{label:'RSI 14 crosses above 40 on a completed bar'},{label:'Price is near support',why:'“Near” and “support” are both undefined here.'},{label:'The chart feels bullish',why:'Nothing in that sentence resolves to true or false from bar data.'}],answer:1,explanation:'It specifies the indicator, period, threshold, direction, and timing.'},
  {prompt:'What is the difference between a filter and a trigger?',choices:[{label:'A filter allows or blocks a setup; a trigger defines the event'},{label:'There is no difference',why:'A filter is true for many bars in a row. A trigger is true on the bar the event happens.'},{label:'A trigger uses future data',why:'Neither may.'},{label:'A filter always exits a trade',why:'Exits are a third role, defined separately.'}],answer:0,explanation:'Separating roles makes the rule easier to reproduce and test.'},
- {prompt:'A rule is logically complete and internally consistent. What does that prove?',choices:[{label:'It is profitable',why:'The lab’s own status says it on every rule: reproducible is not profitable.'},{label:'It can be reproduced, but performance still requires testing'},{label:'It cannot lose',why:'A consistent rule loses whenever the market does not do what it was written for.'},{label:'Costs do not matter',why:'Costs are not modelled here at all. They belong to course 7.'}],answer:1,explanation:'Clarity is necessary for testing but does not establish edge or robustness.'},
+ {prompt:'A rule is logically complete and internally consistent. What does that prove?',choices:[{label:'It is profitable',why:'The lab’s own status says it on every rule: reproducible is not profitable.'},{label:'It can be reproduced, but performance still requires testing'},{label:'It cannot lose',why:'A consistent rule loses whenever the market does not do what it was written for.'},{label:'Costs do not matter',why:'Costs are not modelled here at all. They belong to Backtesting and Trading Systems.'}],answer:1,explanation:'Clarity is necessary for testing but does not establish edge or robustness.'},
  {prompt:'Why must state handling be defined?',choices:[{label:'To prevent every qualifying bar from creating duplicate entries while already active'},{label:'To make indicators predict',why:'State handling changes what the system does with a signal, not what the signal knows.'},{label:'To remove warm-up data',why:'Warm-up is a data-integrity question, handled separately.'},{label:'To calculate fundamentals',why:'Nothing in a rule’s state concerns fundamentals.'}],answer:0,explanation:'A system must know whether it is flat or active and how repeated signals are treated.'},
- {prompt:'Every export from this lesson carries performanceEvaluated: false. Why?',choices:[{label:'The simulator computes no returns, so a well-specified rule is never mistaken for a tested one'},{label:'The rule failed a check',why:'The flag is constant. It is false even for a 100% clarity score.'},{label:'The sample was too short',why:'Length is not the reason: no return is computed at any length.'},{label:'The export is incomplete',why:'The export is complete. It is the evaluation that has not happened, deliberately.'}],answer:0,explanation:'The lab scores clarity and consistency only. Returns, costs and significance belong to courses 6 and 7, and the flag keeps that distinction inside the file.'}
+ {prompt:'Every export from this lesson carries performanceEvaluated: false. Why?',choices:[{label:'The simulator computes no returns, so a well-specified rule is never mistaken for a tested one'},{label:'The rule failed a check',why:'The flag is constant. It is false even for a 100% clarity score.'},{label:'The sample was too short',why:'Length is not the reason: no return is computed at any length.'},{label:'The export is incomplete',why:'The export is complete. It is the evaluation that has not happened, deliberately.'}],answer:0,explanation:'The lab scores clarity and consistency only. Returns, costs and significance belong to Trading Risk Management and Backtesting and Trading Systems, and the flag keeps that distinction inside the file.'}
 ]});</script>
   <script data-progress-marks>
   /* Completion marks. localStorage only: no request leaves the page. */

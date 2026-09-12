@@ -49,10 +49,9 @@ COURSE = {
          "claim invites which technique, and what each one owes the reader."),
     ],
     "syllabus_intro": (
-        "Lessons 1 to 7 are propositional logic, 8 to 10 add quantifiers, and 11 to 14 "
-        "turn all of it into proofs."
+        'Propositional logic, quantifiers, and proofs: statements and logical equivalence support precise arguments with and without quantifiers.'
     ),
-    "how_to": ['Lesson 5 assumes you can build a truth table; lesson 13 assumes you know what the contrapositive is and why it is equivalent.', 'Use the labs adversarially. Most of them let you type your own formula or edit the predicate. The fastest way to understand a claim is to spend two minutes trying to make it false and finding out you cannot.', 'Write the proofs out. Lesson 11 ends with an argument to check, and lessons 12 to 14 each end with a claim to prove yourself. Reading a proof and producing one are different skills, and only the second transfers to these courses.', 'Do not be put off by the continuity and convergence definitions in lessons 9 and 10. They are there because they are the hardest quantifier strings most people ever meet, and the point of those lessons is that you can read and negate them mechanically without knowing what they mean. Nothing in this Subject needs the calculus.'],
+    "how_to": ['The “Logical Equivalence” Lesson assumes you can build a truth table; the “Contraposition and Contradiction” Lesson assumes you know what the contrapositive is and why it is equivalent.', 'Use the labs adversarially. Most of them let you type your own formula or edit the predicate. The fastest way to understand a claim is to spend two minutes trying to make it false and finding out you cannot.', 'Write the proofs out. The “Rules of Inference” Lesson ends with an argument to check, and the “Direct Proof”, “Contraposition and Contradiction”, and “Cases, Counterexamples, and Writing a Proof” Lessons each end with a claim to prove yourself. Reading a proof and producing one are different skills, and only the second transfers to these courses.', 'Do not be put off by the continuity and convergence definitions in the “Nested Quantifiers” and “Negating Quantified Statements” Lessons. They are there because they are the hardest quantifier strings most people ever meet, and the point of those lessons is that you can read and negate them mechanically without knowing what they mean. Nothing in this Subject needs the calculus.'],
     "not_covered": [
         "Formal proof systems. This course teaches proof as mathematicians write it "
         "&mdash; rigorous prose &mdash; not natural deduction trees, sequent calculus, or "
@@ -65,7 +64,7 @@ COURSE = {
     ],
     "footer_lead": (
         (
-        'Truth tables, equivalences and quantifier evaluations on this course are computed in your browser by evaluating the formula under every assignment, so a column is right because the evaluation is right. Verifying a statement on the cases shown is not a proof of it &mdash; lesson 14 and Induction and Recursion are about exactly that gap.'
+        'Truth tables, equivalences and quantifier evaluations on this course are computed in your browser by evaluating the formula under every assignment, so a column is right because the evaluation is right. Verifying a statement on the cases shown is not a proof of it &mdash; the “Cases, Counterexamples, and Writing a Proof” Lesson and Induction and Recursion are about exactly that gap.'
     )
     ),
     "lessons": part_a.LESSONS + part_b.LESSONS,

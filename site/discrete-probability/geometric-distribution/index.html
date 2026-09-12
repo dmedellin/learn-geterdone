@@ -583,6 +583,15 @@
       overflow-x: auto;
     }
     .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
 
     /* ---------- Graphs ----------
        Tokens only. A component override scoped to [data-theme="light"] would
@@ -1040,6 +1049,7 @@
       font-size: 0.9rem;
       resize: vertical;
     }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
     .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
     .fb-actions {
       display: flex;
@@ -1132,6 +1142,7 @@
     [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
     [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
     [data-ui="hero"] .eyebrow { display: block; color: var(--muted); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
     [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
     [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
     [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
@@ -1176,7 +1187,7 @@
     }
     [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
     [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
-    [data-ui="lesson-list"] .lesson-link { min-height: 44px; }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
     body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
     body[data-page-kind] .is-done .lesson-state { color: var(--green); }
     [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
@@ -1276,12 +1287,12 @@ MEMORYLESS:  P(X &gt; m+n | X &gt; m) = P(X &gt; n)</div>
       </div>
     </section>
     <section class="section">
-      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>The last distribution on this course, and the one whose mean is least representative of a typical outcome.</p></div>
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>A waiting-time distribution whose mean is least representative of a typical outcome.</p></div>
       <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>The number of trials is not fixed</h3><p>That is what separates it from the binomial. The sample space is countably infinite, which is why the axioms had to be stated in general.</p></article><article class="card concept-card"><div class="icon">2</div><h3>The mean is <span class="math">1/p</span>, and it is not typical</h3><p>A 1-in-6 event takes 6 attempts on average, and yet the single most likely outcome is the very first attempt.</p></article><article class="card concept-card"><div class="icon">3</div><h3>It is memoryless</h3><p>Having failed 20 times does not improve the next attempt. The distribution of the remaining wait is unchanged.</p></article></div>
     </section>
     <section class="section" id="read">
       <div class="section-head"><div><p class="kicker">The material</p><h2>Waiting times</h2></div><p>The distribution, its mean, memorylessness, and the coupon collector.</p></div>
-      <article class="card card-pad prose"><div class="thm"><span class="label">Theorem &middot; Geometric distribution</span><p>In independent trials with success probability <span class="math">p &gt; 0</span>, let <span class="math">X</span> be the number of the trial on which the first success occurs. Then <span class="math">P(X = k) = (1−p)^{k−1}p</span> for <span class="math">k = 1, 2, 3, …</span></p></div><div class="proof"><p>The first success on trial <span class="math">k</span> means <span class="math">k − 1</span> failures followed by a success. By independence that probability is <span class="math">(1−p)^{k−1}p</span>.</p><p>These sum to 1 by the geometric series of Induction and Recursion lesson 3: <span class="math">Σ_{k≥1} (1−p)^{k−1}p = p/(1 − (1−p)) = 1</span>.</p><p><span class="qed">&#9633;</span></p></div><div class="thm"><span class="label">Theorem &middot; Mean and variance</span><p><span class="math">E[X] = 1/p</span> and <span class="math">Var(X) = (1−p)/p²</span>.</p></div><div class="proof"><p>Condition on the first trial. With probability <span class="math">p</span> it succeeds and <span class="math">X = 1</span>; with probability <span class="math">1 − p</span> it fails and the remaining wait has the same distribution as <span class="math">X</span>. So <span class="math">E[X] = p·1 + (1−p)(1 + E[X])</span>.</p><p>That sentence is a computation from the definition, not a new rule. For <span class="math">k ≥ 2</span>, <span class="math">P(X = k) = (1−p)·P(X = k−1)</span> &mdash; the first trial failed, then the wait started again &mdash; so <span class="math">E[X] = 1·p + Σ_{k≥2} k(1−p)P(X = k−1) = p + (1−p) Σ_{j≥1} (j+1)P(X = j) = p + (1−p)(E[X] + 1)</span>, the same equation.</p><p>Expanding: <span class="math">E[X] = 1 + (1−p)E[X]</span>, hence <span class="math">pE[X] = 1</span> and <span class="math">E[X] = 1/p</span>.</p><p><span class="qed">&#9633;</span></p></div><p>That conditioning argument is worth more than the formula. It avoids summing an infinite series entirely, and the same trick handles many waiting-time problems where no series is available.</p><div class="thm"><span class="label">Theorem &middot; Memorylessness</span><p><span class="math">P(X &gt; m + n | X &gt; m) = P(X &gt; n)</span> for all <span class="math">m, n ≥ 0</span>. The geometric is the only discrete distribution with this property.</p></div><div class="proof"><p><span class="math">P(X &gt; k) = (1−p)^k</span>, since it means the first <span class="math">k</span> trials all failed. Then <span class="math">P(X &gt; m+n | X &gt; m) = (1−p)^{m+n} / (1−p)^m = (1−p)^n = P(X &gt; n)</span>.</p><p><span class="qed">&#9633;</span></p></div><p>This is the gambler's fallacy stated correctly. A roulette wheel that has come up red twenty times is exactly as likely to come up red next spin; the past failures are already accounted for and change nothing. The distribution has no memory because the trials are independent, and independence is what the model assumed.</p><h3>Why the mean misleads</h3><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">p = 1/6:   E[X] = 6
+      <article class="card card-pad prose"><div class="thm"><span class="label">Theorem &middot; Geometric distribution</span><p>In independent trials with success probability <span class="math">p &gt; 0</span>, let <span class="math">X</span> be the number of the trial on which the first success occurs. Then <span class="math">P(X = k) = (1−p)^{k−1}p</span> for <span class="math">k = 1, 2, 3, …</span></p></div><div class="proof"><p>The first success on trial <span class="math">k</span> means <span class="math">k − 1</span> failures followed by a success. By independence that probability is <span class="math">(1−p)^{k−1}p</span>.</p><p>These sum to 1 by the geometric series of the “Induction with Sums and Products” Lesson in Induction and Recursion: <span class="math">Σ_{k≥1} (1−p)^{k−1}p = p/(1 − (1−p)) = 1</span>.</p><p><span class="qed">&#9633;</span></p></div><div class="thm"><span class="label">Theorem &middot; Mean and variance</span><p><span class="math">E[X] = 1/p</span> and <span class="math">Var(X) = (1−p)/p²</span>.</p></div><div class="proof"><p>Condition on the first trial. With probability <span class="math">p</span> it succeeds and <span class="math">X = 1</span>; with probability <span class="math">1 − p</span> it fails and the remaining wait has the same distribution as <span class="math">X</span>. So <span class="math">E[X] = p·1 + (1−p)(1 + E[X])</span>.</p><p>That sentence is a computation from the definition, not a new rule. For <span class="math">k ≥ 2</span>, <span class="math">P(X = k) = (1−p)·P(X = k−1)</span> &mdash; the first trial failed, then the wait started again &mdash; so <span class="math">E[X] = 1·p + Σ_{k≥2} k(1−p)P(X = k−1) = p + (1−p) Σ_{j≥1} (j+1)P(X = j) = p + (1−p)(E[X] + 1)</span>, the same equation.</p><p>Expanding: <span class="math">E[X] = 1 + (1−p)E[X]</span>, hence <span class="math">pE[X] = 1</span> and <span class="math">E[X] = 1/p</span>.</p><p><span class="qed">&#9633;</span></p></div><p>That conditioning argument is worth more than the formula. It avoids summing an infinite series entirely, and the same trick handles many waiting-time problems where no series is available.</p><div class="thm"><span class="label">Theorem &middot; Memorylessness</span><p><span class="math">P(X &gt; m + n | X &gt; m) = P(X &gt; n)</span> for all <span class="math">m, n ≥ 0</span>. The geometric is the only discrete distribution with this property.</p></div><div class="proof"><p><span class="math">P(X &gt; k) = (1−p)^k</span>, since it means the first <span class="math">k</span> trials all failed. Then <span class="math">P(X &gt; m+n | X &gt; m) = (1−p)^{m+n} / (1−p)^m = (1−p)^n = P(X &gt; n)</span>.</p><p><span class="qed">&#9633;</span></p></div><p>This is the gambler's fallacy stated correctly. A roulette wheel that has come up red twenty times is exactly as likely to come up red next spin; the past failures are already accounted for and change nothing. The distribution has no memory because the trials are independent, and independence is what the model assumed.</p><h3>Why the mean misleads</h3><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">p = 1/6:   E[X] = 6
 
    P(X = 1) = 0.167        the single most likely value
    P(X ≤ 3) = 0.421
@@ -1297,7 +1308,7 @@ MEMORYLESS:  P(X &gt; m+n | X &gt; m) = P(X &gt; n)</div>
         <div class="lab-title"><strong id="dsTitle">Distribution</strong><span id="dsSub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>P(X = k)</span><span class="tone-amber"><i class="legend-swatch"></i>E[X]</span></div>
       </div>
-      <div class="lab-stage"><svg id="dsPlot" viewBox="0 0 520 220" role="img" aria-label="Probability mass function drawn as bars, with the expected value marked."></svg></div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="dsPlot" viewBox="0 0 520 220" role="img" aria-label="Probability mass function drawn as bars, with the expected value marked."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="dsTable"></table></div>
       <div class="status-banner" id="dsStatus" style="margin-top:12px;"></div>
         </article>
@@ -1396,7 +1407,7 @@ which is a distribution nobody should summarise with one number.</div><p>Two thi
     </section>
 
     <footer class="footer" data-ui="footer">
-      <p><strong>Discrete Probability.</strong> Probabilities on this course are computed as exact fractions from the enumerated sample space, so <span class="math">1/6</span> appears as <span class="math">1/6</span> rather than as a decimal that is nearly it. The distributions in the last lessons are summed term by term from their definitions and compared with the closed forms.</p>
+      <p><strong>Discrete Probability.</strong> Probabilities on this course are computed as exact fractions from the enumerated sample space, so <span class="math">1/6</span> appears as <span class="math">1/6</span> rather than as a decimal that is nearly it. The binomial and geometric distributions are summed term by term from their definitions and compared with the closed forms.</p>
       <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure is computed in your browser from the stated definition, and a worked example is not a proof.</p>
       <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
     </footer>

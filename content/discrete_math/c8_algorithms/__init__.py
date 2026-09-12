@@ -14,7 +14,7 @@ COURSE = {
     ),
     "blurb": (
         (
-        'Recurrences from Induction and Recursion, counting from Combinatorics and Counting and graphs from Graphs and Trees all reappear as the running time of something &mdash; and the last two lessons say what no algorithm can do.'
+        'Recurrences from Induction and Recursion, counting from Combinatorics and Counting and graphs from Graphs and Trees all reappear as the running time of something &mdash; and “P, NP and NP-Completeness” and “Decidability and the Halting Problem” examine computational limits, distinguishing intractability from undecidability.'
     )
     ),
     "key": [
@@ -43,35 +43,22 @@ COURSE = {
          "P, NP, NP-complete, undecidable. Knowing which of those a problem is in "
          "changes what you should attempt."),
         ("Prove an algorithm right, and bound a sequence",
-         "An invariant for partial correctness and a decreasing measure for termination "
-         "(lesson 2); the cost of a whole sequence of operations rather than the worst "
-         "single one (lesson 8); and the lower bound no comparison sort beats (lesson 6)."),
+         'An invariant for partial correctness and a decreasing measure for termination (“Correctness and Termination”); the cost of a whole sequence of operations rather than the worst single one (“Recursion Trees and Amortised Analysis”); and the lower bound no comparison sort beats (“Searching and Sorting”).'),
     ],
     "syllabus_intro": (
-        "Lessons 1 to 2 are what an algorithm is and what correctness means, 3 to 8 are "
-        "analysis, 9 to 10 are design, and 11 to 12 are the limits."
+        'Algorithm definitions and correctness, analysis of running time, algorithm design, and the limits of computation.'
     ),
     "how_to": [
-        "Produce the witnesses. Every big-O claim in lesson 4 comes with a `C` and a `k`, "
-        "and the lab searches for them; a claim without them is a slogan. When the "
-        "relation is false the lab says so from the growth classes and shows the ratio "
-        "diverging, because no finite search can refute a claim about every `n`.",
-        "Use the measured columns. The lab counts operations by running the algorithms, "
-        "so the predicted growth can be compared with something rather than believed. "
-        "Each lesson's lab opens on that lesson's own example &mdash; the invariant "
-        "trace of lesson 2's `POWER(3, 13)`, lesson 5's four loop nests, lesson 6's "
-        "counts at `n = 16`, lesson 7's `4T(n/2) + n`, lesson 8's sixteen inserts, "
-        "lesson 10's table to 8 &mdash; and every panel quotes what the lab prints there.",
-        "Take lesson 12 seriously. Undecidability is not a statement about current "
-        "technology, and the halting proof is short enough to follow completely.",
+        'Produce the witnesses. Every big-O claim in “Big-O, Big-Omega and Big-Theta” comes with a `C` and a `k`, and the lab searches for them; a claim without them is a slogan. When the relation is false the lab says so from the growth classes and shows the ratio diverging, because no finite search can refute a claim about every `n`.',
+        "Use the measured columns. The lab counts operations by running the algorithms, so the predicted growth can be compared with something rather than believed. Each lesson's lab opens on that lesson's own example &mdash; the invariant trace of “Correctness and Termination”’s `POWER(3, 13)`, “Analysing Iterative Algorithms”’s four loop nests, “Searching and Sorting”’s counts at `n = 16`, “Divide and Conquer”’s `4T(n/2) + n`, “Recursion Trees and Amortised Analysis”’s sixteen inserts, “Dynamic Programming”’s table to 8 &mdash; and every panel quotes what the lab prints there.",
+        'Take “Decidability and the Halting Problem” seriously. Undecidability is not a statement about current technology, and the halting proof is short enough to follow completely.',
     ],
     "not_covered": [
         "Data structures as a subject: heaps, balanced trees, hash tables and their "
         "analyses. They appear where an algorithm needs one and are not developed.",
         "Randomised and approximation algorithms beyond passing mentions, and the "
         "average-case analysis that quicksort needs.",
-        "Formal models of computation. Turing machines are described in lesson 12 only "
-        "as far as the halting problem requires.",
+        'Formal models of computation. Turing machines are described in “Decidability and the Halting Problem” only as far as the halting problem requires.',
     ],
     "footer_lead": (
         "Every operation count on this course is produced by executing the algorithm "

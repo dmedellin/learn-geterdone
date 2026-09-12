@@ -5,6 +5,7 @@
 const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
 const {launch}=require('./browser_cdp'),contracts=require('./browser_contracts');
 const {refine}=require('./browser_contrast_pixels');
+const protocol=require('./mutation_protocol');
 const OUT=process.env.BROWSER_EVIDENCE;
 assert(OUT&&!path.resolve(OUT).startsWith(path.resolve(__dirname,'..')+'/'),'external evidence required');
 const functions=Object.values(contracts).map(f=>f.toString()).join('\n');
@@ -14,12 +15,14 @@ async function main(){
   await c.send('Page.setDocumentContent',{frameId:(await c.send('Page.getFrameTree')).frameTree.frame.id,html:'<!doctype html><html data-theme="dark"><head><style>:root{--bg:#071019;--text:#edf7ff}body{background:var(--bg);color:var(--text)}</style></head><body>'+markup+'</body></html>'});
   let result=await c.evaluate('(()=>{'+functions+';return '+expression+'})()');
   if(raster)result=await refine(c,result);
+  let opacityCorrect=true;
   if(name==='inherited group opacity'){
    const foreground=result.rows[0].foreground;
-   assert(foreground.every((x,i)=>Math.abs(x-[12,16.5,21][i])<=1),'opacity compositing foreground must use the exterior backdrop');
+   opacityCorrect=foreground.every((x,i)=>Math.abs(x-[12,16.5,21][i])<=1);
   }
-  const pass=message?result.failures.some(f=>JSON.stringify(f).includes(message)):result.failures.length===0;
+  const pass=opacityCorrect&&(message?result.failures.some(f=>JSON.stringify(f).includes(message)):result.failures.length===0);
   rows.push({name,message,result,pass});console.log((pass?'PASS ':'FAIL ')+name+' '+JSON.stringify(result));
+  if(!pass)protocol.semantic('FAIL '+name,result);
  }
  try{
   await check('content clipping','<main style="height:20px;overflow:hidden"><p>One line</p><p>Another line</p></main>','rootLayout()','clipped content owner');
@@ -56,6 +59,6 @@ async function main(){
  }finally{await c.close();}
  const summary={passed:rows.filter(r=>r.pass).length,failed:rows.filter(r=>!r.pass).length,rows};
  fs.writeFileSync(path.join(OUT,'summary.json'),JSON.stringify(summary,null,2)+'\n');
- assert.equal(summary.failed,0,'browser contracts must reject intended negative fixtures');
+ if(summary.failed)process.exitCode=1;
 }
-main().catch(e=>{console.error(e.stack);process.exitCode=1});
+main().catch(e=>{protocol.setup(e);process.exitCode=1});

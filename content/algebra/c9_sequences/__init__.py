@@ -44,10 +44,7 @@ COURSE = {
          "and isolate a requested term by solving its exponent equation for an admissible `k`."),
     ],
     "syllabus_intro": (
-        "Lessons 1 and 2 generate sequences and encode finite sums. Lessons 3 to 5 "
-        "classify the two standard families and recover or telescope partial sums. "
-        "Lessons 6 to 8 decide geometric convergence and apply it to decimals and "
-        "payment streams; lessons 9 to 11 construct and use binomial coefficients."
+        'Sequence definitions and recursion generate terms; sigma notation encodes finite sums. Arithmetic and geometric families have exact formulas, while partial sums can be recovered or telescoped. Geometric convergence connects infinite series with repeating decimals and payment streams; Pascal’s triangle and the binomial theorem construct and use binomial coefficients.'
     ),
     "how_to": [
         "After studying each complete worked example, cover it and finish the faded "
@@ -56,8 +53,8 @@ COURSE = {
         "Add the first several terms by hand before using a sum formula. The sequence "
         "labs compare a direct construction with the relevant closed form, while the "
         "Pascal and binomial labs make their own independent checks visible.",
-        "Take the `|r| < 1` condition seriously in lesson 6. The formula returns a number for `r = 2` as happily as for `r = 1/2`, and that number is meaningless.",
-        "Build Pascal's triangle by hand once, at least to row 6. Lesson 10 is much easier for anyone who has seen the coefficients appear before being given a formula for computing one directly.",
+        'Take the `|r| < 1` condition seriously in “Infinite Geometric Series”. The formula returns a number for `r = 2` as happily as for `r = 1/2`, and that number is meaningless.',
+        "Build Pascal's triangle by hand once, at least to row 6. “The Binomial Theorem” is much easier for anyone who has seen the coefficients appear before being given a formula for computing one directly.",
     ],
     "not_covered": [
         "Convergence tests for series in general. Only the geometric case is settled here, and it is settled completely; the rest belongs to calculus.",

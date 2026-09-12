@@ -45,22 +45,16 @@ COURSE = {
          "Linear homogeneous by characteristic roots, nonhomogeneous by a particular "
          "solution, and divide-and-conquer by the master theorem."),
         ("Prove an algorithm correct",
-         "Termination by a quantity that strictly decreases and is bounded below, and "
-         "correctness by strong induction on the input for a recursion or by an "
-         "invariant for a loop &mdash; the two obligations of lessons 8 and 12, neither "
-         "of which is worth anything alone."),
+         'Termination by a quantity that strictly decreases and is bounded below, and correctness by strong induction on the input for a recursion or by an invariant for a loop &mdash; the two obligations of “Recursive Algorithms and Correctness” and “Loop Invariants and Program Correctness”, neither of which is worth anything alone.'),
     ],
     "syllabus_intro": (
-        "Lessons 1 to 5 are induction, 6 to 8 recursion, 9 to 11 recurrences, and 12 "
-        "applies all three to program correctness."
+        'Induction, recursion and recurrences support the program-correctness arguments in “Loop Invariants and Program Correctness”.'
     ),
     "how_to": [
         "Write every proof out in full, including the sentence that says where the "
         "inductive hypothesis was used. A step that never invokes `P(k)` is not an "
         "induction proof, however true its conclusion.",
-        "Spend real time in lesson 1's lab. Two of its statements are false and survive "
-        "dozens of checks; meeting them is the reason this course exists. Lessons 2 and "
-        "5 name them, so look before then.",
+        "Spend real time in “The Well-Ordering Principle”'s lab. Two of its statements are false and survive dozens of checks; meeting them is the reason this course exists. “Mathematical Induction” and “Strong Induction” explain these failures; try to identify the false statements yourself before reading those explanations.",
         "Do the recurrence arithmetic by hand once per lesson before using the lab. "
         "The lab compares your closed form against the iteration, which is only useful "
         "if you produced a closed form to compare.",
@@ -69,12 +63,9 @@ COURSE = {
         "Transfinite induction and induction over ordinals. Everything here is "
         "induction over `ℕ` or over a well-founded recursive structure.",
         (
-            "Generating functions as a recurrence-solving technique. Combinatorics and "
-            "Counting lesson 12 introduces them for counting; using them to solve recurrences "
-            "is not covered here."
+            'Generating functions as a recurrence-solving technique. The “Generating Functions” Lesson in Combinatorics and Counting introduces them for counting; using them to solve recurrences is not covered here.'
         ),
-        "Formal verification tools. Lesson 12 writes loop invariants as mathematics, "
-        "not as annotations a checker consumes.",
+        'Formal verification tools. The “Loop Invariants and Program Correctness” Lesson writes loop invariants as mathematics, not as annotations a checker consumes.',
     ],
     "footer_lead": (
         "The induction lab on this course checks a statement for the values you select "

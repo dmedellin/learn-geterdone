@@ -1243,6 +1243,7 @@ textarea { font: inherit; }
       font-size: 0.9rem;
       resize: vertical;
     }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
     .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
     .fb-actions {
       display: flex;
@@ -1401,6 +1402,27 @@ textarea { font: inherit; }
       .signin-btn { padding: 0; width: 38px; justify-content: center; }
     }
 
+    /* Trading charts use a 960-unit plotting frame. Keep that authored scale
+       instead of shrinking 11-unit axis text to roughly 3 CSS pixels on a
+       phone. The named keyboard scroll owner exposes the complete chart. */
+    @media screen {
+      .market-chart-scroll {
+        contain: inline-size;
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        overscroll-behavior-inline: contain;
+      }
+      .market-chart-scroll > svg.market-chart {
+        display: block;
+        width: 100%;
+        min-width: 960px;
+      }
+    }
+
     body[data-page-kind] {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 16px;
@@ -1434,6 +1456,7 @@ textarea { font: inherit; }
     [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
     [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
     [data-ui="hero"] .eyebrow { display: block; color: var(--muted); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
     [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
     [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
     [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
@@ -1478,7 +1501,7 @@ textarea { font: inherit; }
     }
     [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
     [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
-    [data-ui="lesson-list"] .lesson-link { min-height: 44px; }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
     body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
     body[data-page-kind] .is-done .lesson-state { color: var(--green); }
     [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
@@ -1606,7 +1629,7 @@ textarea { font: inherit; }
 <div class="lab-layout">
   <article class="card chart-card">
     <div class="chart-toolbar"><div class="chart-title"><strong id="managementTitle">Trend continuation</strong><span>Choose one management action before revealing the next candle</span></div><div class="tab-row" id="managementTabs"><button class="tab active" data-scenario="trend" type="button">Trend continuation</button><button class="tab" data-scenario="shakeout" type="button">Volatility before target</button><button class="tab" data-scenario="failure" type="button">Failed setup</button></div></div>
-    <div class="chart-wrap"><svg id="managementChart" class="market-chart" aria-label="Trade management simulation chart"></svg><div class="chart-tooltip"></div></div>
+    <div class="chart-wrap market-chart-scroll" tabindex="0" role="region" aria-label="Interactive chart; scroll horizontally for complete chart labels"><svg id="managementChart" class="market-chart" aria-label="Trade management simulation chart"></svg><div class="chart-tooltip"></div></div>
     <div class="reading-strip" id="managementReadingBlock" aria-live="polite"></div>
     <div class="control-strip"><button class="btn small" id="managementReset" type="button">Reset simulation</button><span class="pill" id="managementCandle">Candle 1</span><span class="pill" id="managementScore">Discipline 0 / 0</span></div>
   </article>
@@ -2248,7 +2271,7 @@ function applyManagementAction(action){const s=managementScenarios[managementKey
 document.getElementById("managementActions").addEventListener("click",event=>{const b=event.target.closest("[data-action]");if(b)applyManagementAction(b.dataset.action);});document.getElementById("managementReset").addEventListener("click",newManagementState);document.getElementById("managementTabs").addEventListener("click",event=>{const b=event.target.closest("[data-scenario]");if(!b)return;document.querySelectorAll("#managementTabs .tab").forEach(x=>x.classList.toggle("active",x===b));managementKey=b.dataset.scenario;newManagementState();});
 setupQuiz({promptId:"managementQuizPrompt",choicesId:"managementQuizChoices",feedbackId:"managementQuizFeedback",scoreId:"managementQuizScore",nextId:"managementQuizNext",questions:[
  {prompt:"The plan says move the stop to break-even only after a close above +1R. Price is currently +0.6R.",choices:[{value:"hold",label:"Keep the original stop"},{value:"be",label:"Move to break-even now",why:"The plan says after a close above +1R, and price is at +0.6R. Run the shakeout tab and move early: the dip to −0.45R fills a break-even stop on a trade that then goes to +2.45R. That is the first mistake this lesson names."},{value:"wide",label:"Widen the stop",why:"Nothing has gone wrong — price is above entry — and widening is never a plan action anyway. The stop only tightens, at the milestones the plan wrote down."},{value:"exit",label:"Exit automatically",why:"No milestone has been reached and no invalidation has printed. An exit at +0.6R is a discretionary change to the plan, and it would be scored as one."}],answer:"hold",explanation:"The predefined milestone has not occurred. Moving early changes the tested rule."},
- {prompt:"Price reaches the stop and invalidates the setup. What is prohibited?",choices:[{value:"widen",label:"Moving the stop farther away"},{value:"record",label:"Recording the loss",why:"Recording the loss is required, not prohibited — it is the entry lesson 14 asks for, with the plan-followed flag set to yes. The prohibited act is moving the stop so the loss is not taken."},{value:"review",label:"Reviewing the setup later",why:"Review is the point of the record. What is prohibited is changing the invalidation while the trade is open so that the review never has a loss to look at."},{value:"accept",label:"Accepting the planned loss",why:"Accepting the planned loss is the plan working. The −1R was chosen before entry as the price of being wrong; the failure is refusing to pay it by widening the stop."}],answer:"widen",explanation:"Widening after entry increases risk and keeps an invalid thesis alive."},
+ {prompt:"Price reaches the stop and invalidates the setup. What is prohibited?",choices:[{value:"widen",label:"Moving the stop farther away"},{value:"record",label:"Recording the loss",why:"Recording the loss is required, not prohibited — it is the entry Trading Journal asks for, with the plan-followed flag set to yes. The prohibited act is moving the stop so the loss is not taken."},{value:"review",label:"Reviewing the setup later",why:"Review is the point of the record. What is prohibited is changing the invalidation while the trade is open so that the review never has a loss to look at."},{value:"accept",label:"Accepting the planned loss",why:"Accepting the planned loss is the plan working. The −1R was chosen before entry as the price of being wrong; the failure is refusing to pay it by widening the stop."}],answer:"widen",explanation:"Widening after entry increases risk and keeps an invalid thesis alive."},
  {prompt:"One trade would have earned more without scaling out. What does that prove?",choices:[{value:"nothing",label:"Almost nothing about the rule across many trades"},{value:"bad",label:"Scaling is always bad",why:"One trade that would have paid more unscaled is one path. On the shakeout path the reduce at +2R banks half before the trade ends at +2.45R; the rule’s value is the average over every path, which one trade cannot show."},{value:"trail",label:"Trailing is always best",why:"Trailing looks best on the path that kept going. On a path that reverses, the trail gives back 1R of open profit that a reduce would have kept. The comparison needs a sample, not a memory."},{value:"future",label:"Future trades will behave the same",why:"The next trade is a different path, and the rule was written for the distribution of paths, not this one. Optimising management from one memorable trade is the fourth mistake this lesson names."}],answer:"nothing",explanation:"Management rules must be evaluated over a representative sample, not one favorable path."},
  {prompt:"What should be compared during review?",choices:[{value:"plan",label:"Planned actions versus actual actions and outcomes"},{value:"profit",label:"Profit only",why:"Profit cannot tell a good decision from a lucky one. A trade managed by feel that made +2R and a trade managed to the plan that lost 1R are, on profit alone, ranked the wrong way round."},{value:"feel",label:"How exciting the trade felt",why:"Excitement is usually a sign the plan was abandoned. The discipline score in the lab is the measurable version of the same question, and it does not ask how the trade felt."},{value:"social",label:"Other traders’ opinions",why:"An opinion is not a record of what the plan said and what was done. Review compares the written plan with the actions taken; nothing anyone else says changes either."}],answer:"plan",explanation:"Execution quality and rule deviations explain whether outcomes came from the system or from inconsistent behavior."}
 ]});

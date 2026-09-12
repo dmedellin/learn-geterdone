@@ -21,13 +21,11 @@ LESSONS = [
         ],
         "key_label": "One expression, one forbidden value",
         "concepts_intro": (
-            "Everything in the first half of this course is a rule about factors, and "
-            "every one of those rules is false at a value where the expression does not "
-            "exist. So the domain comes first, on its own line."
+            'Rational-expression manipulation uses rules about factors, and every one of those rules is false at a value where the expression does not exist. So the domain comes first, on its own line.'
         ),
         "concepts": [
             ("A rational expression is a quotient of polynomials",
-             "`(3x + 1)/(x² − 5)` is one; so is `x + 2`, with denominator `1`. What is <em>not</em> one is anything with a variable under a root or in an exponent &mdash; those arrive in lesson 8 and in Exponential and Logarithmic Functions."),
+             '`(3x + 1)/(x² − 5)` is one; so is `x + 2`, with denominator `1`. What is <em>not</em> one is anything with a variable under a root or in an exponent &mdash; those are covered in “Simplifying Radical Expressions” and in Exponential and Logarithmic Functions.'),
             ("The denominator alone decides the domain",
              "The numerator may be anything, zero included. `(x − 4)/(x + 1)` is "
              "perfectly well defined at `x = 4`, where its value is `0`. It is `x = −1` "
@@ -73,11 +71,7 @@ LESSONS = [
                 "x        1.9      1.99     2        2.01     2.1",
                 "value    3.9      3.99     ——       4.01     4.1",
             ]),
-            ("p", "The values approach `4` from both sides and the expression still has "
-                  "no value at `2`. That gap is called a <strong>hole</strong>, and "
-                  "lesson 7 puts it on a graph. What matters now is that `x + 2` "
-                  "&mdash; the answer to the simplification &mdash; carries no record of "
-                  "it. The exclusion is a fact about where you started."),
+            ("p", 'The values approach `4` from both sides and the expression still has no value at `2`. That gap is called a <strong>hole</strong>, and “Graphs and Asymptotes” puts it on a graph. What matters now is that `x + 2` &mdash; the answer to the simplification &mdash; carries no record of it. The exclusion is a fact about where you started.'),
             ("thm", ("Equality of rational expressions",
                      "Two rational expressions are equal when they agree at every value "
                      "in the domain of <em>both</em>. So `(x² − 4)/(x − 2) = x + 2` is a "
@@ -180,10 +174,7 @@ LESSONS = [
              "precisely why the case is left undefined."),
         ],
         "standard": ("Finish when you write the exclusions before you write anything else.",
-                     "Given any rational expression you should produce its domain in one "
-                     "line, from the factored denominator, without simplifying first. If "
-                     "your habit is to simplify and then look for trouble, you will lose "
-                     "an exclusion in lesson 2 and an extraneous root in lesson 6."),
+                     'Given any rational expression you should produce its domain in one line, from the factored denominator, without simplifying first. If your habit is to simplify and then look for trouble, you will lose an exclusion in “Simplifying Rational Expressions” and an extraneous root in “Solving Rational Equations”.'),
         "note": "The lab names rational zeros as exact fractions and irrational zeros of "
                 "quadratic factors as exact surds. For a higher-degree factor with no "
                 "rational zero it says that the remaining real zeros are unnamed rather "
@@ -363,9 +354,7 @@ LESSONS = [
              "`(x + 3)/(x + 4)` does not become `3/4`. The `x` is added, not multiplied, "
              "and one substitution &mdash; `x = 1` gives `4/5` &mdash; disposes of it."),
             ("Dropping the exclusions on the way to the answer",
-             "`(x² − 4)/(x − 2) = x + 2` is only true for `x ≠ 2`. Without that "
-             "condition the statement is false at exactly one point, and lesson 7 draws "
-             "the hole it leaves."),
+             '`(x² − 4)/(x − 2) = x + 2` is only true for `x ≠ 2`. Without that condition the statement is false at exactly one point, and “Graphs and Asymptotes” draws the hole it leaves.'),
             ("Missing an opposite pair",
              "`(4 − x²)/(x − 2)` looks unfactorable against its denominator until you "
              "write `4 − x² = −(x − 2)(x + 2)`. The answer is `−(x + 2)`, not \"no "
@@ -399,9 +388,7 @@ LESSONS = [
         ],
         "key_label": "Two rules, three sources of exclusions",
         "concepts_intro": (
-            "No common denominator is needed here &mdash; that is lesson 4's problem. "
-            "What this lesson demands is that you factor first and that you account for "
-            "a divisor which may itself be zero."
+            "No common denominator is needed here &mdash; that is “Adding and Subtracting Rational Expressions”'s problem. What this lesson demands is that you factor first and that you account for a divisor which may itself be zero."
         ),
         "concepts": [
             ("Multiplication is across the top and across the bottom",
@@ -453,10 +440,7 @@ LESSONS = [
                          "`x ≠ −2`. Multiplying first would have produced "
                          "`(x² − 4x − 5)/(x² − 3x − 10)` and the same cancellation, "
                          "harder.")),
-            ("p", "There is no rule about numerators here to match the one about "
-                  "denominators in lesson 4. A product needs no common denominator, so "
-                  "the temptation to find one is worth resisting: it is extra work that "
-                  "cannot help."),
+            ("p", 'There is no rule about numerators here to match the one about denominators in “Adding and Subtracting Rational Expressions”. A product needs no common denominator, so the temptation to find one is worth resisting: it is extra work that cannot help.'),
         ],
         "lab": ("rationalfn", {
             "mode": "multiply",
@@ -619,14 +603,8 @@ LESSONS = [
                          "denominator is `2`, and of `x + 3` is `1`, so the LCD is "
                          "`(x + 2)²(x + 3)` &mdash; not the product of the two "
                          "denominators, which would carry `(x + 2)³`.")),
-            ("p", "Multiplying the denominators together is never wrong, only wasteful: "
-                  "the extra factor cancels at the end, after you have carried it through "
-                  "every line. On a two-term sum that is a nuisance; in lesson 6, where "
-                  "the LCD multiplies an entire equation, it is a real cost."),
-            ("p", "Once the LCD is chosen, each fraction is rebuilt to sit over it. "
-                  "Multiply the numerator and the denominator of each by whatever factors "
-                  "the LCD has and it lacks &mdash; legal by the fundamental principle "
-                  "of lesson 2, since you are multiplying by a form of `1`."),
+            ("p", 'Multiplying the denominators together is never wrong, only wasteful: the extra factor cancels at the end, after you have carried it through every line. On a two-term sum that is a nuisance; in “Solving Rational Equations”, where the LCD multiplies an entire equation, it is a real cost.'),
+            ("p", 'Once the LCD is chosen, each fraction is rebuilt to sit over it. Multiply the numerator and the denominator of each by whatever factors the LCD has and it lacks &mdash; legal by the fundamental principle of “Simplifying Rational Expressions”, since you are multiplying by a form of `1`.'),
             ("math", [
                 "5/((x + 2)(x + 3))  +  3/(x + 2)²           LCD (x + 2)²(x + 3)",
                 "",
@@ -647,10 +625,7 @@ LESSONS = [
                   "in brackets before you subtract, and only then distribute. It costs "
                   "one pair of brackets and removes the most common source of lost marks "
                   "in the whole topic."),
-            ("p", "Finally, the answer's domain is inherited from the denominators you "
-                  "started with, exactly as in lesson 2. `(6 − x)/((x − 3)(x + 3))` "
-                  "excludes `3` and `−3`, and would still exclude them if the numerator "
-                  "had cancelled a factor away."),
+            ("p", "Finally, the answer's domain is inherited from the denominators you started with, exactly as in “Simplifying Rational Expressions”. `(6 − x)/((x − 3)(x + 3))` excludes `3` and `−3`, and would still exclude them if the numerator had cancelled a factor away."),
         ],
         "lab": ("rationalfn", {
             "mode": "add",
@@ -693,10 +668,7 @@ LESSONS = [
                 "                    6/((−3)(3))  =  6/(−9)  =  −2/3     ✓",
             ],
             "after": [
-                "Note that `6 − x` shares no factor with the denominator, so the answer "
-                "is already in lowest terms. Note also that it is <em>not</em> `−1` "
-                "times something familiar: `6 − x` and `x − 3` are not opposites, and "
-                "the sign trick from lesson 2 does not apply here.",
+                'Note that `6 − x` shares no factor with the denominator, so the answer is already in lowest terms. Note also that it is <em>not</em> `−1` times something familiar: `6 − x` and `x − 3` are not opposites, and the sign trick from “Simplifying Rational Expressions” does not apply here.',
                 "For a faded subtraction, take `2/(x² − x − 6) − 1/(x − 3)`. "
                 "The supplied factorisation is `x² − x − 6 = (x − 3)(x + 2)`, "
                 "which is also the LCD. Rebuild the second fraction, bracket its new "
@@ -748,10 +720,7 @@ LESSONS = [
              "part of it."),
         ],
         "standard": ("Finish when the LCD is built from factors and the sign survives.",
-                     "You should be able to state the LCD of two factored denominators "
-                     "immediately, and to subtract two fractions whose numerators are "
-                     "binomials without dropping a sign. Those are the two skills lesson "
-                     "5 assumes and lesson 6 runs on."),
+                     'You should be able to state the LCD of two factored denominators immediately, and to subtract two fractions whose numerators are binomials without dropping a sign. Those are the two skills “Complex Fractions” assumes and “Solving Rational Equations” runs on.'),
         "note": "The lab writes the numerator in brackets and pauses there before "
                 "distributing, because that intermediate line is the one nobody writes "
                 "and everybody needs. The exclusions shown are those of the original "
@@ -765,9 +734,7 @@ LESSONS = [
         "module": "Rational expressions",
         "one_line": "Clear a complex fraction by two methods and preserve restrictions from every level.",
         "summary": (
-            "Nothing new is needed here &mdash; only lessons 3 and 4 applied in one of "
-            "two orders. The second order, multiplying through by the LCD of the small "
-            "denominators, is usually much shorter, and both must agree."
+            'Nothing new is needed here &mdash; only the multiplication and division methods in “Multiplying and Dividing Rational Expressions” and the addition and subtraction methods in “Adding and Subtracting Rational Expressions” applied in one of two orders. The second order, multiplying through by the LCD of the small denominators, is usually much shorter, and both must agree.'
         ),
         "key": [
             "method 1:  combine the top, combine the bottom, then divide",
@@ -782,12 +749,9 @@ LESSONS = [
         ),
         "concepts": [
             ("The main bar is a division",
-             "`(A)/(B)` means `A ÷ B` no matter how complicated `A` and `B` are. Once "
-             "each is a single fraction, lesson 3 finishes the job by flipping `B`."),
+             '`(A)/(B)` means `A ÷ B` no matter how complicated `A` and `B` are. Once each is a single fraction, “Multiplying and Dividing Rational Expressions” finishes the job by flipping `B`.'),
             ("Multiplying top and bottom by the LCD is legal",
-             "It is the fundamental principle of lesson 2 again: multiplying both parts "
-             "by the same non-zero expression leaves the value unchanged, and choosing "
-             "the LCD clears every small denominator at once."),
+             'It is the fundamental principle of “Simplifying Rational Expressions” again: multiplying both parts by the same non-zero expression leaves the value unchanged, and choosing the LCD clears every small denominator at once.'),
             ("Exclusions come from every level",
              "The small denominators, the main denominator, and any value making the "
              "whole lower half zero are all excluded. The simplified answer typically "
@@ -801,10 +765,7 @@ LESSONS = [
                      "which the numerator, the denominator, or both, themselves contain "
                      "fractions. `(1/x − 1/3)/(x − 3)` and `(1/x + 1/y)/(1/x − 1/y)` are "
                      "typical.")),
-            ("p", "<strong>Method 1</strong> treats the bar as what it is. Combine the "
-                  "numerator into a single fraction using lesson 4, do the same to the "
-                  "denominator, and then divide the one by the other using lesson 3. It "
-                  "always works and it is often long."),
+            ("p", '<strong>Method 1</strong> treats the bar as what it is. Combine the numerator into a single fraction using “Adding and Subtracting Rational Expressions”, do the same to the denominator, and then divide the one by the other using “Multiplying and Dividing Rational Expressions”. It always works and it is often long.'),
             ("p", "<strong>Method 2</strong> removes the small fractions before they can "
                   "cause trouble. Find the LCD of every small denominator that appears "
                   "anywhere in the expression, and multiply both the whole numerator and "
@@ -819,9 +780,7 @@ LESSONS = [
                          "`(3 − x)/(3x) ÷ (x − 3) = (3 − x)/(3x(x − 3))`. Method 2: "
                          "multiply top and bottom by `3x` to get `(3 − x)/(3x(x − 3))` "
                          "directly. Same expression, one step fewer.")),
-            ("p", "Either way the finish is the sign observation from lesson 2: "
-                  "`3 − x = −(x − 3)`, so the quotient is `−(x − 3)/(3x(x − 3))`, which "
-                  "reduces to `−1/(3x)`."),
+            ("p", 'Either way the finish is the sign observation from “Simplifying Rational Expressions”: `3 − x = −(x − 3)`, so the quotient is `−(x − 3)/(3x(x − 3))`, which reduces to `−1/(3x)`.'),
             ("p", "That answer is startlingly simple, and it is where the domain "
                   "discipline pays. `−1/(3x)` looks like it excludes only `x = 0`. The "
                   "original excluded `x = 0`, because of `1/x`, and `x = 3`, because the "
@@ -968,9 +927,7 @@ LESSONS = [
         ],
         "key_label": "One legal step that costs you a check",
         "concepts_intro": (
-            "This is the first lesson where an entirely correct piece of algebra can "
-            "produce a wrong answer. Understanding why is more useful than remembering "
-            "to check."
+            'In solving a rational equation, an entirely correct piece of algebra can produce a wrong answer. Understanding why is more useful than remembering to check.'
         ),
         "concepts": [
             ("Clearing denominators is the whole method",
@@ -1046,8 +1003,7 @@ LESSONS = [
              "Before any solving. These are the values that will disqualify a candidate "
              "later, and they are easiest to find now."),
             ("Multiply both sides by the LCD",
-             "Every term on both sides, including terms that are not fractions. Bracket "
-             "each numerator as you go, exactly as in lesson 4."),
+             'Every term on both sides, including terms that are not fractions. Bracket each numerator as you go, exactly as in “Adding and Subtracting Rational Expressions”.'),
             ("Solve the polynomial equation",
              "Use Linear Equations and Inequalities for a linear result and the factoring methods from Polynomials and Factoring for the quadratics chosen in this course. The quadratic formula arrives in Quadratics and Complex Numbers and is not required here."),
             ("Test every candidate in the original",
@@ -1083,7 +1039,7 @@ LESSONS = [
                 "`x(x − 2)` is zero, so it is exactly the value at which multiplying "
                 "through stopped being reversible. The method predicts where its own "
                 "failures will appear, which is why the exclusion list is written first.",
-                "Rational and Radical Expressions does this twice: lesson 11 squares both sides of a radical equation, which is legal in the same one-way manner and produces extraneous roots for the same structural reason.",
+                'Rational and Radical Expressions does this twice: “Solving Radical Equations” squares both sides of a radical equation, which is legal in the same one-way manner and produces extraneous roots for the same structural reason.',
                 "For a faded solve, take `1/(x − 1) + 1/(x + 1) = "
                 "(x² − x + 2)/(x² − 1)`. The supplied LCD is `(x − 1)(x + 1)` and "
                 "the exclusions are `x ≠ −1, 1`. Clear every term, factor the resulting "
@@ -1137,11 +1093,7 @@ LESSONS = [
              "in those cases, and it is not the same as \"I could not solve it\"."),
         ],
         "standard": ("Finish when you can explain the extraneous root, not just remove it.",
-                     "Given a rational equation you should list the exclusions before "
-                     "solving, clear correctly, test each candidate in the original, and "
-                     "say why the discarded one appeared &mdash; naming the value at "
-                     "which the LCD was zero. That explanation is what transfers to "
-                     "lesson 11."),
+                     'Given a rational equation you should list the exclusions before solving, clear correctly, test each candidate in the original, and say why the discarded one appeared &mdash; naming the value at which the LCD was zero. That explanation is what transfers to “Solving Radical Equations”.'),
         "note": "The lab never silently drops a root. Each candidate is substituted into "
                 "the original equation in front of you and the two sides are printed as "
                 "exact fractions, so an extraneous root is seen failing rather than "

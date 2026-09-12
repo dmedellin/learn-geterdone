@@ -25,8 +25,7 @@ LESSONS = [
         ),
         "concepts": [
             ("The sum rule needs disjointness",
-             "`|A ∪ B| = |A| + |B|` only when nothing is in both. Overlap means "
-             "double-counting, and lesson 9 is the general repair."),
+             '`|A ∪ B| = |A| + |B|` only when nothing is in both. Overlap means double-counting, and “The Inclusion-Exclusion Principle” is the general repair.'),
             ("The product rule needs independence of counts",
              "The number of second choices must not depend on which first choice was "
              "made. The number itself may vary if it varies uniformly &mdash; but then "
@@ -55,9 +54,7 @@ LESSONS = [
                          "`26 · 26 · 1 = 676`. These overlap &mdash; strings starting with "
                          "a vowel AND ending in `z`, of which there are `5 · 26 · 1 = 130`. "
                          "So the answer is `3380 + 676 − 130 = 3926`, not `4056`.")),
-            ("p", "That subtraction is lesson 9 arriving early. The sum rule as stated does "
-                  "not apply, because the two sets are not disjoint; using it anyway "
-                  "over-counts by exactly the size of the overlap."),
+            ("p", 'That subtraction is an instance of “The Inclusion-Exclusion Principle”. The sum rule as stated does not apply, because the two sets are not disjoint; using it anyway over-counts by exactly the size of the overlap.'),
             ("h3", "When the second count depends on the first"),
             ("p", "The product rule is often stated as needing \"independent\" choices, "
                   "which is imprecise. What it needs is that the <em>number</em> of second "
@@ -96,8 +93,7 @@ LESSONS = [
              "\"Either… or…\" suggests the sum rule; \"first… then…\" suggests the "
              "product rule. Most problems have both, nested."),
             ("If alternatives: are they disjoint?",
-             "If an object could be counted in two cases, the sum rule over-counts. Fix "
-             "the cases or use lesson 9."),
+             'If an object could be counted in two cases, the sum rule over-counts. Fix the cases or use “The Inclusion-Exclusion Principle”.'),
             ("If stages: does the second count vary?",
              "It must be the same number for every first choice. If not, split into cases "
              "where it is constant."),
@@ -142,10 +138,7 @@ LESSONS = [
                    "the sets to be finite and ordered",
                    "nothing"],
              "c": 1,
-             "why": "Overlap is counted twice, so the sets must be disjoint; when they are "
-                    "not, lesson 9's inclusion&ndash;exclusion is the correct rule. Nothing "
-                    "else is required: the sets may differ in size, they need no order, and "
-                    "\"nothing\" is the answer that double-counts."},
+             "why": 'Overlap is counted twice, so the sets must be disjoint; when they are not, inclusion&ndash;exclusion, as developed in “The Inclusion-Exclusion Principle”, is the correct rule. Nothing else is required: the sets may differ in size, they need no order, and "nothing" is the answer that double-counts.'},
             {"q": "How many 3-digit strings over `{0,…,9}` contain at least one 5?",
              "a": ["100", "271", "300", "243"],
              "c": 1,
@@ -170,7 +163,7 @@ LESSONS = [
                      "Count the 4-digit PINs with at least two identical digits. Do it by "
                      "complement, and say in one sentence why the direct count would be "
                      "harder. That sentence is the skill."),
-        "note": "Both rules are theorems about sets: the sum rule is additivity of cardinality over disjoint unions, and the product rule is `|A × B| = |A| · |B|` from Sets, Relations, and Functions lesson 5. Counting is set theory with the sets kept small enough to measure.",
+        "note": 'Both rules are theorems about sets: the sum rule is additivity of cardinality over disjoint unions, and the product rule is `|A × B| = |A| · |B|` from the “Cartesian Products and Tuples” Lesson in Sets, Relations, and Functions. Counting is set theory with the sets kept small enough to measure.',
     },
     # ---------------------------------------------------------------- 02
     {
@@ -199,7 +192,7 @@ LESSONS = [
              "If the first digit cannot be 0, choose it first (9 ways) and then the rest "
              "freely. Choosing left to right regardless is what creates the difficulty."),
             ("Split into cases when the count varies",
-             "Cases must be disjoint and exhaustive &mdash; the same discipline as a proof by cases in Logic and Proof lesson 14."),
+             'Cases must be disjoint and exhaustive &mdash; the same discipline as a proof by cases in the “Cases, Counterexamples, and Writing a Proof” Lesson in Logic and Proof.'),
             ("Complement when the restriction says \"at least\"",
              "The complement of \"at least one\" is \"none\", which is a single "
              "unrestricted count."),
@@ -300,12 +293,7 @@ LESSONS = [
                 "   81 − 16 − 32 = 33                                    agree",
             ],
             "after": [
-                "Two independent routes to 33. That agreement is the real check: a single "
-                "method producing a plausible number is not evidence that the "
-                "classification was right, and the case method is where a missing case "
-                "would show up. The six position pairs were listed by hand; lesson 4 "
-                "gives them a name and a formula, `C(4, 2) = 6`, and from then on they "
-                "need not be listed."
+                'Two independent routes to 33. That agreement is the real check: a single method producing a plausible number is not evidence that the classification was right, and the case method is where a missing case would show up. The six position pairs were listed by hand; “Combinations” gives them a name and a formula, `C(4, 2) = 6`, so they need not be listed individually.'
             ],
         },
         "quiz_title": "Restrictions",
@@ -351,10 +339,7 @@ LESSONS = [
                      "exhaustive because every such number has exactly one first 7. "
                      "Constrain the leading digit first in every case. If the two totals "
                      "agree you have both the arithmetic and the classification right."),
-        "note": "The instinct to count what you want directly is usually the expensive "
-                "one. Complementary counting, and later inclusion and exclusion, both "
-                "amount to counting something easier and correcting &mdash; which is the "
-                "dominant strategy in this course.",
+        "note": 'The instinct to count what you want directly is usually the expensive one. Complementary counting, and inclusion and exclusion, both amount to counting something easier and correcting &mdash; which is the dominant strategy in this course.',
     },
     # ---------------------------------------------------------------- 03
     {
@@ -429,7 +414,7 @@ LESSONS = [
                   "produces a different seating, nothing is identified, and the count is "
                   "`n!`. Say which situation you are in before dividing; the question "
                   "decides it, not the shape of the table."),
-            ("p", "The division-by-symmetry argument is the pattern to remember: when several arrangements are considered the same, count them all and divide by the size of the equivalence class. That is the equivalence relation from Sets, Relations, and Functions doing combinatorial work, and lesson 7 uses it again."),
+            ("p", 'The division-by-symmetry argument is the pattern to remember: when several arrangements are considered the same, count them all and divide by the size of the equivalence class. That is the equivalence relation from Sets, Relations, and Functions doing combinatorial work, and “Permutations with Repetition” uses it again.'),
             ("h3", "The size of factorials"),
             ("math", [
                 "  5! =                        120",
@@ -437,7 +422,7 @@ LESSONS = [
                 " 20! =  2 432 902 008 176 640 000",
                 " 52! ≈ 8.07 × 10⁶⁷",
             ]),
-            ("p", "`52!` is about `10¹⁸` times the number of atoms in the Earth, which is roughly `10⁵⁰`. Any algorithm that examines all permutations of a modest input is not slow &mdash; it is impossible, and Algorithms and Complexity lesson 11 gives that observation a name."),
+            ("p", '`52!` is about `10¹⁸` times the number of atoms in the Earth, which is roughly `10⁵⁰`. Any algorithm that examines all permutations of a modest input is not slow &mdash; it is impossible, and the “P, NP and NP-Completeness” Lesson in Algorithms and Complexity gives that observation a name.'),
         ],
         "lab": ("counting", {
             "n": 5, "r": 3, "rule": "p",
@@ -453,11 +438,9 @@ LESSONS = [
         "steps_intro": "Confirm order matters before reaching for the formula.",
         "steps": [
             ("Check that order matters",
-             "If rearranging the same objects gives a different outcome, it is a "
-             "permutation. If not, lesson 4 has the right formula."),
+             'If rearranging the same objects gives a different outcome, it is a permutation. If not, “Combinations” has the right formula.'),
             ("Check that repetition is forbidden",
-             "Objects are drawn without replacement. If they may repeat, lesson 7 applies "
-             "and the answer is `nʳ`."),
+             'Objects are drawn without replacement. If they may repeat, “Permutations with Repetition” applies and the answer is `nʳ`.'),
             ("Count the factors",
              "`P(n, r)` has exactly `r` factors, ending at `n−r+1`. Miscounting them is "
              "the standard error."),
@@ -514,8 +497,7 @@ LESSONS = [
         ],
         "mistakes": [
             ("Using `P` when order does not matter",
-             "A committee of three is not an ordered triple. `P(n,r)` counts each "
-             "committee `r!` times, which is exactly the relationship lesson 4 exploits."),
+             'A committee of three is not an ordered triple. `P(n,r)` counts each committee `r!` times, which is exactly the relationship “Combinations” exploits.'),
             ("Miscounting the factors",
              "`P(n, r)` runs from `n` down to `n − r + 1`, which is `r` factors. Ending at "
              "`n − r` gives one too many."),
@@ -528,7 +510,7 @@ LESSONS = [
                      "Count the ways to seat 6 people around a round table with two "
                      "specific people not adjacent. Do it by complement, and state exactly "
                      "why the circular count is `5!` rather than `6!`."),
-        "note": "A permutation is also a bijection from a set to itself, which is Sets, Relations, and Functions lesson 12's remark. There are `n!` of them, and under composition they form the symmetric group &mdash; the object most of finite group theory is about.",
+        "note": 'A permutation is also a bijection from a set to itself, which is the remark in “Composition and Inverse Functions” in Sets, Relations, and Functions. There are `n!` of them, and under composition they form the symmetric group &mdash; the object most of finite group theory is about.',
     },
     # ---------------------------------------------------------------- 04
     {
@@ -560,7 +542,7 @@ LESSONS = [
              "Choosing which `r` to include is the same as choosing which `n−r` to leave "
              "out, so `C(n,r) = C(n,n−r)`."),
             ("The subsets sum to `2ⁿ`",
-             "Every subset has exactly one size, so summing `C(n,r)` over all `r` counts every subset once &mdash; and Sets, Relations, and Functions lesson 2 already knew the total."),
+             'Every subset has exactly one size, so summing `C(n,r)` over all `r` counts every subset once &mdash; and the “Subsets and Power Sets” Lesson in Sets, Relations, and Functions establishes the total.'),
         ],
         "read_title": "Choosing without order",
         "read_intro": "The derivation, the identities, and the standard applications.",
@@ -579,9 +561,7 @@ LESSONS = [
                 "The two counts are of the same set, so `P(n, r) = C(n, r) · r!`, and "
                 "dividing gives the formula.",
             ]),
-            ("p", "That proof is a <em>double count</em>: one set counted two ways, and the "
-                  "two expressions therefore equal. Lesson 13 makes the technique explicit; "
-                  "it appears here because it is the cleanest derivation of the formula."),
+            ("p", 'That proof is a <em>double count</em>: one set counted two ways, and the two expressions therefore equal. “Combinatorial Proof” makes the technique explicit; it appears here because it is the cleanest derivation of the formula.'),
             ("thm", ("Symmetry",
                      "`C(n, r) = C(n, n−r)`.")),
             ("proof", [
@@ -622,10 +602,9 @@ LESSONS = [
         "steps_intro": "Order and repetition, in that order.",
         "steps": [
             ("Ask whether order matters",
-             "Committees, hands and subsets: no. Podiums, passwords and sequences: yes. "
-             "This one question separates lessons 3 and 4."),
+             'Committees, hands and subsets: no. Podiums, passwords and sequences: yes. This one question separates “Permutations” and “Combinations”.'),
             ("Ask whether repetition is allowed",
-             "If objects may be chosen more than once, lesson 8 applies instead."),
+             'If objects may be chosen more than once, “Combinations with Repetition” applies instead.'),
             ("Use symmetry to simplify",
              "`C(20,18) = C(20,2) = 190`. Computing the smaller side is faster and less "
              "error-prone."),
@@ -700,10 +679,7 @@ LESSONS = [
                      "product `C(4, k) · C(48, 5 − k)`; say why the two choices in it are "
                      "independent, and why the cases are disjoint. The two totals must "
                      "agree, and the poker example above fixes the magnitude."),
-        "note": "`C(n, r)` is also written `binom(n, r)` and called a binomial coefficient, "
-                "because lesson 6 shows it is the coefficient of `x^r y^{n−r}` in "
-                "`(x + y)ⁿ`. The two facts &mdash; counting subsets and expanding a power "
-                "&mdash; are the same fact.",
+        "note": '`C(n, r)` is also written `binom(n, r)` and called a binomial coefficient, because “The Binomial Theorem” shows it is the coefficient of `x^r y^{n−r}` in `(x + y)ⁿ`. The two facts &mdash; counting subsets and expanding a power &mdash; are the same fact.',
     },
     # ---------------------------------------------------------------- 05
     {
@@ -929,8 +905,7 @@ LESSONS = [
              "Setting `x` and `y` to specific values turns the theorem into a numerical "
              "identity. Two substitutions give the row sum and the alternating sum for free."),
             ("The multinomial theorem generalises it",
-             "With more than two terms the coefficients count arrangements of a multiset, "
-             "which is lesson 7's subject."),
+             "With more than two terms the coefficients count arrangements of a multiset, which is “Permutations with Repetition”'s subject."),
         ],
         "read_title": "The theorem and what follows",
         "read_intro": "Statement, the counting proof, and four corollaries.",
@@ -958,10 +933,7 @@ LESSONS = [
                 "x = 1, y = 2     Σ_k 2^k C(n,k)      = 3ⁿ",
                 "x = 1, y = t     Σ_k t^k C(n,k)      = (1 + t)ⁿ",
             ]),
-            ("p", "The last line is the generating function of the binomial coefficients, "
-                  "and lesson 12 makes that phrase mean something. For now it is the "
-                  "observation that a single algebraic identity encodes a whole row of the "
-                  "triangle."),
+            ("p", 'The last line is the generating function of the binomial coefficients, and the “Generating Functions” Lesson explains that representation. It is the observation that a single algebraic identity encodes a whole row of the triangle.'),
             ("example", ("Extracting one coefficient",
                          "What is the coefficient of `x⁵y³` in `(2x − 3y)⁸`? The general "
                          "term is `C(8,k)(2x)^{8−k}(−3y)^k`. Take `k = 3`: "
@@ -970,10 +942,7 @@ LESSONS = [
                   "raised to the powers too, and a negative sign must be carried through "
                   "the odd power. Both are dropped often enough to be worth naming."),
             ("thm", ("Multinomial theorem",
-                     "`(x₁ + ⋯ + x_m)ⁿ = Σ (n! / (k₁! ⋯ k_m!)) x₁^{k₁} ⋯ x_m^{k_m}`, summed "
-                     "over all non-negative `kᵢ` with `k₁ + ⋯ + k_m = n`. The coefficient "
-                     "counts the ways to assign the `n` factors to the `m` terms, which is "
-                     "lesson 7's arrangement count.")),
+                     "`(x₁ + ⋯ + x_m)ⁿ = Σ (n! / (k₁! ⋯ k_m!)) x₁^{k₁} ⋯ x_m^{k_m}`, summed over all non-negative `kᵢ` with `k₁ + ⋯ + k_m = n`. The coefficient counts the ways to assign the `n` factors to the `m` terms, which is “Permutations with Repetition”'s arrangement count.")),
         ],
         "lab": ("pascal", {
             "identity": "row", "n": 5, "k": 2,
@@ -1062,10 +1031,7 @@ LESSONS = [
                      "Find the coefficient of `x⁴y⁵` in `(2x − 3y)⁹`, and check the sign "
                      "and both constants. Then set `x = y = 1` in the same expansion and "
                      "confirm the result equals `(2 − 3)⁹ = −1`."),
-        "note": "Newton extended the theorem to non-integer exponents, where the sum "
-                "becomes an infinite series and the coefficients use the generalised "
-                "binomial coefficient. That is where lesson 12's generating functions "
-                "acquire their power, and it is outside this course.",
+        "note": 'Newton extended the theorem to non-integer exponents, where the sum becomes an infinite series and the coefficients use the generalised binomial coefficient. That is where the generating functions introduced in “Generating Functions” acquire their power, and it is outside this course.',
     },
     # ---------------------------------------------------------------- 07
     {
@@ -1097,9 +1063,7 @@ LESSONS = [
              "Arranging `n` objects of which some are indistinguishable gives `n!` divided "
              "by the factorial of each repetition count."),
             ("The divisor is a symmetry group size",
-             "Swapping two identical letters produces the same word, so each distinct word "
-             "was counted once for every such swap &mdash; exactly the circular-arrangement "
-             "argument of lesson 3."),
+             'Swapping two identical letters produces the same word, so each distinct word was counted once for every such swap &mdash; exactly the circular-arrangement argument of “Permutations”.'),
         ],
         "read_title": "Repetition in arrangements",
         "read_intro": "Both counts, derived, and the connection to binomial coefficients.",
@@ -1134,20 +1098,14 @@ LESSONS = [
                   "copies of \"out\" gives `n!/(r!(n−r)!)`, which is exactly `C(n,r)`. "
                   "Choosing a subset and arranging a two-type multiset are the same problem."),
             ("thm", ("Multinomial coefficient",
-                     "`n! / (n₁! ⋯ n_k!)` is written `binom(n; n₁, …, n_k)` and counts both "
-                     "the arrangements of the multiset and the ways to distribute `n` "
-                     "distinct objects into `k` labelled boxes with prescribed sizes. It is "
-                     "the coefficient in the multinomial theorem of lesson 6.")),
+                     '`n! / (n₁! ⋯ n_k!)` is written `binom(n; n₁, …, n_k)` and counts both the arrangements of the multiset and the ways to distribute `n` distinct objects into `k` labelled boxes with prescribed sizes. It is the coefficient in the multinomial theorem of “The Binomial Theorem”.')),
             ("example", ("Distributing into boxes",
                          "Deal 52 cards to four players, 13 each: "
                          "`52!/(13!)⁴ ≈ 5.36 × 10²⁸`. The formula is the same because "
                          "assigning each card a player is arranging a multiset of 13 copies "
                          "of each of four labels.")),
             ("h3", "Lattice paths again"),
-            ("p", "A path from `(0,0)` to `(m,n)` using unit right and up steps is an "
-                  "arrangement of `m` R's and `n` U's, so there are `(m+n)!/(m! n!) = "
-                  "C(m+n, m)` of them &mdash; the same answer lesson 4 gave, now visible as "
-                  "a multiset arrangement."),
+            ("p", "A path from `(0,0)` to `(m,n)` using unit right and up steps is an arrangement of `m` R's and `n` U's, so there are `(m+n)!/(m! n!) = C(m+n, m)` of them &mdash; the same answer “Combinations” gives, now visible as a multiset arrangement."),
         ],
         "lab": ("counting", {
             "n": 4, "r": 3, "rule": "pr",

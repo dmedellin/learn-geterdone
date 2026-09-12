@@ -583,6 +583,15 @@
       overflow-x: auto;
     }
     .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
 
     /* ---------- Graphs ----------
        Tokens only. A component override scoped to [data-theme="light"] would
@@ -1040,6 +1049,7 @@
       font-size: 0.9rem;
       resize: vertical;
     }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
     .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
     .fb-actions {
       display: flex;
@@ -1132,6 +1142,7 @@
     [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
     [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
     [data-ui="hero"] .eyebrow { display: block; color: var(--muted); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
     [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
     [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
     [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
@@ -1176,7 +1187,7 @@
     }
     [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
     [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
-    [data-ui="lesson-list"] .lesson-link { min-height: 44px; }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
     body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
     body[data-page-kind] .is-done .lesson-state { color: var(--green); }
     [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
@@ -1290,7 +1301,7 @@ cost: about 2·log₂(b) multiplications, not b
         b    = b div 2
     return result</div><p>The loop reads <span class="math">b</span> in binary from the least significant bit. <span class="math">base</span> holds <span class="math">a^{2^i} mod m</span> at step <span class="math">i</span>, and the result accumulates exactly those powers whose bit is set. Since <span class="math">b = Σ bᵢ2ⁱ</span>, the product of the selected powers is <span class="math">a^b</span>.</p><div class="thm"><span class="label">Theorem &middot; Correctness</span><p>MODPOW returns <span class="math">a^b mod m</span>.</p></div><div class="proof"><p>The loop invariant is <span class="math">result · base^b ≡ a^{b₀} (mod m)</span>, where <span class="math">b₀</span> is the original exponent.</p><p>Initially <span class="math">result = 1</span> and <span class="math">base = a</span>, so it holds. If <span class="math">b</span> is even, <span class="math">base^b = (base²)^{b/2}</span>, and the update preserves it. If <span class="math">b</span> is odd, <span class="math">base^b = base · (base²)^{(b−1)/2}</span>, and multiplying <span class="math">result</span> by <span class="math">base</span> before the halving preserves it.</p><p>At exit <span class="math">b = 0</span>, so the invariant reads <span class="math">result ≡ a^{b₀}</span>.</p><p><span class="qed">&#9633;</span></p></div><h3>The cost</h3><p>The loop runs <span class="math">⌊log₂ b⌋ + 1</span> times, with one squaring per iteration and at most one extra multiplication. The last squaring is never used, so the useful count is <span class="math">⌊log₂ b⌋</span> squarings plus one multiplication per set bit &mdash; at most about <span class="math">2 log₂ b</span> modular multiplications in all.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">b = 128:      naive 128 multiplications,  fast 8 squarings
 b = 10⁶:      naive a million,            fast about 20 squarings
-b = 2¹⁰²⁴:    naive impossible,           fast about 1024 squarings</div><div class="example"><span class="label">Example &middot; <span class="math">7^128 mod 13</span></span><p><span class="math">7² = 49 ≡ 10</span>; <span class="math">10² = 100 ≡ 9</span>; <span class="math">9² = 81 ≡ 3</span>; <span class="math">3² = 9</span>; <span class="math">9² = 81 ≡ 3</span>; <span class="math">3² ≡ 9</span>; <span class="math">9² ≡ 3</span>. Since <span class="math">128 = 2⁷</span>, seven squarings give <span class="math">7^128 ≡ 3 (mod 13)</span>. No number above 144 ever appeared.</p></div><p>That bound is the second essential point: every intermediate is a product of two numbers below <span class="math">m</span>, hence below <span class="math">m²</span>. For a 2048-bit modulus the intermediates are 4096 bits, which is entirely routine, while <span class="math">a^b</span> itself would have about <span class="math">2^1024</span> bits.</p><h3>Where it is used</h3><ul><li><strong>RSA</strong> (lesson 14): both encryption and decryption are a single modular exponentiation, with 2048-bit exponents.</li><li><strong>Diffie&ndash;Hellman key exchange</strong> and the whole family of discrete-logarithm systems.</li><li><strong>Primality testing</strong>: Fermat and Miller&ndash;Rabin both compute <span class="math">a^{n−1} mod n</span>, which is only feasible this way.</li></ul><p>It is worth appreciating the asymmetry the algorithm creates. Computing <span class="math">a^b mod m</span> is fast; recovering <span class="math">b</span> from <span class="math">a</span>, <span class="math">a^b mod m</span> and <span class="math">m</span> &mdash; the discrete logarithm &mdash; is believed hard. A great deal of cryptography lives in that gap.</p></article>
+b = 2¹⁰²⁴:    naive impossible,           fast about 1024 squarings</div><div class="example"><span class="label">Example &middot; <span class="math">7^128 mod 13</span></span><p><span class="math">7² = 49 ≡ 10</span>; <span class="math">10² = 100 ≡ 9</span>; <span class="math">9² = 81 ≡ 3</span>; <span class="math">3² = 9</span>; <span class="math">9² = 81 ≡ 3</span>; <span class="math">3² ≡ 9</span>; <span class="math">9² ≡ 3</span>. Since <span class="math">128 = 2⁷</span>, seven squarings give <span class="math">7^128 ≡ 3 (mod 13)</span>. No number above 144 ever appeared.</p></div><p>That bound is the second essential point: every intermediate is a product of two numbers below <span class="math">m</span>, hence below <span class="math">m²</span>. For a 2048-bit modulus the intermediates are 4096 bits, which is entirely routine, while <span class="math">a^b</span> itself would have about <span class="math">2^1024</span> bits.</p><h3>Where it is used</h3><ul><li><strong>RSA</strong> (“RSA Encryption”): both encryption and decryption are a single modular exponentiation, with 2048-bit exponents.</li><li><strong>Diffie&ndash;Hellman key exchange</strong> and the whole family of discrete-logarithm systems.</li><li><strong>Primality testing</strong>: Fermat and Miller&ndash;Rabin both compute <span class="math">a^{n−1} mod n</span>, which is only feasible this way.</li></ul><p>It is worth appreciating the asymmetry the algorithm creates. Computing <span class="math">a^b mod m</span> is fast; recovering <span class="math">b</span> from <span class="math">a</span>, <span class="math">a^b mod m</span> and <span class="math">m</span> &mdash; the discrete logarithm &mdash; is believed hard. A great deal of cryptography lives in that gap.</p></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>Number theory workbench</h2></div><p>Algorithms with their traces</p></div>
@@ -1372,12 +1383,12 @@ b = 2¹⁰²⁴:    naive impossible,           fast about 1024 squarings</div><
 result = 11 · 31 · 11 mod 50
        = 341 mod 50 · 11 = 41 · 11 = 451 ≡ 1  (mod 50)
 
-7 squarings and 3 multiplications, against 199 the naive way.</div><p>The powers began repeating &mdash; <span class="math">3^4 ≡ 3^64 ≡ 31</span> &mdash; because the multiplicative order of 3 modulo 50 divides <span class="math">φ(50) = 20</span>. Lesson 11 explains that, and it is why the answer came out as 1.</p></article>
+7 squarings and 3 multiplications, against 199 the naive way.</div><p>The powers began repeating &mdash; <span class="math">3^4 ≡ 3^64 ≡ 31</span> &mdash; because the multiplicative order of 3 modulo 50 divides <span class="math">φ(50) = 20</span>. “Fermat's Little Theorem and Euler's Theorem” explains that, and it is why the answer came out as 1.</p></article>
       </div>
     </section>
     <section class="section">
       <div class="grid-2">
-        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reducing the exponent modulo <span class="math">m</span></strong><span>Exponents reduce modulo <span class="math">φ(m)</span>, not <span class="math">m</span>, and only when the base is coprime to <span class="math">m</span>. Lesson 11 states the rule.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Computing <span class="math">a^b</span> before reducing</strong><span>The intermediate is astronomically large. Reducing at every step is the whole point.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Multiplying in the wrong powers</strong><span>Only the set bits of the exponent contribute. Writing <span class="math">b</span> in binary first makes this mechanical.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reducing the exponent modulo <span class="math">m</span></strong><span>Exponents reduce modulo <span class="math">φ(m)</span>, not <span class="math">m</span>, and only when the base is coprime to <span class="math">m</span>. “Fermat's Little Theorem and Euler's Theorem” states the rule.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Computing <span class="math">a^b</span> before reducing</strong><span>The intermediate is astronomically large. Reducing at every step is the whole point.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Multiplying in the wrong powers</strong><span>Only the set bits of the exponent contribute. Writing <span class="math">b</span> in binary first makes this mechanical.</span></div></div></div></article>
         <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can trace the algorithm on paper.</strong><p>Compute <span class="math">5^117 mod 19</span> by square and multiply, writing 117 in binary first: <span class="math">1110101₂</span>, five set bits. Six squarings to reach <span class="math">5^64</span>, five factors to multiply together, and no intermediate above 361.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The same algorithm works for any associative operation: matrix powers, compositions of functions, and group elements generally. The exponent's binary expansion is what is being exploited, and multiplication is incidental.</div></article>
       </div>
     </section>
@@ -1476,7 +1487,7 @@ result = 11 · 31 · 11 mod 50
         + '. Your completion ticks can follow you to another device.');
       a.classList.add('is-in');
     }());
-  var QUIZ = [{"q": "About how many multiplications does <span class=\"math\">a^1000 mod m<\/span> need by square and multiply?", "a": ["1000", "about 20", "about 500", "about 100"], "c": 1, "why": "<span class=\"math\">2 log\u2082 1000 \u2248 20<\/span>: ten squarings and at most ten extra multiplications, one per set bit (<span class=\"math\">1000 = 1111101000\u2082<\/span> has six). 1000 is the naive count; 500 would be halving the work once; 100 is the square root, which plays no part here."}, {"q": "Why reduce mod <span class=\"math\">m<\/span> at every step?", "a": ["To get the right answer", "To keep every intermediate below <span class=\"math\">m\u00b2<\/span> instead of astronomically large", "It is optional", "To make the exponent smaller"], "c": 1, "why": "The answer would be the same without reducing; the numbers would be unrepresentable, so reduction is what makes it computable. It does nothing to the exponent &mdash; that is lesson 11's <span class=\"math\">\u03c6(m)<\/span> &mdash; and it is optional only in the sense that fitting in memory is."}, {"q": "RSA encryption of one block is:", "a": ["a factorisation", "a single modular exponentiation", "a gcd computation", "a table lookup"], "c": 1, "why": "<span class=\"math\">c = m^e mod n<\/span>, and decryption is <span class=\"math\">c^d mod n<\/span>: both are this algorithm with 2048-bit exponents. A factorisation is the attack, not the encryption; a gcd appears once, in key generation, to check <span class=\"math\">e<\/span> against <span class=\"math\">\u03c6(n)<\/span>; and no table with <span class=\"math\">n<\/span> entries could be stored."}];
+  var QUIZ = [{"q": "About how many multiplications does <span class=\"math\">a^1000 mod m<\/span> need by square and multiply?", "a": ["1000", "about 20", "about 500", "about 100"], "c": 1, "why": "<span class=\"math\">2 log\u2082 1000 \u2248 20<\/span>: ten squarings and at most ten extra multiplications, one per set bit (<span class=\"math\">1000 = 1111101000\u2082<\/span> has six). 1000 is the naive count; 500 would be halving the work once; 100 is the square root, which plays no part here."}, {"q": "Why reduce mod <span class=\"math\">m<\/span> at every step?", "a": ["To get the right answer", "To keep every intermediate below <span class=\"math\">m\u00b2<\/span> instead of astronomically large", "It is optional", "To make the exponent smaller"], "c": 1, "why": "The answer would be the same without reducing; the numbers would be unrepresentable, so reduction is what makes it computable. It does nothing to the exponent &mdash; that is \u201cFermat's Little Theorem and Euler's Theorem\u201d's <span class=\"math\">\u03c6(m)<\/span> &mdash; and it is optional only in the sense that fitting in memory is."}, {"q": "RSA encryption of one block is:", "a": ["a factorisation", "a single modular exponentiation", "a gcd computation", "a table lookup"], "c": 1, "why": "<span class=\"math\">c = m^e mod n<\/span>, and decryption is <span class=\"math\">c^d mod n<\/span>: both are this algorithm with 2048-bit exponents. A factorisation is the attack, not the encryption; a gcd appears once, in key generation, to check <span class=\"math\">e<\/span> against <span class=\"math\">\u03c6(n)<\/span>; and no table with <span class=\"math\">n<\/span> entries could be stored."}];
 
   (function () {
 
@@ -1650,7 +1661,7 @@ result = 11 · 31 · 11 mod 50
     out.innerHTML = '';
     status.innerHTML = '<strong>' + what + ' is too large for this lab.</strong> Its only method is trial division up to '
       + 'the square root, which is fine below 10<sup>12</sup> and would freeze this page for minutes above it. That '
-      + 'the cost climbs like that is exactly what lesson 14 relies on; a number this size is best factored on paper, '
+      + 'the cost climbs like that is exactly what “RSA Encryption” relies on; a number this size is best factored on paper, '
       + 'which is to say not at all.';
   }
   function letter(x) { return String.fromCharCode(65 + Number(x)); }

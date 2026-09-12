@@ -278,6 +278,7 @@ input[type=range]{width:100%;accent-color:var(--cyan)}.segmented{display:grid;gr
       font-size: 0.9rem;
       resize: vertical;
     }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
     .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
     .fb-actions {
       display: flex;
@@ -436,6 +437,27 @@ input[type=range]{width:100%;accent-color:var(--cyan)}.segmented{display:grid;gr
       .signin-btn { padding: 0; width: 38px; justify-content: center; }
     }
 
+    /* Trading charts use a 960-unit plotting frame. Keep that authored scale
+       instead of shrinking 11-unit axis text to roughly 3 CSS pixels on a
+       phone. The named keyboard scroll owner exposes the complete chart. */
+    @media screen {
+      .market-chart-scroll {
+        contain: inline-size;
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        overscroll-behavior-inline: contain;
+      }
+      .market-chart-scroll > svg.market-chart {
+        display: block;
+        width: 100%;
+        min-width: 960px;
+      }
+    }
+
     body[data-page-kind] {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 16px;
@@ -469,6 +491,7 @@ input[type=range]{width:100%;accent-color:var(--cyan)}.segmented{display:grid;gr
     [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
     [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
     [data-ui="hero"] .eyebrow { display: block; color: var(--muted); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
     [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
     [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
     [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
@@ -513,7 +536,7 @@ input[type=range]{width:100%;accent-color:var(--cyan)}.segmented{display:grid;gr
     }
     [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
     [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
-    [data-ui="lesson-list"] .lesson-link { min-height: 44px; }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
     body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
     body[data-page-kind] .is-done .lesson-state { color: var(--green); }
     [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
@@ -566,7 +589,243 @@ input[type=range]{width:100%;accent-color:var(--cyan)}.segmented{display:grid;gr
 </style>
   </noscript>
 
-  <script>
+  <script data-canvas-text="v1">
+/* Learn canvas text contract v1. Inlined by the authored-page normalizer. */
+(()=>{
+ 'use strict';
+ const roles=Object.freeze({axis:4.5,annotation:4.5,value:4.5,status:4.5,date:4.5});
+ const tokens=new WeakMap(),sites=new Map(),contexts=new WeakMap(),pending=new Map(),completed=new Map(),gutters=new WeakMap();
+ const nativeFill=CanvasRenderingContext2D.prototype.fillText;
+ const paintObjects=new WeakMap();
+ let depth=0,active=null,probe=null,execution=0;
+ const fail=message=>{throw Object.assign(Error('canvas contract: '+message),{code:'LEARN_CANVAS_SEMANTIC',assertion:message})};
+ const finite=values=>values.every(Number.isFinite);
+ const stable=value=>JSON.stringify(value,Object.keys(value).sort());
+ function site(definition){
+  if(!definition||typeof definition!=='object')fail('missing descriptor');
+  if(['guide','decorative'].includes(definition.role))fail('decorative guide used as semantic text');
+  const keys=['id','role','minimumContrast','region','collision','formatter','family','mode','dependencies'];
+  if(Object.keys(definition).sort().join()!==keys.sort().join()||typeof definition.id!=='string'||!/^[a-zA-Z0-9_.:-]+$/.test(definition.id)||typeof definition.role!=='string'||!Object.hasOwn(roles,definition.role)||!Number.isFinite(definition.minimumContrast)||definition.minimumContrast!==roles[definition.role]||!['axis-right','axis-left','axis-bottom','title-top','annotation','date-left','date-bottom-left','date-bottom-right','label-left','value-right','status'].includes(definition.region)||!['separate','fixed'].includes(definition.collision)||['formatter','family','mode'].some(k=>typeof definition[k]!=='string'||!definition[k])||!Array.isArray(definition.dependencies)||definition.dependencies.some(d=>typeof d!=='string'||!d)||new Set(definition.dependencies).size!==definition.dependencies.length||['frame.width','frame.height','theme'].some(d=>!definition.dependencies.includes(d)))fail('invalid semantic descriptor');
+  const key=stable(definition),prior=sites.get(definition.id);
+  if(prior){if(prior.key!==key)fail('conflicting descriptor '+definition.id);return prior.token;}
+  const descriptor=Object.freeze({...definition,dependencies:Object.freeze([...definition.dependencies])}),token=Object.freeze(Object.create(null));
+  tokens.set(token,descriptor);sites.set(descriptor.id,{key,descriptor,token});return token;
+ }
+ function rolePaint(canvas,role){
+  if(typeof role!=='string'||!Object.hasOwn(roles,role))fail('decorative guide used as semantic text');
+  for(let e=canvas;e;e=e.parentElement){const s=getComputedStyle(e);if(Number(s.opacity)!==1||s.filter!=='none'||s.mixBlendMode!=='normal')fail('unprovable canvas ancestor paint');}
+  const style=getComputedStyle(canvas),foreground=style.getPropertyValue('--text').trim(),background=style.getPropertyValue('--panel-2').trim();
+  const pixel=document.createElement('canvas');pixel.width=pixel.height=1;const c=pixel.getContext('2d',{willReadFrequently:true});
+  const resolve=color=>{if(!CSS.supports('color',color))fail('unresolved semantic paint');c.clearRect(0,0,1,1);c.fillStyle=color;c.fillRect(0,0,1,1);const rgba=[...c.getImageData(0,0,1,1).data];if(rgba[3]!==255)fail('semantic role paint must be opaque');return rgba.slice(0,3)};
+  const fg=resolve(foreground),bg=resolve(background);
+  const luminance=rgb=>rgb.map(v=>v/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4).reduce((sum,v,i)=>sum+v*[.2126,.7152,.0722][i],0);
+  const a=luminance(fg),b=luminance(bg),ratio=(Math.max(a,b)+.05)/(Math.min(a,b)+.05);
+  if(ratio<roles[role])fail('text contrast below threshold');
+  return {foreground,background,fg,bg,ratio};
+ }
+ function traceValue(value){
+  if(value===null||typeof value==='string'||typeof value==='boolean')return value;
+  if(value===undefined)return {undefined:true};
+  if(typeof value==='number'&&Number.isFinite(value))return value;
+  if(Array.isArray(value)){const items=[];for(let i=0;i<value.length;i++){if(!Object.hasOwn(value,i))fail('unprovable canvas trace value');items.push(traceValue(value[i]));}return {array:items};}
+  const paint=value&&typeof value==='object'?paintObjects.get(value):null;
+  if(paint)return {gradient:paint.kind,id:paint.id,arguments:paint.args,stops:paint.stops.map(s=>s.slice())};
+  fail('unprovable canvas trace value');
+ }
+ function trackedGradient(raw,kind,args,frame){
+  const record={raw,kind,id:++frame.paintSequence,frame,args:args.map(traceValue),stops:[],proxy:null};
+  const proxy=new Proxy(Object.create(null),{get(_target,key){const target=raw;
+   if(key!=='addColorStop')fail('unprovable canvas gradient access');
+   return (...args)=>{if(frame.status!=='geometry'||pending.get(frame.canvas)!==frame)fail('gradient mutation outside canvas frame');if(args.length!==2)fail('unprovable canvas gradient stop');const stop=args.map(traceValue);target.addColorStop(...args);record.stops.push(stop);frame.trace.push(['gradient-stop',record.id,record.kind,record.args,stop]);};
+  },defineProperty(){fail('canvas gradient reflection mutation')},deleteProperty(){fail('canvas gradient reflection mutation')},setPrototypeOf(){fail('canvas gradient reflection mutation')},preventExtensions(){fail('canvas gradient reflection mutation')},set(){fail('canvas gradient reflection mutation')}});
+  record.proxy=proxy;paintObjects.set(raw,record);paintObjects.set(proxy,record);return proxy;
+ }
+ const operationMethods=new Set(['save','restore','reset','setTransform','resetTransform','transform','translate','rotate','scale','setLineDash','getLineDash','beginPath','moveTo','lineTo','bezierCurveTo','quadraticCurveTo','arc','arcTo','ellipse','rect','roundRect','closePath','fill','stroke','fillRect','strokeRect','clearRect','clip','measureText','getTransform','getImageData','createImageData','putImageData','drawImage','createLinearGradient','createRadialGradient','createConicGradient','isPointInPath','isPointInStroke','getContextAttributes','isContextLost']);
+ const stateProperties=new Set(['direction','fillStyle','filter','font','fontKerning','fontStretch','fontVariantCaps','globalAlpha','globalCompositeOperation','imageSmoothingEnabled','imageSmoothingQuality','lang','letterSpacing','lineCap','lineDashOffset','lineJoin','lineWidth','miterLimit','shadowBlur','shadowColor','shadowOffsetX','shadowOffsetY','strokeStyle','textAlign','textBaseline','textRendering','wordSpacing']);
+ const paintMethods=new Set(['reset','clearRect','fillRect','strokeRect','fill','stroke','drawImage','putImageData','fillText','strokeText']);
+ function begin(canvas,width,height,dpr){
+  if(!depth)fail('frame missing');
+  if(!(canvas instanceof HTMLCanvasElement)||!finite([width,height,dpr])||width<=0||height<=0||dpr<=0)fail('invalid canvas dimensions');
+  if(pending.has(canvas))fail('canvas begun twice without finalization');
+  const raw=canvas.getContext('2d');if(!raw)fail('2D context missing');
+  const frame={canvas,raw,width,height,dpr,execution:++execution,status:'geometry',commands:[],trace:[],labels:[],paintSequence:0,clipDepth:0,clipStack:[]};
+  pending.set(canvas,frame);
+  if(canvas.width!==Math.round(width*dpr))canvas.width=Math.round(width*dpr);if(canvas.height!==Math.round(height*dpr))canvas.height=Math.round(height*dpr);
+  raw.reset();raw.setTransform(dpr,0,0,dpr,0,0);
+  const proxy=new Proxy(Object.create(null),{
+   get(_target,key){const target=raw;
+    const value=Reflect.get(target,key,target);
+    if(typeof value!=='function')return paintObjects.get(value)?.proxy||value;
+    return (...args)=>{
+     if(key==='fillText'||key==='strokeText')fail('uncontracted native text');
+     if(!operationMethods.has(key))fail('unsupported canvas operation '+String(key));
+     if(paintMethods.has(key)&&frame.status!=='geometry')fail('paint after text finalization');
+     frame.trace.push([String(key),args.map(traceValue)]);
+     const result=value.apply(target,args);
+     return ['createLinearGradient','createRadialGradient','createConicGradient'].includes(key)?trackedGradient(result,key,args,frame):result;
+    };
+   },
+   defineProperty(){fail('canvas context reflection mutation')},deleteProperty(){fail('canvas context reflection mutation')},setPrototypeOf(){fail('canvas context reflection mutation')},preventExtensions(){fail('canvas context reflection mutation')},
+   set(_target,key,value){if(!stateProperties.has(key))fail('unsupported canvas state property '+String(key));const target=raw;const paint=paintObjects.get(value);if(paint&&paint.frame!==frame)fail('gradient used outside canvas frame');frame.trace.push(['set',String(key),traceValue(value)]);return Reflect.set(target,key,paint?.raw||value,target)}
+  });
+  contexts.set(proxy,frame);pending.set(canvas,frame);return proxy;
+ }
+ function region(frame,name){
+  const w=frame.width,h=frame.height,gutter=gutters.get(frame.canvas)||0;
+  const regions={'axis-bottom':[6,h-29,w-6,h-2],'title-top':[6,4,w-6,44],'axis-right':[w-(gutter||68),4,w-4,h-4],'axis-left':[2,4,46,h-30],'date-bottom-left':[42,h-28,w/2,h-2],'date-bottom-right':[w/2,h-28,w-8,h-2],'label-left':[6,6,168,h-6],annotation:[6,44,w-Math.max(74,gutter+8),h-30],'date-left':[6,6,Math.min(116,w/3),h-6],'value-right':[w-116,6,w-6,h-6],status:[6,48,w-6,h-6]};
+  const r=regions[name];if(!r||r[0]<0||r[1]<0||r[2]>w||r[3]>h||r[0]>=r[2]||r[1]>=r[3])fail('invalid descriptor region');
+  return {left:r[0],top:r[1],right:r[2],bottom:r[3]};
+ }
+ function text(context,token,value,x,y,maxWidth){
+  if(arguments.length<5||arguments.length>6)fail('arbitrary semantic paint arguments');
+  const descriptor=tokens.get(token),frame=contexts.get(context);
+  if(!descriptor)fail('unbound site token');if(!frame||frame.status!=='geometry'||!pending.has(frame.canvas))fail('semantic text outside frame');
+  if(frame.clipDepth)fail('unprovable semantic clip');
+  const raw=frame.raw,label=String(value);if(!label.trim())fail('empty semantic text');
+  if(!finite([x,y])||maxWidth!==undefined&&(!Number.isFinite(maxWidth)||maxWidth<=0))fail('nonfinite semantic geometry');
+  if(raw.globalAlpha!==1)fail('semantic alpha below one');
+  if(raw.globalCompositeOperation!=='source-over')fail('unsupported semantic composite');
+  if(typeof raw.fillStyle!=='string')fail('gradient or pattern used for semantic text');
+  if(raw.filter!=='none'||raw.shadowBlur||raw.shadowOffsetX||raw.shadowOffsetY||!['rgba(0, 0, 0, 0)','transparent','#00000000'].includes(raw.shadowColor))fail('unprovable semantic shadow or filter');
+  let matrix=raw.getTransform();if(!matrix.is2D||!finite([matrix.a,matrix.b,matrix.c,matrix.d,matrix.e,matrix.f])||Math.abs(matrix.a*matrix.d-matrix.b*matrix.c)<1e-12)fail('unprovable semantic transform');
+  // Chromium normalizes a six-number setTransform differently from an
+  // accumulated rotate/translate matrix. Measure the transform that the
+  // final flush will actually apply, leaving graph drawing state intact.
+  raw.save();raw.setTransform(matrix.a,matrix.b,matrix.c,matrix.d,matrix.e,matrix.f);matrix=raw.getTransform();raw.restore();
+  for(const property of ['letterSpacing','wordSpacing'])if(raw[property]!==undefined){if(raw[property]!==''&&raw[property]!=='0px')fail('unprovable semantic font spacing');raw[property]='1px';raw[property]='0px';if(raw[property]!=='0px')fail('unresolved semantic font spacing');}
+  raw.fontKerning='none';raw.direction=raw.direction==='inherit'?getComputedStyle(frame.canvas).direction:raw.direction;
+  const font=/^(?:(italic|oblique) )?(?:(normal|bold|[1-9]00) )?([0-9.]+)px (.+)$/.exec(raw.font);if(!font)fail('unresolved semantic font');
+  raw.font=(font[1]?font[1]+' ':'')+Math.max(600,font[2]==='bold'?700:Number(font[2])||400)+' '+Math.max(12,Number(font[3]))+'px '+font[4];
+  const metrics=raw.measureText(label),required=['width','actualBoundingBoxLeft','actualBoundingBoxRight','actualBoundingBoxAscent','actualBoundingBoxDescent'];
+  if(!finite(required.map(k=>metrics[k])))fail('incomplete text metrics');
+  const command={descriptor,token,text:label,x,y,maxWidth,metrics:Object.fromEntries(required.map(k=>[k,metrics[k]])),matrix:[matrix.a,matrix.b,matrix.c,matrix.d,matrix.e,matrix.f],font:raw.font,align:raw.textAlign,baseline:raw.textBaseline,direction:raw.direction,paint:rolePaint(frame.canvas,descriptor.role),region:region(frame,descriptor.region)};
+  frame.commands.push(command);
+ }
+ function bounds(command,frame,x=command.x,y=command.y){
+  const m=command.metrics,compress=command.maxWidth===undefined||!m.width?1:Math.min(1,command.maxWidth/m.width),matrix=new DOMMatrix(command.matrix);
+  const corners=[[x-m.actualBoundingBoxLeft*compress,y-m.actualBoundingBoxAscent],[x+m.actualBoundingBoxRight*compress,y-m.actualBoundingBoxAscent],[x+m.actualBoundingBoxRight*compress,y+m.actualBoundingBoxDescent],[x-m.actualBoundingBoxLeft*compress,y+m.actualBoundingBoxDescent]].map(([x,y])=>{const p=matrix.transformPoint({x,y});return {x:p.x/frame.dpr,y:p.y/frame.dpr}});
+  return {left:Math.min(...corners.map(p=>p.x)),right:Math.max(...corners.map(p=>p.x)),top:Math.min(...corners.map(p=>p.y)),bottom:Math.max(...corners.map(p=>p.y)),corners};
+ }
+ const intersects=(a,b)=>a.left<b.right&&b.left<a.right&&a.top<b.bottom&&b.top<a.bottom;
+ const inside=(a,b)=>a.left>=b.left&&a.right<=b.right&&a.top>=b.top&&a.bottom<=b.bottom;
+ function finish(frame){
+  if(frame.status!=='geometry')fail('duplicate finalization');
+  if(frame.clipDepth)fail('unprovable semantic clip at finalization');
+  const placed=[];
+  for(const command of frame.commands){
+   const initial=bounds(command,frame),pad=2,inkWidth=initial.right-initial.left,inkHeight=initial.bottom-initial.top,r=command.region;
+   if(inkWidth<=0||inkHeight<=0||inkWidth+2*pad>r.right-r.left||inkHeight+2*pad>r.bottom-r.top)fail('unplaceable semantic text '+command.descriptor.id);
+   let left=Math.max(r.left+pad,Math.min(initial.left,r.right-pad-inkWidth)),top=Math.max(r.top+pad,Math.min(initial.top,r.bottom-pad-inkHeight));
+   const candidate=(left,top)=>({left:left-pad,right:left+inkWidth+pad,top:top-pad,bottom:top+inkHeight+pad});
+   let box=candidate(left,top);
+   if(command.descriptor.collision==='separate'&&placed.some(p=>intersects(box,p.box))){
+    const choices=[];
+    for(let y=r.top+pad;y<=r.bottom-pad-inkHeight;y+=inkHeight+2*pad+1)for(let x=r.left+pad;x<=r.right-pad-inkWidth;x+=inkWidth+2*pad+1)choices.push({x,y,d:(x-left)**2+(y-top)**2});
+    choices.sort((a,b)=>a.d-b.d||a.y-b.y||a.x-b.x);
+    const spot=choices.find(p=>!placed.some(q=>intersects(candidate(p.x,p.y),q.box)));
+    if(!spot)fail('unplaceable semantic collision '+command.descriptor.id);left=spot.x;top=spot.y;box=candidate(left,top);
+   }
+   if(placed.some(p=>intersects(box,p.box)))fail('semantic bounds overlap');
+   const inverse=new DOMMatrix(command.matrix).inverse(),shift=inverse.transformPoint({x:(left-initial.left)*frame.dpr,y:(top-initial.top)*frame.dpr,w:0});
+   const x=command.x+shift.x,y=command.y+shift.y,ink=bounds(command,frame,x,y);
+   if(!inside(ink,r)||ink.corners.some(p=>p.x<0||p.y<0||p.x>frame.width||p.y>frame.height))fail('transformed semantic corner outside region');
+   placed.push({command,x,y,ink,box});
+  }
+  frame.placed=placed;frame.status='text';const raw=frame.raw;
+  for(const p of placed){
+   const c=p.command;raw.save();raw.setTransform(frame.dpr,0,0,frame.dpr,0,0);raw.globalAlpha=1;raw.globalCompositeOperation='source-over';raw.filter='none';raw.shadowColor='transparent';raw.fillStyle=c.paint.background;raw.fillRect(p.box.left,p.box.top,p.box.right-p.box.left,p.box.bottom-p.box.top);raw.restore();
+  }
+  const expectedNativeCount=placed.filter(p=>probe?.suppress!==p.command.descriptor.id).length;let nativeOrdinal=0;
+  for(const [instance,p] of placed.entries()){
+   const c=p.command;
+   const label={site:c.descriptor.id,descriptor:c.descriptor,instance,text:c.text,font:c.font,align:c.align,baseline:c.baseline,matrix:c.matrix,maxWidth:c.maxWidth??null,ink:p.ink,region:c.region,backing:p.box,paint:c.paint};frame.labels.push(label);
+   if(probe?.suppress===c.descriptor.id)continue;
+   raw.save();raw.setTransform(...c.matrix);raw.font=c.font;raw.fontKerning='none';raw.letterSpacing='0px';raw.wordSpacing='0px';raw.textAlign=c.align;raw.textBaseline=c.baseline;raw.direction=c.direction;raw.fillStyle=c.paint.foreground;raw.globalAlpha=1;raw.globalCompositeOperation='source-over';raw.filter='none';raw.shadowColor='transparent';
+   const geometry=Object.freeze({width:frame.width,height:frame.height,dpr:frame.dpr,region:Object.freeze({...c.region}),ink:Object.freeze({left:p.ink.left,right:p.ink.right,top:p.ink.top,bottom:p.ink.bottom})});
+   active=Object.freeze({token:c.token,descriptor:c.descriptor,canvas:frame.canvas,instance,execution:frame.execution,ordinal:nativeOrdinal++,count:expectedNativeCount,text:c.text,geometry});
+   try{if(c.maxWidth===undefined)nativeFill.call(raw,c.text,p.x,p.y);else nativeFill.call(raw,c.text,p.x,p.y,c.maxWidth)}finally{active=null;raw.restore()}
+  }
+  frame.status='final';pending.delete(frame.canvas);completed.set(frame.canvas,frame);
+ }
+ function frame(callback){
+  if(depth){depth++;try{const result=callback();if(result&&typeof result.then==='function')fail('asynchronous frame unsupported');return result}finally{depth--;}}
+  const clear=()=>{for(const f of pending.values()){f.status='failed';completed.delete(f.canvas);}pending.clear()};
+  for(let pass=0;pass<3;pass++){
+   let result;depth=1;
+   try{result=callback();if(result&&typeof result.then==='function')fail('asynchronous frame unsupported');}
+   catch(error){clear();throw error}finally{depth=0}
+   try{
+    let reflow=false;
+    for(const f of pending.values()){
+     const axes=f.commands.filter(c=>c.descriptor.region==='axis-right');
+     // Reserve the measured axis lane before graph geometry is finalized.
+     const lane=axes.length?Math.max(68,...axes.map(c=>{const b=bounds(c,f);return Math.ceil(b.right-b.left+16)})):0;
+     if(axes.length&&f.width-lane<160)fail('unplaceable semantic axis lane');
+     if((gutters.get(f.canvas)||0)!==lane){gutters.set(f.canvas,lane);reflow=true;}
+    }
+    if(reflow){clear();continue;}
+    for(const f of [...pending.values()])finish(f);
+    return result;
+   }finally{clear();}
+  }
+  fail('canvas lane allocation did not converge');
+ }
+ function isolated(canvas,siteID,color){
+  const original=completed.get(canvas);
+  if(!original||original.status!=='final'||!original.labels.some(l=>l.site===siteID)||!['#000000','#ffffff'].includes(color))fail('invalid isolated ink request');
+  const mask=document.createElement('canvas');mask.width=canvas.width;mask.height=canvas.height;const raw=mask.getContext('2d');
+  raw.fillStyle='#7f7f7f';raw.fillRect(0,0,mask.width,mask.height);
+  for(const [instance,p] of original.placed.entries()){
+   const c=p.command;if(c.descriptor.id!==siteID)continue;
+   raw.save();raw.setTransform(...c.matrix);raw.font=c.font;raw.fontKerning='none';raw.letterSpacing='0px';raw.wordSpacing='0px';raw.textAlign=c.align;raw.textBaseline=c.baseline;raw.direction=c.direction;raw.fillStyle=color;
+   active=Object.freeze({token:c.token,descriptor:c.descriptor,canvas:mask,owner:canvas,instance,execution:original.execution,text:c.text,diagnostic:true});
+   try{if(c.maxWidth===undefined)nativeFill.call(raw,c.text,p.x,p.y);else nativeFill.call(raw,c.text,p.x,p.y,c.maxWidth)}finally{active=null;raw.restore()}
+  }
+  return {width:mask.width,height:mask.height,data:mask.toDataURL('image/png')};
+ }
+ const api=Object.freeze({site,text,begin,frame,isolated,plotWidth:(ctx,width,rightMargin)=>{const f=contexts.get(ctx);if(!f||!finite([width,rightMargin])||width<=0||rightMargin<0)fail('unprovable plot allocation');const result=width-Math.max(0,(gutters.get(f.canvas)||0)+4-rightMargin);if(result<=0)fail('unplaceable plot beside semantic lane');return result;},
+  nativeToken:()=>active,
+  phase:canvas=>(pending.get(canvas)||completed.get(canvas))?.status||null,
+  inspect:()=>JSON.parse(JSON.stringify([...completed.values()].filter(f=>f.canvas.isConnected).map(f=>({canvas:f.canvas.id,width:f.width,height:f.height,dpr:f.dpr,status:f.status,trace:f.trace,labels:f.labels})))),
+  descriptors:()=>[...sites.values()].map(s=>s.descriptor),
+  probe:settings=>{if(settings!==null&&(!settings||Object.keys(settings).some(k=>k!=='suppress')||settings.suppress!==null&&typeof settings.suppress!=='string'))fail('invalid capture probe');probe=settings},
+  pending:()=>pending.size
+ });
+ // Install before all authored scripts. Public native methods never receive
+ // semantic authority; only the private captured nativeFill can paint text.
+ const prototypes=[CanvasRenderingContext2D.prototype];if(window.OffscreenCanvasRenderingContext2D)prototypes.push(OffscreenCanvasRenderingContext2D.prototype);
+ for(const prototype of prototypes){
+  for(const method of ['fillText','strokeText'])Object.defineProperty(prototype,method,{configurable:false,writable:false,value:function(){fail('uncontracted native text')}});
+  for(const method of ['save','restore','clip','clearRect','fillRect','strokeRect','fill','stroke','drawImage','putImageData','reset']){
+   const original=prototype[method];
+   Object.defineProperty(prototype,method,{configurable:false,writable:false,value:function(...args){
+    const f=pending.get(this.canvas)||completed.get(this.canvas);
+    if(f?.status==='final'&&!['save','restore'].includes(method))fail('paint after text finalization');
+    if(f&&pending.has(this.canvas)){
+     if(method==='save')f.clipStack.push(f.clipDepth);
+     if(method==='restore')f.clipDepth=f.clipStack.pop()??f.clipDepth;
+     if(method==='clip')f.clipDepth++;
+     if(method==='reset'){f.clipDepth=0;f.clipStack=[];}
+    }
+    return original.apply(this,args);
+   }});
+  }
+ }
+ // Assigning either bitmap dimension clears the canvas, including assigning
+ // its current value. Treat that reset as paint after a completed frame.
+ for(const property of ['width','height']){
+  const descriptor=Object.getOwnPropertyDescriptor(HTMLCanvasElement.prototype,property);
+  Object.defineProperty(HTMLCanvasElement.prototype,property,{...descriptor,configurable:false,set(value){
+   const current=pending.get(this)||completed.get(this);
+   if(current?.status==='final')fail('paint after text finalization');
+   return descriptor.set.call(this,value);
+  }});
+ }
+ if(Object.prototype.hasOwnProperty.call(window,'CanvasText'))fail('duplicate helper');
+ Object.defineProperty(window,'CanvasText',{value:api,writable:false,configurable:false});
+})();
+</script>
+<script>
     /* Applied before first paint so an explicit theme choice never flashes the
        other theme. This is why it lives LAST in <head> and not with the rest of
        the page script at the bottom of <body>: that runs after the first paint.
@@ -583,6 +842,9 @@ input[type=range]{width:100%;accent-color:var(--cyan)}.segmented{display:grid;gr
       } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
     })();
   </script>
+<style data-canvas-scroll="v1">
+[data-canvas-scroll="v1"]{overflow:auto;max-width:100%;min-width:0}[data-canvas-scroll="v1"] canvas{display:block;min-width:520px}.card:has(>[data-canvas-scroll="v1"]){min-width:0}.lab:has([data-canvas-scroll="v1"]),.chart-wrap:has(>[data-canvas-scroll="v1"]){overflow:visible}.chart-wrap:has(>[data-canvas-scroll="v1"])>:is(.chart-badge,.chart-label){position:relative;display:table;left:auto;top:auto;margin:14px}@media print{[data-canvas-scroll="v1"]{overflow:visible}[data-canvas-scroll="v1"] canvas{min-width:0}}
+</style>
 </head>
 <body data-page-kind="lesson">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -649,7 +911,7 @@ input[type=range]{width:100%;accent-color:var(--cyan)}.segmented{display:grid;gr
       <div class="lab-head"><div><h3>Relative Volume and Volume Spikes Lab</h3><p>Synthetic educational data · no live market connection</p></div><button class="btn small" type="button" onclick="window.initLab()">Reset</button></div>
       <div class="lab-body">
         <div class="chart-pane">
-          <div class="chart-wrap"><span class="chart-badge" id="chartBadge">MARKET DATA</span><canvas id="chart" aria-label="Interactive market chart"></canvas></div>
+          <div class="chart-wrap"><span class="chart-badge" id="chartBadge">MARKET DATA</span><div data-canvas-scroll="v1" tabindex="0" role="region" aria-label="Interactive market chart"><canvas id="chart" aria-label="Interactive market chart"></canvas></div></div>
           <div id="extraVisual"></div>
           <div class="kpis" id="kpis"></div>
           <div class="market-read" id="marketRead"></div>
@@ -660,7 +922,7 @@ input[type=range]{width:100%;accent-color:var(--cyan)}.segmented{display:grid;gr
   </section>
 
   <section class="section">
-    <div class="section-head"><div><span class="eyebrow">Reading process</span><h2>Read it in order</h2></div><p>Do not jump from one number to a trade. Describe the evidence first.</p></div>
+    <div class="section-head"><div><span class="eyebrow">Reading process</span><h2>Follow the reading steps</h2></div><p>Do not jump from one number to a trade. Describe the evidence first.</p></div>
     <div class="reading-grid"><article class="reading"><b>1</b><div><h3>Build a fair baseline</h3><p>Compare the same timeframe and, for intraday data, similar times of day.</p></div></article>
 <article class="reading"><b>2</b><div><h3>Locate the spike</h3><p>Measure how far current volume exceeds normal participation.</p></div></article>
 <article class="reading"><b>3</b><div><h3>Inspect response</h3><p>Did price continue, stall, or reverse after the spike?</p></div></article></div>
@@ -745,7 +1007,7 @@ input[type=range]{width:100%;accent-color:var(--cyan)}.segmented{display:grid;gr
 
 
   <footer class="footer" data-ui="footer">
-    <p><span>Volume and Order Flow · Lesson 03</span>
+    <p><span>Volume and Order Flow · Relative Volume and Volume Spikes</span>
     <span>Educational synthetic examples only. Not live data, investment advice, or an execution system.</span></p>
     <p>© 2026 dmedellin · Released under the MIT License · Educational use only — charts are synthetic examples, not trade signals.</p>
     <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
@@ -896,14 +1158,7 @@ function workedHTML(title,lines){
   return`<div class="formula" style="margin-top:14px"><strong style="display:block;margin-bottom:6px">${title}</strong>${lines.join("<br>")}</div>`;
 }
 
-function canvasContext(){
-  const canvas=$("#chart");
-  const rect=canvas.getBoundingClientRect(),dpr=Math.min(2,window.devicePixelRatio||1);
-  const w=Math.max(320,rect.width),h=Math.max(310,rect.height);
-  if(canvas.width!==Math.round(w*dpr)||canvas.height!==Math.round(h*dpr)){canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr)}
-  const ctx=canvas.getContext("2d");ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,w,h);
-  return{canvas,ctx,w,h,dpr};
-}
+function canvasContext(){const canvas=$('#chart'),rect=canvas.getBoundingClientRect(),dpr=2,w=Math.max(520,rect.width),h=Math.max(310,rect.height);const ctx=CanvasText.begin(canvas,w,h,dpr);return{ctx,w,h}}
 function colors(){return{bg:css("--bg"),panel:css("--panel"),panel2:css("--panel2"),text:css("--text"),muted:css("--muted"),line:css("--line"),line2:css("--line2"),cyan:css("--cyan"),green:css("--green"),red:css("--red"),amber:css("--amber"),purple:css("--purple"),blue:css("--blue")}}
 function grid(ctx,x,y,w,h,c,rows=5,cols=7){
   ctx.save();ctx.strokeStyle=c.line;ctx.lineWidth=1;
@@ -917,7 +1172,7 @@ function extent(arr,accessors,pad=.08){
 }
 function drawAxes(ctx,area,min,max,c,formatter=v=>fmt(v,2)){
   ctx.save();ctx.fillStyle=c.muted;ctx.font="11px system-ui";ctx.textAlign="left";ctx.textBaseline="middle";
-  for(let i=0;i<=4;i++){const v=max-(max-min)*i/4;ctx.fillText(formatter(v),area.x+area.w+7,area.y+area.h*i/4)}
+  for(let i=0;i<=4;i++){const v=max-(max-min)*i/4;CanvasText.text(ctx,CanvasText.site({"id":"volume-and-order-flow.drawAxes.1","role":"axis","minimumContrast":4.5,"region":"axis-right","collision":"separate","formatter":"formatter(v)","family":"volume-and-order-flow","mode":"drawAxes","dependencies":["frame.width","frame.height","theme","parameter.area","parameter.min","parameter.max","parameter.formatter"]}),formatter(v),area.x+area.w+7,area.y+area.h*i/4)}
   ctx.restore();
 }
 function drawCandles(ctx,series,area,min,max,c){
@@ -947,13 +1202,13 @@ function drawLine(ctx,values,area,min,max,color,width=2){
 function drawLabel(ctx,text,x,y,color){
   ctx.save();ctx.font="800 11px system-ui";const m=ctx.measureText(text),w=m.width+14,h=23;
   ctx.fillStyle=color;ctx.globalAlpha=.16;ctx.fillRect(x,y-h/2,w,h);ctx.globalAlpha=1;ctx.strokeStyle=color;ctx.strokeRect(x,y-h/2,w,h);
-  ctx.fillStyle=color;ctx.textBaseline="middle";ctx.fillText(text,x+7,y);ctx.restore();
+  ctx.fillStyle=color;ctx.textBaseline="middle";CanvasText.text(ctx,CanvasText.site({"id":"volume-and-order-flow.drawLabel.1","role":"annotation","minimumContrast":4.5,"region":"annotation","collision":"separate","formatter":"text","family":"volume-and-order-flow","mode":"drawLabel","dependencies":["frame.width","frame.height","theme","parameter.text","parameter.x","parameter.y"]}),text,x+7,y);ctx.restore();
 }
 function drawHorizontal(ctx,y,x1,x2,color,label){
   ctx.save();ctx.strokeStyle=color;ctx.setLineDash([6,5]);ctx.beginPath();ctx.moveTo(x1,y);ctx.lineTo(x2,y);ctx.stroke();ctx.setLineDash([]);
   if(label)drawLabel(ctx,label,x1+4,y-14,color);ctx.restore()
 }
-function standardChart(series,opts={}){
+function standardChart(series,opts={}){return CanvasText.frame(()=>{
   const {ctx,w,h}=canvasContext(),c=colors();const m={l:18,r:58,t:18,b:24};
   const total={x:m.l,y:m.t,w:w-m.l-m.r,h:h-m.t-m.b};
   const volH=opts.noVolume?0:Math.max(82,total.h*.25),gap=opts.noVolume?0:13;
@@ -964,10 +1219,10 @@ function standardChart(series,opts={}){
   if(!opts.noVolume){
     const vmax=Math.max(...series.map(d=>d.v))*1.12;
     const cols=series.map(d=>d.c>=d.o?c.green:c.red);drawBars(ctx,series.map(d=>d.v),volume,c,{max:vmax,colors:cols,alpha:.5});
-    ctx.fillStyle=c.muted;ctx.font="10px system-ui";ctx.fillText("VOLUME",volume.x,volume.y+10);
+    ctx.fillStyle=c.muted;ctx.font="10px system-ui";CanvasText.text(ctx,CanvasText.site({"id":"volume-and-order-flow.standardChart.1","role":"status","minimumContrast":4.5,"region":"status","collision":"separate","formatter":"\"VOLUME\"","family":"volume-and-order-flow","mode":"standardChart","dependencies":["frame.width","frame.height","theme","parameter.series","parameter.opts"]}),"VOLUME",volume.x,volume.y+10);
   }
   return{ctx,w,h,c,price,volume,min:mn,max:mx,sy:v=>price.y+(mx-v)/(mx-mn)*price.h,sx:i=>price.x+price.w*(i+.5)/series.length};
-}
+});}
 function linePanel(ctx,values,area,c,opts={}){
   let valid=values.filter(v=>v!=null),mn=opts.min??Math.min(...valid),mx=opts.max??Math.max(...valid);
   if(mn===mx){mn-=1;mx+=1}const pad=(mx-mn)*.1;mn-=pad;mx+=pad;grid(ctx,area.x,area.y,area.w,area.h,c,3,7);
@@ -1143,7 +1398,7 @@ function resizeHandler(fn){
 
 function initVolumeBasics(){
   let scenario="bull",activity=100,series;
-  const draw=()=>{
+  const draw=()=>{return CanvasText.frame(()=>{
     const kind=scenario==="bull"?"bull-volumeup":scenario==="bear"?"bear-volumeup":scenario==="balance"?"range-volumeup":"absorb-volumeup";
     series=makeSeries(kind,54,101).map(d=>({...d,v:Math.round(d.v*activity/100)}));
     const ch=standardChart(series);setBadge("PRICE + VOLUME");
@@ -1153,7 +1408,7 @@ function initVolumeBasics(){
     else if(scenario==="bear")marketRead("bear","Sellers are accepting lower prices.","Price is progressing downward while activity expands. Sellers are repeatedly hitting lower bids.",scenario);
     else if(scenario==="balance")marketRead("","Neither side is making durable progress.","Trading activity is present, but price keeps returning toward the middle of the range.",scenario);
     else marketRead("warn","Orders are active, but price is not progressing.","High participation with little price movement suggests opposing passive liquidity is absorbing aggression.",scenario);
-  };
+  });};
   $("#controls").innerHTML=controlHTML("Market state",segmented("stateSeg",[["bull","Bullish"],["bear","Bearish"],["balance","Balanced"],["absorb","Absorption"]],"bull"))+
     rangeControl("activity","Participation",55,170,100,5,"%")+
     `<div class="formula">Volume = completed shares or contracts traded<br>Direction = observed price progress</div><p class="mini-note">Every transaction has both a buyer and a seller. “Control” refers to the side successfully moving price.</p>`;
@@ -1162,7 +1417,7 @@ function initVolumeBasics(){
 }
 function initPriceVolume(){
   let mode="upUp";const labels={upUp:"Price ↑ / Volume ↑",upDown:"Price ↑ / Volume ↓",downUp:"Price ↓ / Volume ↑",downDown:"Price ↓ / Volume ↓"};
-  const draw=()=>{
+  const draw=()=>{return CanvasText.frame(()=>{
     const priceUp=mode.startsWith("up"),volUp=mode.endsWith("Up");
     const kind=(priceUp?"bull":"bear")+"-"+(volUp?"volumeup":"volumedown");
     const s=makeSeries(kind,56,202);standardChart(s);setBadge(labels[mode]);
@@ -1173,14 +1428,14 @@ function initPriceVolume(){
     if(priceUp&&!volUp)marketRead("warn","Buyers are moving price higher with less participation.","Upward progress continues, but fewer trades support the move. Evidence is weaker.",mode);
     if(!priceUp&&volUp)marketRead("bear","Sellers are making downward progress with expanding participation.","More activity is supporting lower prices as sellers continue accepting lower bids.",mode);
     if(!priceUp&&!volUp)marketRead("warn","Sellers are moving price lower with less participation.","Price is falling, but selling participation is contracting. The decline has weaker confirmation.",mode);
-  };
+  });};
   $("#controls").innerHTML=controlHTML("Relationship",segmented("pvSeg",[["upUp","Price ↑ · Vol ↑"],["upDown","Price ↑ · Vol ↓"],["downUp","Price ↓ · Vol ↑"],["downDown","Price ↓ · Vol ↓"]],"upUp"))+
     `<div class="formula">Read in this order:<br>1. Price direction<br>2. Volume change<br>3. Price response</div>`;
   bindSegment("pvSeg",v=>{mode=v;draw()});draw();return resizeHandler(draw);
 }
 function initRelativeVolume(){
   let mode="expansion",threshold=1.5;
-  const draw=()=>{
+  const draw=()=>{return CanvasText.frame(()=>{
     let kind=mode==="expansion"?"bull-spike":mode==="climax"?"bull-climax":mode==="absorption"?"absorb-spike":"range-spike";
     let s=makeSeries(kind,58,303);const spike=Math.floor(s.length*.72);
     if(mode==="climax"){for(let i=spike+1;i<s.length;i++){s[i].c-=Math.pow(i-spike,1.25)*.08;s[i].h=Math.max(s[i].o,s[i].c)+.3;s[i].l=Math.min(s[i].o,s[i].c)-.35}}
@@ -1201,7 +1456,7 @@ function initRelativeVolume(){
     else if(mode==="climax")marketRead("warn","Buying activity became extreme, then price stopped progressing.","The spike did not sustain higher prices and was followed by reversal. It behaved like a climax, not confirmation.",mode);
     else if(mode==="absorption")marketRead("warn","Aggressive activity increased, but price stayed nearly flat.","Opposing liquidity absorbed the orders. High volume did not produce control.",mode);
     else marketRead("","Activity spiked inside a balanced auction.","Both sides traded heavily, but neither maintained progress outside the range.",mode);
-  };
+  });};
   $("#controls").innerHTML=controlHTML("Spike response",segmented("rvSeg",[["expansion","Expansion"],["climax","Climax"],["absorption","Absorption"],["balanced","Balanced"]],"expansion"))+
     rangeControl("rvThreshold","RVOL threshold",1,3,1.5,.1,"×")+
     `<div class="formula">RVOL = current volume ÷ comparable baseline volume</div>`;
@@ -1209,7 +1464,7 @@ function initRelativeVolume(){
 }
 function initVolumeConfirmation(){
   let mode="strong",baseN=18;
-  const draw=()=>{
+  const draw=()=>{return CanvasText.frame(()=>{
     const kind=mode==="strong"?"breakout-volumeup":mode==="weak"?"breakout-volumedown":mode==="failed"?"failed-volumeup":"range-volumeup";
     const s=makeSeries(kind,60,404);const level=101.1;
     if(mode!=="range"){
@@ -1233,7 +1488,7 @@ function initVolumeConfirmation(){
     else if(mode==="weak")marketRead("warn","Buyers moved above resistance, but participation did not expand.","Price is outside the range, but volume confirmation is weak. More acceptance evidence is needed.",mode);
     else if(mode==="failed")marketRead("bear","Buyers crossed resistance but could not maintain higher prices.","High activity appeared at the break, then price returned inside. The attempted move was rejected.",mode);
     else marketRead("","Neither side has broken the range.","Volume is active inside the boundary, but buyers have not established acceptance above resistance.",mode);
-  };
+  });};
   $("#controls").innerHTML=controlHTML("Breakout case",segmented("vcSeg",[["strong","Confirmed"],["weak","Weak volume"],["failed","Failed"],["range","No break"]],"strong"))+
     rangeControl("baseN","Baseline bars",10,30,18,1,"")+
     `<div class="formula">Confirmation = level break + participation + acceptance</div>`;
@@ -1241,7 +1496,7 @@ function initVolumeConfirmation(){
 }
 function initOBV(){
   let mode="confirmBull",period=8;
-  const draw=()=>{
+  const draw=()=>{return CanvasText.frame(()=>{
     let kind=mode.includes("Bull")?"bull-volumeup":"bear-volumeup";let s=makeSeries(kind,62,505);
     if(mode==="bearDiv"){s=divergentVolume(makeSeries("bull-volumeup",62,506),24,3,.45)}
     if(mode==="bullDiv"){s=divergentVolume(makeSeries("bear-volumeup",62,507),24,.45,3)}
@@ -1249,7 +1504,7 @@ function initOBV(){
     const {ctx,w,h}=canvasContext(),c=colors(),m={l:18,r:58,t:18,b:20},totalH=h-m.t-m.b,gap=18,priceH=totalH*.58;
     const price={x:m.l,y:m.t,w:w-m.l-m.r,h:priceH},panel={x:m.l,y:m.t+priceH+gap,w:w-m.l-m.r,h:totalH-priceH-gap};
     grid(ctx,price.x,price.y,price.w,price.h,c);let[mn,mx]=extent(s,[d=>d.l,d=>d.h]);drawCandles(ctx,s,price,mn,mx,c);drawAxes(ctx,price,mn,mx,c);
-    linePanel(ctx,vals,panel,c,{color:c.cyan});ctx.fillStyle=c.muted;ctx.font="10px system-ui";ctx.fillText("ON-BALANCE VOLUME",panel.x,panel.y+11);setBadge("PRICE + OBV");
+    linePanel(ctx,vals,panel,c,{color:c.cyan});ctx.fillStyle=c.muted;ctx.font="10px system-ui";CanvasText.text(ctx,CanvasText.site({"id":"volume-and-order-flow.initOBV.1","role":"status","minimumContrast":4.5,"region":"status","collision":"separate","formatter":"\"ON-BALANCE VOLUME\"","family":"volume-and-order-flow","mode":"initOBV","dependencies":["frame.width","frame.height","theme"]}),"ON-BALANCE VOLUME",panel.x,panel.y+11);setBadge("PRICE + OBV");
     const pchg=(s.at(-1).c-s[0].o)/s[0].o*100,ochg=vals.at(-1)-vals[Math.max(0,vals.length-period-1)];
     setKPIs([["Price trend",pchg>=0?"Higher":"Lower"],["OBV change",(ochg>=0?"+":"")+compact(ochg)],["Relationship",mode.startsWith("confirm")?"Confirmation":"Divergence"]]);
     $("#extraVisual").innerHTML=workedHTML("The last five bars, accumulated",Array.from({length:5},(_,k)=>{const i=s.length-5+k,d=s[i],p=s[i-1];const dir=d.c>p.c?"up":d.c<p.c?"down":"unchanged";return`Bar ${i+1}: close ${fmt(d.c,2)} vs ${fmt(p.c,2)} (${dir}) → ${dir==="up"?"+":dir==="down"?"−":"±"}${dir==="unchanged"?"0":fmt(d.v,0)} → OBV ${fmt(vals[i],0)}`}));
@@ -1257,7 +1512,7 @@ function initOBV(){
     else if(mode==="confirmBear")marketRead("bear","Down-closing bars are carrying more cumulative volume as price falls.","Price and OBV agree: sellers are making downward progress with supporting volume participation.",mode);
     else if(mode==="bearDiv")marketRead("warn","Price rises, but OBV participation fails to confirm.","Buyers are still making price progress, but volume is increasingly associated with down closes. This is a warning, not an automatic short.",mode);
     else marketRead("warn","Price falls, but OBV selling participation fails to confirm.","Sellers are making price progress, but cumulative down-close volume is weakening. This is a warning, not an automatic long.",mode);
-  };
+  });};
   $("#controls").innerHTML=controlHTML("Relationship",segmented("obvSeg",[["confirmBull","Bull confirm"],["confirmBear","Bear confirm"],["bearDiv","Bear divergence"],["bullDiv","Bull divergence"]],"confirmBull"))+
     rangeControl("obvLook","Comparison window",5,20,8,1," bars")+
     `<div class="formula">If close ↑: OBV += volume<br>If close ↓: OBV −= volume</div><p class="mini-note">OBV is a closing-direction proxy, not trade-by-trade aggressor data.</p>`;
@@ -1265,7 +1520,7 @@ function initOBV(){
 }
 function initCMF(){
   let mode="accum",period=14;
-  const draw=()=>{
+  const draw=()=>{return CanvasText.frame(()=>{
     let s=makeSeries(mode==="accum"?"bull-volumeup":mode==="distrib"?"bear-volumeup":"range-volumeup",64,606);
     s=s.map((d,i)=>{
       if(mode==="accum")d.c=d.l+(d.h-d.l)*(.66+.25*Math.sin(i*.5)**2);
@@ -1276,7 +1531,7 @@ function initCMF(){
     const {cmf:vals}=cmf(s,period);const {ctx,w,h}=canvasContext(),c=colors(),m={l:18,r:58,t:18,b:20},gap=18,priceH=(h-m.t-m.b)*.58;
     const price={x:m.l,y:m.t,w:w-m.l-m.r,h:priceH},panel={x:m.l,y:m.t+priceH+gap,w:w-m.l-m.r,h:h-m.t-m.b-priceH-gap};
     grid(ctx,price.x,price.y,price.w,price.h,c);let[mn,mx]=extent(s,[d=>d.l,d=>d.h]);drawCandles(ctx,s,price,mn,mx,c);drawAxes(ctx,price,mn,mx,c);
-    linePanel(ctx,vals,panel,c,{color:c.purple,min:-.55,max:.55,zero:true});ctx.fillStyle=c.muted;ctx.font="10px system-ui";ctx.fillText(`CMF (${period})`,panel.x,panel.y+11);setBadge("PRICE + CMF");
+    linePanel(ctx,vals,panel,c,{color:c.purple,min:-.55,max:.55,zero:true});ctx.fillStyle=c.muted;ctx.font="10px system-ui";CanvasText.text(ctx,CanvasText.site({"id":"volume-and-order-flow.initCMF.1","role":"status","minimumContrast":4.5,"region":"status","collision":"separate","formatter":"`CMF (${period})`","family":"volume-and-order-flow","mode":"initCMF","dependencies":["frame.width","frame.height","theme","state.period"]}),`CMF (${period})`,panel.x,panel.y+11);setBadge("PRICE + CMF");
     const last=vals.filter(v=>v!=null).at(-1)||0;
     setKPIs([["CMF",fmt(last,3)],["Closing pressure",last>.08?"Positive":last<-.08?"Negative":"Balanced"],["Lookback",period+" bars"]]);
     {const d=s.at(-1),mult=((d.c-d.l)-(d.h-d.c))/(d.h-d.l);let a=0,b=0;for(let j=s.length-period;j<s.length;j++){const e=s[j];a+=((e.c-e.l)-(e.h-e.c))/Math.max(.001,e.h-e.l)*e.v;b+=e.v}
@@ -1289,7 +1544,7 @@ function initCMF(){
     if(last>.08)marketRead("bull","High-volume bars are generally closing nearer their highs.","The calculation shows persistent positive closing pressure. Buyers are maintaining stronger closes, though this is inferred rather than trade-by-trade flow.",mode+"/pos");
     else if(last<-.08)marketRead("bear","High-volume bars are generally closing nearer their lows.","The calculation shows persistent negative closing pressure. Sellers are maintaining weaker closes.",mode+"/neg");
     else marketRead("","Closing pressure is balanced over the lookback.","Positive and negative money-flow contributions are offsetting. Neither side has persistent closing control.",mode+"/flat");
-  };
+  });};
   $("#controls").innerHTML=controlHTML("Market behavior",segmented("cmfSeg",[["accum","Accumulation"],["distrib","Distribution"],["balanced","Balanced"]],"accum"))+
     rangeControl("cmfPeriod","CMF period",8,30,14,1,"")+
     `<div class="formula">Multiplier = ((Close−Low)−(High−Close)) ÷ (High−Low)<br>CMF = Σ(multiplier × volume) ÷ Σvolume</div>`;
@@ -1297,7 +1552,7 @@ function initCMF(){
 }
 function initVWAP(){
   let mode="trendUp",showBands=false;
-  const draw=()=>{
+  const draw=()=>{return CanvasText.frame(()=>{
     let kind=mode==="trendUp"?"bull-volumeup":mode==="trendDown"?"bear-volumeup":mode==="twoWay"?"range-volumeup":"reclaim-volumeup";
     const s=makeSeries(kind,64,707),vw=vwap(s,0);const ch=standardChart(s);drawLine(ch.ctx,vw,ch.price,ch.min,ch.max,ch.c.cyan,2.4);setBadge("SESSION VWAP");
     if(showBands){
@@ -1320,7 +1575,7 @@ function initVWAP(){
     else if(mode==="trendDown")marketRead("bear","Sellers keep accepting prices below a falling session average.","Price stays below VWAP and the average falls. Sellers are maintaining downward control.",mode);
     else if(mode==="twoWay")marketRead("","Price repeatedly crosses a flat VWAP.","Trading is rotating around session average value. Neither side maintains directional progress.",mode);
     else marketRead("bull","Buyers recovered VWAP and began accepting higher prices.","The reclaim becomes meaningful because price holds above the average and VWAP begins to turn upward.",mode);
-  };
+  });};
   $("#controls").innerHTML=controlHTML("Session behavior",segmented("vwapSeg",[["trendUp","Bull trend"],["trendDown","Bear trend"],["twoWay","Two-way"],["reclaim","Reclaim"]],"trendUp"))+
     controlHTML("Display",`<label style="display:flex;align-items:center;gap:9px;color:var(--text)"><input id="bands" type="checkbox"> Show ±1 deviation</label>`)+
     `<div class="formula">VWAP = cumulative Σ(typical price × volume) ÷ cumulative Σvolume<br>typical price = (high + low + close) ÷ 3</div>`;
@@ -1328,7 +1583,7 @@ function initVWAP(){
 }
 function initAnchoredVWAP(){
   let mode="majorLow",anchor=12;
-  const draw=()=>{
+  const draw=()=>{return CanvasText.frame(()=>{
     let kind=mode==="majorHigh"?"bear-volumeup":mode==="gap"?"reclaim-volumeup":"bull-volumeup";const s=makeSeries(kind,66,808);
     anchor=clamp(anchor,0,s.length-2);const av=vwap(s,anchor),ch=standardChart(s);drawLine(ch.ctx,av,ch.price,ch.min,ch.max,ch.c.purple,2.5);setBadge("ANCHORED VWAP");
     const x=ch.sx(anchor);ch.ctx.strokeStyle=ch.c.amber;ch.ctx.setLineDash([5,5]);ch.ctx.beginPath();ch.ctx.moveTo(x,ch.price.y);ch.ctx.lineTo(x,ch.volume.y+ch.volume.h);ch.ctx.stroke();ch.ctx.setLineDash([]);drawLabel(ch.ctx,"ANCHOR",Math.min(x+5,ch.price.x+ch.price.w-62),ch.price.y+20,ch.c.amber);
@@ -1343,7 +1598,7 @@ function initAnchoredVWAP(){
     if(last.c>val&&slope>0)marketRead("bull","Trading since the anchor is accepted above a rising average.","Buyers have favorable location relative to the event and continue making upward progress.","above");
     else if(last.c<val&&slope<0)marketRead("bear","Trading since the anchor is accepted below a falling average.","Sellers have favorable location relative to the event and continue making downward progress.","below");
     else marketRead("warn","Price and anchored value are not aligned.","The event-based average is flat or being crossed. Neither side has clear control relative to this anchor.","unaligned");
-  };
+  });};
   $("#controls").innerHTML=controlHTML("Anchor event",segmented("avSeg",[["majorLow","Major low"],["majorHigh","Major high"],["gap","Gap / event"]],"majorLow"))+
     rangeControl("anchorBar","Anchor bar",1,55,13,1,"")+
     `<div class="formula">AVWAP uses the VWAP formula starting at the selected event.</div><p class="mini-note">Choose the anchor before interpreting the result. Do not move it to fit a preferred thesis.</p>`;
@@ -1362,12 +1617,12 @@ function profileData(series,bins=18){
   while(sum/total<.70&&(l>=0||r<bins)){const lv=l>=0?vols[l]:-1,rv=r<bins?vols[r]:-1;if(rv>lv){included.add(r);sum+=rv;r++}else{included.add(l);sum+=lv;l--}}
   const ids=[...included];return{lo,hi,step,vols,poc,val:Math.min(...ids),vah:Math.max(...ids),price:i=>lo+step*(i+.5),total}
 }
-function drawProfileChart(series,bins=18,opts={}){
+function drawProfileChart(series,bins=18,opts={}){return CanvasText.frame(()=>{
   const {ctx,w,h}=canvasContext(),c=colors(),m={l:18,r:14,t:18,b:24},gap=14,profileW=Math.max(120,w*.27);
   const price={x:m.l,y:m.t,w:w-m.l-m.r-profileW-gap,h:h-m.t-m.b};
   const prof={x:price.x+price.w+gap,y:price.y,w:profileW,h:price.h};
   grid(ctx,price.x,price.y,price.w,price.h,c);let[mn,mx]=extent(series,[d=>d.l,d=>d.h],.05);drawCandles(ctx,series,price,mn,mx,c);
-  const p=profileData(series,bins),vmax=Math.max(...p.vols);ctx.fillStyle=c.muted;ctx.font="10px system-ui";ctx.fillText("VOLUME AT PRICE",prof.x,prof.y+10);
+  const p=profileData(series,bins),vmax=Math.max(...p.vols);ctx.fillStyle=c.muted;ctx.font="10px system-ui";CanvasText.text(ctx,CanvasText.site({"id":"volume-and-order-flow.drawProfileChart.1","role":"status","minimumContrast":4.5,"region":"status","collision":"separate","formatter":"\"VOLUME AT PRICE\"","family":"volume-and-order-flow","mode":"drawProfileChart","dependencies":["frame.width","frame.height","theme","parameter.series","parameter.bins","parameter.opts"]}),"VOLUME AT PRICE",prof.x,prof.y+10);
   p.vols.forEach((v,i)=>{
     const y=prof.y+prof.h-(i+1)*prof.h/bins+2,bh=Math.max(2,prof.h/bins-4),bw=(v/vmax)*(prof.w-8);
     ctx.fillStyle=i===p.poc?c.amber:(i>=p.val&&i<=p.vah?c.cyan:c.blue);ctx.globalAlpha=i===p.poc?.82:.42;ctx.fillRect(prof.x, y, bw,bh);ctx.globalAlpha=1;
@@ -1379,17 +1634,17 @@ function drawProfileChart(series,bins=18,opts={}){
     const y=sy(opts.current);drawHorizontal(ctx,y,price.x,prof.x+prof.w,c.purple,"CURRENT");
   }
   setBadge("TIME + VOLUME AT PRICE");return{ctx,w,h,c,price,prof,min:mn,max:mx,sy,p,pocPrice,vahPrice,valPrice}
-}
+});}
 function initVolumeProfile(){
   let mode="range",bins=18;
-  const draw=()=>{
+  const draw=()=>{return CanvasText.frame(()=>{
     let s=mode==="breakout"?breakoutProfileSeries():makeSeries(mode==="range"?"range-volumeup":"bull-volumeup",66,909);
     const ch=drawProfileChart(s,bins);const p=ch.p;const hvn=p.price(p.poc),thin=p.vols.indexOf(Math.min(...p.vols.filter(v=>v>0)));
     setKPIs([["POC",fmt(hvn,2)],["Value area",fmt(ch.valPrice,2)+" – "+fmt(ch.vahPrice,2)],["Profile",mode==="range"?"Balanced":mode==="trend"?"Directional":"Two distributions"]]);
     if(mode==="range")marketRead("","Most activity is concentrated near the middle of the range.","Both sides repeatedly transact around the POC. The profile shows acceptance, not directional control.",mode);
     else if(mode==="trend")marketRead("bull","Buyers move price higher while new volume builds at higher prices.","The market is accepting progressively higher value instead of only visiting it briefly.",mode);
     else marketRead("bull","Buyers left the prior value area and began building activity above it.","The upper distribution indicates acceptance after the breakout; a quick return would instead show rejection.",mode);
-  };
+  });};
   $("#controls").innerHTML=controlHTML("Profile case",segmented("vpSeg",[["range","Range"],["trend","Uptrend"],["breakout","Breakout"]],"range"))+
     rangeControl("profileBins","Price bins",10,30,18,1,"")+
     `<div class="formula">Volume profile = Σ traded volume assigned to each price bin</div><p class="mini-note">Total profile volume shows where trade occurred. It does not identify the aggressor side.</p>`;
@@ -1397,7 +1652,7 @@ function initVolumeProfile(){
 }
 function initValueArea(){
   let mode="inside",bins=20,current=null;
-  const draw=()=>{
+  const draw=()=>{return CanvasText.frame(()=>{
     const s=makeSeries("range-volumeup",64,1010);const p0=profileData(s,bins),baseVAH=p0.lo+p0.step*(p0.vah+1),baseVAL=p0.lo+p0.step*p0.val;
     if(current==null||mode!=="custom"){
       current=mode==="inside"?(baseVAL+baseVAH)/2:mode==="acceptHigh"?baseVAH+p0.step*1.6:mode==="rejectHigh"?baseVAH-p0.step*.25:mode==="acceptLow"?baseVAL-p0.step*1.6:lvnPrice(p0);
@@ -1409,7 +1664,7 @@ function initValueArea(){
     else if(mode==="acceptHigh"||current>ch.vahPrice)marketRead("bull","Buyers are maintaining trade above the prior value area.","The market is accepting higher prices. Continued time and volume above VAH strengthen the evidence.","acceptHigh");
     else if(mode==="acceptLow"||current<ch.valPrice)marketRead("bear","Sellers are maintaining trade below the prior value area.","The market is accepting lower prices. Continued time and volume below VAL strengthen the evidence.","acceptLow");
     else marketRead("","Price is trading inside the accepted value area.","Both sides are transacting around prior value. Neither side has established control outside it.","inside");
-  };
+  });};
   $("#controls").innerHTML=controlHTML("Auction response",segmented("vaSeg",[["inside","Inside value"],["acceptHigh","Accept above"],["rejectHigh","Reject high"],["acceptLow","Accept below"],["lvn","LVN transition"]],"inside"))+
     rangeControl("vaBins","Profile bins",12,28,20,1,"")+
     `<div class="formula">Value area ≈ selected share of profile volume around POC<br>Default in this lab: 70%</div>`;
@@ -1427,21 +1682,21 @@ function renderBook(book){
   const side=(arr,type)=>`<div class="book-side"><div class="book-head"><span>${type==="bid"?"Bid price":"Ask price"}</span><span>Size</span></div>${arr.map(x=>`<div class="book-row"><span>${fmt(x.p,2)}</span><span>${compact(x.q)}</span><i class="depth-bar ${type==="bid"?"bidbar":"askbar"}" style="width:${x.q/max*100}%"></i></div>`).join("")}</div>`;
   $("#extraVisual").innerHTML=`<div class="book" style="margin-top:14px">${side(book.bids,"bid")}${side(book.asks,"ask")}</div>`;
 }
-function drawDepth(book,fill=null){
-  const {ctx,w,h}=canvasContext(),c=colors();const area={x:34,y:25,w:w-68,h:h-55};grid(ctx,area.x,area.y,area.w,area.h,c,4,8);
+function drawDepth(book,fill=null){return CanvasText.frame(()=>{
+  const canvas=$("#chart");canvas.style.minWidth="600px";const {ctx,w,h}=canvasContext(),c=colors();const area={x:34,y:25,w:CanvasText.plotWidth(ctx,w-68,34),h:h-55};grid(ctx,area.x,area.y,area.w,area.h,c,4,8);
   const levels=[...book.bids].reverse().concat(book.asks),max=Math.max(...levels.map(x=>x.q))*1.12,mid=area.x+area.w/2;
   const bw=area.w/(levels.length+2);
   levels.forEach((x,i)=>{
     const isBid=i<book.bids.length,xx=area.x+bw*(i+1),bh=x.q/max*area.h*.78;
     ctx.fillStyle=isBid?c.green:c.red;ctx.globalAlpha=.48;ctx.fillRect(xx-bw*.35,area.y+area.h-bh,bw*.7,bh);ctx.globalAlpha=1;
-    ctx.fillStyle=c.muted;ctx.font="10px system-ui";ctx.textAlign="center";ctx.fillText(fmt(x.p,2),xx,area.y+area.h+16)
+    ctx.fillStyle=c.muted;ctx.font="10px system-ui";ctx.textAlign="center";CanvasText.text(ctx,CanvasText.site({"id":"volume-and-order-flow.drawDepth.1","role":"axis","minimumContrast":4.5,"region":"axis-bottom","collision":"fixed","formatter":"fmt(x.p,2)","family":"volume-and-order-flow","mode":"drawDepth","dependencies":["frame.width","frame.height","theme","parameter.book","parameter.fill"]}),fmt(x.p,2),xx,area.y+area.h+16)
   });
   ctx.strokeStyle=c.cyan;ctx.setLineDash([5,5]);ctx.beginPath();ctx.moveTo(mid,area.y);ctx.lineTo(mid,area.y+area.h);ctx.stroke();ctx.setLineDash([]);
-  ctx.fillStyle=c.muted;ctx.textAlign="left";ctx.fillText("RESTING DEPTH",area.x,area.y+10);setBadge("BID · ASK · DEPTH");
-}
+  ctx.fillStyle=c.muted;ctx.textAlign="left";CanvasText.text(ctx,CanvasText.site({"id":"volume-and-order-flow.drawDepth.2","role":"status","minimumContrast":4.5,"region":"title-top","collision":"fixed","formatter":"\"RESTING DEPTH\"","family":"volume-and-order-flow","mode":"drawDepth","dependencies":["frame.width","frame.height","theme","parameter.book","parameter.fill"]}),"RESTING DEPTH",area.x,area.y+10);setBadge("BID · ASK · DEPTH");
+});}
 function initOrderTypes(){
   let side="buy",type="market",qty=700,scenario="normal",result="Choose an order and execute it.";
-  const draw=()=>{
+  const draw=()=>{return CanvasText.frame(()=>{
     const book=depthBook(scenario);drawDepth(book);renderBook(book);
     const spread=book.asks[0].p-book.bids[0].p;setKPIs([["Best bid",fmt(book.bids[0].p,2)],["Best ask",fmt(book.asks[0].p,2)],["Spread",fmt(spread,2)]]);
     const r=$("#executionResult");if(r)r.textContent=result;
@@ -1449,7 +1704,7 @@ function initOrderTypes(){
     else if(result.startsWith("Market sell"))marketRead("bear","The seller demanded immediate execution and consumed bid liquidity.",result,scenario);
     else if(result.includes("resting"))marketRead("","The limit order is providing liquidity and waiting.",result,scenario);
     else marketRead("","The book shows available resting liquidity.","Aggressive buyers would lift asks; aggressive sellers would hit bids. Displayed size can change before execution.",scenario);
-  };
+  });};
   const execute=()=>{
     const book=depthBook(scenario),levels=side==="buy"?book.asks:book.bids;let remain=qty,cost=0,filled=0,last=null;
     if(type==="market"){
@@ -1489,8 +1744,8 @@ function makeTapeScenario(mode){
 }
 function initTimeSales(){
   let mode="buyProgress",rows=makeTapeScenario(mode),shown=1,timer=null,speed=450;
-  const draw=()=>{
-    const visible=rows.slice(0,shown),{ctx,w,h}=canvasContext(),c=colors(),area={x:35,y:25,w:w-80,h:h-55};grid(ctx,area.x,area.y,area.w,area.h,c);
+  const draw=()=>{return CanvasText.frame(()=>{
+    const visible=rows.slice(0,shown),{ctx,w,h}=canvasContext(),c=colors(),area={x:35,y:25,w:CanvasText.plotWidth(ctx,w-80,45),h:h-55};grid(ctx,area.x,area.y,area.w,area.h,c);
     const vals=visible.map(x=>x.p),mn=Math.min(...vals,99.95)-.02,mx=Math.max(...vals,100.05)+.02;drawLine(ctx,vals,area,mn,mx,c.cyan,2.5);drawAxes(ctx,area,mn,mx,c);
     visible.forEach((d,i)=>{const x=area.x+area.w*i/Math.max(1,visible.length-1),y=area.y+(mx-d.p)/(mx-mn)*area.h;ctx.fillStyle=d.side==="ask"?c.green:c.red;ctx.beginPath();ctx.arc(x,y,2.8,0,Math.PI*2);ctx.fill()});
     setBadge("TRANSACTION TAPE");
@@ -1502,7 +1757,7 @@ function initTimeSales(){
     else if(mode==="buyAbsorb")marketRead("warn","Aggressive buyers are active, but price barely rises.","Passive sellers are absorbing repeated buying. Aggression is not producing control.",mode);
     else if(mode==="sellAbsorb")marketRead("warn","Aggressive sellers are active, but price barely falls.","Passive buyers are absorbing repeated selling. Aggression is not producing control.",mode);
     else marketRead("","Trades alternate around the same prices.","Both sides are active, but neither maintains directional progress.",mode);
-  };
+  });};
   const stop=()=>{if(timer){clearInterval(timer);timer=null;$("#playTape").textContent="Play"}};
   const step=()=>{shown=Math.min(rows.length,shown+1);draw();if(shown>=rows.length)stop()};
   const play=()=>{if(timer){stop();return}$("#playTape").textContent="Pause";timer=setInterval(step,speed)};
@@ -1548,7 +1803,7 @@ function footprintScenario(mode){
 }
 function initFootprint(){
   let mode="alignedBuy",selected=5,ratio=3;
-  const draw=()=>{
+  const draw=()=>{return CanvasText.frame(()=>{
     const s=footprintScenario(mode),ch=standardChart(s,{noVolume:false});setBadge("FOOTPRINT + DELTA");
     const step=ch.price.w/s.length,x=ch.price.x+step*selected;ch.ctx.fillStyle=ch.c.cyan;ch.ctx.globalAlpha=.09;ch.ctx.fillRect(x,ch.price.y,step,ch.price.h);ch.ctx.globalAlpha=1;
     let html=`<div class="footprint" style="margin-top:14px" tabindex="0" role="region" aria-label="Bid and ask volume by price"><div class="fp-grid">`;
@@ -1571,7 +1826,7 @@ function initFootprint(){
     else if(d.delta<0&&body<0)marketRead("bear","Aggressive sellers traded more volume at the bid and price closed lower.","Sell-side aggression and downward price progress agree.","alignedSell");
     else if(d.delta>0&&body<=0)marketRead("warn","Buying was aggressive, but price failed to close higher.","Passive sellers absorbed the ask-side volume. Positive delta did not produce buyer control.","buyAbsorb");
     else marketRead("warn","Selling was aggressive, but price failed to close lower.","Passive buyers absorbed the bid-side volume. Negative delta did not produce seller control.","sellAbsorb");
-  };
+  });};
   $("#controls").innerHTML=controlHTML("Footprint case",`<select id="fpMode"><option value="alignedBuy">Positive delta + price up</option><option value="alignedSell">Negative delta + price down</option><option value="buyAbsorb">Positive delta absorbed</option><option value="sellAbsorb">Negative delta absorbed</option></select>`)+
     rangeControl("fpCandle","Selected candle",1,6,6,1,"")+
     rangeControl("imbalance","Imbalance ratio",2,5,3,.5,"×")+
@@ -1595,12 +1850,12 @@ function makeCVDScenario(mode){
 }
 function initCVD(){
   let mode="alignedBull",reset=0;
-  const draw=()=>{
+  const draw=()=>{return CanvasText.frame(()=>{
     const s=makeCVDScenario(mode);let vals=[];let x=0;s.forEach((d,i)=>{if(i===reset)x=0;vals.push(i<reset?null:(x+=d.delta))});
     const {ctx,w,h}=canvasContext(),c=colors(),m={l:18,r:58,t:18,b:20},gap=18,priceH=(h-m.t-m.b)*.56;
     const price={x:m.l,y:m.t,w:w-m.l-m.r,h:priceH},panel={x:m.l,y:m.t+priceH+gap,w:w-m.l-m.r,h:h-m.t-m.b-priceH-gap};
     grid(ctx,price.x,price.y,price.w,price.h,c);let[mn,mx]=extent(s,[d=>d.l,d=>d.h]);drawCandles(ctx,s,price,mn,mx,c);drawAxes(ctx,price,mn,mx,c);
-    linePanel(ctx,vals,panel,c,{color:c.purple,zero:true});ctx.fillStyle=c.muted;ctx.font="10px system-ui";ctx.fillText("CUMULATIVE VOLUME DELTA",panel.x,panel.y+11);
+    linePanel(ctx,vals,panel,c,{color:c.purple,zero:true});ctx.fillStyle=c.muted;ctx.font="10px system-ui";CanvasText.text(ctx,CanvasText.site({"id":"volume-and-order-flow.initCVD.1","role":"status","minimumContrast":4.5,"region":"status","collision":"separate","formatter":"\"CUMULATIVE VOLUME DELTA\"","family":"volume-and-order-flow","mode":"initCVD","dependencies":["frame.width","frame.height","theme"]}),"CUMULATIVE VOLUME DELTA",panel.x,panel.y+11);
     if(reset>0){const xx=panel.x+panel.w*reset/(s.length-1);ctx.strokeStyle=c.amber;ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(xx,price.y);ctx.lineTo(xx,panel.y+panel.h);ctx.stroke();ctx.setLineDash([])}
     setBadge("PRICE + CVD");const pchg=s.at(-1).c-s[0].o,cchg=vals.filter(v=>v!=null).at(-1)||0;
     setKPIs([["Price change",(pchg>=0?"+":"")+fmt(pchg,2)],["CVD change",(cchg>=0?"+":"")+compact(cchg)],["Relationship",mode.startsWith("aligned")?"Aligned":mode.includes("Absorb")?"Absorption":"Divergence"]]);
@@ -1611,7 +1866,7 @@ function initCVD(){
     else if(mode==="sellAbsorb")marketRead("warn","CVD falls, but price remains nearly flat.","Aggressive sellers are active, but passive buyers prevent downward progress.",mode);
     else if(mode==="bearDiv")marketRead("warn","Price rises while CVD falls.","Price is progressing upward without matching aggressive buying. Classified selling is being absorbed or other buying mechanisms are moving price.",mode);
     else marketRead("warn","Price falls while CVD rises.","Price is progressing downward without matching aggressive selling. Classified buying is being absorbed or other selling mechanisms are moving price.",mode);
-  };
+  });};
   $("#controls").innerHTML=controlHTML("Price / CVD case",`<select id="cvdMode"><option value="alignedBull">Bullish alignment</option><option value="alignedBear">Bearish alignment</option><option value="buyAbsorb">Buying absorbed</option><option value="sellAbsorb">Selling absorbed</option><option value="bearDiv">Price up / CVD down</option><option value="bullDiv">Price down / CVD up</option></select>`)+
     rangeControl("cvdReset","Reset bar",0,40,0,1,"")+
     `<div class="formula">CVDₜ = CVDₜ₋₁ + (ask-classified volume − bid-classified volume)</div><p class="mini-note">CVD can differ by venue, feed, aggregation, classification, and reset convention.</p>`;
@@ -1648,7 +1903,7 @@ function marketDepthState(scenario,step){
 }
 function initMarketDepth(){
   let scenario="bidWall",step=0,log=[];
-  const draw=()=>{
+  const draw=()=>{return CanvasText.frame(()=>{
     const {book,event}=marketDepthState(scenario,step);drawDepth(book);renderBook(book);
     if(!log.length||log.at(-1)!==event)log.push(event);
     $("#extraVisual").insertAdjacentHTML("beforeend",`<div class="status" style="margin-top:12px"><strong>Event ${step}:</strong> ${event}</div><div class="mini-note">${log.map((x,i)=>`${i}. ${x}`).join("<br>")}</div>`);
@@ -1660,7 +1915,7 @@ function initMarketDepth(){
     else if(scenario==="thin"&&step>0)marketRead("warn","A marketable order is moving through several price levels.","Thin displayed depth creates greater price impact and a worse average fill.","thin");
     else if(scenario==="normal"&&step>=3)marketRead("bear","Selling consumed the best bid and price can move lower.","The resting buyers at that level were exhausted.","normalConsumed");
     else marketRead("","The book shows resting intentions before they are tested.","Wait to see whether liquidity remains, replenishes, is executed, or is canceled.","untested");
-  };
+  });};
   $("#controls").innerHTML=controlHTML("Book scenario",`<select id="depthMode"><option value="bidWall">Large bid tested</option><option value="askWall">Large ask tested</option><option value="thin">Thin depth</option><option value="normal">Normal book</option></select>`)+
     `<div class="segmented cols3"><button id="depthStep">Next event</button><button id="depthReset">Reset</button><button id="depthEnd">Run all</button></div>
      <div class="formula" style="margin-top:15px">Displayed order ≠ executed trade<br>Depth + spread + impact + replenishment = fuller liquidity view</div>`;
@@ -1703,7 +1958,7 @@ function initRuleBuilder(){
     if(state.context==="downtrend"&&state.side==="long")notes.push("Note: this rule is countertrend relative to the selected downtrend context. That is a choice rather than a contradiction, but the rule should say why the trend is expected to fail.");
     return{issues,notes}
   };
-  const draw=()=>{
+  const draw=()=>{return CanvasText.frame(()=>{
     const kind=state.side==="long"?(state.context==="range"?"breakout-volumeup":"bull-volumeup"):(state.context==="range"?"failed-volumeup":"bear-volumeup");
     const s=makeSeries(kind,62,1616),vw=vwap(s);const ch=standardChart(s);drawLine(ch.ctx,vw,ch.price,ch.min,ch.max,ch.c.cyan,2);setBadge("RULE PREVIEW");
     const signal=46,x=ch.sx(signal),y=ch.sy(s[signal].c);ch.ctx.fillStyle=state.side==="long"?ch.c.green:ch.c.red;ch.ctx.beginPath();
@@ -1713,7 +1968,7 @@ function initRuleBuilder(){
     if(issues.length)marketRead("warn","The rule asks the market to show conflicting behavior.",issues[0]+" Revise the conditions before backtesting.");
     else if(state.side==="long")marketRead("bull","The rule requires buyers to show participation, aggression, and upward price confirmation.","A long trigger appears only after buyers make measurable progress in the selected context."+(notes.length?" "+notes[0]:""));
     else marketRead("bear","The rule requires sellers to show participation, aggression, and downward price confirmation.","A short trigger appears only after sellers make measurable progress in the selected context."+(notes.length?" "+notes[0]:""));
-  };
+  });};
   $("#controls").innerHTML=
     controlHTML("Market context",`<select id="ruleContext"><option value="uptrend">Uptrend</option><option value="downtrend">Downtrend</option><option value="range">Range boundary</option></select>`)+
     controlHTML("Trade side",segmented("ruleSide",[["long","Long"],["short","Short"]],"long"))+

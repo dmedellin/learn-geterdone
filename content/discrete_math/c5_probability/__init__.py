@@ -51,34 +51,22 @@ COURSE = {
          "geometric."),
     ],
     "syllabus_intro": (
-        "Lessons 1 to 3 set up the model, 4 to 6 are conditioning, and 7 to 12 are "
-        "random variables and the two distributions worth knowing by name."
+        'Probability models and conditioning support the study of random variables and two named distributions: the binomial and the geometric.'
     ),
     "how_to": [
-        "Write the sample space down for the first few lessons, even when it is "
-        "obvious. Most probability errors are errors about what the outcomes are.",
-        "Use the probability lab's outcome list. Every probability on this course is a "
-        "count divided by a count, and seeing the outcomes highlighted makes "
-        "conditioning concrete rather than formal. From lesson 7 the distribution lab "
-        "opens on each lesson's own worked example, so the numbers on the page are the "
-        "numbers in the lab.",
-        "Do the Bayes calculation by frequencies as well as by the formula. The two "
-        "agree, and the frequency version is the one that makes the answer believable. "
-        "Lesson 6's lab does both on a million people, with every cell a whole number.",
+        'Write the sample space down when modelling outcomes and computing their probabilities, even when it is obvious. Most probability errors are errors about what the outcomes are.',
+        "Use the probability lab's outcome list. Every probability on this course is a count divided by a count, and seeing the outcomes highlighted makes conditioning concrete rather than formal. In the Lessons on random variables, expectation, variance, and the binomial and geometric distributions, the distribution lab opens on each Lesson’s own worked example, so the numbers on the page are the numbers in the lab.",
+        "Do the Bayes calculation by frequencies as well as by the formula. The two agree, and the frequency version is the one that makes the answer believable. The “Bayes' Theorem” Lesson’s lab does both on a million people, with every cell a whole number.",
     ],
     "not_covered": [
         "Continuous probability: densities, the normal distribution, and anything "
         "requiring an integral. Everything here is finite or countable.",
         "Limit theorems. The law of large numbers and the central limit theorem are "
         "mentioned where they explain something and are not proved.",
-        "Markov chains, martingales and stochastic processes, which are the natural "
-        "sequel and a course of their own.",
+        'Markov chains, martingales and stochastic processes, related subjects that need a Course of their own.',
     ],
     "footer_lead": (
-        "Probabilities on this course are computed as exact fractions from the "
-        "enumerated sample space, so `1/6` appears as `1/6` rather than as a decimal "
-        "that is nearly it. The distributions in the last lessons are summed term by "
-        "term from their definitions and compared with the closed forms."
+        'Probabilities on this course are computed as exact fractions from the enumerated sample space, so `1/6` appears as `1/6` rather than as a decimal that is nearly it. The binomial and geometric distributions are summed term by term from their definitions and compared with the closed forms.'
     ),
     "lessons": part_a.LESSONS + part_b.LESSONS,
 }

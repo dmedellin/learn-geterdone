@@ -32,10 +32,7 @@ LESSONS = [
              "have one. The notation is worth keeping straight: brackets hold an array, "
              "bars produce a number."),
             ("`D ≠ 0` is exactly the condition for a unique solution",
-             "For `n` equations in `n` unknowns, the system has exactly one solution "
-             "when `D ≠ 0` and does not when `D = 0`. Lesson 1 said a system does one "
-             "of three things; the determinant separates the first from the other two "
-             "without solving anything."),
+             'For `n` equations in `n` unknowns, the system has exactly one solution when `D ≠ 0` and does not when `D = 0`. “Systems of Two Linear Equations” said a system does one of three things; the determinant separates the first from the other two without solving anything.'),
             ("`D = 0` is where the determinant stops helping",
              "It rules out uniqueness and says nothing else. Inconsistent and dependent "
              "systems both have `D = 0`, so the only way to tell which one you are "
@@ -44,10 +41,7 @@ LESSONS = [
         "read_title": "The determinant, and the rule built on it",
         "read_intro": "Two sizes computed by hand, then a formula for the solution and the condition it needs.",
         "body": [
-            ("p", "Lesson 6 solved a system by carrying its augmented matrix to echelon "
-                  "form, and by the end of the reduction you knew how many solutions "
-                  "there were. The determinant answers that question in advance, from "
-                  "the coefficients alone, in a single number."),
+            ("p", '“Gaussian Elimination” solves a system by carrying its augmented matrix to echelon form, and by the end of the reduction you know how many solutions there were. The determinant answers that question in advance, from the coefficients alone, in a single number.'),
             ("def", ("Determinant of a 2 by 2 matrix",
                      "For `A = [ a  b ; c  d ]`, the <strong>determinant</strong> is "
                      "`det A = ad - bc`: the product down the main diagonal minus the "
@@ -109,12 +103,7 @@ LESSONS = [
                          "second is the same equation twice, with infinitely many "
                          "solutions. One determinant, two different outcomes: `D = 0` "
                          "genuinely cannot tell them apart.")),
-            ("p", "Cramer's rule is a formula, not a strategy. For a 2 by 2 system it is "
-                  "quick, and for coefficients that are letters rather than numbers it "
-                  "is often the clearest thing available. For a 4 by 4 system it asks "
-                  "for five 4 by 4 determinants, where one row reduction would have "
-                  "finished the job. Lesson 6 remains the method; this lesson is the "
-                  "criterion."),
+            ("p", "Cramer's rule is a formula, not a strategy. For a 2 by 2 system it is quick, and for coefficients that are letters rather than numbers it is often the clearest thing available. For a 4 by 4 system it asks for five 4 by 4 determinants, where one row reduction would have finished the job. “Gaussian Elimination” remains the method; this lesson is the criterion."),
         ],
         "lab": ("matrix", {
             "mode": "det",
@@ -237,11 +226,7 @@ LESSONS = [
                      "means for the system in one sentence. The test is a system with "
                      "`D = 0`: the right answer is \"not exactly one solution, and I "
                      "need to reduce it to say more\"."),
-        "note": "`D ≠ 0` is about to appear under a second name. Lesson 9 shows that it "
-                "is exactly the condition for the coefficient matrix to have an "
-                "inverse, so three statements &mdash; the system has one solution, the "
-                "matrix is invertible, the determinant is nonzero &mdash; turn out to "
-                "be one statement in three costumes.",
+        "note": '`D ≠ 0` has an equivalent description. “Inverse Matrices” shows that it is exactly the condition for the coefficient matrix to have an inverse, so three statements &mdash; the system has one solution, the matrix is invertible, the determinant is nonzero &mdash; turn out to be one statement in three costumes.',
     },
     # ---------------------------------------------------------------- 09
     {
@@ -270,10 +255,7 @@ LESSONS = [
         ),
         "concepts": [
             ("The inverse is defined by a product, not by a recipe",
-             "`A⁻¹` is the matrix with `AA⁻¹ = A⁻¹A = I`. Both orders are written into "
-             "the definition because matrix multiplication does not commute, as lesson "
-             "7 established. For square matrices one product turns out to force the "
-             "other, but that is a theorem and not something to assume."),
+             '`A⁻¹` is the matrix with `AA⁻¹ = A⁻¹A = I`. Both orders are written into the definition because matrix multiplication does not commute, as “Matrix Products” established. For square matrices one product turns out to force the other, but that is a theorem and not something to assume.'),
             ("A matrix can fail to have an inverse without being zero",
              "Among numbers only `0` lacks a reciprocal. Among matrices, every one with "
              "determinant `0` lacks an inverse, and `[ 2  3 ; 4  6 ]` has no zero entry "
@@ -287,11 +269,7 @@ LESSONS = [
         "read_title": "The identity, the inverse, and the two ways to find one",
         "read_intro": "A definition, a formula that works for 2 by 2, and a method that works for any size.",
         "body": [
-            ("p", "Lesson 7 gave matrix multiplication, and with it a way to write a "
-                  "whole system as one equation. The system `4x + 7y = 1`, `2x + 6y = 8` "
-                  "becomes `AX = B` with `A = [ 4  7 ; 2  6 ]`, `X = [ x ; y ]` and "
-                  "`B = [ 1 ; 8 ]`. Written that way it looks like a single equation "
-                  "asking to be divided by `A`."),
+            ("p", '“Matrix Products” gave matrix multiplication, and with it a way to write a whole system as one equation. The system `4x + 7y = 1`, `2x + 6y = 8` becomes `AX = B` with `A = [ 4  7 ; 2  6 ]`, `X = [ x ; y ]` and `B = [ 1 ; 8 ]`. Written that way it looks like a single equation asking to be divided by `A`.'),
             ("p", "There is no division of matrices. What replaces it is multiplication "
                   "by an inverse, and the first job is to say what an inverse is."),
             ("def", ("Identity matrix",
@@ -332,11 +310,7 @@ LESSONS = [
                          "entry: the top-left of `AA⁻¹` is "
                          "`4(3/5) + 7(-1/5) = 12/5 - 7/5 = 1`.")),
             ("h3", "Any size: augment with I and row reduce"),
-            ("p", "There is a 3 by 3 inverse formula. It is long, it is easy to "
-                  "misremember, and it is unnecessary, because the row reduction of "
-                  "lesson 6 already does the work. Write `A` and the identity side by "
-                  "side as `[ A | I ]`, reduce the left half to `I`, and the right half "
-                  "becomes `A⁻¹`."),
+            ("p", 'There is a 3 by 3 inverse formula. It is long, it is easy to misremember, and it is unnecessary, because the row reduction of “Gaussian Elimination” already does the work. Write `A` and the identity side by side as `[ A | I ]`, reduce the left half to `I`, and the right half becomes `A⁻¹`.'),
             ("p", "The reason is that every row operation is itself a multiplication by "
                   "some matrix, and the operations that carry `A` to `I` are exactly the "
                   "operations that carry `I` to `A⁻¹`. Carrying them out on both halves "
@@ -490,12 +464,7 @@ LESSONS = [
                      "`[ 2  3 ; 4  6 ]` has no inverse. The check `AA⁻¹ = I` should be "
                      "automatic; it costs four multiplications and catches every sign "
                      "error."),
-        "note": "Three conditions have now collapsed into one. `det A ≠ 0`, `A` has an "
-                "inverse, and `AX = B` has exactly one solution for every `B` are the "
-                "same statement about the same matrix. Lesson 10 leaves exact equations "
-                "behind for inequalities, where the answer is a region rather than a "
-                "point &mdash; and where finding the corners of that region is a 2 by 2 "
-                "system all over again.",
+        "note": 'Three conditions are equivalent. `det A ≠ 0`, `A` has an inverse, and `AX = B` has exactly one solution for every `B` are the same statement about the same matrix. “Systems of Inequalities and Linear Programming” uses inequalities, where the answer is a region rather than a point &mdash; and where finding the corners of that region is a 2 by 2 system all over again.',
     },
     # ---------------------------------------------------------------- 10
     {
@@ -542,7 +511,7 @@ LESSONS = [
         "read_title": "Feasible regions and the corner point theorem",
         "read_intro": "Shading by test point, finding corners by elimination, and the theorem that says corners are enough.",
         "body": [
-            ("p", "Lines, Functions and Graphs ended with a single linear inequality in two variables: draw the boundary line, decide which side, shade it. Everything here is that, done several times on one set of axes, and then asked a question."),
+            ("p", '“Linear Inequalities in Two Variables” in Lines, Functions and Graphs explains a single linear inequality in two variables: draw the boundary line, decide which side, shade it. Everything here is that, done several times on one set of axes, and then asked a question.'),
             ("def", ("Solution of a linear inequality in two variables",
                      "The set of points `(x, y)` making the statement true. For a "
                      "linear inequality it is a <strong>half-plane</strong>: everything "
@@ -644,9 +613,7 @@ LESSONS = [
              "is what all the shadings have in common, and it is worth outlining once "
              "it is clear."),
             ("Find the corners, then check each one",
-             "Every corner is the intersection of two boundary lines, so solve those "
-             "two equations together &mdash; elimination, from lesson 3. Then test the "
-             "point against every other constraint and discard it if it fails one."),
+             'Every corner is the intersection of two boundary lines, so solve those two equations together &mdash; elimination, from “Solving by Elimination”. Then test the point against every other constraint and discard it if it fails one.'),
             ("Evaluate the objective at each surviving corner",
              "For a nonempty closed, bounded region, tabulate the values and pick the largest "
              "or the smallest, as asked; the corner theorem makes that comparison "
@@ -754,6 +721,6 @@ LESSONS = [
                      "point and its value. For an unbounded region, exhibit a feasible "
                      "ray or a global bound instead of citing the bounded theorem. Saying "
                      "\"the maximum is 34\" without saying where is half an answer."),
-        "note": 'Everything expensive in this lesson was elimination: each corner is a 2 by 2 system, solved exactly as in Lesson 3. Elimination therefore answers an optimisation question about feasible corners. Sequences and Series studies objects that are ordered lists rather than solution sets.',
+        "note": 'Everything expensive in this lesson was elimination: each corner is a 2 by 2 system, solved exactly as in “Solving by Elimination”. Elimination therefore answers an optimisation question about feasible corners. Sequences and Series studies objects that are ordered lists rather than solution sets.',
     },
 ]

@@ -363,29 +363,29 @@ def close(scripts):
 
 
 def name_horizontal_scrollers(text):
-    """Give authored table/notation overflow owners a keyboard stop and name.
+    """Give authored table/notation/SVG overflow owners a keyboard stop and name.
 
     Parse actual tags so JavaScript strings and instructional examples stay
-    untouched. Existing names and native keyboard semantics take precedence.
+    untouched. A lab stage is included only when its actual markup owns an SVG.
+    Existing names and native keyboard semantics take precedence.
     """
     from html.parser import HTMLParser
 
     offsets = [0]
     for line in text.splitlines(keepends=True):
         offsets.append(offsets[-1] + len(line))
-    edits = []
+    edits = {}
 
     class Scrollers(HTMLParser):
-        def handle_starttag(self, tag, attrs):
-            attrs = dict(attrs)
-            classes = attrs.get('class', '').split()
-            label = next((name for cls, name in (
-                ('mathblock', 'Mathematical notation'), ('table-wrap', 'Data table'),
-                ('data-table', 'Data table'), ('heatmap-wrap', 'Sensitivity grid'),
-                ('calc-table', 'Calculation table'), ('schema-output', 'Exported plan data'),
-                ('footprint', 'Bid and ask volume by price')
-            ) if cls in classes), None)
-            if not label:
+        VOID = {'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input',
+                'link', 'meta', 'param', 'source', 'track', 'wbr'}
+
+        def __init__(self):
+            super().__init__()
+            self.stack = []
+
+        def add(self, tag, attrs, label, at):
+            if at in edits:
                 return
             extra = ''
             if 'tabindex' not in attrs:
@@ -393,11 +393,39 @@ def name_horizontal_scrollers(text):
             if not any(k in attrs for k in ('aria-label', 'aria-labelledby')):
                 extra += (' role="region"' if tag != 'table' else '') + ' aria-label="%s"' % label
             if extra:
-                line, column = self.getpos()
-                at = offsets[line - 1] + column + len(self.get_starttag_text()) - 1
-                edits.append((at, extra))
+                edits[at] = edits.get(at, '') + extra
+
+        def handle_starttag(self, tag, attrs):
+            attrs = dict(attrs)
+            classes = attrs.get('class', '').split()
+            label = next((name for cls, name in (
+                ('mathblock', 'Mathematical notation'), ('table-wrap', 'Data table'),
+                ('data-table', 'Data table'), ('heatmap-wrap', 'Sensitivity grid'),
+                ('calc-table', 'Calculation table'), ('schema-output', 'Exported plan data'),
+                ('footprint', 'Bid and ask volume by price'),
+                ('market-chart-scroll', 'Interactive chart; scroll horizontally for complete chart labels')
+            ) if cls in classes), None)
+            line, column = self.getpos()
+            at = offsets[line - 1] + column + len(self.get_starttag_text()) - 1
+            if label:
+                self.add(tag, attrs, label, at)
+            if tag == 'svg':
+                owner = next((row for row in reversed(self.stack)
+                              if 'lab-stage' in row[1]), None)
+                if owner:
+                    self.add(owner[0], owner[2],
+                             'Interactive diagram; scroll horizontally for complete labels',
+                             owner[3])
+            if tag not in self.VOID:
+                self.stack.append((tag, classes, attrs, at))
+
+        def handle_endtag(self, tag):
+            for index in range(len(self.stack) - 1, -1, -1):
+                if self.stack[index][0] == tag:
+                    self.stack = self.stack[:index]
+                    return
 
     Scrollers().feed(text)
-    for at, extra in reversed(edits):
+    for at, extra in sorted(edits.items(), reverse=True):
         text = text[:at] + extra + text[at:]
     return text

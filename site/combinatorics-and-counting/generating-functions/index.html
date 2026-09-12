@@ -583,6 +583,15 @@
       overflow-x: auto;
     }
     .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
 
     /* ---------- Graphs ----------
        Tokens only. A component override scoped to [data-theme="light"] would
@@ -1040,6 +1049,7 @@
       font-size: 0.9rem;
       resize: vertical;
     }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
     .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
     .fb-actions {
       display: flex;
@@ -1132,6 +1142,7 @@
     [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
     [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
     [data-ui="hero"] .eyebrow { display: block; color: var(--muted); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
     [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
     [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
     [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
@@ -1176,7 +1187,7 @@
     }
     [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
     [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
-    [data-ui="lesson-list"] .lesson-link { min-height: 44px; }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
     body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
     body[data-page-kind] .is-done .lesson-state { color: var(--green); }
     [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
@@ -1286,7 +1297,7 @@ MULTIPLY series  ⟷  COMBINE independent choices</div>
 1/(1 − ax)     = 1 + ax + a²x² + …            a_k = aᵏ
 (1 + x)ⁿ       = Σ_k C(n,k) xᵏ                binomial
 1/(1 − x)ⁿ     = Σ_k C(n+k−1, k) xᵏ           stars and bars!
-(1 − xᵐ⁺¹)/(1 − x) = 1 + x + … + xᵐ           at most m copies</div><p>The fifth line is lesson 8 in a different notation, and that is the point of the method: <span class="math">1/(1−x)ⁿ</span> encodes "choose any number from each of <span class="math">n</span> types", and its coefficients are exactly the stars-and-bars counts.</p><h3>Why multiplication combines choices</h3><p>If <span class="math">A(x)</span> counts the ways to pick items from source 1 and <span class="math">B(x)</span> from source 2, then the coefficient of <span class="math">xᵏ</span> in <span class="math">A(x)B(x)</span> is <span class="math">Σ_j a_j b_{k−j}</span> &mdash; take <span class="math">j</span> items from the first source and <span class="math">k − j</span> from the second, over all splits. That is precisely the product rule combined with the sum rule.</p><div class="example"><span class="label">Example &middot; Coins</span><p>In how many ways can <span class="math">n</span> cents be made from pennies, nickels and dimes? Each denomination contributes a factor: <span class="math">1/(1−x)</span> for pennies, <span class="math">1/(1−x⁵)</span> for nickels, <span class="math">1/(1−x¹⁰)</span> for dimes. The answer is the coefficient of <span class="math">xⁿ</span> in the product. For <span class="math">n = 25</span> it is 12.</p></div><div class="example"><span class="label">Example &middot; A restricted selection</span><p>How many ways to choose 10 items from 4 types with at most 3 of each? Each type contributes <span class="math">1 + x + x² + x³</span>, so the answer is <span class="math">[x¹⁰](1 + x + x² + x³)⁴</span>. Expanding gives 10. Check it another way: a selection is short of the maximum <span class="math">12</span> by <span class="math">2</span>, spread over four types, and lesson 8 counts those spreads as <span class="math">C(5, 2) = 10</span>. Inclusion and exclusion would also work; the generating function encodes the constraint directly.</p></div><h3>Solving a recurrence</h3><p>Generating functions solve recurrences by turning them into equations. For <span class="math">aₙ = 3aₙ₋₁</span> with <span class="math">a₀ = 1</span>, write <span class="math">G(x) = Σ aₙxⁿ</span>. Multiplying the recurrence by <span class="math">xⁿ</span> and summing gives <span class="math">G(x) − 1 = 3xG(x)</span>, so <span class="math">G(x) = 1/(1 − 3x)</span>, whose coefficients are <span class="math">3ⁿ</span>.</p><p>The same method handles Fibonacci: <span class="math">G(x) = x/(1 − x − x²)</span>, and a partial-fraction decomposition recovers Binet's formula from Induction and Recursion lesson 10. The method is more general than characteristic roots, and it extends to recurrences those cannot touch.</p><div class="thm"><span class="label">Theorem &middot; Formal manipulation is legitimate</span><p>Addition, multiplication and (when <span class="math">a₀ ≠ 0</span>) inversion of formal power series are well defined coefficient by coefficient, with no convergence question, because each coefficient of a product depends on finitely many coefficients of the factors.</p></div></article>
+(1 − xᵐ⁺¹)/(1 − x) = 1 + x + … + xᵐ           at most m copies</div><p>The fifth line is “Combinations with Repetition” in a different notation, and that is the point of the method: <span class="math">1/(1−x)ⁿ</span> encodes "choose any number from each of <span class="math">n</span> types", and its coefficients are exactly the stars-and-bars counts.</p><h3>Why multiplication combines choices</h3><p>If <span class="math">A(x)</span> counts the ways to pick items from source 1 and <span class="math">B(x)</span> from source 2, then the coefficient of <span class="math">xᵏ</span> in <span class="math">A(x)B(x)</span> is <span class="math">Σ_j a_j b_{k−j}</span> &mdash; take <span class="math">j</span> items from the first source and <span class="math">k − j</span> from the second, over all splits. That is precisely the product rule combined with the sum rule.</p><div class="example"><span class="label">Example &middot; Coins</span><p>In how many ways can <span class="math">n</span> cents be made from pennies, nickels and dimes? Each denomination contributes a factor: <span class="math">1/(1−x)</span> for pennies, <span class="math">1/(1−x⁵)</span> for nickels, <span class="math">1/(1−x¹⁰)</span> for dimes. The answer is the coefficient of <span class="math">xⁿ</span> in the product. For <span class="math">n = 25</span> it is 12.</p></div><div class="example"><span class="label">Example &middot; A restricted selection</span><p>How many ways to choose 10 items from 4 types with at most 3 of each? Each type contributes <span class="math">1 + x + x² + x³</span>, so the answer is <span class="math">[x¹⁰](1 + x + x² + x³)⁴</span>. Expanding gives 10. Check it another way: a selection is short of the maximum <span class="math">12</span> by <span class="math">2</span>, spread over four types, and “Combinations with Repetition” counts those spreads as <span class="math">C(5, 2) = 10</span>. Inclusion and exclusion would also work; the generating function encodes the constraint directly.</p></div><h3>Solving a recurrence</h3><p>Generating functions solve recurrences by turning them into equations. For <span class="math">aₙ = 3aₙ₋₁</span> with <span class="math">a₀ = 1</span>, write <span class="math">G(x) = Σ aₙxⁿ</span>. Multiplying the recurrence by <span class="math">xⁿ</span> and summing gives <span class="math">G(x) − 1 = 3xG(x)</span>, so <span class="math">G(x) = 1/(1 − 3x)</span>, whose coefficients are <span class="math">3ⁿ</span>.</p><p>The same method handles Fibonacci: <span class="math">G(x) = x/(1 − x − x²)</span>, and a partial-fraction decomposition recovers Binet's formula from the “Solving Linear Recurrences” Lesson in Induction and Recursion. The method is more general than characteristic roots, and it extends to recurrences those cannot touch.</p><div class="thm"><span class="label">Theorem &middot; Formal manipulation is legitimate</span><p>Addition, multiplication and (when <span class="math">a₀ ≠ 0</span>) inversion of formal power series are well defined coefficient by coefficient, with no convergence question, because each coefficient of a product depends on finitely many coefficients of the factors.</p></div></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>The four counting rules</h2></div><p>Enumerated while enumeration is possible</p></div>

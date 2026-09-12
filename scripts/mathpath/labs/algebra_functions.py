@@ -1257,8 +1257,8 @@ def grapher_lab(cfg):
     polynomial_empty_search = (r"""        msg = '<strong>No rational zero exists, and the search proves it rather than assuming it.</strong> '
           + 'Every candidate p/q with p dividing ' + Rtext(c0) + ' and q dividing ' + Rtext(lead)
           + ' was substituted, and none gave 0. A rational-root search alone does not say whether '
-          + 'a non-rational zero is real or complex; Course 6 supplies the quadratic methods that '
-          + 'make that later distinction. The evaluated curve above is a picture, not a replacement '
+          + 'a non-rational zero is real or complex; Quadratics and Complex Numbers supplies the quadratic methods that '
+          + 'make that real-or-complex distinction. The evaluated curve above is a picture, not a replacement '
           + 'for that argument.';""" if mode == "polynomial" else r"""        msg = '<strong>No rational zero exists, and the search proves it rather than assuming it.</strong> '
           + 'Every candidate p/q with p dividing ' + Rtext(c0) + ' and q dividing ' + Rtext(lead)
           + ' was substituted, and none gave 0. '

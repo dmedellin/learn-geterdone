@@ -192,7 +192,7 @@ MONO_JS = r"""
       }
       case 'pow': {
         var e = Mof(node.b);
-        if (!Mconst(e)) throw new Error('an exponent with a letter in it is a later lesson');
+        if (!Mconst(e)) throw new Error('an exponent with a letter in it is outside this expression lab; Exponential Functions covers variable exponents');
         var k = e.length ? e[0].c : R0;
         if (!Rint(k) || k.n < 0n) throw new Error('the exponent ' + Rtext(k) + ' is not a whole number, so this is a root rather than a polynomial term');
         if (k.n > 12n) throw new Error('powers above 12 are more than this lesson needs');
@@ -1962,10 +1962,24 @@ RL_BODY["absolute"] = r"""
     var pad = (hi - lo) * 0.18 + 0.3;
     var line = NumberLine(svg, lo - pad, hi + pad);
     line.interval(Math.min(0, Rnum(a)), Math.max(0, Rnum(a)), true, true);
-    markAt(line, 0, '0', true, 'plot-label', false);
-    markAt(line, Rnum(a), 'a = ' + Rtext(a), true, 'plot-label', true);
-    markAt(line, Rnum(b), 'b = ' + Rtext(b), true, 'plot-label', false);
-    unique.forEach(function (x, i) { markAt(line, Rnum(x), 'x = ' + Rtext(x), true, 'plot-label', i % 2 === 0); });
+    /* Equal values own one point and one readable label. Painting the a, b and
+       solution labels separately at the same coordinates lets later glyphs
+       erase earlier ones when c = 0 (and whenever a or b is zero). */
+    var marks = [
+      { x: R0, label: '0' },
+      { x: a, label: 'a = ' + Rtext(a) },
+      { x: b, label: 'b = ' + Rtext(b) }
+    ];
+    unique.forEach(function (x) { marks.push({ x: x, label: 'x = ' + Rtext(x) }); });
+    var groupedMarks = [];
+    marks.forEach(function (mark) {
+      var group = groupedMarks.find(function (item) { return Requ(item.x, mark.x); });
+      if (group) group.labels.push(mark.label);
+      else groupedMarks.push({ x: mark.x, labels: [mark.label] });
+    });
+    groupedMarks.forEach(function (mark, i) {
+      markAt(line, Rnum(mark.x), mark.labels.join('; '), true, 'plot-label', i % 2 === 1);
+    });
     line.describe('A number line with 0, a = ' + Rtext(a) + ' and b = ' + Rtext(b)
       + ' marked, the distance from 0 to a drawn as a segment, and '
       + unique.length + ' solution(s) of |x - a| = ' + Rtext(c) + ' marked.');

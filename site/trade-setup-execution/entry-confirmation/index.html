@@ -1238,6 +1238,7 @@ textarea { font: inherit; }
       font-size: 0.9rem;
       resize: vertical;
     }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
     .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
     .fb-actions {
       display: flex;
@@ -1396,6 +1397,27 @@ textarea { font: inherit; }
       .signin-btn { padding: 0; width: 38px; justify-content: center; }
     }
 
+    /* Trading charts use a 960-unit plotting frame. Keep that authored scale
+       instead of shrinking 11-unit axis text to roughly 3 CSS pixels on a
+       phone. The named keyboard scroll owner exposes the complete chart. */
+    @media screen {
+      .market-chart-scroll {
+        contain: inline-size;
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        overscroll-behavior-inline: contain;
+      }
+      .market-chart-scroll > svg.market-chart {
+        display: block;
+        width: 100%;
+        min-width: 960px;
+      }
+    }
+
     body[data-page-kind] {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 16px;
@@ -1429,6 +1451,7 @@ textarea { font: inherit; }
     [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
     [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
     [data-ui="hero"] .eyebrow { display: block; color: var(--muted); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
     [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
     [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
     [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
@@ -1473,7 +1496,7 @@ textarea { font: inherit; }
     }
     [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
     [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
-    [data-ui="lesson-list"] .lesson-link { min-height: 44px; }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
     body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
     body[data-page-kind] .is-done .lesson-state { color: var(--green); }
     [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
@@ -1602,7 +1625,7 @@ textarea { font: inherit; }
 <div class="lab-layout">
   <article class="card chart-card">
     <div class="chart-toolbar"><div class="chart-title"><strong id="confirmationTitle">Bullish pullback recovery</strong><span>Choose a confirmation model, then select the candle that permits entry</span></div><div class="tab-row" id="confirmationTabs"><button class="tab active" data-scenario="pullback" type="button">Pullback</button><button class="tab" data-scenario="breakout" type="button">Breakout retest</button><button class="tab" data-scenario="failed" type="button">Failed reaction</button></div></div>
-    <div class="chart-wrap"><svg id="confirmationChart" class="market-chart" aria-label="Entry confirmation chart"></svg><div class="chart-tooltip"></div></div>
+    <div class="chart-wrap market-chart-scroll" tabindex="0" role="region" aria-label="Interactive chart; scroll horizontally for complete chart labels"><svg id="confirmationChart" class="market-chart" aria-label="Entry confirmation chart"></svg><div class="chart-tooltip"></div></div>
     <div class="reading-strip" id="confirmationReading" aria-live="polite"></div>
     <div class="control-strip"><div class="seg-row" id="confirmationModel"><button class="seg-btn" data-value="reaction" type="button">Reaction close</button><button class="seg-btn active" data-value="structure" type="button">Structure shift</button><button class="seg-btn" data-value="retest" type="button">Retest confirmation</button></div></div>
   </article>
@@ -2239,7 +2262,7 @@ setupQuiz({promptId:"confirmationQuizPrompt",choicesId:"confirmationQuizChoices"
  {prompt:"Your model requires a candle close above the last local lower high. Price only wicks above it.",choices:[{value:"enter",label:"Enter because the level traded",why:"The model says close, and a wick is not a close. Entering on the wick is entering on a different rule from the one that will be tested and journaled."},{value:"wait",label:"Wait for the required close"},{value:"change",label:"Change the model to wick confirmation",why:"Changing the rule at the moment it would have fired is choosing the rule by its outcome. Whatever the new rule is, it was not the one written before the setup, so nothing it does can be compared to anything."},{value:"ignore",label:"Ignore the level",why:"The level is the trigger level the model was written against. Ignoring it leaves no rule at all, which is worse than either rule."}],answer:"wait",explanation:"The written model requires a close. Intrabar trading beyond the level does not satisfy it."},
  {prompt:"A retest model never receives a retest after breakout and price continues higher.",choices:[{value:"chase",label:"Chase because the trade worked",why:"Chasing enters at a worse price on no rule, after the evidence the retest model wanted never arrived. The trade working is what makes chasing tempting, and it is not a reason."},{value:"miss",label:"Record a missed trade and keep the model"},{value:"rewrite",label:"Rewrite the entry afterward",why:"A rule rewritten after seeing which entry would have won is a rule fitted to one outcome. The second mistake this lesson names is exactly this — and it makes every earlier result incomparable."},{value:"short",label:"Short the move",why:"The structure is bullish and the plan was long; missing the entry does not reverse the thesis. A short here would be a trade against the evidence because the evidence was inconvenient."}],answer:"miss",explanation:"A rule can miss valid moves. Consistency is necessary to test whether the model has an edge."},
  {prompt:"What is the main cost of waiting for more confirmation?",choices:[{value:"price",label:"Later price and possible missed trades"},{value:"certainty",label:"Guaranteed certainty",why:"More evidence is more evidence, not certainty — the retest model on the pullback tab can still be stopped. The cost it pays for that evidence is a later, worse price."},{value:"risk",label:"Risk always becomes zero",why:"Risk is the distance to the stop, and a later entry moves the entry further from it — risk in points usually grows, not shrinks, as confirmation is added."},{value:"data",label:"No market data",why:"Waiting produces more data, not less. What it costs is the price that moved while the data arrived, and the trades where it never did."}],answer:"price",explanation:"Additional evidence usually arrives after price has moved, which can worsen entry and reward-to-risk."},
- {prompt:"When should the confirmation model be selected?",choices:[{value:"before",label:"Before the setup resolves"},{value:"after",label:"After seeing the outcome",why:"Chosen afterwards, the model will always be the one that would have won this time. That is hindsight, and it is why the failed tab scores the reaction model as an entry that lost rather than as no entry."},{value:"profit",label:"Only after profit",why:"A model selected only on winning trades has been selected by the outcome. It cannot then be tested, because the losing trades were never counted under it."},{value:"never",label:"It should remain undefined",why:"An undefined model cannot be replayed, backtested, or journaled. Everything from lesson 13 onwards depends on the entry being a rule that another reviewer could apply."}],answer:"before",explanation:"Predefining the model prevents hindsight from changing what counted as a valid entry."}
+ {prompt:"When should the confirmation model be selected?",choices:[{value:"before",label:"Before the setup resolves"},{value:"after",label:"After seeing the outcome",why:"Chosen afterwards, the model will always be the one that would have won this time. That is hindsight, and it is why the failed tab scores the reaction model as an entry that lost rather than as no entry."},{value:"profit",label:"Only after profit",why:"A model selected only on winning trades has been selected by the outcome. It cannot then be tested, because the losing trades were never counted under it."},{value:"never",label:"It should remain undefined",why:"An undefined model cannot be replayed, backtested, or journaled. Backtesting, Trading Journal and Performance Review depend on the entry being a rule that another reviewer could apply."}],answer:"before",explanation:"Predefining the model prevents hindsight from changing what counted as a valid entry."}
 ]});
 renderConfirmation();
 </script>

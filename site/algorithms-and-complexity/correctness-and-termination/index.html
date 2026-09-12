@@ -583,6 +583,15 @@
       overflow-x: auto;
     }
     .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
 
     /* ---------- Graphs ----------
        Tokens only. A component override scoped to [data-theme="light"] would
@@ -1040,6 +1049,7 @@
       font-size: 0.9rem;
       resize: vertical;
     }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
     .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
     .fb-actions {
       display: flex;
@@ -1132,6 +1142,7 @@
     [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
     [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
     [data-ui="hero"] .eyebrow { display: block; color: var(--muted); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
     [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
     [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
     [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
@@ -1176,7 +1187,7 @@
     }
     [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
     [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
-    [data-ui="lesson-list"] .lesson-link { min-height: 44px; }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
     body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
     body[data-page-kind] .is-done .lesson-state { color: var(--green); }
     [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
@@ -1276,7 +1287,7 @@ invariant for the first, a decreasing measure for the second</div>
       </div>
     </section>
     <section class="section">
-      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>This is Induction and Recursion lesson 12 applied to algorithms, and the split is what makes the proofs short.</p></div>
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>This is the “Loop Invariants and Program Correctness” Lesson in Induction and Recursion applied to algorithms, and the split is what makes the proofs short.</p></div>
       <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>The two are independent</h3><p>An algorithm can be partially correct and never stop, or terminate promptly with a wrong answer. Neither proof implies the other.</p></article><article class="card concept-card"><div class="icon">2</div><h3>An invariant is what the loop preserves</h3><p>Naming the preserved property is more informative than describing what the loop does, and it is what closes the argument.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Termination needs a decreasing measure</h3><p>A quantity that strictly decreases on every iteration and cannot decrease forever. Usually an index or a remaining size.</p></article></div>
     </section>
     <section class="section" id="read">
@@ -1286,7 +1297,7 @@ invariant for the first, a decreasing measure for the second</div>
         if aᵢ = x:  return i
     return 0
 
-INVARIANT   before iteration i,  x ∉ {a₁, …, a_{i−1}}</div><p><strong>Initialisation.</strong> Before the first iteration the set is empty and the claim is vacuous. <strong>Maintenance.</strong> The iteration returns if <span class="math">aᵢ = x</span>, so reaching the next iteration means <span class="math">x ≠ aᵢ</span>, extending the invariant. <strong>Termination.</strong> If the loop finishes, the invariant says <span class="math">x</span> is in none of <span class="math">a₁ … aₙ</span>, so returning 0 is correct; if it returns <span class="math">i</span>, then <span class="math">aᵢ = x</span>.</p><p><strong>Termination</strong> holds because <span class="math">n − i</span> strictly decreases and is a non-negative integer.</p><h3>Insertion sort</h3><p>The outer-loop invariant is that <span class="math">a[1..j−1]</span> holds the original first <span class="math">j−1</span> elements in sorted order. Both halves are needed: "sorted" alone would be satisfied by an algorithm that replaced the array with zeros, and the specification says the output must be a permutation of the input.</p><p>Termination: the outer loop runs <span class="math">n − 1</span> times, and the inner loop decreases <span class="math">i</span> each iteration with <span class="math">i ≥ 0</span> enforced by its own condition.</p><h3>Euclid&#x27;s algorithm</h3><p>The invariant is <span class="math">gcd(a, b) = gcd(a₀, b₀)</span>, preserved because <span class="math">gcd(a,b) = gcd(b, a mod b)</span>. Termination holds because <span class="math">b</span> strictly decreases and is a non-negative integer. At exit <span class="math">b = 0</span> and <span class="math">gcd(a, 0) = a</span>, which the invariant identifies as the answer.</p><p>That invariant is the whole proof and it is one line, which is characteristic: a good invariant names the quantity the loop preserves, and the correctness then follows from the exit condition.</p><h3>When termination is the hard part</h3><div class="example"><span class="label">Example &middot; The Collatz procedure</span><p>From <span class="math">n</span>, repeat: if <span class="math">n</span> is even, halve it; otherwise replace it by <span class="math">3n + 1</span>; stop at 1. It terminates for every starting value ever tested &mdash; beyond <span class="math">10²⁰</span> &mdash; and no proof is known that it always does. Partial correctness is trivial; termination is an open problem.</p></div><p>That example separates the two obligations cleanly. It also previews lesson 12: there is no general procedure that decides termination for arbitrary programs, which is why each one needs its own argument.</p></article>
+INVARIANT   before iteration i,  x ∉ {a₁, …, a_{i−1}}</div><p><strong>Initialisation.</strong> Before the first iteration the set is empty and the claim is vacuous. <strong>Maintenance.</strong> The iteration returns if <span class="math">aᵢ = x</span>, so reaching the next iteration means <span class="math">x ≠ aᵢ</span>, extending the invariant. <strong>Termination.</strong> If the loop finishes, the invariant says <span class="math">x</span> is in none of <span class="math">a₁ … aₙ</span>, so returning 0 is correct; if it returns <span class="math">i</span>, then <span class="math">aᵢ = x</span>.</p><p><strong>Termination</strong> holds because <span class="math">n − i</span> strictly decreases and is a non-negative integer.</p><h3>Insertion sort</h3><p>The outer-loop invariant is that <span class="math">a[1..j−1]</span> holds the original first <span class="math">j−1</span> elements in sorted order. Both halves are needed: "sorted" alone would be satisfied by an algorithm that replaced the array with zeros, and the specification says the output must be a permutation of the input.</p><p>Termination: the outer loop runs <span class="math">n − 1</span> times, and the inner loop decreases <span class="math">i</span> each iteration with <span class="math">i ≥ 0</span> enforced by its own condition.</p><h3>Euclid&#x27;s algorithm</h3><p>The invariant is <span class="math">gcd(a, b) = gcd(a₀, b₀)</span>, preserved because <span class="math">gcd(a,b) = gcd(b, a mod b)</span>. Termination holds because <span class="math">b</span> strictly decreases and is a non-negative integer. At exit <span class="math">b = 0</span> and <span class="math">gcd(a, 0) = a</span>, which the invariant identifies as the answer.</p><p>That invariant is the whole proof and it is one line, which is characteristic: a good invariant names the quantity the loop preserves, and the correctness then follows from the exit condition.</p><h3>When termination is the hard part</h3><div class="example"><span class="label">Example &middot; The Collatz procedure</span><p>From <span class="math">n</span>, repeat: if <span class="math">n</span> is even, halve it; otherwise replace it by <span class="math">3n + 1</span>; stop at 1. It terminates for every starting value ever tested &mdash; beyond <span class="math">10²⁰</span> &mdash; and no proof is known that it always does. Partial correctness is trivial; termination is an open problem.</p></div><p>That example separates the two obligations cleanly. It also illustrates the question addressed in “Decidability and the Halting Problem”: there is no general procedure that decides termination for arbitrary programs, which is why each one needs its own argument.</p></article>
     </section>
     <section class="section" id="lab">
       <div class="section-head"><div><p class="kicker">Interactive</p><h2>Algorithms and growth</h2></div><p>Counts from running, not from quoting</p></div>
@@ -1296,7 +1307,7 @@ INVARIANT   before iteration i,  x ∉ {a₁, …, a_{i−1}}</div><p><strong>In
         <div class="lab-title"><strong id="alTitle">Algorithms and growth</strong><span id="alSub"></span></div>
         <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>measured</span><span class="tone-purple"><i class="legend-swatch"></i>predicted</span><span class="tone-amber"><i class="legend-swatch"></i>crossover</span></div>
       </div>
-      <div class="lab-stage"><svg id="alPlot" viewBox="0 0 520 230" role="img" aria-label="Operation counts plotted against input size."></svg></div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Operation counts plot, scroll horizontally for the complete chart"><svg id="alPlot" style="min-width:520px" viewBox="0 0 520 230" role="img" aria-label="Operation counts plotted against input size."></svg></div>
       <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="alTable"></table></div>
       <div class="status-banner" id="alStatus" style="margin-top:12px;"></div>
         </article>
@@ -1793,12 +1804,24 @@ TERMINATION     m halves each iteration, bounded below by 0    ✓
     series.forEach(function (ser) {
       var d = ser.values.map(function (v, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(v).toFixed(1); }).join(' ');
       s += '<path d="' + d + '" fill="none" stroke="' + ser.colour + '" stroke-width="2.4" opacity="0.9" />';
-      s += '<text x="' + (x(ser.values.length - 1) - 6) + '" y="' + Math.max(14, y(ser.values[ser.values.length - 1]) - 6)
-        + '" text-anchor="end" font-size="11" font-weight="700" fill="' + ser.colour + '">' + ser.label + '</text>';
     });
-    s += '<text x="26" y="216" font-size="10" fill="var(--muted)">n = ' + xs[0] + '</text>';
-    s += '<text x="500" y="216" text-anchor="end" font-size="10" fill="var(--muted)">n = ' + xs[xs.length - 1] + '</text>';
-    if (logScale) s += '<text x="30" y="24" font-size="10" fill="var(--muted)">log scale</text>';
+    // Finish every curve before placing readable endpoint labels. Keep the
+    // authored color association and halo, with bounded separation at ties.
+    var labels = series.map(function (ser, i) {
+      return {series: ser, order: i, baseline: Math.max(20, Math.min(188, y(ser.values[ser.values.length - 1]) - 6))};
+    }).sort(function (a, b) { return a.baseline - b.baseline || a.order - b.order; });
+    labels.forEach(function (label, i) { if (i) label.baseline = Math.max(label.baseline, labels[i - 1].baseline + 18); });
+    for (var i = labels.length - 1; i >= 0; i -= 1) {
+      labels[i].baseline = Math.min(labels[i].baseline, i === labels.length - 1 ? 188 : labels[i + 1].baseline - 18);
+    }
+    labels.forEach(function (label) {
+      var ser = label.series;
+      s += '<text x="' + (x(ser.values.length - 1) - 6) + '" y="' + label.baseline
+        + '" text-anchor="end" font-size="12" font-weight="700" fill="' + ser.colour + '">' + ser.label + '</text>';
+    });
+    s += '<text x="26" y="216" font-size="12" fill="var(--muted)">n = ' + xs[0] + '</text>';
+    s += '<text x="500" y="216" text-anchor="end" font-size="12" fill="var(--muted)">n = ' + xs[xs.length - 1] + '</text>';
+    if (logScale) s += '<text x="30" y="24" font-size="12" fill="var(--muted)">log scale</text>';
     plot.innerHTML = s;
   }
 
@@ -1909,8 +1932,8 @@ TERMINATION     m halves each iteration, bounded below by 0    ✓
         + 'At exit m = 0, so result · base⁰ = result, and the invariant reads result = ' + x + sup(n) + ' = ' + big(t.value)
         + ': the correctness argument in one line. The loop did ' + t.squarings + ' squarings and ' + t.mults
         + ' multiplications, one for each 1 in n = ' + t.binary + '₂, against n − 1 = ' + t.naive
-        + ' for repeated multiplication — lesson 1\'s comparison, measured. The final squaring is wasted (m is 0 by then), '
-        + 'which is why course 6 lesson 8 counts bits − 1. What the lab cannot do is prove the invariant for the n it did not '
+        + ' for repeated multiplication — the comparison in “Algorithms and Pseudocode”, measured. The final squaring is wasted (m is 0 by then), '
+        + 'which is why “Modular Exponentiation” counts bits − 1. What the lab cannot do is prove the invariant for the n it did not '
         + 'run; the proof is the worked example.';
     },
     loops: function () {
@@ -1943,7 +1966,7 @@ TERMINATION     m halves each iteration, bounded below by 0    ✓
         + 'Σ (n − i + 1) reindexed to Σ m; C ran ' + last.C + ' = n · ⌊log₂ n⌋, because halving reaches 1 in ⌊log₂ n⌋ steps; '
         + 'D — the standard\'s triple triangular nest, Σ_i Σ_j j — ran ' + fmt(last.D) + ' = n(n+1)(n+2)/6, one sixth of n³ '
         + 'to leading order. ' + (exact ? '<strong>Every measured column equals its formula exactly</strong>, because none of '
-        + 'these loops looks at data; the formulas are course 3 lesson 3\'s sums.' : 'A measured column disagrees with its formula.')
+        + 'these loops looks at data; the formulas are the sums in “Induction with Sums and Products”.' : 'A measured column disagrees with its formula.')
         + ' Multiplying B\'s bounds instead of summing would give n² = ' + fmt(N * N) + ', about twice the truth — the first mistake.';
     },
     search: function () {
@@ -2098,7 +2121,7 @@ TERMINATION     m halves each iteration, bounded below by 0    ✓
       var detail;
       if (policy === 'double') {
         var pow2 = (n & (n - 1)) === 0;
-        detail = 'The copies are 1 + 2 + 4 + ⋯, a geometric series (course 3 lesson 3) that stays under 2n, so the total stays under 3n '
+        detail = 'The copies are 1 + 2 + 4 + ⋯, a geometric series (see “Induction with Sums and Products”) that stays under 2n, so the total stays under 3n '
           + 'whatever n is. ' + (pow2
             ? 'This n is a power of two, so the last doubling happened at insert ' + (n / 2 + 1) + ' and the copies are n − 1 = ' + r.copies
               + ': the total is just under 2n. Set n = ' + (n + 1) + ' to see the next doubling push it above 2n and still below 3n — '

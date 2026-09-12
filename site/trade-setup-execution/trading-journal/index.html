@@ -1218,6 +1218,7 @@ a.brand { text-decoration: none; }
       font-size: 0.9rem;
       resize: vertical;
     }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
     .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
     .fb-actions {
       display: flex;
@@ -1376,6 +1377,27 @@ a.brand { text-decoration: none; }
       .signin-btn { padding: 0; width: 38px; justify-content: center; }
     }
 
+    /* Trading charts use a 960-unit plotting frame. Keep that authored scale
+       instead of shrinking 11-unit axis text to roughly 3 CSS pixels on a
+       phone. The named keyboard scroll owner exposes the complete chart. */
+    @media screen {
+      .market-chart-scroll {
+        contain: inline-size;
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        overscroll-behavior-inline: contain;
+      }
+      .market-chart-scroll > svg.market-chart {
+        display: block;
+        width: 100%;
+        min-width: 960px;
+      }
+    }
+
     body[data-page-kind] {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 16px;
@@ -1409,6 +1431,7 @@ a.brand { text-decoration: none; }
     [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
     [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
     [data-ui="hero"] .eyebrow { display: block; color: var(--muted); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
     [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
     [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
     [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
@@ -1453,7 +1476,7 @@ a.brand { text-decoration: none; }
     }
     [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
     [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
-    [data-ui="lesson-list"] .lesson-link { min-height: 44px; }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
     body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
     body[data-page-kind] .is-done .lesson-state { color: var(--green); }
     [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
@@ -1581,7 +1604,7 @@ a.brand { text-decoration: none; }
       
 <div class="lab-layout">
   <article class="card card-pad">
-    <div class="practice-head"><h3 id="journalFormTitle">New journal entry</h3><span class="score" id="journalStorageStatus">Browser storage</span></div><div class="note"><strong>The first entry to make is the trade you managed in lesson 12.</strong> Any symbol (it was synthetic), setup Pullback, long, one-hour timeframe. The result in R is what the simulation reported when it finished; “followed the written plan” is what its discipline score said, and each deviation gets its tag. Write the thesis line as it stood before the trade — the plan on that page — not as the outcome makes it look now.</div>
+    <div class="practice-head"><h3 id="journalFormTitle">New journal entry</h3><span class="score" id="journalStorageStatus">Browser storage</span></div><div class="note"><strong>Use the simulated trade in Trade Management as a journal-entry example.</strong> Any symbol (it was synthetic), setup Pullback, long, one-hour timeframe. The result in R is what the simulation reported when it finished; “followed the written plan” is what its discipline score said, and each deviation gets its tag. Write the thesis line as it stood before the trade — the plan on that page — not as the outcome makes it look now.</div>
     <div class="form-grid">
       <div class="field"><label for="journalDate">Date</label><input id="journalDate" type="date" /></div>
       <div class="field"><label for="journalSymbol">Symbol / instrument</label><input id="journalSymbol" type="text" maxlength="20" placeholder="e.g. SPY" /></div>
@@ -1592,7 +1615,7 @@ a.brand { text-decoration: none; }
       <div class="field"><label for="journalEntry">Entry</label><input id="journalEntry" type="number" step="0.01" /></div>
       <div class="field"><label for="journalStop">Initial stop</label><input id="journalStop" type="number" step="0.01" /></div>
       <div class="field"><label for="journalTarget">Initial target</label><input id="journalTarget" type="number" step="0.01" /></div>
-      <div class="field"><label for="journalExecution">Execution score (1–5)</label><select id="journalExecution"><option value="1">1 · Poor</option><option value="2">2</option><option value="3" selected>3 · Acceptable</option><option value="4">4</option><option value="5">5 · Excellent</option></select></div>
+      <div class="field"><label for="journalExecution">Execution score (1 to 5)</label><select id="journalExecution"><option value="1">1 · Poor</option><option value="2">2</option><option value="3" selected>3 · Acceptable</option><option value="4">4</option><option value="5">5 · Excellent</option></select></div>
       <div class="field"><label for="journalPlan">Followed the written plan?</label><select id="journalPlan"><option value="true">Yes</option><option value="false">No</option></select></div>
       <div class="field full-span"><label for="journalContext">Thesis and context</label><textarea id="journalContext" placeholder="Higher-timeframe structure, location, trigger, invalidation, and target..."></textarea></div>
       <div class="field full-span"><label>Mistake tags</label><div class="tag-grid" id="journalMistakes"><label class="tag-check"><input type="checkbox" value="Early entry" /><span>Early entry</span></label><label class="tag-check"><input type="checkbox" value="Late entry" /><span>Late entry</span></label><label class="tag-check"><input type="checkbox" value="Oversized" /><span>Oversized</span></label><label class="tag-check"><input type="checkbox" value="Moved stop" /><span>Moved stop</span></label><label class="tag-check"><input type="checkbox" value="Unplanned exit" /><span>Unplanned exit</span></label><label class="tag-check"><input type="checkbox" value="No valid setup" /><span>No valid setup</span></label></div></div>
@@ -1605,9 +1628,9 @@ a.brand { text-decoration: none; }
   <aside class="card side-panel">
     <h3>Journal summary</h3>
     <div class="kpi-grid" aria-live="polite"><div class="kpi"><span>Trades</span><strong id="journalCount">0</strong></div><div class="kpi"><span>Net result</span><strong id="journalNet">0.00R</strong></div><div class="kpi"><span>Plan adherence</span><strong id="journalAdherence">—</strong></div><div class="kpi"><span>Execution score</span><strong id="journalAvgExecution">—</strong></div></div>
-    <div class="chart-wrap" style="min-height:260px;border:1px solid var(--line);border-radius:14px;overflow:hidden;"><svg id="journalChart" class="market-chart" style="min-height:260px;" aria-label="Journal equity curve"></svg></div>
+    <div class="chart-wrap market-chart-scroll" style="min-height:260px;border:1px solid var(--line);border-radius:14px;overflow:hidden;" tabindex="0" role="region" aria-label="Interactive chart; scroll horizontally for complete chart labels"><svg id="journalChart" class="market-chart" style="min-height:260px;" aria-label="Journal equity curve"></svg></div>
     <div class="action-row"><button class="btn small" id="journalSample" type="button">Load sample entries</button><button class="btn small" id="journalExportJson" type="button">Export JSON</button><button class="btn small" id="journalExportCsv" type="button">Export CSV</button><label class="btn small" for="journalImport" style="cursor:pointer;">Import JSON</label><input id="journalImport" class="sr-only" type="file" accept="application/json,.json" /></div>
-    <div class="note"><strong>Compatible export:</strong> The JSON file can be imported directly into Lesson 15, Performance Review.</div>
+    <div class="note"><strong>Compatible export:</strong> The JSON file can be imported directly into Performance Review.</div>
   </aside>
 </div>
 <div class="section" style="padding-bottom:0;">
@@ -1631,7 +1654,7 @@ a.brand { text-decoration: none; }
     <section class="section">
       <div class="grid-2">
         <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Recording only winners and memorable trades</strong><span>Selective records produce misleading performance statistics.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Writing the thesis after the outcome</strong><span>Hindsight changes what appeared knowable before entry.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Using vague notes without categories</strong><span>Free text alone is difficult to aggregate into actionable patterns.</span></div></div><div class="lesson-row"><div class="num">4</div><div><strong>Judging quality only from profit</strong><span>A well-executed trade can lose, and a poorly executed trade can win.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Completion standard</h3><div class="callout"><div class="mark">✓</div><div><strong>Finish when you have recorded, exported and re-imported one complete entry.</strong><p>Thesis written as it was before the outcome, result in R, plan adherence, execution score, and a mistake tag wherever one applies. The trade from lesson 12 is the one to use.</p></div></div><div class="note" style="margin-top:12px;"><strong>Scope:</strong> This lesson teaches process and measurement. It does not provide live market data, personalized recommendations, or trade signals.</div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Completion standard</h3><div class="callout"><div class="mark">✓</div><div><strong>Finish when you have recorded, exported and re-imported one complete entry.</strong><p>Thesis written as it was before the outcome, result in R, plan adherence, execution score, and a mistake tag wherever one applies. The simulated trade in Trade Management supplies this example.</p></div></div><div class="note" style="margin-top:12px;"><strong>Scope:</strong> This lesson teaches process and measurement. It does not provide live market data, personalized recommendations, or trade signals.</div></article>
       </div>
     </section>
 

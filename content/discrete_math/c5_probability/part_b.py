@@ -38,7 +38,7 @@ LESSONS = [
         "read_intro": "The definition, the distribution, and how several variables interact.",
         "body": [
             ("def", ("Random variable",
-                     "A <strong>random variable</strong> on a sample space `S` is a function `X : S → ℝ` &mdash; a function in Sets, Relations, and Functions lesson 10's sense, one value for each element of the domain `S`. The event `X = k` is `{s ∈ S : X(s) = k}`, and `P(X = k)` is its probability.")),
+                     'A <strong>random variable</strong> on a sample space `S` is a function `X : S → ℝ` &mdash; a function in the sense defined in the “Functions” Lesson in Sets, Relations, and Functions, one value for each element of the domain `S`. The event `X = k` is `{s ∈ S : X(s) = k}`, and `P(X = k)` is its probability.')),
             ("p", "The name is doubly misleading, as is traditional. `X` is a function and "
                   "it is completely determined; what varies is which outcome occurs. "
                   "Reading `X` as a function on outcomes removes most of the confusion this "
@@ -63,9 +63,7 @@ LESSONS = [
                      "For an event `A`, the <strong>indicator</strong> `I_A` is the random "
                      "variable equal to 1 when `A` occurs and 0 otherwise. Its distribution "
                      "is `P(I_A = 1) = P(A)`.")),
-            ("p", "Indicators look trivial and are the single most useful tool in lesson 9. "
-                  "Any count can be written as a sum of indicators, and expectation adds "
-                  "over sums regardless of dependence."),
+            ("p", 'Indicators look trivial and are the single most useful tool in “Linearity of Expectation”. Any count can be written as a sum of indicators, and expectation adds over sums regardless of dependence.'),
             ("h3", "Several variables together"),
             ("def", ("Joint distribution and independence",
                      "The <strong>joint distribution</strong> of `X` and `Y` is "
@@ -84,12 +82,7 @@ LESSONS = [
         "lab": ("distribution", {
             "kind": "dice",
             "panel_title": "A distribution, listed",
-            "panel_intro": "The bars are `P(X = k)` for the sum of two dice and the table "
-                           "lists them: the triangle `1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1` over "
-                           "36, with the `Σ` row reading `1.000000`. That row is this "
-                           "lesson's check. The `E[X]` figures and the dashed line are "
-                           "lesson 8's and `Var(X)` is lesson 10's; the `k·P(X = k)` "
-                           "column is their raw material and can wait.",
+            "panel_intro": "The bars are `P(X = k)` for the sum of two dice and the table lists them: the triangle `1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1` over 36, with the `Σ` row reading `1.000000`. That row is this lesson's check. The `E[X]` figures and the dashed line are “Expected Value”’s and `Var(X)` is “Variance and Standard Deviation”’s; the `k·P(X = k)` column is their raw material and can wait.",
         }),
         "steps_title": "Working with a random variable",
         "steps_intro": "Define the function before computing anything about it.",
@@ -123,9 +116,7 @@ LESSONS = [
                 "               ⟹ dependent, as expected: Y is part of X.",
             ],
             "after": [
-                "`Y` is an indicator, and `X` is the sum of three such indicators &mdash; "
-                "one per flip. That decomposition is what lesson 9 exploits, and it works "
-                "even though the indicators here are visibly not independent of `X`."
+                '`Y` is an indicator, and `X` is the sum of three such indicators &mdash; one per flip. That decomposition is what “Linearity of Expectation” exploits, and it works even though the indicators here are visibly not independent of `X`.'
             ],
         },
         "quiz_title": "Random variables",
@@ -152,10 +143,7 @@ LESSONS = [
             {"q": "An indicator variable `I_A` takes values:",
              "a": ["0 and 1", "−1 and 1", "any real", "0 only"],
              "c": 0,
-             "why": "1 when `A` occurs, 0 otherwise, so its expectation is `P(A)`, which "
-                    "lesson 9 uses constantly. `−1` and `1` is a different coding "
-                    "without that property; \"any real\" describes a general random "
-                    "variable; and a variable that is 0 only is the indicator of `∅`."},
+             "why": '1 when `A` occurs, 0 otherwise, so its expectation is `P(A)`, which “Linearity of Expectation” uses constantly. `−1` and `1` is a different coding without that property; "any real" describes a general random variable; and a variable that is 0 only is the indicator of `∅`.'},
         ],
         "mistakes": [
             ("Treating `X` as random rather than as a function",
@@ -216,8 +204,7 @@ LESSONS = [
                      "For a discrete random variable `X` taking finitely many values, "
                      "`E[X] = Σ_k k · P(X = k)`, summed over the values `X` takes. "
                      "Equivalently `E[X] = Σ_{s ∈ S} X(s)P(s)`.")),
-            ("p", "The second form is often more useful: sum over outcomes rather than "
-                  "over values. It makes the linearity of lesson 9 immediate."),
+            ("p", 'The second form is often more useful: sum over outcomes rather than over values. It makes the linearity of “Linearity of Expectation” immediate.'),
             ("example", ("A fair die",
                          "`E[X] = (1+2+3+4+5+6)/6 = 3.5`. Not a value the die can show, and "
                          "that is not a defect: it is the long-run average of many rolls.")),
@@ -230,9 +217,7 @@ LESSONS = [
             ("thm", ("Expectation of a function",
                      "`E[g(X)] = Σ_k g(k)P(X = k)`. Note `E[g(X)] ≠ g(E[X])` in general: "
                      "for a fair die `E[X²] = 91/6 ≈ 15.17` while `(E[X])² = 12.25`.")),
-            ("p", "That inequality is not a curiosity; it is the reason variance is defined "
-                  "the way lesson 10 defines it, and it is behind the general fact that "
-                  "averaging and transforming do not commute."),
+            ("p", 'That inequality is not a curiosity; it is the reason variance is defined the way “Variance and Standard Deviation” defines it, and it is behind the general fact that averaging and transforming do not commute.'),
             ("h3", "Fair games and expected winnings"),
             ("example", ("A carnival game",
                          "Pay £2 to roll a die and win £`X` where `X` is the face shown. "
@@ -251,8 +236,7 @@ LESSONS = [
             ("ul", [
                 "<strong>Not the most likely outcome.</strong> The expected number of "
                 "heads in 3 flips is 1.5, which is impossible.",
-                "<strong>Not a guarantee.</strong> A game with positive expectation can "
-                "lose for a long time; lesson 10's variance is what measures that.",
+                '<strong>Not a guarantee.</strong> A game with positive expectation can lose for a long time; the variance studied in “Variance and Standard Deviation” is what measures that.',
                 "<strong>Not enough to compare two options.</strong> Two bets with equal "
                 "expectation can differ enormously in risk, and expectation alone cannot "
                 "see it.",
@@ -262,15 +246,7 @@ LESSONS = [
             "kind": "uniform",
             "n": 6,
             "panel_title": "Summed, then compared",
-            "panel_intro": "The lab opens on the fair die &mdash; Uniform on `1 … 6` &mdash; "
-                           "and sums the `k·P(X = k)` column: `1/6 + 2/6 + ⋯ + 6/6 = "
-                           "3.5000`, the `E[X] summed` figure, beside the closed form "
-                           "`(n + 1)/2 = 7/2`. There is no 3.5 in the `k` column, and the "
-                           "dashed line falls between the bars for 3 and 4: the lesson's "
-                           "first caution, visible. The `Var(X)` figure is lesson 10's. "
-                           "Then switch to the sum of two fair dice: `7.0000`, this time a "
-                           "value the sum can take, because being attainable is a property "
-                           "of the distribution and not of expectation.",
+            "panel_intro": "The lab opens on the fair die &mdash; Uniform on `1 … 6` &mdash; and sums the `k·P(X = k)` column: `1/6 + 2/6 + ⋯ + 6/6 = 3.5000`, the `E[X] summed` figure, beside the closed form `(n + 1)/2 = 7/2`. There is no 3.5 in the `k` column, and the dashed line falls between the bars for 3 and 4: the lesson's first caution, visible. The `Var(X)` figure is “Variance and Standard Deviation”’s. Then switch to the sum of two fair dice: `7.0000`, this time a value the sum can take, because being attainable is a property of the distribution and not of expectation.",
         }),
         "steps_title": "Computing an expectation",
         "steps_intro": "From the definition first; formulas afterwards.",
@@ -301,7 +277,7 @@ LESSONS = [
                 "",
                 "The customer's expectation is exactly −£10.",
                 "The insurer's edge comes from selling MANY policies, where the",
-                "average approaches the expectation — which is lesson 10's subject.",
+                'average approaches the expectation — which is the law-of-large-numbers argument in “Variance and Standard Deviation”.',
             ],
             "after": [
                 "Both parties can be acting sensibly. The customer accepts a negative "
@@ -322,27 +298,18 @@ LESSONS = [
             {"q": "`E[X] = 2.7`. What does that tell you about the most likely value?",
              "a": ["It is 3", "It is 2.7", "Nothing directly", "It is 2 or 3"],
              "c": 2,
-             "why": "The mean and the mode are different summaries. A distribution with "
-                    "mean 2.7 can easily have its highest probability at 1; `2.7` itself "
-                    "may not be a value at all; and \"2 or 3\" assumes the mass sits near "
-                    "the mean, which lesson 12's geometric distribution (mean 6, mode 1) "
-                    "refutes."},
+             "why": 'The mean and the mode are different summaries. A distribution with mean 2.7 can easily have its highest probability at 1; `2.7` itself may not be a value at all; and "2 or 3" assumes the mass sits near the mean, which “The Geometric Distribution and Waiting Times”’s geometric distribution (mean 6, mode 1) refutes.'},
             {"q": "`E[X²]` versus `(E[X])²`:",
              "a": ["always equal", "`E[X²] ≥ (E[X])²`", "`E[X²] ≤ (E[X])²`", "unrelated"],
              "c": 1,
-             "why": "Their difference is the variance, which is non-negative &mdash; "
-                    "exactly lesson 10's computational formula. They are equal only for "
-                    "a constant `X`; the fair die's `91/6` against `12.25` rules out `≤`; "
-                    "and they are anything but unrelated &mdash; the gap is the single most "
-                    "useful number about spread."},
+             "why": "Their difference is the variance, which is non-negative &mdash; exactly “Variance and Standard Deviation”’s computational formula. They are equal only for a constant `X`; the fair die's `91/6` against `12.25` rules out `≤`; and they are anything but unrelated &mdash; the gap is the single most useful number about spread."},
         ],
         "mistakes": [
             ("Expecting the expectation to be attainable",
              "3.5 for a die and 1.5 heads in three flips are both fine. The expectation "
              "summarises the distribution."),
             ("Reading the expectation as the typical outcome",
-             "For skewed distributions the mean can be far from anything likely. The "
-             "geometric distribution in lesson 12 is the standard example."),
+             'For skewed distributions the mean can be far from anything likely. The geometric distribution in “The Geometric Distribution and Waiting Times” is the standard example.'),
             ("Applying a function inside the expectation",
              "`E[g(X)] ≠ g(E[X])` unless `g` is linear. This is the source of many wrong "
              "risk calculations."),
@@ -352,9 +319,7 @@ LESSONS = [
                      "Compute the expected number of heads in five fair flips from the "
                      "definition, then state in one sentence why 2.5 is a sensible answer "
                      "for a quantity that must be an integer."),
-        "note": "Lesson 9 gives a much faster route to most expectations. Linearity holds "
-                "without independence, which makes decomposing a complicated variable into "
-                "indicators the dominant technique in the rest of this course.",
+        "note": '“Linearity of Expectation” gives a much faster route to most expectations. Linearity holds without independence, which makes decomposing a complicated variable into indicators the dominant technique for the expectation calculations in this Course.',
     },
     # ---------------------------------------------------------------- 09
     {
@@ -413,9 +378,7 @@ LESSONS = [
                   "`X = I_{A₁} + ⋯ + I_{A_n}` and `E[X] = Σ P(Aᵢ)`. The events may overlap, "
                   "depend on each other, or be governed by anything at all."),
             ("example", ("Heads in `n` flips",
-                         "`X = Σ Iᵢ` where `Iᵢ` indicates heads on flip `i`. Each has "
-                         "expectation `p`, so `E[X] = np` &mdash; without computing the "
-                         "binomial distribution (lesson 11) at all.")),
+                         '`X = Σ Iᵢ` where `Iᵢ` indicates heads on flip `i`. Each has expectation `p`, so `E[X] = np` &mdash; without computing the binomial distribution (“Bernoulli Trials and the Binomial Distribution”) at all.')),
             ("example", ("Fixed points of a random permutation",
                          "`X` counts the elements left in place. `X = Σ Iᵢ` where `Iᵢ` "
                          "indicates that `i` is fixed, and `P(Iᵢ = 1) = 1/n`. So "
@@ -424,12 +387,7 @@ LESSONS = [
                          "last &mdash; and linearity does not care.")),
             ("p", "That result is worth pausing on. On average exactly one person gets their own hat back, whether there are 5 people or 5 million. Computing it from the derangement distribution of Combinatorics and Counting would be considerably harder."),
             ("example", ("The coupon collector",
-                         "There are `n` distinct coupons, one per box at random. How many "
-                         "boxes to collect them all? Let `Xᵢ` be the number of boxes bought "
-                         "while holding exactly `i − 1` distinct coupons. Then "
-                         "`E[Xᵢ] = n/(n − i + 1)` (lesson 12 supplies that), so "
-                         "`E[total] = n(1 + 1/2 + ⋯ + 1/n) ≈ n ln n`. For `n = 50` that is "
-                         "about 225 boxes.")),
+                         'There are `n` distinct coupons, one per box at random. How many boxes to collect them all? Let `Xᵢ` be the number of boxes bought while holding exactly `i − 1` distinct coupons. Then `E[Xᵢ] = n/(n − i + 1)` (“The Geometric Distribution and Waiting Times” supplies that), so `E[total] = n(1 + 1/2 + ⋯ + 1/n) ≈ n ln n`. For `n = 50` that is about 225 boxes.')),
             ("example", ("Matching pairs",
                          "Two shuffled decks are dealt face up side by side. The expected "
                          "number of positions where the cards match is "
@@ -483,7 +441,7 @@ LESSONS = [
                 "Linearity does not care.",
                 "",
                 "Computing this from the distribution of X would require the",
-                "derangement numbers of Combinatorics and Counting lesson 10 — for one number.",
+                'derangement numbers of the “Derangements” Lesson in Combinatorics and Counting — for one number.',
             ],
             "after": [
                 "The answer is 1 for every `n`, which connects directly to derangements: "
@@ -582,20 +540,13 @@ LESSONS = [
                 "`E[(X − μ)²] = E[X² − 2μX + μ²] = E[X²] − 2μE[X] + μ² = E[X²] − 2μ² + μ² "
                 "= E[X²] − μ²`, using linearity and `E[X] = μ`.",
             ]),
-            ("p", "Two consequences drop out. Variance is non-negative, so "
-                  "`E[X²] ≥ (E[X])²` always &mdash; the inequality noticed in lesson 8. And "
-                  "`Var(X) = 0` exactly when `X` is constant."),
+            ("p", 'Two consequences drop out. Variance is non-negative, so `E[X²] ≥ (E[X])²` always &mdash; the inequality noticed in “Expected Value”. And `Var(X) = 0` exactly when `X` is constant.'),
             ("thm", ("Scaling and shifting",
                      "`Var(aX + b) = a²Var(X)`. Adding a constant moves the distribution "
                      "without changing its spread; scaling by `a` scales the spread by "
                      "`|a|` and the variance by `a²`.")),
             ("thm", ("Variance of a sum",
-                     "If `X` and `Y` are independent, `Var(X + Y) = Var(X) + Var(Y)`. "
-                     "Without independence, `Var(X + Y) = Var(X) + Var(Y) + 2Cov(X,Y)`, "
-                     "where the <strong>covariance</strong> `Cov(X,Y) = E[XY] − E[X]E[Y]` "
-                     "is the amount by which the product rule fails &mdash; lesson 9 showed "
-                     "it is 0 when `X` and `Y` are independent, which is where the first "
-                     "form comes from.")),
+                     'If `X` and `Y` are independent, `Var(X + Y) = Var(X) + Var(Y)`. Without independence, `Var(X + Y) = Var(X) + Var(Y) + 2Cov(X,Y)`, where the <strong>covariance</strong> `Cov(X,Y) = E[XY] − E[X]E[Y]` is the amount by which the product rule fails &mdash; “Linearity of Expectation” shows it is 0 when `X` and `Y` are independent, which is where the first form comes from.')),
             ("p", "This is the difference from expectation, and it is worth stating "
                   "plainly: sums of expectations never need independence, sums of variances "
                   "always do. Adding `X` to itself makes the point &mdash; "
@@ -617,10 +568,7 @@ LESSONS = [
                 "The sum has variance `nσ²` by independence, and dividing by `n` scales the "
                 "variance by `1/n²`, giving `σ²/n`.",
             ]),
-            ("p", "The `√n` is why the insurer of lesson 8 sells many policies. It also "
-                  "explains why halving the uncertainty of an estimate requires four times "
-                  "the data &mdash; the most consequential single fact in applied "
-                  "statistics."),
+            ("p", 'The `√n` is why the insurer of “Expected Value” sells many policies. It also explains why halving the uncertainty of an estimate requires four times the data &mdash; the most consequential single fact in applied statistics.'),
             ("thm", ("Chebyshev's inequality",
                      "For any `k &gt; 0`, `P(|X − μ| ≥ kσ) ≤ 1/k²`. At most a quarter of "
                      "any distribution lies more than two standard deviations from its "
@@ -646,7 +594,7 @@ LESSONS = [
         "steps_intro": "Two expectations, then subtract.",
         "steps": [
             ("Compute `E[X]`",
-             "The weighted average, as in lesson 8."),
+             'The weighted average, as in “Expected Value”.'),
             ("Compute `E[X²]`",
              "Same distribution, values squared: `Σ k²P(X = k)`. Not `(E[X])²`."),
             ("Subtract",
@@ -787,7 +735,7 @@ LESSONS = [
                 "trials succeed, which is `C(n,k)`.",
                 "The sequences are disjoint events, so the sum rule gives the product.",
             ]),
-            ("p", "The distribution sums to 1 by the binomial theorem of Combinatorics and Counting lesson 6: `Σ_k C(n,k)p^k(1−p)^{n−k} = (p + (1−p))ⁿ = 1`. That is the theorem doing genuine work, not an analogy."),
+            ("p", 'The distribution sums to 1 by the theorem in the “The Binomial Theorem” Lesson in Combinatorics and Counting: `Σ_k C(n,k)p^k(1−p)^{n−k} = (p + (1−p))ⁿ = 1`. That is the theorem doing genuine work, not an analogy.'),
             ("thm", ("Mean and variance",
                      "`E[X] = np` and `Var(X) = np(1−p)`.")),
             ("proof", [
@@ -844,8 +792,7 @@ LESSONS = [
         "steps_intro": "Check the three assumptions before using the formula.",
         "steps": [
             ("Confirm `n` is fixed in advance",
-             "If the number of trials depends on the results, this is not a binomial "
-             "&mdash; lesson 12 handles the commonest such case."),
+             'If the number of trials depends on the results, this is not a binomial &mdash; “The Geometric Distribution and Waiting Times” handles the commonest such case.'),
             ("Confirm the trials are independent",
              "Sampling without replacement is the standard violation, and it matters when "
              "the sample is a substantial fraction of the population."),
@@ -947,8 +894,7 @@ LESSONS = [
         ],
         "key_label": "Waiting for a success",
         "concepts_intro": (
-            "The last distribution on this course, and the one whose mean is least "
-            "representative of a typical outcome."
+            'A waiting-time distribution whose mean is least representative of a typical outcome.'
         ),
         "concepts": [
             ("The number of trials is not fixed",
@@ -971,7 +917,7 @@ LESSONS = [
             ("proof", [
                 "The first success on trial `k` means `k − 1` failures followed by a "
                 "success. By independence that probability is `(1−p)^{k−1}p`.",
-                "These sum to 1 by the geometric series of Induction and Recursion lesson 3: `Σ_{k≥1} (1−p)^{k−1}p = p/(1 − (1−p)) = 1`.",
+                'These sum to 1 by the geometric series of the “Induction with Sums and Products” Lesson in Induction and Recursion: `Σ_{k≥1} (1−p)^{k−1}p = p/(1 − (1−p)) = 1`.',
             ]),
             ("thm", ("Mean and variance",
                      "`E[X] = 1/p` and `Var(X) = (1−p)/p²`.")),

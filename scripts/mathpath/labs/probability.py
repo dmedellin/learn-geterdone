@@ -187,7 +187,7 @@ def probability_lab(cfg):
       if (a && b) nAB += 1;
       var style = a && b ? 'border-color:var(--green);color:var(--green);'
         : a ? 'border-color:var(--cyan);color:var(--cyan);'
-        : b ? 'border-color:var(--purple);color:var(--purple);' : 'opacity:0.5;';
+        : b ? 'border-color:var(--purple);color:var(--purple);' : 'color:var(--text);border-style:dashed;';
       return '<span class="chip" style="' + style + '">' + exp.label(o) + '</span>';
     });
     space.innerHTML = cells.join('');

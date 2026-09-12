@@ -4,7 +4,8 @@
 'use strict';
 const fs=require('node:fs'),path=require('node:path'),http=require('node:http'),assert=require('node:assert/strict');
 const {launch}=require('./browser_cdp'),contracts=require('./browser_contracts');
-const {refine}=require('./browser_contrast_pixels');
+const {refine,reportFailures}=require('./browser_contrast_pixels');
+const protocol=require('./mutation_protocol');
 const ROOT=path.resolve(process.env.SOURCE_ROOT||path.join(__dirname,'..')),SITE=path.join(ROOT,'site'),OUT=process.env.BROWSER_EVIDENCE;
 assert(OUT&&!path.resolve(OUT).startsWith(ROOT+'/'),'external evidence required');
 fs.mkdirSync(OUT,{recursive:true});assert(!fs.existsSync(path.join(OUT,'observations.jsonl')),'fresh evidence required');
@@ -28,6 +29,7 @@ async function main(){
   const result=await refine(c,await c.evaluate('renderedContrast()'));
   const row={route:page.route,kind:page.kind,width,height,theme,state,...result};rows.push(row);
   fs.appendFileSync(path.join(OUT,'observations.jsonl'),JSON.stringify(row)+'\n');
+  reportFailures(result.failures);
   console.log((result.failures.length?'FAIL':'PASS')+' contrast '+page.route+' '+width+' '+theme+' '+state+' samples='+result.rows.length+' failures='+result.failures.length+' '+JSON.stringify(result.failures.slice(0,2)));
   if(caps.includes(page)&&['initial','slide-16','active-states'].includes(state)){
    await c.evaluate('window.scrollTo(0,0)');
@@ -64,6 +66,6 @@ async function main(){
   }
  }finally{await c.close();await new Promise(r=>server.close(r));}
  const summary={pages:selected.length,families:[...new Set(selected.map(p=>p.kind))],observations:rows.length,samples:rows.reduce((n,r)=>n+r.rows.length,0),failures:rows.reduce((n,r)=>n+r.failures.length,0)};
- fs.writeFileSync(path.join(OUT,'summary.json'),JSON.stringify(summary,null,2)+'\n');console.log(JSON.stringify(summary));assert.equal(summary.failures,0,'rendered text contrast thresholds');
+ fs.writeFileSync(path.join(OUT,'summary.json'),JSON.stringify(summary,null,2)+'\n');console.log(JSON.stringify(summary));if(summary.failures)process.exitCode=1;
 }
-main().catch(e=>{console.error(e.stack);server.close();process.exitCode=1});
+main().catch(e=>{protocol.setup(e);server.close();process.exitCode=1});

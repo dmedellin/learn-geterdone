@@ -583,6 +583,15 @@
       overflow-x: auto;
     }
     .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
 
     /* ---------- Graphs ----------
        Tokens only. A component override scoped to [data-theme="light"] would
@@ -1040,6 +1049,7 @@
       font-size: 0.9rem;
       resize: vertical;
     }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
     .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
     .fb-actions {
       display: flex;
@@ -1132,6 +1142,7 @@
     [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
     [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
     [data-ui="hero"] .eyebrow { display: block; color: var(--muted); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
     [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
     [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
     [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
@@ -1176,7 +1187,7 @@
     }
     [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
     [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
-    [data-ui="lesson-list"] .lesson-link { min-height: 44px; }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
     body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
     body[data-page-kind] .is-done .lesson-state { color: var(--green); }
     [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
@@ -1284,7 +1295,7 @@ steps = O(log min(a,b))</div>
       <article class="card card-pad prose"><div class="thm"><span class="label">Theorem &middot; The key identity</span><p>For <span class="math">b &gt; 0</span>, <span class="math">gcd(a, b) = gcd(b, a mod b)</span>.</p></div><div class="proof"><p>Write <span class="math">a = qb + r</span> with <span class="math">r = a mod b</span>. If <span class="math">d</span> divides <span class="math">a</span> and <span class="math">b</span>, then it divides <span class="math">a − qb = r</span>, so it is a common divisor of <span class="math">b</span> and <span class="math">r</span>.</p><p>Conversely if <span class="math">d</span> divides <span class="math">b</span> and <span class="math">r</span>, then it divides <span class="math">qb + r = a</span>, so it is a common divisor of <span class="math">a</span> and <span class="math">b</span>.</p><p>The two pairs therefore have exactly the same common divisors, so the greatest is the same.</p><p><span class="qed">&#9633;</span></p></div><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">GCD(a, b):
     while b ≠ 0:
         (a, b) = (b, a mod b)
-    return a</div><p><strong>Correctness</strong> is the loop invariant of Induction and Recursion lesson 12: <span class="math">gcd(a, b)</span> never changes, by the identity. <strong>Termination</strong> holds because <span class="math">b</span> strictly decreases and is a non-negative integer. At exit <span class="math">b = 0</span> and <span class="math">gcd(a, 0) = a</span>.</p><h3>How fast</h3><div class="thm"><span class="label">Theorem &middot; Two steps halve</span><p>In two iterations, the first argument is at least halved.</p></div><div class="proof"><p>If <span class="math">b ≤ a/2</span> then <span class="math">a mod b &lt; b ≤ a/2</span> and one step suffices. Otherwise <span class="math">b &gt; a/2</span>, so <span class="math">a = 1·b + (a − b)</span> and <span class="math">a mod b = a − b &lt; a/2</span>.</p><p>Either way the value two steps later is below <span class="math">a/2</span>, so the number of iterations is <span class="math">O(log a)</span>.</p><p><span class="qed">&#9633;</span></p></div><div class="thm"><span class="label">Theorem &middot; Lamé&#x27;s theorem</span><p>The number of division steps is at most five times the number of decimal digits of the smaller input, and the worst case occurs exactly for consecutive Fibonacci numbers.</p></div><p>Fibonacci inputs are worst because every quotient is 1 &mdash; the slowest possible progress. <span class="math">gcd(F_{n+1}, F_n)</span> takes <span class="math">n − 1</span> steps, and since <span class="math">F_n</span> grows like <span class="math">φⁿ</span>, that is logarithmic in the input. Induction and Recursion lesson 10 supplied the growth rate.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">gcd(89, 55):    89 = 1·55 + 34
+    return a</div><p><strong>Correctness</strong> is the loop invariant of the “Loop Invariants and Program Correctness” Lesson in Induction and Recursion: <span class="math">gcd(a, b)</span> never changes, by the identity. <strong>Termination</strong> holds because <span class="math">b</span> strictly decreases and is a non-negative integer. At exit <span class="math">b = 0</span> and <span class="math">gcd(a, 0) = a</span>.</p><h3>How fast</h3><div class="thm"><span class="label">Theorem &middot; Two steps halve</span><p>In two iterations, the first argument is at least halved.</p></div><div class="proof"><p>If <span class="math">b ≤ a/2</span> then <span class="math">a mod b &lt; b ≤ a/2</span> and one step suffices. Otherwise <span class="math">b &gt; a/2</span>, so <span class="math">a = 1·b + (a − b)</span> and <span class="math">a mod b = a − b &lt; a/2</span>.</p><p>Either way the value two steps later is below <span class="math">a/2</span>, so the number of iterations is <span class="math">O(log a)</span>.</p><p><span class="qed">&#9633;</span></p></div><div class="thm"><span class="label">Theorem &middot; Lamé&#x27;s theorem</span><p>The number of division steps is at most five times the number of decimal digits of the smaller input, and the worst case occurs exactly for consecutive Fibonacci numbers.</p></div><p>Fibonacci inputs are worst because every quotient is 1 &mdash; the slowest possible progress. <span class="math">gcd(F_{n+1}, F_n)</span> takes <span class="math">n − 1</span> steps, and since <span class="math">F_n</span> grows like <span class="math">φⁿ</span>, that is logarithmic in the input. The “Solving Linear Recurrences” Lesson in Induction and Recursion supplies the growth rate.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">gcd(89, 55):    89 = 1·55 + 34
                 55 = 1·34 + 21
                 34 = 1·21 + 13
                 21 = 1·13 +  8
@@ -1352,7 +1363,7 @@ Every quotient is 1 — the slowest the algorithm can ever go.</div><p>By contra
     </section>
     <section class="section" id="process">
       <div class="section-head"><div><p class="kicker">Method</p><h2>Running the algorithm</h2></div><p>Divide, keep the remainder, repeat.</p></div>
-      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Divide the larger by the smaller</h3><p>Record the quotient and the remainder. The quotient is not needed for the gcd but is needed for lesson 6.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Replace the pair</h3><p><span class="math">(a, b)</span> becomes <span class="math">(b, r)</span>. The gcd is unchanged, by the identity.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Repeat until the remainder is 0</h3><p>The remainders strictly decrease, so this happens.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Read off the last nonzero remainder</h3><p>That is the gcd. Equivalently, it is the value of <span class="math">a</span> when <span class="math">b</span> reaches 0.</p></article></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Divide the larger by the smaller</h3><p>Record the quotient and the remainder. The quotient is not needed for the gcd but is needed for “Bézout's Identity and Modular Inverses”.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Replace the pair</h3><p><span class="math">(a, b)</span> becomes <span class="math">(b, r)</span>. The gcd is unchanged, by the identity.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Repeat until the remainder is 0</h3><p>The remainders strictly decrease, so this happens.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Read off the last nonzero remainder</h3><p>That is the gcd. Equivalently, it is the value of <span class="math">a</span> when <span class="math">b</span> reaches 0.</p></article></div>
     </section>
     <section class="section" id="practice">
       <div class="grid-2">
@@ -1374,13 +1385,13 @@ CHECK    1071 = 21 · 51        462 = 21 · 22
 
 By factorisation:  1071 = 3 · 7 · 51 = 3² · 7 · 17
                     462 = 2 · 3 · 7 · 11
-                    common: 3 · 7 = 21                    ✓</div><p>Three divisions against the eight or so needed to factor both numbers &mdash; and the gap widens without limit as the inputs grow. That asymmetry is the practical content of lesson 4's warning.</p></article>
+                    common: 3 · 7 = 21                    ✓</div><p>Three divisions against the eight or so needed to factor both numbers &mdash; and the gap widens without limit as the inputs grow. That asymmetry is the practical content of “Greatest Common Divisor”'s warning.</p></article>
       </div>
     </section>
     <section class="section">
       <div class="grid-2">
         <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Stopping at the wrong point</strong><span>The gcd is the last NONZERO remainder, which is <span class="math">a</span> when <span class="math">b</span> becomes 0. Returning 0 is the classic off-by-one.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Requiring <span class="math">a &gt; b</span> to start</strong><span>One extra step fixes it automatically: if <span class="math">a &lt; b</span> the first division swaps them.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Assuming big numbers mean many steps</strong><span><span class="math">gcd(1071, 462)</span> takes three steps; <span class="math">gcd(89, 55)</span> takes nine. The quotients decide, not the magnitudes.</span></div></div></div></article>
-        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can predict the step count.</strong><p>Run the algorithm on <span class="math">gcd(144, 89)</span> and count the divisions before starting: <span class="math">144 = F₁₂</span> and <span class="math">89 = F₁₁</span>, so the body's rule names the number. Consecutive Fibonacci numbers give the maximum, and knowing that in advance is the analysis working.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Lesson 6 runs the same divisions backwards to produce Bézout's coefficients, which is where modular inverses come from &mdash; and therefore where RSA's private key comes from. The quotients recorded here are exactly what that needs.</div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can predict the step count.</strong><p>Run the algorithm on <span class="math">gcd(144, 89)</span> and count the divisions before starting: <span class="math">144 = F₁₂</span> and <span class="math">89 = F₁₁</span>, so the body's rule names the number. Consecutive Fibonacci numbers give the maximum, and knowing that in advance is the analysis working.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> “Bézout's Identity and Modular Inverses” runs the same divisions backwards to produce Bézout's coefficients, which is where modular inverses come from &mdash; and therefore where RSA's private key comes from. The quotients recorded here are exactly what that needs.</div></article>
       </div>
     </section>
     </main>
@@ -1652,7 +1663,7 @@ By factorisation:  1071 = 3 · 7 · 51 = 3² · 7 · 17
     out.innerHTML = '';
     status.innerHTML = '<strong>' + what + ' is too large for this lab.</strong> Its only method is trial division up to '
       + 'the square root, which is fine below 10<sup>12</sup> and would freeze this page for minutes above it. That '
-      + 'the cost climbs like that is exactly what lesson 14 relies on; a number this size is best factored on paper, '
+      + 'the cost climbs like that is exactly what “RSA Encryption” relies on; a number this size is best factored on paper, '
       + 'which is to say not at all.';
   }
   function letter(x) { return String.fromCharCode(65 + Number(x)); }

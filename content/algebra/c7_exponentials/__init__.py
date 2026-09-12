@@ -44,7 +44,7 @@ COURSE = {
          "into a ratio."),
     ],
     "syllabus_intro": (
-        "Lessons 1 to 3 are exponential functions and `e`; 4 to 8 define the logarithm and its laws; 9 to 12 solve and apply."
+        'Exponential functions, growth and decay, and the number `e` provide the basis for logarithms and their laws. Equations connect these inverse functions; compound interest, continuous growth and logarithmic scales apply them.'
     ),
     "how_to": [
         "After each complete worked example, cover its answer and do the faded "
