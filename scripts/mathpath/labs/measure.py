@@ -1703,7 +1703,7 @@ def _scrape(cfg):
     table.innerHTML = '<thead><tr><th>interval I</th><th>d/I exactly</th><th>P(caught)</th>'
       + '<th>longest invisible spike</th><th>reads in 5 min</th></tr></thead><tbody>' + rows + '</tbody>'
       + '<tfoot><tr><td colspan="5" class="small-copy">A shorter interval costs storage in proportion '
-      + '&mdash; course 10\'s cardinality lesson prices it &mdash; and buys exactly this column of '
+      + '&mdash; &ldquo;Metric Cardinality&rdquo; prices it &mdash; and buys exactly this column of '
       + 'probabilities, which is the trade the two lessons make together.</td></tr></tfoot>';
 
     /* The counter panel: the same reads, on a metric that only goes up until
@@ -2455,7 +2455,7 @@ def _burn(cfg):
     status.innerHTML = 'At ' + Rpct(objective, 3) + ' over ' + days + ' days the budget is <strong>'
       + Rtext(budget) + ' minutes = ' + Rfixed(budget, 2) + '</strong> &mdash; on the standard 30-day window '
       + 'three nines is exactly 43.2 minutes, and that is this number with the slider at 30. '
-      + '<span class="tone-muted">Course 5 counts the same budget in failed requests over a 2 628 000-second '
+      + '<span class="tone-muted">Availability and Failure counts the same budget in failed requests over a 2 628 000-second '
       + 'month, where the same objective is 43.8 minutes; the convention is stated on both pages because '
       + 'the two figures are the same fact about different months.</span> Burning at <strong>'
       + Rfixed(b, 1) + '&times;</strong> means ' + Rpct(rate, 3) + ' of requests failing, which exhausts the '
