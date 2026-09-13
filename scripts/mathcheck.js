@@ -41,6 +41,8 @@ const GRAPH_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'graph.py');
 const graphSrc = fs.readFileSync(GRAPH_SOURCE, 'utf8');
 const ALGO_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'algorithms.py');
 const algoSrc = fs.readFileSync(ALGO_SOURCE, 'utf8');
+const SYSD_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'sysdesign_core.py');
+const sysdSrc = fs.readFileSync(SYSD_SOURCE, 'utf8');
 
 /* Each block is  NAME = r"""..."""  in the Python module. */
 function blockFrom(text, name, where) {
@@ -50,6 +52,7 @@ function blockFrom(text, name, where) {
 }
 function block(name) { return blockFrom(src, name, SOURCE); }
 function logicBlock(name) { return blockFrom(logicSrc, name, LOGIC_SOURCE); }
+function sysdBlock(name) { return blockFrom(sysdSrc, name, SYSD_SOURCE); }
 function countingBlock(name) { return blockFrom(countingSrc, name, COUNTING_SOURCE); }
 function probBlock(name) { return blockFrom(probSrc, name, PROB_SOURCE); }
 function numberBlock(name) { return blockFrom(numberSrc, name, NUMBER_SOURCE); }
@@ -859,6 +862,91 @@ console.log('algorithm counts and the witness verdict (course 8 lab)');
   eq(greedyCoins([1, 3, 4], 6).picks.join('+') + ' vs ' + dpCoins([1, 3, 4], 6).picks.join('+'), '4+1+1 vs 3+3', 'at 6: 4 + 1 + 1 against 3 + 3');
   eq(dpCoins([1, 3, 4], 8).table.join(' '), '0 1 2 1 1 2 2 2 2', 'the lesson 10 table best[0..8]');
   eq(greedyFailures([1, 5, 10, 25], 99).length, 0, 'with {1, 5, 10, 25} greedy is optimal for every amount to 99');
+}
+
+
+// ---------------------------------- capacity, latency, queues and availability
+console.log('system design: exact capacity, queueing and availability');
+{
+  eval(countingBlock('BIGINT_JS') + sysdBlock('HARMONIC_JS') + sysdBlock('PERCENTILE_JS')
+       + sysdBlock('PMF_JS') + sysdBlock('QUEUE_JS') + sysdBlock('AVAIL_JS')
+       + sysdBlock('APPROX_JS'));
+
+  /* Zipf popularity: the cache hit rate is a ratio of harmonics, and it is the
+     ratio that makes a small cache of a skewed workload worth having. */
+  eq(Rtext(harmonic(4, 1)), '25/12', 'H(4,1) = 1 + 1/2 + 1/3 + 1/4');
+  eq(Rtext(harmonic(3, 2)), '49/36', 'H(3,2) = 1 + 1/4 + 1/9');
+  eq(Rtext(zipfHit(1, 4, 1)), '12/25', 'the most popular of four keys, s = 1');
+  eq(Rtext(zipfHit(4, 4, 1)), '1', 'caching everything hits everything');
+
+  /* Nearest rank, so a percentile is a value some request actually took. */
+  eq(percentileRank(10, R(9n, 10n)), 9, 'p90 of ten samples is the 9th');
+  eq(percentileRank(10, R(99n, 100n)), 10, 'p99 of ten samples is the 10th, not an interpolation');
+  eq(percentileRank(100, R(1n, 2n)), 50, 'p50 of a hundred');
+  const lat = [1, 2, 3, 4, 5, 6, 7, 8, 9, 100];
+  eq(percentile(lat, R(9n, 10n)), 9, 'the p90 of that sample');
+  eq(Rtext(empiricalCdf(lat, 5)), '1/2', 'P(X <= 5)');
+
+  /* A latency budget adds distributions; fan-out takes their maximum. */
+  const coin = [[0, R(1n, 2n)], [1, R(1n, 2n)]];
+  eq(pmfConvolve(coin, coin).map(p => p[0] + ':' + Rtext(p[1])).join(' '),
+     '0:1/4 1:1/2 2:1/4', 'two independent stages add by convolution');
+  eq(Rtext(pmfMean(pmfConvolve(coin, coin))), '1', 'and their means add');
+  eq(pmfMax(coin, 2).map(p => p[0] + ':' + Rtext(p[1])).join(' '),
+     '0:1/4 1:3/4', 'the max of two: the tail is what fan-out costs');
+  eq(Rtext(pmfTail(pmfConvolve(coin, coin), 0)), '3/4', 'P(sum > 0)');
+
+  /* M/M/1 from the cut equations. */
+  const q = mm1(R(1n, 1n), R(2n, 1n));
+  eq(Rtext(q.rho) + ' ' + Rtext(q.L) + ' ' + Rtext(q.W) + ' ' + Rtext(q.Lq),
+     '1/2 1 1 1/2', 'M/M/1 at lam = 1, mu = 2');
+  eq(mm1(R(3n, 1n), R(2n, 1n)).stable, false, 'rho >= 1 does not settle');
+  /* The knee: the last tenth of utilisation costs more than the first nine. */
+  eq(Rtext(mm1(R(9n, 10n), R(1n, 1n)).L), '9', 'rho = 0.9 queues 9');
+  eq(Rtext(mm1(R(99n, 100n), R(1n, 1n)).L), '99', 'rho = 0.99 queues 99');
+
+  /* Erlang C must agree with M/M/1 at one server -- and s = 1 is exactly the
+     case that cannot distinguish a from rho, so s = 2 and 3 are checked too. */
+  eq(Rtext(erlangC(R(1n, 1n), R(2n, 1n), 1).pWait), '1/2', 'Erlang C at s = 1 is rho');
+  eq(Rtext(erlangC(R(1n, 1n), R(2n, 1n), 1).L), Rtext(q.L), 'and its L is M/M/1 L');
+  const e2 = erlangC(R(1n, 1n), R(1n, 1n), 2);
+  eq(Rtext(e2.p0) + ' ' + Rtext(e2.pWait) + ' ' + Rtext(e2.L), '1/3 1/3 4/3', 'M/M/2 at a = 1');
+  const e3 = erlangC(R(2n, 1n), R(1n, 1n), 3);
+  eq(Rtext(e3.p0) + ' ' + Rtext(e3.pWait), '1/9 4/9', 'M/M/3 at a = 2');
+  /* Pooling: one queue of two servers beats two queues of one. */
+  eq(Rcmp(erlangC(R(1n, 1n), R(1n, 1n), 2).Wq, mm1(R(1n, 2n), R(1n, 1n)).Wq), -1,
+     'a pooled M/M/2 waits less than two separate M/M/1s at the same load');
+
+  /* A bounded queue is stable at any load, and Little's law must use the
+     EFFECTIVE arrival rate, not the offered one. */
+  const fk = mm1k(R(1n, 1n), R(1n, 1n), 3);
+  eq(Rtext(fk.blocking), '1/4', 'M/M/1/3 at rho = 1 blocks a quarter');
+  eq(Rtext(fk.L), '3/2', 'and holds 3/2 on average');
+  eq(Rtext(fk.lamEff), '3/4', 'the effective rate is lam(1 - pK)');
+
+  /* Availability composes three ways, and the three must agree where they meet. */
+  eq(Rtext(availSeries([R(9n, 10n), R(9n, 10n)])), '81/100', 'series multiplies down');
+  eq(Rtext(availParallel([R(9n, 10n), R(9n, 10n)])), '99/100', 'parallel multiplies up');
+  const three = [R(9n, 10n), R(9n, 10n), R(9n, 10n)];
+  eq(Rtext(availKofN(R(9n, 10n), 3, 3)), Rtext(availSeries(three)), 'n-of-n is series');
+  eq(Rtext(availKofN(R(9n, 10n), 1, 3)), Rtext(availParallel(three)), '1-of-n is parallel');
+  eq(Rtext(availKofN(R(1n, 2n), 2, 3)), '1/2', 'majority of three fair coins');
+  /* Ten 99.9% dependencies in series are 99.0%, not "as good as the weakest". */
+  const ten = []; for (let i = 0; i < 10; i += 1) ten.push(R(999n, 1000n));
+  near(Number(Rdec(availSeries(ten), 6)), 0.990045, 1e-6, 'ten 99.9% dependencies give 99.0%');
+
+  /* Retries: the geometric sum, and what it costs when p is high. */
+  eq(Rtext(retryAttempts(R(1n, 2n), 2)), '7/4', 'two retries at p = 1/2 cost 7/4 attempts');
+  eq(Rtext(retrySuccess(R(1n, 2n), 2)), '7/8', 'and succeed 7/8 of the time');
+  eq(Rtext(retryAttempts(R(9n, 10n), 3)), '3439/1000', 'at p = 0.9 the amplification approaches r + 1');
+
+  /* The four places this subject rounds, and only these. */
+  near(expNegApprox(1, 1e-15), Math.exp(-1), 1e-12, 'e^-1 by series');
+  near(expNegApprox(5, 1e-15), Math.exp(-5), 1e-12, 'e^-5 by series');
+  near(standardErrorApprox(0.5, 100), 0.05, 1e-12, 'the standard error of a proportion');
+  /* 1.44*log2(1/0.01) = 9.57 bits per key is the canonical 1% figure, and the
+     rate it actually delivers at k = 7 is what the lesson quotes. */
+  near(bloomApprox(9585, 1000, 7), 0.01004, 1e-4, 'a Bloom filter at 9.585 bits per key is ~1%');
 }
 
 if (fails) {
