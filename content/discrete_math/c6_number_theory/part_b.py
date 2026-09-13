@@ -568,7 +568,7 @@ LESSONS = [
                      "multiplicative on coprime arguments, so "
                      "`φ(mn) = φ(m)φ(n)` when `gcd(m,n) = 1`. In general "
                      "`φ(n) = n Π_{p | n} (1 − 1/p)`.")),
-            ("p", 'The multiplicativity is the Chinese remainder theorem in disguise: `ℤ_{mn} ≅ ℤ_m × ℤ_n` for coprime moduli, and an element is invertible in the product exactly when both components are. The product formula is inclusion and exclusion over the prime divisors, from the “The Inclusion-Exclusion Principle” Lesson in Combinatorics and Counting.'),
+            ("p", 'The multiplicativity is the Chinese remainder theorem in disguise: `ℤ_{mn} ≅ ℤ_m × ℤ_n` for coprime moduli, and an element is invertible in the product exactly when both components are. The product formula is inclusion and exclusion over the prime divisors, from “The Inclusion-Exclusion Principle” in Combinatorics and Counting.'),
             ("math", [
                 "φ(7)  = 6              prime",
                 "φ(9)  = 9 − 3 = 6      = 3² − 3",
@@ -743,7 +743,7 @@ LESSONS = [
             ("def", ("Hash function",
                      "A function `h` mapping a large key space into `{0, 1, …, m−1}`. The "
                      "simplest is `h(k) = k mod m`.")),
-            ("p", 'Since the key space is larger than the range, collisions are unavoidable: by the pigeonhole principle of the “The Pigeonhole Principle” Lesson in Sets, Relations, and Functions, some slot receives more than one key. A hash table is therefore designed around collisions &mdash; by chaining, or by probing for another slot.'),
+            ("p", 'Since the key space is larger than the range, collisions are unavoidable: by the pigeonhole principle of “The Pigeonhole Principle” in Sets, Relations, and Functions, some slot receives more than one key. A hash table is therefore designed around collisions &mdash; by chaining, or by probing for another slot.'),
             ("thm", ("Why the modulus should be prime",
                      "If `m = 2^r`, then `k mod m` depends only on the low `r` bits of `k`. "
                      "Keys sharing those bits &mdash; addresses aligned to a boundary, "
@@ -753,7 +753,7 @@ LESSONS = [
                          "Hashing memory addresses with `m = 16` when every address is a "
                          "multiple of 16 sends every key to slot 0. With `m = 17` the same "
                          "keys spread across all seventeen slots.")),
-            ("p", 'The birthday problem of the “Computing Probabilities” Lesson in Discrete Probability gives the collision rate: with `m` slots and `n` keys, collisions become likely once `n` is around `√m`. A table of a million slots sees its first collision after about a thousand insertions, which is why load factors are managed rather than collisions avoided.'),
+            ("p", 'The birthday problem of “Computing Probabilities” in Discrete Probability gives the collision rate: with `m` slots and `n` keys, collisions become likely once `n` is around `√m`. A table of a million slots sees its first collision after about a thousand insertions, which is why load factors are managed rather than collisions avoided.'),
             ("h3", "Linear congruential generators"),
             ("def", ("LCG",
                      "`x_{n+1} = (a·x_n + c) mod m`, from a seed `x₀`. The parameters "
@@ -842,7 +842,7 @@ LESSONS = [
                    "Modular arithmetic is imprecise",
                    "They are avoidable with a prime modulus"],
              "c": 1,
-             "why": 'A map from a larger set to a smaller one cannot be injective (the “The Pigeonhole Principle” Lesson in Sets, Relations, and Functions), so the design question is how collisions are handled. A better hash function spreads them and cannot remove them; modular arithmetic is exact; and a prime modulus changes which keys collide, not whether some do.'},
+             "why": 'A map from a larger set to a smaller one cannot be injective (“The Pigeonhole Principle” in Sets, Relations, and Functions), so the design question is how collisions are handled. A better hash function spreads them and cannot remove them; modular arithmetic is exact; and a prime modulus changes which keys collide, not whether some do.'},
             {"q": "`h(k) = k mod 2^r` is a poor choice because:",
              "a": ["it is slow",
                    "it uses only the low `r` bits of the key",
@@ -975,7 +975,7 @@ LESSONS = [
                   "with the same key satisfy `c₁ ⊕ c₂ = m₁ ⊕ m₂`, from which both plaintexts "
                   "can usually be recovered &mdash; the failure that broke the Soviet "
                   "VENONA traffic."),
-            ("p", 'RSA in “RSA Encryption” answers the key-distribution problem instead: no shared secret is needed at all.'),
+            ("p", "“RSA Encryption”'s RSA answers the key-distribution problem instead: no shared secret is needed at all."),
         ],
         "lab": ("number", {
             "mode": "affine", "a": 5, "b": 8,
@@ -1121,7 +1121,7 @@ LESSONS = [
                 "    PUBLIC KEY   (n, e)",
                 "    PRIVATE KEY  (n, d)      and p, q, φ(n) must stay secret",
             ]),
-            ("p", "Every step uses a result from this Course: primality testing and the totient formula from “Fermat's Little Theorem and Euler's Theorem”, coprimality from “Greatest Common Divisor”, and the modular inverse from “Bézout's Identity and Modular Inverses”."),
+            ("p", "Every step is a lesson from this course: primality testing from “Fermat's Little Theorem and Euler's Theorem”, the totient formula from “Fermat's Little Theorem and Euler's Theorem”, coprimality from “Greatest Common Divisor”, and the modular inverse from “Bézout's Identity and Modular Inverses”."),
             ("h3", "Encryption and decryption"),
             ("p", "With the message encoded as an integer `m` with `0 ≤ m &lt; n`, encryption is `c = m^e mod n` and decryption is `m = c^d mod n`. Both are single modular exponentiations, computed by “Modular Exponentiation”'s algorithm."),
             ("thm", ("Correctness",
@@ -1274,10 +1274,6 @@ LESSONS = [
                      "it, and then factor `n` to recover `d`. With `e = 3` you should find "
                      "`n = 391`, `φ(n) = 352` and `d = 235`. Doing the attack yourself is "
                      "what makes the security argument concrete rather than asserted."),
-        "note": "Padding schemes, "
-                "key management, side-channel resistance and protocol design are all "
-                "essential and none of them is number theory. What number theory supplies "
-                "is the core operation and an honest account of what it does and does not "
-                "guarantee.",
+        "note": 'This course ends where cryptographic engineering begins. Padding schemes, key management, side-channel resistance and protocol design are all essential and none of them is number theory. What number theory supplies is the core operation and an honest account of what it does and does not guarantee.',
     },
 ]

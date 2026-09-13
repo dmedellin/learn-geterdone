@@ -44,7 +44,7 @@ COURSE = {
          "and isolate a requested term by solving its exponent equation for an admissible `k`."),
     ],
     "syllabus_intro": (
-        'Sequence definitions and recursion generate terms; sigma notation encodes finite sums. Arithmetic and geometric families have exact formulas, while partial sums can be recovered or telescoped. Geometric convergence connects infinite series with repeating decimals and payment streams; Pascal’s triangle and the binomial theorem construct and use binomial coefficients.'
+        'Sequences are generated and finite sums encoded first. Next the two standard families are classified and partial sums recovered or telescoped. Then geometric convergence is decided and applied to decimals and payment streams; last, binomial coefficients are constructed and used.'
     ),
     "how_to": [
         "After studying each complete worked example, cover it and finish the faded "
@@ -60,9 +60,7 @@ COURSE = {
         "Convergence tests for series in general. Only the geometric case is settled here, and it is settled completely; the rest belongs to calculus.",
         "Sequences of functions, power series and Taylor series.",
         (
-            "Mathematical induction as a proof technique. Several formulas on this course are "
-            "proved by other means and stated as proved by induction elsewhere; Induction and "
-            "Recursion covers it."
+            'Mathematical induction as a proof technique. Several formulas on this course are proved by other means and stated as proved by induction elsewhere; the Discrete Mathematics path devotes a course to it.'
         ),
     ],
     "footer_lead": (

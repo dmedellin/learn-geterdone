@@ -14,7 +14,7 @@ COURSE = {
     ),
     "blurb": (
         (
-        'Recurrences from Induction and Recursion, counting from Combinatorics and Counting and graphs from Graphs and Trees all reappear as the running time of something &mdash; and “P, NP and NP-Completeness” and “Decidability and the Halting Problem” examine computational limits, distinguishing intractability from undecidability.'
+        'The course the rest of the path was building toward. Recurrences from Induction and Recursion, counting from Combinatorics and Counting and graphs from Graphs and Trees all reappear as the running time of something &mdash; and the last two lessons say what no algorithm can do.'
     )
     ),
     "key": [
@@ -46,7 +46,7 @@ COURSE = {
          'An invariant for partial correctness and a decreasing measure for termination (“Correctness and Termination”); the cost of a whole sequence of operations rather than the worst single one (“Recursion Trees and Amortised Analysis”); and the lower bound no comparison sort beats (“Searching and Sorting”).'),
     ],
     "syllabus_intro": (
-        'Algorithm definitions and correctness, analysis of running time, algorithm design, and the limits of computation.'
+        'First what an algorithm is and what correctness means, then analysis, then design, and last the limits.'
     ),
     "how_to": [
         'Produce the witnesses. Every big-O claim in “Big-O, Big-Omega and Big-Theta” comes with a `C` and a `k`, and the lab searches for them; a claim without them is a slogan. When the relation is false the lab says so from the growth classes and shows the ratio diverging, because no finite search can refute a claim about every `n`.',

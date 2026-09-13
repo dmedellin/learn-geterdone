@@ -208,7 +208,7 @@ LESSONS = [
                      "produce the pair and check it in both equations. Naming the case "
                      "first is what turns an inconsistent system into a two-line answer "
                      "instead of a page of algebra ending in `0 = 14`."),
-        "note": "The three cases survive every enlargement of the problem. “Systems in Three Variables” has three variables and the same three answers; “Gaussian Elimination” reads them straight off a row-reduced matrix without any geometry at all. The determinant in “Determinants and Cramer's Rule” compresses the coefficient comparison into a single test for the first case.",
+        "note": "The three cases survive every enlargement of the problem. “Systems in Three Variables” has three variables and the same three answers; “Gaussian Elimination” reads them straight off a row-reduced matrix without any geometry at all. The determinant in “Determinants and Cramer's Rule” will compress the coefficient comparison into a single test for the first case.",
     },
     # ---------------------------------------------------------------- 02
     {
@@ -658,7 +658,7 @@ LESSONS = [
         ],
         "standard": ("Finish when you choose the cheaper variable before starting.",
                      'Look at the four coefficients, decide which variable costs one multiplication instead of two, and carry it through in exact fractions. Both routes give the same pair; being able to say which is shorter, and why, is the judgement that survives into “Gaussian Elimination”, where the choice is made for you by position on the page.'),
-        "note": 'Elimination underlies the three-variable and matrix methods. “Systems in Three Variables” performs it twice to remove one variable from a three-equation system; “Matrices and Row Operations” writes it without the letters, as operations on the rows of a matrix; “Gaussian Elimination” turns it into an algorithm with no decisions left in it.',
+        "note": 'Elimination is the rest of this half of the course. “Systems in Three Variables” performs it twice to remove one variable from a three-equation system; “Matrices and Row Operations” writes it without the letters, as operations on the rows of a matrix; “Gaussian Elimination” turns it into an algorithm with no decisions left in it.',
     },
     # ---------------------------------------------------------------- 04
     {
@@ -870,7 +870,7 @@ LESSONS = [
         ],
         "standard": ("Finish when the plan is written before the arithmetic starts.",
                      'State which variable is leaving and which two pairs will remove it, then execute in exact fractions and check in all three original equations. A three-variable system solved by improvising comes out right about half the time; solved to a plan it is routine, and the plan is precisely what “Gaussian Elimination” automates.'),
-        "note": 'Matrix methods retain the elimination arithmetic with the letters deleted. “Matrices and Row Operations” writes `x + y + z = 6` as the row `1 1 1 | 6` and `E2 − 2E1` as `R2 − 2R1`; nothing about the numbers changes, which is exactly why hand elimination helps explain the row notation.',
+        "note": 'From here to “Inverse Matrices” this is the same arithmetic with the letters deleted. “Matrices and Row Operations” writes `x + y + z = 6` as the row `1 1 1 | 6` and `E2 − 2E1` as `R2 − 2R1`; nothing about the numbers changes, which is exactly why it is worth having done one of these by hand first.',
     },
     # ---------------------------------------------------------------- 05
     {
@@ -969,7 +969,7 @@ LESSONS = [
                   "`0 1 | 1`, adding each to the other simultaneously gives `1 1 | 2` "
                   "twice, turning a unique solution into a line."),
             ("example", ("Two operations, written out",
-                         'Start from the augmented matrix of the “Systems in Three Variables” system. `R2 − 2R1 → R2` gives the row `0 −3 1 | −3`, and `R3 + R1 → R3` gives `0 3 5 | 21`.',
+                         'Start from the augmented matrix of the system in “Systems in Three Variables”. `R2 − 2R1 → R2` gives the row `0 −3 1 | −3`, and `R3 + R1 → R3` gives `0 3 5 | 21`.',
                          'Those are the equations `A` and `B` of “Systems in Three Variables”, entry for entry. The matrix has not made the arithmetic easier; it has made the position of every number decidable in advance.')),
             ("p", 'Write each operation beside the row it produces, exactly as the combinations were labelled in “Systems in Three Variables”. “Gaussian Elimination” performs eight or ten of these in a row, and an unlabelled sequence of matrices is impossible to debug.'),
         ],
@@ -997,7 +997,7 @@ LESSONS = [
              "admiring the final matrix."),
         ],
         "worked": {
-            "title": 'The “Systems in Three Variables” system, as a matrix',
+            "title": 'The system in “Systems in Three Variables”, as a matrix',
             "intro": [
                 'The same two eliminations as “Systems in Three Variables”, written without letters. Every number below appears in the worked example there; only the layout has changed.'
             ],
@@ -1076,7 +1076,7 @@ LESSONS = [
                      "row operations and name the inverse of each. If you cannot name "
                      "the inverse, the step you performed was probably not one of the "
                      "three."),
-        "note": 'This is the same arithmetic in less ink. What it buys is “Gaussian Elimination”. With the letters gone there is an obvious order in which to do the operations &mdash; leftmost column first, then the next &mdash; and an order that obvious is an algorithm rather than a decision.',
+        "note": 'Nothing has been gained yet: this is the same arithmetic in less ink. What it buys is “Gaussian Elimination”. With the letters gone there is an obvious order in which to do the operations &mdash; leftmost column first, then the next &mdash; and an order that obvious is an algorithm rather than a decision.',
     },
     # ---------------------------------------------------------------- 06
     {
@@ -1225,7 +1225,7 @@ LESSONS = [
              "parameter form, or the empty set."),
         ],
         "worked": {
-            "title": 'Reducing the “Systems in Three Variables” matrix to the answer',
+            "title": 'Reducing the matrix from “Systems in Three Variables” to the answer',
             "intro": [
                 'The same system once more, carried all the way to reduced row echelon form. Compare the first two operations with “Matrices and Row Operations” and the whole of it with “Systems in Three Variables”.'
             ],
@@ -1325,7 +1325,7 @@ LESSONS = [
                      "augmented matrix to reduced row echelon form in exact fractions, "
                      "and name which of the three cases you are in before writing any "
                      "solution down."),
-        "note": "“Matrix Products” asks what else can be done with a matrix: added, scaled, and multiplied. The product is what lets a whole system be written `Ax = b`, and “Determinants and Cramer's Rule” and “Inverse Matrices” answer the related question &mdash; which coefficient matrices give exactly one solution, and whether the answer can be had in one step instead of ten.",
+        "note": "“Matrix Products” leaves systems for a moment and asks what else can be done with a matrix: added, scaled, and multiplied. The product is what lets a whole system be written `Ax = b`, and “Determinants and Cramer's Rule” and “Inverse Matrices” answer the question this lesson leaves open &mdash; which coefficient matrices give exactly one solution, and whether the answer can be had in one step instead of ten.",
     },
     # ---------------------------------------------------------------- 07
     {
@@ -1417,7 +1417,7 @@ LESSONS = [
                 "CD =    2  −5             DC exists too, and is 3 × 3",
                 "       26  14",
             ]),
-            ("p", 'The definition looks arbitrary until a system is written with it. Take the coefficient matrix of the “Systems in Three Variables” system, a column of the three unknowns, and a column of the three constants. The product of the first two is a column whose entries are the left-hand sides of the three equations, so the whole system is the single statement `Ax = b`.'),
+            ("p", 'The definition looks arbitrary until a system is written with it. Take the coefficient matrix of the system in “Systems in Three Variables”, a column of the three unknowns, and a column of the three constants. The product of the first two is a column whose entries are the left-hand sides of the three equations, so the whole system is the single statement `Ax = b`.'),
             ("math", [
                 " 1   1   1     x            6",
                 " 2  −1   3     y     =      9",
@@ -1546,6 +1546,6 @@ LESSONS = [
         ],
         "standard": ("Finish when the size of the answer is the first thing you write.",
                      'Before computing a single entry, write `m × p` down. It catches an impossible product before any arithmetic happens, it tells you how many entries you owe, and it is the habit that makes `Ax = b` in “Inverse Matrices” read as one equation rather than as three.'),
-        "note": "Writing a system as `Ax = b` invites the obvious move: divide by `A`. There is no division of matrices, but there is sometimes a matrix that undoes multiplication by `A`. “Determinants and Cramer's Rule” produces the single number that decides whether such a matrix exists, and “Inverse Matrices” defines it as `A⁻¹`, constructs it by row reduction, and turns the system into `x = A⁻¹b` &mdash; which is why constructing an inverse requires the row-reduction method of “Gaussian Elimination”.",
+        "note": "Writing a system as `Ax = b` invites the obvious move: divide by `A`. There is no division of matrices, but there is sometimes a matrix that undoes multiplication by `A`. “Determinants and Cramer's Rule” produces the single number that decides whether such a matrix exists, and “Inverse Matrices” defines it as `A⁻¹`, constructs it by row reduction, and turns the system into `x = A⁻¹b` &mdash; which is the reason this course did “Gaussian Elimination” first.",
     },
 ]

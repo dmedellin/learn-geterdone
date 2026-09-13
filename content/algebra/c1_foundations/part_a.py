@@ -54,7 +54,7 @@ LESSONS = [
                      "<strong>real numbers</strong> are all the numbers on the number "
                      "line; a real number that is not rational is called "
                      "<strong>irrational</strong>.",
-                     'Whether `0` counts as a natural number is a convention and it differs between books. This course starts the naturals at `1` and no algebraic result here depends on the choice.')),
+                     'Whether `0` counts as a natural number is a convention and it differs between books. This course starts the naturals at `1` and nothing later depends on the choice.')),
             ("p", "\"Can be written\" is the operative phrase, exactly as it will be for polynomials in Polynomials and Factoring. `4` is rational because `4 = 4/1`. `0.25` is rational because `0.25 = 1/4`. You do not have to be shown the fraction; it has to exist."),
             ("h3", "Decimals tell you which kind you have"),
             ("p", "Every rational number has a decimal expansion that either stops or "
@@ -211,7 +211,7 @@ LESSONS = [
         "module": "The number system",
         "one_line": "Commutativity, associativity, distribution, identities, inverses.",
         "summary": (
-            "Five kinds of permission &mdash; commutativity, associativity, distribution, identities and inverses &mdash; are all the licence you have to rearrange an expression. The algebraic rearrangements here apply these properties to longer expressions. Subtraction and division have none of them, and that omission is where most sign errors come from."
+            'Five kinds of permission &mdash; commutativity, associativity, distribution, identities and inverses &mdash; are all the licence you have to rearrange an expression. Everything later in this path is one of them applied to a longer expression. Subtraction and division have none of them, and that omission is where most sign errors come from.'
         ),
         "key": [
             "a + b  =  b + a                 commutative",
@@ -414,16 +414,14 @@ LESSONS = [
              "and `48`. Distribution crosses from multiplication to addition and nowhere "
              "else."),
             ("Letting a minus sign reach only the first term",
-             "`−(x − 3)` is `−x + 3`, not `−x − 3`. The `−1` multiplies every term inside "
-             "the bracket, and `(−1)(−3) = 3`. This one error will outnumber all the "
-             "others in equation-solving and function work."),
+             '`−(x − 3)` is `−x + 3`, not `−x − 3`. The `−1` multiplies every term inside the bracket, and `(−1)(−3) = 3`. This one error will outnumber all the others in the next two courses.'),
         ],
         "standard": ("Finish when you can name the property behind every line of a rearrangement.",
                      "Simplify `7 − 4(2 − z)` and annotate it, one property per line, with "
                      "\"arithmetic\" allowed for steps that are just numbers. Then disprove "
                      "`1/(a + b) = 1/a + 1/b` with values for which every denominator is "
                      "defined. If a line has no property name, it is the line to inspect."),
-        "note": '“The Distributive Law” does nothing but the distributive property, at length, and “Combining Like Terms” does it backwards. Fluency with these properties matters, because an error made in a property is invisible &mdash; the result still looks like algebra, and only substituting a number reveals it.',
+        "note": '“The Distributive Law” does nothing but the distributive property, at length, and “Combining Like Terms” does it backwards. It is worth being fluent here first, because an error made in a property is invisible &mdash; the result still looks like algebra, and only substituting a number reveals it.',
     },
     # ---------------------------------------------------------- order-of-operations
     {
@@ -620,8 +618,8 @@ LESSONS = [
              "the typed line does."),
         ],
         "standard": ("Finish when your value and a calculator's value agree on the awkward expressions, not just the easy ones.",
-                     "Evaluate `−6² + 24 / 3 / 2`, `(−6)² + 24 / (3/2)`, and a fraction whose numerator and denominator each contain a sum. Rewrite the whole expression after every operation and label the invisible grouping made by the fraction bar. These shapes account for many arithmetic disagreements in algebra."),
-        "note": 'This convention is why a polynomial can be written `3x² + 5x + 7` with no brackets at all: the exponent level binds before the multiplication level, which binds before the addition level, so the expression reads as `(3 · x²) + (5 · x) + 7` without being told to. Polynomial and function notation is built on top of it.',
+                     'Evaluate `−6² + 24 / 3 / 2`, `(−6)² + 24 / (3/2)`, and a fraction whose numerator and denominator each contain a sum. Rewrite the whole expression after every operation and label the invisible grouping made by the fraction bar. These shapes account for nearly every arithmetic disagreement later in the path.'),
+        "note": 'This convention is why a polynomial can be written `3x² + 5x + 7` with no brackets at all: the exponent level binds before the multiplication level, which binds before the addition level, so the expression reads as `(3 · x²) + (5 · x) + 7` without being told to. Every notation you meet later is built on top of it.',
     },
     # -------------------------------------------------------------- absolute-value
     {
@@ -725,7 +723,7 @@ LESSONS = [
         "lab": ("realline", {
             "mode": "absolute",
             "panel_title": "Both cases, and the equation",
-            "panel_intro": 'Set `a`, `b` and `c`. The lab applies the two-case definition to your `a` and highlights the case that fires, measures the distance from `a` to `b`, and solves `|x − a| = c`. Make `c` negative and predict the solution count before reading the table. The `√(a²)` check illustrates the root identity in “Roots and Radicals”; the two-case definition and the distance are the work to retrieve here.',
+            "panel_intro": 'Set `a`, `b` and `c`. The lab applies the two-case definition to your `a` and highlights the case that fires, measures the distance from `a` to `b`, and solves `|x − a| = c`. Make `c` negative and predict the solution count before reading the table. The `√(a²)` check is a preview of “Roots and Radicals”; the two-case definition and the distance are the work to retrieve here.',
         }),
         "steps_title": "Working with an absolute value",
         "steps_intro": "Decide the sign of what is inside the bars. Everything else follows from that.",
@@ -1038,7 +1036,7 @@ LESSONS = [
                      "simplify `(2a⁻³b²)² · 3ab⁻¹` with restrictions stated. The test is "
                      "whether each addition or multiplication of exponents can be tied to "
                      "one law, not whether the final expression looks compact."),
-        "note": '“Scientific Notation” uses these laws on powers of ten and nothing else, which makes them concrete. “Rational Exponents” pushes the exponent out of the integers altogether: if `x^(1/2) · x^(1/2)` is to equal `x¹`, then `x^(1/2)` has no choice but to be a square root. Each extension of exponent notation here uses that argument.',
+        "note": '“Scientific Notation” uses these laws on powers of ten and nothing else, which makes them concrete. “Rational Exponents” pushes the exponent out of the integers altogether: if `x^(1/2) · x^(1/2)` is to equal `x¹`, then `x^(1/2)` has no choice but to be a square root. Every extension of the exponent on this path is made by that same argument.',
     },
     # ---------------------------------------------------------- scientific-notation
     {

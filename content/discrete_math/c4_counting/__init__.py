@@ -49,7 +49,7 @@ COURSE = {
          "every `n` at once."),
     ],
     "syllabus_intro": (
-        'The basic counting rules, binomial coefficients, repetition, corrections and bounds support generating functions, combinatorial proofs and the choice of a counting method.'
+        'The basic rules come first, then the binomial coefficients and repetition, then corrections and bounds, and last the techniques that generalise them.'
     ),
     "how_to": [
         "Check every formula against an enumeration while the numbers are small. The "

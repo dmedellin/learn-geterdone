@@ -25,7 +25,7 @@ LESSONS = [
         ),
         "concepts": [
             ("A graph is a relation, drawn",
-             "The symmetric irreflexive relation from Sets, Relations, and Functions on `V` is exactly a simple graph. The picture adds nothing mathematically and a great deal practically."),
+             "Sets, Relations, and Functions's symmetric irreflexive relation on `V` is exactly a simple graph. The picture adds nothing mathematically and a great deal practically."),
             ("The drawing is not the graph",
              "Position and edge shape carry no information. Two very different pictures can be the same graph, which is “Subgraphs and Graph Isomorphism”'s subject."),
             ("The variants are not interchangeable",
@@ -63,12 +63,12 @@ LESSONS = [
                 "Qₙ        hypercube             bit strings differing  n·2^{n−1} edges",
                 "                                in one position",
             ]),
-            ("p", "`K₅` and `K_{3,3}` matter for planarity: “Planar Graphs and Euler's Formula” shows they are precisely the obstructions to drawing a graph in the plane without crossings."),
+            ("p", "`K₅` and `K_{3,3}` matter later: “Planar Graphs and Euler's Formula” shows they are precisely the obstructions to drawing a graph in the plane without crossings."),
             ("h3", "Four models"),
             ("ul", [
-                '<strong>Social networks.</strong> Vertices are people, edges are acquaintance. The pigeonhole result from Sets, Relations, and Functions &mdash; two people share a degree &mdash; is a statement about this graph.',
+                "<strong>Social networks.</strong> Vertices are people, edges are acquaintance. Sets, Relations, and Functions's pigeonhole result &mdash; two people share a degree &mdash; is a statement about this graph.",
                 "<strong>Road networks.</strong> Vertices are junctions, edges are roads, weights are distances. Shortest paths are “Shortest Paths and Dijkstra's Algorithm”.",
-                "<strong>Dependencies.</strong> Vertices are tasks, directed edges are \"must precede\". A valid schedule exists exactly when there is no cycle, which is the partial-order structure from Sets, Relations, and Functions again.",
+                '<strong>Dependencies.</strong> Vertices are tasks, directed edges are "must precede". A valid schedule exists exactly when there is no cycle, which is Sets, Relations, and Functions\'s partial order again.',
                 '<strong>Molecules.</strong> Vertices are atoms, edges are bonds. Two molecules with the same formula and different structures are non-isomorphic graphs, which is “Subgraphs and Graph Isomorphism”.',
             ]),
             ("p", "The common thread: whenever the data is \"a set of things and which "
@@ -79,7 +79,7 @@ LESSONS = [
                      "A simple graph on `n` vertices has at most `C(n,2) = n(n−1)/2` edges, "
                      "with equality exactly for `Kₙ`.")),
             ("proof", [
-                'Each edge is an unordered pair of distinct vertices, and no pair may repeat, so the edges form a subset of the `C(n,2)` pairs. The “Combinations” Lesson in Combinatorics and Counting counts them.',
+                'Each edge is an unordered pair of distinct vertices, and no pair may repeat, so the edges form a subset of the `C(n,2)` pairs. “Combinations” in Combinatorics and Counting counts them.',
             ]),
         ],
         "lab": ("graph", {
@@ -129,7 +129,7 @@ LESSONS = [
                 "          each vertex has degree n, so |E| = n·2ⁿ/2 = n·2^{n−1}",
             ],
             "after": [
-                'The hypercube count used the theorem developed in “Degree and the Handshake Theorem”: `2|E| = Σ deg(v) = n · 2ⁿ`. Counting edges through degrees is the standard move and it is worth knowing.'
+                'The hypercube count used the handshake theorem of “Degree and the Handshake Theorem” before it was stated: `2|E| = Σ deg(v) = n · 2ⁿ`. Counting edges through degrees is the standard move and it is worth having early.'
             ],
         },
         "quiz_title": "Graphs",
@@ -227,7 +227,7 @@ LESSONS = [
                 "By edge: each edge has exactly two ends, giving `2|E|`.",
                 "One set counted twice, so the two expressions are equal.",
             ]),
-            ("p", 'This is a combinatorial proof in the sense of the “Combinatorial Proof” Lesson in Combinatorics and Counting, and it is an example of the method: name the objects, count them two ways, conclude.'),
+            ("p", 'This is a combinatorial proof in the sense of “Combinatorial Proof” in Combinatorics and Counting, and it is the cleanest example on the path: name the objects, count them two ways, conclude.'),
             ("thm", ("The handshake corollary",
                      "In any graph, the number of vertices of odd degree is even.")),
             ("proof", [
@@ -405,7 +405,7 @@ LESSONS = [
                 "add an edge                      O(1)          O(1)",
                 "iterate all edges                O(n²)         Θ(n + |E|)",
             ]),
-            ("p", 'The `O` and `Θ` in the table are the growth-rate notation used in “Divide-and-Conquer Recurrences” in Induction and Recursion: `Θ(n + |E|)` means proportional to `n + |E|` up to a constant factor, and `O(1)` means bounded by a constant. The “Big-O, Big-Omega and Big-Theta” Lesson in Algorithms and Complexity makes both precise; here they are read as "linear" and "constant".'),
+            ("p", 'The `O` and `Θ` in the table are the notation of “Divide-and-Conquer Recurrences”, in Induction and Recursion: `Θ(n + |E|)` means proportional to `n + |E|` up to a constant factor, and `O(1)` means bounded by a constant. “Big-O, Big-Omega and Big-Theta” in Algorithms and Complexity makes both precise; here they are read as "linear" and "constant".'),
             ("p", 'The traversals of “Breadth-First and Depth-First Search” iterate neighbours constantly, so an adjacency list gives breadth-first search a running time of `Θ(n + |E|)` while a matrix gives `Θ(n²)`. On a sparse graph that is the difference between linear and quadratic.'),
             ("p", "The matrix wins when the graph is dense, when adjacency tests dominate, "
                   "or when the linear algebra of the next theorem is wanted."),
@@ -568,7 +568,7 @@ LESSONS = [
              "A walk may repeat anything; a path repeats no vertex; a cycle is a path "
              "that returns to its start."),
             ("Reachability is an equivalence relation",
-             'Reflexive, symmetric and transitive, so by the “Equivalence Relations and Partitions” Lesson in Sets, Relations, and Functions it partitions the vertices &mdash; and the blocks are the components.'),
+             'Reflexive, symmetric and transitive, so by “Equivalence Relations and Partitions” in Sets, Relations, and Functions it partitions the vertices &mdash; and the blocks are the components.'),
             ("Connectivity needs at least `n − 1` edges",
              "Each edge can reduce the component count by at most one, and you start with "
              "`n` components."),
@@ -604,7 +604,7 @@ LESSONS = [
                 "Reflexive: the length-0 walk joins `v` to itself. Symmetric: reverse the "
                 "path. Transitive: concatenate two walks and extract a path by the theorem "
                 "above.",
-                'By the “Equivalence Relations and Partitions” Lesson in Sets, Relations, and Functions the classes partition `V`, and each class induces a maximal connected subgraph.',
+                'By “Equivalence Relations and Partitions” in Sets, Relations, and Functions the classes partition `V`, and each class induces a maximal connected subgraph.',
             ]),
             ("thm", ("The edge bound",
                      "A connected graph on `n` vertices has at least `n − 1` edges.")),
@@ -719,7 +719,7 @@ LESSONS = [
                      "Take a graph on eight vertices with ten edges, identify its "
                      "components, and list its bridges by checking which edges lie on no "
                      "cycle. Both are one search each."),
-        "note": "Higher connectivity &mdash; how many vertices or edges must be removed to disconnect a graph &mdash; is measured by the connectivity `κ(G)` and edge connectivity `λ(G)`, and Menger's theorem relates them to the number of disjoint paths between vertices. These questions extend the connectivity studied here.",
+        "note": "Higher connectivity &mdash; how many vertices or edges must be removed to disconnect a graph &mdash; is measured by the connectivity `κ(G)` and edge connectivity `λ(G)`, and Menger's theorem relates them to the number of disjoint paths between vertices. It is the natural sequel to this lesson.",
     },
     # ---------------------------------------------------------------- 05
     {
@@ -740,7 +740,7 @@ LESSONS = [
         ],
         "key_label": "Same graph, different labels",
         "concepts_intro": (
-            "Isomorphism is the bijection from Sets, Relations, and Functions with a structure-preserving condition attached."
+            "Isomorphism is Sets, Relations, and Functions's bijection with a structure-preserving condition attached."
         ),
         "concepts": [
             ("It is a bijection that preserves adjacency",
@@ -1303,6 +1303,6 @@ LESSONS = [
                      "For a graph of your own, decide the Euler question by counting "
                      "degrees, then attempt Hamilton by hand and notice what changes: one "
                      "is a check, the other is a search."),
-        "note": 'The travelling salesman problem is Hamilton with weights: find the cheapest Hamilton circuit. It is the canonical hard optimisation problem, and the “P, NP and NP-Completeness” Lesson in Algorithms and Complexity places it precisely.',
+        "note": 'The travelling salesman problem is Hamilton with weights: find the cheapest Hamilton circuit. It is the canonical hard optimisation problem, and “P, NP and NP-Completeness” in Algorithms and Complexity places it precisely.',
     },
 ]

@@ -1,5 +1,19 @@
 """Conservative visitor-copy inventory; no route-specific exceptions.
 
+What a finding is. A reference is a defect when it identifies a Course or Lesson
+by a NUMBER: renumber or insert one and the sentence becomes flatly wrong, with
+nothing in the prose to reveal it. Those are `numeric-reference`, `catalog-range`
+and `numbered-link`, and they fail the build.
+
+What a finding is not. Relative prose -- "the next two courses", "every notation
+you meet later", "Lines, Functions and Graphs ended with", "after this course" --
+survives renumbering, and it is how this library states a prerequisite
+relationship. An earlier pass treated those as defects too and rewrote the
+sentences around them, which cost the author's voice and, in several places, the
+teaching point: `.claude/agents/pedagogical-expert.md` names that flattening as a
+defect in its own right. Those patterns are still matched and still reported, as
+PROSE_STYLE, so the inventory stays complete -- they simply do not fail.
+
 DOM text includes inactive and noscript fallbacks. JavaScript literal strings are
 an overapproximation of dynamic copy, including search data and export templates.
 URLs and identifiers are not prose. Every vocabulary exception states a domain
@@ -149,6 +163,12 @@ IMPLICIT = re.compile(
     r'|(?:formula|method)\b[^.!?]{0,160}\bcomes next)\b', re.I)
 
 
+# Matched and reported, but not defects: see the module docstring.
+RELATIVE_PROSE = {'ordinal-dependency', 'implicit-curricular-order'}
+PROSE_STYLE = ('Relative curricular prose. It survives renumbering and states a real '
+               'prerequisite relationship, so it is inventoried rather than failed.')
+
+
 def domain_reason(record, rule, match):
     text = record['text']
     if rule == 'catalog-range' and '-' in match[0]:
@@ -161,6 +181,12 @@ def domain_reason(record, rule, match):
         if record['boundary'] == 'attribute:value' and '|' in text and re.search(r'[*/]', text):
             return 'A worked-expression preset encodes alternatives separated by pipes; the parenthesised difference is a denominator.'
     if rule == 'prescriptive-framing':
+        # Naming a sibling Subject is taxonomy, not framing, and outside a label
+        # surface it is the only thing that tells a reader the target is on
+        # another Subject at all. Flag it where the page names itself.
+        if (re.fullmatch(r'(?:trading|algebra|discrete mathematics)\s+(?:paths?|tracks?)', match[0], re.I)
+                and record.get('family') not in ('library', 'subject')):
+            return 'Names a sibling Subject in prose; the reader needs to know the target is elsewhere.'
         if text == 'Take each edge in order if it joins two components':
             return 'Kruskal edge-processing instruction: the ordering applies to weighted edges, not Courses or Lessons.'
         if text == 'Read the pair in order':
@@ -178,7 +204,9 @@ def classify(record):
     matches = []
     legitimate = []
     if record.get('named_course_sequence'):
-        matches.append(dict(record, rule='named-course-sequencing', match=record['named_course_sequence']))
+        legitimate.append(dict(record, rule='named-course-sequencing',
+                               match=record['named_course_sequence'],
+                               reason=PROSE_STYLE))
     if (record.get('tag') == 'nav' or record.get('family') in ('library', 'subject', 'course')) and re.fullmatch(r'(?:paths?|tracks?|modules?|progression|stages?)', text, re.I):
         matches.append(dict(record, rule='taxonomy-label', match=text))
     if record['boundary'] == 'catalog-anchor' and re.match(r'^(?:Lesson\s+|Course\s+)?\d+\b', text, re.I):
@@ -187,7 +215,7 @@ def classify(record):
                           ('catalog-range', RANGE), ('prescriptive-framing', FRAMING),
                           ('implicit-curricular-order', IMPLICIT)]:
         for m in pattern.finditer(text):
-            reason = domain_reason(record, name, m)
+            reason = PROSE_STYLE if name in RELATIVE_PROSE else domain_reason(record, name, m)
             if reason:
                 legitimate.append(dict(record, rule=name, match=m[0], reason=reason))
             else:

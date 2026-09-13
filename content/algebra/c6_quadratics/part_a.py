@@ -47,7 +47,7 @@ LESSONS = [
                      "`a ≠ 0`. That arrangement is called <strong>standard "
                      "form</strong>.",
                      "The condition `a ≠ 0` is what makes the equation quadratic rather than linear. If `a` were `0` the `x²` term would disappear and Linear Equations and Inequalities would already have solved what was left.")),
-            ("p", '`b` or `c` may be zero, and often are. `x² - 9 = 0` has `b = 0`; `x² + 3x = 0` has `c = 0`. Both are quadratic, and those shapes are handled by the square root property and factoring out a common factor, respectively.'),
+            ("p", '`b` or `c` may be zero, and often are. `x² - 9 = 0` has `b = 0`; `x² + 3x = 0` has `c = 0`. Both are quadratic, and each of those two shapes gets a method of its own later in the course.'),
             ("thm", ("The zero product property",
                      "For real numbers `a` and `b`, `ab = 0` if and only if `a = 0` or "
                      "`b = 0`.",
@@ -277,7 +277,7 @@ LESSONS = [
             ("p", "`4x² - 12x + 9 = 0` is `(2x - 3)² = 0`, so the only equation to solve "
                   "is `2x - 3 = 0` and the only solution is `x = 3/2`. Substituting: "
                   "`4(9/4) - 12(3/2) + 9 = 9 - 18 + 9 = 0`."),
-            ("p", 'It is standard to say this equation has a double root at `3/2`, or a root of multiplicity 2. That is a statement about the factorisation, not about the solution set &mdash; the equation has exactly one solution. The convention earns its keep in “The Discriminant” and in the “Graphs of Polynomial Functions” Lesson in Polynomials and Factoring, where counting roots with multiplicity is what makes the statements come out clean.'),
+            ("p", 'It is standard to say this equation has a double root at `3/2`, or a root of multiplicity 2. That is a statement about the factorisation, not about the solution set &mdash; the equation has exactly one solution. The convention earns its keep in “The Discriminant” and in “Graphs of Polynomial Functions” in Polynomials and Factoring, where counting roots with multiplicity is what makes the statements come out clean.'),
             ("thm", ("What a factorisation says about the solutions",
                      "Suppose `ax² + bx + c = a(x - r)(x - s)` for every value of `x`, "
                      "with `a ≠ 0`. Then the solutions of `ax² + bx + c = 0` are exactly "
@@ -297,7 +297,7 @@ LESSONS = [
                 "2x + 3 = 0   or   3x - 4 = 0",
                 "x = -3/2     or   x = 4/3",
             ]),
-            ("p", "Both answers are fractions and both are exact. `-3/2` is the solution; `-1.5` is a decimal that happens to equal it, and `4/3` has no decimal that equals it at all. Exact fractions are used here for that reason."),
+            ("p", 'Both answers are fractions and both are exact. `-3/2` is the solution; `-1.5` is a decimal that happens to equal it, and `4/3` has no decimal that equals it at all. Exact fractions are the standard on this path for that reason.'),
             ("h3", "When the factoring will not come"),
             ("p", 'A complete search that fails is a result about integer factorisation and nothing more. `x² - 4x + 1 = 0` has no pair of integers with product `1` and sum `-4`, so it does not factor over the integers. It still has two solutions, `2 + √3` and `2 - √3`, which “Completing the Square” produces. "It does not factor" and "it has no solutions" are different sentences, and only the first one has been established.'),
             ("example", ("Running the method backwards",
@@ -329,7 +329,7 @@ LESSONS = [
              "so the other reads `0`. Arrange in descending powers, so that `a`, `b` and "
              "`c` can be seen."),
             ("Factor completely, common factor first",
-             'Take out the GCF, as “Factoring Out the Greatest Common Factor” in Polynomials and Factoring insists, then factor what is left. A monic trinomial needs a product-and-sum pair from “Factoring Simple Trinomials” in that Course; anything else needs “The AC Method”.'),
+             'Take out the GCF, as “Factoring Out the Greatest Common Factor” in Polynomials and Factoring insists, then factor what is left. A monic trinomial needs a product-and-sum pair from “Factoring Simple Trinomials” in that course; anything else needs “The AC Method”.'),
             ("Set each non-constant factor to zero and solve",
              "Each one gives a linear equation. Skip any constant factor, which can "
              "never be zero. A repeated factor gives its solution once, not twice."),
@@ -426,8 +426,8 @@ LESSONS = [
              "about whether solutions exist."),
         ],
         "standard": ("Finish when factoring is a first attempt you abandon quickly.",
-                     'You should reach standard form without thinking, spend a few seconds looking for an integer factorisation, and move to “Completing the Square” or “The Quadratic Formula” without regret when none appears. Every answer checked in the original equation, and a repeated factor reported as one solution.'),
-        "note": 'Factoring is the fastest method and the least reliable, because it works only when the coefficients were chosen to let it. Three other methods remove that condition: the square root property handles anything with no `x` term, completing the square handles everything, and the formula is completing the square carried out once and kept.',
+                     'You should reach standard form without thinking, spend a few seconds looking for an integer factorisation, and move to “Completing the Square” or 5 without regret when none appears. Every answer checked in the original equation, and a repeated factor reported as one solution.'),
+        "note": 'Factoring is the fastest method and the least reliable, because it works only when the coefficients were chosen to let it. “The Square Root Property”, “Completing the Square” and “The Quadratic Formula” remove the condition a piece at a time: the square root property handles anything with no `x` term, completing the square handles everything, and the formula is completing the square carried out once and kept.',
     },
     # ---------------------------------------------------------------- 03
     {
@@ -481,7 +481,7 @@ LESSONS = [
                   "Forgetting it loses a solution, and the answer that remains looks "
                   "complete."),
             ("h3", "Why √(x²) is not x"),
-            ("p", "Taking the square root of both sides is often described as \"square-rooting\", which hides a real difficulty. `√(x²)` is `|x|`, not `x`: at `x = -3` the left side is `√9 = 3` and `x` itself is `-3`. So `x² = k` gives `|x| = √k`, and the absolute-value equations from Linear Equations and Inequalities then split that into the two cases `x = √k` and `x = -√k`."),
+            ("p", 'Taking the square root of both sides is often described as "square-rooting", which hides a real difficulty. `√(x²)` is `|x|`, not `x`: at `x = -3` the left side is `√9 = 3` and `x` itself is `-3`. So `x² = k` gives `|x| = √k`, and Linear Equations and Inequalities\'s absolute value equations then split that into the two cases `x = √k` and `x = -√k`.'),
             ("p", "Both routes &mdash; the factoring one and the absolute value one "
                   "&mdash; arrive at the same pair, and both of them make the second "
                   "sign a consequence of the algebra rather than a decoration added at "
@@ -621,7 +621,7 @@ LESSONS = [
                      "one written step, simplify the radical exactly, and check. You "
                      "should also be able to say why `√k` on its own is not the answer: "
                      "the symbol is a function, and the equation has two solutions."),
-        "note": 'This property looks narrow, because it needs an equation with no `x` term, and “Completing the Square” makes it universal. Completing the square turns any quadratic into `(x - h)² = k`, and from there this is the property that finishes it. Completing the square reaches the shape that the square root property solves.',
+        "note": 'This property looks narrow, because it needs an equation with no `x` term, and “Completing the Square” makes it universal. Completing the square turns any quadratic into `(x - h)² = k`, and from there this is the property that finishes it. Everything in “Completing the Square” exists to reach the shape this one can already solve.',
     },
     # ---------------------------------------------------------------- 04
     {
@@ -856,7 +856,7 @@ LESSONS = [
              "without the `-9` gives `10`."),
         ],
         "standard": ("Finish when an odd b does not slow you down.",
-                     'Take a quadratic with `a ≠ 1` and an odd `b`, complete the square in exact fractions, and finish with the square root property. If you can do that reliably you can also derive the quadratic formula, the subject of “The Quadratic Formula”, by using this procedure carried out once on `ax² + bx + c = 0`.'),
+                     'Take a quadratic with `a ≠ 1` and an odd `b`, complete the square in exact fractions, and finish with the square root property. If you can do that reliably you can also derive the quadratic formula, which is the subject of “The Quadratic Formula” and is this procedure carried out once on `ax² + bx + c = 0`.'),
         "note": 'This is the most valuable procedure in the course, and it pays twice. Run it on `ax² + bx + c = 0` and it produces the quadratic formula, in “The Quadratic Formula”. Run it on `y = ax² + bx + c`, using the add-and-subtract form so that the left side stays as `y`, and it produces the vertex, in “Vertex Form and the Axis of Symmetry”.',
     },
     # ---------------------------------------------------------------- 05
@@ -976,7 +976,7 @@ LESSONS = [
         "lab": ("quadratic", {
             "mode": "formula",
             "panel_title": "Coefficients in, exact real roots out",
-            "panel_intro": 'Set `a`, `b` and `c` and watch the substitution happen with every sign shown. The lab keeps the answer as an exact radical and then reduces it when real roots exist; a negative discriminant reports no real solution in this lab mode; “Complex Numbers” defines the extended number system.',
+            "panel_intro": 'Set `a`, `b` and `c` and watch the substitution happen with every sign shown. The lab keeps the answer as an exact radical and then reduces it when real roots exist; a negative discriminant stops at no real solution until complex numbers are defined later in the course.',
         }),
         "steps_title": "Applying the quadratic formula",
         "steps_intro": "The first two steps hold the errors; the last two are arithmetic.",
@@ -1082,7 +1082,7 @@ LESSONS = [
                      "reaching the formula in six or seven lines. Then use it with `a`, "
                      "`b` and `c` written out separately every time, and reduce the "
                      "result by dividing the whole numerator."),
-        "note": 'The formula is one of the four solution methods, and it subsumes the others rather than replacing them: factoring is faster when it works, and the square root property is faster when `b = 0`. What the formula adds is a guarantee that no quadratic on this course can go unfinished &mdash; and the quantity `b² - 4ac` that fell out of the derivation is the subject of “The Discriminant”.',
+        "note": 'The formula is the last of the four solution methods, and it subsumes the others rather than replacing them: factoring is faster when it works, and the square root property is faster when `b = 0`. What the formula adds is a guarantee that no quadratic on this course can go unfinished &mdash; and the quantity `b² - 4ac` that fell out of the derivation is the whole of “The Discriminant”.',
     },
     # ---------------------------------------------------------------- 06
     {
@@ -1235,7 +1235,7 @@ LESSONS = [
             ],
             "after": [
                 "C is the one that pays. Polynomials and Factoring's product-and-sum search over the divisors of `1` would have been tried and would have failed, and `D = 12` says in advance that it must: `12` is not a perfect square, so no rational factorisation exists. One line replaced a search.",
-                'D was settled by a single subtraction. “Complex Numbers”, “Operations with Complex Numbers” and “Complex Roots of Quadratics” supply the numbers and method that continue beyond the reals. Nothing in this lesson changes when complex roots are included &mdash; `D &lt; 0` will still mean "no real solution", which is why the word <em>real</em> is worth writing.',
+                'D was settled by a single subtraction. “Complex Numbers”, “Operations with Complex Numbers” and “Complex Roots of Quadratics” supply the numbers and method that continue beyond the reals. Nothing in this lesson changes when those roots arrive &mdash; `D &lt; 0` will still mean "no real solution", which is why the word <em>real</em> is worth writing now.',
                 "For a faded method-choice pass, classify these before doing any full "
                 "solution: `x² - 11x + 24 = 0`, `5x² - 45 = 0`, "
                 "`x² + 8x = 3`, and `2x² + x + 4 = 0`. The supplied cues are, in "
@@ -1295,14 +1295,14 @@ LESSONS = [
              "`D = 0` gives exactly one solution, `-b/(2a)`. It is the boundary between "
              "two and none, and it belongs to neither of them."),
             ("Saying \"no solutions\" when \"no real solutions\" is meant",
-             'Without distinguishing real and complex numbers, the two phrases look interchangeable, and they are not. `x² + 1 = 0` has no real solution and two complex ones. The sentence you write about real solutions should still be true when the number system is extended.'),
+             'Before “Complex Numbers” the two phrases look interchangeable, and they are not. `x² + 1 = 0` has no real solution and two complex ones. The sentence you write today should still be true three lessons from now.'),
         ],
         "standard": ("Finish when D is the first thing you compute on any quadratic.",
                      "Given the coefficients you should produce `D`, name the case, say "
                      "whether the answers will be rational, and only then pick a method. "
                      "Getting the sign of `-4ac` right when `c` is negative is the single "
                      "skill that makes the whole habit reliable."),
-        "note": 'The discriminant classifies the solutions over the real numbers. `D &lt; 0` is not the end of the story: “Complex Numbers” defines a number whose square is `-1`, “Complex Roots of Quadratics” returns to every equation this lesson dismissed, and “Graphs of Quadratic Functions” shows what a negative discriminant looks like &mdash; a parabola that misses the x-axis entirely.',
+        "note": 'The discriminant is the last thing this course does with real numbers alone. `D &lt; 0` is not the end of the story: “Complex Numbers” defines a number whose square is `-1`, “Complex Roots of Quadratics” returns to every equation this lesson dismissed, and “Graphs of Quadratic Functions” shows what a negative discriminant looks like &mdash; a parabola that misses the x-axis entirely.',
     },
     # ---------------------------------------------------------------- 07
     {
@@ -1311,7 +1311,7 @@ LESSONS = [
         "module": "Complex numbers",
         "one_line": "Convert negative square roots to i and identify both parts of a complex number.",
         "summary": (
-            '`x² = -1` has no real solution, so a number `i` with `i² = -1` is defined and joined to the reals. A complex number is `a + bi` with `a` and `b` real; every real number is one of them, and the system is built so that all the algebraic properties of real numbers keep working unchanged.'
+            '`x² = -1` has no real solution, so a number `i` with `i² = -1` is defined and joined to the reals. A complex number is `a + bi` with `a` and `b` real; every real number is one of them, and the system is built so that all the algebra of the courses from Foundations of Algebra to Rational and Radical Expressions keeps working unchanged.'
         ),
         "key": [
             "i² = -1                      the defining property",
@@ -1321,7 +1321,7 @@ LESSONS = [
         ],
         "key_label": "The definition, and what follows from it",
         "concepts_intro": (
-            "Extending the number system to solve an equation is not a new move. It has already happened three times, each for the same reason."
+            'Extending the number system to solve an equation is not a new move. It has happened three times already on this path, and every time for the same reason.'
         ),
         "concepts": [
             ("i is defined by exactly one property",
@@ -1332,7 +1332,7 @@ LESSONS = [
              "and the convention exists so that \"imaginary part\" names a coordinate "
              "you can compare and equate."),
             ("Every real number is complex",
-             "`5` is `5 + 0i`. The reals are not replaced or contradicted; they sit inside the complex numbers as the ones with imaginary part `0`. Everything proved in real-number algebra goes on holding, for exactly the numbers it held for before."),
+             '`5` is `5 + 0i`. The reals are not replaced or contradicted; they sit inside the complex numbers as the ones with imaginary part `0`. Everything proved in the courses from Foundations of Algebra to Rational and Radical Expressions goes on holding, for exactly the numbers it held for before.'),
         ],
         "read_title": "A number whose square is negative",
         "read_intro": "Why the extension is legitimate, what the objects are, and how to write a root of a negative number.",
@@ -1386,7 +1386,7 @@ LESSONS = [
                 "denominator and therefore itself real &mdash; and `i` is not real. So "
                 "`d - b = 0`, that is `b = d`; and then `a - c = 0`, that is `a = c`.",
             ]),
-            ("p", 'One equation between complex numbers is therefore two equations between real numbers. That equality rule is used throughout complex arithmetic, and it is why complex numbers behave like points in a plane: `a + bi` corresponds to the point `(a, b)`, with the real numbers lying along the horizontal axis and the pure imaginary ones up the vertical.'),
+            ("p", 'One equation between complex numbers is therefore two equations between real numbers. That is used constantly from here on, and it is why complex numbers behave like points in a plane: `a + bi` corresponds to the point `(a, b)`, with the real numbers lying along the horizontal axis and the pure imaginary ones up the vertical.'),
             ("p", 'The plane picture also explains an absence. No ordering of the complex numbers is compatible with their arithmetic, so the words "positive", "greater than" and "between" are not available for them, and neither are the signs `&lt;` and `≤`. Points in a plane do not come in an order. Those words are used only where the numbers involved are real.'),
             ("h3", "Square roots of negative numbers"),
             ("def", ("The root of a negative number",

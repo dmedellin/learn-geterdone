@@ -91,7 +91,7 @@ LESSONS = [
                   "every pair by a chord with no three chords meeting at a point, and "
                   "count the regions the disc is cut into. For `n = 1` through `5` the "
                   "counts are `1, 2, 4, 8, 16`. For `n = 6` the count is `31`."),
-            ("p", 'So a formula that matches the first five terms of a recursion is a candidate, not a fact. Establishing that it matches for every `n` requires mathematical induction, which these Algebra courses do not cover: it is the subject of Induction and Recursion under Discrete Mathematics. Within this course, say "this formula agrees with the first six terms" and mean exactly that.'),
+            ("p", 'So a formula that matches the first five terms of a recursion is a candidate, not a fact. Establishing that it matches for every `n` requires mathematical induction, which this path does not cover: it is the subject of the Induction and Recursion course on the Discrete Mathematics path. Within this course, say "this formula agrees with the first six terms" and mean exactly that.'),
         ],
         "lab": ("sequence", {
             "mode": "define",
@@ -149,7 +149,7 @@ LESSONS = [
                 "The `n = 6` line is the only one doing real work. The first two use "
                 "terms the guess was built from; the third predicts a term first and "
                 "then checks it, which is the only kind of test that can fail.",
-                'It still is not a proof. What would settle it is the argument that assumes `aₖ = 2ᵏ⁺¹ - 1` and shows the recurrence forces `aₖ₊₁ = 2(2ᵏ⁺¹ - 1) + 1 = 2ᵏ⁺² - 1`, so that the formula, once true anywhere, is true for ever after. That is induction, the subject of Induction and Recursion under Discrete Mathematics, outside these Algebra courses.',
+                "It still is not a proof. What would settle it is the argument that assumes `aₖ = 2ᵏ⁺¹ - 1` and shows the recurrence forces `aₖ₊₁ = 2(2ᵏ⁺¹ - 1) + 1 = 2ᵏ⁺² - 1`, so that the formula, once true anywhere, is true for ever after. That is induction, and it is the Discrete Mathematics path's business rather than this one's.",
                 "For a faded conversion, take `b₁ = 2` and `bₙ = 3bₙ₋₁ + 2` for "
                 "`n ≥ 2`. The supplied first move is to compute `b₁ + 1` and "
                 "`b₂ + 1` rather than the terms alone. Generate through `b₅`, propose "
@@ -467,7 +467,7 @@ LESSONS = [
                      "it, write a given list of numbers in sigma notation in at least two "
                      "ways, and move a lower limit to `1` by substitution. Expanding the "
                      "first term of both forms is the check, and it costs one line."),
-        "note": 'The arithmetic, geometric and partial-sum work uses sigma notation. “Arithmetic Sequences and Series” finds `Σ aₖ` for the sequences whose terms rise by a fixed amount, by pairing the list with its own reversal; “Geometric Sequences and Series” does it for a fixed ratio, by subtracting `rSₙ` from `Sₙ`. Both arguments reorder the terms of a finite sum, which is legal precisely because the sum is finite &mdash; the point where that stops being safe is “Infinite Geometric Series”.',
+        "note": 'Every sum from here on is written this way. “Arithmetic Sequences and Series” finds `Σ aₖ` for the sequences whose terms rise by a fixed amount, by pairing the list with its own reversal; “Geometric Sequences and Series” does it for a fixed ratio, by subtracting `rSₙ` from `Sₙ`. Both arguments reorder the terms of a finite sum, which is legal precisely because the sum is finite &mdash; the point where that stops being safe is “Infinite Geometric Series”.',
     },
     # ---------------------------------------------------------------- 03
     {
@@ -537,7 +537,7 @@ LESSONS = [
                      "`d = (aₙ - a₁)/(n - 1)`, which recovers the common difference "
                      "from the first term and any one other term. From two terms in "
                      "general positions it is `d = (aₙ - aₘ)/(n - m)`.")),
-            ("p", "Plotted, an arithmetic sequence is a row of dots lying on a straight line of slope `d` &mdash; the slope from Lines, Functions and Graphs, sampled at the integers. `aₙ = a₁ + (n - 1)d` is `y = mx + c` with the letters renamed, which is why a sequence with a constant difference is called linear."),
+            ("p", "Plotted, an arithmetic sequence is a row of dots lying on a straight line of slope `d` &mdash; Lines, Functions and Graphs's slope, sampled at the integers. `aₙ = a₁ + (n - 1)d` is `y = mx + c` with the letters renamed, which is why a sequence with a constant difference is called linear."),
             ("def", ("Series and partial sum",
                      "A <strong>series</strong> is the sum of the terms of a sequence. "
                      "The sum of the first `n` terms is the <strong>n-th partial "
@@ -743,7 +743,7 @@ LESSONS = [
                      "`aₙ = a₁rⁿ⁻¹` for every `n ≥ 1`. Getting from `a₁` to `aₙ` is "
                      "`n - 1` multiplications by `r`, exactly as getting there in an "
                      "arithmetic sequence was `n - 1` additions of `d`.")),
-            ("p", "For `r &gt; 0`, the plotted terms lie on an exponential curve: `a₁rⁿ⁻¹` is the `a·bˣ` form from Exponential and Logarithmic Functions sampled at the integers. For `r &lt; 0`, no real exponential curve has that negative base; the magnitudes follow `|a₁||r|ⁿ⁻¹` while the signs alternate. `|r| &gt; 1` grows in magnitude, `0 &lt; |r| &lt; 1` decays in magnitude, `r = 1` is constant, and `r = 0` becomes zero after the first term."),
+            ("p", "For `r &gt; 0`, the plotted terms lie on an exponential curve: `a₁rⁿ⁻¹` is Exponential and Logarithmic Functions's `a·bˣ` sampled at the integers. For `r &lt; 0`, no real exponential curve has that negative base; the magnitudes follow `|a₁||r|ⁿ⁻¹` while the signs alternate. `|r| &gt; 1` grows in magnitude, `0 &lt; |r| &lt; 1` decays in magnitude, `r = 1` is constant, and `r = 0` becomes zero after the first term."),
             ("def", ("Geometric series",
                      "The sum of the terms of a geometric sequence. `Sₙ` denotes the "
                      "sum of the first `n` terms, `a₁ + a₁r + … + a₁rⁿ⁻¹`.")),
@@ -877,7 +877,7 @@ LESSONS = [
                      "any finite number of terms, handle `r = 0` and `r = 1` correctly, "
                      "and reproduce the `Sₙ - rSₙ` cancellation in three lines. No "
                      "convergence claim belongs in the answer yet."),
-        "note": 'A finite formula still contains `n`, so changing the stopping place produces a new number. “Partial Sums and Telescoping” treats `S₁, S₂, S₃, …` as a sequence in its own right; “Infinite Geometric Series” uses that viewpoint to ask whether the sequence approaches a number when the stopping place keeps moving.',
+        "note": 'A finite formula still contains `n`, so changing the stopping place produces a new number. “Partial Sums and Telescoping” treats `S₁, S₂, S₃, …` as a sequence in its own right; only after that does “Infinite Geometric Series” ask whether the sequence approaches a number when the stopping place keeps moving.',
     },
     # ---------------------------------------------------------------- 05
     {
@@ -1064,7 +1064,7 @@ LESSONS = [
                 "the last is `1/n - 1/(n + 1)`, and it is the second half of that "
                 "bracket that has no partner. Writing `1 - 1/n` gives `(n - 1)/n`, wrong "
                 "by `1/(n(n + 1))` and entirely plausible on the page.",
-                'The partial sums `1/2, 2/3, 3/4, 4/5, …` climb and every one is below `1`. Whether they add up to `1` is a convergence question of the kind defined in “Infinite Geometric Series”, and having `n/(n + 1)` in closed form is what makes it answerable.',
+                'The partial sums `1/2, 2/3, 3/4, 4/5, …` climb and every one is below `1`. Whether they add up to `1` is the question of “Infinite Geometric Series”, and having `n/(n + 1)` in closed form is what makes it answerable.',
                 "For a faded telescope, sum `2/((2k - 1)(2k + 1))` from `k = 1` to "
                 "`k = 5`. The supplied split is "
                 "`1/(2k - 1) - 1/(2k + 1)`. Recombine it first, write all five "
@@ -1218,7 +1218,7 @@ LESSONS = [
                 "If `a₁ = 0`, the recurrence multiplies `0` at every step and the "
                 "partial sums are `0, 0, 0, …`, which already proves the stated exception. "
                 "Now take `a₁ ≠ 0`.",
-                "For `r = 0`, the partial sums are `a₁, a₁, a₁, …`, so they converge to `a₁ = a₁/(1 - 0)`. For `0 &lt; |r| &lt; 1`, the exponential-decay result from Exponential and Logarithmic Functions says the positive sequence `|r|ⁿ` approaches `0`. Since `|rⁿ| = |r|ⁿ`, the signed power `rⁿ` does too, alternating when `r &lt; 0`. In `Sₙ = a₁/(1 - r) - [a₁/(1 - r)]rⁿ`, the second piece therefore approaches `0`, leaving `a₁/(1 - r)`.",
+                "For `r = 0`, the partial sums are `a₁, a₁, a₁, …`, so they converge to `a₁ = a₁/(1 - 0)`. For `0 &lt; |r| &lt; 1`, Exponential and Logarithmic Functions's exponential-decay result says the positive sequence `|r|ⁿ` approaches `0`. Since `|rⁿ| = |r|ⁿ`, the signed power `rⁿ` does too, alternating when `r &lt; 0`. In `Sₙ = a₁/(1 - r) - [a₁/(1 - r)]rⁿ`, the second piece therefore approaches `0`, leaving `a₁/(1 - r)`.",
                 'Suppose instead `|r| &gt; 1`. Then `|aₙ| = |a₁||r|ⁿ⁻¹` grows without bound, and by “Partial Sums and Telescoping” the gap between consecutive partial sums is `aₙ`. Partial sums moving further and further apart cannot be settling on a number. For `r = 1`, `Sₙ = na₁`, which runs away; for `r = -1`, `Sₙ` is `a₁, 0, a₁, 0, …` , visiting two values for ever and approaching neither. Those three exhaust `|r| ≥ 1`.',
             ]),
             ("h3", "How close, after how many terms"),

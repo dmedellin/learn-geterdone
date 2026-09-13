@@ -21,11 +21,11 @@ LESSONS = [
         ],
         "key_label": "One expression, one forbidden value",
         "concepts_intro": (
-            'Rational-expression manipulation uses rules about factors, and every one of those rules is false at a value where the expression does not exist. So the domain comes first, on its own line.'
+            'Everything in the first half of this course is a rule about factors, and every one of those rules is false at a value where the expression does not exist. So the domain comes first, on its own line.'
         ),
         "concepts": [
             ("A rational expression is a quotient of polynomials",
-             '`(3x + 1)/(x² − 5)` is one; so is `x + 2`, with denominator `1`. What is <em>not</em> one is anything with a variable under a root or in an exponent &mdash; those are covered in “Simplifying Radical Expressions” and in Exponential and Logarithmic Functions.'),
+             '`(3x + 1)/(x² − 5)` is one; so is `x + 2`, with denominator `1`. What is <em>not</em> one is anything with a variable under a root or in an exponent &mdash; those arrive in “Simplifying Radical Expressions” and in Exponential and Logarithmic Functions.'),
             ("The denominator alone decides the domain",
              "The numerator may be anything, zero included. `(x − 4)/(x + 1)` is "
              "perfectly well defined at `x = 4`, where its value is `0`. It is `x = −1` "
@@ -366,7 +366,7 @@ LESSONS = [
                      "numerator and the denominator. If you cannot name it, you have not "
                      "cancelled &mdash; you have invented a rule that happens to work on "
                      "this example."),
-        "note": "A numerical check is not a proof, and it is not offered here as one: an identity can survive a lucky value. But a single disagreement is conclusive in the other direction, and that is what makes the habit worth having &mdash; it cannot confirm your answer, and it will reliably refute a wrong one.",
+        "note": 'A numerical check is not a proof, and on this path it is never offered as one: an identity can survive a lucky value. But a single disagreement is conclusive in the other direction, and that is what makes the habit worth having &mdash; it cannot confirm your answer, and it will reliably refute a wrong one.',
     },
     # ---------------------------------------------------------------- 03
     {
@@ -734,7 +734,7 @@ LESSONS = [
         "module": "Rational expressions",
         "one_line": "Clear a complex fraction by two methods and preserve restrictions from every level.",
         "summary": (
-            'Nothing new is needed here &mdash; only the multiplication and division methods in “Multiplying and Dividing Rational Expressions” and the addition and subtraction methods in “Adding and Subtracting Rational Expressions” applied in one of two orders. The second order, multiplying through by the LCD of the small denominators, is usually much shorter, and both must agree.'
+            'Nothing new is needed here &mdash; only “Multiplying and Dividing Rational Expressions” and “Adding and Subtracting Rational Expressions” applied in one of two orders. The second order, multiplying through by the LCD of the small denominators, is usually much shorter, and both must agree.'
         ),
         "key": [
             "method 1:  combine the top, combine the bottom, then divide",
@@ -927,7 +927,7 @@ LESSONS = [
         ],
         "key_label": "One legal step that costs you a check",
         "concepts_intro": (
-            'In solving a rational equation, an entirely correct piece of algebra can produce a wrong answer. Understanding why is more useful than remembering to check.'
+            'This is the first lesson where an entirely correct piece of algebra can produce a wrong answer. Understanding why is more useful than remembering to check.'
         ),
         "concepts": [
             ("Clearing denominators is the whole method",
@@ -1005,7 +1005,7 @@ LESSONS = [
             ("Multiply both sides by the LCD",
              'Every term on both sides, including terms that are not fractions. Bracket each numerator as you go, exactly as in “Adding and Subtracting Rational Expressions”.'),
             ("Solve the polynomial equation",
-             "Use Linear Equations and Inequalities for a linear result and the factoring methods from Polynomials and Factoring for the quadratics chosen in this course. The quadratic formula arrives in Quadratics and Complex Numbers and is not required here."),
+             'Use Linear Equations and Inequalities for a linear result and factoring from Polynomials and Factoring for the quadratics chosen in this course. The quadratic formula arrives in Quadratics and Complex Numbers and is not required here.'),
             ("Test every candidate in the original",
              "Any candidate on the exclusion list is extraneous and is discarded. State "
              "the surviving solution set, which may be empty."),

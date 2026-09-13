@@ -38,7 +38,7 @@ LESSONS = [
         "read_intro": "The definition, the distribution, and how several variables interact.",
         "body": [
             ("def", ("Random variable",
-                     'A <strong>random variable</strong> on a sample space `S` is a function `X : S → ℝ` &mdash; a function in the sense defined in the “Functions” Lesson in Sets, Relations, and Functions, one value for each element of the domain `S`. The event `X = k` is `{s ∈ S : X(s) = k}`, and `P(X = k)` is its probability.')),
+                     "A <strong>random variable</strong> on a sample space `S` is a function `X : S → ℝ` &mdash; a function in the sense of “Functions”, in Sets, Relations, and Functions, one value for each element of the domain `S`. The event `X = k` is `{s ∈ S : X(s) = k}`, and `P(X = k)` is its probability.")),
             ("p", "The name is doubly misleading, as is traditional. `X` is a function and "
                   "it is completely determined; what varies is which outcome occurs. "
                   "Reading `X` as a function on outcomes removes most of the confusion this "
@@ -91,7 +91,7 @@ LESSONS = [
              "\"The number of heads\", \"the sum\", \"1 if it rains\". A random variable "
              "with no stated rule is not defined."),
             ("Collect the outcomes by value",
-             "`P(X = k)` is the probability of the set of outcomes giving `k`. This again uses counting from Combinatorics and Counting."),
+             "`P(X = k)` is the probability of the set of outcomes giving `k`. This is Combinatorics and Counting's counting again."),
             ("Check the distribution sums to 1",
              "Every outcome contributes to exactly one value, so the probabilities must "
              "total 1. A free check that catches missed cases."),
@@ -236,7 +236,7 @@ LESSONS = [
             ("ul", [
                 "<strong>Not the most likely outcome.</strong> The expected number of "
                 "heads in 3 flips is 1.5, which is impossible.",
-                '<strong>Not a guarantee.</strong> A game with positive expectation can lose for a long time; the variance studied in “Variance and Standard Deviation” is what measures that.',
+                "<strong>Not a guarantee.</strong> A game with positive expectation can lose for a long time; “Variance and Standard Deviation”'s variance is what measures that.",
                 "<strong>Not enough to compare two options.</strong> Two bets with equal "
                 "expectation can differ enormously in risk, and expectation alone cannot "
                 "see it.",
@@ -277,7 +277,7 @@ LESSONS = [
                 "",
                 "The customer's expectation is exactly −£10.",
                 "The insurer's edge comes from selling MANY policies, where the",
-                'average approaches the expectation — which is the law-of-large-numbers argument in “Variance and Standard Deviation”.',
+                "average approaches the expectation — which is “Variance and Standard Deviation”'s subject.",
             ],
             "after": [
                 "Both parties can be acting sensibly. The customer accepts a negative "
@@ -319,7 +319,7 @@ LESSONS = [
                      "Compute the expected number of heads in five fair flips from the "
                      "definition, then state in one sentence why 2.5 is a sensible answer "
                      "for a quantity that must be an integer."),
-        "note": '“Linearity of Expectation” gives a much faster route to most expectations. Linearity holds without independence, which makes decomposing a complicated variable into indicators the dominant technique for the expectation calculations in this Course.',
+        "note": '“Linearity of Expectation” gives a much faster route to most expectations. Linearity holds without independence, which makes decomposing a complicated variable into indicators the dominant technique in the rest of this course.',
     },
     # ---------------------------------------------------------------- 09
     {
@@ -441,7 +441,7 @@ LESSONS = [
                 "Linearity does not care.",
                 "",
                 "Computing this from the distribution of X would require the",
-                'derangement numbers of the “Derangements” Lesson in Combinatorics and Counting — for one number.',
+                'derangement numbers of “Derangements” in Combinatorics and Counting — for one number.',
             ],
             "after": [
                 "The answer is 1 for every `n`, which connects directly to derangements: "
@@ -546,7 +546,7 @@ LESSONS = [
                      "without changing its spread; scaling by `a` scales the spread by "
                      "`|a|` and the variance by `a²`.")),
             ("thm", ("Variance of a sum",
-                     'If `X` and `Y` are independent, `Var(X + Y) = Var(X) + Var(Y)`. Without independence, `Var(X + Y) = Var(X) + Var(Y) + 2Cov(X,Y)`, where the <strong>covariance</strong> `Cov(X,Y) = E[XY] − E[X]E[Y]` is the amount by which the product rule fails &mdash; “Linearity of Expectation” shows it is 0 when `X` and `Y` are independent, which is where the first form comes from.')),
+                     'If `X` and `Y` are independent, `Var(X + Y) = Var(X) + Var(Y)`. Without independence, `Var(X + Y) = Var(X) + Var(Y) + 2Cov(X,Y)`, where the <strong>covariance</strong> `Cov(X,Y) = E[XY] − E[X]E[Y]` is the amount by which the product rule fails &mdash; “Linearity of Expectation” showed it is 0 when `X` and `Y` are independent, which is where the first form comes from.')),
             ("p", "This is the difference from expectation, and it is worth stating "
                   "plainly: sums of expectations never need independence, sums of variances "
                   "always do. Adding `X` to itself makes the point &mdash; "
@@ -735,7 +735,7 @@ LESSONS = [
                 "trials succeed, which is `C(n,k)`.",
                 "The sequences are disjoint events, so the sum rule gives the product.",
             ]),
-            ("p", 'The distribution sums to 1 by the theorem in the “The Binomial Theorem” Lesson in Combinatorics and Counting: `Σ_k C(n,k)p^k(1−p)^{n−k} = (p + (1−p))ⁿ = 1`. That is the theorem doing genuine work, not an analogy.'),
+            ("p", 'The distribution sums to 1 by the binomial theorem of “The Binomial Theorem” in Combinatorics and Counting: `Σ_k C(n,k)p^k(1−p)^{n−k} = (p + (1−p))ⁿ = 1`. That is the theorem doing genuine work, not an analogy.'),
             ("thm", ("Mean and variance",
                      "`E[X] = np` and `Var(X) = np(1−p)`.")),
             ("proof", [
@@ -894,7 +894,7 @@ LESSONS = [
         ],
         "key_label": "Waiting for a success",
         "concepts_intro": (
-            'A waiting-time distribution whose mean is least representative of a typical outcome.'
+            'The last distribution on this course, and the one whose mean is least representative of a typical outcome.'
         ),
         "concepts": [
             ("The number of trials is not fixed",
@@ -917,7 +917,7 @@ LESSONS = [
             ("proof", [
                 "The first success on trial `k` means `k − 1` failures followed by a "
                 "success. By independence that probability is `(1−p)^{k−1}p`.",
-                'These sum to 1 by the geometric series of the “Induction with Sums and Products” Lesson in Induction and Recursion: `Σ_{k≥1} (1−p)^{k−1}p = p/(1 − (1−p)) = 1`.',
+                'These sum to 1 by the geometric series of “Induction with Sums and Products” in Induction and Recursion: `Σ_{k≥1} (1−p)^{k−1}p = p/(1 − (1−p)) = 1`.',
             ]),
             ("thm", ("Mean and variance",
                      "`E[X] = 1/p` and `Var(X) = (1−p)/p²`.")),
@@ -1073,9 +1073,6 @@ LESSONS = [
                      "and head-head (`1/4`) finishes in two. Solve "
                      "`E = ½(E + 1) + ¼(E + 2) + ¼·2` and check that you get `6`. No series "
                      "was available, and the argument did not need one."),
-        "note": "The geometric distribution "
-                "is the discrete analogue of the exponential, memorylessness characterises "
-                "both, and the coupon collector is the first example most people meet of a "
-                "process whose expected time is dominated by its final stages.",
+        "note": 'This course ends where several others begin. The geometric distribution is the discrete analogue of the exponential, memorylessness characterises both, and the coupon collector is the first example most people meet of a process whose expected time is dominated by its final stages.',
     },
 ]

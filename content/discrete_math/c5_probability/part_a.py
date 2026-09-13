@@ -39,7 +39,7 @@ LESSONS = [
                      "The <strong>sample space</strong> `S` is the set of all possible "
                      "outcomes of an experiment. An <strong>outcome</strong> is one "
                      "element of `S`; an <strong>event</strong> is a subset of `S`.")),
-            ("p", 'The outcomes must be <strong>mutually exclusive</strong> (no two happen together) and <strong>exhaustive</strong> (at least one happens), so that exactly one happens. Those are the two obligations a proof by cases carries in the “Cases, Counterexamples, and Writing a Proof” Lesson in Logic and Proof &mdash; overlap nowhere, cover everything &mdash; and they fail in the same ways.'),
+            ("p", 'The outcomes must be <strong>mutually exclusive</strong> (no two happen together) and <strong>exhaustive</strong> (at least one happens), so that exactly one happens. Those are the two obligations a proof by cases carries in “Cases, Counterexamples, and Writing a Proof” in Logic and Proof &mdash; overlap nowhere, cover everything &mdash; and they fail in the same ways.'),
             ("example", ("Two dice, two models",
                          "Model A: `S` is the 36 ordered pairs `(1,1)` through `(6,6)`, all "
                          "equally likely. Model B: `S` is the 11 sums `2, …, 12`. Both are "
@@ -60,9 +60,9 @@ LESSONS = [
                 "exactly one of A, B      A △ B",
                 "A and B cannot both      A ∩ B = ∅     (mutually exclusive)",
             ]),
-            ("p", 'Every identity from the “Set Identities and Proofs” Lesson in Sets, Relations, and Functions therefore applies, and De Morgan is used constantly: "not (A or B)" is "neither A nor B", which is usually the easier event to count.'),
+            ("p", 'Every identity from “Set Identities and Proofs” in Sets, Relations, and Functions therefore applies, and De Morgan is used constantly: "not (A or B)" is "neither A nor B", which is usually the easier event to count.'),
             ("def", ("Probability of an event (equally likely case)",
-                     'When the outcomes of a finite `S` are equally likely, `P(E) = |E| / |S|`. Every probability in this Course’s equally-likely examples is this ratio, computed with tools from Combinatorics and Counting.')),
+                     "When the outcomes of a finite `S` are equally likely, `P(E) = |E| / |S|`. Every probability in this course's early lessons is this ratio, computed with Combinatorics and Counting's tools.")),
             ("example", ("Choosing a granularity",
                          "Flip three coins and ask for the probability of exactly two "
                          "heads. Outcomes as ordered triples: 8 equally likely, of which "
@@ -179,7 +179,7 @@ LESSONS = [
              "Permutations, combinations, complements and inclusion&ndash;exclusion. The "
              "denominator is a count too and is often the easier one."),
             ("The complement rule saves work",
-             '`P(at least one) = 1 − P(none)`, exactly as in the “Counting with Restrictions” Lesson in Combinatorics and Counting and for the same reason.'),
+             '`P(at least one) = 1 − P(none)`, exactly as in “Counting with Restrictions” in Combinatorics and Counting and for the same reason.'),
             ("The answer is bounded",
              "Any probability outside `[0, 1]` is a counting error, and that check costs "
              "nothing."),
@@ -222,7 +222,7 @@ LESSONS = [
                   "<em>pairs</em>: 23 people form `C(23,2) = 253` pairs, and each has about "
                   "a `1/365` chance of matching. The intuition that fails is comparing 23 "
                   "with 365 rather than 253 with 365."),
-            ("p", 'This is a different question from the pigeonhole statement in the “The Pigeonhole Principle” Lesson in Sets, Relations, and Functions. That one said 367 people <em>guarantee</em> a match; this one says 23 make it likely. Certainty and probability are different claims and neither implies the other.'),
+            ("p", 'This is a different question from the pigeonhole statement in “The Pigeonhole Principle” in Sets, Relations, and Functions. That one said 367 people <em>guarantee</em> a match; this one says 23 make it likely. Certainty and probability are different claims and neither implies the other.'),
             ("h3", "When outcomes are not equally likely"),
             ("p", 'Then probabilities are assigned to outcomes directly, subject to being non-negative and summing to 1, and `P(E) = Σ_{s ∈ E} P(s)`. A loaded die, a biased coin and a weighted lottery all work this way, and “The Probability Axioms” states the axioms that govern them.'),
         ],
@@ -267,7 +267,7 @@ LESSONS = [
                 " = 1712304 + 778320 + 103776 + 4512 + 48  =  2 598 960     ✓",
             ],
             "after": [
-                "The check is Vandermonde's identity from the “Binomial Coefficients and Pascal's Triangle” Lesson in Combinatorics and Counting, appearing as a probability check: the five disjoint cases must exhaust the hands. It would catch a wrong `C(48,3)` immediately."
+                "The check is Vandermonde's identity from “Binomial Coefficients and Pascal's Triangle” in Combinatorics and Counting, appearing as a probability check: the five disjoint cases must exhaust the hands. It would catch a wrong `C(48,3)` immediately."
             ],
         },
         "quiz_title": "Computing probabilities",
@@ -308,7 +308,7 @@ LESSONS = [
             ("Counting \"at least one\" directly",
              "It produces overlapping cases. `1 − P(none)` cannot double-count."),
             ("Confusing certainty with high probability",
-             '367 people guarantee a shared birthday; 23 make it likely. The pigeonhole result from Sets, Relations, and Functions and this lesson answer different questions.'),
+             "367 people guarantee a shared birthday; 23 make it likely. Sets, Relations, and Functions's pigeonhole and this lesson answer different questions."),
         ],
         "standard": ("Finish when you check your answer against a complementary count.",
                      "Compute the probability that a five-card hand contains at least one "
@@ -349,7 +349,7 @@ LESSONS = [
              "`P(Ē) = 1 − P(E)` and `P(A ∪ B) = P(A) + P(B) − P(A ∩ B)` are proved, not "
              "assumed."),
             ("Additivity needs disjointness",
-             'For overlapping events the general rule is inclusion and exclusion, which is the “The Inclusion-Exclusion Principle” Lesson in Combinatorics and Counting with probabilities in place of counts.'),
+             'For overlapping events the general rule is inclusion and exclusion, which is “The Inclusion-Exclusion Principle” in Combinatorics and Counting with probabilities in place of counts.'),
         ],
         "read_title": "The axioms and what follows",
         "read_intro": "The three rules, then six theorems derived from them.",
@@ -392,7 +392,7 @@ LESSONS = [
                          "equally, so each has `2/15`. Check: `1/3 + 5 · 2/15 = 1/3 + 2/3 = "
                          "1`. Then `P(even) = 2/15 + 2/15 + 1/3 = 3/5`, which the "
                          "equally-likely model would have put at `1/2`.")),
-            ("p", 'Notice that the axioms did all the work and the equally-likely assumption did none. The results on conditioning, independence, Bayes’ theorem, random variables, expectation, variance, and the binomial and geometric distributions is proved from the axioms and therefore holds for loaded dice too.'),
+            ("p", 'Notice that the axioms did all the work and the equally-likely assumption did none. Everything from “Conditional Probability” on is proved from the axioms and therefore holds for loaded dice too.'),
         ],
         "lab": ("probability", {
             "experiment": "urn",
@@ -586,7 +586,7 @@ LESSONS = [
             "a": 0,
             "b": 2,
             "panel_title": "Conditioning, visibly",
-            "panel_intro": 'Event B is the condition, and the table shows `P(A|B)` as the count in both divided by the count in B &mdash; the restricted sample space, not the original. A = sum is 7 and B = the first die is 4 is the dice example in the body: B holds in 6 of the 36 chips and A in one of those, `(4,3)`, so `P(A|B) = 1/6`. Now switch B to "at least one 6": the numerator is two chips, `(1,6)` and `(6,1)`, but `P(A|B) = 2/11` while `P(B|A) = 2/6 = 1/3` &mdash; same numerator, different denominators, and the ratio of the two answers is `P(A)/P(B) = 6/11`, which is an instance of “Bayes\' Theorem”.',
+            "panel_intro": 'Event B is the condition, and the table shows `P(A|B)` as the count in both divided by the count in B &mdash; the restricted sample space, not the original. A = sum is 7 and B = the first die is 4 is the dice example in the body: B holds in 6 of the 36 chips and A in one of those, `(4,3)`, so `P(A|B) = 1/6`. Now switch B to "at least one 6": the numerator is two chips, `(1,6)` and `(6,1)`, but `P(A|B) = 2/11` while `P(B|A) = 2/6 = 1/3` &mdash; same numerator, different denominators, and the ratio of the two answers is `P(A)/P(B) = 6/11`, which is “Bayes\' Theorem”\'s theorem before it is stated.',
         }),
         "steps_title": "Conditioning correctly",
         "steps_intro": "Say which event is the condition, out loud.",
@@ -601,7 +601,7 @@ LESSONS = [
              "Each draw conditions on the previous ones. Without replacement, the "
              "denominators shrink."),
             ("Ask whether you wanted the other conditional",
-             "The two are related by Bayes, as developed in “Bayes' Theorem”. Computing the wrong one is the most consequential error in this course."),
+             "The two are related by Bayes, which is “Bayes' Theorem”. Computing the wrong one is the most consequential error in this course."),
         ],
         "worked": {
             "title": "The two-child problem",

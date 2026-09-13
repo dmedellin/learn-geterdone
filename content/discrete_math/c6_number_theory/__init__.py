@@ -49,7 +49,7 @@ COURSE = {
          "&mdash; then break one from two letter frequencies."),
     ],
     "syllabus_intro": (
-        'Divisibility and gcd results support modular arithmetic and its applications to hashing, pseudorandom numbers, classical ciphers and RSA encryption.'
+        'Divisibility and gcd come first, then modular arithmetic, and last the applications that use all of it.'
     ),
     "how_to": [
         "Use the workbench lab in every lesson. Each mode prints the algorithm's trace "

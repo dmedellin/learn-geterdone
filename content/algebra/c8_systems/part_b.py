@@ -41,7 +41,7 @@ LESSONS = [
         "read_title": "The determinant, and the rule built on it",
         "read_intro": "Two sizes computed by hand, then a formula for the solution and the condition it needs.",
         "body": [
-            ("p", '“Gaussian Elimination” solves a system by carrying its augmented matrix to echelon form, and by the end of the reduction you know how many solutions there were. The determinant answers that question in advance, from the coefficients alone, in a single number.'),
+            ("p", '“Gaussian Elimination” solved a system by carrying its augmented matrix to echelon form, and by the end of the reduction you knew how many solutions there were. The determinant answers that question in advance, from the coefficients alone, in a single number.'),
             ("def", ("Determinant of a 2 by 2 matrix",
                      "For `A = [ a  b ; c  d ]`, the <strong>determinant</strong> is "
                      "`det A = ad - bc`: the product down the main diagonal minus the "
@@ -226,7 +226,7 @@ LESSONS = [
                      "means for the system in one sentence. The test is a system with "
                      "`D = 0`: the right answer is \"not exactly one solution, and I "
                      "need to reduce it to say more\"."),
-        "note": '`D ≠ 0` has an equivalent description. “Inverse Matrices” shows that it is exactly the condition for the coefficient matrix to have an inverse, so three statements &mdash; the system has one solution, the matrix is invertible, the determinant is nonzero &mdash; turn out to be one statement in three costumes.',
+        "note": '`D ≠ 0` is about to appear under a second name. “Inverse Matrices” shows that it is exactly the condition for the coefficient matrix to have an inverse, so three statements &mdash; the system has one solution, the matrix is invertible, the determinant is nonzero &mdash; turn out to be one statement in three costumes.',
     },
     # ---------------------------------------------------------------- 09
     {
@@ -464,7 +464,7 @@ LESSONS = [
                      "`[ 2  3 ; 4  6 ]` has no inverse. The check `AA⁻¹ = I` should be "
                      "automatic; it costs four multiplications and catches every sign "
                      "error."),
-        "note": 'Three conditions are equivalent. `det A ≠ 0`, `A` has an inverse, and `AX = B` has exactly one solution for every `B` are the same statement about the same matrix. “Systems of Inequalities and Linear Programming” uses inequalities, where the answer is a region rather than a point &mdash; and where finding the corners of that region is a 2 by 2 system all over again.',
+        "note": 'Three conditions have now collapsed into one. `det A ≠ 0`, `A` has an inverse, and `AX = B` has exactly one solution for every `B` are the same statement about the same matrix. “Systems of Inequalities and Linear Programming” leaves exact equations behind for inequalities, where the answer is a region rather than a point &mdash; and where finding the corners of that region is a 2 by 2 system all over again.',
     },
     # ---------------------------------------------------------------- 10
     {
@@ -511,7 +511,7 @@ LESSONS = [
         "read_title": "Feasible regions and the corner point theorem",
         "read_intro": "Shading by test point, finding corners by elimination, and the theorem that says corners are enough.",
         "body": [
-            ("p", '“Linear Inequalities in Two Variables” in Lines, Functions and Graphs explains a single linear inequality in two variables: draw the boundary line, decide which side, shade it. Everything here is that, done several times on one set of axes, and then asked a question.'),
+            ("p", 'Lines, Functions and Graphs ended with a single linear inequality in two variables: draw the boundary line, decide which side, shade it. Everything here is that, done several times on one set of axes, and then asked a question.'),
             ("def", ("Solution of a linear inequality in two variables",
                      "The set of points `(x, y)` making the statement true. For a "
                      "linear inequality it is a <strong>half-plane</strong>: everything "
@@ -721,6 +721,6 @@ LESSONS = [
                      "point and its value. For an unbounded region, exhibit a feasible "
                      "ray or a global bound instead of citing the bounded theorem. Saying "
                      "\"the maximum is 34\" without saying where is half an answer."),
-        "note": 'Everything expensive in this lesson was elimination: each corner is a 2 by 2 system, solved exactly as in “Solving by Elimination”. Elimination therefore answers an optimisation question about feasible corners. Sequences and Series studies objects that are ordered lists rather than solution sets.',
+        "note": "Everything expensive in this lesson was elimination: each corner is a 2 by 2 system, solved exactly as in “Solving by Elimination”. That is the course's first half in service of a question it could not have asked. This is the last lesson of the course; Sequences and Series takes up objects that are ordered lists rather than solution sets.",
     },
 ]

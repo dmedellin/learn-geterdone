@@ -44,7 +44,7 @@ COURSE = {
          "into a ratio."),
     ],
     "syllabus_intro": (
-        'Exponential functions, growth and decay, and the number `e` provide the basis for logarithms and their laws. Equations connect these inverse functions; compound interest, continuous growth and logarithmic scales apply them.'
+        'First exponential functions and `e`; then the definition of the logarithm and its laws; then solving and applying.'
     ),
     "how_to": [
         "After each complete worked example, cover its answer and do the faded "
@@ -61,7 +61,7 @@ COURSE = {
     ],
     "footer_lead": (
         (
-        'Exponential and logarithmic values can be irrational, so these labs show rounded decimals &mdash; and they say where they rounded. The exact statements, the laws and the domains, are computed exactly and the rounding never enters them.'
+        'Exponential and logarithmic values can be irrational, so this is the one course on the path where the labs show rounded decimals &mdash; and they say where they rounded. The exact statements, the laws and the domains, are computed exactly and the rounding never enters them.'
     )
     ),
     "lessons": part_a.LESSONS + part_b.LESSONS,

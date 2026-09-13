@@ -64,6 +64,7 @@ class VisitorText(HTMLParser):
     def __init__(self, markup):
         super().__init__(convert_charrefs=True)
         self.stack, self.text, self.accessible, self.references = [], [], [], []
+        self.family = None
         self.feed(markup)
         if self.references:
             doc = ui.Elements(markup)
@@ -74,6 +75,8 @@ class VisitorText(HTMLParser):
 
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
+        if tag == 'body':
+            self.family = attrs.get('data-page-kind')
         hidden = (any(h for _, h in self.stack) or tag in ('script', 'style', 'template')
                   or 'hidden' in attrs or bool(re.search(r'(?:display\s*:\s*none|visibility\s*:\s*hidden)', attrs.get('style', ''))))
         self.text.append(' ')
@@ -120,10 +123,20 @@ PROGRESSION = {
 
 
 def progression_matches(markup):
-    copy = VisitorText(markup).copy()
+    visitor = VisitorText(markup)
+    copy = visitor.copy()
     # These two execution-workflow clauses are reviewed domain exceptions.
     copy = copy.replace('Keep the trading path explicit', '').replace('normal trading path is unreliable', '')
-    return [(name, m.group()) for name, pattern in PROGRESSION.items() for m in re.finditer(pattern, copy, re.I)]
+    patterns = dict(PROGRESSION)
+    if visitor.family not in (None, 'library', 'subject'):
+        # Naming a sibling Subject in teaching prose is the only thing telling a
+        # reader the target is on another Subject at all, and it survives any
+        # renumbering; tests/visitor_copy.py allows it everywhere except the
+        # library and Subject pages, which name themselves. Generic framing --
+        # 'learning path' -- stays forbidden on every family, and a fragment
+        # with no page family is still held to the whole rule.
+        patterns['public path identity'] = r'\blearning path\b'
+    return [(name, m.group()) for name, pattern in patterns.items() for m in re.finditer(pattern, copy, re.I)]
 
 
 class TestReviewRemediation(unittest.TestCase):
@@ -195,6 +208,16 @@ class TestReviewRemediation(unittest.TestCase):
             self.assertTrue(progression_matches('<svg aria-label="' + re.sub('<[^>]+>', '', phrase) + '"></svg>'), phrase)
         self.assertTrue(progression_matches('<noscript>Open a path</noscript>'))
         self.assertTrue(progression_matches('<span id="name" hidden>Open a path</span><svg aria-labelledby="name"></svg>'), 'hidden referenced accessible name')
+        # A sibling Subject named in teaching prose is allowed off the pages
+        # that name themselves; generic framing is forbidden on all of them.
+        prose = '<body data-page-kind="%s"><p>Induction is on the Discrete Mathematics path.</p></body>'
+        for kind in ('course', 'lesson'):
+            self.assertEqual([], progression_matches(prose % kind), kind)
+        for kind in ('library', 'subject'):
+            self.assertEqual([('public path identity', 'Discrete Mathematics path')],
+                             progression_matches(prose % kind), kind)
+        for kind in ('course', 'lesson', 'library', 'subject'):
+            self.assertTrue(progression_matches('<body data-page-kind="%s"><p>Follow the learning path.</p></body>' % kind), kind)
 
 
 class TestFunctionalSelectors(unittest.TestCase):

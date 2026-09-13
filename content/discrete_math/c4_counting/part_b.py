@@ -427,7 +427,7 @@ LESSONS = [
                 "derangement of `n − 1` items: `Dₙ₋₁` ways.",
                 "So `Dₙ = (n−1)(Dₙ₋₂ + Dₙ₋₁)`.",
             ]),
-            ("p", 'Two derivations of the same numbers, by different techniques. The recurrence is a case split of the kind the “Recurrence Relations” Lesson in Induction and Recursion develops; the formula came from inclusion and exclusion. Agreement between them is a genuine check, and both are worth having.'),
+            ("p", 'Two derivations of the same numbers, by different techniques. The recurrence is a case split of the kind “Recurrence Relations” in Induction and Recursion taught; the formula came from inclusion and exclusion. Agreement between them is a genuine check, and both are worth having.'),
             ("example", ("The hat-check problem",
                          "`n` people check hats and receive them back at random. The probability nobody gets their own is `Dₙ/n!`, which for `n ≥ 7` is 0.3679 to four places whatever `n` is &mdash; at `n = 5` it is still 0.3667 and at 6 it is 0.3681. Discrete Probability makes the division into a probability statement.")),
         ],
@@ -786,7 +786,7 @@ LESSONS = [
                   "For `aₙ = 3aₙ₋₁` with `a₀ = 1`, write `G(x) = Σ aₙxⁿ`. Multiplying the "
                   "recurrence by `xⁿ` and summing gives `G(x) − 1 = 3xG(x)`, so "
                   "`G(x) = 1/(1 − 3x)`, whose coefficients are `3ⁿ`."),
-            ("p", "The same method handles Fibonacci: `G(x) = x/(1 − x − x²)`, and a partial-fraction decomposition recovers Binet's formula from the “Solving Linear Recurrences” Lesson in Induction and Recursion. The method is more general than characteristic roots, and it extends to recurrences those cannot touch."),
+            ("p", "The same method handles Fibonacci: `G(x) = x/(1 − x − x²)`, and a partial-fraction decomposition recovers Binet's formula from “Solving Linear Recurrences” in Induction and Recursion. The method is more general than characteristic roots, and it extends to recurrences those cannot touch."),
             ("thm", ("Formal manipulation is legitimate",
                      "Addition, multiplication and (when `a₀ ≠ 0`) inversion of formal power "
                      "series are well defined coefficient by coefficient, with no "
@@ -938,7 +938,7 @@ LESSONS = [
                      "gives `A` and another way gives `B`. Since `S` has one size, "
                      "`A = B`.")),
             ("example", ("Handshakes",
-                         'In any graph, `Σ_v deg(v) = 2|E|`. Count the incidences &mdash; pairs (vertex, edge at that vertex). By vertex: each contributes its degree. By edge: each has two endpoints. The “Degree and the Handshake Theorem” Lesson in Graphs and Trees develops this argument.')),
+                         'In any graph, `Σ_v deg(v) = 2|E|`. Count the incidences &mdash; pairs (vertex, edge at that vertex). By vertex: each contributes its degree. By edge: each has two endpoints. “Degree and the Handshake Theorem” in Graphs and Trees opens with this.')),
             ("example", ("Pascal's rule, again",
                          "`C(n,k) = C(n−1,k−1) + C(n−1,k)`: count `k`-subsets by whether "
                          "they contain a fixed element. One set, two classifications.")),
@@ -954,7 +954,7 @@ LESSONS = [
                   "a known double count in disguise, and recognising which is the skill."),
             ("h3", "Bijective proof"),
             ("thm", ("The method",
-                     'To prove `|A| = |B|`, construct an explicit bijection `f : A → B`. the criteria in “Injective, Surjective, Bijective” in Sets, Relations, and Functions apply: injective and surjective, both argued.')),
+                     "To prove `|A| = |B|`, construct an explicit bijection `f : A → B`. The criteria of “Injective, Surjective, Bijective”, in Sets, Relations, and Functions, apply: injective and surjective, both argued.")),
             ("example", ("Symmetry of binomial coefficients",
                          "`C(n,k) = C(n,n−k)` via complementation: send each `k`-subset to "
                          "its complement. It is its own inverse, hence a bijection.")),
@@ -1078,7 +1078,7 @@ LESSONS = [
              "and its inverse."),
         ],
         "standard": ("Finish when you prefer the counting proof.",
-                     'Two proofs, one of each kind. First, “The Binomial Theorem” obtains `Σ_k 2ᵏ·C(n,k) = 3ⁿ` by substitution; prove it by double counting instead, and say what a single object being counted is &mdash; a pair `A ⊆ B ⊆ S`, or a function from `S` to a three-element set; either works. Second, prove that the `k`-subsets of `{1, …, n}` containing no two consecutive integers number `C(n − k + 1, k)`, by a bijection: subtract `i − 1` from the `i`th smallest element, write down the inverse, and check the map at `n = 5`, `k = 2`, where both sides are 6.'),
+                     'Two proofs, one of each kind. First, “The Binomial Theorem” obtained `Σ_k 2ᵏ·C(n,k) = 3ⁿ` by substitution; prove it by double counting instead, and say what a single object being counted is &mdash; a pair `A ⊆ B ⊆ S`, or a function from `S` to a three-element set; either works. Second, prove that the `k`-subsets of `{1, …, n}` containing no two consecutive integers number `C(n − k + 1, k)`, by a bijection: subtract `i − 1` from the `i`th smallest element, write down the inverse, and check the map at `n = 5`, `k = 2`, where both sides are 6.'),
         "note": "Some identities have no known combinatorial proof, which is a genuine "
                 "open kind of question: finding a bijection where only algebra is known is "
                 "an active research activity, because the bijection carries information the "
@@ -1263,7 +1263,7 @@ LESSONS = [
              "evaluate."),
         ],
         "standard": ("Finish when classification precedes computation automatically.",
-                     'Five problems from this course, without consulting the worked solutions: the 4-digit PINs, the podium from ten runners, the 5-card hands, five doughnuts from three kinds, and the arrangements of BANANA. For each, write the two answers &mdash; order? repetition? &mdash; and the rule they select before computing anything; they should land on four different rules and one multiset. Then verify the doughnuts by listing. That sequence &mdash; classify, compute, check &mdash; is the whole course.'),
+                     'Five problems from this course, without looking back: the 4-digit PINs, the podium from ten runners, the 5-card hands, five doughnuts from three kinds, and the arrangements of BANANA. For each, write the two answers &mdash; order? repetition? &mdash; and the rule they select before computing anything; they should land on four different rules and one multiset. Then verify the doughnuts by listing. That sequence &mdash; classify, compute, check &mdash; is the whole course.'),
         "note": "Discrete Probability turns these counts into probabilities by dividing by the size of the sample space, so every classification error here becomes a wrong probability there. The counting is the hard part; the division is not.",
     },
 ]

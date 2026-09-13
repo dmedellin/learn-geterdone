@@ -37,7 +37,7 @@ COURSE = {
     ),
     "blurb": (
         (
-        'Arithmetic, made general. Why a letter can stand for a number, which rearrangements are always allowed and which only look allowed, and the exponent and radical rules that algebraic manipulation relies on.'
+        'Arithmetic, made general. Why a letter can stand for a number, which rearrangements are always allowed and which only look allowed, and the exponent and radical rules that everything after this course leans on.'
     )
     ),
     "key": [
@@ -50,7 +50,7 @@ COURSE = {
     "assumes_long": "fractions, negatives, and long division",
     "outcomes_intro": (
         (
-        'Read, evaluate and simplify real-number expressions, with a stated reason for every rearrangement.'
+        'By the end you can read, evaluate and simplify the real-number expressions the next courses use, with a stated reason for every rearrangement.'
     )
     ),
     "outcomes": [
@@ -66,9 +66,9 @@ COURSE = {
          "Translate an English quantity into algebra, keeping track of what the letter stands for &mdash; which is where most word-problem errors are made."),
     ],
     "syllabus_intro": (
-        'Real numbers and notation explain the numbers and how expressions are read; naming the parts of an expression supports the use of properties to justify rearrangements. Absolute value, exponents and radicals describe real-number operations; distribution, collecting like terms, evaluation and translation connect expressions with their values and meanings.'
+        '“Real Numbers and the Number Line” and “Order of Operations” settle the numbers and how notation is read; “Variables, Expressions, and Terms” names the parts of an expression before “Properties of the Real Numbers” licenses rearrangements. Absolute value, exponents and radicals come next; expanding, collecting, evaluating and translating expressions close the course.'
     ),
-    "how_to": ['Do the arithmetic yourself before you read the answer. Every lab shows its steps, and the steps are worth more than the result &mdash; the result you could have got from a calculator.', 'Take the property lessons seriously even if the arithmetic is easy. “Properties of the Real Numbers” is the reason `-(x - 3)` is `-x + 3`, and that single sign is the most common error in equation-solving and function work.', 'When a lab disagrees with you, find which step differs rather than which answer. The step is the thing you will repeat a thousand times.'],
+    "how_to": ['Do the arithmetic yourself before you read the answer. Every lab shows its steps, and the steps are worth more than the result &mdash; the result you could have got from a calculator.', 'Take the property lessons seriously even if the arithmetic is easy. “Properties of the Real Numbers” is the reason `-(x - 3)` is `-x + 3`, and that single sign is the most common error in the next two courses.', 'When a lab disagrees with you, find which step differs rather than which answer. The step is the thing you will repeat a thousand times.'],
     "not_covered": [
         "Proof of the field axioms. This course states the properties of the real numbers and uses them; constructing the reals from the rationals belongs to analysis.",
         (
@@ -76,9 +76,7 @@ COURSE = {
             "none; Quadratics and Complex Numbers introduces `i` and gives it one."
         ),
         (
-            "Trigonometry and logarithms. Logarithms arrive in Exponential and Logarithmic "
-            "Functions, where exponentials make them necessary; trigonometry is not covered "
-            "in these courses."
+            'Trigonometry and logarithms. Logarithms arrive in Exponential and Logarithmic Functions, where exponentials make them necessary; trigonometry is not on this path at all.'
         ),
     ],
     "footer_lead": (

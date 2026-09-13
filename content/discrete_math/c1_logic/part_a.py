@@ -29,7 +29,7 @@ LESSONS = [
              "\"it depends\". The value may be unknown to us; what matters is that "
              "the sentence has one."),
             ("Open sentences are not propositions yet",
-             '`x &gt; 3` has no truth value until `x` is given one. It becomes a proposition when the variable is bound, which is what quantifiers do in the “Predicates and Quantifiers” Lesson.'),
+             '`x &gt; 3` has no truth value until `x` is given one. It becomes a proposition when the variable is bound, which is what quantifiers do in “Predicates and Quantifiers”.'),
             ("Truth is not the same as provability",
              "\"Every even number greater than 2 is a sum of two primes\" is a "
              "proposition. Nobody knows its value; it still has one."),
@@ -46,7 +46,7 @@ LESSONS = [
             ("ul", [
                 "<strong>Not declarative.</strong> \"What time is it?\" and \"Close the "
                 "door.\" assert nothing, so there is nothing to be true or false.",
-                '<strong>Open.</strong> "`x + 1 = 5`" is true for `x = 4` and false otherwise. It has a truth value only once `x` is fixed. Such a sentence is a <em>predicate</em>, and the “Predicates and Quantifiers” Lesson gives it the treatment it deserves.',
+                '<strong>Open.</strong> "`x + 1 = 5`" is true for `x = 4` and false otherwise. It has a truth value only once `x` is fixed. Such a sentence is a <em>predicate</em>, and “Predicates and Quantifiers” gives it the treatment it deserves.',
                 "<strong>Self-referentially paradoxical.</strong> \"This sentence is "
                 "false\" cannot be true (it would then be false) and cannot be false (it "
                 "would then be true). No truth value can be assigned consistently.",
@@ -59,7 +59,7 @@ LESSONS = [
                   "moment sentences may talk about their own truth, the two-valued system "
                   "breaks."),
             ("thm", ("Bivalence",
-                     "Every proposition has exactly one of the two truth values `T`, `F`. This is an assumption of classical logic, not a theorem within it, and it is what licenses `p ∨ ¬p` &mdash; the law of the excluded middle &mdash; used throughout these lessons.")),
+                     'Every proposition has exactly one of the two truth values `T`, `F`. This is an assumption of classical logic, not a theorem within it, and it is what licenses `p ∨ ¬p` &mdash; the law of the excluded middle &mdash; used throughout this path.')),
             ("p", "Unknown is not a third value. \"There are infinitely many twin primes\" "
                   "is a proposition whose value nobody currently knows; the sentence is "
                   "true or it is false, and our ignorance is a fact about us."),
@@ -77,7 +77,7 @@ LESSONS = [
             "formulas": ["p", "~p", "p & q", "p | q"],
             "compare_with": "p | q",
             "panel_title": "One variable at a time",
-            "panel_intro": 'Start with `p` alone: two rows, because one proposition has two possible truth values and nothing else. The two-variable formulas are a preview — the “Logical Connectives” Lesson defines `&` and `|` properly. Watch only the row count for now: it doubles.',
+            "panel_intro": 'Start with `p` alone: two rows, because one proposition has two possible truth values and nothing else. The two-variable formulas are a preview — “Logical Connectives” defines `&` and `|` properly. Watch only the row count for now: it doubles.',
         }),
         "steps_title": "Deciding whether a sentence is a proposition",
         "steps_intro": "Four questions, in this order. The first \"no\" settles it.",
@@ -143,14 +143,14 @@ LESSONS = [
              "A conjecture is a proposition. Its value exists whether or not anyone has "
              "found it, and no rule in this course needs to know which it is."),
             ("Calling an open sentence false because it is sometimes false",
-             '`x &gt; 3` is not false; it has no value at all until `x` is fixed. Confusing "not always true" with "false" is the same error that makes quantifier negation hard in the “Negating Quantified Statements” Lesson.'),
+             '`x &gt; 3` is not false; it has no value at all until `x` is fixed. Confusing "not always true" with "false" is the same error that makes quantifier negation hard in “Negating Quantified Statements”.'),
             ("Assuming vagueness and ignorance are the same problem",
              "\"Tall\" has no sharp boundary, so \"he is tall\" is not a proposition. "
              "\"P = NP\" has a sharp meaning we cannot currently evaluate, so it is."),
         ],
         "standard": ("Finish when you can say why a sentence fails, not just that it does.",
-                     'Given ten sentences you should be able to sort them and name the specific reason for each exclusion: not declarative, open, self-referential, or vague. "It\'s not a proposition" without the reason is the answer that does not transfer to the “Predicates and Quantifiers” Lesson.'),
-        "note": 'The truth table lab appears here with a single variable on purpose. Two rows for one proposition, four for two, `2ⁿ` for `n` &mdash; the doubling is worth noticing now, because the “Truth Tables” Lesson depends on it and Combinatorics and Counting counts it.',
+                     'Given ten sentences you should be able to sort them and name the specific reason for each exclusion: not declarative, open, self-referential, or vague. "It\'s not a proposition" without the reason is the answer that does not transfer to “Predicates and Quantifiers”.'),
+        "note": 'The truth table lab appears here with a single variable on purpose. Two rows for one proposition, four for two, `2ⁿ` for `n` &mdash; the doubling is worth noticing now, because “Truth Tables” depends on it and Combinatorics and Counting counts it.',
     },
     # ---------------------------------------------------------------- 02
     {
@@ -216,7 +216,7 @@ LESSONS = [
                 "F   T  |   T     F     T     T",
                 "F   F  |   T     F     F     F",
             ]),
-            ("p", 'Two English constructions to watch. "Neither `p` nor `q`" is `¬p ∧ ¬q`, which the “Logical Equivalence” Lesson shows equals `¬(p ∨ q)`. "`p` unless `q`" is `¬q → p`, which is the “The Conditional and Its Relatives” Lesson\'s business and is <em>not</em> `p ⊕ q`.'),
+            ("p", 'Two English constructions to watch. "Neither `p` nor `q`" is `¬p ∧ ¬q`, which “Logical Equivalence” shows equals `¬(p ∨ q)`. "`p` unless `q`" is `¬q → p`, which is “The Conditional and Its Relatives”\'s business and is <em>not</em> `p ⊕ q`.'),
             ("thm", ("Precedence",
                      "In order from tightest to loosest: `¬`, then `∧`, then `∨` and `⊕`, "
                      "then `→`, then `↔`. So `¬p ∨ q ∧ r` means `(¬p) ∨ (q ∧ r)`. This is "
@@ -288,7 +288,7 @@ LESSONS = [
         ],
         "mistakes": [
             ("Reading `∨` as exclusive",
-             "It costs you one row in every truth table containing a disjunction, and it makes De Morgan's laws look wrong in the “Logical Equivalence” Lesson."),
+             "It costs you one row in every truth table containing a disjunction, and it makes De Morgan's laws look wrong in “Logical Equivalence”."),
             ("Dropping parentheses around a negation",
              "`¬p ∧ q` and `¬(p ∧ q)` disagree in two of four rows. When a negation "
              "governs more than a single letter, write the brackets."),
@@ -326,7 +326,7 @@ LESSONS = [
         ),
         "concepts": [
             ("The number of rows is `2ⁿ`",
-             "Each variable doubles the cases. Three variables give 8 rows, five give 32. This growth is why the “Logical Equivalence” Lesson's equivalence laws are worth having."),
+             "Each variable doubles the cases. Three variables give 8 rows, five give 32. This growth is why “Logical Equivalence”'s equivalence laws are worth having."),
             ("Columns go inside out",
              "Evaluate the innermost subexpressions first and build outward, exactly as "
              "you would evaluate an arithmetic expression."),
@@ -383,7 +383,7 @@ LESSONS = [
              "Innermost first. Each new column should depend only on columns already "
              "written."),
             ("Read the last column",
-             'All `T` is a tautology, all `F` a contradiction, a mixture is contingent &mdash; the vocabulary of the “Tautology, Contradiction, Satisfiability” Lesson.'),
+             'All `T` is a tautology, all `F` a contradiction, a mixture is contingent &mdash; the vocabulary of “Tautology, Contradiction, Satisfiability”.'),
         ],
         "worked": {
             "title": "`¬p ∨ (q ∧ r)`, in full",
@@ -402,7 +402,7 @@ LESSONS = [
                 "F  F  F  |  T     F   |      T",
             ],
             "after": [
-                'Read the shape of the last column. When `p` is false, `¬p` is true and the disjunction is true whatever `q` and `r` do &mdash; four rows settled by one column. When `p` is true everything rests on `q ∧ r`, and only the row where both hold survives. Keep this column: the “The Conditional and Its Relatives” Lesson introduces a connective, `→`, whose table is exactly this one, and the rows that surprise people there are the four you have just filled in without surprise.'
+                'Read the shape of the last column. When `p` is false, `¬p` is true and the disjunction is true whatever `q` and `r` do &mdash; four rows settled by one column. When `p` is true everything rests on `q ∧ r`, and only the row where both hold survives. Keep this column: “The Conditional and Its Relatives” introduces a connective, `→`, whose table is exactly this one, and the rows that surprise people there are the four you have just filled in without surprise.'
             ],
         },
         "quiz_title": "Reading and building tables",
@@ -552,7 +552,7 @@ LESSONS = [
              "conclusion. If you cannot describe that case, you have not understood "
              "the claim."),
             ("Form the contrapositive when the hypothesis is awkward",
-             '"If `n²` is even then `n` is even" is hard to attack directly; its contrapositive "if `n` is odd then `n²` is odd" falls out in one line. The “Contraposition and Contradiction” Lesson makes this a method.'),
+             '"If `n²` is even then `n` is even" is hard to attack directly; its contrapositive "if `n` is odd then `n²` is odd" falls out in one line. “Contraposition and Contradiction” makes this a method.'),
             ("Never assume the converse",
              "Proving `p → q` gives you nothing about `q → p`. If you need both, say so "
              "and prove both."),
@@ -598,7 +598,7 @@ LESSONS = [
         ],
         "mistakes": [
             ("Using the converse as if it were the original",
-             'From `p → q` and `q`, nothing follows about `p`. This is the error behind most bad reasoning from evidence, and the “Rules of Inference” Lesson names it as a fallacy.'),
+             'From `p → q` and `q`, nothing follows about `p`. This is the error behind most bad reasoning from evidence, and “Rules of Inference” names it as a fallacy.'),
             ("Finding vacuous truth absurd and rejecting it",
              "It is a consequence of wanting `p → q` to be false only when the promise "
              "is broken. Any other convention makes universally quantified statements "
@@ -609,8 +609,8 @@ LESSONS = [
         ],
         "standard": ("Finish when you can write all three relatives of a conditional and "
                      "say which is equivalent, without a table.",
-                     'Given "if `n` is a multiple of 10 then `n` is a multiple of 5", produce the converse, inverse and contrapositive, and identify which are true &mdash; one integer settles the two that are not. The habit of forming the contrapositive is what the “Contraposition and Contradiction” Lesson turns into a proof technique.'),
-        "note": '`p → q ≡ ¬p ∨ q` is worth memorising: it converts every conditional into a disjunction and is how conditionals are eliminated when a formula is put into the normal forms of the “Normal Forms and Boolean Algebra” Lesson.',
+                     'Given "if `n` is a multiple of 10 then `n` is a multiple of 5", produce the converse, inverse and contrapositive, and identify which are true &mdash; one integer settles the two that are not. The habit of forming the contrapositive is what “Contraposition and Contradiction” turns into a proof technique.'),
+        "note": '`p → q ≡ ¬p ∨ q` is worth memorising: it converts every conditional into a disjunction and is how conditionals are eliminated when a formula is put into the normal forms of “Normal Forms and Boolean Algebra”.',
     },
     # ---------------------------------------------------------------- 05
     {
@@ -697,7 +697,7 @@ LESSONS = [
             "compare_with": "~p | ~q",
             "mode": "two",
             "panel_title": "Prove or refute an equivalence",
-            "panel_intro": 'In compare mode the lab highlights any row that separates the two formulas. No highlighted row means equivalent; one is a complete disproof. Then set A to `~(p & q)` and B to `~p & ~q` &mdash; the error the “Logical Connectives” Lesson warned about &mdash; and read the two rows that separate them.',
+            "panel_intro": 'In compare mode the lab highlights any row that separates the two formulas. No highlighted row means equivalent; one is a complete disproof. Then set A to `~(p & q)` and B to `~p & ~q` &mdash; the error “Logical Connectives” warned about &mdash; and read the two rows that separate them.',
         }),
         "steps_title": "Proving an equivalence",
         "steps_intro": "Two routes. Choose by the number of variables.",
@@ -762,14 +762,14 @@ LESSONS = [
              "`p ≡ q` is a claim about two formulas; `p ↔ q` is a formula. Writing "
              "`(p ≡ q) ∧ r` is a category error."),
             ("Checking a few rows and concluding equivalence",
-             "Agreement on the rows you looked at is not agreement on all of them. Induction and Recursion studies methods for proving claims over an unbounded domain."),
+             'Agreement on the rows you looked at is not agreement on all of them. This is the same gap Induction and Recursion spends a whole course closing.'),
         ],
         "standard": ("Finish when you can simplify a four-connective formula by named "
                      "laws and justify each step.",
                      "Take `¬(p ∨ (¬p ∧ q))` and reduce it to `¬p ∧ ¬q`, naming De Morgan, "
                      "distribution and negation as you use them. A step you cannot name "
                      "is a step you have guessed."),
-        "note": 'Every law above has a dual, obtained by swapping `∧` with `∨` and `T` with `F`. That symmetry is not a coincidence; the “Normal Forms and Boolean Algebra” Lesson makes it a structural fact about Boolean algebra.',
+        "note": 'Every law above has a dual, obtained by swapping `∧` with `∨` and `T` with `F`. That symmetry is not a coincidence; “Normal Forms and Boolean Algebra” makes it a structural fact about Boolean algebra.',
     },
     # ---------------------------------------------------------------- 06
     {
@@ -822,7 +822,7 @@ LESSONS = [
                   "reduces to any other, which is why an algorithm for one is an "
                   "algorithm for all."),
             ("thm", ("Equivalence as a tautology",
-                     "`A ≡ B` if and only if `A ↔ B` is a tautology. The “Logical Equivalence” Lesson's whole subject is therefore a special case of this lesson's.")),
+                     "`A ≡ B` if and only if `A ↔ B` is a tautology. “Logical Equivalence”'s whole subject is therefore a special case of this lesson's.")),
             ("p", "Deciding satisfiability by truth table takes `2ⁿ` rows. For a formula "
                   "with 300 variables &mdash; small by the standards of real applications "
                   "&mdash; that is `2³⁰⁰` rows, more than there are atoms in the "
@@ -877,7 +877,7 @@ LESSONS = [
                 "No assignment makes it false, so it is a TAUTOLOGY.",
             ],
             "after": [
-                'This tautology has a name: <em>modus tollens</em>, the inference rule of the “Rules of Inference” Lesson. Every valid rule of inference is a tautology in exactly this shape &mdash; premises conjoined, implying the conclusion.'
+                'This tautology has a name: <em>modus tollens</em>, the inference rule of “Rules of Inference”. Every valid rule of inference is a tautology in exactly this shape &mdash; premises conjoined, implying the conclusion.'
             ],
         },
         "quiz_title": "Classification",
@@ -901,7 +901,7 @@ LESSONS = [
                    "Truth tables give wrong answers for large formulas",
                    "Satisfiability is undecidable"],
              "c": 1,
-             "why": 'It is perfectly decidable &mdash; just exponentially so by the obvious method. Undecidability is a different phenomenon, and the “Decidability and the Halting Problem” Lesson in Algorithms and Complexity meets it.'},
+             "why": 'It is perfectly decidable &mdash; just exponentially so by the obvious method. Undecidability is a different phenomenon, and “Decidability and the Halting Problem” in Algorithms and Complexity meets it.'},
             {"q": "Which assignment shows that `(p ∨ q) → (p ∧ q)` is not a tautology?",
              "a": ["`p = T, q = T`", "`p = T, q = F`", "`p = F, q = F`",
                    "None &mdash; it is a tautology"],
@@ -1007,7 +1007,7 @@ LESSONS = [
                   "NAND, written `p ↑ q ≡ ¬(p ∧ q)`, expresses negation as `p ↑ p` and "
                   "conjunction as `(p ↑ q) ↑ (p ↑ q)`."),
             ("h3", "The same algebra, in hardware"),
-            ("p", 'Replace `T` with 1, `F` with 0, `∧` with AND, `∨` with OR and `¬` with NOT, and every law of the “Logical Equivalence” Lesson becomes a fact about digital circuits. A formula in DNF is a two-level circuit: a layer of AND gates feeding one OR gate. That correspondence is why NAND being functionally complete matters commercially &mdash; a chip can be built from one kind of gate.'),
+            ("p", 'Replace `T` with 1, `F` with 0, `∧` with AND, `∨` with OR and `¬` with NOT, and every law of “Logical Equivalence” becomes a fact about digital circuits. A formula in DNF is a two-level circuit: a layer of AND gates feeding one OR gate. That correspondence is why NAND being functionally complete matters commercially &mdash; a chip can be built from one kind of gate.'),
             ("p", "The two-level DNF circuit is fast and often enormous. Minimising it "
                   "&mdash; finding the smallest equivalent formula &mdash; is its own "
                   "hard problem, and is what Karnaugh maps and the Quine&ndash;McCluskey "

@@ -279,7 +279,7 @@ LESSONS = [
                 "Fibonacci heap                              Θ(|E| + n log n)",
             ]),
             ("p", "For sparse graphs the heap version is much faster; for dense ones the simple scan is competitive. The choice is exactly “Graph Representations”'s representation trade-off appearing again."),
-            ("p", "With all weights equal to 1, Dijkstra settles vertices in the order BFS visits them, and the priority queue degenerates into a plain queue. BFS is Dijkstra's special case, so the unweighted traversal in “Breadth-First and Depth-First Search” supplies the special case."),
+            ("p", "With all weights equal to 1, Dijkstra settles vertices in the order BFS visits them, and the priority queue degenerates into a plain queue. BFS is Dijkstra's special case, which is why “Breadth-First and Depth-First Search” came first."),
         ],
         "lab": ("graph", {
             "algo": "dijkstra", "preset": "lesson", "n": 4,
@@ -468,12 +468,12 @@ LESSONS = [
                      "<strong>children</strong>. The <strong>depth</strong> of a vertex is "
                      "its distance from the root, and the <strong>height</strong> of the "
                      "tree is the largest depth.")),
-            ("p", 'Rooting adds structure that the underlying tree does not have: "is an ancestor of" &mdash; the parent relation closed under transitivity &mdash; is a partial order, and it is the material from “Partial Orders” in Sets, Relations, and Functions appearing as a data structure.'),
+            ("p", 'Rooting adds structure that the underlying tree does not have: "is an ancestor of" &mdash; the parent relation closed under transitivity &mdash; is a partial order, and it is the material of “Partial Orders”, in Sets, Relations, and Functions, appearing as a data structure.'),
             ("thm", ("Binary trees",
                      "A <strong>binary tree</strong> has at most two children per vertex. "
                      "One of height `h` has at most `2^{h+1} − 1` vertices, so a binary "
                      "tree on `n` vertices has height at least `log₂(n+1) − 1`.")),
-            ("p", 'That bound is why balanced search trees are the data structure they are: `n` items can be arranged with depth about `log₂ n`, and search costs one comparison per level. The “Searching and Sorting” Lesson in Algorithms and Complexity makes the connection to binary search explicit.'),
+            ("p", 'That bound is why balanced search trees are the data structure they are: `n` items can be arranged with depth about `log₂ n`, and search costs one comparison per level. “Searching and Sorting” in Algorithms and Complexity makes the connection to binary search explicit.'),
             ("h3", "Counting trees"),
             ("thm", ("Cayley's formula",
                      "The number of distinct labelled trees on `n` vertices is `n^{n−2}`. "
@@ -593,7 +593,7 @@ LESSONS = [
             "PREORDER   root, then left subtree, then right    — copying, prefix notation",
             "INORDER    left, root, right                      — sorted order in a BST",
             "POSTORDER  left, right, then root                 — evaluation, deletion",
-            'all three are structural induction (the “Structural Induction” Lesson in Induction and Recursion)',
+            'all three are structural induction (“Structural Induction” in Induction and Recursion)',
         ],
         "key_label": "Where the root goes",
         "concepts_intro": (
@@ -605,7 +605,7 @@ LESSONS = [
              "Pre: before the subtrees. In: between them. Post: after both. Everything "
              "else is the same recursion."),
             ("Each is a structural induction",
-             'The recursive definition of a binary tree from the “Recursive Definitions” Lesson in Induction and Recursion gives the recursion directly.'),
+             'The recursive definition of a binary tree from “Recursive Definitions” in Induction and Recursion gives the recursion directly.'),
             ("Inorder on a search tree gives sorted order",
              "That is the defining property of a binary search tree, and it is why inorder "
              "matters."),
@@ -618,7 +618,7 @@ LESSONS = [
                 "INORDER(v):      INORDER(left);  visit v;  INORDER(right)",
                 "POSTORDER(v):    POSTORDER(left);  POSTORDER(right);  visit v",
             ]),
-            ("p", 'Each is the recursive definition of a binary tree with the visit inserted at a different point, so each is a structural induction in the sense of the “Structural Induction” Lesson in Induction and Recursion. Every node is visited exactly once and the cost is `Θ(n)`.'),
+            ("p", 'Each is the recursive definition of a binary tree with the visit inserted at a different point, so each is a structural induction in the sense of “Structural Induction” in Induction and Recursion. Every node is visited exactly once and the cost is `Θ(n)`.'),
             ("h3", "Expression trees"),
             ("p", "An arithmetic expression is a binary tree: operators are internal nodes "
                   "and operands are leaves. The three traversals produce the three standard "
@@ -638,7 +638,7 @@ LESSONS = [
                   "operands, and on an operator pop two and push the result. No parentheses "
                   "and no precedence rules are needed, because the tree structure is "
                   "already encoded in the order."),
-            ("p", 'Infix is the notation people read and the only one of the three that is ambiguous without parentheses or precedence conventions &mdash; which is the whole reason the “Logical Connectives” Lesson in Logic and Proof states a precedence order.'),
+            ("p", 'Infix is the notation people read and the only one of the three that is ambiguous without parentheses or precedence conventions &mdash; which is the whole reason “Logical Connectives” in Logic and Proof had to state a precedence order.'),
             ("h3", "Binary search trees"),
             ("def", ("Binary search tree",
                      "A binary tree in which every node's key exceeds all keys in its left "
@@ -653,7 +653,7 @@ LESSONS = [
                 "root; then `R`'s keys in increasing order, all greater. The concatenation "
                 "is increasing.",
             ]),
-            ("p", 'Searching a balanced binary search tree costs `Θ(log n)`, one comparison per level, which is the binary search in “Searching and Sorting” in Algorithms and Complexity reorganised as a data structure. If the tree is unbalanced &mdash; a path &mdash; it degenerates to `Θ(n)`, which is why balancing schemes exist.'),
+            ("p", "Searching a balanced binary search tree costs `Θ(log n)`, one comparison per level, which is the binary search of “Searching and Sorting”, in Algorithms and Complexity, reorganised as a data structure. If the tree is unbalanced &mdash; a path &mdash; it degenerates to `Θ(n)`, which is why balancing schemes exist."),
             ("h3", "Other traversals"),
             ("p", "<strong>Level order</strong> visits by depth and is exactly breadth-first "
                   "search from the root, using a queue rather than recursion. It is the "
@@ -794,7 +794,7 @@ LESSONS = [
              "Take the cheapest edge that does not close a cycle, repeatedly. The cut "
              "property is why this cannot go wrong."),
             ("Greedy is usually wrong",
-             'The “Greedy Algorithms” Lesson in Algorithms and Complexity shows greedy failing on coin change and on the travelling salesman. Minimum spanning trees are the exception, and the reason is structural.'),
+             '“Greedy Algorithms” in Algorithms and Complexity shows greedy failing on coin change and on the travelling salesman. Minimum spanning trees are the exception, and the reason is structural.'),
         ],
         "read_title": "Spanning trees",
         "read_intro": "Existence, the minimum weight problem, and why greed works here.",
@@ -848,7 +848,7 @@ LESSONS = [
                   "such property, and greed then fails &mdash; sometimes badly. Coin change "
                   "with denominations `{1, 3, 4}` is greedy-wrong at 6, and the travelling "
                   "salesman is greedy-wrong routinely."),
-            ("p", 'The technical name for the structure that makes greed correct is a <strong>matroid</strong>, and the forests of a graph form one. The “Greedy Algorithms” Lesson in Algorithms and Complexity discusses greedy algorithms without the theory; what matters here is that "greedy works" is a theorem about this problem, not a general method.'),
+            ("p", 'The technical name for the structure that makes greed correct is a <strong>matroid</strong>, and the forests of a graph form one. “Greedy Algorithms” in Algorithms and Complexity discusses greedy algorithms without the theory; what matters here is that "greedy works" is a theorem about this problem, not a general method.'),
             ("h3", "Cost"),
             ("p", "Kruskal sorts the edges &mdash; `Θ(|E| log |E|)` &mdash; and then tests "
                   "each for a cycle using a union&ndash;find structure, at nearly constant "
@@ -942,7 +942,7 @@ LESSONS = [
         ],
         "mistakes": [
             ("Assuming greedy works generally",
-             'It works here because of the cut property. The “Greedy Algorithms” Lesson in Algorithms and Complexity shows greedy failing on a problem that looks no harder.'),
+             'It works here because of the cut property. “Greedy Algorithms” in Algorithms and Complexity shows greedy failing on a problem that looks no harder.'),
             ("Reading the tree as a shortest-path tree",
              "It minimises the total weight of the tree, not the distance between any "
              "pair. In the worked example the tree route `A–B–C–D–E` weighs 10 while the "
@@ -1025,7 +1025,7 @@ LESSONS = [
             ("thm", ("Colouring is hard",
                      "Deciding whether `χ(G) ≤ 3` is NP-complete, and computing `χ(G)` "
                      "exactly is NP-hard. Even approximating it well is hard.")),
-            ("p", 'The jump from 2 to 3 is an example of a problem changing character with a parameter. Nothing in the statements suggests it, and the “P, NP and NP-Completeness” Lesson in Algorithms and Complexity explains what NP-complete means.'),
+            ("p", 'The jump from 2 to 3 is the sharpest example on this path of a problem changing character with a parameter. Nothing in the statements suggests it, and “P, NP and NP-Completeness” in Algorithms and Complexity explains what NP-complete means.'),
             ("h3", "The four-colour theorem"),
             ("thm", ("Four colours suffice",
                      "Every planar graph has `χ(G) ≤ 4`.")),
@@ -1141,7 +1141,7 @@ LESSONS = [
                      "For a graph of your own, find the largest complete subgraph you can "
                      "and run greedy. If the two numbers meet you have `χ` exactly; if not, "
                      "you have located the difficulty."),
-        "note": 'Register allocation in compilers is graph colouring on a graph with thousands of vertices, solved by heuristics because the exact problem is NP-hard. It is one of the most economically significant applications of graph theory.',
+        "note": 'Register allocation in compilers is graph colouring on a graph with thousands of vertices, solved by heuristics because the exact problem is NP-hard. It is one of the most economically significant applications of anything on this path.',
     },
     # ---------------------------------------------------------------- 14
     {
@@ -1237,7 +1237,7 @@ LESSONS = [
                      "`2E = Σ deg(v) ≥ 6V`, contradicting `E ≤ 3V − 6`. That fact is the "
                      "base of the induction proving the five-colour theorem, and the "
                      "starting point of the four-colour proof.")),
-            ("p", "The handshake theorem applies here. Counting degrees gave Euler's criterion in “Euler and Hamilton Paths”, the tree edge count in “Trees”, and now the degree bound that makes planar graphs colourable."),
+            ("p", "So this course ends where it began: with the handshake theorem. Counting degrees gave Euler's criterion in “Euler and Hamilton Paths”, the tree edge count in “Trees”, and now the degree bound that makes planar graphs colourable."),
         ],
         "lab": ("graph", {
             "algo": "planar", "preset": "complete", "n": 5,

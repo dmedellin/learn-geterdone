@@ -128,7 +128,7 @@ LESSONS = [
                 "has an odd number of nodes.        ∎",
             ],
             "after": [
-                'The parity argument is the result from “Direct Proof” in Logic and Proof reused: the sum of two odd integers is even. Structural induction supplied the two odd numbers; elementary arithmetic finished the job.'
+                "The parity argument reuses the result of “Direct Proof”, in Logic and Proof: the sum of two odd integers is even. Structural induction supplied the two odd numbers; elementary arithmetic finished the job."
             ],
         },
         "quiz_title": "Structural induction",
@@ -327,7 +327,7 @@ LESSONS = [
                 "Cost: at most 2·log₂ n calls — two odd steps never occur in a row.",
             ],
             "after": [
-                'Strong induction is essential here: the even branch reaches back to `n/2`, not to `n − 1`. Ordinary induction would give a hypothesis about the wrong value. The “Modular Exponentiation” Lesson in Number Theory and Cryptography uses this algorithm as modular exponentiation, where the saving is the difference between feasible and impossible.'
+                'Strong induction is essential here: the even branch reaches back to `n/2`, not to `n − 1`. Ordinary induction would give a hypothesis about the wrong value. “Modular Exponentiation” in Number Theory and Cryptography uses this algorithm as modular exponentiation, where the saving is the difference between feasible and impossible.'
             ],
         },
         "quiz_title": "Recursive correctness",
@@ -369,8 +369,8 @@ LESSONS = [
              "used but not stated is a proof of a different theorem."),
         ],
         "standard": ("Finish when you can discharge both obligations in a paragraph.",
-                     'Write a recursive algorithm computing the `n`th Fibonacci number, prove it terminates and prove it correct. Then count the calls it makes: the naive version makes exponentially many &mdash; about `φⁿ`, the root “Solving Linear Recurrences” finds for this recurrence &mdash; and the “Dynamic Programming” Lesson in Algorithms and Complexity returns to fix that.'),
-        "note": 'The naive recursive Fibonacci makes about `1.6ⁿ` calls because it recomputes the same subproblems repeatedly. Storing results &mdash; memoisation &mdash; drops it to `n` calls, and that observation is the whole idea of dynamic programming in the “Dynamic Programming” Lesson in Algorithms and Complexity.',
+                     'Write a recursive algorithm computing the `n`th Fibonacci number, prove it terminates and prove it correct. Then count the calls it makes: the naive version makes exponentially many &mdash; about `φⁿ`, the root “Solving Linear Recurrences” finds for this recurrence &mdash; and “Dynamic Programming” in Algorithms and Complexity returns to fix that.'),
+        "note": 'The naive recursive Fibonacci makes about `1.6ⁿ` calls because it recomputes the same subproblems repeatedly. Storing results &mdash; memoisation &mdash; drops it to `n` calls, and that observation is the whole idea of dynamic programming in “Dynamic Programming” in Algorithms and Complexity.',
     },
     # ---------------------------------------------------------------- 09
     {
@@ -455,12 +455,12 @@ LESSONS = [
                 "   = 2ⁿ⁻¹H₁ + (2ⁿ⁻² + … + 2 + 1)",
                 "   = 2ⁿ⁻¹ + 2ⁿ⁻¹ − 1       = 2ⁿ − 1",
             ]),
-            ("p", 'The geometric sum from “Induction with Sums and Products” finished it. Unrolling works well for first-order recurrences and becomes unmanageable for higher orders, which is why “Solving Linear Recurrences” develops characteristic-root methods.'),
+            ("p", 'The geometric sum from “Induction with Sums and Products” finished it. Unrolling works well for first-order recurrences and becomes unmanageable for higher orders, which is why “Solving Linear Recurrences” exists.'),
         ],
         "lab": ("recurrence", {
             "preset": "hanoi",
             "panel_title": "Set up, unroll, compare",
-            "panel_intro": "Each preset shows the recurrence unrolled beside its closed form. The note under the status line explains where the closed form came from &mdash; the subject of “Solving Linear Recurrences” and “Divide-and-Conquer Recurrences”. The Tower of Hanoi here starts at `a₀ = 0` rather than the lesson's `H₁ = 1` and agrees from `a₁` on. Then select `aₙ = aₙ₋₁ + n`: it unrolls to 0, 1, 3, 6, 10, 15, the triangular numbers, and its closed form is “Induction with Sums and Products”'s first identity arrived at from the other direction.",
+            "panel_intro": "Each preset shows the recurrence unrolled beside its closed form. The note under the status line explains where the closed form came from &mdash; which is “Solving Linear Recurrences” and “Divide-and-Conquer Recurrences”. The Tower of Hanoi here starts at `a₀ = 0` rather than the lesson's `H₁ = 1` and agrees from `a₁` on. Then select `aₙ = aₙ₋₁ + n`: it unrolls to 0, 1, 3, 6, 10, 15, the triangular numbers, and its closed form is the first identity of “Induction with Sums and Products” arrived at from the other direction.",
         }),
         "steps_title": "Setting up a recurrence",
         "steps_intro": "Find the last decision; everything before it is a smaller instance.",
@@ -534,7 +534,7 @@ LESSONS = [
              "Order `k` needs `k` of them. Fewer leaves the sequence undetermined; more "
              "may be inconsistent with the recurrence."),
             ("Treating an unrolled pattern as proved",
-             'Unrolling produces a conjecture. The induction proof is what turns it into a solution, and the “Cases, Counterexamples, and Writing a Proof” Lesson in Logic and Proof explains why that step is not a formality.'),
+             'Unrolling produces a conjecture. The induction proof is what turns it into a solution, and “Cases, Counterexamples, and Writing a Proof” in Logic and Proof explains why that step is not a formality.'),
         ],
         "standard": ("Finish when you can derive a recurrence and verify its first terms "
                      "by hand.",
@@ -800,7 +800,7 @@ LESSONS = [
                   "greater than 1, and `a/bᵈ` compared with 1 is `log_b a` compared with "
                   "`d`. That is the whole theorem."),
             ("def", ("The Θ notation, as much as is needed here",
-                     '`T(n) = Θ(g(n))` means `T(n)` is trapped between two positive constant multiples of `g(n)` for all large enough `n`: `c₁ g(n) ≤ T(n) ≤ c₂ g(n)` once `n` is past some threshold. It names a growth rate and discards the constants. The “Big-O, Big-Omega and Big-Theta” Lesson in Algorithms and Complexity makes this precise and works with it; here it is only the shape of the answer the theorem reports.')),
+                     '`T(n) = Θ(g(n))` means `T(n)` is trapped between two positive constant multiples of `g(n)` for all large enough `n`: `c₁ g(n) ≤ T(n) ≤ c₂ g(n)` once `n` is past some threshold. It names a growth rate and discards the constants. “Big-O, Big-Omega and Big-Theta” in Algorithms and Complexity makes this precise and works with it; here it is only the shape of the answer the theorem reports.')),
             ("thm", ("Master theorem (polynomial form)",
                      "Let `T(n) = aT(n/b) + Θ(nᵈ)` with `a ≥ 1`, `b &gt; 1`, `d ≥ 0`. Then "
                      "`T(n) = Θ(nᵈ)` if `log_b a &lt; d`; `T(n) = Θ(nᵈ log n)` if "
@@ -1054,7 +1054,7 @@ LESSONS = [
         ],
         "worked": {
             "title": "Euclid's algorithm",
-            "intro": ['The “The Euclidean Algorithm” Lesson in Number Theory and Cryptography uses this; here it is the correctness argument.'],
+            "intro": ['“The Euclidean Algorithm” in Number Theory and Cryptography uses this; here it is the correctness argument.'],
             "lines": [
                 "GCD(a, b):",
                 "    while b ≠ 0:",
@@ -1125,6 +1125,6 @@ LESSONS = [
                      "invariant. Then check that at exit the invariant plus the loop "
                      "condition gives exactly `result = xⁿ` &mdash; if it needs an extra "
                      "sentence, the invariant was too weak."),
-        "note": 'This is the whole of Hoare logic in miniature: preconditions, postconditions and invariants, with a proof rule for each construct. The “Correctness and Termination” Lesson in Algorithms and Complexity returns to correctness as a property to be established before efficiency is worth measuring.',
+        "note": 'This is the whole of Hoare logic in miniature: preconditions, postconditions and invariants, with a proof rule for each construct. “Correctness and Termination” in Algorithms and Complexity returns to correctness as a property to be established before efficiency is worth measuring.',
     },
 ]

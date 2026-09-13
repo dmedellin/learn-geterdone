@@ -85,7 +85,7 @@ LESSONS = [
             "size": 4,
             "preset": "le",
             "panel_title": "A predicate you can edit",
-            "panel_intro": "The grid IS the predicate: cell `(x, y)` says whether `P(x, y)` holds, and every verdict is recomputed by walking it. Read only the first and last lines of the verdict table for now: `∀x ∀y` is this lesson's `∀` applied to every pair and `∃x ∃y` is its `∃`. One empty cell is enough to break the first; one full cell is all the second needs. The four mixed lines are the “Nested Quantifiers” Lesson's, and they are the reason it exists.",
+            "panel_intro": "The grid IS the predicate: cell `(x, y)` says whether `P(x, y)` holds, and every verdict is recomputed by walking it. Read only the first and last lines of the verdict table for now: `∀x ∀y` is this lesson's `∀` applied to every pair and `∃x ∃y` is its `∃`. One empty cell is enough to break the first; one full cell is all the second needs. The four mixed lines are “Nested Quantifiers”'s, and they are the reason it exists.",
         }),
         "steps_title": "Translating into quantifiers",
         "steps_intro": "Domain first, predicate second, quantifier last.",
@@ -137,7 +137,7 @@ LESSONS = [
                    "Show `∃x ¬P(x)` is false",
                    "Build a truth table"],
              "c": 1,
-             "why": 'One counterexample is a complete refutation of a universal claim. That nobody has proved it says nothing about its value (the “Propositions and Truth Values” Lesson); showing `∃x ¬P(x)` false would PROVE it, not refute it; and a truth table has no rows to offer over an infinite domain.'},
+             "why": 'One counterexample is a complete refutation of a universal claim. That nobody has proved it says nothing about its value (“Propositions and Truth Values”); showing `∃x ¬P(x)` false would PROVE it, not refute it; and a truth table has no rows to offer over an infinite domain.'},
             {"q": "\"Some student passed\" is correctly written as:",
              "a": ["`∃x (Student(x) → Passed(x))`",
                    "`∀x (Student(x) → Passed(x))`",
@@ -254,7 +254,7 @@ LESSONS = [
             "size": 4,
             "preset": "diag",
             "panel_title": "Separate the two orders",
-            "panel_intro": 'The identity preset separates the theorem pair: every `x` has a `y` with `y = x` — its own — so `∀x ∃y` holds, but no single `y` equals everything, so `∃y ∀x` fails. Then try the successor preset and explain why `∀x ∃y` fails there too: on the finite universe `{1, …, 4}` the top element has no successor. The claim true over all of `ℕ` dies at the edge of a truncated domain — the domain is part of the statement, exactly as the “Predicates and Quantifiers” Lesson said.',
+            "panel_intro": 'The identity preset separates the theorem pair: every `x` has a `y` with `y = x` — its own — so `∀x ∃y` holds, but no single `y` equals everything, so `∃y ∀x` fails. Then try the successor preset and explain why `∀x ∃y` fails there too: on the finite universe `{1, …, 4}` the top element has no successor. The claim true over all of `ℕ` dies at the edge of a truncated domain — the domain is part of the statement, exactly as “Predicates and Quantifiers” said.',
         }),
         "steps_title": "Reading a nested statement",
         "steps_intro": "Left to right, and never rearrange.",
@@ -394,7 +394,7 @@ LESSONS = [
                 "  ≡ ∃x ∀y ¬ ∀z  P(x, y, z)",
                 "  ≡ ∃x ∀y ∃z ¬P(x, y, z)",
             ]),
-            ("p", 'Every quantifier has flipped and the negation now sits on the predicate, where the propositional rules of the “Logical Equivalence” Lesson take over. If `P` is a conditional, `¬(A → B) ≡ A ∧ ¬B` finishes the job.'),
+            ("p", 'Every quantifier has flipped and the negation now sits on the predicate, where the propositional rules of “Logical Equivalence” take over. If `P` is a conditional, `¬(A → B) ≡ A ∧ ¬B` finishes the job.'),
             ("example", ("Negating a restricted universal",
                          "\"Every prime greater than 2 is odd\" is "
                          "`∀x ((P(x) ∧ x &gt; 2) → Odd(x))`. Its negation is "
@@ -529,7 +529,7 @@ LESSONS = [
              "A valid argument from false premises proves nothing about the world; it "
              "guarantees only that the conclusion follows."),
             ("The two fallacies are conditional confusions",
-             'Affirming the consequent uses the converse; denying the antecedent uses the inverse. The “The Conditional and Its Relatives” Lesson already showed neither is equivalent to the original.'),
+             'Affirming the consequent uses the converse; denying the antecedent uses the inverse. “The Conditional and Its Relatives” already showed neither is equivalent to the original.'),
         ],
         "read_title": "Valid inference",
         "read_intro": "The definition, the standard rules, and how to check any candidate rule yourself.",
@@ -672,7 +672,7 @@ LESSONS = [
                      "able to say in one line whether it is modus ponens, modus tollens, "
                      "or one of the two fallacies &mdash; and for the fallacies, state the "
                      "row that breaks it."),
-        "note": 'The four quantifier rules are stated here without full justification because the conditions on them (fresh names, arbitrary elements) are what a proof must respect. The “Direct Proof”, “Contraposition and Contradiction”, and “Cases, Counterexamples, and Writing a Proof” Lessons use them in prose, which is how they appear in practice.',
+        "note": 'The four quantifier rules are stated here without full justification because the conditions on them (fresh names, arbitrary elements) are what a proof must respect. “Direct Proof”, “Contraposition and Contradiction” and “Cases, Counterexamples, and Writing a Proof” use them in prose, which is how they appear in practice.',
     },
     # ---------------------------------------------------------------- 12
     {
@@ -751,13 +751,13 @@ LESSONS = [
                   "distinguish the assumption you made from the conclusion you reached; "
                   "confusing the two is how a proof silently becomes circular."),
             ("example", ("A proof that assumes what it proves",
-                         '"Claim: if `n²` is even then `n` is even. Proof: `n` is even, so `n = 2k`, so `n² = 4k²` is even." This proves the converse, having assumed the conclusion. It is the most common flawed proof in this course, and the “Contraposition and Contradiction” Lesson gives the technique that handles the real claim.')),
-            ("p", 'When a direct proof stalls, that is information. Being unable to get from `p` to `q` forwards often means the natural route is backwards &mdash; through the contrapositive &mdash; which is the “Contraposition and Contradiction” Lesson.'),
+                         '"Claim: if `n²` is even then `n` is even. Proof: `n` is even, so `n = 2k`, so `n² = 4k²` is even." This proves the converse, having assumed the conclusion. It is the most common flawed proof in this course, and “Contraposition and Contradiction” gives the technique that handles the real claim.')),
+            ("p", 'When a direct proof stalls, that is information. Being unable to get from `p` to `q` forwards often means the natural route is backwards &mdash; through the contrapositive &mdash; which is “Contraposition and Contradiction”.'),
         ],
         "lab": ("induction", {
             "statement": "div6",
             "panel_title": "Check a claim before you try to prove it",
-            "panel_intro": '`n³ − n` is divisible by 6 for every `n` the slider reaches, and the table is evidence about those `n` and nothing more. Try a direct proof of the claim: `n³ − n = (n − 1) n (n + 1)`, and the attempt stalls at "one of three consecutive integers is a multiple of 3", which needs a split into cases. A stall like that is diagnostic &mdash; the “Contraposition and Contradiction” Lesson is about reading it &mdash; and the “Cases, Counterexamples, and Writing a Proof” Lesson finishes this claim. Ignore the "inductive step" line under the table for now: it is Induction and Recursion\'s vocabulary.',
+            "panel_intro": '`n³ − n` is divisible by 6 for every `n` the slider reaches, and the table is evidence about those `n` and nothing more. Try the direct proof after this lesson: `n³ − n = (n − 1) n (n + 1)`, and the attempt stalls at "one of three consecutive integers is a multiple of 3", which needs a split into cases. A stall like that is diagnostic &mdash; “Contraposition and Contradiction” is about reading it &mdash; and “Cases, Counterexamples, and Writing a Proof” finishes this claim. Ignore the "inductive step" line under the table for now: it is Induction and Recursion\'s vocabulary.',
         }),
         "steps_title": "Writing a direct proof",
         "steps_intro": "The first two steps are where proofs are won or lost.",
@@ -866,7 +866,7 @@ LESSONS = [
         ),
         "concepts": [
             ("Contraposition proves an equivalent statement",
-             '`p → q ≡ ¬q → ¬p` (the “The Conditional and Its Relatives” Lesson), so proving one proves the other. Nothing is assumed beyond the new hypothesis `¬q`.'),
+             '`p → q ≡ ¬q → ¬p` (“The Conditional and Its Relatives”), so proving one proves the other. Nothing is assumed beyond the new hypothesis `¬q`.'),
             ("Contradiction assumes the negation of the goal",
              "You assume `¬s` and derive something false. The falsehood may be anything: "
              "`0 = 1`, a number both even and odd, a contradiction of a hypothesis."),
@@ -1028,7 +1028,7 @@ LESSONS = [
                      "Prove \"if `n` is an integer and `n² + 5` is odd then `n` is even\" "
                      "&mdash; and be able to say, before starting, which technique you "
                      "will use and why the other would be harder."),
-        "note": "Constructive mathematics rejects proof by contradiction for existence claims: knowing that no counterexample exists is not the same as being able to produce an example. That distinction has no consequences for the arguments here, but Euclid's proof above is worth revisiting with it in mind.",
+        "note": "Constructive mathematics rejects proof by contradiction for existence claims: knowing that no counterexample exists is not the same as being able to produce an example. That distinction has no consequences on this path, but Euclid's proof above is worth revisiting with it in mind.",
     },
     # ---------------------------------------------------------------- 14
     {
@@ -1049,7 +1049,7 @@ LESSONS = [
         ],
         "key_label": "The last three techniques",
         "concepts_intro": (
-            "Two more techniques, and then the standard every proof here is held to."
+            'Two more techniques, and then the standard everything on this path is held to.'
         ),
         "concepts": [
             ("Cases must be exhaustive",
@@ -1095,7 +1095,7 @@ LESSONS = [
                      "A <strong>counterexample</strong> to `∀x P(x)` is an element `c` of "
                      "the domain with `¬P(c)`. Exhibiting one disproves the statement "
                      "completely.")),
-            ("p", 'This follows directly from the “Negating Quantified Statements” Lesson: `¬∀x P(x) ≡ ∃x ¬P(x)`, and an existential is proved by producing a witness. It is why negating a claim before attacking it is worth the two minutes &mdash; the negation describes exactly what you are hunting for.'),
+            ("p", 'This follows directly from “Negating Quantified Statements”: `¬∀x P(x) ≡ ∃x ¬P(x)`, and an existential is proved by producing a witness. It is why negating a claim before attacking it is worth the two minutes &mdash; the negation describes exactly what you are hunting for.'),
             ("example", ("Refuting a plausible claim",
                          "\"Every positive integer is the sum of at most three squares\" "
                          "is false: 7 requires four (`4 + 1 + 1 + 1`). One number settles "
@@ -1103,7 +1103,7 @@ LESSONS = [
                          "the sum of at most four squares &mdash; is Lagrange's theorem, "
                          "and needs a real proof.")),
             ("h3", "Why checking is not proving"),
-            ("p", "Induction and Recursion develops methods for proving such statements."),
+            ("p", 'This is the point the whole course has been building toward, and Induction and Recursion exists because of it.'),
             ("thm", ("Two statements that survive dozens of checks and are false",
                      "`n² + n + 41` is prime for every `n` from 0 to 39, and composite at "
                      "`n = 40`, where it equals `1681 = 41²`. And `n` points on a circle "
@@ -1127,7 +1127,7 @@ LESSONS = [
                 "&mdash; write it.",
                 "<strong>An explicit ending.</strong> State what has been proved.",
             ]),
-            ("p", 'A proof is a social object as much as a logical one: its purpose is to convince a careful, skeptical reader who does not already believe the claim. Everything in the “Direct Proof”, “Contraposition and Contradiction”, and “Cases, Counterexamples, and Writing a Proof” Lessons serves that purpose.'),
+            ("p", 'A proof is a social object as much as a logical one: its purpose is to convince a careful, skeptical reader who does not already believe the claim. Everything in “Direct Proof”, “Contraposition and Contradiction” and “Cases, Counterexamples, and Writing a Proof” serves that purpose.'),
         ],
         "lab": ("induction", {
             "statement": "prime41",
@@ -1208,7 +1208,7 @@ LESSONS = [
         ],
         "standard": ("Finish when you can state, for any claim, what would refute it, "
                      "and prove one claim by cases.",
-                     "Before attempting a proof, identify what would count as a counterexample. It tells you whether to hunt for a proof or for a counterexample, and it is the mechanical negation of the “Negating Quantified Statements” Lesson put to work. Then prove the claim the “Direct Proof” Lesson's lab showed you: for every integer `n`, `n³ − n` is divisible by 3. Write `n³ − n = (n − 1) n (n + 1)`, split into `n = 3k`, `n = 3k + 1` and `n = 3k + 2`, and say in each case which factor is the multiple of 3. Divisibility by 6 adds the parity of this lesson's theorem and a fact about 2 and 3 that Number Theory and Cryptography proves."),
-        "note": "Induction and Recursion supplies the technique this lesson leaves missing: induction proves a statement for every natural number by proving one implication rather than infinitely many cases. It is the answer to \"checking is not proving\".",
+                     "That single habit &mdash; asking what a counterexample would look like before trying to prove anything &mdash; is what this course was for. It tells you whether to hunt for a proof or for a counterexample, and it is the mechanical negation of “Negating Quantified Statements” put to work. Then prove the claim “Direct Proof”'s lab showed you: for every integer `n`, `n³ − n` is divisible by 3. Write `n³ − n = (n − 1) n (n + 1)`, split into `n = 3k`, `n = 3k + 1` and `n = 3k + 2`, and say in each case which factor is the multiple of 3. Divisibility by 6 adds the parity of this lesson's theorem and a fact about 2 and 3 that Number Theory and Cryptography proves."),
+        "note": 'Induction and Recursion supplies the technique this lesson leaves missing: induction proves a statement for every natural number by proving one implication rather than infinitely many cases. It is the answer to "checking is not proving", and it is two courses away.',
     },
 ]

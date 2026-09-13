@@ -32,7 +32,7 @@ LESSONS = [
              "That is the whole difference between an equation and an expression: "
              "`3x − 4` on its own has nothing to be true about."),
             ("A solution is a value that makes the statement true",
-             'It is not "whatever comes out of the procedure". The procedure is a fast way of producing a candidate; substitution is what decides whether the candidate is a solution. Those are two different jobs and methods such as clearing a variable denominator can produce candidates that fail.'),
+             'It is not "whatever comes out of the procedure". The procedure is a fast way of producing a candidate; substitution is what decides whether the candidate is a solution. Those are two different jobs and later lessons will produce candidates that fail.'),
             ("Solving is a chain of equations with the same solutions",
              "Every legal move replaces an equation by another one with exactly the same "
              "solution set. That is the only reason the last line of the working, `x = 5`, "
@@ -220,7 +220,7 @@ LESSONS = [
              "keeping them separate is what makes the chain of equivalences readable."),
         ],
         "standard": ("Finish when you can decide, in exact arithmetic, whether a given number is a solution.",
-                     'Without the lab, test both `x = 3` and `x = 5/2` in `4x + 1 = 13`, showing the two side values and a verdict for each. Then explain why multiplying both sides by zero cannot preserve that solution set. Equation-solving methods produce candidates; this is how you find out what they are worth.'),
+                     'Without the lab, test both `x = 3` and `x = 5/2` in `4x + 1 = 13`, showing the two side values and a verdict for each. Then explain why multiplying both sides by zero cannot preserve that solution set. Every later lesson produces candidates; this is how you find out what they are worth.'),
         "note": '“One- and Two-Step Equations” starts producing candidates instead of testing them, using exactly the two properties stated above. Notice that the properties never mention `x`: they are facts about numbers, and that is why they apply to whatever the two sides of your equation happen to be.',
     },
     # ---------------------------------------------------------------- 02
@@ -414,10 +414,10 @@ LESSONS = [
              "by, not a decoration on the term, and this is the single most common "
              "arithmetic slip in the lesson."),
             ("Rounding an exact answer to a decimal",
-             "`x = 7/3` is the answer; `2.33` is a nearby number that fails the check. Fractions are exact, they are not harder to substitute, and algebraic work relies on them."),
+             '`x = 7/3` is the answer; `2.33` is a nearby number that fails the check. Fractions are exact, they are not harder to substitute, and the rest of this path expects them.'),
         ],
         "standard": ("Finish when you can name every operation you apply and check the result without being asked.",
-                     'Solve `9 − 4x = −6` without the lab: name each operation, keep the answer as an exact fraction, and substitute it into the original. Then solve `3(x + 2) = 21` once by division first and once by distribution; the two routes must agree. “Variables on Both Sides”, “Equations with Fractions” and “Literal Equations and Formulas” add collecting or clearing moves and finish with the same isolation and check.'),
+                     'Solve `9 − 4x = −6` without the lab: name each operation, keep the answer as an exact fraction, and substitute it into the original. Then solve `3(x + 2) = 21` once by division first and once by distribution; the two routes must agree. Everything in “Variables on Both Sides”, “Equations with Fractions” and “Literal Equations and Formulas” adds new opening moves and finishes exactly like this.'),
         "note": 'The lab shows one operation per row on purpose. When an equation goes wrong it is almost never the strategy that failed &mdash; it is one row, and a trace where every row is named tells you which one. “Variables on Both Sides” adds the only genuinely new move on the course: subtracting a variable term.',
     },
     # ---------------------------------------------------------------- 03
@@ -1061,7 +1061,7 @@ LESSONS = [
                      "collect both target terms, factor, divide, and state the condition "
                      "on the divisor. Use exact values to spot-check the result, then say "
                      "why that one assignment checks signs but does not prove the formula."),
-        "note": 'The condition `p ≠ 0` occurs in three forms: the multiplication property in “What It Means to Solve an Equation”, the final division in “One- and Two-Step Equations”, and the divisor here. “Identities and Contradictions” asks what an equation is saying when `p` really is zero, and the answer turns out to be one of exactly two things.',
+        "note": 'The condition `p ≠ 0` has now appeared in three lessons in three disguises: the multiplication property in “What It Means to Solve an Equation”, the final division in “One- and Two-Step Equations”, and the divisor here. “Identities and Contradictions” asks what an equation is saying when `p` really is zero, and the answer turns out to be one of exactly two things.',
     },
     # ---------------------------------------------------------------- 06
     {
@@ -1274,7 +1274,7 @@ LESSONS = [
                      "simplified remainder and write either the value, every real number, "
                      "or no solution. Then use `px = q` to explain why no linear equation "
                      "has exactly two solutions."),
-        "note": 'Equation-solving methods can produce these two lines, and they always mean the same thing. In Systems and Matrices a system of equations collapsing to `0 = 0` means the two equations were the same line, and one collapsing to `0 = 5` means the lines are parallel &mdash; the same reading, one dimension up.',
+        "note": 'Every method later on can produce these two lines, and they always mean the same thing. In Systems and Matrices a system of equations collapsing to `0 = 0` means the two equations were the same line, and one collapsing to `0 = 5` means the lines are parallel &mdash; the same reading, one dimension up.',
     },
     # ---------------------------------------------------------------- 07
     {
@@ -1378,7 +1378,7 @@ LESSONS = [
         "lab": ("equation", {
             "mode": "proportion",
             "panel_title": "Keep the ratio order, then cross-multiply",
-            "panel_intro": 'Before running the first or third preset, label what each numerator and denominator measures and predict the two cross products. Presets with a variable denominator illustrate “Rational and Radical Expressions”, not completion work for this lesson.',
+            "panel_intro": 'Before running the first or third preset, label what each numerator and denominator measures and predict the two cross products. Presets with a variable denominator are a preview of Rational and Radical Expressions, not completion work for this lesson.',
         }),
         "steps_title": "Solving a proportion",
         "steps_intro": "Most of the work is done before the algebra starts.",
@@ -1468,7 +1468,7 @@ LESSONS = [
              "`(new − old)/old` says so explicitly."),
         ],
         "standard": ("Finish when you set the proportion up with matching units and identify the percent whole before you solve.",
-                     'Without the lab, model this rate: 5 kg cost 14, so what do 8 kg cost? Label both ratio units, cross-multiply and check the exact answer. Then solve `45/w = 18/100` and say why `w`, rather than 45, is the whole. Variable-denominator equations remain “Rational and Radical Expressions” work.'),
+                     'Without the lab, model this rate: 5 kg cost 14, so what do 8 kg cost? Label both ratio units, cross-multiply and check the exact answer. Then solve `45/w = 18/100` and say why `w`, rather than 45, is the whole. Variable-denominator equations remain the work of Rational and Radical Expressions.'),
         "note": '“Modelling with Linear Equations” takes the same step &mdash; turning a described situation into an equation &mdash; without the proportion to hang it on, which makes naming the unknown the main decision. The excluded-value habit built here returns in Rational and Radical Expressions, where every rational equation begins with it.',
     },
 ]

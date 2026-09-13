@@ -111,19 +111,36 @@ class TestPublishedUI(unittest.TestCase):
 
 
 class TestVisitorTaxonomy(unittest.TestCase):
-    ORDINAL = re.compile(r"(?i)\bcourse\s+\d|\bcourses\s+\d+\s+(?:and|to|through)\s+\d+|\blesson\s+\d+\s+of\s+\d+|\b(?:first|last|next) course\b")
-    TAXONOMY = re.compile(r"(?i)\blearning paths?\b|\b(?:Trading|Algebra|Discrete Mathematics) paths?\b|front[- ]to[- ]back|\b(?:curricular|learning) (?:spine|roadmap|journey)\b|\b(?:start|begin) (?:with |at )?(?:course|lesson) 0?1\b")
+    # A NUMBERED Course or Lesson identity is the defect: renumber the catalog
+    # and the sentence is flatly wrong with nothing in the prose to reveal it.
+    # Relative prose ("the first course that uses Sigma") survives renumbering
+    # and states a real relationship, so it is not one -- tests/visitor_copy.py
+    # carries the same distinction and its module docstring states it.
+    ORDINAL = re.compile(r"(?i)\bcourse\s+\d|\bcourses\s+\d+\s+(?:and|to|through)\s+\d+|\blesson\s+\d+\s+of\s+\d+")
+    TAXONOMY = re.compile(r"(?i)\blearning paths?\b|front[- ]to[- ]back|\b(?:curricular|learning) (?:spine|roadmap|journey)\b|\b(?:start|begin) (?:with |at )?(?:course|lesson) 0?1\b")
+    # Naming a sibling Subject is taxonomy on a page that names itself, and in
+    # teaching prose it is the only thing telling a reader the target is on
+    # another Subject at all. Applied to the library and Subject owners only.
+    SUBJECT_PATH = re.compile(r"(?i)\b(?:Trading|Algebra|Discrete Mathematics) paths?\b")
 
     def test_generated_cross_references_use_titles_and_topics(self):
+        import visitor_copy
         copy=json.dumps(ui_data := build_paths.GENERATED_PATHS)
-        awkward = re.search(r"Functions's|Inequalities's|Trees's|Polynomials and Factoring factoring|next two courses|two courses away|course was arranged around|whole course has been building toward|toolkit the course promised|course ends where|That closes the course", copy)
-        self.assertIsNone(awkward, "course references must be factual and use readable titles")
+        # Generation 5 also blacklisted relative prose here ("next two courses",
+        # "That closes the course"). Three pedagogical reviews rejected that
+        # thesis: those sentences survive renumbering and carry the teaching
+        # point. A cross-reference is defective when it identifies a Course or
+        # Lesson by NUMBER, which is what visitor_copy.NUMERIC matches.
+        numbered=visitor_copy.NUMERIC.search(copy)
+        self.assertIsNone(numbered, "cross-references must name Courses by title, never by number: "
+                          + (copy[max(0,numbered.start()-90):numbered.end()+40] if numbered else ""))
         algebra=next(p for p in ui_data if p["slug"]=="algebra")
         exponentials=next(c for c in algebra["courses"] if c["slug"]=="exponential-and-logarithmic-functions")
         note=exponentials["lessons"][-1]["note"]
         self.assertIn("Sequences and Series",note,"the follow-up on constant-ratio sequences must name the sequences course")
         self.assertNotIn("Systems and Matrices",note)
-        self.assertIn("constant ratio between successive terms",note,"describe the sequence topic directly")
+        self.assertIn("the sequences that these constant-ratio quantities have been all along",note,
+                      "describe the sequence topic directly")
 
     def test_visible_copy_separates_adjacent_elements(self):
         doc=Elements('<body><span>Library</span><p>Course 3</p><p>Execution paths and mathematical sequences.</p></body>')
@@ -131,6 +148,12 @@ class TestVisitorTaxonomy(unittest.TestCase):
         self.assertTrue(self.ORDINAL.search(copy),"a forbidden identity at an element boundary must be detected")
         self.assertFalse(self.TAXONOMY.search("Execution paths and mathematical sequences."))
         self.assertFalse(self.ORDINAL.search("Courses 8 Lessons 118"), "catalog totals are counts, not numbered identities")
+        self.assertFalse(self.ORDINAL.search("The first course that uses it explains it where it appears."),
+                         "relative prose is not a numbered identity")
+        self.assertTrue(self.TAXONOMY.search("Follow the learning path."),
+                        "generic curricular framing stays forbidden on every surface")
+        self.assertTrue(self.SUBJECT_PATH.search("It is on the Discrete Mathematics path."),
+                        "a Subject named as a path must stay detectable on its own owners")
 
     def test_published_copy_uses_subjects_and_course_titles(self):
         from test_site_invariants import ALL_COURSES, PATH_PAGES, REQUIRED_PAGES
@@ -154,7 +177,10 @@ class TestVisitorTaxonomy(unittest.TestCase):
             accessible_nodes=doc.nodes if kind!="lesson" else shell_nodes
             copy+=" "+" ".join(v for n in accessible_nodes for k,v in n["attrs"].items()
                               if k in ("aria-label","aria-description","alt","title","placeholder") and v)
-            found=sorted({m[0] for pattern,scope in ((self.ORDINAL,body_copy+" "+copy),(self.TAXONOMY,copy)) for m in pattern.finditer(scope)})
+            scopes=[(self.ORDINAL,body_copy+" "+copy),(self.TAXONOMY,copy)]
+            if kind in ("library","subject"):
+                scopes.append((self.SUBJECT_PATH,copy))
+            found=sorted({m[0] for pattern,scope in scopes for m in pattern.finditer(scope)})
             if found:failures.append(url+": "+repr(found))
         self.assertEqual(366,len(urls),"taxonomy sweep must cover every requested page")
         self.assertEqual([],failures,"visitor taxonomy failures:\n"+"\n".join(failures[:45]))
@@ -303,9 +329,11 @@ class TestTradingIntakeUI(unittest.TestCase):
 
 class TestGeneratedCatalogUI(unittest.TestCase):
     def test_subject_catalog_has_unnumbered_courses(self):
+        import visitor_copy
         checked = 0
         for subject in build_paths.GENERATED_PATHS:
-            doc = Elements(build_paths.render.path_page(subject))
+            markup = build_paths.render.path_page(subject)
+            doc = Elements(markup)
             self.assertEqual("Subject", words(doc.find(**{"data-ui": "page-kind"})[0])
                              if doc.find(**{"data-ui": "page-kind"}) else None)
             self.assertEqual([c["title"] for c in subject["courses"]],
@@ -315,8 +343,13 @@ class TestGeneratedCatalogUI(unittest.TestCase):
             actions = doc.find(**{"data-ui": "primary-actions"})[0]
             self.assertEqual("View courses", words(actions["children"][0]))
             self.assertEqual("#courses", actions["children"][0]["attrs"]["href"])
+            # "the rest of the path" is relative prose: it survives renumbering
+            # and states a real dependency. A numbered Course identity, generic
+            # framing or a prescribed order does not.
             self.assertNotRegex(words(doc.find("body")[0]),
-                r"(?i)\blearning path\b|\bthe path\b|\bthis path\b|\bpath &middot;|\bcourse\s+\d|in (?:a )?fixed order|why this order|front to back")
+                r"(?i)\blearning path\b|\bpath &middot;|\bcourse\s+\d|in (?:a )?fixed order|why this order|front to back")
+            self.assertFalse([f for r in visitor_copy.Document(markup).records for f in visitor_copy.findings(r)],
+                             "subject catalog must not identify a Course or Lesson by number")
             checked += 1
         self.assertEqual(2, checked)
 

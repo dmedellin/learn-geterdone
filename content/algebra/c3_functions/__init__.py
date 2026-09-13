@@ -35,7 +35,7 @@ COURSE = {
     ),
     "blurb": (
         (
-        'Put algebra on a picture. Slope and every form of a line, then the definition that organises these courses &mdash; a function &mdash; with its notation, its domain, the transformations that move its graph, and its inverse.'
+        'Put algebra on a picture. Slope and every form of a line, then the definition that organises the rest of the path &mdash; a function &mdash; with its notation, its domain, the transformations that move its graph, and its inverse.'
     )
     ),
     "key": [
@@ -66,7 +66,7 @@ COURSE = {
          "line or a restricted square."),
     ],
     "syllabus_intro": (
-        'Lines and the half-planes they bound connect equations and inequalities with pictures. The definition of a function supports its notation, domain and range, piecewise rules, graph transformations, composition and inverse.'
+        'Lines and the half-planes they bound come first. “What a Function Is” defines a function; the rest of the course develops its notation, domain and range, piecewise rules, graph transformations, composition and inverse.'
     ),
     "how_to": [
         "After each complete example, cover its answer and finish the faded rehearsal. "

@@ -366,7 +366,7 @@ LESSONS = [
         "lab": ("inequality", {
             "mode": "linear",
             "panel_title": "One inequality, solved and drawn",
-            "panel_intro": 'Before running a preset, predict the boundary, whether it is included, and the exact operation that will reverse the relation. The lab reports the answer only as an inequality, words and a number line; formal set notation is covered in “Interval and Set-Builder Notation”.',
+            "panel_intro": 'Before running a preset, predict the boundary, whether it is included, and the exact operation that will reverse the relation. The lab reports the answer only as an inequality, words and a number line; formal set notation waits for “Interval and Set-Builder Notation”.',
         }),
         "steps_title": "Solving a linear inequality",
         "steps_intro": 'Steps 1 to 3 are “Variables on Both Sides” unchanged. Step 4 is what the relation adds.',
@@ -470,7 +470,7 @@ LESSONS = [
                      "to the step that reverses the first relation and explain why no step "
                      "reverses the second. For each answer, test its boundary plus one "
                      "number from either side in the original statement."),
-        "note": 'The answer above was written `x ≤ −6`. “Interval and Set-Builder Notation” writes the same set as `(−∞, −6]` and as `{ x ∈ ℝ : x ≤ −6 }`, and all three say the same thing. Compound inequalities and absolute-value equations and inequalities produce solution sets in two pieces, which is where those notations stop being optional.',
+        "note": 'The answer above was written `x ≤ −6`. “Interval and Set-Builder Notation” writes the same set as `(−∞, −6]` and as `{ x ∈ ℝ : x ≤ −6 }`, and all three say the same thing. “Compound Inequalities”, “Absolute Value Equations” and “Absolute Value Inequalities” produce solution sets in two pieces, which is where those notations stop being optional.',
     },
     # ---------------------------------------------------------------- 10
     {
@@ -571,7 +571,7 @@ LESSONS = [
         "lab": ("inequality", {
             "mode": "compound",
             "panel_title": "Two statements, three number lines",
-            "panel_intro": 'Solve both statements on paper and predict the combined shape before choosing `and` or `or`. The lab draws each set and the combination, using inequalities and words only; interval and set-builder notation are covered in “Interval and Set-Builder Notation”.',
+            "panel_intro": 'Solve both statements on paper and predict the combined shape before choosing `and` or `or`. The lab draws each set and the combination, using inequalities and words only; interval and set-builder notation wait for “Interval and Set-Builder Notation”.',
         }),
         "steps_title": "Solving a compound inequality",
         "steps_intro": "The two halves are solved independently. The connector is applied once, at the end, to the two answers.",
@@ -682,7 +682,7 @@ LESSONS = [
                      "overlap with correct endpoint inclusion. Then solve "
                      "`2x + 1 ≤ −3 or x − 4 &gt; 0` and report both rays. Test every finite "
                      "boundary against the original pair."),
-        "note": 'The connector decides everything here, and absolute-value inequalities supply it automatically: `|X| &lt; k` produces an <em>and</em> and `|X| &gt; k` produces an <em>or</em>. Understanding compound inequalities gives those absolute-value cases their intersection and union meanings.',
+        "note": 'The connector decides everything here, and “Absolute Value Equations” and “Absolute Value Inequalities” supply it automatically: `|X| &lt; k` produces an <em>and</em> and `|X| &gt; k` produces an <em>or</em>. That is the reason absolute value is treated after this lesson rather than before it.',
     },
     # ---------------------------------------------------------------- 11
     {
@@ -803,7 +803,7 @@ LESSONS = [
              "A negative number: no solutions, and you are finished. Zero: one case, "
              "`X = 0`. A positive number: two cases. An expression containing `x`: split, "
              "and rely on step 4 to sort the candidates out."),
-            ('Write the two equations and solve each using “One- and Two-Step Equations” and “Variables on Both Sides”',
+            ('Write the two equations and solve each by “One- and Two-Step Equations” and “Variables on Both Sides”',
              "`X = k` and `X = −k`. Write the second with a bracket &mdash; `X = −(k)` "
              "&mdash; so that a right side with several terms gets every one of its signs "
              "flipped."),
@@ -1017,7 +1017,7 @@ LESSONS = [
         "lab": ("inequality", {
             "mode": "absolute",
             "panel_title": "The band and the two rays, drawn",
-            "panel_intro": 'Before running a preset, predict whether the result is a band, two rays, everything or nothing, and name the connector. The lab answers with inequalities, words and drawings only; formal set notation is covered in “Interval and Set-Builder Notation”.',
+            "panel_intro": 'Before running a preset, predict whether the result is a band, two rays, everything or nothing, and name the connector. The lab answers with inequalities, words and drawings only; formal set notation waits for “Interval and Set-Builder Notation”.',
         }),
         "steps_title": "Solving an absolute value inequality",
         "steps_intro": "The first two steps decide which rule you are about to use, or whether you need one at all.",
@@ -1122,7 +1122,7 @@ LESSONS = [
                      "solve both pieces and test both boundaries plus one excluded value "
                      "in the original. Then classify all four statements `|x| &lt; 0`, "
                      "`|x| ≤ 0`, `|x| &gt; 0`, and `|x| ≥ 0`."),
-        "note": 'Two of the answers in this lesson &mdash; `x ≤ −2 or x ≥ 5`, and every real number &mdash; are awkward to write as inequalities in words. “Interval and Set-Builder Notation” supplies interval and set-builder notation, in which they become `(−∞, −2] ∪ [5, ∞)` and `(−∞, ∞)`.',
+        "note": 'Two of the answers in this lesson &mdash; `x ≤ −2 or x ≥ 5`, and every real number &mdash; are awkward to write in the notation used so far. The last lesson supplies interval and set-builder notation, in which they become `(−∞, −2] ∪ [5, ∞)` and `(−∞, ∞)`.',
     },
     # ---------------------------------------------------------------- 13
     {
@@ -1166,7 +1166,7 @@ LESSONS = [
         "read_title": "Writing a solution set down",
         "read_intro": "Four ways to say the same thing, the pieces each notation is made of, and the handful of written forms that mean nothing.",
         "body": [
-            ("p", 'Each solution set in the linear, compound and absolute-value inequality examples is a set of numbers written as an inequality. That is a perfectly good way to write a set, and it becomes clumsy the moment the set has two pieces. It also says nothing about which numbers were on the table to begin with. Two standard notations address both.'),
+            ("p", 'Every answer in “Linear Inequalities”, “Compound Inequalities”, “Absolute Value Equations” and “Absolute Value Inequalities” was a set of numbers written as an inequality. That is a perfectly good way to write a set, and it becomes clumsy the moment the set has two pieces. It also says nothing about which numbers were on the table to begin with. Two standard notations address both.'),
             ("def", ("Interval notation",
                      "For `a ≤ b`: `[a, b]` is the set of `x` with `a ≤ x ≤ b`; `(a, b)` "
                      "is the set with `a &lt; x &lt; b`; `[a, b)` and `(a, b]` include one "
@@ -1328,7 +1328,7 @@ LESSONS = [
              "claims that `0` is a solution."),
         ],
         "standard": ("Finish when you can move between the four representations without stopping to think.",
-                     'Translate `(−∞, 1) ∪ [6, ∞)` into an inequality, a real-number set-builder condition and a number line with correct endpoint dots. Then list `{ n ∈ ℤ : −2 &lt; n ≤ 2 }` and explain why the same condition over `ℝ` cannot be listed. These exact forms express solution sets for inequalities, domains and ranges.'),
+                     'Translate `(−∞, 1) ∪ [6, ∞)` into an inequality, a real-number set-builder condition and a number line with correct endpoint dots. Then list `{ n ∈ ℤ : −2 &lt; n ≤ 2 }` and explain why the same condition over `ℝ` cannot be listed. Every later solution set is expected in one of these exact forms.'),
         "note": "This closes the course. Every solution set of an inequality here has been an interval or a union of two intervals, because each statement reduces to at most two linear ones and a linear statement changes from true to false at most once along the line. Quadratics and Complex Numbers solves quadratic inequalities, where the answer is regularly the two pieces lying outside a pair of roots, and this notation is what keeps those answers readable.",
     },
 ]

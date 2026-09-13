@@ -34,7 +34,7 @@ LESSONS = [
              "behaves under addition and multiplication and how many roots it can have. "
              "Most decisions in this course start by looking at it."),
             ("Standard form is a convention, not a rule of algebra",
-             'Writing terms in descending degree changes nothing about the expression. It is worth doing because the polynomial procedures &mdash; division in “Polynomial Long Division” especially &mdash; assumes the terms are in that order.'),
+             'Writing terms in descending degree changes nothing about the expression. It is worth doing because every later procedure &mdash; division in “Polynomial Long Division” especially &mdash; assumes the terms are in that order.'),
         ],
         "read_title": "What a polynomial is",
         "read_intro": "One definition, the three ways an expression fails it, and the vocabulary that follows.",
@@ -79,7 +79,7 @@ LESSONS = [
                   "<strong>monomial</strong>, two a <strong>binomial</strong>, three a "
                   "<strong>trinomial</strong>. Beyond three, nobody bothers."),
             ("example", ("Reading a polynomial",
-                         '`−2x³ + 5x + 8` is a trinomial in standard form. Degree 3, leading coefficient `−2`, constant term `8`. The coefficient of `x²` is `0`, which is worth saying out loud &mdash; “Polynomial Long Division” requires you to write that zero down.')),
+                         '`−2x³ + 5x + 8` is a trinomial in standard form. Degree 3, leading coefficient `−2`, constant term `8`. The coefficient of `x²` is `0`, which is worth saying out loud &mdash; “Polynomial Long Division” will make you write that zero down.')),
         ],
         "lab": ("polynomial", {
             "mode": "form",
@@ -96,7 +96,7 @@ LESSONS = [
              "or a variable sitting in an exponent means the techniques in this course do "
              "not apply, and a different course does."),
             ("Multiply out anything in brackets",
-             'The definition asks whether the expression <em>can be</em> written as a sum of terms, so `x(x + 1)` qualifies. You cannot read the degree off a factored form reliably without the multiplication rule explained in “Multiplying Polynomials”.'),
+             'The definition asks whether the expression <em>can be</em> written as a sum of terms, so `x(x + 1)` qualifies. You cannot read the degree off a factored form reliably until “Multiplying Polynomials”.'),
             ("Combine like terms",
              "Terms with the same power of the same variable add together. Do this before "
              "reading the degree, because cancellation can lower it."),
@@ -223,7 +223,7 @@ LESSONS = [
                      "This is the distributive law `ac + bc = (a + b)c` with `c = xⁿ`. It "
                      "is not a special rule about polynomials, and that is exactly why it "
                      "is safe.")),
-            ("p", 'Turn the theorem around and you can see why `x² + x³` cannot be collected: there is no common `c` to pull out other than `x²`, and pulling that out gives `x²(1 + x)` &mdash; a product, not a shorter sum. It is a legitimate move, and it is factoring, as explained in “Factoring Out the Greatest Common Factor”. It just is not addition.'),
+            ("p", 'Turn the theorem around and you can see why `x² + x³` cannot be collected: there is no common `c` to pull out other than `x²`, and pulling that out gives `x²(1 + x)` &mdash; a product, not a shorter sum. It is a legitimate move, and it is factoring, which starts in “Factoring Out the Greatest Common Factor”. It just is not addition.'),
             ("h3", "Subtraction"),
             ("p", "Subtracting a polynomial means adding its negative, and the negative "
                   "of a polynomial has <em>every</em> sign flipped:"),
@@ -346,7 +346,7 @@ LESSONS = [
                      "every sign right first time, because you write the negation on its "
                      "own line rather than doing it in your head. Substituting `x = 1` "
                      "into both the question and your answer should be automatic."),
-        "note": 'The `x = 1` check is worth making a habit. It costs seconds, it catches sign errors and dropped terms, and it is the same idea &mdash; evaluating a polynomial at a number &mdash; that becomes the remainder theorem in “Synthetic Division and the Remainder Theorem”.',
+        "note": 'The `x = 1` check is worth making a habit now. It costs seconds, it catches sign errors and dropped terms, and it is the same idea &mdash; evaluating a polynomial at a number &mdash; that becomes the remainder theorem in “Synthetic Division and the Remainder Theorem”.',
     },
     # ---------------------------------------------------------------- 03
     {
@@ -527,8 +527,8 @@ LESSONS = [
              "terms are like terms and must be combined: `x² − 3x − 28`."),
         ],
         "standard": ("Finish when you can state the degree and leading term before you multiply.",
-                     'For any product you should be able to say the degree, the leading term, the constant term and the number of partial products before writing a line of working &mdash; and then use all four to check the result. That is what makes factoring, which runs this process backwards, feel like a search rather than a guess.'),
-        "note": 'Factoring out a common factor, grouping, trinomial methods and special forms run multiplication in reverse. Factoring is asking which two polynomials would multiply to give the one in front of you, so the fluency you build expanding is exactly the fluency that makes factoring checkable.',
+                     'For any product you should be able to say the degree, the leading term, the constant term and the number of partial products before writing a line of working &mdash; and then use all four to check the result. That is what makes “Factoring Out the Greatest Common Factor” onward, where you run this process backwards, feel like a search rather than a guess.'),
+        "note": 'Everything from here to “Factoring Special Forms” is this lesson in reverse. Factoring is asking which two polynomials would multiply to give the one in front of you, so the fluency you build expanding is exactly the fluency that makes factoring checkable.',
     },
     # ---------------------------------------------------------------- 04
     {
@@ -558,7 +558,7 @@ LESSONS = [
              "Each identity is proved in one line by distributing. If you ever doubt a "
              "sign, expand it &mdash; the derivation is shorter than the doubt."),
             ("The middle term is the whole difficulty",
-             '`(a + b)²` is `a² + 2ab + b²`, not `a² + b²`. Squaring distributes over multiplication but never over addition, and this is an error that can persist in algebraic manipulation.'),
+             '`(a + b)²` is `a² + 2ab + b²`, not `a² + b²`. Squaring distributes over multiplication but never over addition, and this is the error that survives longest into later courses.'),
             ("Recognition is what you are training",
              "`a` and `b` stand for whole expressions, not just letters. In `(3x + 5)"
              "(3x − 5)` you have `a = 3x` and `b = 5`, and the answer `9x² − 25` needs no "
@@ -733,17 +733,17 @@ LESSONS = [
         ],
         "key_label": "One law, one recipe",
         "concepts_intro": (
-            'Factoring asks a different kind of question from evaluation and expansion: not "what does this equal" but "what would multiply to give this". The answer is a product, and it is checkable in seconds.'
+            'Factoring asks a different kind of question from anything so far: not "what does this equal" but "what would multiply to give this". The answer is a product, and it is checkable in seconds.'
         ),
         "concepts": [
             ("Factoring is multiplication in reverse",
-             "Every factorisation can be verified by expanding it. For factoring, checking an answer by expansion is often faster than producing it, so there is never a reason to submit an unchecked one."),
+             'Every factorisation can be verified by expanding it. This is the only topic on the path where checking your answer is faster than producing it, so there is never a reason to submit an unchecked one.'),
             ("The GCF must divide EVERY term",
              "Not most of them. A factor shared by two terms out of three is not a common "
              "factor of the polynomial, and pulling it out anyway leaves a fraction "
              "behind."),
             ("Take it out first, always",
-             'Grouping, trinomial methods and special forms all assume the easy factor is gone. Skipping this step is what turns a one-line problem into a trinomial with coefficients too large to search sensibly.'),
+             'Every grouping, trinomial and special-form technique assumes the easy factor is gone. Skipping this step is what turns a one-line problem into a trinomial with coefficients too large to search sensibly.'),
         ],
         "read_title": "Finding what every term shares",
         "read_intro": "What factoring means, how the GCF is computed, and the two details that go wrong.",
@@ -788,7 +788,7 @@ LESSONS = [
                   "`5x²`, which is not what you started with &mdash; and the expansion "
                   "check catches it immediately."),
             ("h3", "Factoring out a negative"),
-            ("p", 'When the leading coefficient is negative it is usually worth taking the minus sign out with the GCF, because the grouping and trinomial techniques used here are stated for a positive leading term:'),
+            ("p", 'When the leading coefficient is negative it is usually worth taking the minus sign out with the GCF, because the grouping, trinomial and special-form techniques to come are stated for a positive leading term:'),
             ("math", [
                 "−4x³ + 8x² − 12x  =  −4x(x² − 2x + 3)",
             ]),
@@ -902,7 +902,7 @@ LESSONS = [
              "after the step and ask whether it still has something in common."),
         ],
         "standard": ("Finish when the GCF is automatic and the bracket is always checked.",
-                     'Given any integer-coefficient polynomial you should take the GCF out without thinking about it, keep the term count right, and then look at what remains and ask which technique comes next. Grouping, trinomial methods and special forms all work on the bracket this step produces.'),
+                     'Given any integer-coefficient polynomial you should take the GCF out without thinking about it, keep the term count right, and then look at what remains and ask which technique comes next. Grouping, trinomial methods and special forms all begin from the bracket this step produces.'),
         "note": "The lab puts this first in its decision list for a reason worth stating "
                 "plainly: a trinomial like `6x² + 15x + 6` looks like hard work until the "
                 "`3` comes out and leaves `2x² + 5x + 2`. The same problem, with a search "
@@ -1087,7 +1087,7 @@ LESSONS = [
                      "on the second pair first time, and always look again at both factors "
                      "afterwards. You should also be comfortable saying \"grouping does not "
                      "work here\" without claiming more than that."),
-        "note": 'Grouping earns its place twice. Here it handles four terms, and in “The AC Method” the AC method deliberately splits a three-term polynomial into four so that this technique can be used on it. Reliable signs in grouping are therefore essential to the AC method.',
+        "note": 'Grouping earns its place twice. Here it handles four terms, and in “The AC Method” the AC method deliberately splits a three-term polynomial into four so that this technique can be used on it. Getting the signs reliable now pays for itself two lessons from now.',
     },
     # ---------------------------------------------------------------- 07
     {
@@ -1152,7 +1152,7 @@ LESSONS = [
                 "<strong>`c &lt; 0`.</strong> The product is negative, so `p` and `q` have "
                 "<em>opposite</em> signs. The one with the larger absolute value carries "
                 "the sign of `b`.",
-                '<strong>`c = 0`.</strong> There is no trinomial to search: `x² + bx` has a common factor `x`, and “Factoring Out the Greatest Common Factor” handles it.',
+                '<strong>`c = 0`.</strong> There is no trinomial to search: `x² + bx` has a common factor `x`, and “Factoring Out the Greatest Common Factor” already handled it.',
             ]),
             ("p", "These are not extra rules to memorise. Each one is read straight off "
                   "`pq = c` and `p + q = b`, and deriving them on the spot is safer than "
@@ -1163,7 +1163,7 @@ LESSONS = [
                   "trinomial the answer is no. If `x² + bx + c` with integer coefficients "
                   "factors into linear factors with rational numbers, those numbers are "
                   "necessarily integers, so they are already on the list."),
-            ("p", '“The Factor Theorem and Rational Roots” proves this as part of the rational root theorem. It is the reason the search is trustworthy: an empty result means the trinomial does not factor over the rationals, not merely that you did not find how.'),
+            ("p", '“The Factor Theorem and Rational Roots” proves this as part of the rational root theorem. For now, take it as the reason the search is trustworthy: an empty result means the trinomial does not factor over the rationals, not merely that you did not find how.'),
             ("example", ("A complete search that fails",
                          "`x² + x + 1`. The divisor pairs of `1` are `(1, 1)` and "
                          "`(−1, −1)`, giving sums `2` and `−2`. Neither equals `1`, and "

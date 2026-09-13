@@ -13,7 +13,7 @@ COURSE = {
     ),
     "blurb": (
         (
-        'Solve for several unknowns together, then find the notation that removes the bookkeeping. A matrix is elimination with the letters deleted, so hand elimination explains the row notation used in this course.'
+        'Solve for several unknowns together, then find the notation that removes the bookkeeping. A matrix is elimination with the letters deleted, which is why this course does elimination by hand first and only then writes it down as rows.'
     )
     ),
     "key": [
@@ -40,7 +40,7 @@ COURSE = {
          "Build a closed, bounded feasible region, solve boundary pairs for its corners, reject infeasible crossings, and compare an objective at the surviving corners."),
     ],
     "syllabus_intro": (
-        'Classification, substitution and elimination describe and solve systems by hand. Matrices express that work through row operations, reduction and products; determinants and inverses identify and solve uniquely solvable systems. Two-variable systems also support optimisation over a bounded feasible region.'
+        'Systems are classified and solved by hand first. That work is then turned into row operations, reduction and matrix products; determinants and inverses are added next. “Systems of Inequalities and Linear Programming” returns to two-variable systems to optimise over a bounded feasible region.'
     ),
     "how_to": [
         "After each complete example, cover its answer and finish the faded rehearsal. The first decision is supplied; the remaining elimination, row operation, classification and check are yours.",

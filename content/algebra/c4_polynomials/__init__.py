@@ -44,9 +44,9 @@ COURSE = {
          "root from no root at all."),
     ],
     "syllabus_intro": (
-        'Definitions, addition, subtraction, multiplication and special products describe polynomials and their operations. Removing the greatest common factor is the first move in a factorisation; grouping, trinomial methods and special forms are branches chosen by term count and pattern. Division and root-finding connect the factors to graph sketches.'
+        'Defining polynomials and operating on them comes first. “Factoring Out the Greatest Common Factor” is the first move in every factorisation; grouping, trinomial methods and special forms are branches chosen by term count and pattern. The course ends by dividing, finding roots and then sketching.'
     ),
-    "how_to": ["Always look for a common factor first. The lab's decision list starts there because skipping it is what turns a one-line problem into an unfactorable-looking mess.", 'Expand your factored answer to check it. Checking a factorisation by expansion is faster than producing it.', 'After each complete example, cover the answer and do the faded rehearsal on paper. The first decision is supplied; the remaining algebra and the expansion or substitution check are yours before you answer the quiz.'],
+    "how_to": ["Always look for a common factor first. The lab's decision list starts there because skipping it is what turns a one-line problem into an unfactorable-looking mess.", 'Expand your factored answer to check it. Factoring is the only topic on this path where checking is faster than the work itself.', 'After each complete example, cover the answer and do the faded rehearsal on paper. The first decision is supplied; the remaining algebra and the expansion or substitution check are yours before you answer the quiz.'],
     "not_covered": [
         (
             "Factoring quadratics with irrational or complex coefficients. Quadratics and "

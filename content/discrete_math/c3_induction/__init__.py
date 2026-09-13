@@ -14,7 +14,7 @@ COURSE = {
     ),
     "blurb": (
         (
-        'Checking cases is not proving, as Logic and Proof explains. Establish a base case and prove `P(k) → P(k+1)` once, and the claim holds for every natural number from that base onward, including those you could never check. The same idea applies to definitions, data, algorithms and recurrences.'
+        'Logic and Proof ended by showing that checking cases is not proving. This is the answer: prove `P(k) → P(k+1)` once and the claim holds for every `n` you could ever check and every one you could not. Then the same idea applied to definitions, to data, to algorithms and to recurrences.'
     )
     ),
     "key": [
@@ -27,8 +27,7 @@ COURSE = {
     "assumes_long": "proof technique and set notation",
     "outcomes_intro": (
         (
-        "Prove statements about natural numbers and recursive objects, solve recurrences, and "
-        "prove algorithm correctness."
+        'By the end you can prove a statement about every natural number, solve the recurrences Algorithms and Complexity will produce, and prove an algorithm does what it claims.'
     )
     ),
     "outcomes": [
@@ -48,13 +47,13 @@ COURSE = {
          'Termination by a quantity that strictly decreases and is bounded below, and correctness by strong induction on the input for a recursion or by an invariant for a loop &mdash; the two obligations of “Recursive Algorithms and Correctness” and “Loop Invariants and Program Correctness”, neither of which is worth anything alone.'),
     ],
     "syllabus_intro": (
-        'Induction, recursion and recurrences support the program-correctness arguments in “Loop Invariants and Program Correctness”.'
+        'Induction comes first, then recursion, then recurrences, and “Loop Invariants and Program Correctness” applies all three to program correctness.'
     ),
     "how_to": [
         "Write every proof out in full, including the sentence that says where the "
         "inductive hypothesis was used. A step that never invokes `P(k)` is not an "
         "induction proof, however true its conclusion.",
-        "Spend real time in “The Well-Ordering Principle”'s lab. Two of its statements are false and survive dozens of checks; meeting them is the reason this course exists. “Mathematical Induction” and “Strong Induction” explain these failures; try to identify the false statements yourself before reading those explanations.",
+        'Spend real time in the lab of “The Well-Ordering Principle”. Two of its statements are false and survive dozens of checks; meeting them is the reason this course exists. “Mathematical Induction” and “Strong Induction” name them, so look before then.',
         "Do the recurrence arithmetic by hand once per lesson before using the lab. "
         "The lab compares your closed form against the iteration, which is only useful "
         "if you produced a closed form to compare.",
@@ -63,9 +62,9 @@ COURSE = {
         "Transfinite induction and induction over ordinals. Everything here is "
         "induction over `ℕ` or over a well-founded recursive structure.",
         (
-            'Generating functions as a recurrence-solving technique. The “Generating Functions” Lesson in Combinatorics and Counting introduces them for counting; using them to solve recurrences is not covered here.'
+            'Generating functions as a recurrence-solving technique. “Generating Functions” in Combinatorics and Counting introduces them for counting; using them to solve recurrences is a natural next step this path does not take.'
         ),
-        'Formal verification tools. The “Loop Invariants and Program Correctness” Lesson writes loop invariants as mathematics, not as annotations a checker consumes.',
+        'Formal verification tools. “Loop Invariants and Program Correctness” writes loop invariants as mathematics, not as annotations a checker consumes.',
     ],
     "footer_lead": (
         "The induction lab on this course checks a statement for the values you select "

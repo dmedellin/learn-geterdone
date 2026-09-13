@@ -264,7 +264,7 @@ LESSONS = [
         "read_title": "Solving with a negative discriminant",
         "read_intro": "The formula does not change. What changes is what is under the root.",
         "body": [
-            ("p", '“The Discriminant” read the sign of `D = b² - 4ac` and reported two, one or no real solutions. The no-real-solution case is a boundary of the real number system: `√D` with `D &lt; 0` has no real value. “Complex Numbers” gives it a complex value, and nothing else about the method needs adjusting.'),
+            ("p", '“The Discriminant” read the sign of `D = b² - 4ac` and reported two, one or no real solutions. The last case was left open on purpose: `√D` with `D &lt; 0` had no meaning yet. “Complex Numbers” gave it one, and nothing else about the method needs adjusting.'),
             ("thm", ("Solutions when the discriminant is negative",
                      "Let `a`, `b`, `c` be real with `a ≠ 0`, and let "
                      "`D = b² - 4ac &lt; 0`. Then `ax² + bx + c = 0` has exactly two "
@@ -417,7 +417,7 @@ LESSONS = [
         ],
         "mistakes": [
             ("Answering \"no solution\" with no qualifier",
-             'For a quadratic over the real or complex numbers, the honest answers are "no real solution" or "two complex solutions". `x² + 4 = 0` has both descriptions and they do not contradict each other.'),
+             'After this lesson the honest answers are "no real solution" or "two complex solutions". `x² + 4 = 0` has both descriptions and they do not contradict each other.'),
             ("Dividing only part of the numerator by 2a",
              "`(-2 ± 6i)/4` is `-1/2 ± (3/2)i`, not `-1/2 ± 6i`. The fraction bar "
              "runs under the whole numerator, exactly as it does when the "
@@ -429,8 +429,8 @@ LESSONS = [
              "absorbed into the sign."),
         ],
         "standard": ("Finish when a negative discriminant makes you reach for i rather than stop.",
-                     'Take any quadratic with `D &lt; 0`, produce the conjugate pair in the form `p ± qi` with `p` and `q` exact, and verify one of them by substitution. If the check is a nuisance, practise the arithmetic in “Operations with Complex Numbers” to support this substitution check.'),
-        "note": 'Every quadratic with real coefficients now has exactly two solutions &mdash; two distinct real ones, one repeated real one, or a conjugate pair. That completeness is what the complex numbers were introduced for. The graphing and optimisation work concerns real coefficients and real graphs, where the discriminant decides how the parabola meets the axis.',
+                     'Take any quadratic with `D &lt; 0`, produce the conjugate pair in the form `p ± qi` with `p` and `q` exact, and verify one of them by substitution. If the check is a nuisance, the arithmetic of “Operations with Complex Numbers” needs another pass before this one does.'),
+        "note": 'Every quadratic with real coefficients now has exactly two solutions &mdash; two distinct real ones, one repeated real one, or a conjugate pair. That completeness is what the complex numbers were introduced for. The remaining lessons return to real coefficients and real graphs, where the discriminant decides how the parabola meets the axis.',
     },
     # ---------------------------------------------------------------- 10
     {
@@ -461,7 +461,7 @@ LESSONS = [
              "`y = x² - 100` opens upward and `y = -x² + 100` opens downward, and the "
              "constants had nothing to do with it."),
             ("Intercepts are the two solved problems you already have",
-             'Setting `x = 0` gives the y-intercept, `c`, in one step. Setting `y = 0` gives the x-intercepts, which is the quadratic equation addressed by the solution methods &mdash; so the discriminant counts them: two, one or none.'),
+             'Setting `x = 0` gives the y-intercept, `c`, in one step. Setting `y = 0` gives the x-intercepts, which is the equation the lessons from “Quadratic Equations and the Zero Product Property” to “The Discriminant” solved &mdash; so the discriminant counts them: two, one or none.'),
             ("The curve is symmetric, exactly",
              "Every parabola has a vertical mirror line, `x = -b/(2a)`. Two points "
              "the same distance either side of it have the same height, which halves "
@@ -556,7 +556,7 @@ LESSONS = [
              "One substitution, `x = 0`, and it is free. Every parabola has exactly "
              "one."),
             ("Find the x-intercepts, or show there are none",
-             'Solve `ax² + bx + c = 0` by whichever of factoring, the square root property, completing the square or the quadratic formula is quickest, or compute `D` and stop there if it is negative.'),
+             'Solve `ax² + bx + c = 0` by whichever of “Solving by Factoring”, “The Square Root Property”, “Completing the Square” and “The Quadratic Formula” is quickest, or compute `D` and stop there if it is negative.'),
             ("Draw the axis x = -b/(2a), then use symmetry",
              "Plot the point on the axis, `(h, f(h))`, and reflect every other point "
              "you have across it. Two or three plotted points and the mirror line are "
@@ -641,7 +641,7 @@ LESSONS = [
                      "y-intercept, the x-intercepts or a reason there are none, and "
                      "the axis &mdash; from the coefficients alone. Plotted points "
                      "should confirm the sketch, never be the way you discover it."),
-        "note": 'The lowest or highest point can be identified as "the point on the axis", computed by substituting `h` into `f`. “Vertex Form and the Axis of Symmetry” gives it a name and a form of the equation that displays it, and “Maximum and Minimum Problems” turns that into the tool for optimisation problems.',
+        "note": 'The lowest or highest point has been treated so far as "the point on the axis", computed by substituting `h` into `f`. “Vertex Form and the Axis of Symmetry” gives it a name and a form of the equation that displays it, and “Maximum and Minimum Problems” turns that into the tool for optimisation problems.',
     },
     # ---------------------------------------------------------------- 11
     {
@@ -1376,14 +1376,14 @@ LESSONS = [
              "general pattern is `a[f(x)]² + b[f(x)] + c`: the repeated object may be "
              "a whole expression such as `x² - 3`, not merely a power."),
             ("u is a temporary name, not the answer",
-             "The substitution renames part of the equation so that a known method applies. The question was about `x`, so the last step is always to substitute back for x, and an answer left in terms of `u` is half an answer."),
+             'The substitution renames part of the equation so that a known method applies. The question was about `x`, so the last step is always the return journey, and an answer left in terms of `u` is half an answer.'),
             ("Some values of u give no real x",
              "If `u = x²` then `u` cannot be negative, and if `u = √x` then `u` cannot "
              "be negative either. A negative solution for `u` is discarded, so two "
              "values of `u` need not give four values of `x`."),
         ],
         "read_title": "Substitution into quadratic form",
-        "read_intro": "The shape, the substitution, and the back-substitution.",
+        "read_intro": 'The shape, the substitution, and the return journey.',
         "body": [
             ("p", "A quartic has no formula in this course, and Polynomials and Factoring's rational root search is a general tool that can miss irrational roots entirely. But a quartic with no odd powers is not really a quartic: it is a quadratic wearing `x²` where a quadratic wears `x`, and renaming that part is enough to finish it exactly."),
             ("def", ("Quadratic form",
@@ -1418,7 +1418,7 @@ LESSONS = [
                          "So this quartic has two real solutions, not four. The count "
                          "of `u` values and the count of `x` values are different "
                          "numbers, and only the second answers the question.")),
-            ("p", 'Over the complex numbers defined in “Complex Numbers” and used in “Complex Roots of Quadratics” the story is different: `x² = -1` gives `x = ±i`, so the same quartic has four complex solutions, `2`, `-2`, `i` and `-i`. Which answer is wanted depends on which number system the question is asked in, and that is worth stating in the answer.'),
+            ("p", 'Over the complex numbers of “Complex Numbers”, “Operations with Complex Numbers” and “Complex Roots of Quadratics” the story is different: `x² = -1` gives `x = ±i`, so the same quartic has four complex solutions, `2`, `-2`, `i` and `-i`. Which answer is wanted depends on which number system the question is asked in, and that is worth stating in the answer.'),
             ("h3", "Radicals and negative exponents"),
             ("example", ("x - 5√x + 6 = 0",
                          "Put `u = √x`, so `u² = x` and the equation is "
@@ -1441,8 +1441,8 @@ LESSONS = [
                   "`x² = 7` and `x² = 1`. The four solutions are `±√7` and `±1`. "
                   "Expanding the brackets first would have produced the same quartic "
                   "the long way round."),
-            ("p", 'One manipulation to avoid: reducing the degree by dividing by a power of `x`. `x⁴ = 4x²` becomes `x²(x² - 4) = 0` by factoring, with solutions `0`, `2` and `-2`; dividing both sides by `x²` returns `x² = 4` and silently loses `x = 0`. Dividing by something that might be zero deletes solutions, wherever the expression could be zero.'),
-            ("p", "A last check worth making: Polynomials and Factoring fixed that a polynomial of degree `n` has at most `n` real solutions. A quartic that comes back with five, or a solution that fails when substituted, means the back-substitution went wrong &mdash; usually by squaring a rejected `u` or by forgetting a `±`."),
+            ("p", 'One manipulation to avoid: reducing the degree by dividing by a power of `x`. `x⁴ = 4x²` becomes `x²(x² - 4) = 0` by factoring, with solutions `0`, `2` and `-2`; dividing both sides by `x²` returns `x² = 4` and silently loses `x = 0`. Dividing by something that might be zero deletes solutions, in this course and in every later one.'),
+            ("p", 'A last check worth making: Polynomials and Factoring fixed that a polynomial of degree `n` has at most `n` real solutions. A quartic that comes back with five, or a solution that fails when substituted, means the return journey went wrong &mdash; usually by squaring a rejected `u` or by forgetting a `±`.'),
         ],
         "lab": ("quadratic", {
             "mode": "reducible",
@@ -1466,7 +1466,7 @@ LESSONS = [
              "forces: `u ≥ 0` for both of those, `x ≠ 0` for `u = 1/x`. Recording it "
              "now is what makes step four quick."),
             ("Solve the quadratic in u",
-             'Factor, complete the square, or use the formula &mdash; whichever quadratic solution method fits. Nothing about this step is new.'),
+             'Factor, complete the square, or use the formula &mdash; whichever of “Solving by Factoring”, “The Square Root Property”, “Completing the Square” and “The Quadratic Formula” fits. Nothing about this step is new.'),
             ("Substitute back, discard, and check",
              "For each `u`, solve `f(x) = u` for `x`. Discard the values of `u` the "
              "restriction forbids, and substitute every survivor into the original "
@@ -1502,7 +1502,7 @@ LESSONS = [
                 "`u`, which is the only way to test the substitution itself. A degree "
                 "4 equation has at most four real solutions, and this one has four, so "
                 "there is nothing left to find.",
-                "For a faded back-substitution exercise, solve `2x⁴ - 5x² + 2 = 0` over the reals. The supplied substitution is `u = x²` with `u ≥ 0`. Factor the quadratic in `u`, send both permitted values back through `x² = u` and check one root from each pair in the original quartic. Compare with `x = ±√2` and `x = ±√2/2`; returning only the two positive values means the square root property lost its `±`.",
+                'For a faded return journey, solve `2x⁴ - 5x² + 2 = 0` over the reals. The supplied substitution is `u = x²` with `u ≥ 0`. Factor the quadratic in `u`, send both permitted values back through `x² = u` and check one root from each pair in the original quartic. Compare with `x = ±√2` and `x = ±√2/2`; returning only the two positive values means the square root property lost its `±`.',
             ],
         },
         "quiz_title": "Substitutions",
@@ -1549,6 +1549,6 @@ LESSONS = [
                      "has and why. Two lines of setup &mdash; `u = x²` and `u ≥ 0` "
                      "&mdash; make the rest routine; skipping them is what turns a "
                      "four-solution problem into a two-solution answer."),
-        "note": "Exponential and Logarithmic Functions solves `4ˣ - 5·2ˣ + 4 = 0` by putting `u = 2ˣ`, which applies the same substitution to a different expression: recognise that one power is the square of another, name the smaller one, and obtain a quadratic.",
+        "note": 'This is the end of the course, and the technique is the one that travels furthest. Exponential and Logarithmic Functions solves `4ˣ - 5·2ˣ + 4 = 0` by putting `u = 2ˣ`, which is the same move on a different expression: recognise that one power is the square of another, name the smaller one, and a quadratic appears where there was none.',
     },
 ]

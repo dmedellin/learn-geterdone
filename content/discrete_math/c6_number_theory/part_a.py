@@ -57,7 +57,7 @@ LESSONS = [
                      "For any integer `a` and any positive integer `b`, there are unique "
                      "integers `q` and `r` with `a = qb + r` and `0 ≤ r &lt; b`.")),
             ("proof", [
-                '<strong>Existence.</strong> Let `S = {a − qb : q ∈ ℤ, a − qb ≥ 0}`. It is nonempty (take `q` very negative) and consists of non-negative integers, so by well-ordering (the “The Well-Ordering Principle” Lesson in Induction and Recursion) it has a least element `r = a − qb`.',
+                '<strong>Existence.</strong> Let `S = {a − qb : q ∈ ℤ, a − qb ≥ 0}`. It is nonempty (take `q` very negative) and consists of non-negative integers, so by well-ordering (“The Well-Ordering Principle” in Induction and Recursion) it has a least element `r = a − qb`.',
                 "If `r ≥ b` then `r − b = a − (q+1)b` is in `S` and smaller than `r`, "
                 "contradicting minimality. So `0 ≤ r &lt; b`.",
                 "<strong>Uniqueness.</strong> If `a = qb + r = q'b + r'` with both "
@@ -124,7 +124,7 @@ LESSONS = [
                 "Check:    4728 = 3 × 1576                        ✓",
             ],
             "after": [
-                'The whole argument is the linear-combination property used twice: once to see that `Σ dᵢ(10ⁱ − 1)` is a multiple of 3, and once to pass divisibility between `n` and its digit sum, whose difference that sum is. Nine divides every `10ⁱ − 1` too, so the same test works for 9. “Modular Arithmetic” gives the argument a notation &mdash; `10ⁱ ≡ 1 (mod 3)` &mdash; that makes it one line, and handles 11, where `10ⁱ − (−1)ⁱ` is the multiple.'
+                'The whole argument is the linear-combination property used twice: once to see that `Σ dᵢ(10ⁱ − 1)` is a multiple of 3, and once to pass divisibility between `n` and its digit sum, whose difference that sum is. Nine divides every `10ⁱ − 1` too, so the same test works for 9. “Modular Arithmetic” will give the argument a notation &mdash; `10ⁱ ≡ 1 (mod 3)` &mdash; that makes it one line, and will handle 11, where `10ⁱ − (−1)ⁱ` is the multiple.'
             ],
         },
         "quiz_title": "Divisibility",
@@ -167,7 +167,7 @@ LESSONS = [
              "`b &gt; 0` as stated."),
         ],
         "standard": ("Finish when the linear-combination property is automatic.",
-                     'Prove that if `d | (a + b)` and `d | a` then `d | b`. It is one application of the property, and it is the shape of argument the proofs about primes, sieving, gcds and modular inverses repeat.'),
+                     "Prove that if `d | (a + b)` and `d | a` then `d | b`. It is one application of the property, and it is the shape of argument that every lesson from “Primes and Unique Factorisation” to “Bézout's Identity and Modular Inverses” repeats."),
         "note": "Everything in this course is a consequence of the division algorithm. "
                 "The Euclidean algorithm is it applied repeatedly, modular arithmetic is "
                 "its remainder, and RSA is modular arithmetic with large primes.",
@@ -179,7 +179,7 @@ LESSONS = [
         "module": "Divisibility",
         "one_line": "Every integer above 1 factors into primes, in exactly one way.",
         "summary": (
-            'The fundamental theorem of arithmetic. Primes are the multiplicative atoms, there are infinitely many, and the uniqueness of the factorisation is what makes almost every argument about divisibility, gcds and modular arithmetic possible.'
+            'The fundamental theorem of arithmetic. Primes are the multiplicative atoms, there are infinitely many, and the uniqueness of the factorisation is what makes almost every later argument possible.'
         ),
         "key": [
             "prime: exactly two positive divisors, 1 and itself.  1 is NOT prime.",
@@ -216,7 +216,7 @@ LESSONS = [
                      "Every integer `n &gt; 1` can be written as a product of primes, and "
                      "the factorisation is unique up to the order of the factors.")),
             ("proof", [
-                '<strong>Existence</strong>, by strong induction (the “Strong Induction” Lesson in Induction and Recursion). If `n` is prime it is a product of one prime. Otherwise `n = ab` with `1 &lt; a, b &lt; n`, and by the inductive hypothesis both factor into primes; concatenating the two factorisations gives one for `n`.',
+                '<strong>Existence</strong>, by strong induction (“Strong Induction” in Induction and Recursion). If `n` is prime it is a product of one prime. Otherwise `n = ab` with `1 &lt; a, b &lt; n`, and by the inductive hypothesis both factor into primes; concatenating the two factorisations gives one for `n`.',
                 "<strong>Uniqueness</strong> requires Euclid's lemma (“Bézout's Identity and Modular Inverses”): if a prime `p` divides `ab` then `p | a` or `p | b`. Given two factorisations of `n`, the first prime of one divides the product forming the other, hence divides one of its primes, hence equals it. Cancelling and repeating matches the factorisations term by term.",
             ]),
             ("p", "Uniqueness is not obvious and it is not universal. In the number system `{a + b√−5}` the number 6 factors as `2 · 3` and as `(1 + √−5)(1 − √−5)`, with all four factors irreducible. Unique factorisation is a property of `ℤ`, and it is what Number Theory and Cryptography relies on throughout."),
@@ -289,7 +289,7 @@ LESSONS = [
                 "                   60,72,90,120,180,360        — 24 of them   ✓",
             ],
             "after": [
-                'The divisor count is a product rule application: a divisor is determined by choosing an exponent for each prime independently, from 0 up to its exponent in `n`. The “The Sum and Product Rules” Lesson in Combinatorics and Counting is doing the work, and the fundamental theorem is what guarantees the choice determines the divisor uniquely.'
+                'The divisor count is a product rule application: a divisor is determined by choosing an exponent for each prime independently, from 0 up to its exponent in `n`. “The Sum and Product Rules” in Combinatorics and Counting is doing the work, and the fundamental theorem is what guarantees the choice determines the divisor uniquely.'
             ],
         },
         "quiz_title": "Primes",
@@ -347,7 +347,7 @@ LESSONS = [
         "module": "Divisibility",
         "one_line": "Cross out the multiples; what survives is prime.",
         "summary": (
-            'The oldest algorithm still in use. It finds every prime up to `n` by removing multiples, stops at `√n` for the reason “Primes and Unique Factorisation” gives, and costs far less than testing each number separately.'
+            'The oldest algorithm still in use. It finds every prime up to `n` by removing multiples, stops at `√n` for the reason “Primes and Unique Factorisation” gave, and costs far less than testing each number separately.'
         ),
         "key": [
             "for each prime p ≤ √n:  cross out 2p, 3p, … — starting at p²",
@@ -732,7 +732,7 @@ LESSONS = [
                 "        (a, b) = (b, a mod b)",
                 "    return a",
             ]),
-            ("p", '<strong>Correctness</strong> is the loop invariant of the “Loop Invariants and Program Correctness” Lesson in Induction and Recursion: `gcd(a, b)` never changes, by the identity. <strong>Termination</strong> holds because `b` strictly decreases and is a non-negative integer. At exit `b = 0` and `gcd(a, 0) = a`.'),
+            ("p", '<strong>Correctness</strong> is the loop invariant of “Loop Invariants and Program Correctness” in Induction and Recursion: `gcd(a, b)` never changes, by the identity. <strong>Termination</strong> holds because `b` strictly decreases and is a non-negative integer. At exit `b = 0` and `gcd(a, 0) = a`.'),
             ("h3", "How fast"),
             ("thm", ("Two steps halve",
                      "In two iterations, the first argument is at least halved.")),
@@ -746,7 +746,7 @@ LESSONS = [
                      "The number of division steps is at most five times the number of "
                      "decimal digits of the smaller input, and the worst case occurs "
                      "exactly for consecutive Fibonacci numbers.")),
-            ("p", 'Fibonacci inputs are worst because every quotient is 1 &mdash; the slowest possible progress. `gcd(F_{n+1}, F_n)` takes `n − 1` steps, and since `F_n` grows like `φⁿ`, that is logarithmic in the input. The “Solving Linear Recurrences” Lesson in Induction and Recursion supplies the growth rate.'),
+            ("p", 'Fibonacci inputs are worst because every quotient is 1 &mdash; the slowest possible progress. `gcd(F_{n+1}, F_n)` takes `n − 1` steps, and since `F_n` grows like `φⁿ`, that is logarithmic in the input. “Solving Linear Recurrences” in Induction and Recursion supplied the growth rate.'),
             ("math", [
                 "gcd(89, 55):    89 = 1·55 + 34",
                 "                55 = 1·34 + 21",
@@ -901,7 +901,7 @@ LESSONS = [
                      "`ax + by = gcd(a,b)`. Moreover `gcd(a,b)` is the smallest positive "
                      "integer expressible in that form.")),
             ("proof", [
-                'Let `S = {ax + by : x, y ∈ ℤ, ax + by &gt; 0}`, which is nonempty (it contains `|a|`). By well-ordering (the “The Well-Ordering Principle” Lesson in Induction and Recursion) it has a least element `d = ax₀ + by₀`.',
+                'Let `S = {ax + by : x, y ∈ ℤ, ax + by &gt; 0}`, which is nonempty (it contains `|a|`). By well-ordering (“The Well-Ordering Principle” in Induction and Recursion) it has a least element `d = ax₀ + by₀`.',
                 "Divide: `a = qd + r` with `0 ≤ r &lt; d`. Then "
                 "`r = a − qd = a(1 − qx₀) + b(−qy₀)`, which is of the required form. Since "
                 "`0 ≤ r &lt; d` and `d` is the smallest positive such value, `r = 0`, so "
@@ -1067,7 +1067,7 @@ LESSONS = [
         ],
         "key_label": "Almost ordinary arithmetic",
         "concepts_intro": (
-            "Congruence is the equivalence relation from Sets, Relations, and Functions applied to the integers, and the classes support arithmetic."
+            "Congruence is Sets, Relations, and Functions's equivalence relation applied to the integers, and the classes support arithmetic."
         ),
         "concepts": [
             ("Congruence is an equivalence relation",
@@ -1090,7 +1090,7 @@ LESSONS = [
                      "It is reflexive (`m | 0`), symmetric (`m | (a−b)` gives `m | (b−a)`) "
                      "and transitive (`m | (a−b)` and `m | (b−c)` give `m | (a−c)` by the "
                      "linear-combination property).")),
-            ("p", 'By the “Equivalence Relations and Partitions” Lesson in Sets, Relations, and Functions it therefore partitions `ℤ` into equivalence classes. There are exactly `m` of them, one for each remainder `0, 1, …, m−1`, and the set of classes is written `ℤ/mℤ` or `ℤ_m`.'),
+            ("p", 'By “Equivalence Relations and Partitions” in Sets, Relations, and Functions it therefore partitions `ℤ` into equivalence classes. There are exactly `m` of them, one for each remainder `0, 1, …, m−1`, and the set of classes is written `ℤ/mℤ` or `ℤ_m`.'),
             ("thm", ("Arithmetic is well defined",
                      "If `a ≡ b (mod m)` and `c ≡ d (mod m)`, then `a + c ≡ b + d` and "
                      "`ac ≡ bd (mod m)`.")),
@@ -1100,7 +1100,7 @@ LESSONS = [
                 "And `ac = (b + ms)(d + mt) = bd + m(bt + ds + mst)`, so the products are "
                 "congruent.",
             ]),
-            ("p", 'This is the well-definedness check discussed in the “Functions” Lesson in Sets, Relations, and Functions, carried out. It says arithmetic on classes is legitimate: the answer does not depend on which representatives were used, so `[3] + [4] = [7]` is a statement about classes rather than about the numbers 3 and 4.'),
+            ("p", 'This is the well-definedness check “Functions” in Sets, Relations, and Functions warned about, carried out. It says arithmetic on classes is legitimate: the answer does not depend on which representatives were used, so `[3] + [4] = [7]` is a statement about classes rather than about the numbers 3 and 4.'),
             ("p", "The practical consequence is that a computation may be reduced at any "
                   "point. To find `17 · 23 (mod 5)`, reduce first: `2 · 3 = 6 ≡ 1`, rather "
                   "than computing 391 and dividing."),
@@ -1211,6 +1211,6 @@ LESSONS = [
                      "Compute `123 · 456 (mod 7)` by reducing each factor first. Two small "
                      "multiplications rather than one large one, and the answer is the same "
                      "because congruence respects multiplication."),
-        "note": 'Modular arithmetic is the arithmetic of `ℤ/mℤ`, the quotient of the integers by an equivalence relation. The “Equivalence Relations and Partitions” Lesson in Sets, Relations, and Functions develops exactly that structure; this course computes in it.',
+        "note": 'Modular arithmetic is the arithmetic of `ℤ/mℤ`, the quotient of the integers by an equivalence relation. “Equivalence Relations and Partitions” in Sets, Relations, and Functions built exactly that structure; this course computes in it.',
     },
 ]

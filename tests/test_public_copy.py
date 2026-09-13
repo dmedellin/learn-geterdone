@@ -61,17 +61,30 @@ class TestPublicCopy(unittest.TestCase):
                          'shared library/Subject copy must use titles and topic relationships')
 
     def test_indirect_curricular_reference_mutations(self):
-        for text in (
-                'The smoothing every later tool is built on.',
-                'Five positions assembled from the parts above, one lesson each.'):
-            with self.subTest(text=text):
+        # An indirect reference becomes a defect when it names a position by
+        # number: renumber the Course and the sentence is silently wrong.
+        for text in ('The smoothing the tool in lesson 9 is built on.',
+                     'Five positions assembled from the parts in lesson 4, one lesson each.'):
+            with self.subTest(defect=text):
                 doc = copy.Document('<body data-page-kind="course"><p>' + text + '</p></body>')
-                self.assertIn('implicit-curricular-order',
+                self.assertIn('numeric-reference',
                               [f['rule'] for r in doc.records for f in copy.findings(r)])
+        # The relative originals are still matched and still inventoried, but
+        # they survive renumbering, so they are reported rather than failed.
+        for text in ('The smoothing every later tool is built on.',
+                     'Five positions assembled from the parts above, one lesson each.'):
+            with self.subTest(prose=text):
+                doc = copy.Document('<body data-page-kind="course"><p>' + text + '</p></body>')
+                self.assertFalse([f for r in doc.records for f in copy.findings(r)])
+                self.assertIn('implicit-curricular-order',
+                              [f['rule'] for r in doc.records for f in copy.classify(r)[1]],
+                              'relative prose must stay in the inventory')
         for text in ('Pricing topics above a long-call payoff diagram.',
                      'Factor out the common term before applying another factoring method.'):
             doc = copy.Document('<body data-page-kind="course"><p>' + text + '</p></body>')
             self.assertFalse([f for r in doc.records for f in copy.findings(r)])
+            self.assertFalse([f for r in doc.records for f in copy.classify(r)[1]],
+                             'domain language must not be matched at all')
 
     def test_shared_surface_gate_mutations_on_owned_copies(self):
         from unittest import mock
@@ -151,7 +164,7 @@ class TestPublicCopy(unittest.TestCase):
             'capstone': '<h2>Lesson 16 exports a risk plan</h2>',
             'aria': '<svg aria-label="Lessons 01 to 03 show conditioning"></svg>',
             'quiz feedback': '<button data-why="Lesson 6 explains the risk">Answer</button>',
-            'title': '<button title="Next lesson">Open</button>',
+            'title': '<button title="Go to lesson 7">Open</button>',
             'alt': '<img alt="Lesson 2">',
             'value': '<input value="Lesson 3">',
             'placeholder': '<input placeholder="Lesson 4">',
@@ -165,7 +178,7 @@ class TestPublicCopy(unittest.TestCase):
             'structured': '<script type="application/ld+json">{"description":"Lesson 6"}</script>',
             'vocabulary': '<nav>Open a path. START HERE. Course progression.</nav>',
             **{word: '<nav>' + word + '</nav>' for word in ('Path', 'Track', 'Module', 'Progression', 'Stage')},
-            'noscript': '<noscript><p>The final lesson exports a plan.</p></noscript>',
+            'noscript': '<noscript><p>Lesson 16 exports a plan.</p></noscript>',
         }
         for family in ('library', 'subject', 'course', 'lesson', 'progress', 'auth', 'supplemental', 'slides'):
             for label, payload in payloads.items():
@@ -207,32 +220,66 @@ class TestPublicCopy(unittest.TestCase):
                 mutant = copy.Document('<body data-page-kind="lesson"><p>' + text + ' The next lesson uses Lesson 6.</p></body>')
                 self.assertTrue([f for r in mutant.records for f in copy.findings(r)], 'domain language cannot excuse ordinal dependencies')
 
-    def test_implicit_order_mutations_and_domain_controls(self):
+    def test_numbered_order_mutations_and_relative_prose_controls(self):
+        """Every page family must fail a numbered position and keep the prose.
+
+        Each payload is the numbered form of the `controls` entry at the same
+        position: the relative sentence survives renumbering and states a real
+        prerequisite, the numbered one is flatly wrong the moment a Lesson moves.
+        The five entries after those twelve are domain vocabulary that names no
+        curricular position at all, so the rules must not match them.
+        """
         payloads = (
-            'The first half of this course concerns fractions.',
-            'Every technique in the first half requires factoring.',
-            'Complex numbers are defined later in the course.',
-            'After this lesson, these answers are available.',
-            'Every radical from here on uses this notation.',
-            'Every later solution set uses intervals.',
-            'Every method later on produces these lines.',
-            'Every notation you meet later relies on this.',
-            'Nothing so far defines a fractional exponent.',
-            'Among the formulas available so far, roots restrict the domain.',
-            'The named Course later supplies the equation method.',
-            'The formula for computing one entry comes next.',
+            'Lessons 1 to 6 of this course concern fractions.',
+            'Every technique in lessons 1 to 6 requires factoring.',
+            'Complex numbers are defined in lesson 7.',
+            'After lesson 9, these answers are available.',
+            'Every radical from lesson 5 on uses this notation.',
+            'Every solution set in lesson 8 uses intervals.',
+            'Every method in lesson 3 produces these lines.',
+            'Every notation in lesson 12 relies on this.',
+            'Nothing before lesson 4 defines a fractional exponent.',
+            'Among the formulas in lessons 1 to 5, roots restrict the domain.',
+            'Course 6 supplies the equation method.',
+            'The formula for computing one entry is in lesson 10.',
         )
+        # text -> (rule it is inventoried under, or None when the vocabulary is
+        # pure domain language and must not be matched at all, reason).
         controls = {
+            'The first half of this course concerns fractions.':
+                ('implicit-curricular-order', 'Relative prose: it survives renumbering, so it is inventoried, not failed.'),
+            'Every technique in the first half requires factoring.':
+                ('implicit-curricular-order', 'Relative prose naming a span of the Course, not a Lesson number.'),
+            'Complex numbers are defined later in the course.':
+                ('implicit-curricular-order', 'Relative prose stating where a definition arrives, without a number.'),
+            'After this lesson, these answers are available.':
+                ('implicit-curricular-order', 'Relative prose about this page, true wherever the Lesson sits.'),
+            'Every radical from here on uses this notation.':
+                ('implicit-curricular-order', 'Relative prose: "from here on" moves with the Lesson.'),
+            'Every later solution set uses intervals.':
+                ('implicit-curricular-order', 'Relative prose stating a real forward dependency.'),
+            'Every method later on produces these lines.':
+                ('implicit-curricular-order', 'Relative prose stating a real forward dependency.'),
+            'Every notation you meet later relies on this.':
+                ('implicit-curricular-order', 'Relative prose: the teaching point is the dependency itself.'),
+            'Nothing so far defines a fractional exponent.':
+                ('implicit-curricular-order', 'Relative prose about what has been covered, not about Lesson numbers.'),
+            'Among the formulas available so far, roots restrict the domain.':
+                ('implicit-curricular-order', 'Relative prose about what has been covered, not about Lesson numbers.'),
+            'The named Course later supplies the equation method.':
+                ('implicit-curricular-order', 'Relative prose naming a prerequisite relationship between Courses.'),
+            'The formula for computing one entry comes next.':
+                ('implicit-curricular-order', 'Relative prose: "comes next" survives any renumbering.'),
             'The second half of the definition requires a positive root.':
-                'Two clauses in a mathematical definition, not Course order.',
+                (None, 'Two clauses in a mathematical definition, not Course order.'),
             'The second half of a row is the first half reversed.':
-                "Pascal triangle symmetry describes array entries.",
+                (None, "Pascal triangle symmetry describes array entries."),
             'Each earlier number system was extended to solve an equation.':
-                'Mathematical number-system extensions, not curricular order.',
+                (None, 'Mathematical number-system extensions, not curricular order.'),
             'An earlier arithmetic step was wrong; check the original equation.':
-                'A procedural verification rule for one calculation.',
+                (None, 'A procedural verification rule for one calculation.'),
             'The first term and every later term equal zero.':
-                'Indices of a mathematical sequence, not Lessons.',
+                (None, 'Indices of a mathematical sequence, not Lessons.'),
         }
         with tempfile.TemporaryDirectory(prefix='algebra-copy-controls-', dir='/tmp') as tmp:
             root = Path(tmp)
@@ -243,12 +290,17 @@ class TestPublicCopy(unittest.TestCase):
                         file.write_text(f'<body data-page-kind="{family}"><p>{text}</p></body>')
                         pages, records = copy.scan(root)
                         self.assertEqual(len(pages), 1)
-                        self.assertIn('implicit-curricular-order', [f['rule'] for r in records for f in copy.findings(r)])
-            for text, reason in controls.items():
+                        self.assertIn('numeric-reference', [f['rule'] for r in records for f in copy.findings(r)])
+            for text, (inventoried, reason) in controls.items():
                 with self.subTest(domain_reason=reason):
                     file.write_text(f'<body data-page-kind="lesson"><p>{text}</p></body>')
                     _, records = copy.scan(root)
                     self.assertFalse([f for r in records for f in copy.findings(r)])
+                    reported = [f['rule'] for r in records for f in copy.classify(r)[1]]
+                    if inventoried:
+                        self.assertIn(inventoried, reported, 'relative prose must stay in the inventory')
+                    else:
+                        self.assertFalse(reported, 'domain language must not be matched at all')
 
     def test_named_course_order_uses_rendered_titles(self):
         with tempfile.TemporaryDirectory(prefix='named-copy-controls-', dir='/tmp') as tmp:
@@ -258,12 +310,18 @@ class TestPublicCopy(unittest.TestCase):
             (owner / 'index.html').write_text('<body data-page-kind="course"><h1>Vector Methods</h1></body>')
             file = root / 'index.html'
             for verb in ('began', 'begins', 'started', 'starts', 'ended', 'ends'):
+                # Named-course sequencing survives renumbering, so it is
+                # inventoried as legitimate prose rather than failed.
                 file.write_text(f'<body data-page-kind="lesson"><p>Vector Methods {verb} with elimination.</p></body>')
                 _, records = copy.scan(root)
-                self.assertIn('named-course-sequencing', [f['rule'] for r in records for f in copy.findings(r)])
+                self.assertIn('named-course-sequencing', [f['rule'] for r in records for f in copy.classify(r)[1]])
+                self.assertFalse([f for r in records for f in copy.findings(r)],
+                                 'a rendered Course title is not a numbered reference')
             file.write_text('<body data-page-kind="lesson"><p>The sequence starts with zero. Vector Methods explains elimination.</p></body>')
             _, records = copy.scan(root)
             self.assertFalse([f for r in records for f in copy.findings(r)], 'sequence terms are mathematical objects; a named explanation is a topic relationship')
+            self.assertNotIn('named-course-sequencing', [f['rule'] for r in records for f in copy.classify(r)[1]],
+                             'sequence terms are mathematical objects; a named explanation is a topic relationship')
 
 
 class TestAlgebraSemanticCopy(unittest.TestCase):

@@ -38,7 +38,7 @@ COURSE = {
          "Add, multiply and divide complex numbers, use the conjugate, and interpret a conjugate pair of roots as a parabola that misses the axis."),
     ],
     "syllabus_intro": (
-        'Quadratic solution methods and the discriminant determine solutions and their counts. Complex numbers and their arithmetic extend the solutions beyond the reals; graphs, vertex form, optimisation, inequalities and substitutions apply and extend quadratic methods.'
+        'Quadratics are solved and their solutions counted first; the complex numbers are built next; and last they are graphed, optimised and extended.'
     ),
     "how_to": [
         "On each lesson, cover the complete worked example before attempting the faded rehearsal beneath it. The rehearsal supplies the first strategic decision but leaves the algebra and check to you; only then use the quiz as independent retrieval.",
@@ -49,8 +49,7 @@ COURSE = {
     "not_covered": [
         "Polar form of complex numbers, De Moivre's theorem and complex roots of unity, which need trigonometry.",
         (
-            "Cubic and quartic formulas. Polynomials and Factoring's rational root theorem is "
-            "the method used here for higher degrees."
+            "Cubic and quartic formulas. Polynomials and Factoring's rational root theorem is the tool this path gives for higher degrees."
         ),
         "Conic sections in general. The parabola appears here as the graph of a quadratic function, not as a locus.",
     ],

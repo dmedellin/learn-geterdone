@@ -281,7 +281,7 @@ LESSONS = [
                      "cases, and defend `0.999… = 1` without appealing to authority. "
                      "Being able to say why `1/7` repeats and `3/40` does not is part "
                      "of it."),
-        "note": '“Annuities and Accumulated Payments” applies the finite and infinite geometric-sum formulas on money: a payment made at the end of every period, each one earning interest for a different length of time, is a geometric series in disguise, and the question of what a stream of payments continuing for ever is worth today is an `|r| &lt; 1` question with a bank behind it.',
+        "note": 'Everything so far has summed abstract terms. “Annuities and Accumulated Payments” spends the same two formulas on money: a payment made at the end of every period, each one earning interest for a different length of time, is a geometric series in disguise, and the question of what a stream of payments continuing for ever is worth today is an `|r| &lt; 1` question with a bank behind it.',
     },
     # ---------------------------------------------------------------- 08
     {
@@ -569,7 +569,7 @@ LESSONS = [
                      "from the same series read the other way, and explain why a "
                      "perpetuity has a finite value while an annuity with `r &gt; 1` "
                      "still has a perfectly good finite sum over `n` periods."),
-        "note": "Binomial coefficients follow a different pattern from payment sums &mdash; the numbers that appear when a single bracket is raised to a power &mdash; and the link is that those numbers, like the terms of a series, count something definite. “Pascal's Triangle” builds the table of them by addition alone; “The Binomial Theorem” gives a formula for computing one directly.",
+        "note": "That is the last of the sums. “Pascal's Triangle”, “The Binomial Theorem” and “The General Term of an Expansion” follow a different pattern &mdash; the numbers that appear when a single bracket is raised to a power &mdash; and the link back is that those numbers, like the terms of a series, count something definite. “Pascal's Triangle” builds the table of them by addition alone, before any formula for computing one directly is given.",
     },
     # ---------------------------------------------------------------- 09
     {
@@ -578,7 +578,7 @@ LESSONS = [
         "module": "The binomial theorem",
         "one_line": "Construct and check a row of Pascal's triangle, then interpret one entry as a choice count.",
         "summary": (
-            'Start with a single `1` and make every entry the sum of the two above it. The rows that come out are the coefficients of `(a + b)ⁿ`, and each entry counts something exact: the number of ways to choose `k` things from `n`. This lesson builds the triangle and establishes what its entries count; “The Binomial Theorem” gives the formula for computing one without building the rows above it.'
+            'Start with a single `1` and make every entry the sum of the two above it. The rows that come out are the coefficients of `(a + b)ⁿ`, and each entry counts something exact: the number of ways to choose `k` things from `n`. This lesson builds the triangle and establishes what its entries count; the formula for computing one without building the rows above it comes next.'
         ),
         "key": [
             "row 4      1   4   6   4   1      each entry the sum of the two above",
@@ -662,7 +662,7 @@ LESSONS = [
                 "`k` from the other `n - 1`, and there are `N(n-1,k)`. No selection is "
                 "in both groups and none is outside them, so "
                 "`N(n,k) = N(n-1,k-1) + N(n-1,k)`.",
-                "So `N` starts as the triangle does and grows by the same rule, which forces the two tables to agree row by row. Stating that last step properly is what mathematical induction is for, and Induction and Recursion supplies that proof; the two rules and the two starting rows are what this course checks.",
+                'So `N` starts as the triangle does and grows by the same rule, which forces the two tables to agree row by row. Stating that last step properly is what mathematical induction is for, and the Discrete Mathematics path does it; the two rules and the two starting rows are what this course checks.',
             ]),
             ("p", "There is a second count in the same picture. Start at the apex and "
                   "walk down, going left or right at each step. The number of routes "
@@ -676,7 +676,7 @@ LESSONS = [
                   "subset exactly once, and a set of `n` things has `2ⁿ` subsets, one "
                   "for each way of saying yes or no to each thing. Row 6 gives "
                   "`1 + 6 + 15 + 20 + 15 + 6 + 1 = 64`, and `2⁶ = 64`."),
-            ("p", 'With alternating signs the same rows give `0`, for every `n ≥ 1`. Row 4 gives `1 - 4 + 6 - 4 + 1 = 0` and row 7 gives `1 - 7 + 21 - 35 + 35 - 21 + 7 - 1 = 0`. For odd `n` the symmetry pairs each entry with an equal one of the opposite sign, which settles that case; for even `n` the cancellation is real but the clean reason for it is the binomial theorem with `a = 1` and `b = -1`, as explained in “The Binomial Theorem”.'),
+            ("p", 'With alternating signs the same rows give `0`, for every `n ≥ 1`. Row 4 gives `1 - 4 + 6 - 4 + 1 = 0` and row 7 gives `1 - 7 + 21 - 35 + 35 - 21 + 7 - 1 = 0`. For odd `n` the symmetry pairs each entry with an equal one of the opposite sign, which settles that case; for even `n` the cancellation is real but the clean reason for it is the binomial theorem with `a = 1` and `b = -1`, which is the subject of “The Binomial Theorem”.'),
             ("p", 'The entries grow quickly: `C(20,10) = 184756`, and reaching it by addition means building twenty rows, one hundred and ninety additions. That is the argument for a formula, and it is what “The Binomial Theorem” supplies.'),
         ],
         "lab": ("sequence", {
@@ -805,7 +805,7 @@ LESSONS = [
                      "read `C(8,3)` off it with the positions counted correctly, and "
                      "say why the entry is the answer to a question about choosing "
                      "delegations. The `2ⁿ` check should be automatic."),
-        "note": 'The triangle is a table with a counting interpretation. “The Binomial Theorem” connects it to algebra: expanding `(a + b)ⁿ` means choosing an `a` or a `b` from each of `n` brackets, which is the same choosing problem, so row `n` turns out to be the list of coefficients. Knowing the rows makes the coefficient relationship easy to recognise.',
+        "note": 'So far the triangle is a table with a counting interpretation. “The Binomial Theorem” connects it to algebra: expanding `(a + b)ⁿ` means choosing an `a` or a `b` from each of `n` brackets, which is the same choosing problem, so row `n` turns out to be the list of coefficients. Having the rows already in hand is what makes that lesson short.',
     },
     # ---------------------------------------------------------------- 10
     {
@@ -1029,7 +1029,7 @@ LESSONS = [
                      "row 5, compute a binomial coefficient by cancelling factorials, "
                      "and expand `(2x - 3)⁴` correctly including signs. For a complete "
                      "expansion, the `x = 1` check should be automatic."),
-        "note": "The binomial-coefficients lesson specialises this identity into a method for picking a single term out of an expansion without writing the rest. `C(n,k)` was defined here as a formula and used as a count; Combinatorics and Counting develops its counting interpretation. Elimination, row reduction, determinants, corner points, and the two sequence families each use properties of the real numbers introduced in Foundations of Algebra.",
+        "note": 'This theorem is the last new identity of the course. “The General Term of an Expansion” specialises it into a method for picking a single term out of an expansion without writing the rest, and it ends where counting begins: `C(n,k)` was defined here as a formula and used as a count, and the Combinatorics and Counting course on the Discrete Mathematics path takes it up as a subject in its own right. The algebra was the point, though. Every step of this path &mdash; elimination, row reduction, the determinant and the corner points in Systems and Matrices, the two sequence families here &mdash; was legal because some property of the real numbers said so, which is the thing Foundations of Algebra opened with.',
     },
     # ---------------------------------------------------------------- 11
     {
@@ -1286,6 +1286,6 @@ LESSONS = [
                      "plainly when no such term exists. Getting `C(n,k)` from a row of "
                      "the triangle or from the factorial formula, and the sign from "
                      "`(-1)ᵏ`, should be routine by now."),
-        "note": 'A sequence is a function on the positive integers, and a series sums its terms. An infinite sum needs a limit of partial sums before it can mean anything; a binomial coefficient is a count. The three habits worth keeping are: derive the closed form rather than reciting it, check the condition before applying the formula, and say exactly what a check has established and what it has not.',
+        "note": 'That closes the course. It began with a sequence as a function on the positive integers, moved to the sums of their terms, and needed a limit of partial sums before an infinite one could mean anything; it ends with a coefficient that is a count. The three habits worth keeping are the ones the course kept insisting on: derive the closed form rather than reciting it, check the condition before applying the formula, and say exactly what a check has established and what it has not.',
     },
 ]

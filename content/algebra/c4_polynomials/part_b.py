@@ -178,7 +178,7 @@ LESSONS = [
              "If your two brackets come out as `3x - 2` and `-3x + 2`, factor `-1` out "
              "of the second and continue."),
             ("Treating a failed search as a failed attempt",
-             'Running out of pairs is the method succeeding. It has told you the trinomial is irreducible over the integers, which is exactly what “The Factor Theorem and Rational Roots” requires as a conclusion.'),
+             'Running out of pairs is the method succeeding. It has told you the trinomial is irreducible over the integers, which is exactly what “The Factor Theorem and Rational Roots” will need you to be able to conclude.'),
         ],
         "standard": ("Finish when an empty pair list reads as a result rather than a dead end.",
                      "You should be able to factor `6x² - 7x - 20` and `12x² - 17x + 6` "
@@ -556,7 +556,7 @@ LESSONS = [
                      "full identity with the remainder in place, and verify it by "
                      "multiplying out &mdash; which is the only step here that "
                      "confirms every sign at once."),
-        "note": 'Long division works for a divisor of any degree, and that generality is the reason to understand the full method. Synthetic division, covered in “Synthetic Division and the Remainder Theorem”, is faster but applies only when the divisor is `x - c`; when a divisor is quadratic or worse, this is the method, and there is no shortcut waiting.',
+        "note": "Long division works for a divisor of any degree, and that generality is why it comes first. “Synthetic Division and the Remainder Theorem”'s synthetic division is faster but applies only when the divisor is `x - c`; when a divisor is quadratic or worse, this is the method, and there is no shortcut waiting.",
     },
     # ---------------------------------------------------------------- 11
     {
@@ -951,7 +951,7 @@ LESSONS = [
                      "factors, and state of `x³ - 2` that it has no rational root "
                      "&mdash; citing the four tested candidates as the reason rather "
                      "than reporting that you could not find one."),
-        "note": "Rational and Radical Expressions uses factored denominators, Quadratics and Complex Numbers uses the roots of quadratics, and the polynomial-graphs lesson uses the factored form to draw a graph. Each application requires a search that either produces exact factors or proves there are none.",
+        "note": 'This is the lesson the course was arranged around. Rational and Radical Expressions needs factored denominators, Quadratics and Complex Numbers needs the roots of quadratics, and “Graphs of Polynomial Functions” needs the factored form to draw a graph. All three are downstream of a search that either produces exact factors or proves there are none.',
     },
     # ---------------------------------------------------------------- 13
     {
@@ -1057,7 +1057,7 @@ LESSONS = [
         "steps_intro": "Ends first, then the axis, then the one point you should always plot.",
         "steps": [
             ("Factor it, if it is not factored already",
-             'Everything below is read off the factored form. Common-factor, grouping, trinomial and special-form techniques, together with the search in “The Factor Theorem and Rational Roots”, produce that form.'),
+             'Everything below is read off the factored form. The common-factor, grouping, trinomial and special-form techniques and the search in “The Factor Theorem and Rational Roots” exist to get you here.'),
             ("Fix the two ends",
              "Look at the degree and the leading coefficient only. Even degree: both "
              "ends together. Odd degree: opposite ends. Positive leading coefficient: "
@@ -1156,6 +1156,6 @@ LESSONS = [
                      "shape from the ends, the three roots with their multiplicities "
                      "and `f(0)` alone &mdash; using sample values only to confirm the "
                      "signs, never to discover them."),
-        "note": 'The graph is drawn from the factored form, which is obtained through the root search in “The Factor Theorem and Rational Roots” and the common-factor, grouping, trinomial and special-form techniques. Anything the lab plots is computed by evaluating the polynomial you entered, so a curve that looks wrong is telling you something about the polynomial rather than about the drawing.',
+        "note": 'This is where the course arrives. The graph is drawn from the factored form, the factored form came from the search in “The Factor Theorem and Rational Roots”, and that search was made possible by the common-factor, grouping, trinomial and special-form techniques. Anything the lab plots is computed by evaluating the polynomial you entered, so a curve that looks wrong is telling you something about the polynomial rather than about the drawing.',
     },
 ]

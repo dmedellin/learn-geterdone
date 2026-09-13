@@ -48,7 +48,7 @@ LESSONS = [
                      "as for every logarithm.")),
             ("def", ("Natural logarithm",
                      '`ln x` means `log_e(x)`, where `e = 2.71828…` is the number “The Number e” obtained as a limit. The name is historical &mdash; <em>logarithmus naturalis</em> &mdash; and `e` is not a more natural base for arithmetic than any other. It is the base in which continuous growth is written, which is the only reason this course needs it.')),
-            ("p", 'Nothing about the two definitions is new. The logarithm definition, graph properties and laws apply to them unchanged, because they are instances of the same definition and not a second kind of object.'),
+            ("p", 'Nothing about the two definitions is new. Every statement from “What a Logarithm Is” onwards applies to them unchanged, because they are instances of the same definition and not a second kind of object.'),
             ("math", [
                 "log 10 = 1              ln e = 1",
                 "log 1  = 0              ln 1 = 0",
@@ -392,7 +392,7 @@ LESSONS = [
                      "and the power law, you cannot put `log b` on top by accident, "
                      "because the derivation shows where the denominator came from. "
                      "Memorising the fraction alone leaves a fifty-fifty guess."),
-        "note": 'This identity is what makes the numerical evaluation in “Solving Exponential Equations” possible. Solving `5^x = 17` gives `x = log_5(17)` straight from the definition, which names the answer without evaluating it; change of base turns that name into `ln 17 / ln 5 ≈ 1.760374`.',
+        "note": 'This identity is what makes “Solving Exponential Equations” finish. Solving `5^x = 17` gives `x = log_5(17)` straight from the definition, which names the answer without evaluating it; change of base turns that name into `ln 17 / ln 5 ≈ 1.760374`.',
     },
     # ---------------------------------------------------------------- 09
     {
@@ -435,7 +435,7 @@ LESSONS = [
         "read_title": "Bringing the variable down",
         "read_intro": "The same-base method, the logarithm method, the substitution that hides a quadratic, and the equations with no solution at all.",
         "body": [
-            ("p", 'Polynomial and radical equations put the unknown in the base: `x² = 9`, `x³ − x = 0`. `3^(2x − 1) = 81` puts it in the exponent, and no amount of dividing, factoring or root-taking will move it. Two methods do.'),
+            ("p", 'Every equation before this course put the unknown in the base: `x² = 9`, `x³ − x = 0`. `3^(2x − 1) = 81` puts it in the exponent, and no amount of dividing, factoring or root-taking will move it. Two methods do.'),
             ("thm", ("Exponentials are one-to-one",
                      "For `b &gt; 0` with `b ≠ 1`: `b^u = b^v` if and only if `u = v`.",
                      "The forward direction is what solves equations. The reverse "
@@ -842,7 +842,7 @@ LESSONS = [
                      "condensing anything, and then be able to say in advance that one of "
                      "the two candidates from `x² − 3x − 10 = 0` will fail it. It does: "
                      "`x = 5` is the solution and `x = −2` is rejected."),
-        "note": 'The two equation types use inverse operations. “Solving Exponential Equations” applies a logarithm to both sides to bring a variable down; this lesson makes both sides exponents to lift a variable out. “Compound Interest and Continuous Growth” and “Logarithmic Scales” apply these ideas &mdash; compound interest, and scales that are logarithms in ordinary clothes.',
+        "note": 'Both halves of the course now solve. “Solving Exponential Equations” applied a logarithm to both sides to bring a variable down; this lesson made both sides exponents to lift a variable out. The last two lessons stop solving and start applying &mdash; compound interest, and the scales that are logarithms in ordinary clothes.',
     },
     # ---------------------------------------------------------------- 11
     {
@@ -1066,7 +1066,7 @@ LESSONS = [
                      "assemble `A = P(1 + r/12)^(12t)` from those two facts alone. A "
                      "recalled formula with `n` and `t` in the wrong places looks exactly "
                      "like a correct one until the money is wrong."),
-        "note": '`e` is defined in “The Number e” as the limit of `(1 + 1/n)^n`, with no application attached to it. This is the application, and it is also the historical order: the limit was first met by asking what happens to an account compounded more and more often.',
+        "note": '`e` entered this course in “The Number e” as the limit of `(1 + 1/n)^n`, with no application attached to it. This is the application, and it is also the historical order: the limit was first met by asking what happens to an account compounded more and more often.',
     },
     # ---------------------------------------------------------------- 12
     {
@@ -1291,6 +1291,6 @@ LESSONS = [
                      "`10^((S₂ − S₁)/k)` as a factor on the quantity. If the answer "
                      "comes out carrying the units of the scale, the conversion has not "
                      "been done."),
-        "note": "Each reading on these scales is an exponent: “What a Logarithm Is”'s definition doing ordinary work. Every legal manipulation is one of the three laws of “The Laws of Logarithms” read in the other direction. Sequences and Series studies sequences with a constant ratio between successive terms.",
+        "note": 'This is the last lesson of the course, and it is the definition in “What a Logarithm Is” doing ordinary work: every reading on these scales is an exponent, and every legal manipulation of them is one of the three laws of “The Laws of Logarithms” read in the other direction. Sequences and Series picks up the sequences that these constant-ratio quantities have been all along.',
     },
 ]

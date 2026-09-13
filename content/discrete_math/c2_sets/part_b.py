@@ -20,7 +20,7 @@ LESSONS = [
         ],
         "key_label": "One structure, two descriptions",
         "concepts_intro": (
-            "This theorem says two apparently different things are the same thing."
+            'This is the first theorem on the path that says two apparently different things are the same thing.'
         ),
         "concepts": [
             ("Equivalence generalises equality",
@@ -251,7 +251,7 @@ LESSONS = [
                   "distinct elements could each precede the other and both count as least, "
                   "and the notion would be useless."),
             ("def", ("Topological sort",
-                     'A <strong>topological sort</strong> of a finite poset is a total order extending it: a listing of the elements in which every element appears after everything below it. Every finite poset has at least one, and the “Graphs and Trees” Course’s “Breadth-First and Depth-First Search” Lesson notes that a depth-first traversal of the directed graph produces one.')),
+                     'A <strong>topological sort</strong> of a finite poset is a total order extending it: a listing of the elements in which every element appears after everything below it. Every finite poset has at least one, and “Breadth-First and Depth-First Search” in Graphs and Trees notes that a depth-first traversal of the directed graph produces one.')),
         ],
         "lab": ("relation", {
             "size": 5, "preset": "div",
@@ -349,7 +349,7 @@ LESSONS = [
                      "Eight vertices in four levels, with edges only between sets differing "
                      "by one element. Then identify the least, the greatest, and a pair of "
                      "incomparable elements in the middle two levels."),
-        "note": "Topological sorting is the practical face of this lesson: build dependencies, course prerequisites and spreadsheet recalculation all extend a partial order to a total one. The “Graphs and Trees” Course’s “Breadth-First and Depth-First Search” Lesson's depth-first search is where the algorithm comes from, and it fails exactly when the dependencies contain a cycle &mdash; which is to say, when they were not a partial order at all.",
+        "note": "Topological sorting is the practical face of this lesson: build dependencies, course prerequisites and spreadsheet recalculation all extend a partial order to a total one. The depth-first search of “Breadth-First and Depth-First Search”, in Graphs and Trees, is where the algorithm comes from, and it fails exactly when the dependencies contain a cycle &mdash; which is to say, when they were not a partial order at all.",
     },
     # ---------------------------------------------------------------- 10
     {
@@ -378,7 +378,7 @@ LESSONS = [
              "Every element of the domain must have an image (total), and only one "
              "(well defined). A rule failing either is not a function."),
             ("Codomain is declared, image is derived",
-             '`f : ℝ → ℝ` with `f(x) = x²` has codomain `ℝ` and image `[0, ∞)`. Surjectivity in the “Injective, Surjective, Bijective” Lesson is exactly the question of whether they coincide.'),
+             '`f : ℝ → ℝ` with `f(x) = x²` has codomain `ℝ` and image `[0, ∞)`. Surjectivity in “Injective, Surjective, Bijective” is exactly the question of whether they coincide.'),
             ("The codomain is part of the function",
              "`x ↦ x²` from `ℝ` to `ℝ` and from `ℝ` to `[0, ∞)` are different functions, "
              "and one is surjective while the other is not."),
@@ -400,7 +400,7 @@ LESSONS = [
                      "<strong>codomain</strong>, and "
                      "`f(A) = {f(a) : a ∈ A} ⊆ B` the <strong>image</strong> (or range).")),
             ("example", ("The same rule, three functions",
-                         '`f : ℝ → ℝ`, `f(x) = x²` has image `[0, ∞) ≠ ℝ`. `g : ℝ → [0, ∞)`, `g(x) = x²` has image equal to its codomain. `h : [0, ∞) → [0, ∞)`, `h(x) = x²` is in addition one-to-one. Same formula, three different functions, three different answers in the “Injective, Surjective, Bijective” Lesson.')),
+                         '`f : ℝ → ℝ`, `f(x) = x²` has image `[0, ∞) ≠ ℝ`. `g : ℝ → [0, ∞)`, `g(x) = x²` has image equal to its codomain. `h : [0, ∞) → [0, ∞)`, `h(x) = x²` is in addition one-to-one. Same formula, three different functions, three different answers in “Injective, Surjective, Bijective”.')),
             ("h3", "Two ways a rule fails to be a function"),
             ("ul", [
                 "<strong>Not total.</strong> `f : ℝ → ℝ` with `f(x) = 1/x` is not a "
@@ -419,13 +419,13 @@ LESSONS = [
                      "For `S ⊆ A`, `f(S) = {f(a) : a ∈ S}`. For `T ⊆ B`, the "
                      "<strong>preimage</strong> `f⁻¹(T) = {a ∈ A : f(a) ∈ T}`. The "
                      "preimage notation does not presuppose an inverse function.")),
-            ("p", 'That last remark matters. `f⁻¹(T)` is defined for every function and every `T`; it may be empty. The inverse <em>function</em> `f⁻¹` exists only when `f` is a bijection, which is the “Composition and Inverse Functions” Lesson.'),
+            ("p", 'That last remark matters. `f⁻¹(T)` is defined for every function and every `T`; it may be empty. The inverse <em>function</em> `f⁻¹` exists only when `f` is a bijection, which is “Composition and Inverse Functions”.'),
             ("def", ("Some standard functions",
                      "`⌊x⌋` is the largest integer `≤ x`; `⌈x⌉` the smallest integer `≥ x`. The <strong>identity</strong> `id_A(a) = a`. A <strong>sequence</strong> is a function `ℕ → A`, which is why Induction and Recursion's recurrences are functions on the naturals.")),
         ],
         "lab": ("function", {
             "panel_title": "Assign each input an output",
-            "panel_intro": "Every element of `A` has exactly one arrow, which is what makes this a function. Notice you cannot build a non-function here &mdash; the control only permits one target per source. The figure that is this lesson's is Image size: it reads `4 / 4` because the image fills the codomain. Click one arrow so that two elements share a target and it drops to `3 / 4` &mdash; the codomain unchanged, the image smaller. The property table underneath is the “Injective, Surjective, Bijective” Lesson's.",
+            "panel_intro": "Every element of `A` has exactly one arrow, which is what makes this a function. Notice you cannot build a non-function here &mdash; the control only permits one target per source. The figure that is this lesson's is Image size: it reads `4 / 4` because the image fills the codomain. Click one arrow so that two elements share a target and it drops to `3 / 4` &mdash; the codomain unchanged, the image smaller. The property table underneath is “Injective, Surjective, Bijective”'s.",
         }),
         "steps_title": "Checking a rule is a function",
         "steps_intro": "Two conditions, plus a third when classes are involved.",
@@ -440,7 +440,7 @@ LESSONS = [
              "Compute the rule on two representatives of the same class. Different answers "
              "mean the rule is not a function on classes at all."),
             ("State the codomain deliberately",
-             "It is part of the function. Declaring `f : ℝ → ℝ` rather than `f : ℝ → [0,∞)` changes the answer to the “Injective, Surjective, Bijective” Lesson's question."),
+             "It is part of the function. Declaring `f : ℝ → ℝ` rather than `f : ℝ → [0,∞)` changes the answer to “Injective, Surjective, Bijective”'s question."),
         ],
         "worked": {
             "title": "Is it a function?",
@@ -491,7 +491,7 @@ LESSONS = [
         ],
         "mistakes": [
             ("Treating image and codomain as the same set",
-             "They coincide exactly when the function is surjective, which is the “Injective, Surjective, Bijective” Lesson's question. Assuming they coincide answers it without asking."),
+             "They coincide exactly when the function is surjective, which is “Injective, Surjective, Bijective”'s question. Assuming they coincide answers it without asking."),
             ("Ignoring the domain when a rule is undefined somewhere",
              "`1/x` is a perfectly good function &mdash; on `ℝ \\ {0}`. The rule and the "
              "domain together make the function."),
@@ -500,7 +500,7 @@ LESSONS = [
         ],
         "standard": ("Finish when you can state domain, codomain and image separately for "
                      "any function you meet.",
-                     'For `f : ℤ → ℤ` with `f(n) = n²`, name all three, and then say what changes if the codomain is narrowed to the set of perfect squares. That narrowing is the whole difference the “Injective, Surjective, Bijective” Lesson measures.'),
+                     'For `f : ℤ → ℤ` with `f(n) = n²`, name all three, and then say what changes if the codomain is narrowed to the set of perfect squares. That narrowing is the whole difference “Injective, Surjective, Bijective” measures.'),
         "note": "A function is formally a set of pairs, so two functions are equal when "
                 "they have the same domain, the same codomain and the same value at every "
                 "point. Two formulas that agree everywhere define one function; the same "
@@ -578,7 +578,7 @@ LESSONS = [
                 "exactly one, so no two inputs collide and `f` is injective.",
             ]),
             ("thm", ("The cardinality constraints",
-                     'If `f : A → B` is injective then `|A| ≤ |B|`; if surjective then `|A| ≥ |B|`; if bijective then `|A| = |B|`. For finite sets these are the pigeonhole principle of the “The Pigeonhole Principle” Lesson.')),
+                     'If `f : A → B` is injective then `|A| ≤ |B|`; if surjective then `|A| ≥ |B|`; if bijective then `|A| = |B|`. For finite sets these are the pigeonhole principle of “The Pigeonhole Principle”.')),
             ("p", "So the answer is sometimes settled before any function is examined. "
                   "With `|A| = 5` and `|B| = 3` no injection exists, whatever the rule; "
                   "with `|A| = 3` and `|B| = 5` no surjection does. The lab reports this "
@@ -994,7 +994,7 @@ LESSONS = [
                 "  0 2 4 6 8 10 …",
             ],
             "after": [
-                "This is Hilbert's hotel in arithmetic form, and it is the property that <em>defines</em> an infinite set: a set is infinite exactly when it is in bijection with a proper subset of itself. For a finite set that is impossible, by the “Injective, Surjective, Bijective” Lesson's theorem."
+                "This is Hilbert's hotel in arithmetic form, and it is the property that <em>defines</em> an infinite set: a set is infinite exactly when it is in bijection with a proper subset of itself. For a finite set that is impossible, by “Injective, Surjective, Bijective”'s theorem."
             ],
         },
         "quiz_title": "Countability",
@@ -1051,7 +1051,7 @@ LESSONS = [
         "module": "Counting",
         "one_line": "More objects than boxes means some box has two.",
         "summary": (
-            'If `n` objects go into `k` boxes with `n > k`, some box holds at least two. It is obvious, it is a one-line consequence of the “Injective, Surjective, Bijective” Lesson, and it proves things that are not obvious at all.'
+            'If `n` objects go into `k` boxes with `n > k`, some box holds at least two. It is obvious, it is a one-line consequence of “Injective, Surjective, Bijective”, and it proves things that are not obvious at all.'
         ),
         "key": [
             "n objects, k boxes, n > k   ⟹   some box has ≥ 2",
@@ -1065,7 +1065,7 @@ LESSONS = [
             "boxes are, and that is where the work is."
         ),
         "concepts": [
-            ('It is the “Injective, Surjective, Bijective” Lesson restated',
+            ('It is “Injective, Surjective, Bijective” restated',
              "No injection exists from a larger finite set to a smaller one. Objects are "
              "the domain, boxes the codomain, and a collision is two objects sharing a box."),
             ("The generalised form is sharper",
@@ -1208,6 +1208,6 @@ LESSONS = [
                      "different subsets have the same sum. The objects are subsets and the "
                      "boxes are possible sums &mdash; count both and the argument writes "
                      "itself, which is the skill this lesson is for."),
-        "note": 'The “Combinatorics and Counting” Course’s “The Generalised Pigeonhole Principle” Lesson returns to the generalised principle with harder applications, and Graphs and Trees uses it to prove that a graph on `n` vertices with more than `n − 1` edges must contain a cycle. It is a reusable fact in discrete mathematics.',
+        "note": '“The Generalised Pigeonhole Principle” in Combinatorics and Counting returns to the generalised principle with harder applications, and Graphs and Trees uses it to prove that a graph on `n` vertices with more than `n − 1` edges must contain a cycle. It is the most reusable single fact on this path.',
     },
 ]

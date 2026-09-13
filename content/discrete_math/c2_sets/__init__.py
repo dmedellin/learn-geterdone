@@ -8,7 +8,7 @@ COURSE = {
     "level": "Beginner",
     "summary": (
         (
-        'The vocabulary these courses are written in: sets and their algebra, power sets and Cartesian products, relations and the two kinds that matter (equivalence and order), functions and the three properties they may have, cardinality, and the pigeonhole principle.'
+        'The vocabulary the rest of the path is written in: sets and their algebra, power sets and Cartesian products, relations and the two kinds that matter (equivalence and order), functions and the three properties they may have, cardinality, and the pigeonhole principle.'
     )
     ),
     "blurb": (
@@ -22,12 +22,11 @@ COURSE = {
         "equivalence relation  ⟺  partition",
         "|A| = |B|    ⟺  a bijection A → B exists",
     ],
-    "assumes_short": "Logic and proof",
+    "assumes_short": 'Logic and Proof',
     "assumes_long": "quantifiers and proof technique",
     "outcomes_intro": (
         (
-        "Use set notation and proof techniques to reason about relations, functions, and "
-        "cardinality."
+        'By the end you have the objects every later course manipulates, and the proof habits from Logic and Proof applied to them.'
     )
     ),
     "outcomes": [
@@ -49,7 +48,7 @@ COURSE = {
     ],
     "syllabus_intro": (
         (
-        'Sets, relations, functions, and the counting consequences that Combinatorics and Counting builds on.'
+        'First sets, then relations, then functions, and last the counting consequences that Combinatorics and Counting builds on.'
     )
     ),
     "how_to": [
@@ -62,7 +61,7 @@ COURSE = {
         "preset and use as few elements as the claim needs &mdash; but the elements "
         "you leave untouched still count, so reflexivity fails until every one of "
         "them has its loop.",
-        'Pay attention to the “Cardinality and Countability” Lesson. Countability is where intuition about size stops working, and arguments comparing infinite cardinalities depend on accepting bijection as the definition of "same size".',
+        'Pay attention to “Cardinality and Countability”. Countability is where intuition about size stops working, and every argument after it depends on accepting bijection as the definition of "same size".',
     ],
     "not_covered": [
         "Axiomatic set theory. Sets here are naive: collections of objects. The "
@@ -71,7 +70,7 @@ COURSE = {
         "Russell's paradox is mentioned where it explains a restriction, but the "
         "resolution &mdash; separating sets from classes &mdash; is not developed.",
         (
-            'Ordinals, transfinite induction, and the continuum hypothesis. The “Cardinality and Countability” Lesson stops at the two cardinalities these courses use.'
+            'Ordinals, transfinite induction, and the continuum hypothesis. “Cardinality and Countability” stops at the two cardinalities the rest of the path uses.'
         ),
     ],
     "footer_lead": (

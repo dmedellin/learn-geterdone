@@ -8,7 +8,7 @@ LESSONS = [
         "module": "Exponents and radicals",
         "one_line": "Why x^(1/n) must mean the n-th root if the laws are to hold.",
         "summary": (
-            'The integer-exponent laws do not define what `x^(1/2)` means. Rather than invent a meaning, ask which meaning keeps the exponent laws of “Integer Exponents” true &mdash; and there is only one. That answer is the n-th root, and everything about rational exponents follows from it.'
+            'Nothing so far says what `x^(1/2)` means. Rather than invent a meaning, ask which meaning keeps the exponent laws of “Integer Exponents” true &mdash; and there is only one. That answer is the n-th root, and everything about rational exponents follows from it.'
         ),
         "key": [
             "(x^(1/n))ⁿ  =  x^(n·(1/n))  =  x¹  =  x   so x^(1/n) is an n-th root",
@@ -215,7 +215,7 @@ LESSONS = [
                      "with that negative exponent, and answer why `x^(1/2)` is a square "
                      "root rather than half of `x`: the exponent law leaves no alternative, "
                      "and convention only chooses which root the notation names."),
-        "note": 'Radicals can be written as rational powers, and it is usually worth doing. Rational and Radical Expressions simplifies expressions like `√(x⁵)` by rewriting them as `x^(5/2)` and using the laws you already have, rather than by inventing separate rules for radicals.',
+        "note": 'Every radical you meet from here on can be written as a rational power, and it is usually worth doing. Rational and Radical Expressions simplifies expressions like `√(x⁵)` by rewriting them as `x^(5/2)` and using the laws you already have, rather than by inventing separate rules for radicals.',
     },
     # --------------------------------------------- algebraic-expressions-and-terms
     {
@@ -236,7 +236,7 @@ LESSONS = [
         ],
         "key_label": "Reading an expression",
         "concepts_intro": (
-            'Almost every error in distributing, combining like terms, evaluating and translating expressions is an error of reading rather than of arithmetic: the wrong piece was treated as a unit.'
+            'Almost every error in “The Distributive Law”, “Combining Like Terms”, “Evaluating Expressions” and “Translating Words into Algebra” is an error of reading rather than of arithmetic: the wrong piece was treated as a unit.'
         ),
         "concepts": [
             ("A letter is a number whose value is not being supplied",
@@ -253,7 +253,7 @@ LESSONS = [
         "read_title": "The parts of an expression",
         "read_intro": "Variable, term, coefficient, factor and degree, each defined once and then used.",
         "body": [
-            ("p", "An expression is a recipe for a number: it says what to do, and given values for the letters it produces a value. It does not claim anything. `2x + 5` is an expression; `2x + 5 = 11` is an equation, which does make a claim and is a topic in Linear Equations and Inequalities. The distinction matters immediately, because you can solve an equation and you cannot solve an expression."),
+            ("p", "An expression is a recipe for a number: it says what to do, and given values for the letters it produces a value. It does not claim anything. `2x + 5` is an expression; `2x + 5 = 11` is an equation, which does make a claim and is Linear Equations and Inequalities's subject. The distinction matters immediately, because you can solve an equation and you cannot solve an expression."),
             ("def", ("Variable, constant, expression",
                      "A <strong>variable</strong> is a letter standing for a number whose "
                      "value is not fixed. A <strong>constant</strong> is a number written "
@@ -277,7 +277,7 @@ LESSONS = [
                 "        term 2   −5x          the minus sign belongs to it",
                 "        term 3   7",
             ]),
-            ("p", 'Writing the subtraction as an addition once, as above, is worth the line. “Properties of the Real Numbers” licenses reordering these terms by commutativity of addition. The reading skill here is narrower: if a term eventually moves, its attached sign must move with it.'),
+            ("p", 'Writing the subtraction as an addition once, as above, is worth the line. “Properties of the Real Numbers” will license reordering these terms by commutativity of addition. For now the reading skill is narrower: if a term eventually moves, its attached sign must move with it.'),
             ("def", ("Coefficient and variable part",
                      "A term that is a number times a product of variables splits into a "
                      "<strong>coefficient</strong> &mdash; the numerical factor, sign "
@@ -300,7 +300,7 @@ LESSONS = [
                      "combined.",
                      "`4xy` has degree `1 + 1 = 2`. A constant term such as `7` has "
                      "degree `0`, since `7 = 7x⁰`.")),
-            ("p", 'The qualification about combining is explained in “Combining Like Terms”. In `5x − 5x + 4` the highest degree written on the page is `1`, but the two `x` terms sum to `0` and the expression is `4`, of degree `0`. Degree describes the expression, not the ink.'),
+            ("p", 'The qualification about combining is a preview of “Combining Like Terms”. In `5x − 5x + 4` the highest degree written on the page is `1`, but the two `x` terms sum to `0` and the expression is `4`, of degree `0`. Degree describes the expression, not the ink.'),
             ("example", ("Two expressions, read part by part",
                          "`4xy − y² + 2` has three terms. Their coefficients are `4`, "
                          "`−1` and `2`; their degrees are `2`, `2` and `0`; the "
@@ -312,7 +312,7 @@ LESSONS = [
         "lab": ("expression", {
             "mode": "terms",
             "panel_title": "Take an expression apart",
-            "panel_intro": "Type an expression and the lab splits it at its top-level `+` and `−` signs, naming the coefficient and degree of each term. It also expands the expression and counts the terms again, so feed it `5(x + 2)` and predict the as-written count first. The expanded count illustrates “The Distributive Law”; the degree column illustrates a topic in Polynomials and Factoring and is not part of this lesson's completion standard.",
+            "panel_intro": "Type an expression and the lab splits it at its top-level `+` and `−` signs, naming the coefficient and degree of each term. It also expands the expression and counts the terms again, so feed it `5(x + 2)` and predict the as-written count first. The expanded count previews “The Distributive Law”; the degree column previews Polynomials and Factoring and is not part of this lesson's completion standard.",
         }),
         "steps_title": "Reading an expression correctly",
         "steps_intro": "Four passes. Do them in order; the bracket pass changes everything after it.",
@@ -784,7 +784,7 @@ LESSONS = [
         ],
         "mistakes": [
             ("Adding the exponents instead of the coefficients",
-             '`3x² + 5x² = 8x²`. Exponents add when powers are <em>multiplied</em>, as explained in “Integer Exponents”. Adding like terms leaves the variable part exactly as it was, and only the coefficients change.'),
+             '`3x² + 5x² = 8x²`. Exponents add when powers are <em>multiplied</em>, which is “Integer Exponents”. Adding like terms leaves the variable part exactly as it was, and only the coefficients change.'),
             ("Writing `3x + 4y = 7xy`",
              "There is nothing to combine: the variable parts differ, so no common factor "
              "can be taken out. Testing at `x = 1, y = 1` gives `7` on both sides and "
@@ -796,7 +796,7 @@ LESSONS = [
         ],
         "standard": ("Finish when you can say instantly whether two terms may be added, and why.",
                      "Expand and collect `3(2x − y) − x + 4y − 7`, marking every group by its variable part before adding coefficients. Justify each merge by the distributive law read backwards and explain why an unlike term stays. Linear Equations and Inequalities collects on each side of an equation and preserves every sign error made here."),
-        "note": 'These three reading skills work together. “Variables, Expressions, and Terms” finds the terms, “The Distributive Law” gets them out of their brackets, and this lesson decides which may be merged. Polynomials and Factoring does the same three things to polynomials and calls it addition.',
+        "note": 'This is the last of the three reading skills. “Variables, Expressions, and Terms” found the terms, “The Distributive Law” got them out of their brackets, and this lesson decides which may be merged. Polynomials and Factoring does the same three things to polynomials and calls it addition.',
     },
     # --------------------------------------------------------- evaluating-expressions
     {
@@ -1236,6 +1236,6 @@ LESSONS = [
                      "and choose a value that separates it from the common product-of-the-"
                      "whole-sum error. Then translate \"four less than three times the sum "
                      "of a number and two\" and test the nearest rival reading."),
-        "note": "Linear Equations and Inequalities turns these expressions into equations by setting two of them equal. Solving an equation requires first translating the stated relationship correctly.",
+        "note": 'This is the last lesson of the course, and it is the one that gets used first. Linear Equations and Inequalities turns these expressions into equations by setting two of them equal, and every technique it teaches for solving is worthless if the equation was written from a misread sentence.',
     },
 ]

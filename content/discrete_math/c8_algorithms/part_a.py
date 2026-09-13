@@ -72,7 +72,7 @@ LESSONS = [
                   "subject of this course, and it is a property of the algorithm rather "
                   "than of the machine."),
             ("h3", "Correctness before efficiency"),
-            ("p", 'An algorithm that is fast and wrong is worthless, and the order of work is therefore fixed: establish correctness (“Correctness and Termination”), then measure cost (growth rates, asymptotic bounds, iterative analysis, searching and sorting, divide and conquer, and amortised analysis), then look for a better method (“Greedy Algorithms” and “Dynamic Programming”).'),
+            ("p", 'An algorithm that is fast and wrong is worthless, and the order of work is therefore fixed: establish correctness (“Correctness and Termination”), then measure cost (growth rates, asymptotic bounds, iterative analysis, searching and sorting, divide and conquer, recursion trees and amortised analysis), then look for a better method (“Greedy Algorithms” and “Dynamic Programming”).'),
             ("p", "The order is worth stating because the temptation runs the other way. "
                   "Optimising an algorithm before knowing it is right produces a faster "
                   "wrong answer, and the speed makes the error harder to find."),
@@ -80,7 +80,7 @@ LESSONS = [
         "lab": ("algorithm", {
             "mode": "growth", "n": 64,
             "panel_title": "Why the choice matters",
-            "panel_intro": 'The functions plotted are the cost curves of different algorithms for the same tasks. At `n = 64`, where the lab opens, `log₂ n` is 6 and `2ⁿ` is about `1.8 × 10¹⁹` &mdash; more than eighteen orders of magnitude between the cheapest curve and the dearest, and at a billion operations a second the exponential one alone takes about 585 years. The other modes explore named topics: the invariant trace is “Correctness and Termination”, and the counted loops and sorts are “Analysing Iterative Algorithms” and “Searching and Sorting”.',
+            "panel_intro": 'The functions plotted are the cost curves of different algorithms for the same tasks. At `n = 64`, where the lab opens, `log₂ n` is 6 and `2ⁿ` is about `1.8 × 10¹⁹` &mdash; more than eighteen orders of magnitude between the cheapest curve and the dearest, and at a billion operations a second the exponential one alone takes about 585 years. The other modes are the lessons to come: the invariant trace is “Correctness and Termination”, the counted loops and sorts “Analysing Iterative Algorithms” and “Searching and Sorting”.',
         }),
         "steps_title": "Writing an algorithm down",
         "steps_intro": "State the contract before the steps.",
@@ -91,7 +91,7 @@ LESSONS = [
              "No step may require judgement. If it does, it is a subproblem needing its own "
              "algorithm."),
             ("Check it terminates on every valid input",
-             'Exhibit a quantity that strictly decreases and is bounded below, as in the “Recursive Algorithms and Correctness” Lesson in Induction and Recursion.'),
+             'Exhibit a quantity that strictly decreases and is bounded below, as in “Recursive Algorithms and Correctness” in Induction and Recursion.'),
             ("Only then consider the cost",
              'Count the dominant operation as a function of the input size. That is “Analysing Iterative Algorithms”.'),
         ],
@@ -186,7 +186,7 @@ LESSONS = [
         ],
         "key_label": "Two obligations",
         "concepts_intro": (
-            'This is the “Loop Invariants and Program Correctness” Lesson in Induction and Recursion applied to algorithms, and the split is what makes the proofs short.'
+            'This is “Loop Invariants and Program Correctness” in Induction and Recursion applied to algorithms, and the split is what makes the proofs short.'
         ),
         "concepts": [
             ("The two are independent",
@@ -246,7 +246,7 @@ LESSONS = [
                          "ever tested &mdash; beyond `10²⁰` &mdash; and no proof is known "
                          "that it always does. Partial correctness is trivial; termination "
                          "is an open problem.")),
-            ("p", 'That example separates the two obligations cleanly. It also illustrates the question addressed in “Decidability and the Halting Problem”: there is no general procedure that decides termination for arbitrary programs, which is why each one needs its own argument.'),
+            ("p", 'That example separates the two obligations cleanly. It also previews “Decidability and the Halting Problem”: there is no general procedure that decides termination for arbitrary programs, which is why each one needs its own argument.'),
         ],
         "lab": ("algorithm", {
             "mode": "invariant", "n": 13, "x": 3,
@@ -563,7 +563,7 @@ LESSONS = [
              "A `C` and a `k` that work. Anything else is a restatement of the claim."),
         ],
         "read_title": "The three notations",
-        "read_intro": 'Definitions, worked proofs, and the properties that shorten complexity arguments.',
+        "read_intro": 'Definitions, worked proofs, and the properties that shorten later work.',
         "body": [
             ("def", ("Big-O",
                      "`f(n) = O(g(n))` means there are constants `C &gt; 0` and `k` such "
@@ -587,7 +587,7 @@ LESSONS = [
                          "Suppose `n² ≤ Cn` for all `n ≥ k`. Dividing by `n` gives `n ≤ C` "
                          "for all `n ≥ k`, which is false for `n &gt; max(C, k)`. No pair "
                          "of witnesses exists.")),
-            ("p", 'That is the shape of a disproof: assume witnesses and derive a contradiction. It is a direct proof of a negation, and the “Contraposition and Contradiction” Lesson in Logic and Proof explains the technique.'),
+            ("p", 'That is the shape of a disproof: assume witnesses and derive a contradiction. It is a direct proof of a negation, and “Contraposition and Contradiction” in Logic and Proof is the technique.'),
             ("h3", "Useful properties"),
             ("math", [
                 "transitive       f = O(g),  g = O(h)   ⟹   f = O(h)",
@@ -746,7 +746,7 @@ LESSONS = [
              "Two independent nested loops give the product; two blocks in sequence give "
              "the sum, which asymptotically is the larger."),
             ("A dependent inner bound gives a sum",
-             '`for i = 1 to n: for j = 1 to i` runs `Σ i = n(n+1)/2` times, which is `Θ(n²)` &mdash; the formula from “Induction with Sums and Products” in Induction and Recursion.'),
+             "`for i = 1 to n: for j = 1 to i` runs `Σ i = n(n+1)/2` times, which is `Θ(n²)` &mdash; the formula of “Induction with Sums and Products”, in Induction and Recursion."),
         ],
         "read_title": "Counting operations",
         "read_intro": "The three patterns, the case distinction, and four worked analyses.",
@@ -775,7 +775,7 @@ LESSONS = [
                 "",
                 "total  Σ_{i=1}^{n} i  =  n(n+1)/2  =  Θ(n²)",
             ]),
-            ("p", 'The constant differs from the independent case &mdash; half as many iterations &mdash; and the class does not. This is where the summation formulas from “Induction with Sums and Products” in Induction and Recursion earn their place, and where a triple dependent nest gives `Σ i² = Θ(n³)`.'),
+            ("p", "The constant differs from the independent case &mdash; half as many iterations &mdash; and the class does not. This is where the summation formulas of “Induction with Sums and Products”, in Induction and Recursion, earn their place, and where a triple dependent nest gives `Σ i² = Θ(n³)`."),
             ("h3", "Loops that multiply or divide"),
             ("math", [
                 "i = 1",
@@ -987,7 +987,7 @@ LESSONS = [
                 "comparison with two outcomes, and each leaf is one possible output "
                 "ordering. To sort correctly the tree must have at least `n!` leaves, one "
                 "per permutation of the input.",
-                'A binary tree of height `h` has at most `2^h` leaves &mdash; the bound in the “Trees” Lesson in Graphs and Trees of `2^{h+1} − 1` vertices, restricted to the last level &mdash; so a tree with `L` leaves has height at least `log₂ L`, and this one has height at least `log₂(n!)`.',
+                "A binary tree of height `h` has at most `2^h` leaves &mdash; the `2^{h+1} − 1` vertex bound of “Trees”, in Graphs and Trees, restricted to the last level &mdash; so a tree with `L` leaves has height at least `log₂ L`, and this one has height at least `log₂(n!)`.",
                 "The largest `n/2` factors of `n!` are each at least `n/2`, so "
                 "`n! ≥ (n/2)^{n/2}` and `log₂(n!) ≥ (n/2) log₂(n/2)`, which is "
                 "`Ω(n log n)`. The height is the worst-case number of comparisons, and "
@@ -995,7 +995,7 @@ LESSONS = [
                 "`log₂(n!) ≈ n log₂ n − 1.44n`, but the crude bound is all the theorem "
                 "needs.)",
             ]),
-            ("p", 'This is a genuine impossibility result and it is worth distinguishing from a failure of ingenuity: no comparison sort will ever beat `n log n`, and merge sort therefore achieves the optimum. The permutation count from Combinatorics and Counting and the tree-height bound from Graphs and Trees are both doing work in the proof.'),
+            ("p", "This is a genuine impossibility result and it is worth distinguishing from a failure of ingenuity: no comparison sort will ever beat `n log n`, and merge sort therefore achieves the optimum. Combinatorics and Counting's count of permutations and Graphs and Trees's tree height bound are both doing work in the proof."),
             ("p", "Sorts that beat the bound exist and they do not compare. Counting sort "
                   "and radix sort use the values themselves as indices and run in `Θ(n)` "
                   "under assumptions about the key range. They do not contradict the "
@@ -1093,7 +1093,7 @@ LESSONS = [
              "that is worth more than a better asymptotic class."),
         ],
         "standard": ("Finish when you can state the lower bound and why it holds.",
-                     "Explain in three sentences why `n!` leaves force `Θ(n log n)` height. The argument uses the permutation count from Combinatorics and Counting and the tree bound from Graphs and Trees, and it is an impossibility proof."),
+                     "Explain in three sentences why `n!` leaves force `Θ(n log n)` height. The argument uses Combinatorics and Counting's permutation count and Graphs and Trees's tree bound, and it is the cleanest impossibility proof on this path."),
         "note": "Timsort, the default sort in Python and Java, is merge sort with insertion "
                 "sort for small runs and special handling for existing sorted runs. Every "
                 "element of that design is a response to something in this lesson.",

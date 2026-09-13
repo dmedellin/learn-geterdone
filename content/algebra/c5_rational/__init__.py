@@ -36,10 +36,10 @@ COURSE = {
          "Locate rational-function asymptotes and holes from factored form, then solve an even-root inequality and use its boundaries and range to sketch a radical function."),
     ],
     "syllabus_intro": (
-        'Rational expressions connect domain restrictions, simplification, equations and graphs. Radical expressions connect simplification and operations with radical equations and functions.'
+        'Rational expressions, equations and graphs come first; radicals follow, from simplification to radical functions.'
     ),
     "how_to": [
-        'Factor everything before you do anything else. Every rational-expression technique here is stated in terms of factors, and none of them applies to a sum.',
+        'Factor everything before you do anything else. Every technique in the first half is stated in terms of factors, and none of them applies to a sum.',
         'Write the excluded values down at the top of the page, before you start. They are not recoverable from your simplified answer &mdash; that is the whole point of “Rational Expressions and Their Domains”.',
         'After each complete example, cover its answer and do the faded rehearsal before the quiz. The first strategic move is supplied; the remaining algebra, restrictions and original-expression check are yours. In “Solving Rational Equations” and “Solving Radical Equations” that check is part of the method, because a legal step can create an extraneous candidate.',
     ],

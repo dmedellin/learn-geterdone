@@ -13,7 +13,7 @@ COURSE = {
     ),
     "blurb": (
         (
-        'Counting with a denominator. For equally likely finite outcomes, probability is a ratio of counts, so the techniques of Combinatorics and Counting do much of the work. Conditioning and independence can go wrong for reasons that have nothing to do with arithmetic.'
+        'Counting with a denominator. Every probability here is a ratio of counts, so Combinatorics and Counting does most of the work &mdash; and the parts that go wrong, conditioning and independence, go wrong for reasons that have nothing to do with arithmetic.'
     )
     ),
     "key": [
@@ -51,19 +51,19 @@ COURSE = {
          "geometric."),
     ],
     "syllabus_intro": (
-        'Probability models and conditioning support the study of random variables and two named distributions: the binomial and the geometric.'
+        'The model is set up first, then conditioning, and last random variables and the two distributions worth knowing by name.'
     ),
     "how_to": [
-        'Write the sample space down when modelling outcomes and computing their probabilities, even when it is obvious. Most probability errors are errors about what the outcomes are.',
-        "Use the probability lab's outcome list. Every probability on this course is a count divided by a count, and seeing the outcomes highlighted makes conditioning concrete rather than formal. In the Lessons on random variables, expectation, variance, and the binomial and geometric distributions, the distribution lab opens on each Lesson’s own worked example, so the numbers on the page are the numbers in the lab.",
-        "Do the Bayes calculation by frequencies as well as by the formula. The two agree, and the frequency version is the one that makes the answer believable. The “Bayes' Theorem” Lesson’s lab does both on a million people, with every cell a whole number.",
+        'Write the sample space down for the opening lessons, as far as “The Probability Axioms”, even when it is obvious. Most probability errors are errors about what the outcomes are.',
+        "Use the probability lab's outcome list. Every probability on this course is a count divided by a count, and seeing the outcomes highlighted makes conditioning concrete rather than formal. From “Random Variables” the distribution lab opens on each lesson's own worked example, so the numbers on the page are the numbers in the lab.",
+        "Do the Bayes calculation by frequencies as well as by the formula. The two agree, and the frequency version is the one that makes the answer believable. “Bayes' Theorem”’s lab does both on a million people, with every cell a whole number.",
     ],
     "not_covered": [
         "Continuous probability: densities, the normal distribution, and anything "
         "requiring an integral. Everything here is finite or countable.",
         "Limit theorems. The law of large numbers and the central limit theorem are "
         "mentioned where they explain something and are not proved.",
-        'Markov chains, martingales and stochastic processes, related subjects that need a Course of their own.',
+        'Markov chains, martingales and stochastic processes, which are the natural sequel and a course of their own.',
     ],
     "footer_lead": (
         'Probabilities on this course are computed as exact fractions from the enumerated sample space, so `1/6` appears as `1/6` rather than as a decimal that is nearly it. The binomial and geometric distributions are summed term by term from their definitions and compared with the closed forms.'

@@ -54,7 +54,7 @@ LESSONS = [
                          "`26 · 26 · 1 = 676`. These overlap &mdash; strings starting with "
                          "a vowel AND ending in `z`, of which there are `5 · 26 · 1 = 130`. "
                          "So the answer is `3380 + 676 − 130 = 3926`, not `4056`.")),
-            ("p", 'That subtraction is an instance of “The Inclusion-Exclusion Principle”. The sum rule as stated does not apply, because the two sets are not disjoint; using it anyway over-counts by exactly the size of the overlap.'),
+            ("p", 'That subtraction is “The Inclusion-Exclusion Principle” arriving early. The sum rule as stated does not apply, because the two sets are not disjoint; using it anyway over-counts by exactly the size of the overlap.'),
             ("h3", "When the second count depends on the first"),
             ("p", "The product rule is often stated as needing \"independent\" choices, "
                   "which is imprecise. What it needs is that the <em>number</em> of second "
@@ -138,7 +138,7 @@ LESSONS = [
                    "the sets to be finite and ordered",
                    "nothing"],
              "c": 1,
-             "why": 'Overlap is counted twice, so the sets must be disjoint; when they are not, inclusion&ndash;exclusion, as developed in “The Inclusion-Exclusion Principle”, is the correct rule. Nothing else is required: the sets may differ in size, they need no order, and "nothing" is the answer that double-counts.'},
+             "why": 'Overlap is counted twice, so the sets must be disjoint; when they are not, “The Inclusion-Exclusion Principle”\'s inclusion&ndash;exclusion is the correct rule. Nothing else is required: the sets may differ in size, they need no order, and "nothing" is the answer that double-counts.'},
             {"q": "How many 3-digit strings over `{0,…,9}` contain at least one 5?",
              "a": ["100", "271", "300", "243"],
              "c": 1,
@@ -163,7 +163,7 @@ LESSONS = [
                      "Count the 4-digit PINs with at least two identical digits. Do it by "
                      "complement, and say in one sentence why the direct count would be "
                      "harder. That sentence is the skill."),
-        "note": 'Both rules are theorems about sets: the sum rule is additivity of cardinality over disjoint unions, and the product rule is `|A × B| = |A| · |B|` from the “Cartesian Products and Tuples” Lesson in Sets, Relations, and Functions. Counting is set theory with the sets kept small enough to measure.',
+        "note": 'Both rules are theorems about sets: the sum rule is additivity of cardinality over disjoint unions, and the product rule is `|A × B| = |A| · |B|` from “Cartesian Products and Tuples” in Sets, Relations, and Functions. Counting is set theory with the sets kept small enough to measure.',
     },
     # ---------------------------------------------------------------- 02
     {
@@ -192,7 +192,7 @@ LESSONS = [
              "If the first digit cannot be 0, choose it first (9 ways) and then the rest "
              "freely. Choosing left to right regardless is what creates the difficulty."),
             ("Split into cases when the count varies",
-             'Cases must be disjoint and exhaustive &mdash; the same discipline as a proof by cases in the “Cases, Counterexamples, and Writing a Proof” Lesson in Logic and Proof.'),
+             'Cases must be disjoint and exhaustive &mdash; the same discipline as a proof by cases in “Cases, Counterexamples, and Writing a Proof” in Logic and Proof.'),
             ("Complement when the restriction says \"at least\"",
              "The complement of \"at least one\" is \"none\", which is a single "
              "unrestricted count."),
@@ -293,7 +293,7 @@ LESSONS = [
                 "   81 − 16 − 32 = 33                                    agree",
             ],
             "after": [
-                'Two independent routes to 33. That agreement is the real check: a single method producing a plausible number is not evidence that the classification was right, and the case method is where a missing case would show up. The six position pairs were listed by hand; “Combinations” gives them a name and a formula, `C(4, 2) = 6`, so they need not be listed individually.'
+                'Two independent routes to 33. That agreement is the real check: a single method producing a plausible number is not evidence that the classification was right, and the case method is where a missing case would show up. The six position pairs were listed by hand; “Combinations” gives them a name and a formula, `C(4, 2) = 6`, and from then on they need not be listed.'
             ],
         },
         "quiz_title": "Restrictions",
@@ -414,7 +414,7 @@ LESSONS = [
                   "produces a different seating, nothing is identified, and the count is "
                   "`n!`. Say which situation you are in before dividing; the question "
                   "decides it, not the shape of the table."),
-            ("p", 'The division-by-symmetry argument is the pattern to remember: when several arrangements are considered the same, count them all and divide by the size of the equivalence class. That is the equivalence relation from Sets, Relations, and Functions doing combinatorial work, and “Permutations with Repetition” uses it again.'),
+            ("p", "The division-by-symmetry argument is the pattern to remember: when several arrangements are considered the same, count them all and divide by the size of the equivalence class. That is Sets, Relations, and Functions's equivalence relation doing combinatorial work, and “Permutations with Repetition” uses it again."),
             ("h3", "The size of factorials"),
             ("math", [
                 "  5! =                        120",
@@ -422,7 +422,7 @@ LESSONS = [
                 " 20! =  2 432 902 008 176 640 000",
                 " 52! ≈ 8.07 × 10⁶⁷",
             ]),
-            ("p", '`52!` is about `10¹⁸` times the number of atoms in the Earth, which is roughly `10⁵⁰`. Any algorithm that examines all permutations of a modest input is not slow &mdash; it is impossible, and the “P, NP and NP-Completeness” Lesson in Algorithms and Complexity gives that observation a name.'),
+            ("p", '`52!` is about `10¹⁸` times the number of atoms in the Earth, which is roughly `10⁵⁰`. Any algorithm that examines all permutations of a modest input is not slow &mdash; it is impossible, and “P, NP and NP-Completeness” in Algorithms and Complexity gives that observation a name.'),
         ],
         "lab": ("counting", {
             "n": 5, "r": 3, "rule": "p",
@@ -510,7 +510,7 @@ LESSONS = [
                      "Count the ways to seat 6 people around a round table with two "
                      "specific people not adjacent. Do it by complement, and state exactly "
                      "why the circular count is `5!` rather than `6!`."),
-        "note": 'A permutation is also a bijection from a set to itself, which is the remark in “Composition and Inverse Functions” in Sets, Relations, and Functions. There are `n!` of them, and under composition they form the symmetric group &mdash; the object most of finite group theory is about.',
+        "note": "A permutation is also a bijection from a set to itself, which is the remark of “Composition and Inverse Functions”, in Sets, Relations, and Functions. There are `n!` of them, and under composition they form the symmetric group &mdash; the object most of finite group theory is about.",
     },
     # ---------------------------------------------------------------- 04
     {
@@ -542,7 +542,7 @@ LESSONS = [
              "Choosing which `r` to include is the same as choosing which `n−r` to leave "
              "out, so `C(n,r) = C(n,n−r)`."),
             ("The subsets sum to `2ⁿ`",
-             'Every subset has exactly one size, so summing `C(n,r)` over all `r` counts every subset once &mdash; and the “Subsets and Power Sets” Lesson in Sets, Relations, and Functions establishes the total.'),
+             'Every subset has exactly one size, so summing `C(n,r)` over all `r` counts every subset once &mdash; and “Subsets and Power Sets” in Sets, Relations, and Functions already knew the total.'),
         ],
         "read_title": "Choosing without order",
         "read_intro": "The derivation, the identities, and the standard applications.",
@@ -933,7 +933,7 @@ LESSONS = [
                 "x = 1, y = 2     Σ_k 2^k C(n,k)      = 3ⁿ",
                 "x = 1, y = t     Σ_k t^k C(n,k)      = (1 + t)ⁿ",
             ]),
-            ("p", 'The last line is the generating function of the binomial coefficients, and the “Generating Functions” Lesson explains that representation. It is the observation that a single algebraic identity encodes a whole row of the triangle.'),
+            ("p", 'The last line is the generating function of the binomial coefficients, and “Generating Functions” makes that phrase mean something. For now it is the observation that a single algebraic identity encodes a whole row of the triangle.'),
             ("example", ("Extracting one coefficient",
                          "What is the coefficient of `x⁵y³` in `(2x − 3y)⁸`? The general "
                          "term is `C(8,k)(2x)^{8−k}(−3y)^k`. Take `k = 3`: "
@@ -1031,7 +1031,7 @@ LESSONS = [
                      "Find the coefficient of `x⁴y⁵` in `(2x − 3y)⁹`, and check the sign "
                      "and both constants. Then set `x = y = 1` in the same expansion and "
                      "confirm the result equals `(2 − 3)⁹ = −1`."),
-        "note": 'Newton extended the theorem to non-integer exponents, where the sum becomes an infinite series and the coefficients use the generalised binomial coefficient. That is where the generating functions introduced in “Generating Functions” acquire their power, and it is outside this course.',
+        "note": "Newton extended the theorem to non-integer exponents, where the sum becomes an infinite series and the coefficients use the generalised binomial coefficient. That is where “Generating Functions”'s generating functions acquire their power, and it is outside this course.",
     },
     # ---------------------------------------------------------------- 07
     {
@@ -1105,7 +1105,7 @@ LESSONS = [
                          "assigning each card a player is arranging a multiset of 13 copies "
                          "of each of four labels.")),
             ("h3", "Lattice paths again"),
-            ("p", "A path from `(0,0)` to `(m,n)` using unit right and up steps is an arrangement of `m` R's and `n` U's, so there are `(m+n)!/(m! n!) = C(m+n, m)` of them &mdash; the same answer “Combinations” gives, now visible as a multiset arrangement."),
+            ("p", "A path from `(0,0)` to `(m,n)` using unit right and up steps is an arrangement of `m` R's and `n` U's, so there are `(m+n)!/(m! n!) = C(m+n, m)` of them &mdash; the same answer “Combinations” gave, now visible as a multiset arrangement."),
         ],
         "lab": ("counting", {
             "n": 4, "r": 3, "rule": "pr",

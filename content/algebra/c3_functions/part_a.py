@@ -179,8 +179,8 @@ LESSONS = [
         ],
         "standard": ("Finish when you can plot a point, name its quadrant, and decide "
                      "membership of a graph by substituting rather than by looking.",
-                     'Given six pairs and an equation you should be able to place all six, classify each by sign, and say which are on the graph with the arithmetic that proves it. That substitution test is the definition graph-based reasoning relies on, from the intercepts in “Graphing a Linear Equation” to the inverse in “Inverse Functions”.'),
-        "note": 'The convention that `x` comes first is arbitrary but universal, and it is the same convention that makes `f(x)` in “Function Notation” an input and the value it returns an output. Once a pair is written `(input, output)` the function relationship reads from input to output.',
+                     'Given six pairs and an equation you should be able to place all six, classify each by sign, and say which are on the graph with the arithmetic that proves it. That substitution test is the definition every later lesson leans on, from the intercepts in “Graphing a Linear Equation” to the inverse in “Inverse Functions”.'),
+        "note": 'The convention that `x` comes first is arbitrary but universal, and it is the same convention that makes `f(x)` in “Function Notation” an input and the value it returns an output. Once a pair is written `(input, output)` the whole course reads in one direction.',
     },
     # ---------------------------------------------------------------- 02
     {
@@ -209,7 +209,7 @@ LESSONS = [
              "other pair on one straight line. Solving it means describing that whole "
              "set, not finding \"the\" answer."),
             ("Two points determine the line, three points check it",
-             'Geometry says two distinct points fix a line, so two solutions suffice. Plot a third anyway: if it misses, one of the three is wrong, and checking the third point exposes the inconsistency.'),
+             'Geometry says two distinct points fix a line, so two solutions suffice. Plot a third anyway: if it misses, one of the three is wrong, and you find out now rather than in “Slope”.'),
             ("Intercepts are the cheapest two points",
              "Setting `y = 0` and then `x = 0` each collapses the equation to one unknown, which is the case Linear Equations and Inequalities already solved. No other pair of points is easier to get."),
         ],
@@ -263,12 +263,12 @@ LESSONS = [
                 "whatever `x` is. A <em>horizontal</em> line.",
             ]),
             ("p", "Both are genuine linear equations under the definition above: `x = a` is `1·x + 0·y = a`. The instinct that `x = −2` should be a single point comes from Linear Equations and Inequalities, where it was one; with a second variable present, `y` is unconstrained and the solution set is a whole line."),
-            ("p", 'Keep `x = −2` in view. It is the one shape that fails the test in “What a Function Is”, and knowing what it looks like makes that test obvious.'),
+            ("p", 'Keep `x = −2` in view. It is the one shape that will fail the test in “What a Function Is”, and knowing what it looks like now is what makes that test obvious later.'),
         ],
         "lab": ("line", {
             "mode": "graph",
             "panel_title": "Two points, and everything that follows from them",
-            "panel_intro": 'The line, its two intercepts and the table of values are all computed from the points you choose, so moving a point moves all three together. Predict the table and intercepts first; the slope readout illustrates “Slope”. The vertical preset shows one x-value serving every y.',
+            "panel_intro": 'The line, its two intercepts and the table of values are all computed from the points you choose, so moving a point moves all three together. Predict the table and intercepts first; the slope readout is a preview for “Slope”. The vertical preset shows one x-value serving every y.',
         }),
         "steps_title": "Graphing ax + by = c",
         "steps_intro": "Intercepts first, table as the fallback, third point always.",
@@ -583,7 +583,7 @@ LESSONS = [
              "the y-intercept. No work is required to extract them &mdash; which is the "
              "entire reason for rearranging into this shape."),
             ("Getting there is one goal: isolate y",
-             "Whatever the equation looks like, the procedure is the one from Linear Equations and Inequalities: undo the additions, then undo the multiplication. The only new demand is finishing in exactly the shape `mx + b`."),
+             "Whatever the equation looks like, the procedure is Linear Equations and Inequalities's: undo the additions, then undo the multiplication. The only new demand is finishing in exactly the shape `mx + b`."),
             ("Every non-vertical line has one such equation",
              'Vertical lines are the sole exception, since they cannot be solved for `y` at all. That exception is not an inconvenience; it is a signal, and “What a Function Is” explains what it signals.'),
         ],
@@ -599,7 +599,7 @@ LESSONS = [
                   "`x = 0` the height is `b`, at `x = 1` it is `m + b`, so a run of 1 "
                   "produces a rise of `m`."),
             ("h3", "Rearranging into the form"),
-            ("p", "The work uses methods from Linear Equations and Inequalities, applied to an equation that keeps `x` around as a passenger. Move every term that is not `y` to the other side, then divide by whatever multiplies `y` &mdash; dividing the <em>whole</em> side, every term:"),
+            ("p", "The work is Linear Equations and Inequalities's, applied to an equation that keeps `x` around as a passenger. Move every term that is not `y` to the other side, then divide by whatever multiplies `y` &mdash; dividing the <em>whole</em> side, every term:"),
             ("math", [
                 "2x + 3y = 12",
                 "     3y = -2x + 12          subtract 2x from both sides",
@@ -631,7 +631,7 @@ LESSONS = [
                   "instruction is 1 right and 2 up. Forgetting the invisible denominator "
                   "is what turns a slope of 2 into a step of 2 right and 2 up, which is a "
                   "line of slope 1."),
-            ("p", 'The form also makes comparison trivial, and that is what “Parallel and Perpendicular Lines” uses: two lines written this way can be checked for parallelism by looking at two coefficients, with no computation at all.'),
+            ("p", 'The form also makes comparison trivial, and that is what “Parallel and Perpendicular Lines” will use: two lines written this way can be checked for parallelism by looking at two coefficients, with no computation at all.'),
         ],
         "lab": ("line", {
             "mode": "forms",
@@ -927,7 +927,7 @@ LESSONS = [
                      "form each time and verify with a point that was not used in the "
                      "construction. That verification habit is what makes the answer "
                      "yours rather than the back of the book's."),
-        "note": 'Point-slope is the form that generalises furthest. The tangent to a curve at a point is written in exactly this shape, because a point and a direction is all a tangent is; what changes is where the slope comes from, not the form it feeds.',
+        "note": 'Point-slope is the form that generalises furthest. Later courses write the tangent to a curve at a point in exactly this shape, because a point and a direction is all a tangent is; what changes is where the slope comes from, not the form it feeds.',
     },
     # ---------------------------------------------------------------- 06
     {
@@ -1174,7 +1174,7 @@ LESSONS = [
                      "<em>exactly one</em> output. The input set is the "
                      "<strong>domain</strong>; the outputs form the "
                      "<strong>range</strong>.")),
-            ("p", 'Every word is load-bearing. "Each" forbids an input the rule cannot handle. "Exactly one" forbids an input with two answers. A rule that fails either is not a function, and calling it one anyway breaks the related definitions &mdash; notation in “Function Notation” assumes `f(3)` names a single number, and an inverse in “Inverse Functions” assumes the assignment can be run backwards.'),
+            ("p", 'Every word is load-bearing. "Each" forbids an input the rule cannot handle. "Exactly one" forbids an input with two answers. A rule that fails either is not a function, and calling it one anyway breaks everything downstream &mdash; notation in “Function Notation” assumes `f(3)` names a single number, and an inverse in “Inverse Functions” assumes the assignment can be run backwards.'),
             ("h3", "What the definition permits"),
             ("p", "The asymmetry surprises people, so state it plainly: outputs may "
                   "repeat, inputs may not. Several inputs sharing one output is ordinary "
@@ -1242,7 +1242,7 @@ LESSONS = [
             ("Ask whether any claimed input gets none",
              'A rule that says nothing about some input in its stated domain is not a function on that domain. “Domain and Range” turns this into finding the domain.'),
             ("If it fails, name the input that breaks it",
-             '"Not a function" is half an answer. "Not a function: `x = 4` gives both `2` and `−2`" is the whole one, and it is the form that transfers to domain and inverse-function reasoning.'),
+             '"Not a function" is half an answer. "Not a function: `x = 4` gives both `2` and `−2`" is the whole one, and it is the form that transfers to every later lesson.'),
         ],
         "worked": {
             "title": "Six rules, classified with reasons",
@@ -1328,6 +1328,6 @@ LESSONS = [
                      "with two outputs. This is the definition the remaining seven "
                      "lessons build on: notation, domain, transformation, composition and "
                      "inverse all presuppose that an input has one answer."),
-        "note": 'The definition explains three related exceptions. Vertical lines have no slope, cannot be written `y = mx + b`, and are not functions &mdash; all three because a single `x` is paired with many `y`. The notation, domain, piecewise, transformation, composition and inverse work concerns functions, and that unique-output condition is what makes the notation `f(x)` safe to use.',
+        "note": 'The definition explains an exception that has come up three times already. Vertical lines have no slope, cannot be written `y = mx + b`, and are not functions &mdash; all three because a single `x` is paired with many `y`. From “Function Notation” onward everything in this course is a function, and that is why the notation `f(x)` is about to be safe to use.',
     },
 ]

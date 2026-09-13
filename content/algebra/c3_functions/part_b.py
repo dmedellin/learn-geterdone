@@ -21,7 +21,7 @@ LESSONS = [
         ],
         "key_label": "Four lines that prevent most of the errors",
         "concepts_intro": (
-            '“What a Function Is” establishes that an input has exactly one output. This lesson gives that output a name, which makes domain, piecewise, transformation, composition and inverse-function statements writable.'
+            '“What a Function Is” established that an input has exactly one output. This lesson gives that output a name, which is what makes every later lesson writable.'
         ),
         "concepts": [
             ("The whole symbol names one number",
@@ -34,7 +34,7 @@ LESSONS = [
              "Every occurrence of `x` becomes `(−2)`, brackets and all. The brackets "
              "are what stop `(−2)²` from collapsing to `−4`."),
             ("Evaluate and solve are opposite questions",
-             "`f(3)` hands you an input and asks for the output; there is exactly one answer. `g(x) = 5` for `g(x) = 3x − 7` hands you an output and asks which input produced it; the linear method from Linear Equations and Inequalities gives `x = 4`. On a table or graph there may be none, one or several such inputs. Confusing the two questions is the most common error in this lesson."),
+             "`f(3)` hands you an input and asks for the output; there is exactly one answer. `g(x) = 5` for `g(x) = 3x − 7` hands you an output and asks which input produced it; Linear Equations and Inequalities's linear method gives `x = 4`. On a table or graph there may be none, one or several such inputs. Confusing the two questions is the most common error in this lesson."),
         ],
         "read_title": "Reading and using the notation",
         "read_intro": "What the symbol means, how to substitute safely, and the two questions it can pose.",
@@ -220,7 +220,7 @@ LESSONS = [
                      "linear function equation `s(x) = 11` for `s(x) = 2x − 5`. "
                      "For each answer, say whether it is an output or an input and "
                      "check it in the original rule."),
-        "note": 'Domain, piecewise, transformation, composition and inverse-function work use this notation, so the habit of reading `f(x)` as one name rather than two factors matters. “Domain and Range” asks which inputs the slot is allowed to accept, a question the notation makes it possible to state precisely.',
+        "note": 'Every lesson from here on is written in this notation, so the habit of reading `f(x)` as one name rather than two factors is worth forming now. “Domain and Range” asks which inputs the slot is allowed to accept, which is the first question the notation makes it possible to state precisely.',
     },
 
     # ---------------------------------------------------------------- 09
@@ -230,7 +230,7 @@ LESSONS = [
         "module": "Functions",
         "one_line": "What goes in, what comes out, and what is excluded.",
         "summary": (
-            'The domain is the set of inputs a function accepts; the range is the set of outputs it actually produces. For polynomial, rational and radical formulas, a zero denominator and an even root of a negative are the two domain failures; finding a range needs an argument about the outputs.'
+            'The domain is the set of inputs a function accepts; the range is the set of outputs it actually produces. Among the formulas available so far, a zero denominator and an even root of a negative are the two domain failures; finding a range needs an argument about the outputs.'
         ),
         "key": [
             "domain = every input the rule accepts",
@@ -292,7 +292,7 @@ LESSONS = [
                 "",
                 "k(x) = sqrt(9 - x^2)              9 - x^2 >= 0  ->  -3 <= x <= 3",
             ]),
-            ("p", 'The last one is worth slowing down for. `9 − x² ≥ 0` is `x² ≤ 9`, and the inputs whose square is at most `9` are those between `−3` and `3` inclusive. Taking a square root of both sides of `x² ≤ 9` and writing `x ≤ 3` loses the whole left half of the answer; this is the absolute value inequality from the “Absolute Value Inequalities” Lesson in Linear Equations and Inequalities, in a new costume.'),
+            ("p", 'The last one is worth slowing down for. `9 − x² ≥ 0` is `x² ≤ 9`, and the inputs whose square is at most `9` are those between `−3` and `3` inclusive. Taking a square root of both sides of `x² ≤ 9` and writing `x ≤ 3` loses the whole left half of the answer; this is the absolute value inequality from “Absolute Value Inequalities” in Linear Equations and Inequalities, in a new costume.'),
             ("h3", "Why the range is harder"),
             ("p", "The domain is a question about the formula: which inputs does it "
                   "choke on. The range is a question about the function's behaviour "
@@ -318,7 +318,7 @@ LESSONS = [
                          "the range excludes `7`. Copying the input restriction into "
                          "the range confuses the two axes.")),
             ("h3", "Writing the answer"),
-            ("p", 'Interval notation from the “Interval and Set-Builder Notation” Lesson in Linear Equations and Inequalities, is the expected form. A square bracket includes the endpoint, a round bracket excludes it, and `∞` always takes a round bracket because it is not a number that can be attained. Use `∪` to join the pieces when an excluded point splits the domain, and list the pieces in increasing order.'),
+            ("p", 'Interval notation from “Interval and Set-Builder Notation” in Linear Equations and Inequalities, is the expected form. A square bracket includes the endpoint, a round bracket excludes it, and `∞` always takes a round bracket because it is not a number that can be attained. Use `∪` to join the pieces when an excluded point splits the domain, and list the pieces in increasing order.'),
             ("p", "One habit is worth building: after writing a domain, test a value "
                   "just inside each end and one value that should be excluded. For "
                   "`[−4, 1) ∪ (1, ∞)` try `x = −4`, which gives `0/(−5) = 0`, and "
@@ -462,7 +462,7 @@ LESSONS = [
                      "by naming which condition caused it. For a range, state the "
                      "minimum or the input recovered from a requested output; do not "
                      "read the answer from a sketch alone."),
-        "note": 'Domain restrictions are the reason “Inverse Functions” needs a restriction at all, and the reason a composite in “Composition of Functions” can have a smaller domain than either function it was built from. “Piecewise Functions” applies the idea to piecewise rules: a function whose domain is deliberately cut into pieces, with a different formula on each.',
+        "note": 'Domain restrictions are the reason “Inverse Functions” needs a restriction at all, and the reason a composite in “Composition of Functions” can have a smaller domain than either function it was built from. “Piecewise Functions” takes the idea one step further: a function whose domain is deliberately cut into pieces, with a different formula on each.',
     },
 
     # ---------------------------------------------------------------- 10
@@ -513,7 +513,7 @@ LESSONS = [
                      "so each input selects exactly one piece. Overlap is also legal "
                      "when every formula that applies gives the same output; conflicting "
                      "outputs are what violate the function definition.")),
-            ("p", 'The most familiar example can be stated without piecewise notation: absolute value. `|x|` is `x` when `x` is at least zero and `−x` when `x` is negative, which is two formulas and a condition. The “Absolute Value” Lesson in Foundations of Algebra calls the two cases a definition; the piecewise brace is that definition typeset.'),
+            ("p", 'The most familiar example was written down long before the notation was: absolute value. `|x|` is `x` when `x` is at least zero and `−x` when `x` is negative, which is two formulas and a condition. “Absolute Value” in Foundations of Algebra called the two cases a definition; the piecewise brace is that definition typeset.'),
             ("math", [
                 "          x      if x >= 0",
                 "|x| =",
@@ -985,7 +985,7 @@ LESSONS = [
                      "Given `f(4) = −2`, for example, you should locate the matching "
                      "point on `3f(2(x + 1)) − 4` without needing to know any new "
                      "parent-function family."),
-        "note": 'Every transformation here is a composition in disguise: `f(x − 3)` is `f` applied to the output of the rule that sends `x` to `x − 3`. “Composition of Functions” makes that explicit and general, which is why the horizontal moves can be understood through composition rather than as an exception.',
+        "note": 'Every transformation here is a composition in disguise: `f(x − 3)` is `f` applied to the output of the rule that sends `x` to `x − 3`. “Composition of Functions” makes that explicit and general, which is why the horizontal moves will stop feeling like an exception once composition is in place.',
     },
 
     # ---------------------------------------------------------------- 12
@@ -1389,7 +1389,7 @@ LESSONS = [
              "the reflection in `y = x` carried out on the equation, and it is the "
              "only step where the two letters change roles."),
             ("Solve for y",
-             "Use the rearranging methods from Linear Equations and Inequalities for a line. When a square appears, the `±` arrives here, and the restriction from step 1 decides which sign can return inputs from the retained half."),
+             'Use Linear Equations and Inequalities rearranging for a line. When a square appears, the `±` arrives here, and the restriction from step 1 decides which sign can return inputs from the retained half.'),
             ("State the domain, and verify both compositions",
              "The domain of `f⁻¹` is the range of `f`, which is a check as much as a "
              "statement: if the two do not match, something earlier is wrong. Then "
@@ -1498,7 +1498,7 @@ LESSONS = [
                      "the sign choice forced by the restriction, and verify both "
                      "compositions. Rational-function inverses and shifted quadratics "
                      "wait for the courses that teach their algebra."),
-        "note": "The course covers notation, domain, shape, composition and inverse. Function notation and inverse reasoning rest on explicit definitions, without assuming factoring, rational-function algebra, or the quadratic formula.",
+        "note": 'That completes the toolkit the course promised: notation, domain, shape, composition and inverse. The path can now use function notation and inverse reasoning without smuggling in factoring, rational-function algebra or the quadratic formula before their own courses teach them.',
     },
 
     # ---------------------------------------------------------------- 14
@@ -1595,7 +1595,7 @@ LESSONS = [
                   "needing the rearrangement at all, which is why it is the more "
                   "reliable method."),
             ("thm", ("Multiplying or dividing by a negative reverses the sign",
-                     'If `a &lt; b` and `c` is negative then `ac &gt; bc`. This is the single rule from the “Linear Inequalities” Lesson in Linear Equations and Inequalities that survives into two variables, and it is where a correct boundary line ends up with the wrong side shaded. Adding or subtracting anything, and multiplying by a positive, leave the direction alone.')),
+                     'If `a &lt; b` and `c` is negative then `ac &gt; bc`. This is the single rule from “Linear Inequalities” in Linear Equations and Inequalities that survives into two variables, and it is where a correct boundary line ends up with the wrong side shaded. Adding or subtracting anything, and multiplying by a positive, leave the direction alone.')),
             ("h3", "When the boundary passes through the origin"),
             ("p", "`y &lt; 3x` has the origin on its boundary, so `(0, 0)` cannot be "
                   "the test point: it satisfies the equation, not the inequality, and "
@@ -1761,6 +1761,6 @@ LESSONS = [
                      "`y`. You should also handle a boundary through the origin by "
                      "choosing a different test point, and read an inequality back off "
                      "a shaded picture."),
-        "note": '“What a Function Is” asks a related question: whether each input has exactly one output, instead of which pairs solve a statement. Systems and Matrices stacks several shaded regions on one set of axes; the overlap of the shaded half-planes is the feasible set that linear programming optimises over.',
+        "note": 'That closes the line block. “What a Function Is” changes the question from which pairs solve a statement to whether each input has exactly one output. Systems and Matrices later stacks several shaded regions on one set of axes; the overlap of the shaded half-planes is the feasible set that linear programming optimises over.',
     },
 ]

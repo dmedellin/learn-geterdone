@@ -8,7 +8,7 @@ LESSONS = [
         "module": "Exponential functions",
         "one_line": "Classify exponential formulas and tables, then state their base, intercept and asymptote.",
         "summary": (
-            'In power and root functions the variable is in the base: `x²`, `x³`, `√x`. An exponential function puts it in the exponent instead, and that one move changes what the values do &mdash; a constant ratio between steps, where a line has a constant difference.'
+            'In every function so far the variable sat in the base: `x²`, `x³`, `√x`. An exponential function puts it in the exponent instead, and that one move changes what the values do &mdash; a constant ratio between steps, where a line has a constant difference.'
         ),
         "key": [
             "f(x) = a·b^x        a ≠ 0,   b > 0,   b ≠ 1",
@@ -207,7 +207,7 @@ LESSONS = [
                      "first, name `b` if they are constant, and state `a`. Given a "
                      "formula you should state the base, `f(0)` and the horizontal "
                      "asymptote without drawing anything."),
-        "note": 'The restrictions `b &gt; 0` and `b ≠ 1` are what make the logarithm definition and its graph possible. A positive base other than `1` takes every positive value exactly once, which is what lets “What a Logarithm Is” define a logarithm as the exponent that produces a given number &mdash; the exponent, singular.',
+        "note": 'The restrictions `b &gt; 0` and `b ≠ 1` are what make growth and decay, the number `e`, and the logarithm and its graph possible. A positive base other than `1` takes every positive value exactly once, which is what lets “What a Logarithm Is” define a logarithm as the exponent that produces a given number &mdash; the exponent, singular.',
     },
     # ---------------------------------------------------------------- 02
     {
@@ -289,7 +289,7 @@ LESSONS = [
             ]),
             ("p", '`b^n = 2` rarely has a whole-number solution. For `b = 101/100` the powers step across `2` between `n = 69` and `n = 70`: `(101/100)^69 ≈ 1.9869` and `(101/100)^70 ≈ 2.0068`, both rounded to four places. The exact answer is irrational, near `69.6607`. Solving `b^n = 2` for `n` is what “Solving Exponential Equations” does, and it needs a logarithm.'),
             ("example", ("The rule of 70",
-                         'For a rise of `r` percent a step, the doubling time is close to `70/r`. At 1% that gives `70` against a true `69.6607`; at 5% it gives `14` against `14.2067`; at 10% it gives `7` against `7.2725`. Here this is a checked shortcut, not a derived rule: “Solving Exponential Equations” uses logarithms to solve the doubling equation. The rule runs slightly high below about 2% a step and slightly low above it, and by 20% a step it offers `3.5` against a true `3.8018`.')),
+                         'For a rise of `r` percent a step, the doubling time is close to `70/r`. At 1% that gives `70` against a true `69.6607`; at 5% it gives `14` against `14.2067`; at 10% it gives `7` against `7.2725`. For now this is a checked shortcut, not a derived rule: “Solving Exponential Equations” will solve the doubling equation after logarithms have been defined. The rule runs slightly high below about 2% a step and slightly low above it, and by 20% a step it offers `3.5` against a true `3.8018`.')),
             ("h3", "Decay is growth reflected"),
             ("p", "`(1/b)^x = b^(−x)`, so the decay curve with base `1/b` is the "
                   "growth curve with base `b` reflected in the vertical axis. There "
@@ -653,7 +653,7 @@ LESSONS = [
         "module": "Logarithms",
         "one_line": "Convert between exponential and logarithmic form and evaluate exact logarithms.",
         "summary": (
-            '`log_b(x)` is the exponent you put on `b` to get `x`. Every logarithmic application in this course &mdash; the graphs, the three laws, both kinds of equation &mdash; is that one sentence applied, and nearly every error is a step taken without it.'
+            '`log_b(x)` is the exponent you put on `b` to get `x`. Everything later in this course &mdash; the graphs, the three laws, both kinds of equation &mdash; is that one sentence applied, and nearly every error is a step taken without it.'
         ),
         "key": [
             "log_b(x) = y      means exactly      b^y = x",
@@ -933,7 +933,7 @@ LESSONS = [
                          "and `log_3(1) = 0`, and through `(8, 1)`, because `x − 5 = 3` "
                          "and `log_3(3) = 1`. It is the standard shape, five units to "
                          "the right.")),
-            ("p", 'One case worth examining: the domain is decided by the argument being positive, not by `x` being positive. `log_2(x²)` is defined for every `x ≠ 0`, negative values included, because `x²` is positive there. “The Laws of Logarithms” shows why that makes one of the three laws need a careful statement.'),
+            ("p", 'One case worth having met early: the domain is decided by the argument being positive, not by `x` being positive. `log_2(x²)` is defined for every `x ≠ 0`, negative values included, because `x²` is positive there. “The Laws of Logarithms” shows why that makes one of the three laws need a careful statement.'),
         ],
         "lab": ("logarithm", {
             "mode": "graph",
@@ -1134,7 +1134,7 @@ LESSONS = [
             ]),
             ("p", 'The first is the sum error and there is nothing to rescue in it. The second is more interesting, because the quotient `log_b(M)/log_b(N)` is not meaningless &mdash; it equals `log_N(M)`. Here `log_2(8)/log_2(4) = 3/2`, and `log_4(8)` is indeed `3/2`. A ratio of two logarithms is a change of base, which “Change of Base” makes into a rule; it is not the logarithm of a ratio.'),
             ("h3", "Expanding and condensing"),
-            ("p", 'Expanding means using the laws left to right, until every logarithm has a single letter inside it. Condensing means the reverse: coefficients go back up as exponents, sums become products, differences become quotients, and the whole expression ends as one logarithm. Both directions are needed &mdash; expanding for differentiation, condensing to solve equations in “Solving Logarithmic Equations”.'),
+            ("p", 'Expanding means using the laws left to right, until every logarithm has a single letter inside it. Condensing means the reverse: coefficients go back up as exponents, sums become products, differences become quotients, and the whole expression ends as one logarithm. Both directions are needed &mdash; expanding to differentiate later, condensing to solve equations in “Solving Logarithmic Equations”.'),
             ("example", ("A restriction that is easy to lose",
                          "`log_b(x²) = 2·log_b(x)` is true for `x &gt; 0` and false "
                          "for `x &lt; 0`. At `x = −5` the left side is `log_b(25)`, a "

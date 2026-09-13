@@ -30,8 +30,20 @@ What you should check, because each has failed here before:
   are not the manifest digest; that mistake has already cost a wasted diagnosis.
   The package is public — an anonymous ghcr pull token is enough, so "blocked on
   credentials" is almost always the wrong conclusion.
-- **The release job's deploy step is INERT.** Cutover is manual. Green workflows
-  do not mean anything is live.
+- **The deploy step is live, and it waits for a person.** `deploy-production`
+  runs on the self-hosted runner on hetzner-apps and calls
+  `/usr/local/sbin/platform-deploy-static`; the `production` environment has a
+  required reviewer, so a green `Release` run that nobody approved has shipped
+  nothing. Check the run's own deployment gate, not just its colour. (This line
+  read "INERT, cutover is manual" until 2026-09-12; that was true before the
+  shared-private-edge onboarding and is not true now.)
+- **The wrapper's acceptance is the image contract.** The image must listen on
+  8080 and serve `/release.txt` whose body is exactly the git SHA it was passed,
+  or the wrapper rolls the release back.
+- **The edge is shared.** The wrapper owns
+  `/etc/caddy/sites.d/learn-geterdone.caddy` and reloads Caddy for every tenant
+  on the host. After a cutover, re-check the neighbour hostnames, not only this
+  one.
 - **Key run queries to the head SHA.** Listing "the latest runs" returns the
   previous commit's results before the new ones appear, and reads as green.
 - Some invariants live only in `ci.yml`. Run the workflow's own steps locally

@@ -75,7 +75,7 @@ LESSONS = [
                          "`(3x² + 1)/(x² − 4)` has a tie, so `y = 3/1 = 3`. "
                          "`(x² + 1)/(x − 1)` has `2 &gt; 1`, so no horizontal "
                          "asymptote at all.")),
-            ("p", 'In that last case long division writes the function as `x + 1 + 2/(x − 1)`, and the graph approaches the line `y = x + 1`. That is a slant asymptote. It is mentioned here because the division makes it visible; this course does not pursue it, and no method here depends on it.'),
+            ("p", 'In that last case long division writes the function as `x + 1 + 2/(x − 1)`, and the graph approaches the line `y = x + 1`. That is a slant asymptote. It is mentioned here because the division makes it visible; this course does not pursue it, and nothing later depends on it.'),
             ("h3", "Zeros, and the one condition on them"),
             ("p", "A rational function is zero exactly where its numerator is zero AND "
                   "the point is in the domain. `x = 3` makes the numerator of our example "
@@ -207,7 +207,7 @@ LESSONS = [
                      "the end behaviour &mdash; and say which line of the factorisation "
                      "each one came from. A sketch that is right by accident does not "
                      "transfer to the next function."),
-        "note": 'The rational-expression pattern &mdash; write the domain down first, then simplify, and expect the simplified form to have forgotten something &mdash; also applies to radical expressions and equations, with squaring in place of cancelling.',
+        "note": 'This is the last lesson on rational expressions. The pattern it leaves you with &mdash; write the domain down first, then simplify, and expect the simplified form to have forgotten something &mdash; is exactly the pattern the radical half of the course repeats from “Simplifying Radical Expressions”, with squaring in place of cancelling.',
     },
     # ---------------------------------------------------------------- 08
     {
@@ -216,7 +216,7 @@ LESSONS = [
         "module": "Radicals",
         "one_line": "Decide the real domain and simplify an nth-root expression, using absolute value when an even root requires it.",
         "summary": (
-            'Radical expressions, like rational expressions, require the values that are not allowed to be stated. An even root demands a non-negative radicand, the principal root is a single number rather than two, and both facts show up in the identity `√(x²) = |x|`.'
+            'The second half of the course opens the way the first did: with the values that are not allowed. An even root demands a non-negative radicand, the principal root is a single number rather than two, and both facts show up in the identity `√(x²) = |x|`.'
         ),
         "key": [
             "√(a²) = |a|            not a",
@@ -258,7 +258,7 @@ LESSONS = [
                      "root. When `n` is odd, `ⁿ√a` denotes the unique real root, which has "
                      "the same sign as `a`. When `n` is even and `a &lt; 0`, `ⁿ√a` is not "
                      "a real number.")),
-            ("p", 'That last clause is the radical-domain counterpart of "the denominator is not zero". It is a restriction on the domain, it is decided before any algebra happens, and no manipulation later can be allowed to lose it. `√(−4)` is treated here as undefined; Quadratics and Complex Numbers introduces `i` and gives it a value.'),
+            ("p", 'That last clause is the radical half\'s version of "the denominator is not zero". It is a restriction on the domain, it is decided before any algebra happens, and no manipulation later can be allowed to lose it. `√(−4)` is treated here as undefined; Quadratics and Complex Numbers introduces `i` and gives it a value.'),
             ("thm", ("The identity that catches everyone",
                      "For every real `x`, `√(x²) = |x|`.",
                      "The left side is non-negative by definition of the principal root, "
@@ -399,7 +399,7 @@ LESSONS = [
                      "simplify it exactly, and justify each extraction by the product or "
                      "quotient rule with its hypothesis checked. Knowing that `√200 = 10√2` "
                      "matters less than knowing why `√(−4) · √(−9)` is not `6`."),
-        "note": 'Operations with radicals, rationalizing denominators, radical equations and radical functions rely on radical simplification and its conditions. Adding radicals needs simplified form to see which are alike, rationalizing needs the product rule, and radical equations need the domain restriction that the even index imposes here.',
+        "note": 'Everything in “Adding, Subtracting and Multiplying Radicals”, “Rationalizing Denominators”, “Solving Radical Equations” and “Radical Functions and Their Graphs” rests on this one. Adding radicals needs simplified form to see which are alike, rationalizing needs the product rule, and radical equations need the domain restriction that the even index imposes here.',
     },
     # ---------------------------------------------------------------- 09
     {
@@ -579,7 +579,7 @@ LESSONS = [
                      "simplify every term, combine exactly the like ones, and leave the "
                      "rest alone without discomfort. `7 + 2√10` is a finished answer, and "
                      "treating it as unfinished is what produces an invented step."),
-        "note": 'The conjugate product proved here provides the multiplier for rationalizing. “Rationalizing Denominators” needs a multiplier that clears a two-term radical denominator, and the difference of squares is the only thing that does it in one step.',
+        "note": 'The conjugate product proved here is used immediately. “Rationalizing Denominators” needs a multiplier that clears a two-term radical denominator, and the difference of squares is the only thing that does it in one step.',
     },
     # ---------------------------------------------------------------- 10
     {
@@ -769,8 +769,8 @@ LESSONS = [
         ],
         "standard": ("Finish when the simplified shape of a numerical denominator tells you the multiplier "
                      "immediately.",
-                     'Given any of the three shapes you should be able to name the form of `1` before doing any arithmetic, and say what the denominator will become. You should also be able to say why this step, unlike squaring in “Solving Radical Equations”, can never affect a solution set.'),
-        "note": 'Rationalizing is a pure rewriting &mdash; guaranteed to preserve value and domain. The squaring step in “Solving Radical Equations” preserves neither, which is why rewriting an expression and solving an equation need different checks.',
+                     'Given any of the three shapes you should be able to name the form of `1` before doing any arithmetic, and say what the denominator will become. You should also be able to say why this step, unlike the one in “Solving Radical Equations”, can never affect a solution set.'),
+        "note": 'Rationalizing is the last technique in this course that is a pure rewriting &mdash; guaranteed to preserve value and domain. “Solving Radical Equations” uses a step that preserves neither, and the contrast is the point of meeting them in this order.',
     },
     # ---------------------------------------------------------------- 11
     {
@@ -1000,7 +1000,7 @@ LESSONS = [
         ],
         "key_label": "Three functions, three domains",
         "concepts_intro": (
-            "Find the values that are not allowed before drawing the graph."
+            'The course ends where it began: with the values that are not allowed, found before anything is drawn.'
         ),
         "concepts": [
             ("The domain is the solution of an inequality",
@@ -1042,7 +1042,7 @@ LESSONS = [
                      "`y = x`, which is what makes it that function's inverse &mdash; and "
                      "why the restriction is needed at all.")),
             ("p", "The transformations from Lines, Functions and Graphs apply unchanged. In `y = a·√(x − h) + k` the graph starts at `(h, k)` instead of the origin; `h` shifts the domain to `x ≥ h`, `k` shifts the range to `y ≥ k`, and a negative `a` flips it downwards so the range becomes `y ≤ k`. The endpoint is the one point worth plotting exactly."),
-            ("p", 'A connection with “Simplifying Radical Expressions”. The function `f(x) = √(x²)` is defined for every real `x`, since `x²` is never negative &mdash; but its graph is not the line `y = x`. It is `y = |x|`, a V with its vertex at the origin. The identity from “Simplifying Radical Expressions”, drawn.'),
+            ("p", 'One last connection back to “Simplifying Radical Expressions”. The function `f(x) = √(x²)` is defined for every real `x`, since `x²` is never negative &mdash; but its graph is not the line `y = x`. It is `y = |x|`, a V with its vertex at the origin. The identity from “Simplifying Radical Expressions”, drawn.'),
             ("p", "Everywhere in this course `√(−4)` has been outside the domain, and every domain here has been a set of real numbers. Quadratics and Complex Numbers introduces `i` and gives negative radicands values; nothing in this course anticipates that, and the domains stated here are the correct ones for real-valued functions."),
         ],
         "lab": ("grapher", {
@@ -1168,6 +1168,6 @@ LESSONS = [
                      "points you chose to be exact. A graph drawn before the domain is "
                      "known is a graph that will be drawn over an interval where the "
                      "function does not exist."),
-        "note": "Identify excluded values before simplifying. A denominator gives isolated exclusions, an even radical gives whole intervals, and both can be lost from an answer simplified before the domain was written down.",
+        "note": 'That closes the course, and it closes it on the sentence it opened with: find the values that are not allowed, and find them first. A denominator gave isolated exclusions, an even radical gives whole intervals, and both are invisible in an answer that was simplified before the domain was written down.',
     },
 ]
