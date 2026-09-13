@@ -17,8 +17,10 @@ from . import (
     algebra_systems,
     algorithms,
     counting,
+    estimate,
     graph,
     induction,
+    latency,
     logic,
     number,
     probability,
@@ -70,6 +72,12 @@ REGISTRY = {
     "matrix": algebra_systems.matrix_lab,
     "sequence": algebra_systems.sequence_lab,
     "quadratic": algebra_quadratic.quadratic_lab,
+
+    # The System Design path. Its labs share the exact engine in
+    # sysdesign_core.py on top of algebra_core's rationals: one kit per
+    # course, with the mode chosen by cfg["mode"].
+    "estimate": estimate.estimate_lab,
+    "latency": latency.latency_lab,
 }
 
 

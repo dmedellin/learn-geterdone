@@ -43,6 +43,10 @@ const ALGO_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'algorithms.py');
 const algoSrc = fs.readFileSync(ALGO_SOURCE, 'utf8');
 const SYSD_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'sysdesign_core.py');
 const sysdSrc = fs.readFileSync(SYSD_SOURCE, 'utf8');
+const ESTIMATE_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'estimate.py');
+const estimateSrc = fs.readFileSync(ESTIMATE_SOURCE, 'utf8');
+const LATENCY_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'latency.py');
+const latencySrc = fs.readFileSync(LATENCY_SOURCE, 'utf8');
 
 /* Each block is  NAME = r"""..."""  in the Python module. */
 function blockFrom(text, name, where) {
@@ -53,6 +57,8 @@ function blockFrom(text, name, where) {
 function block(name) { return blockFrom(src, name, SOURCE); }
 function logicBlock(name) { return blockFrom(logicSrc, name, LOGIC_SOURCE); }
 function sysdBlock(name) { return blockFrom(sysdSrc, name, SYSD_SOURCE); }
+function estimateBlock(name) { return blockFrom(estimateSrc, name, ESTIMATE_SOURCE); }
+function latencyBlock(name) { return blockFrom(latencySrc, name, LATENCY_SOURCE); }
 function countingBlock(name) { return blockFrom(countingSrc, name, COUNTING_SOURCE); }
 function probBlock(name) { return blockFrom(probSrc, name, PROB_SOURCE); }
 function numberBlock(name) { return blockFrom(numberSrc, name, NUMBER_SOURCE); }
@@ -1024,6 +1030,383 @@ console.log('system design: exact capacity, queueing and availability');
   near(sqrtApprox(R(2n, 1n), 1e-15), Math.SQRT2, 1e-12, 'a root that rounds, and says so');
   near(sqrtApprox(R(9n, 4n), 1e-15), 1.5, 1e-12, 'agreeing with Rsqrt where Rsqrt is exact');
   near(harmonicApprox(1000000, 1), 14.392727, 1e-4, 'the Zipf normaliser past where exact is readable');
+}
+
+// ------------------------------------- system design C2: latency and the tail
+/* The `latency` kit's own arithmetic, on the numbers its eleven lessons print.
+   Every assertion below is a figure that appears on a page, so a change that
+   moves one of them is a change to what a lesson claims. */
+console.log('system design: latency, percentiles and the tail');
+{
+  eval(block('RATIONAL_JS') + sysdBlock('RCEIL_JS') + sysdBlock('PERCENTILE_JS')
+       + sysdBlock('PMF_JS') + sysdBlock('APPROX_JS') + latencyBlock('LATENCY_JS'));
+
+  /* Rfixed exists because Rdec cannot do this. 0.999^693 has a 2079-digit
+     numerator; Number() of it is Infinity and Infinity/Infinity is NaN, so the
+     fan-out lesson at p99.9 would print NaN. Long division in BigInt instead. */
+  eq(Rfixed(R(1n, 3n), 6), '0.333333', 'a third to six places');
+  eq(Rfixed(R(2n, 3n), 6), '0.666667', 'two thirds, rounded half up at the last digit');
+  eq(Rfixed(R(-1n, 8n), 3), '-0.125', 'a negative rational keeps its sign');
+  eq(Rfixed(R(7n, 1n), 0), '7', 'no places asked for, no decimal point');
+  eq(Rfixed(Rpow(R(999n, 1000n), 693), 6), '0.499900', '0.999^693, which Number cannot hold');
+  eq(String(Number(Rpow(R(999n, 1000n), 693).n)), 'Infinity', 'and this is why Rdec would give NaN');
+  eq(Rpct(R(1n, 400n), 4), '0.2500%', 'a probability as a percentage');
+
+  /* L1 and L3: the two terms, and the size at which they cross. */
+  eq(Rtext(transferMs(64000, 100)), '128/25', '64 kB over 100 Mbit/s is 5.12 ms');
+  eq(Rtext(bdpBytes(100, 80)), '1000000', '100 Mbit/s x 80 ms holds exactly one megabyte');
+  eq(Rtext(linkTimeMs(5, 80, 14000, 10)), '2056/5', '5 round trips at 80 ms plus 14 kB at 10 Mbit/s');
+  eq(Rtext(crossoverBytes(5, 80, 10)), '500000', 'the bytes catch 5 round trips at 500 kB');
+  /* The crossover for ONE round trip IS the bandwidth-delay product -- L1 and
+     L3 are the same fact, and if these ever disagree one of the two is wrong. */
+  eq(Rtext(crossoverBytes(1, 80, 100)), Rtext(bdpBytes(100, 80)), 'k = 1 crossover is the BDP');
+
+  /* L2: the floor. c is exact by definition, so this is an exact fraction. */
+  eq(Rtext(lightFloorMs(5585)), '8377500000/149896229', 'New York to London, exactly');
+  eq(Rfixed(lightFloorMs(5585), 3), '55.889', 'which is the 56 ms the course quotes');
+  eq(Rfixed(unexplainedMs(76, 5585), 3), '20.111', 'a measured 76 ms leaves 20 ms to explain');
+  eq(Rcmp(unexplainedMs(40, 5585), R(0n, 1n)) < 0, true, 'a measurement under the floor goes negative');
+
+  /* L4: the longest path, its slack, and the two edges the lesson toggles. */
+  const dagT = [4, 18, 6, 22, 55, 12, 3];
+  const dagE = [[0, 1], [0, 2], [1, 3], [1, 4], [2, 4], [3, 5], [4, 5], [5, 6]];
+  const base = dagSchedule(dagT, dagE);
+  eq(base.length, 92, 'the critical path is 92 ms, not the 120 ms the stages total');
+  eq(base.slack.join(','), '0,0,12,33,0,0,0', 'cache has 12 ms spare and enrich 33');
+  eq(base.path.join('-'), '0-1-4-5-6', 'gateway, authz, db, render, respond');
+  /* Speeding up an off-path stage changes nothing: enrich to 1 ms is still 92. */
+  eq(dagSchedule([4, 18, 6, 1, 55, 12, 3], dagE).length, 92, 'making enrich instant saves nothing');
+  eq(dagSchedule([4, 18, 6, 22, 55, 12, 2], dagE).length, 91, 'a critical stage saves its whole millisecond');
+  /* Serialising the cache behind authz puts it ON the path and costs 6 ms. */
+  const serial = dagSchedule(dagT, dagE.concat([[1, 2]]));
+  eq(serial.length + ' ' + serial.slack[2], '98 0', 'authz -> cache moves cache onto the path');
+  /* Making the db wait for the enrichment costs the whole 22 ms of it. */
+  const after = dagSchedule(dagT, dagE.concat([[3, 4]]));
+  eq(after.length + ' ' + after.path.join('-'), '114 0-1-3-4-5-6', 'enrich -> db reroutes the path');
+
+  /* L5: the rank, the value it selects, and the mean that is neither. */
+  const s5 = parseSample('12, 13, 14, 14, 15, 15, 16, 17, 18, 19, 21, 22, 24, 27, 31, 38, 52, 96, 180, 420');
+  eq(s5.length, 20, 'twenty measurements');
+  eq(percentile(s5, R(1n, 2n)) + ' ' + percentile(s5, R(95n, 100n)) + ' ' + percentile(s5, R(99n, 100n)),
+     '19 180 420', 'p50, p95 and p99 by nearest rank');
+  eq(Rtext(sampleMean(s5)), '266/5', 'the mean is 53.2 ms');
+  eq(countBelow(s5, sampleMean(s5)), 17, '17 of 20 requests are faster than the average');
+  /* Nothing in the sample IS the mean, which is the lesson. */
+  eq(s5.indexOf(53), -1, 'and no request took 53 ms');
+  eq(parseSample('   '), 'null', 'an empty sample is refused rather than guessed at');
+
+  /* L6: p^n, the break-even n, and the same number from pmfMax. */
+  eq(Rfixed(Rpow(R(99n, 100n), 69), 6), '0.499837', '0.99^69 is just under a half');
+  eq(fanoutBreakEven(R(99n, 100n), 20000), 69, 'a p99 becomes the median at a fan-out of 69');
+  eq(fanoutBreakEven(R(9n, 10n), 20000), 7, 'a p90 at 7');
+  eq(fanoutBreakEven(R(19n, 20n), 20000), 14, 'a p95 at 14');
+  eq(fanoutBreakEven(R(999n, 1000n), 20000), 693, 'and a p99.9 at 693');
+  /* 68 must NOT be the answer: at n = 68 the probability is still above a half,
+     and an off-by-one here is the whole content of the lesson. */
+  eq(Rcmp(Rpow(R(99n, 100n), 68), R(1n, 2n)) > 0, true, '68 calls are still better than even');
+  const twoWay = pmfMax([[0, R(99n, 100n)], [1, R(1n, 100n)]], 69);
+  eq(Rtext(twoWay[0][1]), Rtext(Rpow(R(99n, 100n), 69)), 'pmfMax agrees with p^n exactly');
+
+  /* L7: the hedge. The preset is 100 measured calls as run lengths. */
+  const hSpec = parsePmfSpec('10:40, 12:25, 15:15, 20:10, 30:5, 50:3, 120:1, 300:1');
+  const hPmf = pmfFromSpec(hSpec);
+  eq(expandSpec(hSpec).length, 100, 'the run lengths expand to a hundred calls');
+  eq(pmfPercentile(hPmf, R(99n, 100n)) + ' ' + pmfPercentile(hPmf, R(95n, 100n))
+     + ' ' + pmfPercentile(hPmf, R(1n, 2n)), '120 30 12', 'p99, p95 and p50 of the service');
+  eq(Rtext(hedgeLoad(hPmf, 30)), '1/20', 'a hedge at the p95 costs 5% more traffic');
+  eq(Rtext(Rpow(hedgeLoad(hPmf, 30), 2)), '1/400', 'and the tail past it is that squared');
+  eq(Rtext(hedgedTail(hPmf, 30, 42)), '7/400', 'P(hedged > 42) = P(X > 42) P(X > 12)');
+  eq(hedgedQuantile(hPmf, 30, R(99n, 100n)), 45, 'the hedged p99 is 45 ms, down from 120');
+  eq(hedgedQuantile(hPmf, 30, R(1n, 2n)), 12, 'and the median does not move');
+  /* Hedging at the median doubles the load, which is the misconception. */
+  eq(Rtext(hedgeLoad(hPmf, 12)), '7/20', 'hedging at the p50 sends a backup for a third of requests');
+
+  /* L8: percentiles do not add. Two stages, seven atoms each. */
+  const A = pmfFromSpec(parsePmfSpec('4:520, 6:250, 9:120, 14:60, 22:30, 38:16, 70:4'));
+  const B = pmfFromSpec(parsePmfSpec('12:420, 17:300, 24:150, 34:80, 48:36, 72:12, 130:2'));
+  const S = pmfNormalise(pmfConvolve(A, B));
+  const q99 = R(99n, 100n);
+  eq(pmfPercentile(A, q99) + ' ' + pmfPercentile(B, q99), '38 72', 'each stage has its own p99');
+  eq(pmfPercentile(S, q99), 78, 'the SUM has a p99 of 78 ms');
+  eq(pmfPercentile(A, q99) + pmfPercentile(B, q99), 110, 'while the two p99s add to 110');
+  eq(pmfPercentile(S, q99) < pmfPercentile(A, q99) + pmfPercentile(B, q99), true,
+     'p99(A + B) < p99(A) + p99(B) on these distributions');
+  /* Means DO add, exactly -- the contrast the lesson is built on. */
+  eq(Rtext(pmfMean(A)) + ' ' + Rtext(pmfMean(B)) + ' ' + Rtext(pmfMean(S)),
+     '881/125 2414/125 659/25', 'the two means and the sum of the two stages');
+  eq(Rtext(Radd(pmfMean(A), pmfMean(B))), Rtext(pmfMean(S)), 'expectation is linear; percentiles are not');
+  eq(S.length, 43, '43 attainable totals from 7 x 7 pairs');
+  eq(Rtext(pmfCdfAt(S, 78)), '3096/3125', 'the cumulative at 78 ms, exactly');
+  eq(Rcmp(pmfCdfAt(S, 78), q99) >= 0, true, 'which does reach 99/100');
+  eq(Rcmp(pmfCdfAt(S, 77), q99) < 0, true, 'while the atom below it does not -- so 78 is the rank');
+  eq(parsePmfSpec('4:520, oops'), 'null', 'an unreadable stage is refused, not half-parsed');
+  eq(parsePmfSpec('4:0'), 'null', 'and a zero weight is not a distribution');
+
+  /* L9: the budget, allocated backwards from a 400 ms SLO. */
+  const plan = budgetPlan(400, 208, [8, 20, 150, 40]);
+  eq(Rtext(plan.avail) + ' ' + Rtext(plan.share), '192 48', '192 ms left, 48 ms each on an even split');
+  eq(Rtext(plan.residual), '-26', 'the plan is 26 ms short');
+  eq(plan.rows.map(function (r) { return r.fits ? 'y' : 'n'; }).join(''), 'yyny', 'search is the stage that cannot fit');
+  eq(Rtext(plan.rows[2].residual), '-102', 'by 102 ms');
+  eq(Rtext(plan.spare) + ' ' + Rtext(plan.need), '76 102', 'the others release 76 ms against a need of 102');
+  eq(plan.balanced, true, 'and the residual balances both ways of counting it');
+  /* Raise the SLO until it fits, and the two ways of counting still agree. */
+  const roomy = budgetPlan(500, 208, [8, 20, 150, 40]);
+  eq(Rtext(roomy.residual) + ' ' + roomy.balanced, '74 true', 'at a 500 ms SLO the plan fits');
+
+  /* L10: the timeout, the retries and the calls it kills. */
+  const tSpec = parsePmfSpec('8:45, 11:25, 16:15, 24:8, 45:4, 90:2, 400:1');
+  const tSample = expandSpec(tSpec);
+  eq(tSample.length, 100, 'a hundred measured calls');
+  eq(Rtext(worstCaseMs(90, 1)), '180', 'one retry at a 90 ms timeout is 180 ms worst case');
+  eq(Rtext(killFraction(tSample, 90)), '1/100', 'a timeout at the p99 kills one call in a hundred');
+  eq(Rtext(allAttemptsLost(R(1n, 100n), 1)), '1/10000', 'and both attempts fail once in ten thousand');
+  eq(Rtext(sampleMean(tSample)), '1827/100', 'the mean of that sample is 18.27 ms');
+  /* The misconception, priced: a timeout at the mean throws away 15% of calls
+     that were going to succeed. */
+  eq(Rtext(killFraction(tSample, 18)), '3/20', 'a timeout at the mean kills 15% of good calls');
+  eq(Rtext(killFraction(tSample, 400)), '0', 'a timeout past the maximum kills none');
+
+  /* L11: the one rounded figure on the course, and the reason it rounds. */
+  near(mathisMbitsApprox(1460, 100, R(1n, 100n)), 1.168, 1e-9, '1% loss at 100 ms bounds a flow at 1.168 Mbit/s');
+  eq(streamsToFillApprox(10000, mathisMbitsApprox(1460, 100, R(1n, 100n))), 8562,
+     'so 8562 streams are needed to fill a 10 Gbit/s link');
+  /* Halving the loss multiplies the bound by sqrt(2), not by 2 -- the whole
+     shape of the result is in that square root. */
+  near(mathisMbitsApprox(1460, 100, R(1n, 200n)) / mathisMbitsApprox(1460, 100, R(1n, 100n)),
+       Math.SQRT2, 1e-9, 'halving the loss buys a factor of sqrt 2');
+  eq(Rsqrt(R(1n, 50n)), 'null', 'and 2% loss has no rational root at all, which is why sqrtApprox is used');
+  near(mathisMbitsApprox(1460, 100, R(1n, 50n)), 0.826, 1e-3,
+       'and twice the loss is not half the bound: 2% gives 0.826, not 0.584');
+}
+
+
+// ------------------------------------------- capacity estimation (kit: estimate)
+/* The arithmetic of System Design course 1. Every case below is a claim some
+   lesson on that course makes out loud, so a failure here is a page asserting
+   something false, not a style regression. */
+console.log('capacity estimation: intervals, unit chains, series and ceilings');
+{
+  eval(countingBlock('BIGINT_JS') + sysdBlock('RCEIL_JS') + sysdBlock('APPROX_JS')
+       + estimateBlock('ESTIMATE_JS'));
+
+  /* Printing an exact rational at a size that defeats Rdec. This is not
+     cosmetic: Rdec goes through Number(n)/Number(d), and the storage mode
+     routinely holds 10^15 over 10^72. */
+  eq(Rround(R(1n, 3n), 4), '0.3333', 'a third to four places');
+  eq(Rround(R(2n, 3n), 4), '0.6667', 'two thirds rounds up, not down');
+  eq(Rround(R(1n, 2n), 0), '1', 'a half rounds half-up at zero places');
+  eq(Rround(R(-1n, 3n), 3), '-0.333', 'and the sign survives');
+  eq(Rround(R(10n ** 24n + 1n, 1n), 0), '1000000000000000000000001',
+     '10^24 + 1 exactly, where a double would have said 1e+24');
+  eq(Number(Rdec(R(10n ** 24n + 1n, 1n))) === 1e24, true,
+     'which is exactly what Rdec does say, and why Rround exists');
+  eq(groupDec('1234567.89'), '1 234 567.89', 'grouping stops at the decimal point');
+  eq(groupDec('-1000'), '-1 000', 'and does not eat the sign');
+  eq(showR(R(1234567n, 100n), 1), '12 345.7', 'a figure as a capacity page shows it');
+  eq(Rtextg(R(100000n, 1n)), '100 000', 'an exact ratio, grouped');
+  eq(Rtextg(R(125n, 108n)), '125/108', 'a small fraction is left alone');
+  eq(powTen(5) + ' ' + powTen(-3), '10⁵ 10⁻³', 'decades read as decades');
+
+  /* Widths in powers of ten: an exact integer search, and its rounded gloss. */
+  eq(decadeBracket(R(64n, 1n)), 1, '64 is between 10^1 and 10^2');
+  eq(decadeBracket(R(1n, 1n)), 0, '1 sits in decade 0');
+  eq(decadeBracket(R(1000n, 1n)), 3, 'an exact power belongs to its own decade, not the one below');
+  eq(decadeBracket(R(1n, 1000n)), -3, 'and a thousandth to -3');
+  eq(decadeBracket(R(999n, 1000n)), -1, 'just under 1 is decade -1');
+  near(log10Approx(R(1000n, 1n)), 3, 1e-12, 'log10 of a thousand');
+  near(log10Approx(R(64n, 1n)), 1.80617997, 1e-6, 'log10 of the width three doubling factors give');
+  /* The case Rnum cannot do: both ends past 2^53, the ratio small. */
+  near(log10Approx(Rdiv(R(10n ** 40n, 1n), R(10n ** 37n, 1n))), 3, 1e-9,
+       'a ratio of two numbers a double cannot hold');
+  near(ratioApprox(R(3n * 10n ** 40n, 1n), R(10n ** 40n, 1n)), 3, 1e-9,
+       'and the same ratio as a Number, for pixels');
+
+  /* L1. Three factors at a factor of two: the product is at a factor of EIGHT,
+     the interval is 64x end to end, and the arithmetic midpoint is four times
+     the estimate -- which is the misconception the lesson names. */
+  const C = [R(10000000n, 1n), R(100n, 1n), R(1000n, 1n)];
+  const two = [R(2n, 1n), R(2n, 1n), R(2n, 1n)];
+  const iv = productInterval(C, two, two);
+  eq(Rtext(iv.centre), '1000000000000', 'the product of the central values');
+  eq(Rtext(iv.lo) + ' ' + Rtext(iv.hi), '125000000000 8000000000000', 'the product interval');
+  eq(Rtext(iv.down) + ' ' + Rtext(iv.up), '8 8', 'three half-widths of 2 multiply to 8, not to 6');
+  eq(Rtext(iv.ratio), '64', 'and end to end the interval is 64x');
+  eq(Rtext(Rdiv(arithMid(iv.lo, iv.hi), iv.centre)), '65/16',
+     'the arithmetic midpoint is 65/16 of the estimate: it is dragged to the high end');
+  eq(Rtext(geoMeanExact(iv.lo, iv.hi)), '1000000000000',
+     'the geometric centre of a symmetric interval IS the product of the centres, exactly');
+  /* Asymmetric: the root is irrational, so the page must round and say so. */
+  const skew = productInterval(C, two, [R(2n, 1n), R(3n, 1n), R(2n, 1n)]);
+  eq(Rtext(skew.up), '12', 'one factor skewed high widens only the high end');
+  eq(geoMeanExact(skew.lo, skew.hi), 'null', 'and its geometric centre is not rational');
+  near(geoMeanApprox(skew.lo, skew.hi), Math.sqrt(1.5) * 1e12, 1e4,
+       'so it is computed by the rounded root, which is sqrt(3/2) x the centre');
+  /* A factor known exactly contributes nothing to the width. */
+  const one3 = [R(1n, 1n), R(1n, 1n), R(1n, 1n)];
+  eq(Rtext(productInterval(C, one3, one3).ratio), '1', 'three exact factors give a point, not an interval');
+
+  /* L2. 86400 against 10^5, in both directions -- the lesson's own numbers. */
+  eq(Rtext(rpsExact(R(10000000n, 1n), R(100n, 1n))), '312500/27', '10M users x 100 actions a day, per second');
+  eq(Rtext(rpsRounded(R(10000000n, 1n), R(100n, 1n))), '10000', 'and with the 10^5-second day');
+  eq(Rtext(dayLengthRatio()), '125/108', 'the shortcut day is 125/108 of a real one');
+  eq(Rtext(rateShortfallRatio()), '108/125', 'so the rate it gives is 108/125 of the truth');
+  eq(Rtext(Rdiv(rpsExact(R(7n, 1n), R(13n, 1n)), rpsRounded(R(7n, 1n), R(13n, 1n)))), '125/108',
+     'and the ratio does not depend on the volume, which is why it is quotable');
+  eq(Rtrim(Rround(Rmul(Rsub(dayLengthRatio(), R(1n, 1n)), R(100n, 1n)), 2)), '15.74',
+     'the 15.7% the lesson quotes is the DAY being long');
+  eq(Rtext(Rmul(Rsub(R(1n, 1n), rateShortfallRatio()), R(100n, 1n))), '68/5',
+     'the rate is low by 13.6%, which is a different number and the reader will confuse them');
+  /* Turning it back: rate x 86400 must return the daily volume it came from. */
+  eq(Rtext(Rmul(rpsExact(R(10000000n, 1n), R(100n, 1n)), R(86400n, 1n))), '1000000000',
+     'the chain read upward returns where it started');
+
+  /* L3. 100:1 is 1/101, not 1%. */
+  const sp = splitRates(R(10000n, 1n), R(100n, 1n));
+  eq(Rtext(sp.writeShare), '1/101', 'a 100:1 read/write ratio makes writes one part in 101');
+  eq(Rtext(sp.readShare), '100/101', 'and reads the other hundred');
+  eq(Rtext(Radd(sp.readShare, sp.writeShare)), '1', 'the two shares are a partition');
+  eq(Rtext(sp.naiveWriteShare), '1/100', 'the instinct says 1/100');
+  eq(Requ(sp.writeShare, sp.naiveWriteShare), false, 'which is not the same number');
+  eq(Rtext(sp.naiveOver), '101/100', 'and overstates the write rate by exactly (r+1)/r');
+  eq(Rtext(sp.writes) + ' ' + Rtext(sp.reads), '10000/101 1000000/101', 'the two rates, exactly');
+  eq(Rtext(Radd(sp.writes, sp.reads)), '10000', 'and they add back to the total');
+  eq(Rtext(splitRates(R(2n, 1n), R(1n, 1n)).writeShare), '1/2', '1:1 is half and half');
+
+  /* L5. Bits, bytes, and the header that is charged once per request. */
+  eq(Rtext(bandwidthMbit(R(2000n, 1n), R(1000n, 1n), R(200n, 1n))), '96/5',
+     '2000 req/s of 1200 B is 19.2 Mbit/s');
+  eq(Rtrim(Rround(bandwidthMbit(R(2000n, 1n), R(1000n, 1n), R(200n, 1n)), 2)), '19.2', 'read as a decimal');
+  eq(Rtext(Rdiv(bandwidthMbit(R(2000n, 1n), R(1000n, 1n), R(200n, 1n)),
+                bandwidthNoEight(R(2000n, 1n), R(1000n, 1n), R(200n, 1n)))), '8',
+     'forgetting the factor of 8 is out by exactly 8, at every rate and every size');
+  eq(Rtext(headerShare(R(1000n, 1n), R(200n, 1n))), '1/6', 'headers are a sixth of a 1 kB request');
+  eq(Rtext(headerShare(R(200n, 1n), R(200n, 1n))), '1/2',
+     'and half of one whose payload equals the header');
+  eq(Rtext(headerCrossover(R(200n, 1n))), '200', 'which is why the crossover payload IS the header size');
+  eq(Rcmp(headerShare(R(199n, 1n), R(200n, 1n)), R(1n, 2n)) > 0, true, 'below it they are the majority');
+
+  /* L4. Storage as a series, with growth compounding once a month. */
+  const gb500 = R(500n * 10n ** 9n, 1n);
+  const terms = growthTerms(gb500, 90, R(5n, 100n));
+  eq(terms.length, 3, '90 days is three monthly blocks');
+  eq(terms.map(function (t) { return t.days; }).join(','), '30,30,30', 'each of them full');
+  eq(Rtext(terms[2].rate), '551250000000', 'by the third month the daily ingest has compounded twice');
+  eq(Rtext(terms[2].running), '47287500000000', 'and 47.2875 TB has accumulated');
+  eq(Rtext(storageGrowth(gb500, 90, R(5n, 100n), 3)), '141862500000000', 'three copies of it');
+  eq(Rtext(storageFlat(gb500, 90, 3)), '135000000000000', 'against 135 TB if ingest never grew');
+  /* The invariant that catches an off-by-one in the block loop. */
+  eq(Rtext(storageGrowth(gb500, 90, R(0n, 1n), 3)), Rtext(storageFlat(gb500, 90, 3)),
+     'at zero growth the geometric series IS the arithmetic one');
+  eq(Rtext(storageGrowth(gb500, 1, R(5n, 100n), 1)), Rtext(gb500), 'one day is one day of ingest');
+  /* A part-month: 45 days is 30 at the first rate and 15 at the second. */
+  const part = growthTerms(R(10n, 1n), 45, R(1n, 10n));
+  eq(part.map(function (t) { return t.days; }).join(','), '30,15', 'the last block is short');
+  eq(Rtext(part[1].rate), '11', 'and runs at the compounded rate');
+  eq(Rtext(part[1].running), '465', '30x10 + 15x11');
+
+  /* L6. The ratio between two rungs, exactly. */
+  eq(Rtext(rungRatio(10000000, 100)), '100000',
+     '10^5 main-memory references fit inside one disk seek -- the lesson’s headline');
+  eq(Rtext(rungRatio(150000000, 1)), '150000000', 'and the whole ruler spans that from L1');
+  eq(Rtext(rungRatio(4, 3)), '4/3', 'two rungs that do not divide stay a fraction');
+
+  /* L7. Twenty-four buckets, a peak, a mean, and their ratio. */
+  eq(profileWeights('flat', 12, 5).join(','), new Array(24).fill(10).join(','),
+     'a flat profile is flat whatever the amplitude');
+  const office = profileWeights('office', 21, 6);
+  eq(office[21], 46, 'the busy hour carries 10 + 6x6');
+  eq(office.reduce(function (a, b) { return a + b; }, 0), 456, 'and the day totals 456 weight');
+  eq(office[9], 10, 'twelve hours away the profile is back at the floor');
+  const spike = profileWeights('spike', 19, 10);
+  eq(spike[19] + ',' + spike[18] + ',' + spike[20], '130,10,10', 'a spike is one bucket and nothing else');
+  let shapeThrew = false;
+  try { profileWeights('nonesuch', 0, 1); } catch (e) { shapeThrew = true; }
+  eq(shapeThrew, true, 'an unknown profile shape raises rather than quietly going flat');
+  const buckets = office.map(function (w) { return R(BigInt(w) * 1000000n, 1n); });
+  const ps = peakStats(buckets);
+  eq(ps.peakHour, 21, 'the peak is where the shape put it');
+  eq(Rtext(ps.total), '456000000', 'the day’s total');
+  eq(Rtext(ps.peakRps), '115000/9', 'peak requests a second');
+  eq(Rtext(ps.meanRps), '47500/9', 'mean requests a second');
+  eq(Rtext(ps.ratio), '46/19', 'peak over mean is 24 x the busiest bucket over the total, exactly');
+  eq(Rtext(peakStats(new Array(24).fill(R(7n, 1n))).ratio), '1',
+     'and a day with no shape at all has a multiplier of 1, which is the sanity check');
+
+  /* L8. The ceiling, and the headroom named rather than assumed. */
+  const mc = machineCount(R(20000n, 1n), R(40n, 1n), 8, R(60n, 100n));
+  eq(Rtext(mc.capacity), '200', 'one 8-core machine at 40 ms a request serves 200 req/s');
+  eq(Rtext(mc.usable), '120', 'of which 60% may be used');
+  eq(Rtext(mc.exact), '500/3', 'so the fleet needs 500/3 machines');
+  eq(mc.n, 167n, 'and machines are integers, so N = 167');
+  eq(mc.nFull, 100n, 'sizing at 100% would have said 100');
+  eq(Rtext(mc.spare), '13400', 'N leaves 13 400 req/s of headroom');
+  eq(Rtext(Rmul(mc.utilisation, R(100n, 1n))), '10000/167',
+     'the peak then sits at 10000/167 % of the fleet, which is 59.88');
+  eq(Rtrim(Rround(Rmul(mc.utilisation, R(100n, 1n)), 2)), '59.88', 'read as a percentage');
+  /* The ceiling must not round a whole number up: that is the off-by-one that
+     buys a machine nobody needs, on every page that sizes anything. */
+  eq(machineCount(R(24000n, 1n), R(40n, 1n), 8, R(60n, 100n)).n, 200n,
+     'an exact 200 machines is 200, not 201');
+  eq(machineCount(R(1n, 1n), R(40n, 1n), 8, R(60n, 100n)).n, 1n, 'and any positive load needs at least one');
+
+  /* L9. The working set, and the inverse that the whole lesson rests on. */
+  const hot = R(1n, 10n), share = R(9n, 10n);
+  eq(Rtext(workingSetFraction(hot, share, R(8n, 10n))), '4/45',
+     '80% of the hits from a tenth of the data that takes 90% of the reads');
+  eq(Rtext(workingSetFraction(R(5n, 100n), R(75n, 100n), R(95n, 100n))), '81/100',
+     'and 95% costs 81% of the data once the target is past the knee');
+  eq(Rtext(hitRateAt(hot, share, hot)), '9/10', 'caching exactly the hot region gets exactly its share');
+  eq(Rtext(hitRateAt(hot, share, R(1n, 1n))), '1', 'caching everything hits everything');
+  eq(Rtext(hitRateAt(hot, share, R(0n, 1n))), '0', 'caching nothing hits nothing');
+  eq(Rtext(workingSetFraction(hot, share, R(1n, 1n))), '1', 'and a 100% target needs all of it');
+  /* Inverse, at ten targets either side of the knee. A sizing lesson whose
+     curve and whose inverse disagree is giving the reader a number that its own
+     graph contradicts. */
+  let inverseOk = true;
+  for (let t = 1; t <= 10; t += 1) {
+    const target = R(BigInt(t), 10n);
+    if (!Requ(hitRateAt(hot, share, workingSetFraction(hot, share, target)), target)) inverseOk = false;
+  }
+  eq(inverseOk, true, 'the memory a target needs, put back into the curve, returns that target');
+  eq(Rtext(workingSetBytes(R(5n * 10n ** 12n, 1n), hot, share, R(8n, 10n))), '4000000000000/9',
+     '5 TB, a tenth hot, 80% wanted: 444.4 GB');
+  /* No skew at all: caching x of the data buys x of the hits, which is the
+     "caching is not worth it here" case the lesson needs to be able to show. */
+  eq(Rtext(workingSetFraction(R(1n, 2n), R(1n, 2n), R(9n, 10n))), '9/10',
+     'with no skew the cache must hold as much as the hit rate you want');
+
+  /* L10. Two routes, their ratio, the band, and the shared factor. */
+  const routeA = [R(500000n, 1n), R(20n, 1n), R(2000000n, 1n)];
+  const routeB = [R(10000000n, 1n), R(1800000n, 1n)];
+  eq(Rtext(routeProduct(routeA)), '20000000000000', 'route A');
+  eq(Rtext(routeProduct(routeB)), '18000000000000', 'route B');
+  eq(Rtext(routeRatio(routeProduct(routeA), routeProduct(routeB))), '10/9', 'and the ratio between them');
+  eq(Rtext(routeProduct([])), '1', 'an empty chain is the empty product');
+  eq(withinBand(R(10n, 9n), R(8n, 1n)), true, '10/9 is inside a band of 8');
+  eq(withinBand(R(9n, 10n), R(8n, 1n)), true, 'and so is its reciprocal');
+  eq(withinBand(R(9n, 1n), R(8n, 1n)), false, 'nine is outside');
+  /* The direction a naive check gets wrong: a ratio far BELOW 1 is just as much
+     a disagreement as one far above, and "ratio < k" alone would pass it. */
+  eq(withinBand(R(1n, 9n), R(8n, 1n)), false, 'and so is a ninth');
+  eq(withinBand(R(1n, 1n), R(1n, 1n)), true, 'a band of 1 admits only exact agreement');
+  eq(sharedFactors(['users', 'sessions', 'bytes'], [R(5n), R(3n), R(7n)],
+                   ['rows', 'bytes'], [R(9n), R(7n)]).join(','), 'bytes',
+     'a factor in both chains with the same value is shared');
+  eq(sharedFactors(['bytes'], [R(7n)], ['bytes'], [R(8n)]).length, 0,
+     'the same NAME at a different value is not: route B measured it for itself');
+  eq(sharedFactors(['bytes'], [R(7n)], ['rows'], [R(7n)]).length, 0,
+     'and a coincidence of value under another name is not either');
+
+  /* Units and the slider ladder. */
+  eq(fmtBytes(R(1500n, 1n), 2), '1.5 kB', 'kB is 1000 B, decimal, as a disk is sold');
+  eq(fmtBytes(R(999n, 1n), 2), '999 B', 'and below that it stays bytes');
+  eq(fmtBytes(R(47287500000000n, 1n), 2), '47.29 TB', 'the storage lesson’s own total');
+  eq(fmtBytes(R(10n ** 15n, 1n), 2), '1 PB', 'and a petabyte is a petabyte');
+  eq(Rtext(ladderValue(0)) + ' ' + Rtext(ladderValue(1)) + ' ' + Rtext(ladderValue(6)), '1 3/2 10',
+     'the 1, 1.5, 2, 3, 5, 7 ladder, one rung per decade step');
+  eq(Rtext(ladderValue(ladderIndex(0, 7))), '10000000', '10 million is a rung, so lesson 1 can open on it');
+  eq(Rtext(ladderValue(ladderIndex(2, 6))), '2000000', 'and so is 2 MB');
 }
 
 if (fails) {
