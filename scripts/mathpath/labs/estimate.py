@@ -1919,7 +1919,13 @@ TRIANGULATE_SCRIPT = r"""
   var sel = document.getElementById('tgPreset');
   var shareSel = document.getElementById('tgShare');
   var tableA = document.getElementById('tgTableA'), tableB = document.getElementById('tgTableB');
-  var bandEl = document.getElementById('tgBand');
+  /* The DRAWING. The slider below is 'tgBand'; this must not share its id:
+     a browser's getElementById returns the FIRST match in document order,
+     which is this svg, so a shared id made the slider read undefined and the
+     band compute NaN. labcheck cannot catch it -- its shim stores ids in a
+     Map, so the LAST registration wins and the slider resolved correctly
+     there. The duplicate-id check in ci.yml is what catches it. */
+  var bandEl = document.getElementById('tgBandPlot');
   var status = document.getElementById('tgStatus');
 
   function preset() {
@@ -2062,7 +2068,7 @@ def _triangulate(cfg):
         '          <div class="table-wrap"><table class="tt" id="tgTableA"></table></div>\n'
         '          <div class="table-wrap"><table class="tt" id="tgTableB"></table></div>\n'
         "        </div>\n"
-        '        <svg id="tgBand" style="min-width:520px" viewBox="0 0 520 84" role="img" '
+        '        <svg id="tgBandPlot" style="min-width:520px" viewBox="0 0 520 84" role="img" '
         'aria-label="The ratio between the two routes against the agreement band."></svg>\n'
         "      </div>\n"
         '      <div class="status-banner" id="tgStatus" style="margin-top:12px;"></div>'

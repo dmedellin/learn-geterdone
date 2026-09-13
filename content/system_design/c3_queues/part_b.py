@@ -528,7 +528,7 @@ LESSONS = [
                      "`ρ < 1`. The server count on this path is always `s`.")),
             ("def", ("Erlang C, stated",
                      "The probability that an arrival has to wait at all is "
-                     "`C(s,a) = [a^s/(s!(1 − ρ))] ÷ [Σ_(n<s) aⁿ/n! + a^s/(s!(1 − ρ))]`.",
+                     "`C(s,a) = [a^s/(s!(1 − ρ))] ÷ [Σ_(n&lt;s) aⁿ/n! + a^s/(s!(1 − ρ))]`.",
                      "From it, `L_q = C(s,a)·ρ/(1 − ρ)` and `W_q = L_q/λ` by Little's Law. "
                      "The derivation is not given here: it is Operations Research, "
                      "`markov-chains-decisions-and-queues/multiple-servers-and-erlang-c`, and "
