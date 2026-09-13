@@ -3,6 +3,38 @@
 Read this before changing anything. It is the contract between whoever (human or
 agent) edits this repository and the platform that will eventually serve it.
 
+## 0. Work in progress: three Subjects are present and none of them is live
+
+`content/system_design/`, `content/algorithms/` and `content/operations_research/`
+are in the tree. **None of them publishes a single page, and that is deliberate.**
+
+A generated path becomes real only by joining `GENERATED_PATHS` in
+`scripts/build_paths.py`, and none of the three has. Until one does: no page is
+built, no URL declaration moves, `tests/content_preservation.json` does not walk
+the package, and every count in section 1 below is still correct. The live site
+is exactly the 369 pages it has been.
+
+| Subject | state |
+|---|---|
+| System Design | **complete** — 10 courses, 114 lessons, 10 lab kits, all gates passing. Ready to wire. |
+| Algorithms | `algo_core.py` written (21 blocks). 14 kits and 109 lessons to go. |
+| Operations Research | `or_core.py` written — an exact simplex, 13 blocks. 12 kits and 94 lessons to go. |
+
+A course module still being authored exports `COURSE = None`, which
+`content/<subject>/__init__.py` filters out. That is the state most of them are
+in, and it is visible in the source rather than hidden by omission.
+
+**Before wiring any of them**, read the two things that will otherwise cost you a
+day: section 1's note on what adding a Subject actually touches (it is about two
+dozen files, not the five the URL rule names), and `content_errors` in
+`tests/test_review_remediation.py`, which builds its inventory *from*
+`GENERATED_PATHS` and compares with a symmetric difference — so joining that
+tuple makes every `.py` file in the package mandatory in the preservation
+contract, with no partial option and no warning.
+
+Half-finished lab kits for the other two Subjects are parked, unverified, on
+the `wip/or-and-algorithms-kits` branch. Nothing on `main` depends on them.
+
 ## 1. What this repository is
 
 An educational static site published as **Learn** at `https://learn.geterdone.io`:
