@@ -49,6 +49,24 @@ HARMONIC_JS = r"""
   }
 """
 
+RCEIL_JS = r"""
+  /* Ceiling and floor of an exact rational, as BigInt.
+
+     Capacity answers are counts of machines, shards and tree levels, and the
+     whole point of a sizing lesson is that 3.2 machines is four. Integer
+     division truncates toward zero, so a negative rational needs the sign. */
+  function Rfloor(a) {
+    var q = a.n / a.d;
+    if (a.n < 0n && q * a.d !== a.n) q -= 1n;
+    return q;
+  }
+  function Rceil(a) {
+    var q = a.n / a.d;
+    if (a.n > 0n && q * a.d !== a.n) q += 1n;
+    return q;
+  }
+"""
+
 PERCENTILE_JS = r"""
   /* Nearest-rank percentile: the smallest value at or above q of the sample.
 
@@ -57,10 +75,7 @@ PERCENTILE_JS = r"""
      worse answer for this subject than one that a request did. */
   function percentileRank(n, q) {
     /* q is a rational in [0,1]; the rank is ceil(q*n), at least 1. */
-    var prod = Rmul(q, R(BigInt(n), 1n));
-    /* A rational is {n, d}; Rnum() is its DECIMAL value, not its numerator. */
-    var r = prod.n, d = prod.d;
-    var rank = r / d + (r % d === 0n ? 0n : 1n);
+    var rank = Rceil(Rmul(q, R(BigInt(n), 1n)));
     if (rank < 1n) rank = 1n;
     if (rank > BigInt(n)) rank = BigInt(n);
     return Number(rank);
@@ -177,6 +192,45 @@ QUEUE_JS = r"""
     for (n = 0; n <= K; n += 1) L = Radd(L, Rmul(R(BigInt(n), 1n), pi[n]));
     var pK = pi[K], lamEff = Rmul(lam, Rsub(R(1n, 1n), pK));
     return { rho: rho, pi: pi, blocking: pK, lamEff: lamEff, L: L, W: Rdiv(L, lamEff) };
+  }
+"""
+
+REPLAY_JS = r"""
+  /* Replay a reference trace through a cache of k slots.
+
+     Farthest-in-future is here rather than in the kit because it is the BOUND
+     the whole replacement lesson rests on -- no online policy beats it -- and a
+     bound that cannot be tested in isolation is a bound nobody has checked.
+     Returns hits, misses and the exact hit rate. */
+  function replayPolicy(trace, k, policy) {
+    var cache = [], hits = 0, i, j;
+    for (i = 0; i < trace.length; i += 1) {
+      var key = trace[i], at = cache.indexOf(key);
+      if (at >= 0) {
+        hits += 1;
+        if (policy === 'lru') { cache.splice(at, 1); cache.push(key); }
+        continue;
+      }
+      if (cache.length < k) { cache.push(key); continue; }
+      var victim = 0;
+      if (policy === 'lru' || policy === 'fifo') {
+        victim = 0;                       /* both evict the front; LRU refreshes on hit */
+      } else if (policy === 'opt') {
+        /* evict whichever cached key is next used farthest ahead, or never */
+        var best = -1;
+        for (j = 0; j < cache.length; j += 1) {
+          var next = trace.indexOf(cache[j], i + 1);
+          if (next === -1) { victim = j; best = Infinity; break; }
+          if (next > best) { best = next; victim = j; }
+        }
+      }
+      cache.splice(victim, 1);
+      cache.push(key);
+    }
+    return {
+      hits: hits, misses: trace.length - hits,
+      rate: R(BigInt(hits), BigInt(trace.length))
+    };
   }
 """
 
@@ -339,9 +393,26 @@ APPROX_JS = r"""
     for (var k = 1; k <= n && k <= 100000; k += 1) t += 1 / Math.pow(k, s);
     return t;
   }
-  /* Bits per key for a target false-positive rate: 1.44 * log2(1/p). */
-  function bitsPerKeyApprox(target) { return Math.log2(1 / target) / Math.LN2 * Math.LN2 * 1.4426950408889634; }
+  /* Bits per key for a target false-positive rate: log2(1/p)/ln 2, which is the
+     familiar 1.44 * log2(1/p). At p = 0.01 this is 9.57. */
+  function bitsPerKeyApprox(target) { return Math.log2(1 / target) / Math.LN2; }
+  /* A root that rounds, by Newton from a rational start. Rsqrt returns null for
+     a non-square, which is right for exactness and useless for a geometric-mean
+     centre or a square-root scaling law. */
+  function sqrtApprox(a, tol) {
+    var x = Number(a.n) / Number(a.d);
+    if (x < 0) return NaN;
+    if (x === 0) return 0;
+    tol = tol || 1e-15;
+    var g = x, prev = 0;
+    while (Math.abs(g - prev) > tol * Math.max(1, g)) { prev = g; g = (g + x / g) / 2; }
+    return g;
+  }
+  /* Natural log, for the two max-load results this subject STATES rather than
+     proves. Everywhere else a logarithm is an exact integer search instead. */
+  function logApprox(x) { return Math.log(x); }
 """
 
-__all__ = ["HARMONIC_JS", "PERCENTILE_JS", "PMF_JS", "QUEUE_JS", "SLOTTED_JS",
-           "TRACE_JS", "STREAM_JS", "AVAIL_JS", "APPROX_JS"]
+__all__ = ["HARMONIC_JS", "RCEIL_JS", "PERCENTILE_JS", "PMF_JS", "QUEUE_JS",
+           "SLOTTED_JS", "TRACE_JS", "STREAM_JS", "REPLAY_JS", "AVAIL_JS",
+           "APPROX_JS"]

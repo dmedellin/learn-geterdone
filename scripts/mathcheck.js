@@ -868,10 +868,10 @@ console.log('algorithm counts and the witness verdict (course 8 lab)');
 // ---------------------------------- capacity, latency, queues and availability
 console.log('system design: exact capacity, queueing and availability');
 {
-  eval(countingBlock('BIGINT_JS') + sysdBlock('HARMONIC_JS') + sysdBlock('PERCENTILE_JS')
-       + sysdBlock('PMF_JS') + sysdBlock('QUEUE_JS') + sysdBlock('SLOTTED_JS')
-       + sysdBlock('TRACE_JS') + sysdBlock('STREAM_JS') + sysdBlock('AVAIL_JS')
-       + sysdBlock('APPROX_JS'));
+  eval(countingBlock('BIGINT_JS') + sysdBlock('HARMONIC_JS') + sysdBlock('RCEIL_JS')
+       + sysdBlock('PERCENTILE_JS') + sysdBlock('PMF_JS') + sysdBlock('QUEUE_JS')
+       + sysdBlock('SLOTTED_JS') + sysdBlock('TRACE_JS') + sysdBlock('STREAM_JS')
+       + sysdBlock('REPLAY_JS') + sysdBlock('AVAIL_JS') + sysdBlock('APPROX_JS'));
 
   /* Zipf popularity: the cache hit rate is a ratio of harmonics, and it is the
      ratio that makes a small cache of a skewed workload worth having. */
@@ -988,6 +988,29 @@ console.log('system design: exact capacity, queueing and availability');
   eq(sampleFromPmf(fair, R(1n, 2n)), 2, 'u exactly on the boundary falls to the second value');
   eq(sampleFromPmf(fair, R(0n, 1n)), 1, 'and u = 0 to the first');
 
+  /* Ceiling and floor, because 3.2 machines is four. */
+  eq(Rceil(R(16n, 5n)), 4n, 'ceil(3.2) = 4 -- the sizing answer');
+  eq(Rfloor(R(16n, 5n)), 3n, 'floor(3.2) = 3');
+  eq(Rceil(R(4n, 1n)), 4n, 'an exact integer does not round up');
+  eq(Rfloor(R(-16n, 5n)), -4n, 'floor of a negative goes down, not toward zero');
+  eq(Rceil(R(-16n, 5n)), -3n, 'and ceil goes up');
+  /* The case the sign guard exists for: an EXACT negative integer must not be
+     pushed a further step. Without it -4 floors to -5. */
+  eq(Rfloor(R(-4n, 1n)), -4n, 'floor of an exact negative integer is itself');
+  eq(Rceil(R(-4n, 1n)), -4n, 'and so is its ceiling');
+
+  /* Replacement policies on a trace, and the bound the lesson rests on.
+     Trace A B C A B D A B C D, three slots. */
+  const tr3 = ['A','B','C','A','B','D','A','B','C','D'];
+  const opt = replayPolicy(tr3, 3, 'opt'), lru = replayPolicy(tr3, 3, 'lru');
+  /* Exact rates, not merely an ordering: "OPT >= LRU" holds for several WRONG
+     policies too, including one that evicts the nearest-future key. */
+  eq(Rtext(opt.rate), '1/2', 'farthest-in-future gets 5 of 10');
+  eq(Rtext(lru.rate), '2/5', 'LRU gets 4');
+  eq(Rcmp(opt.rate, lru.rate) > 0, true, 'and the bound is strict on this trace');
+  eq(replayPolicy(tr3, 10, 'lru').misses, 4, 'a cache big enough misses only the compulsory four');
+  eq(Rtext(replayPolicy(['A','A','A','A'], 1, 'lru').rate), '3/4', 'one key, one slot');
+
   /* The four places this subject rounds, and only these. */
   near(expNegApprox(1, 1e-15), Math.exp(-1), 1e-12, 'e^-1 by series');
   near(expNegApprox(5, 1e-15), Math.exp(-5), 1e-12, 'e^-5 by series');
@@ -995,6 +1018,12 @@ console.log('system design: exact capacity, queueing and availability');
   /* 1.44*log2(1/0.01) = 9.57 bits per key is the canonical 1% figure, and the
      rate it actually delivers at k = 7 is what the lesson quotes. */
   near(bloomApprox(9585, 1000, 7), 0.01004, 1e-4, 'a Bloom filter at 9.585 bits per key is ~1%');
+  /* 9.585, not the 9.57 a textbook quotes: that figure uses 1.44 in place of
+     1/ln2 = 1.4427. The lesson should give the exact form and note the rounding. */
+  near(bitsPerKeyApprox(0.01), 9.585, 0.001, '1% costs 9.585 bits per key');
+  near(sqrtApprox(R(2n, 1n), 1e-15), Math.SQRT2, 1e-12, 'a root that rounds, and says so');
+  near(sqrtApprox(R(9n, 4n), 1e-15), 1.5, 1e-12, 'agreeing with Rsqrt where Rsqrt is exact');
+  near(harmonicApprox(1000000, 1), 14.392727, 1e-4, 'the Zipf normaliser past where exact is readable');
 }
 
 if (fails) {
