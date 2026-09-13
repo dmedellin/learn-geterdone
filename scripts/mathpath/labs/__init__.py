@@ -16,6 +16,8 @@ from . import (
     algebra_rational,
     algebra_systems,
     algorithms,
+    avail,
+    cache,
     counting,
     estimate,
     graph,
@@ -24,6 +26,7 @@ from . import (
     logic,
     number,
     probability,
+    queue,
     sets,
 )
 from .common import QUIZ_MARKUP, QUIZ_SCRIPT, Lab, cfg_literal
@@ -78,6 +81,9 @@ REGISTRY = {
     # course, with the mode chosen by cfg["mode"].
     "estimate": estimate.estimate_lab,
     "latency": latency.latency_lab,
+    "cache": cache.cache_lab,
+    "queue": queue.queue_lab,
+    "avail": avail.avail_lab,
 }
 
 

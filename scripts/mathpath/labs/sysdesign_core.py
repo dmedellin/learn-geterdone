@@ -368,13 +368,23 @@ APPROX_JS = r"""
      every lesson that calls one states that it is an approximation -- which is
      the library's rule, not a courtesy. */
 
-  /* e^-x by its alternating series, summed until a term is below tol.
-     Used for the Poisson limit and the Bloom filter rate. */
+  /* e^-x, as the reciprocal of a POSITIVE-term series.
+
+     The obvious implementation sums the alternating series for e^-x directly,
+     and it is wrong in a way that looks right at the arguments a test usually
+     picks. Terms of alternating sign near cancel, losing roughly 2x/ln(10)
+     significant digits: exact at x = 5, 0.4% out at x = 17, 173% out at x = 20,
+     and past x = 21 the SIGN is wrong -- a probability comes back negative.
+
+     Summing e^x instead has every term positive, so nothing cancels, and one
+     division at the end is exact to a rounding. */
   function expNegApprox(x, tol) {
-    var t = 1, s = 1, k = 1;
     tol = tol || 1e-15;
-    while (Math.abs(t) > tol && k < 200) { t = -t * x / k; s += t; k += 1; }
-    return s;
+    if (x < 0) return 1 / expNegApprox(-x, tol);
+    if (x > 700) return 0;            /* e^700 is the edge of a double */
+    var t = 1, s = 1, k = 1;
+    while (t > tol * s && k < 1000) { t = t * x / k; s += t; k += 1; }
+    return 1 / s;
   }
   /* The Bloom false-positive rate. The exact form (1 - 1/m)^(kn) is available
      as a rational; this is the (1 - e^(-kn/m))^k idealisation lessons compare

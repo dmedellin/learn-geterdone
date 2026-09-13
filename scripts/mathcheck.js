@@ -1020,6 +1020,19 @@ console.log('system design: exact capacity, queueing and availability');
   /* The four places this subject rounds, and only these. */
   near(expNegApprox(1, 1e-15), Math.exp(-1), 1e-12, 'e^-1 by series');
   near(expNegApprox(5, 1e-15), Math.exp(-5), 1e-12, 'e^-5 by series');
+  /* The arguments that expose a cancelling implementation. Summing the
+     ALTERNATING series for e^-x is exact at 1 and 5 -- which is why the first
+     version of this test passed -- and then 0.4% out at 17, 173% out at 20, and
+     NEGATIVE past 21. A probability cannot be negative, so these are pinned by
+     relative error rather than absolute, at arguments where the absolute error
+     of a badly wrong answer is still tiny. */
+  for (const x of [10, 12, 15, 17, 20, 21, 25, 40]) {
+    const got = expNegApprox(x, 1e-15), want = Math.exp(-x);
+    eq(got > 0, true, 'e^-' + x + ' is positive');
+    eq(Math.abs(got - want) / want < 1e-10, true,
+       'e^-' + x + ' is right to a relative 1e-10, not merely a small absolute error');
+  }
+  near(expNegApprox(-2, 1e-15), Math.exp(2), 1e-10, 'a negative argument gives e^|x|');
   near(standardErrorApprox(0.5, 100), 0.05, 1e-12, 'the standard error of a proportion');
   /* 1.44*log2(1/0.01) = 9.57 bits per key is the canonical 1% figure, and the
      rate it actually delivers at k = 7 is what the lesson quotes. */
@@ -1407,6 +1420,841 @@ console.log('capacity estimation: intervals, unit chains, series and ceilings');
      'the 1, 1.5, 2, 3, 5, 7 ladder, one rung per decade step');
   eq(Rtext(ladderValue(ladderIndex(0, 7))), '10000000', '10 million is a rung, so lesson 1 can open on it');
   eq(Rtext(ladderValue(ladderIndex(2, 6))), '2000000', 'and so is 2 MB');
+}
+
+// ------------------------------------------- caching and hit rates (kit: cache)
+/* The `cache` kit's own arithmetic, on the numbers its ten lessons print.
+   Every assertion below is a figure that appears on a page, so a change that
+   moves one of them is a change to what a lesson claims.
+
+   Three of them are not figures but PINS. The stepper this kit uses to show a
+   policy's cache contents duplicates the eviction rules of the core's
+   replayPolicy, which is the tested one, so it is checked against it on every
+   trace and every size below; the byte hit rate is checked against zipfHit at
+   the shifted exponent it must equal; and the phase-averaged TTL simulation is
+   checked against the closed form it is meant to confirm. A duplicated rule
+   that nothing compares is a rule that has already drifted. */
+console.log('system design: caching, skew, replacement and staleness');
+{
+  const CACHE_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'cache.py');
+  const cacheSrc = fs.readFileSync(CACHE_SOURCE, 'utf8');
+  const cacheBlock = (name) => blockFrom(cacheSrc, name, CACHE_SOURCE);
+  eval(block('RATIONAL_JS') + sysdBlock('RCEIL_JS') + sysdBlock('HARMONIC_JS')
+       + sysdBlock('QUEUE_JS') + sysdBlock('REPLAY_JS') + sysdBlock('APPROX_JS')
+       + cacheBlock('CACHE_JS'));
+
+  /* --- printing. Rnum goes through Number and this course overflows it. --- */
+  eq(Rshow(R(1n, 3n), 3), '0.333', 'long division in BigInt');
+  eq(Rshow(R(2n, 3n), 3), '0.667', 'rounded half up at the last digit');
+  eq(Rshow(R(1n, 2n), 0), '1', 'and half rounds up, not to even');
+  eq(Rshow(R(-1n, 3n), 3), '-0.333', 'the sign survives the division');
+  /* The reason Rshow exists: a byte weight over fifty ranks leaves a double. */
+  eq(Rnum(R(10n ** 400n + 1n, 3n * 10n ** 400n)), NaN, 'Rnum of a 400-digit ratio is NaN');
+  eq(Rshow(R(10n ** 400n + 1n, 3n * 10n ** 400n), 4), '0.3333', 'Rshow of the same is a third');
+  eq(Rpercent(R(1n, 3n), 2), '33.33%', 'a percentage of an exact probability');
+  eq(groupNum(1234567), '1 234 567', 'digit grouping');
+  eq(bytesText(1500), '1.50 kB', 'a kB is 1000 B: egress is billed in decimal units');
+  eq(bytesText(40000000000n), '40.00 GB', 'and so is a GB');
+  eq(moneyText(R(2400000n, 1n)), '$24 000.00', 'cents to dollars');
+
+  /* --- L1: the backend sees the miss rate ---------------------------------
+     The lesson's whole claim is the ratio: 90% to 99% is a tenfold cut, and
+     99% to 99.9% is another one. Asserting the two loads alone would not
+     catch a formula that had (1 - h) right and lambda wrong. */
+  eq(Rtext(backendRate(R(10000n, 1n), R(9n, 10n))), '1000', '10k rps at 90% leaves 1000');
+  eq(Rtext(backendRate(R(10000n, 1n), R(99n, 100n))), '100', 'and at 99%, 100');
+  eq(Rtext(backendRho(R(10000n, 1n), R(9n, 10n), R(2000n, 1n))), '1/2', 'the backend sits at rho = 1/2');
+  eq(Rtext(missMultiple(R(9n, 10n), R(99n, 100n))), '10', '90% to 99% divides the load by 10');
+  eq(Rtext(missMultiple(R(99n, 100n), R(999n, 1000n))), '10', 'and 99% to 99.9% by 10 again');
+  eq(missMultiple(R(9n, 10n), R(1n, 1n)), null, 'a perfect cache has no ratio, and says so');
+
+  /* --- L2: an expectation, and a percentile that steps --------------------- */
+  eq(Rtext(meanLatency(R(19n, 20n), R(1n, 1n), R(40n, 1n))), '59/20', 'the lesson mean, 2.95 ms');
+  eq(Rtext(latencyQuantile(R(19n, 20n), R(1n, 1n), R(40n, 1n), R(1n, 2n))), '1', 'the p50 is a hit');
+  eq(Rtext(latencyQuantile(R(19n, 20n), R(1n, 1n), R(40n, 1n), R(99n, 100n))), '40',
+     'at h = 95% the p99 is the MISS latency -- the misconception, refuted');
+  eq(Rtext(latencyQuantile(R(99n, 100n), R(1n, 1n), R(40n, 1n), R(99n, 100n))), '1',
+     'and it flips exactly at h = q, not gradually');
+  eq(Rtext(latencyQuantile(R(9899n, 10000n), R(1n, 1n), R(40n, 1n), R(99n, 100n))), '40',
+     'one ten-thousandth below q and it is the miss latency again');
+
+  /* --- L3, L4: Zipf, exactly ---------------------------------------------- */
+  eq(Rtext(rankTerm(2, 3)) + ' ' + Rtext(rankTerm(2, -3)) + ' ' + Rtext(rankTerm(5, 0)), '8 1/8 1',
+     'i^e for e positive, negative and zero');
+  eq(Rtext(zipfProb(1, 4, 1)), '12/25', 'the most popular of four keys at s = 1');
+  eq(Rtext(zipfShare(4, 20, 1, 50).exact), '6466460/11167027',
+     'the top 4 of 20 at s = 1 -- the L3 worked example, exactly');
+  eq(zipfShare(4, 20, 1, 50).rounded, false, 'and it is not rounded');
+  eq(Rtext(zipfHit(4, 20, 0)), '1/5', 's = 0 IS uniform popularity: 20% of the keys, 20% of the hits');
+  eq(Rtext(zipfShare(0, 20, 1, 50).exact) + ' ' + Rtext(zipfShare(25, 20, 1, 50).exact), '0 1',
+     'an empty cache hits nothing and a complete one hits everything');
+  /* Past the limit the page must ROUND and must say so. A silent switch would
+     print an approximation in the shape of an exact fraction. */
+  eq(zipfShare(20, 200, 1, 50).rounded, true, 'past N = 50 the share is rounded');
+  eq(zipfShare(20, 200, 1, 50).exact, null, 'and there is no exact fraction to offer');
+  near(zipfShare(20, 200, 1, 50).value, 0.612101, 1e-5, 'the rounded value at N = 200');
+  /* Sizing: the C a target costs, and the diminishing returns that follow. */
+  eq(sizeForTarget(50, 2, R(9n, 10n)), 5, 'at N = 50, s = 2, ninety per cent costs 5 keys');
+  eq(sizeForTarget(50, 2, R(99n, 100n)), 28, 'and ninety-nine per cent costs 28 -- the next nine');
+  eq(sizeForTarget(20, 0, R(1n, 2n)), 10, 'under uniform popularity it IS proportional: half for half');
+  eq(JSON.stringify(sizeTarget(200, 1, R(9n, 10n), 50)), '{"c":111,"rounded":true}',
+     'past the limit the search rounds, and reports that it did');
+  eq(hitCurve(4, 1, 50).join(' '), '0.48 0.72 0.88 1', 'h(C) for C = 1..4 at N = 4, s = 1');
+
+  /* --- L10: the byte hit rate is a different number ------------------------
+     It is the same harmonic ratio at exponent s - b, so the two must agree
+     wherever both are defined. That identity is the assertion: it catches a
+     sign error in the exponent, which no single value would. */
+  eq(Rtext(byteWeight(20, 1, 0)), Rtext(harmonic(20, 1)), 'at b = 0 the byte weight IS the harmonic');
+  eq(Rtext(byteHit(4, 20, 1, 0)), Rtext(zipfHit(4, 20, 1)),
+     'so at b = 0 the byte hit rate IS the request hit rate -- the control');
+  eq(Rtext(byteHit(4, 20, 2, 1)), Rtext(zipfHit(4, 20, 1)), 'and in general it is zipfHit at s - b');
+  eq(Rtext(byteHit(4, 20, 1, 1)), '1/5',
+     'at b = s it collapses to C/N: 57.9% of the requests, 20% of the bytes');
+  eq(Rtext(byteHit(2, 4, 1, 2)), '3/10', 'b > s is allowed, and harmonicApprox could not compute it');
+  near(byteHitApprox(4, 20, 1, 1), 0.2, 1e-12, 'the rounded path agrees with the exact one');
+  eq(Rtext(objectBytes(3, 1, 100000)), '300000', 'rank 3 at b = 1 is three times the base size');
+  eq(Rtext(egressCost(R(40000n * 1000000000n, 1n), R(2n, 1n), 30)), '2400000',
+     '40 TB a day at 2c/GB is $24 000 a month');
+
+  /* --- L5: replacement, and the bound the lesson rests on ------------------ */
+  const T1 = parseTrace('A B C A B D A B C D');
+  eq(T1.join(''), 'ABCABDABCD', 'the course trace parses');
+  eq(parseTrace('a,b--c  A!!b').join('|'), 'A|B|C|A|B', 'any separator, and case folds');
+  eq(traceKeys(T1).join(''), 'ABCD', 'four distinct keys, in first-use order');
+  eq(Rtext(replayTrace(T1, 3, 'opt').rate), '1/2', 'farthest-in-future gets 5 of 10');
+  eq(Rtext(replayTrace(T1, 3, 'lru').rate), '2/5', 'LRU gets 4');
+  eq(Rtext(replayTrace(T1, 3, 'fifo').rate), '1/5', 'FIFO gets 2');
+  /* THE PIN. The stepper duplicates the core's eviction rules so that it can
+     report cache contents; if the two ever disagree the page is showing one
+     run and counting another. Checked on five traces at six sizes. */
+  {
+    let mismatches = 0;
+    const traces = [T1, parseTrace('1 2 3 4 1 2 5 1 2 3 4 5'), parseTrace('A A A B C B C B C'),
+                    parseTrace('A B C D E A B C D E A B'), parseTrace('A')];
+    for (const t of traces) {
+      for (let k = 1; k <= 6; k += 1) {
+        for (const p of ['fifo', 'lru', 'opt']) {
+          if (replayTrace(t, k, p).hits !== replayPolicy(t, k, p).hits) mismatches += 1;
+        }
+      }
+    }
+    eq(mismatches, 0, 'the kit stepper agrees with the core replay on every trace, size and policy');
+  }
+  /* LFU is the one policy the core does not implement, so it needs a trace
+     that separates it from the two it would otherwise be mistaken for. On
+     A A A B C B C B C at two slots it keeps the stale hot key and gets 2
+     where FIFO, LRU and OPT all get 6. */
+  const T2 = parseTrace('A A A B C B C B C');
+  eq(replayTrace(T2, 2, 'lfu').hits, 2, 'LFU holds the once-hot key and thrashes on the rest');
+  eq(replayTrace(T2, 2, 'lru').hits, 6, 'LRU lets it go');
+  eq(replayTrace(T2, 2, 'fifo').hits, 6, 'so does FIFO');
+  eq(replayTrace(T2, 2, 'opt').hits, 6, 'and the bound is 6 as well, so LFU is losing 4 hits');
+  /* An unknown policy must throw. The core silently treats one as FIFO, which
+     would show a FIFO run under an LFU heading. */
+  {
+    let threw = false;
+    try { replayTrace(T1, 3, 'random'); } catch (err) { threw = true; }
+    eq(threw, true, 'an unknown policy throws rather than quietly becoming FIFO');
+  }
+  /* Belady's anomaly, measured. FIFO misses 9 times with three slots and 10
+     with four; LRU and OPT are stack algorithms and never rise. */
+  const BEL = parseTrace('1 2 3 4 1 2 5 1 2 3 4 5');
+  eq(missBySize(BEL, 'fifo', 6).join(','), '12,12,9,10,5,5', 'FIFO misses against cache size');
+  eq(missBySize(BEL, 'lru', 6).join(','), '12,12,10,8,5,5', 'LRU never rises');
+  eq(missBySize(BEL, 'opt', 6).join(','), '12,9,7,6,5,5', 'nor does the bound');
+  eq(JSON.stringify(firstAnomaly(BEL, 'fifo', 6)), '{"k":3,"up":4,"from":9,"to":10}',
+     "Belady's anomaly, found rather than asserted");
+  eq(firstAnomaly(BEL, 'lru', 6), null, 'and LRU has none');
+  eq(firstAnomaly(BEL, 'opt', 6), null, 'and neither has OPT');
+  eq(firstAnomaly(T1, 'fifo', 6), null, 'the course trace does not show one, which is why the kit ships both');
+
+  /* --- L6: TTL and staleness ---------------------------------------------- */
+  eq(Rtext(staleFraction(R(10n, 1n), R(60n, 1n))), '1/12', 'T/(2U) below U');
+  eq(Rtext(staleFraction(R(120n, 1n), R(60n, 1n))), '3/4', '1 - U/(2T) above it');
+  eq(Rtext(staleFraction(R(60n, 1n), R(60n, 1n))), '1/2', 'and the two branches meet at T = U');
+  eq(Rtext(ttlMissRate(R(5n, 1n), R(10n, 1n))), '1/50', 'a 10 s TTL at 5 reads/s misses 2%');
+  eq(Rtext(ttlMissRate(R(5n, 1n), R(1n, 10n))), '1',
+     'a TTL shorter than the gap between reads misses everything, and the rate caps at 1');
+  /* The boundary the simulation turns on: a refresh at the same instant as an
+     update picks up the NEW value, so the next update is strictly after. */
+  eq(Rtext(nextUpdateAfter(R(0n, 1n), R(0n, 1n), R(60n, 1n))), '60',
+     'an update at the refresh instant does not make the copy stale');
+  eq(Rtext(nextUpdateAfter(R(0n, 1n), R(10n, 1n), R(60n, 1n))), '10', 'the next one does');
+  /* THE SECOND PIN: the phase-averaged simulation must reproduce the closed
+     form it is printed beside, or the page is showing two models. */
+  eq(Rtext(staleRun(R(10n, 1n), R(60n, 1n), R(15n, 1n), 24).fraction), '1/12', 'one run at one phase');
+  eq(Rtext(staleAverage(R(10n, 1n), R(60n, 1n), 24, 24)), Rtext(staleFraction(R(10n, 1n), R(60n, 1n))),
+     'and 24 midpoint phases reproduce T/(2U) exactly');
+  eq(Rtext(staleAverage(R(120n, 1n), R(60n, 1n), 24, 2)), Rtext(staleFraction(R(120n, 1n), R(60n, 1n))),
+     'the same on the other branch');
+  eq(Rtext(staleAverage(R(25n, 1n), R(60n, 1n), 24, 10)), '5/24',
+     'and with T not dividing U it still lands on the formula');
+
+  /* --- L7: the stampede ---------------------------------------------------- */
+  eq(Rtext(stampedeSize(R(500n, 1n), R(40n, 1n))), '20', 'lambda*d: 500 rps through a 40 ms window');
+  eq(Rtext(stampedeSize(R(500n, 1n), R(1n, 1n))), '1/2', 'a 1 ms window lets half a request through');
+  eq(String(stampedeCount(R(500n, 1n), R(1n, 1n))), '1', 'which the backend counts as one');
+  eq(Rtext(stampedeTotal(R(500n, 1n), R(40n, 1n), 10)), '200', 'ten hot keys expiring together');
+
+  /* --- L8: write-through against write-back -------------------------------- */
+  const W = parseTrace('A B A C A B A D A B');
+  eq(distinctPerWindow(W, 5).map((x) => x.distinct).join(','), '3,3', 'three distinct keys per flush');
+  eq(coalescing(W, 5).writes + ' ' + coalescing(W, 5).distinct + ' ' + Rtext(coalescing(W, 5).ratio),
+     '10 6 5/3', 'ten writes become six, a ratio of 5/3');
+  eq(coalescing(W, 5).peak, 3, 'and the largest dirty set is three keys');
+  eq(Rtext(coalescing(W, 1).ratio), '1', 'flushing every write coalesces nothing');
+  eq(Rtext(coalescing(W, 99).ratio), '5/2', 'and one flush for the whole trace coalesces most');
+  eq(Rtext(bytesAtRisk(3, 4000)), '12000', 'three 4 kB keys is 12 kB at risk');
+
+  /* --- L9: the second level is conditional --------------------------------- */
+  eq(Rtext(globalHit(R(4n, 5n), R(1n, 2n))), '9/10', '80% then half the rest is 90%, not 130%');
+  eq(Rtext(globalMiss(R(4n, 5n), R(1n, 2n))), '1/10', 'the global miss is the PRODUCT');
+  eq(Rtext(Radd(globalHit(R(4n, 5n), R(1n, 2n)), globalMiss(R(4n, 5n), R(1n, 2n)))), '1',
+     'and the two account for everything');
+  eq(Rtext(levelLatency(R(4n, 5n), R(1n, 2n), R(1n, 1n), R(5n, 1n), R(50n, 1n))), '7',
+     't1 + (1-h1)(t2 + (1-h2)t3) = 7 ms');
+  eq(Rtext(naiveSumHit(R(4n, 5n), R(1n, 2n))), '13/10',
+     'adding the rates gives 130%, which is how you know it is the wrong operation');
+  eq(Rtext(conditionalShare(R(4n, 5n), R(1n, 2n))), '1/10',
+     "L2's measured 50% is 10% of all requests, not 50%");
+}
+
+// ------------------------------- system design C3: queues and utilisation
+/* The `queue` kit's own arithmetic, on the numbers its thirteen lessons print.
+
+   The block this section exists for is the Geo/Geo/1 convergence. A slotted
+   simulation is NOT M/M/1 at finite slot size, and a lesson that says its
+   formula is "checked against the simulation" is comparing two models. The
+   assertions below pin the exact discrete mean at three slot sizes and the rate
+   at which it approaches the continuous one, so a change that quietly restores
+   the false claim fails here rather than on the page. */
+console.log('system design: queues, Little\'s Law and the slotted chain');
+{
+  const QUEUE_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'queue.py');
+  const queueSrc = fs.readFileSync(QUEUE_SOURCE, 'utf8');
+  const queueBlock = (name) => blockFrom(queueSrc, name, QUEUE_SOURCE);
+  eval(block('RATIONAL_JS') + countingBlock('BIGINT_JS') + sysdBlock('RCEIL_JS')
+       + sysdBlock('QUEUE_JS') + sysdBlock('SLOTTED_JS') + sysdBlock('TRACE_JS')
+       + sysdBlock('STREAM_JS') + sysdBlock('APPROX_JS') + queueBlock('QUEUE_KIT_JS'));
+
+  /* --- L1: mu is a rate ------------------------------------------------- */
+  eq(Rtext(muFromServiceMs(1)), '1000', 'a 1 ms service is 1000 per second, not 1');
+  eq(Rtext(muFromServiceMs(4)), '250', 'a 4 ms service is 250 per second');
+  eq(Rtext(serviceMsFromMu(muFromServiceMs(4))), '4', 'and back again');
+  eq(Rtext(Rdiv(R(800n, 1n), muFromServiceMs(1))), '4/5', 'rho = lambda/mu at the lesson preset');
+  eq(Rtext(growthPerSec(R(1200n, 1n), muFromServiceMs(1))), '200', 'above rho = 1 the backlog grows at lambda - mu');
+  eq(Rtext(backlogAfter(R(1200n, 1n), muFromServiceMs(1), 60)), '12000', 'a minute of that is 12 000 waiting');
+  eq(Rtext(backlogAfter(R(800n, 1n), muFromServiceMs(1), 60)), '0', 'and below rho = 1 nothing accumulates');
+
+  /* --- L2: Little's Law inside a window ---------------------------------- */
+  /* The lesson's trace: five customers over ten slots, area 17. */
+  const A = [0, 1, 2, 5, 6], D = [3, 4, 6, 8, 10];
+  const w10 = littleWindow(A, D, 10);
+  eq(w10.area + ' ' + w10.arrived + ' ' + w10.done + ' ' + w10.inflight, '17 5 5 0', 'the whole trace, counted');
+  eq(Rtext(w10.L) + ' ' + Rtext(w10.lambda) + ' ' + Rtext(w10.W), '17/10 1/2 17/5', 'L, lambda and W over it');
+  eq(Rtext(w10.lamW), Rtext(w10.L), 'and lambda*W IS L, with no model assumed');
+  eq(w10.holds, true, 'the identity holds on a window everyone has left');
+  eq(occupancyTrace(A, D, 10).join(''), '1232122211', 'the N(t) staircase the area is under');
+  eq(Rtext(littleFromTrace(A, D).L), Rtext(w10.L), 'and the core agrees at the full horizon');
+  /* Cut the window short and it stops holding -- which is the misconception,
+     and the assertion that keeps the lab honest about WHY. */
+  const w8 = littleWindow(A, D, 8);
+  eq(w8.inflight, 1, 'at T = 8 one customer is still in the system');
+  eq(Rtext(w8.L) + ' vs ' + Rtext(w8.lamW), '15/8 vs 65/32', 'so L and lambda*W part company');
+  eq(w8.holds, false, 'the law did not fail; the window did');
+
+  /* --- L3: the same identity, solved three ways -------------------------- */
+  eq(Rtext(littleSolve('L', R(1n, 2n), R(4n, 1n))), '2', 'L = lambda*W');
+  eq(Rtext(littleSolve('W', R(2n, 1n), R(1n, 2n))), '4', 'W = L/lambda');
+  eq(Rtext(littleSolve('lambda', R(2n, 1n), R(4n, 1n))), '1/2', 'lambda = L/W');
+  /* The unit trap the lesson is about: 500/s at 40 ms is 20, not 20 000. */
+  eq(Rtext(poolForRate(R(500n, 1n), R(40n, 1n))), '20', '500 per second at 40 ms needs 20 connections');
+  eq(Rtext(poolCapPerSec(20, R(40n, 1n))), '500', 'and 20 connections at 40 ms cap at 500 per second');
+  eq(Rtext(poolForRate(poolCapPerSec(20, R(40n, 1n)), R(40n, 1n))), '20', 'the two are inverses');
+
+  /* --- L4, L7: the slotted chain, which is the point of this section ------ */
+  /* The closed form the kit's docstring states, checked against the core's
+     geoGeo1 at four points. One point would not do it: at q = 1/2 several wrong
+     formulas coincide with the right one. */
+  function closed(p, q) {
+    const rho = Rdiv(p, q);
+    return Rdiv(Rmul(rho, Rsub(R(1n, 1n), p)), Rsub(R(1n, 1n), rho));
+  }
+  const pts = [[2, 5, 1, 2], [4, 5, 1, 1], [1, 4, 1, 3], [2, 25, 1, 10]];
+  pts.forEach(function (t) {
+    const p = R(BigInt(t[0]), BigInt(t[1])), q = R(BigInt(t[2]), BigInt(t[3]));
+    eq(Rtext(geoGeo1(p, q).L), Rtext(closed(p, q)),
+       'Geo/Geo/1 L = rho(1-p)/(1-rho) at p = ' + Rtext(p) + ', q = ' + Rtext(q));
+    eq(Rtext(geoGeo1(p, q).p0), Rtext(Rsub(R(1n, 1n), Rdiv(p, q))),
+       'and its empty probability is 1 - rho at p = ' + Rtext(p));
+  });
+  /* The convergence panel L7 ships, exactly. At lambda = 4/5, mu = 1 the
+     largest legal slot is 1, and each tenth of it closes the gap by a factor of
+     ten -- linear in Delta, because the gap is rho*p/(1 - rho) and p = lambda*Delta. */
+  eq(Rtext(largestLegalSlot(R(4n, 5n), R(1n, 1n))), '1', 'the largest slot where lambda*D and mu*D are probabilities');
+  eq(Rtext(largestLegalSlot(R(1n, 1n), R(2n, 1n))), '1/2', 'and it is set by whichever rate is larger');
+  const conv = convergenceRows(R(4n, 5n), R(1n, 1n), 3);
+  eq(conv.map(r => Rtext(r.delta) + ':' + Rtext(r.L)).join(' '),
+     '1:4/5 1/10:92/25 1/100:496/125', 'the exact slotted mean at Delta = 1, 1/10, 1/100');
+  eq(conv.map(r => Rtext(r.gap)).join(' '), '16/5 8/25 4/125',
+     'and the shortfall against rho/(1-rho), falling by exactly ten each step');
+  eq(Rtext(Rdiv(conv[0].gap, conv[1].gap)) + ' ' + Rtext(Rdiv(conv[1].gap, conv[2].gap)), '10 10',
+     'exactly ten, because the gap is linear in the slot');
+  eq(Rtext(mm1(R(4n, 5n), R(1n, 1n)).L), '4', 'while the continuous formula says 4 at every slot size');
+  eq(Rtext(slottedMean(R(4n, 5n), R(1n, 1n), R(1n, 2n))), '12/5',
+     'and at Delta = 1/2 the slotted mean is the docstring\'s 12/5, not 4');
+  /* A slot too big is not a small error, it is not a model: p must be a
+     probability, and the panel must refuse rather than print a number. */
+  eq(slottedMean(R(2n, 1n), R(3n, 1n), R(1n, 1n)), 'null', 'lambda*Delta > 1 is not a Bernoulli slot');
+  eq(slottedMean(R(1n, 2n), R(3n, 1n), R(1n, 1n)), 'null', 'nor is mu*Delta > 1');
+  /* Lq = L - rho, because exactly rho of the time there is one in service. */
+  eq(Rtext(geoGeo1Lq(R(2n, 5n), R(1n, 2n))), '8/5', 'the slotted Lq is L - rho');
+  eq(Rtext(slottedCa2(R(2n, 5n))) + ' ' + Rtext(slottedCs2(R(1n, 2n))), '3/5 1/2',
+     'and the chain\'s own coefficients of variation are 1 - p and 1 - q');
+
+  /* --- L4: the simulation must match the chain it claims to be ----------- */
+  const p25 = R(2n, 5n), q12 = R(1n, 2n);
+  eq(drawBelow(0, 100, R(2n, 5n)), true, 'a draw at 0 is below any positive probability');
+  eq(drawBelow(39, 100, R(2n, 5n)), true, 'and 39/100 is below 2/5');
+  eq(drawBelow(40, 100, R(2n, 5n)), false, 'while 40/100 is NOT -- the boundary is half-open, or every rate is biased high');
+  eq(slottedRun(p25, q12, 7, 12).join(''), slottedRun(p25, q12, 7, 12).join(''), 'the same seed gives the same run');
+  eq(slottedRun(p25, q12, 7, 12).join('') === slottedRun(p25, q12, 8, 12).join(''), false,
+     'and a different seed does not');
+  /* 40 000 slots, warm-up discarded: the measured mean must land near 12/5. A
+     loose tolerance, because this asserts the SIMULATOR implements the chain,
+     not that a finite sample equals its mean. */
+  const longRun = slottedRun(p25, q12, 11, 40000);
+  near(Number(Rdec(runMean(longRun, 4000), 6)), 2.4, 0.12, 'a long slotted run converges on the chain\'s exact 12/5');
+  eq(Rtext(runMean([0, 1, 2, 3], 0)) + ' ' + Rtext(runMean([0, 1, 2, 3], 2)), '3/2 5/2', 'the mean, and the mean after a warm-up');
+  eq(queueOf([0, 1, 2, 3]).join(''), '0012', 'those waiting is N - 1, floored at zero');
+  eq(runMax([0, 3, 1]), 3, 'and the peak of a run');
+  /* D/D/1 at the same rho: never a queue, and the mean IS rho. That is lesson
+     4's whole claim, and it is exact rather than measured. */
+  eq(Rtext(runMean(ddRun(5, 4, 4000), 0)), '4/5', 'clockwork arrivals at rho = 4/5 hold exactly 4/5');
+  eq(runMax(ddRun(5, 4, 4000)), 1, 'and never more than the one in service -- nothing ever waits');
+  eq(runMax(ddRun(4, 1, 100)), 1, 'the same at a light load');
+  /* Deterministic service, same arrival stream: it must wait LESS than
+     geometric service at the same rho, which is lesson 9 seen from lesson 4. */
+  eq(Rcmp(runMean(queueOf(slottedDetRun(p25, 2, 11, 40000)), 4000),
+          runMean(queueOf(slottedRun(p25, q12, 11, 40000)), 4000)) < 0, true,
+     'fixed service waits less than geometric service on the same arrivals');
+  /* The initial transient: E[N] over an ensemble starts low and climbs. This is
+     the assertion behind the sentence "the simulation starts empty". */
+  const curve = transientCurve(p25, q12, 1, 24, 160);
+  eq(Rtext(curve[0]) === '0' || Rcmp(curve[0], R(1n, 1n)) < 0, true, 'the ensemble starts near empty');
+  eq(Rcmp(curveMean(curve, 0, 20), curveMean(curve, 80, 160)) < 0, true,
+     'and the early mean is BELOW the late one -- the bias a warm-up removes');
+  eq(runningMeans([1, 1, 1, 1], 0, 2).map(r => r[0] + ':' + Rtext(r[1])).join(' '), '2:1 4:1',
+     'the running mean, sampled, and exact at each cut-off');
+
+  /* --- L5: geometric to exponential -------------------------------------- */
+  eq(Rtext(geoTail(R(1n, 2n), 2, 2)), '81/256', '(1 - 1/2*1/2)^(2/(1/2)) = (3/4)^4, exactly');
+  eq(Rtext(geoTail(R(1n, 1n), 1, 3)), '0', 'lambda*Delta = 1 means it always arrives in the first slot');
+  /* Rfixed, not Rdec: 200^400 has 921 digits and Number() of it is Infinity, so
+     Rdec returns NaN on exactly the case the lesson is about. */
+  near(parseFloat(Rfixed(geoTail(R(1n, 2n), 10, 4), 8)), 0.1285121, 1e-6, '(19/20)^40, the lesson\'s exact tail');
+  near(parseFloat(Rfixed(geoTail(R(1n, 2n), 100, 4), 8)), 0.1346580, 1e-6, 'a hundred times finer');
+  near(expNegApprox(2, 1e-15), 0.13533528, 1e-7, 'and e^-2, which is where it is going');
+  eq(Rcmp(geoTail(R(1n, 2n), 100, 4), geoTail(R(1n, 2n), 10, 4)) > 0, true, 'the gap closes from below');
+  /* Memorylessness is EXACT at every slot size, for every s. Not a limit. */
+  [0, 1, 3, 5].forEach(function (s) {
+    eq(Rtext(geoCondTail(R(1n, 2n), 10, s, 4)), Rtext(geoTail(R(1n, 2n), 10, 4)),
+       'P(T > s+4 | T > s) = P(T > 4) at s = ' + s + ', exactly');
+  });
+
+  /* --- L6: the binomial exactly, Poisson as its limit --------------------- */
+  /* binomRow is a recurrence; this checks it against the closed form it
+     replaced, which is the only way to know the recurrence is the same
+     distribution and not merely a fast one. */
+  const row = binomRow(20, 10, 20);
+  let mass = R(0n, 1n);
+  for (let k = 0; k <= 20; k += 1) {
+    mass = Radd(mass, row[k]);
+    eq(Rtext(row[k]), Rtext(Rmul(R(comb(20, k), 1n), Rmul(Rpow(R(1n, 2n), k), Rpow(R(1n, 2n), 20 - k)))),
+       'binomRow[' + k + '] is comb(n,k)p^k(1-p)^(n-k)');
+  }
+  eq(Rtext(mass), '1', 'and the row is a distribution');
+  eq(Rtext(binomPmf(20, 10, 10)), '46189/262144', 'ten heads in twenty tosses');
+  eq(Rtext(binomTail(20, 10, 19)), '1/1048576', 'a tail past n-1 is the last atom, (1/2)^20');
+  eq(Rtext(binomTail(20, 10, 10)), '215955/524288', 'and P(more than half heads) at n = 20');
+  eq(Rtext(binomTail(20, 10, 20)), '0', 'nothing exceeds n');
+  eq(Rtext(binomVar(100, 10)), '9', 'the binomial variance m(1 - m/n) at n = 100');
+  eq(Rtext(binomVar(1000, 10)), '99/10', 'closer to the mean as the window is chopped finer');
+  near(Number(Rdec(binomTail(200, 10, 15), 8)), 0.0443561, 1e-5, 'P(count > 15) exactly, at 20 chances per unit');
+  near(poissonTailApprox(10, 15), 0.0487404, 1e-6, 'and by the Poisson limit, which rounds');
+  near(poissonPmfApprox(10, 10), 0.1251100, 1e-6, 'e^-m m^k/k! at the mean');
+  eq(headroomForApprox(10, 0.01, 400), 18, 'a mean of 10 needs headroom 18 for a 1% overflow');
+  eq(headroomForApprox(10, 0.001, 400), 21, 'and 21 for 0.1% -- the price of the tail');
+  eq(headroomForApprox(12, 0.01, 400), 21, 'and 21 at a mean of 12, the largest this lab offers');
+  /* Every Poisson figure above is checked against the same recurrence started
+     from Math.exp rather than from the core's series, because the two agree only
+     inside the range the block below pins. */
+  function refPoissonTail(m, C) { let t = Math.exp(-m), h = t; for (let k = 1; k <= C; k += 1) { t = t * m / k; h += t; } return 1 - h; }
+  near(poissonTailApprox(10, 15), refPoissonTail(10, 15), 1e-8, 'the Poisson tail matches a Math.exp reference at m = 10');
+  near(poissonTailApprox(12, 20), refPoissonTail(12, 20), 1e-6, 'and at m = 12, the edge of the usable range');
+
+  /* --- e^-x has a range, and the kit stops inside it ---------------------- *
+     sysdesign_core's expNegApprox sums the ALTERNATING series for e^-x, whose
+     largest term is about e^x/sqrt(2 pi x) while the answer is e^-x. It
+     therefore loses roughly 2x/ln(10) significant digits to cancellation:
+     measured, the relative error is 3e-9 at x = 10, 1.6e-7 at x = 12, 4e-3 at
+     x = 17 and 173% at x = 20, and past x = 21 the SIGN is wrong.
+
+     That is a defect in the core, not in this kit, and the fix belongs there --
+     1/exp(x) by a positive-term series would be correct at every x. Until then
+     the kit bounds the two modes that call it and refuses outside the bound,
+     because a wrong number under a promise of a checkable one is worse than no
+     number. These assertions pin both halves: that the method is good where the
+     lab uses it, and that the lab's own functions refuse where it is not. */
+  near(expNegSafe(10), Math.exp(-10), Math.exp(-10) * 1e-6, 'e^-10 is still good to six figures');
+  near(expNegSafe(12), Math.exp(-12), Math.exp(-12) * 1e-5, 'e^-12, the bound, to five');
+  eq(expNegSafe(20), 'NaN', 'past the bound the kit returns NaN rather than a confident 173% error');
+  eq(expNegSafe(-1), 'NaN', 'and refuses a negative x outright');
+  eq(poissonTailApprox(20, 25), 'NaN', 'so the Poisson tail refuses too');
+  eq(headroomForApprox(20, 0.01, 400), -1, 'and the headroom search reports that it has no answer');
+  eq(Number.isNaN(expTailApprox(R(2n, 1n), 12)), true, 'lambda*t = 24 is outside the method');
+  eq(expTailApprox(R(3n, 2n), 8) > 0, true, 'lambda*t = 12 is inside it');
+
+  /* --- L8: the knee ------------------------------------------------------ */
+  eq(Rtext(kneeFactor(R(1n, 2n))) + ' ' + Rtext(kneeFactor(R(9n, 10n))) + ' ' + Rtext(kneeFactor(R(99n, 100n))),
+     '2 10 100', 'W/S at 50%, 90% and 99%');
+  eq(Rtext(Rdiv(kneeFactor(R(9n, 10n)), kneeFactor(R(1n, 2n)))), '5', '50% to 90% multiplies the wait by five');
+  eq(Rtext(Rdiv(kneeFactor(R(99n, 100n)), kneeFactor(R(9n, 10n)))), '10', 'and 90% to 99% by ten more');
+  eq(Rtext(rhoForFactor(10)) + ' ' + Rtext(rhoForFactor(100)), '9/10 99/100', 'the rho at which W = kS is (k-1)/k');
+  eq(Rtext(kneeFactor(rhoForFactor(7))), '7', 'and the two are inverses at every k');
+
+  /* --- L9: Kingman, whose model is the approximation --------------------- */
+  /* At c_a^2 = c_s^2 = 1 the formula must reproduce M/M/1 EXACTLY. If it does
+     not, the disagreement the lesson shows is an arithmetic bug rather than a
+     modelling one, and the page would be teaching the wrong lesson. */
+  [[1, 2], [4, 5], [9, 10]].forEach(function (r) {
+    const rho = R(BigInt(r[0]), BigInt(r[1])), mu = R(1n, 1n);
+    const S = Rinv(mu), lam = Rmul(rho, mu);
+    eq(Rtext(kingmanWq(rho, R(1n, 1n), R(1n, 1n), S)), Rtext(mm1(lam, mu).Wq),
+       'Kingman at c^2 = 1, 1 IS the M/M/1 Wq at rho = ' + Rtext(rho));
+  });
+  eq(Rtext(kingmanWq(R(4n, 5n), R(1n, 1n), R(0n, 1n), R(2n, 1n))), '4', 'M/D/1 waits half of M/M/1');
+  eq(Rtext(kingmanWq(R(4n, 5n), R(1n, 1n), R(1n, 1n), R(2n, 1n))), '8', 'which is 8');
+  eq(kingmanWq(R(1n, 1n), R(1n, 1n), R(1n, 1n), R(1n, 1n)), 'null', 'and it says nothing at rho = 1');
+  /* The disagreement itself, as a number: at the chain's own coefficients
+     Kingman says 22/5 and the exact chain says 4. */
+  eq(Rtext(kingmanWq(R(4n, 5n), slottedCa2(R(2n, 5n)), slottedCs2(R(1n, 2n)), R(2n, 1n))), '22/5',
+     'Kingman at the slotted chain\'s true c^2');
+  eq(Rtext(Rdiv(geoGeo1Lq(R(2n, 5n), R(1n, 2n)), R(2n, 5n))), '4', 'against the chain\'s exact 4');
+
+  /* --- L10: pooling ------------------------------------------------------ */
+  /* The lesson's worked example: lambda = 3, mu = 1, s = 4. */
+  const pooled = erlangC(R(3n, 1n), R(1n, 1n), 4), separate = mm1(R(3n, 4n), R(1n, 1n));
+  eq(Rtext(pooled.pWait) + ' ' + Rtext(pooled.Lq) + ' ' + Rtext(pooled.Wq), '27/53 81/53 27/53',
+     'Erlang C at a = 3, s = 4');
+  eq(Rtext(separate.Wq), '3', 'against 3 for one of four separate queues at the same load');
+  eq(Rtext(Rdiv(separate.Wq, pooled.Wq)), '53/9', 'so splitting the traffic costs 53/9 times the wait');
+  eq(Rtext(Rdiv(R(3n, 1n), Rmul(R(4n, 1n), R(1n, 1n)))), '3/4', 'at an identical rho of 3/4 either way');
+
+  /* --- L11: the two W values a lossy system separates -------------------- */
+  const fin = mm1k(R(4n, 5n), R(1n, 1n), 4);
+  eq(Rtext(fin.blocking), '256/2101', 'the lesson preset blocks 256/2101');
+  eq(Rtext(fin.L) + ' ' + Rtext(fin.lamEff), '3284/2101 1476/2101', 'its L and its ADMITTED rate');
+  eq(Rtext(fin.W), '821/369', 'W from the admitted rate, which is the right one');
+  eq(Rtext(Rdiv(fin.L, R(4n, 5n))), '4105/2101', 'W from the offered rate, which is the wrong one');
+  eq(Rtext(Rdiv(fin.W, Rdiv(fin.L, R(4n, 5n)))), Rtext(Rinv(Rsub(R(1n, 1n), fin.blocking))),
+     'and the error is exactly the factor 1/(1 - piK)');
+  eq(smallestBuffer(R(4n, 5n), R(1n, 1n), R(1n, 100n), 60), 14, 'a 1% loss target needs K = 14 here');
+  eq(smallestBuffer(R(4n, 5n), R(1n, 1n), R(1n, 1000n), 60), 24, 'and 0.1% needs K = 24');
+  eq(Rtext(bufferLatencyCap(R(1n, 1n), 14)), '14', 'which caps the wait near K/mu -- the bufferbloat trade');
+  /* A finite chain is stable at every rho, which is the other half of L11. */
+  eq(Rtext(mm1k(R(1n, 1n), R(1n, 1n), 4).blocking), '1/5', 'at rho = 1 every state is equally likely');
+  eq(Rtext(mm1k(R(2n, 1n), R(1n, 1n), 3).L) !== '', true, 'and even above rho = 1 there is an answer');
+
+  /* --- L12: the bucket and the window it replaces ------------------------ */
+  const TRACE = [0, 200, 400, 600, 800, 900, 900, 900, 900, 900,
+                 1000, 1000, 1000, 1000, 1000, 1400, 1600, 1800, 2000, 2200];
+  const bkt = bucketRun(TRACE, R(5n, 1n), 3);
+  eq(bkt.admitted + '/' + bkt.rejected, '13/7', 'the lesson trace through a bucket of 3 refilling at 5/s');
+  eq(bkt.rows.map(r => (r.admit ? '+' : '-')).join(''), '+++++++---+----+++++', 'and which arrival got what');
+  eq(largestBurst(bkt.rows, 1000) <= 3 + 5, true, 'no second exceeds the b + rt bound');
+  eq(largestBurst(bkt.rows, 1000), 7, 'the largest it actually allows here is 7');
+  /* The misconception, as a number: a fixed window of the same nominal limit
+     lets nearly twice that through across a boundary. */
+  const win = fixedWindowRun(TRACE, 5, 1000);
+  eq(win.admitted + '/' + win.rejected, '12/8', 'the same trace through a fixed window at 5 per second');
+  eq(largestBurst(win.rows, 1000), 9, 'which lets 9 through in one second while claiming 5');
+  eq(largestBurst(win.rows, 1000) > largestBurst(bkt.rows, 1000), true, 'worse than the bucket it replaces');
+  eq(Rtext(bucketRun([0, 1000, 2000], R(1n, 1n), 1).rows[2].tokens), '0', 'tokens are exact, not drifting floats');
+  /* The lid, which is what makes b a burst allowance rather than a savings
+     account. Idle for twenty seconds at one token a second and the bucket has
+     earned twenty; it may keep three. Without the cap a quiet night pays for an
+     unbounded morning and the b + rt guarantee is gone. */
+  const idle = bucketRun([0, 20000, 20000, 20000, 20000, 20000, 20000], R(1n, 1n), 3);
+  eq(idle.admitted + '/' + idle.rejected, '4/3', 'twenty idle seconds still buy only b tokens');
+  eq(idle.rows.map(r => (r.admit ? '+' : '-')).join(''), '++++---', 'the burst stops at b, not at what was earned');
+  eq(Rtext(bucketRun([0, 20000], R(1n, 1n), 3).rows[1].tokens), '2',
+     'the level is capped at b before the arrival is charged, so it is 2 and not 21');
+  eq(bucketRun([0, 0, 0, 0], R(5n, 1n), 2).admitted, 2, 'a burst with no gap spends the bucket and stops');
+  eq(parseTimes('0 10  20', 9).join(','), '0,10,20', 'times parse and sort');
+  eq(parseTimes('', 9), 'null', 'and an empty trace is refused rather than guessed at');
+
+  /* --- L13: a spike is an area ------------------------------------------- */
+  const plan = backlogPlan(R(1000n, 1n), R(800n, 1n), R(1500n, 1n), 60, R(800n, 1n));
+  eq(Rtext(plan.excess) + ' ' + Rtext(plan.peak), '500 30000', 'the excess rate, and the area it builds');
+  eq(Rtext(plan.headroom) + ' ' + Rtext(plan.drainSecs), '200 150', 'the headroom left, and the drain it buys');
+  eq(Rtext(plan.maxLagSecs), '30', 'the worst lag is backlog/mu');
+  eq(Rtext(plan.totalSecs), '210', 'so a 60 second spike is a 210 second incident');
+  eq(Rtext(backlogAt(plan, 60, 30)) + ' ' + Rtext(backlogAt(plan, 60, 60)), '15000 30000', 'the backlog rises to its peak AT the end of the spike');
+  eq(Rtext(backlogAt(plan, 60, 135)) + ' ' + Rtext(backlogAt(plan, 60, 210)), '15000 0', 'and falls from there');
+  eq(Rtext(backlogAt(plan, 60, 400)), '0', 'never going negative');
+  const never = backlogPlan(R(1000n, 1n), R(800n, 1n), R(1500n, 1n), 60, R(1000n, 1n));
+  eq(never.drains, false, 'with no headroom afterwards it never drains');
+  eq(never.drainSecs, 'null', 'and there is no drain time to print');
+  eq(Rtext(backlogPlan(R(1000n, 1n), R(800n, 1n), R(900n, 1n), 60, R(800n, 1n)).peak), '0',
+     'a "spike" under mu builds nothing at all');
+
+  /* --- the kit's own printing -------------------------------------------- */
+  eq(Rfixed(R(1n, 3n), 4), '0.3333', 'long division in BigInt');
+  eq(Rfixed(R(2n, 3n), 4), '0.6667', 'rounded half up at the last digit');
+  eq(Rfixed(R(-1n, 8n), 3), '-0.125', 'and signed');
+  eq(Rpct(R(4n, 5n), 1), '80.0%', 'a percentage of an exact probability');
+  eq(Rshort(R(17n, 10n), 4), '17/10', 'a readable fraction stays a fraction');
+  eq(Rshort(R(272378807820n, 68618940391n), 4), '3.9694', 'and a twelve-digit one becomes a decimal');
+  eq(commas(1234567), '1 234 567', 'digit grouping');
+}
+
+// --------------------------------------- availability and failure (kit: avail)
+/* The `avail` kit's own arithmetic, on the numbers its thirteen lessons print.
+   Every assertion below is a figure that appears on a page, so a change that
+   moves one of them is a change to what a lesson claims.
+
+   Four of them are not figures but IDENTITIES, and they are the reason this
+   section exists. k-of-n at k = n must be the series product and at k = 1 the
+   parallel form; the break-even common cause must be exactly the point at
+   which a pair is no better than one machine; halving the repair window must
+   divide the loss probability by 2^(N-1) and not by two; and the overlap
+   distribution of shuffle sharding must sum to one. Each is exact, each is
+   checkable, and each is a claim a lesson makes in prose. */
+console.log('system design: availability, retries, durability and blast radius');
+{
+  const AVAIL_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'avail.py');
+  const availSrc = fs.readFileSync(AVAIL_SOURCE, 'utf8');
+  const availBlock = (name) => blockFrom(availSrc, name, AVAIL_SOURCE);
+  eval(block('RATIONAL_JS') + countingBlock('BIGINT_JS') + sysdBlock('AVAIL_JS')
+       + sysdBlock('STREAM_JS') + sysdBlock('APPROX_JS') + availBlock('AVAILKIT_JS'));
+
+  /* --- printing. Rdec goes through Number; the storm iterates past it. ----- */
+  eq(Rfixed(R(1n, 3n), 6), '0.333333', 'long division in BigInt');
+  eq(Rfixed(R(2n, 3n), 6), '0.666667', 'rounded half up at the last digit');
+  eq(Rfixed(R(-1n, 8n), 3), '-0.125', 'a negative rational keeps its sign');
+  eq(Rpct(R(999n, 1000n), 5), '99.90000%', 'three nines as a percentage');
+  eq(Rpct(R(9999n, 10000n), 5), '99.99000%', 'and four, which two places could not tell apart');
+  /* RpctAuto widens with the answer, because a fixed width prints a five-nines
+     quorum as 100.000000% -- which is the exact claim these lessons deny. */
+  eq(RpctAuto(R(999n, 1000n)), '99.90000%', 'three nines gets five places');
+  eq(RpctAuto(Rsub(R(1n, 1n), R(1n, 10n ** 10n))), '99.999999990000%',
+     'ten nines gets twelve places, rather than rounding to 100%');
+  eq(Rpct(Rsub(R(1n, 1n), R(1n, 10n ** 10n)), 6), '100.000000%',
+     'which a fixed six places would have printed as a hundred per cent');
+  eq(RpctAuto(R(1n, 1n)), '100%', 'and only an exact one prints as 100%');
+  eq(RpctAuto(R(1n, 2n)), '50.0000%', 'while a coin-flip availability gets four');
+  /* The reason Rfixed exists here: an iterate of the retry map overflows Number. */
+  eq(String(Number(Rpow(R(999n, 1000n), 400).n)), 'Infinity',
+     'Number() of 0.999^400 is Infinity');
+  eq(Rfixed(Rpow(R(999n, 1000n), 400), 6), '0.670186', 'Rfixed prints it anyway');
+
+  /* --- L1: nines and downtime, in both directions ------------------------- */
+  eq(Rtext(periodSeconds('month')), '2628000', 'a month is a twelfth of a 365-day year');
+  eq(Rtext(periodSeconds('year')), '31536000', 'and a year is 365 days');
+  eq(Rtext(Rmul(periodSeconds('month'), R(12n, 1n))), Rtext(periodSeconds('year')),
+     'twelve of those months are exactly the year');
+  eq(Rtext(downtimeSeconds(R(999n, 1000n), periodSeconds('month'))), '2628',
+     '99.9% is 2628 seconds a month');
+  eq(durText(downtimeSeconds(R(999n, 1000n), periodSeconds('month'))), '43 min 48 s',
+     'which is the 43.8 minutes the lesson quotes');
+  eq(durText(downtimeSeconds(R(9999n, 10000n), periodSeconds('month'))), '4 min 22.80 s',
+     'and one more nine is a tenth of it, not 0.09% more');
+  eq(durText(downtimeSeconds(R(999n, 1000n), periodSeconds('year'))), '8 h 45 min 36 s',
+     '8.76 hours a year');
+  /* The two directions are inverses, which is what makes the budget selector
+     and the target selector the same lesson rather than two. */
+  eq(Rtext(availFromDowntime(R(2628n, 1n), periodSeconds('month'))), '999/1000',
+     'a 2628-second budget IS three nines');
+  eq(Rtext(availFromDowntime(downtimeSeconds(R(99991n, 100000n), periodSeconds('week')),
+                             periodSeconds('week'))), '99991/100000',
+     'and the round trip returns the availability it started from');
+  eq(ninesOf(R(999n, 1000n)), 3, '99.9% has three nines');
+  eq(ninesOf(R(9995n, 10000n)), 3, '99.95% has three, not three and a half');
+  eq(ninesOf(R(9n, 10n)), 1, '90% has one');
+  eq(ninesOf(R(1n, 2n)), 0, 'and 50% has none');
+
+  /* --- L2: MTBF, MTTR, and the identity that makes the lesson -------------- */
+  eq(Rtext(availFromMtbf(R(1000n, 1n), R(1n, 1n))), '1000/1001', 'A = MTBF/(MTBF + MTTR)');
+  /* THE IDENTITY: halving the repair time is worth exactly as much as doubling
+     the time between failures. A(2M, R) = 2M/(2M+R) = M/(M+R/2) = A(M, R/2).
+     The lesson says "worth as much"; this is the sense in which that is exact. */
+  eq(Requ(availFromMtbf(Rmul(R(1000n, 1n), R(2n, 1n)), R(1n, 1n)),
+          availFromMtbf(R(1000n, 1n), Rdiv(R(1n, 1n), R(2n, 1n)))), true,
+     'doubling MTBF and halving MTTR give the SAME fraction');
+  eq(Requ(availFromMtbf(Rmul(R(37n, 5n), R(2n, 1n)), R(3n, 7n)),
+          availFromMtbf(R(37n, 5n), Rdiv(R(3n, 7n), R(2n, 1n)))), true,
+     'and on numbers with nothing round about them');
+  /* The target solvers invert the availability formula, so putting their
+     answer back in must return the target exactly. */
+  eq(Rtext(availFromMtbf(R(1000n, 1n), mttrForTarget(R(1000n, 1n), R(9999n, 10000n)))), '9999/10000',
+     'the MTTR a target needs, put back through A, returns the target');
+  eq(Rtext(availFromMtbf(mtbfForTarget(R(1n, 1n), R(999n, 1000n)), R(1n, 1n))), '999/1000',
+     'and so does the MTBF a target needs');
+  eq(Rtext(failuresPerPeriod(Radd(R(3600000n, 1n), R(3600n, 1n)), periodSeconds('year'))), '8760/1001',
+     '1000 h up plus 1 h down is 8.75 cycles a year');
+
+  /* --- L3: the chain, and how far under the weakest link it lands ---------- */
+  eq(Rtext(pctToFraction('99.9')), '999/1000', 'a typed percentage is an exact fraction');
+  eq(Rtext(pctToFraction('99.95')), '1999/2000', 'and in lowest terms');
+  eq(parseChain('99.9, 99.99, 100').length, 3, 'a chain of three');
+  eq(parseChain('99.9, banana'), null, 'and a typo is refused rather than guessed at');
+  const ten = parseChain('99.9, 99.9, 99.9, 99.9, 99.9, 99.9, 99.9, 99.9, 99.9, 99.9');
+  eq(Rtext(availSeries(ten)), Rtext(Rpow(R(999n, 1000n), 10)), 'ten of them is the tenth power');
+  eq(Rfixed(availSeries(ten), 7), '0.9900449', 'ten 99.9% dependencies give 99.0%, not 99.9%');
+  /* The misconception, as a number: the chain is TEN TIMES the downtime of its
+     own weakest link, not equal to it. */
+  eq(Rfixed(Rdiv(Rsub(R(1n, 1n), availSeries(ten)), Rsub(R(1n, 1n), R(999n, 1000n))), 2), '9.96',
+     'the chain is 9.96x the downtime of the weakest link in it');
+  eq(Rcmp(availSeries(ten), R(999n, 1000n)) < 0, true, 'and strictly worse than it');
+  eq(Rtext(availSeries(parseChain('100, 100'))), '1', 'a chain of perfect parts is perfect');
+
+  /* --- L4: parallel, and the failover the formula does not contain --------- */
+  const two99 = [R(99n, 100n), R(99n, 100n)];
+  eq(Rtext(availParallel(two99)), '9999/10000', 'two 99% paths are four nines, ideally');
+  const charged = parallelWithFailover(two99, R(30n, 1n), R(12n, 1n), periodSeconds('year'));
+  eq(Rtext(charged.ideal), '9999/10000', 'the ideal figure is untouched');
+  eq(Rtext(charged.charge), '1/87600', '12 failovers of 30 s is 360 s a year');
+  eq(Rtext(charged.adjusted), Rtext(Rsub(R(9999n, 10000n), R(1n, 87600n))),
+     'and the real availability is the ideal one minus that');
+  eq(Rfixed(charged.adjusted, 8), '0.99988858', 'four nines becomes three');
+  eq(ninesOf(charged.ideal) + ' ' + ninesOf(charged.adjusted), '4 3',
+     'the switch costs a whole nine, which is what "failover is not free" means');
+  eq(Rtext(parallelWithFailover(two99, R(0n, 1n), R(12n, 1n), periodSeconds('year')).adjusted),
+     '9999/10000', 'an instant switch costs nothing, which is the formula as written');
+
+  /* --- L5: k-of-n, AND THE TWO IDENTITIES ---------------------------------- */
+  /* These are the assertions the course rests on: the binomial tail is not a
+     third model, it is the other two with k moved. If either fails, one of
+     three lessons is teaching a different arithmetic from the other two. */
+  const A99 = R(99n, 100n);
+  for (const n of [1, 2, 3, 5, 8, 12]) {
+    const copies = [];
+    for (let i = 0; i < n; i += 1) copies.push(A99);
+    eq(Requ(availKofN(A99, n, n), availSeries(copies)), true,
+       'k = n is the series product at n = ' + n);
+    eq(Requ(availKofN(A99, 1, n), availParallel(copies)), true,
+       'k = 1 is the parallel form at n = ' + n);
+    eq(Rtext(kofnTotal(A99, n)), '1', 'and all ' + (n + 1) + ' terms sum to one');
+  }
+  /* The same two identities on an availability with an ugly denominator, since
+     99/100 is exactly the kind of number a wrong coefficient survives. */
+  const Augly = R(7n, 11n), uglyCopies = [Augly, Augly, Augly, Augly];
+  eq(Requ(availKofN(Augly, 4, 4), availSeries(uglyCopies)), true, 'k = n at A = 7/11');
+  eq(Requ(availKofN(Augly, 1, 4), availParallel(uglyCopies)), true, 'k = 1 at A = 7/11');
+  eq(Rtext(kofnTotal(Augly, 4)), '1', 'and its terms still sum to one');
+  eq(Rtext(availKofN(R(1n, 2n), 2, 3)), '1/2', 'a majority of three fair coins');
+  eq(Rfixed(availKofN(A99, 3, 5), 6), '0.999990', '3 of 5 at 99% is five nines');
+  /* "More replicas always means more available" is false, and this is where. */
+  eq(Rcmp(availKofN(A99, 5, 5), A99) < 0, true, '5-of-5 is WORSE than 1-of-1');
+  eq(Rtext(kofnTerms(A99, 3)[3].term), Rtext(Rpow(A99, 3)), 'the j = n term is the series product');
+  eq(String(kofnTerms(A99, 5)[2].c), '10', 'the coefficients are C(n, j)');
+
+  /* --- L6: the common cause, and where redundancy stops paying ------------- */
+  eq(Rtext(pairBothDown(R(0n, 1n), R(1n, 100n))), '1/10000', 'at c = 0 the pair is p^2');
+  eq(Rtext(pairBothDown(R(1n, 1000n), R(1n, 100n))), '10999/10000000',
+     'a 0.1% common cause against a 10^-4 pair');
+  eq(Rfixed(Rdiv(pairBothDown(R(1n, 1000n), R(1n, 100n)), R(1n, 10000n)), 2), '11.00',
+     'which is eleven times what independence promised');
+  eq(Rtext(correlatedBreakEven(R(1n, 100n))), '1/101', 'the break-even c is p/(1 + p)');
+  /* THE IDENTITY: at that c the pair is EXACTLY as available as one machine.
+     The lesson asks the reader to find "the c at which redundancy buys
+     nothing"; this is the sense in which that c is exact rather than a
+     reading off a curve. */
+  for (const p of [R(1n, 100n), R(1n, 3n), R(7n, 1000n)]) {
+    eq(Rtext(pairBothDown(correlatedBreakEven(p), p)), Rtext(p),
+       'at c = p/(1+p) the pair is down exactly as often as one machine, p = ' + Rtext(p));
+    eq(Rtext(redundancyGain(correlatedBreakEven(p), p)), '1',
+       'so the redundancy gain there is exactly 1');
+  }
+  eq(Rtext(redundancyGain(R(0n, 1n), R(1n, 100n))), '100', 'and 1/p under independence');
+
+  /* --- L7: the error budget, in requests rather than minutes --------------- */
+  const reqs = Rmul(R(1000n, 1n), periodSeconds('month'));
+  eq(Rtext(reqs), '2628000000', '1000 rps for a month');
+  eq(Rtext(budgetRequests(R(999n, 1000n), reqs)), '2628000', 'is a budget of 2.628 M failures');
+  eq(Rtext(incidentBurn(R(1000n, 1n), R(1800n, 1n), R(1n, 1n))), '1800000',
+     'a 30-minute total outage costs 1.8 M of them');
+  eq(Rtext(Rdiv(incidentBurn(R(1000n, 1n), R(1800n, 1n), R(1n, 1n)),
+                budgetRequests(R(999n, 1000n), reqs))), '50/73', 'which is 68.5% of the budget');
+  /* Severity is a multiplier, which is the whole difference between an SLO on
+     requests and an SLO on the clock. */
+  eq(Rtext(incidentBurn(R(1000n, 1n), R(1800n, 1n), R(1n, 2n))), '900000',
+     'the same 30 minutes at half severity costs half as much');
+  eq(Rtext(budgetSeconds(R(999n, 1000n), periodSeconds('month'))), '2628',
+     'and the budget as a full outage is the L1 downtime figure again');
+
+  /* --- L8: retries as load ------------------------------------------------- */
+  eq(Rtext(retryAttempts(R(1n, 10n), 2)), '111/100', 'two retries at p = 0.1 cost 1.11 attempts');
+  eq(Rtext(retrySuccess(R(1n, 10n), 2)), '999/1000', 'and succeed 99.9% of the time');
+  eq(Rtext(amplifiedLoad(R(500n, 1n), R(1n, 10n), 2)), '555', '500 rps becomes 555 attempts a second');
+  eq(Rtext(duplicateShare(R(1n, 10n), 2)), '11/111', 'of which 9.9% is retry traffic');
+  /* The geometric sum, checked against the sum it stands for: the expected
+     attempts are the probabilities of reaching each attempt, added up. */
+  for (const p of [R(1n, 10n), R(9n, 10n), R(1n, 3n)]) {
+    for (const r of [0, 1, 3, 6]) {
+      let s = R(0n, 1n);
+      for (let i = 0; i <= r; i += 1) s = Radd(s, attemptReach(p, i));
+      eq(Rtext(s), Rtext(retryAttempts(p, r)),
+         'sum of p^i for i <= r IS the closed form, p = ' + Rtext(p) + ', r = ' + r);
+    }
+  }
+  /* The amplification is worst exactly when the service is worst, and its
+     ceiling is the retry budget itself. */
+  eq(Rcmp(retryAttempts(R(9n, 10n), 3), retryAttempts(R(1n, 10n), 3)) > 0, true,
+     'a worse failure rate costs more attempts, not fewer');
+  eq(Rtext(retryAttempts(R(9n, 10n), 3)), '3439/1000', 'p = 0.9 with 3 retries is 3.439 attempts');
+  eq(Rcmp(retryAttempts(R(99n, 100n), 3), R(4n, 1n)) < 0, true, 'and it never reaches r + 1');
+
+  /* --- L9: the retry storm, its iteration and its fixed point -------------- */
+  const lam = R(95n, 100n), cap = R(1n, 1n), base = R(1n, 10n);
+  eq(Rtext(stormFailure(R(1n, 2n), cap, base)), '1/10', 'under capacity the failure rate is the base');
+  eq(Rtext(stormFailure(R(2n, 1n), cap, base)), '11/20',
+     'at twice capacity half the excess fails on top of it');
+  eq(Rtext(stormNext(lam, cap, base, 0, lam).load), Rtext(lam),
+     'with no retries the map is the identity, so the offered load IS the answer');
+  const run = stormRun(lam, cap, base, 3, 5, 3000);
+  eq(run.rows.length, 5, 'five iterations');
+  eq(Rtext(run.rows[0].amp), '1111/1000', 'the first amplification, exactly');
+  eq(Rtext(run.rows[0].out), '21109/20000', 'and the first iterate, which is already over capacity');
+  eq(Rcmp(run.rows[0].out, cap) > 0, true, 'from an offered load that was NOT');
+  eq(Rcmp(run.rows[4].out, run.rows[0].out) > 0, true, 'the iterates climb');
+  /* The fixed point is an ENCLOSURE and the bracket is what makes it exact:
+     the map is increasing, so a sign change between two fractions traps a
+     fixed point between them. Both ends are checked in the right direction. */
+  const fp = stormFixedPoint(lam, cap, base, 3, 24);
+  eq(Rcmp(stormNext(lam, cap, base, 3, fp.lo).load, fp.lo) >= 0, true,
+     'the map pushes the low end up');
+  eq(Rcmp(stormNext(lam, cap, base, 3, fp.hi).load, fp.hi) <= 0, true,
+     'and the high end down, so the fixed point is between them');
+  eq(Rcmp(fp.lo, fp.hi) <= 0, true, 'and the bracket is the right way round');
+  eq(Rfixed(fp.lo, 5), '1.72736', 'the fixed point of the preset');
+  /* THE LESSON: the un-retried load was serviceable and the fixed point is not. */
+  eq(Rcmp(lam, cap) <= 0, true, '0.95 of capacity was fine');
+  eq(Rcmp(fp.lo, cap) > 0, true, 'and the retries alone put the fixed point above capacity');
+  eq(Rcmp(stormFixedPoint(lam, cap, base, 0, 24).hi, cap) < 0, true,
+     'with retries switched off the same load settles below capacity');
+  /* The digit budget stops the table rather than hanging the page. */
+  eq(stormRun(lam, cap, base, 3, 12, 200).stopped, true,
+     'a tight digit budget stops the iteration and says so');
+  eq(stormRun(lam, cap, base, 3, 12, 200).rows.length < 12, true, 'with fewer rows than asked for');
+
+  /* --- L10: backoff waves, seeded ----------------------------------------- */
+  eq([1, 2, 3, 4].map((i) => backoffDelayMs(1000, i)).join(','), '1000,2000,4000,8000',
+     'the waves land at 1, 2, 4 and 8 seconds');
+  const noJit = backoffHistogram(600, 20, 1000, 0, 8, 40, 7, 200);
+  eq(noJit.plain.join(',') === noJit.jitter.join(','), true,
+     'jitter of zero width IS the un-jittered schedule, which is the check that the spread is centred');
+  eq(peakOf(noJit.plain), 600, 'and every client lands in one slot');
+  const jit = backoffHistogram(600, 20, 1000, 100, 8, 40, 7, 200);
+  eq(peakOf(jit.jitter) < peakOf(jit.plain), true, 'jitter lowers the peak');
+  eq(peakOf(jit.plain), 600, 'while the un-jittered arm is unchanged by the jitter slider');
+  eq(totalOf(jit.plain), 3600, 'six waves of 600 without jitter');
+  /* Seeded, and the seed is actually used: same seed same bars, other seed not. */
+  eq(backoffHistogram(600, 20, 1000, 100, 8, 40, 7, 200).jitter.join(','),
+     jit.jitter.join(','), 'the same seed draws the same histogram');
+  eq(backoffHistogram(600, 20, 1000, 100, 8, 40, 8, 200).jitter.join(',') === jit.jitter.join(','),
+     false, 'and a different seed does not');
+  eq(perSecond(jit.jitter, 200).length <= 40, true, 'the per-second fold covers the horizon');
+  eq(totalOf(perSecond(jit.jitter, 200)), totalOf(jit.jitter), 'and loses no retries');
+
+  /* --- L11: shedding against collapse ------------------------------------- */
+  const capacity = R(1000n, 1n);
+  eq(Rtext(goodputShed(R(2000n, 1n), capacity, R(900n, 1n))), '900',
+     'shedding above 90% of capacity delivers 900 rps at twice the load');
+  eq(Rtext(goodputUnshed(R(2000n, 1n), capacity)), '500', 'not shedding delivers 500');
+  eq(Rcmp(goodputShed(R(2000n, 1n), capacity, R(900n, 1n)),
+          goodputUnshed(R(2000n, 1n), capacity)) > 0, true,
+     'so rejecting requests served MORE users than accepting them');
+  eq(Rtext(goodputUnshed(capacity, capacity)), '1000', 'the collapse model is continuous at the knee');
+  eq(Rtext(goodputUnshed(R(500n, 1n), capacity)), '500', 'and is the offered load below it');
+  eq(Rtext(goodputShed(R(500n, 1n), capacity, R(900n, 1n))), '500',
+     'a shedder under its threshold sheds nothing');
+  eq(Rtext(rejectedFraction(R(2000n, 1n), R(900n, 1n))), '11/20', 'and rejects 55% at twice capacity');
+  eq(Rtext(rejectedFraction(R(500n, 1n), R(900n, 1n))), '0', 'nothing at all below it');
+  /* A threshold set above capacity is not a shedder: what it admits collapses
+     exactly as the unshed arm does, which is the failure mode of a limit copied
+     from the load generator rather than measured from the service. */
+  eq(Rtext(goodputShed(R(2000n, 1n), capacity, R(1200n, 1n))),
+     Rtext(goodputUnshed(R(1200n, 1n), capacity)), 'a threshold above capacity sheds into collapse');
+  eq(Rtext(goodputShed(R(2000n, 1n), capacity, R(1200n, 1n))), '2500/3',
+     'and delivers less than a threshold at 90% would');
+  eq(Rtext(admittedLoad(R(2000n, 1n), R(900n, 1n))), '900', 'the shedder admits the threshold');
+  eq(Rtext(admittedLoad(R(500n, 1n), R(900n, 1n))), '500', 'or the offered load, whichever is smaller');
+  eq(Rtext(Rdiv(admittedLoad(R(2000n, 1n), R(900n, 1n)), capacity)), '9/10',
+     'so utilisation under the shedder is the ADMITTED load over capacity, not the goodput');
+
+  /* --- L12: durability, the one approximation ----------------------------- */
+  /* The exact fraction of the first-order formula, which is what the page
+     prints beside the float so that the reader can see WHICH part rounds. */
+  eq(Rtext(durabilityLossExact(3, R(1n, 50n), R(24n, 1n))), '3/8326562500',
+     'three copies, 2% a year, a 24 h repair window');
+  near(durabilityLossApprox(3, R(1n, 50n), R(24n, 1n)), 3.6029e-10, 1e-14,
+     'and the float agrees with it');
+  near(durabilityLossApprox(3, R(1n, 50n), R(24n, 1n)),
+       Number(durabilityLossExact(3, R(1n, 50n), R(24n, 1n)).n)
+       / Number(durabilityLossExact(3, R(1n, 50n), R(24n, 1n)).d), 1e-20,
+       'the rounding is in the MODEL, not in the division');
+  /* THE IDENTITY: halving the window divides by 2^(N-1), not by two. This is
+     the lesson's "R matters as much as f", and it is exact. */
+  for (const n of [2, 3, 4, 6]) {
+    eq(Rtext(Rdiv(durabilityLossExact(n, R(1n, 50n), R(24n, 1n)),
+                  durabilityLossExact(n, R(1n, 50n), R(12n, 1n)))), String(Math.pow(2, n - 1)),
+       'halving R divides the loss probability by 2^(N-1) at N = ' + n);
+  }
+  /* "Three copies is three times the durability" is false: it is a factorial
+     times the Nth power of the failure rate. */
+  eq(Rtext(Rdiv(durabilityLossExact(1, R(1n, 50n), R(24n, 1n)),
+                durabilityLossExact(3, R(1n, 50n), R(24n, 1n)))),
+     Rtext(Rdiv(R(1n, 1n), Rmul(R(6n, 1n), Rmul(Rpow(R(1n, 50n), 2), Rpow(R(1n, 365n), 2))))),
+     'a third copy is worth f^2 R^2 times a factorial, not a factor of three');
+  eq(Rtext(durabilityLossExact(1, R(1n, 50n), R(24n, 1n))), '1/50',
+     'and one copy is just the failure rate');
+  /* The truncation itself: the first-order term stands in for 1 - e^-x, and
+     the page shows the gap rather than claiming there is none. */
+  const gap = truncationGap(2 * 0.02 * 24 / 8760);
+  eq(gap.first > gap.exact, true, 'the first-order term overstates 1 - e^-x');
+  near((gap.first - gap.exact) / gap.first, 5.48e-5, 1e-6, 'here by 0.0055%');
+
+  /* --- L13: shuffle sharding, exactly ------------------------------------- */
+  eq(String(comb(16, 2)), '120', 'sixteen nodes, two each, is 120 shards');
+  eq(Rtext(shuffleDisjoint(16, 2)), '91/120', 'two tenants share no node 91 times in 120');
+  eq(Rtext(shuffleIdentical(16, 2)), '1/120', 'and hold the identical set once');
+  eq(Rtext(shuffleOverlap(16, 2, 1)), '7/30', 'overlapping in exactly one is the rest');
+  /* THE IDENTITY: the overlap distribution is a distribution. This is
+     Vandermonde, and a wrong coefficient anywhere breaks it. */
+  for (const [n, k] of [[16, 2], [8, 3], [40, 8], [10, 5], [6, 1], [5, 3]]) {
+    let s = R(0n, 1n);
+    for (let j = 0; j <= k; j += 1) s = Radd(s, shuffleOverlap(n, k, j));
+    eq(Rtext(s), '1', 'the overlap terms sum to one at n = ' + n + ', k = ' + k);
+  }
+  /* Where a disjoint pair is impossible the probability must be zero, not
+     small: with k > n/2 there are not enough nodes left to miss you. */
+  eq(Rtext(shuffleDisjoint(5, 3)), '0', 'with 3 of 5 nodes, no second tenant can miss you');
+  eq(Rtext(shuffleIdentical(5, 3)), '1/10', 'and one pairing in ten is identical');
+  eq(Rtext(blastFraction(16, 2)), '1/8', 'one bad node degrades an eighth of the tenants');
+  /* The sample assignment is drawn from the same seeded stream the page uses,
+     so what it shows and what it claims come from one run. */
+  const sets = shuffleAssign(16, 2, 12, 3);
+  eq(sets.length, 12, 'twelve tenants drawn');
+  eq(sets.every((s) => s.length === 2), true, 'each holding exactly k nodes');
+  eq(sets.every((s) => s[0] !== s[1]), true, 'and never the same node twice');
+  eq(sets.every((s) => s.every((v) => v >= 0 && v < 16)), true, 'all inside the fleet');
+  eq(shuffleAssign(16, 2, 12, 3).join('|'), sets.join('|'), 'the same seed draws the same assignment');
+  eq(shuffleAssign(16, 2, 12, 4).join('|') === sets.join('|'), false, 'a different seed does not');
+  eq(identicalCount([[1, 2], [1, 2], [3, 4]]), 1, 'one tenant holds the exact set of the first');
+  eq(disjointCount([[1, 2], [1, 2], [3, 4]]), 1, 'and one shares nothing with it');
 }
 
 if (fails) {
