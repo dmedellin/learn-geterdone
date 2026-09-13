@@ -1803,7 +1803,7 @@ def _budget(cfg):
     s += '<line x1="' + sx + '" y1="20" x2="' + sx + '" y2="86" stroke="var(--amber)" stroke-width="2.5" />'
       + '<text x="' + Math.max(12, Math.min(sx - 60, 390)) + '" y="16" font-size="10" fill="var(--amber)" '
       + 'font-weight="700">SLO = ' + slo + ' ms</text>'
-      + '<text x="12" y="104" font-size="10" fill="var(--muted)">grey: the floors from lessons 2 and 3. '
+      + '<text x="12" y="104" font-size="10" fill="var(--muted)">grey: the speed-of-light and round-trip floors. '
       + 'The bar past the amber line is the part that does not fit.</text>'
       + '<text x="12" y="126" font-size="10" fill="var(--muted)">even share of what is left: '
       + Rfixed(plan.share, 2) + ' ms per stage</text>'

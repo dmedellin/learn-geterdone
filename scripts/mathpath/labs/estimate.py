@@ -1645,7 +1645,7 @@ MACHINES_SCRIPT = r"""
       + '<span class="tone-red">Sizing at 100% would have said ' + res.nFull + '</span>, which is '
       + (res.nFull === res.n ? 'the same answer here and is still the wrong reasoning'
          : (res.n - res.nFull) + ' fewer machines and no room for a failure, a deploy or a bad afternoon')
-      + '. The ' + rhoPct + '% is taken as given on this course; course 3 is where it is earned, and the knee '
+      + '. The ' + rhoPct + '% is taken as given on this course; “Queues and Utilisation” is where it is earned, and the knee '
       + 'in the queueing curve is the reason it is not 95%.';
   }
 
@@ -1813,7 +1813,7 @@ WORKINGSET_SCRIPT = r"""
       + ' <span class="tone-red">Caching is not all-or-nothing</span>: the curve between "cache nothing" and '
       + '"cache everything" is where every real system lives, and the knee at ('
       + Rtext(hot) + ', ' + Rtext(share) + ') is the whole reason a small cache is worth having. '
-      + 'The hot fraction here is STATED; course 4 lesson 4 replaces it with the Zipf curve, which derives '
+      + 'The hot fraction here is STATED; “Cache Size and Hit Rate” replaces it with the Zipf curve, which derives '
       + 'the same shape from a popularity exponent instead of asserting it.';
   }
 
@@ -2020,7 +2020,7 @@ TRIANGULATE_SCRIPT = r"""
     status.innerHTML = 'Route A says <strong>' + showR(totalA, 2) + '</strong> ' + st.p.quantity
       + ', route B says <strong>' + showR(totalB, 2) + '</strong>, and the ratio is <strong>'
       + (ratio === null ? '—' : Rtext(ratio)) + '</strong> — exact, a quotient of two products of '
-      + 'exact fractions. Lesson 1’s factors gave an interval ÷' + Rtext(k) + ' … ×'
+      + 'exact fractions. The factors in “Orders of Magnitude” gave an interval ÷' + Rtext(k) + ' … ×'
       + Rtext(k) + ' wide, and the ratio '
       + (inside ? '<span class="tone-green">lies inside it</span>' : '<span class="tone-red">lies outside it</span>')
       + '. ' + (shareNames.length
@@ -2055,7 +2055,7 @@ def _triangulate(cfg):
             "and whether their agreement means anything",
             _swatch("tone-cyan", "inside the band")
             + _swatch("tone-red", "a factor both routes share")
-            + _swatch("tone-green", "the band lesson 1 gave"),
+            + _swatch("tone-green", "the band “Orders of Magnitude” gave"),
         )
         + '      <div class="lab-stage" id="tgStage" tabindex="0" role="region" aria-label="Two factor chains and the ratio between their answers.">\n'
         '        <div class="grid-2">\n'

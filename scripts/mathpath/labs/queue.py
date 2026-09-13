@@ -2576,7 +2576,7 @@ def _finite(cfg):
         )
         + _hint(
             "fiHint",
-            "The rate that crosses into a lossy system is the <em>admitted</em> one. Lesson 2 "
+            "The rate that crosses into a lossy system is the <em>admitted</em> one. “Little’s Law from a Trace” "
             "proved L = &lambda;W on a trace of arrivals that actually entered; feed it the offered "
             "rate instead and you get a W that is too small by exactly the factor "
             "(1 &minus; &pi;<sub>K</sub>). Both are printed below so the size of that mistake is "
@@ -2674,7 +2674,7 @@ def _finite(cfg):
             + 'the excess leaves as loss instead of as backlog. '
           : '')
       + '<span class="tone-red">Now the error this lesson exists for.</span> W = L/&lambda; gives '
-      + Rshort(wrongW, 4) + ', and it is wrong. Lesson 2 proved L = &lambda;W by counting customers '
+      + Rshort(wrongW, 4) + ', and it is wrong. “Little’s Law from a Trace” proved L = &lambda;W by counting customers '
       + 'that entered the system; here ' + Rpct(f.blocking, 3) + ' of them never did. The rate that '
       + 'crosses the boundary is &lambda;(1 &minus; &pi;<sub>K</sub>) = ' + Rshort(f.lamEff, 5)
       + ', so the true W is <strong>' + Rshort(f.W, 4) + '</strong> &mdash; larger by exactly '

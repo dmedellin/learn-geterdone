@@ -724,7 +724,7 @@ def _hitrate_load(cfg):
       + Rtext(rho) + ' of its ' + groupNum(cap) + ' rps capacity'
       + (q.stable
           ? ' &mdash; a mean wait of <strong>' + Rshow(Rmul(q.W, R(1000n, 1n)), 2)
-            + ' ms</strong> by the M/M/1 result of course 3.'
+            + ' ms</strong> by the M/M/1 result from Queues and Utilisation.'
           : ' &mdash; past 1, so the backlog grows without bound and there is no mean wait to quote.')
       + ' Moving h from 90% to 99% does not make the backend 9% happier: it divides its load by '
       + '<strong>' + Rtext(ten) + '</strong>, because the quantity that moved is the miss rate, '
@@ -1277,7 +1277,7 @@ def _size(cfg):
         )
         + _hint(
             "szHint",
-            "This replaces the stated hot fraction of course 1 lesson 9. There the working set was "
+            "This replaces the stated hot fraction of “Memory and the Working Set”. There it was "
             "given as a percentage; here it comes out of the skew, and the curve shows why the "
             "number was never proportional to the cache size.",
         )
@@ -1961,7 +1961,7 @@ def _stampede(cfg):
         script=script,
         panel_title="Set the key's rate and the miss window",
         panel_intro="The burst is &lambda;&middot;d, computed from the rate and the window you set, "
-        "and drawn against the backend capacity course 3 sized.",
+        "and drawn against the backend capacity Queues and Utilisation sized.",
     )
 
 
