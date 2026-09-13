@@ -906,8 +906,10 @@ def _banner(cid):
 # when N does -- which is the whole point of both lessons.
 _REPLY_PMF = "2:600, 4:300, 8:70, 16:22, 24:6, 40:2"
 
-# The follower-lag distribution of L3. Its mean is 33.7 ms and a fifth of the
-# mass is above that, which is the lesson.
+# The follower-lag distribution of the stale-reads lesson. Its mean is
+# 629/20 = 31.45 ms and a fifth of the mass is above that, which is the
+# lesson. (The comment said 33.7 until someone checked it against the lab,
+# which had been printing 31.45 all along.)
 _LAG_PMF = "10:500, 25:300, 50:120, 120:60, 250:15, 400:5"
 
 # The message diagram L9 and L10 share, so that the two lessons stamp the same
@@ -1462,7 +1464,8 @@ def _quorum(cfg):
             "Every C(N, R) read set is checked against every C(N, W) write set, so the minimum "
             "below is measured rather than argued. Overlap makes a read <em>able</em> to see the "
             "latest acknowledged write. It does not make the system linearizable &mdash; that "
-            "needs an order on the operations, and it is lesson 12&rsquo;s business.",
+            "needs an order on the operations, and it is the business of "
+            "&ldquo;Linearizability by Enumeration&rdquo;.",
         )
     )
 
@@ -1566,7 +1569,8 @@ def _quorum(cfg):
             + ', so a disjoint pair exists and the picture above is one of ' + group(scan.disjoint) + '.')
       + '</text>'
       + '<text x="30" y="' + (116 + cell) + '" font-size="10" fill="var(--muted)">'
-      + 'Overlap says a read CAN see the newest acknowledged write. Lesson 12 is about whether the '
+      + 'Overlap says a read CAN see the newest acknowledged write. &ldquo;Linearizability by '
+      + 'Enumeration&rdquo; is about whether the '
       + 'operations have an order at all.</text>';
     grid.innerHTML = s;
 
@@ -1587,7 +1591,7 @@ def _quorum(cfg):
       + ' <span class="tone-purple">Overlap is not linearizability.</span> It guarantees the read '
       + 'TOUCHES a replica that holds the newest acknowledged write; it does not order two '
       + 'concurrent writes, and it does not stop a read that started later from returning an older '
-      + 'value than one that started earlier. That is lesson 12, and it is a different and harder '
+      + 'value than one that started earlier. That is linearizability, and it is a different and harder '
       + 'question than this one.';
   }
 
@@ -1655,7 +1659,7 @@ def _quorumlat(cfg):
         )
         + _hint(
             "qlHint",
-            "The tail is availKofN &mdash; the same sum course 5 uses for a k-of-n availability, at "
+            "The tail is availKofN &mdash; the same sum Availability and Failure uses for a k-of-n availability, at "
             "success probability F(t). Watch the p99 column as N rises with W held still: more "
             "replicas give the quorum more chances to be met early, so the write gets faster.",
         )
@@ -2010,7 +2014,7 @@ def _majority(cfg):
         )
         + _hint(
             "mjHint",
-            "The availability is the k-of-n binomial tail of course 5, at k = the majority. Read the "
+            "The availability is the k-of-n binomial tail of Availability and Failure, at k = the majority. Read the "
             "table down the even rows: each of them tolerates exactly what the odd row above it "
             "tolerates, and is available <em>less</em> often, because the majority grew by one and "
             "the fleet grew by one too.",
@@ -2486,7 +2490,7 @@ def _lamport(cfg):
             + 'the diagram. They are concurrent: no chain of process edges and messages joins them '
             + 'in either direction. A smaller stamp means nothing on its own, and a system that '
             + 'resolved a conflict by comparing Lamport stamps would pick a winner between these '
-            + 'two for no reason at all. Lesson 10 is the clock that can tell.'
+            + 'two for no reason at all. &ldquo;Vector Clocks and Concurrency&rdquo; is the clock that can tell.'
           : 'On THIS diagram there happens to be no such pair &mdash; every pair of events is '
             + 'causally ordered, so the total order the stamps give is the causal order. Add a '
             + 'process, or remove a message, and the counterexample appears: the property is a '
@@ -2640,7 +2644,7 @@ def _vector(cfg):
     pairsT.innerHTML = '<thead><tr><th>event</th><th>event</th><th>why neither precedes the other</th>'
       + '<th>Lamport stamps</th></tr></thead><tbody>' + prow + '</tbody><tfoot><tr>'
       + '<td colspan="4" class="small-copy">Each of these is a write that could conflict with the '
-      + 'other, and a merge has to decide between them. Lesson 13 counts what each way of deciding '
+      + 'other, and a merge has to decide between them. &ldquo;Conflict Resolution, Counted&rdquo; counts what each way of deciding '
       + 'throws away.</td></tr></tfoot>';
 
     status.innerHTML = 'The diagram has ' + events.length + ' events and ' + total
@@ -2652,12 +2656,12 @@ def _vector(cfg):
             + 'vector dominates the other, so no chain of process steps and messages joins them, so '
             + 'neither happened before the other. Their Lamport stamps are ' + L[conc[0][0]]
             + ' and ' + L[conc[0][1]] + ' &mdash; a single number cannot say "incomparable", which '
-            + 'is why lesson 9&rsquo;s clock reported an order that is not there.'
+            + 'is why the Lamport clock reported an order that is not there.'
           : 'On this diagram nothing is concurrent, so a Lamport stamp would have been enough. '
             + 'Delete a message and watch the count rise.')
       + ' <span class="tone-purple">Concurrent does not mean simultaneous.</span> It is a statement '
       + 'about reachability in this graph and says nothing about wall-clock time &mdash; which is '
-      + 'lesson 11&rsquo;s subject, and a different kind of uncertainty entirely.';
+      + 'the subject of &ldquo;Physical Clocks and Drift&rdquo;, and a different kind of uncertainty entirely.';
   }
 
   /* The two components that make the pair incomparable: one where a leads and

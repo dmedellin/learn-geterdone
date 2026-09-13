@@ -1601,7 +1601,7 @@ def _lsm(cfg):
             + 'height is: multiply F in until the capacity reaches the data. ')
       + 'Read amplification is <strong>' + Rtext(ra)
       + '</strong> before filters, because a key that is not there has to be looked for on every '
-      + 'level. That number is what course 8 L6 cancels, and it is the reason that lesson is a '
+      + 'level. That number is what &ldquo;Bloom Filters: Bits per Key&rdquo; cancels, and it is the reason that lesson is a '
       + 'lesson rather than a paragraph: "append-only, therefore cheap" is wrong on both axes at '
       + 'once, and only one of them can be bought back.';
   }

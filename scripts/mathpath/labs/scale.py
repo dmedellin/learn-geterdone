@@ -1814,7 +1814,7 @@ VERTICAL_SCRIPT = r"""
       + ' — ' + st.t + '× a node — horizontal needs <strong>'
       + (N === null ? 'more nodes than exist' : N + ' nodes, not ' + st.t)
       + '</strong>, because N machines deliver N/(1 + α(N&minus;1)) machines’ worth, not N. '
-      + 'That is the Universal Scalability Law’s contention term with β = 0, the same one lesson 2 '
+      + 'That is the Universal Scalability Law’s contention term with β = 0, the same one that lesson '
       + 'draws, and it puts a ceiling of ' + (Rzero(st.alpha) ? 'none' : Rnice(Rinv(st.alpha), 1) + '×')
       + ' on the fleet itself. '
       + (hCost === null ? '' : 'That costs <strong>' + money(hCost) + '</strong> a month. ')
@@ -1831,7 +1831,7 @@ VERTICAL_SCRIPT = r"""
             + '</strong> does it never lose again. The gap between those two numbers is the price of '
             + '“buy the next size up”.')
       + ' And the single box has no parallel path at all: one machine is one failure domain, '
-      + 'which course 5 lesson 4 has already priced and this page does not repeat.';
+      + 'which &ldquo;Parallel: Redundancy&rdquo; has already priced and this page does not repeat.';
   }
 
   ['vtT', 'vtM', 'vtA', 'vtN', 'vtB'].forEach(function (id) {
@@ -1888,7 +1888,7 @@ def _vertical(cfg):
         panel_title=cfg.get("panel_title", "Price a target capacity both ways"),
         panel_intro=cfg.get(
             "panel_intro",
-            "The node count comes from the same contention term lesson 2 draws, so the two pages "
+            "The node count comes from the same contention term the Universal Scalability Law draws, so the two pages "
             "cannot disagree about what a fleet delivers. Both prices are exact, and the crossing "
             "is reported twice — the first target horizontal wins at, and the target past which "
             "it never loses again.",
@@ -1902,7 +1902,7 @@ def _vertical(cfg):
 WASTE_PRESETS = [
     {
         "key": "consumer-evening",
-        "label": "course 1's consumer profile: one evening peak at 21:00, 250 rps a point",
+        "label": "the consumer profile of “Peak to Average”: one evening peak at 21:00, 250 rps a point",
         "shape": "evening", "hour": 21, "amp": 6, "base": 250, "rho": 70,
         "what": "a consumer app",
     },
@@ -2036,7 +2036,7 @@ WASTE_SCRIPT = r"""
       + ' rps you actually use leaves <strong>' + cut.hours + ' of the 24 hours</strong> over capacity, '
       + 'the worst by ' + Rnice(cut.worst, 0) + ' rps — and at the peak hour ρ would be '
       + (worstRho === null ? '—' : Rshort(worstRho, 3))
-      + ', which course 3 says is not a busy queue but no steady state at all. '
+      + ', which Queues and Utilisation says is not a busy queue but no steady state at all. '
       + 'The only profile with no waste is a flat one, and the way to flatten a profile is to put '
       + 'work on it that does not care when it runs.';
   }
@@ -2514,7 +2514,7 @@ AUTOSCALE_SCRIPT = r"""
             + ' assumes no reserve and a ramp longer than the boot; the area above is the general case.)')
       + ' At the worst instant λ = ' + Rnice(dem, 0) + ' rps against μ = ' + Rnice(cap, 0)
       + ' rps in service, so <strong>ρ = ' + (rho === null ? '—' : Rshort(rho, 4))
-      + '</strong> — the same λ/μ course 3 defines, and '
+      + '</strong> — the same λ/μ Queues and Utilisation defines, and '
       + (rho !== null && Rcmp(rho, R(1n, 1n)) >= 0
           ? '<span class="tone-red">above 1 there is no steady state at all</span>: the backlog grows at '
             + 'λ−μ = ' + Rnice(growth, 0) + ' requests a second, which is what the shaded '
@@ -2587,7 +2587,7 @@ def _autoscale(cfg):
             "panel_intro",
             "The shortfall is the exact area between demand and the capacity actually in service, "
             "and r·τ·(D − τ/2) is printed beside it as the check. ρ is "
-            "λ/μ — course 3's definition, not a second one — so the same two "
+            "λ/μ — the definition of Queues and Utilisation, not a second one — so the same two "
             "consequences apply: above 1 the backlog grows at λ−μ, and below it the "
             "response time multiplier is 1/(1−ρ).",
         ),
@@ -3695,7 +3695,7 @@ HEADROOM_SCRIPT = r"""
     status.innerHTML = 'With ' + st.n + ' machines at ' + Rnice(st.cap, 0) + ' rps each, ' + st.p.what
       + ' carries ' + Rnice(st.lam, 0) + ' rps at <strong>ρ = '
       + (rho === null ? '—' : Rshort(rho, 4)) + '</strong> — λ over μ, the same '
-      + 'definition course 3 gives, with μ the capacity actually in service. '
+      + 'definition Queues and Utilisation gives, with μ the capacity actually in service. '
       + 'Lose ' + st.lost + ' of the ' + st.n + ' and μ falls to <strong>' + Rtext(frac)
       + '</strong> of nameplate, so ρ is <em>multiplied</em> by N/(N−f) = '
       + Rtext(Rinv(frac)) + ' and becomes <strong>'
@@ -3707,7 +3707,7 @@ HEADROOM_SCRIPT = r"""
             + ' requests a second, and 1/(1−ρ) is not a number any more. '
           : 'Response time goes from ' + (before === null ? '—' : Rnice(before, 2) + '×')
             + ' the service time to ' + (factorAfter === null ? '—' : Rnice(factorAfter, 2) + '×')
-            + ' — course 3 lesson 8’s 1/(1−ρ), the same hyperbola. ')
+            + ' — the 1/(1−ρ) of &ldquo;The Knee: Response Time vs Utilisation&rdquo;, the same hyperbola. ')
       + '<span class="tone-amber">Running at ρ = 0.9 leaves nothing for a failure</span>, and '
       + 'the number that actually matters is N−1 capacity: <strong>(N−1)/N = '
       + Rtext(survivingFraction(st.n, 1)) + '</strong> of nameplate, which on three machines is two '
@@ -3776,7 +3776,7 @@ def _headroom(cfg):
         panel_title=cfg.get("panel_title", "Size the fleet against the failure you expect"),
         panel_intro=cfg.get(
             "panel_intro",
-            "ρ is λ/μ — course 3's definition — with μ the capacity "
+            "ρ is λ/μ — the definition of Queues and Utilisation — with μ the capacity "
             "actually in service, so losing f of N multiplies it by N/(N−f) exactly. The machine "
             "count that holds a target is found by a scan and by rearranging the inequality, and the "
             "two integers must agree.",
