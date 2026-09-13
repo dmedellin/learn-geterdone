@@ -2102,7 +2102,7 @@ def _fsync(cfg):
         )
         + _hint(
             "fsHint",
-            "The queue here is course 3's M/M/1 reused, not a second model: batches arrive at "
+            "The queue here is the M/M/1 of Queues and Utilisation, reused rather than a second model: batches arrive at "
             "&lambda;/B and the one thread that fsyncs serves them at 1/t. At B = 1 that queue is "
             "unstable whenever &lambda; exceeds 1/t, which is the cap arriving as a queueing fact "
             "rather than as an assertion.",
@@ -2517,7 +2517,7 @@ def _workingset(cfg):
 
     markup = (
         _toolbar(
-            "The page cache is course 4's cache",
+            "The page cache is the cache of Caching and Hit Rates",
             "h = H(C,s)/H(N,s), and the disk still sees (1 &minus; h) &times; reads",
             [
                 ("cyan", "pages memory holds"),
@@ -2554,7 +2554,7 @@ def _workingset(cfg):
         )
         + _hint(
             "wsHint",
-            "This calls zipfHit in sysdesign_core.py &mdash; the same function course 4's cache "
+            "This calls zipfHit in sysdesign_core.py &mdash; the same function the Caching and Hit Rates "
             "lab calls, not a second copy, so the two courses cannot drift apart. s is the Zipf "
             "exponent and nothing else on this path is called s.",
         )
@@ -2729,7 +2729,7 @@ def _workingset(cfg):
         controls=controls,
         script=script,
         panel_title="Set the memory, the dataset and the skew",
-        panel_intro="The hit rate is H(C,s)/H(N,s) with C and N in pages &mdash; course 4's "
+        panel_intro="The hit rate is H(C,s)/H(N,s) with C and N in pages &mdash; the Caching and Hit Rates "
         "formula, called through the same shared function &mdash; and the disk IOPS are "
         "(1 &minus; h) &times; the read rate.",
     )
