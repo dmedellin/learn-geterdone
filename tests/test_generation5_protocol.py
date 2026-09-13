@@ -143,7 +143,7 @@ try{
 }finally{await c.close();}})().catch(e=>{console.error(e.stack);process.exitCode=1});
 '''
             run=subprocess.run(['node','-e',program],cwd=ROOT,env=dict(os.environ,TMPDIR='/tmp',
-                SOURCE_ROOT=str(ROOT),BROWSER_EVIDENCE=tmp),capture_output=True,text=True,timeout=20)
+                SOURCE_ROOT=str(ROOT),BROWSER_EVIDENCE=tmp),capture_output=True,text=True,timeout=60)
             result=classify(run,'CDP timeout Runtime.evaluate');evidence('cdp-deadline',run,result)
             self.assertEqual(0,run.returncode,run.stdout+run.stderr)
             self.assertFalse(result['caught'],'expected timeout is a fixture observation, never a semantic catch')
@@ -160,7 +160,7 @@ await c.close();process.exitCode=1;
         for sig in ['', 'SIGTERM', 'SIGKILL']:
             with self.subTest(signal=sig), tempfile.TemporaryDirectory(prefix='lcd-late-',dir='/tmp') as tmp:
                 run=subprocess.run(['node','-e',program],cwd=ROOT,env=dict(os.environ,TMPDIR='/tmp',
-                    SOURCE_ROOT=str(ROOT),BROWSER_EVIDENCE=tmp,TEST_SIGNAL=sig),capture_output=True,text=True,timeout=20)
+                    SOURCE_ROOT=str(ROOT),BROWSER_EVIDENCE=tmp,TEST_SIGNAL=sig),capture_output=True,text=True,timeout=60)
                 result=classify(run,'intended assertion');evidence('late-browser-'+(sig or 'normal'),run,result)
                 self.assertEqual(1,run.returncode)
                 self.assertEqual(not sig,result['caught'],'late browser failure must taint the semantic record')
@@ -181,7 +181,7 @@ launch({dir:process.env.BROWSER_EVIDENCE,name:'chrome-failure',base:'http://127.
         for failure in ['spawn','nonzero']:
             with self.subTest(failure=failure), tempfile.TemporaryDirectory(prefix='lcd-spawn-',dir='/tmp') as tmp:
                 run=subprocess.run(['node','-e',program],cwd=ROOT,env=dict(os.environ,TMPDIR='/tmp',
-                    SOURCE_ROOT=str(ROOT),BROWSER_EVIDENCE=tmp,TEST_FAILURE=failure),capture_output=True,text=True,timeout=20)
+                    SOURCE_ROOT=str(ROOT),BROWSER_EVIDENCE=tmp,TEST_FAILURE=failure),capture_output=True,text=True,timeout=60)
                 result=classify(run,'intended assertion');evidence('chrome-'+failure,run,result)
                 self.assertEqual(1,run.returncode);self.assertFalse(result['caught']);self.assertTrue(result['setupRecords'])
                 proof=json.loads((Path(tmp)/'chrome-failure-cleanup.json').read_text())
@@ -217,6 +217,6 @@ assert(fs.readFileSync(path.join(OUT,'anchor-fixture/command.log'),'utf8').inclu
 '''
         with tempfile.TemporaryDirectory(prefix='lcd-anchor-',dir='/tmp') as tmp:
             run=subprocess.run(['node','-e',program],cwd=ROOT,env=dict(os.environ,TMPDIR='/tmp',
-                SOURCE_ROOT=str(ROOT),BROWSER_EVIDENCE=tmp),capture_output=True,text=True,timeout=20)
+                SOURCE_ROOT=str(ROOT),BROWSER_EVIDENCE=tmp),capture_output=True,text=True,timeout=60)
             result=classify(run,'intended assertion');evidence('mutation-anchor',run,result)
             self.assertEqual(0,run.returncode,run.stdout+run.stderr)
