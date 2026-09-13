@@ -426,7 +426,7 @@ LESSONS = [
              "about whether solutions exist."),
         ],
         "standard": ("Finish when factoring is a first attempt you abandon quickly.",
-                     'You should reach standard form without thinking, spend a few seconds looking for an integer factorisation, and move to “Completing the Square” or 5 without regret when none appears. Every answer checked in the original equation, and a repeated factor reported as one solution.'),
+                     'You should reach standard form without thinking, spend a few seconds looking for an integer factorisation, and move to “Completing the Square” or “The Quadratic Formula” without regret when none appears. Every answer checked in the original equation, and a repeated factor reported as one solution.'),
         "note": 'Factoring is the fastest method and the least reliable, because it works only when the coefficients were chosen to let it. “The Square Root Property”, “Completing the Square” and “The Quadratic Formula” remove the condition a piece at a time: the square root property handles anything with no `x` term, completing the square handles everything, and the formula is completing the square carried out once and kept.',
     },
     # ---------------------------------------------------------------- 03
