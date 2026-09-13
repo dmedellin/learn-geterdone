@@ -12,7 +12,9 @@ COURSE = {
         "Several equations at once, and the array that makes solving them mechanical: substitution, elimination, three-variable systems, row operations, Gaussian elimination, matrix arithmetic, determinants, inverses, and linear programming."
     ),
     "blurb": (
-        "Solve for several unknowns together, then find the notation that removes the bookkeeping. A matrix is elimination with the letters deleted, which is why this course does elimination by hand first and only then writes it down as rows."
+        (
+        'Solve for several unknowns together, then find the notation that removes the bookkeeping. A matrix is elimination with the letters deleted, which is why this course does elimination by hand first and only then writes it down as rows.'
+    )
     ),
     "key": [
         "one solution, none, or infinitely many  —  and nothing else",
@@ -20,7 +22,7 @@ COURSE = {
         "det A = 0   ⟺   A has no inverse",
         "the optimum of a linear objective sits at a corner",
     ],
-    "assumes_short": "Courses 1\u20137",
+    "assumes_short": "Linear equations and functions",
     "assumes_long": "lines, functions, and exact fraction arithmetic",
     "outcomes_intro": (
         "By the end you can choose and carry out an exact method for the two- and "
@@ -38,10 +40,7 @@ COURSE = {
          "Build a closed, bounded feasible region, solve boundary pairs for its corners, reject infeasible crossings, and compare an objective at the surviving corners."),
     ],
     "syllabus_intro": (
-        "Lessons 1 to 4 classify and solve systems by hand. Lessons 5 to 7 turn "
-        "that work into row operations, reduction and matrix products; lessons 8 "
-        "and 9 add determinants and inverses. Lesson 10 returns to two-variable "
-        "systems to optimise over a bounded feasible region."
+        'Systems are classified and solved by hand first. That work is then turned into row operations, reduction and matrix products; determinants and inverses are added next. “Systems of Inequalities and Linear Programming” returns to two-variable systems to optimise over a bounded feasible region.'
     ),
     "how_to": [
         "After each complete example, cover its answer and finish the faded rehearsal. The first decision is supplied; the remaining elimination, row operation, classification and check are yours.",

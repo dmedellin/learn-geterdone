@@ -187,7 +187,7 @@ def probability_lab(cfg):
       if (a && b) nAB += 1;
       var style = a && b ? 'border-color:var(--green);color:var(--green);'
         : a ? 'border-color:var(--cyan);color:var(--cyan);'
-        : b ? 'border-color:var(--purple);color:var(--purple);' : 'opacity:0.5;';
+        : b ? 'border-color:var(--purple);color:var(--purple);' : 'color:var(--text);border-style:dashed;';
       return '<span class="chip" style="' + style + '">' + exp.label(o) + '</span>';
     });
     space.innerHTML = cells.join('');
@@ -579,7 +579,7 @@ def bayes_lab(cfg):
     s += '<rect x="0" y="34" width="' + Math.max(2, wTP) + '" height="40" rx="3" fill="var(--green)" opacity="0.9" />';
     s += '<rect x="' + wTP + '" y="34" width="' + Math.max(0, 520 - wTP) + '" height="40" rx="3" fill="var(--amber)" opacity="0.75" />';
     s += '<text x="0" y="100" font-size="11" fill="var(--green)" font-weight="700">' + grp(c.TP) + ' have the condition</text>';
-    s += '<text x="520" y="100" text-anchor="end" font-size="11" fill="var(--amber)" font-weight="700">' + grp(c.FP) + ' do not</text>';
+    s += '<text x="516" y="100" text-anchor="end" font-size="11" fill="var(--amber)" font-weight="700">' + grp(c.FP) + ' do not</text>';
     plot.innerHTML = s;
 
     table.innerHTML = '<thead><tr><th>of ' + grp(N) + ' people</th><th>people</th><th>test positive</th><th>test negative</th></tr></thead><tbody>'

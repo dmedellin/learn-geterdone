@@ -10,7 +10,9 @@ COURSE = {
         "Growth that compounds, and the function that undoes it: exponential functions and their graphs, decay, the number e, the logarithm as an inverse, the three laws, change of base, solving equations of both kinds, and the scales built on logarithms."
     ),
     "blurb": (
-        "The variable moves into the exponent, and ordinary algebra stops working. A logarithm is the tool that brings it back down &mdash; defined as an inverse, with three laws that are the exponent laws read backwards."
+        (
+        'The variable moves into the exponent, and ordinary algebra stops working. A logarithm is the tool that brings it back down &mdash; defined as an inverse, with three laws that are the exponent laws read backwards.'
+    )
     ),
     "key": [
         "log_b(x) = y   ⟺   b^y = x",
@@ -18,7 +20,7 @@ COURSE = {
         "log(M^p) = p·log M              the law that solves equations",
         "A = P·e^(rt)        e = 2.71828…",
     ],
-    "assumes_short": "Courses 1–6",
+    "assumes_short": "Functions and exponents",
     "assumes_long": "exponents, inverse functions, and graphing",
     "outcomes_intro": (
         "By the end you can model constant-ratio change, use logarithms as inverse "
@@ -42,7 +44,7 @@ COURSE = {
          "into a ratio."),
     ],
     "syllabus_intro": (
-        "Lessons 1 to 3 are exponential functions and `e`; 4 to 8 define the logarithm and its laws; 9 to 12 solve and apply."
+        'First exponential functions and `e`; then the definition of the logarithm and its laws; then solving and applying.'
     ),
     "how_to": [
         "After each complete worked example, cover its answer and do the faded "
@@ -58,7 +60,9 @@ COURSE = {
         "Curve fitting and regression on transformed data, which is a statistics topic.",
     ],
     "footer_lead": (
-        "Exponential and logarithmic values are irrational, so this is the one course on the path where the labs show rounded decimals &mdash; and they say where they rounded. The exact statements, the laws and the domains, are computed exactly and the rounding never enters them."
+        (
+        'Exponential and logarithmic values can be irrational, so this is the one course on the path where the labs show rounded decimals &mdash; and they say where they rounded. The exact statements, the laws and the domains, are computed exactly and the rounding never enters them.'
+    )
     ),
     "lessons": part_a.LESSONS + part_b.LESSONS,
 }

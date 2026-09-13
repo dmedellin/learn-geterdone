@@ -63,7 +63,7 @@ SHARED_JS = r"""
     var thead = (heads && heads.length)
       ? '<thead>' + rowOf(heads.map(function (h) { return '<th>' + h + '</th>'; })) + '</thead>'
       : '';
-    return '<div class="table-wrap"><table class="tt"><caption>' + caption + '</caption>'
+    return '<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>' + caption + '</caption>'
       + thead + '<tbody>' + rows.join('') + '</tbody></table></div>';
   }
   function chip(ok, text) { return '<span class="chip ' + (ok ? 'ok' : 'no') + '">' + text + '</span>'; }
@@ -1901,7 +1901,7 @@ def factoring_lab(cfg):
         + (Pdeg(p) % 2 === 1
           ? ' The odd-degree curve above still crosses the axis, so there IS a real root &mdash; an '
             + 'irrational one, and irrational roots are exactly the ones no amount of grouping will reveal.'
-          : ' At even degree this search does not decide whether the curve reaches the axis: Course 6 '
+          : ' At even degree this search does not decide whether the curve reaches the axis: Quadratics and Complex Numbers '
             + 'separates irrational real roots from complex ones.');
   }
 """
@@ -2029,7 +2029,7 @@ def factoring_lab(cfg):
             + 'looked for the middle coefficient of a MONIC trinomial, and this one is not monic.'),
         say('what follows', monic
           ? Ptext(p) + ' has no rational linear factor. Whether its non-rational zeros are real or '
-            + 'complex is a different question, taught with the quadratic formula in Course 6.'
+            + 'complex is a different question, taught with the quadratic formula in Quadratics and Complex Numbers.'
           : 'run the ac search on a*c = ' + Rtext(Rmul(a, c)) + '. It gives '
             + Pfactortextfull(p) + ', which is why this smaller c-only search was not evidence.')
       ]));
@@ -2055,7 +2055,7 @@ def factoring_lab(cfg):
         + '.</strong> ' + pairs.length + ' pair' + (pairs.length === 1 ? ' was' : 's were')
         + ' tried and every sum missed. '
         + (monic ? 'For a monic trinomial that is conclusive: it does not factor over the rationals, '
-                 + 'while Course 6 determines whether the remaining zeros are irrational or complex.'
+                 + 'while Quadratics and Complex Numbers determines whether the remaining zeros are irrational or complex.'
                  : 'With a = ' + Rtext(a) + ' this search was the wrong one to run: the ac method '
                  + 'searches for a product of a*c = ' + Rtext(Rmul(a, c)) + ' instead, and it finds '
                  + Ptext(p) + ' = ' + Pfactortextfull(p) + '.');
@@ -2165,7 +2165,7 @@ def factoring_lab(cfg):
           + 'the two middle products m = ru and n = st would obey m*n = (rt)(su) = a*c and '
           + 'm + n = ru + st = b. They would have appeared in the list above.'),
         say('the exact conclusion', Ptext(core) + ' has no factorisation into two binomials with '
-          + 'integer coefficients. Course 6 supplies the quadratic formula for classifying its '
+          + 'integer coefficients. Quadratics and Complex Numbers supplies the quadratic formula for classifying its '
           + 'non-rational zeros; this pair search does not need that later method.')
       ]));
     }
@@ -2186,7 +2186,7 @@ def factoring_lab(cfg):
         + 'All ' + pairs.length + ' were tried above. Any integer-coefficient binomial product would '
         + 'create one of those pairs from its two middle products, so ' + Ptext(core)
         + ' does not factor into integer-coefficient binomials. That is the exact scope of this '
-        + 'search; Course 6 classifies the roots that lie outside it.';
+        + 'search; Quadratics and Complex Numbers classifies the roots that lie outside it.';
   }
 """
 
@@ -2541,7 +2541,7 @@ def factoring_lab(cfg):
           + 'linear factor with rational coefficients')];
       if (Pdeg(leftover) === 2) {
         leftRows.push(say('is that final over the rationals?', 'yes: a quadratic that factors over '
-          + 'the rationals has a rational linear factor, and the search ruled every one out. Course 6 '
+          + 'the rationals has a rational linear factor, and the search ruled every one out. Quadratics and Complex Numbers '
           + 'then determines whether its two non-rational zeros are real or complex.'));
       } else if (Pdeg(leftover) === 3) {
         leftRows.push(say('is that final?', 'for a cubic, yes: a cubic that factors at all has a linear '
@@ -2575,7 +2575,7 @@ def factoring_lab(cfg):
             + 'would contain a linear factor. An odd-degree polynomial still has a real zero, so the '
             + 'curve crosses at an irrational value that no list of fractions could contain.'
           : (Pdeg(core) === 2
-            ? 'For degree 2 that also settles factorisation over the rationals. Course 6 determines '
+            ? 'For degree 2 that also settles factorisation over the rationals. Quadratics and Complex Numbers determines '
               + 'whether the remaining non-rational zeros are real or complex; this search does not.'
           : 'At degree ' + Pdeg(core) + ' that rules out linear factors but not a split into two '
             + 'quadratics, which this search does not test for.'));

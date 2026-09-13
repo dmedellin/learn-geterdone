@@ -32,10 +32,7 @@ LESSONS = [
              "That is the whole difference between an equation and an expression: "
              "`3x − 4` on its own has nothing to be true about."),
             ("A solution is a value that makes the statement true",
-             "It is not \"whatever comes out of the procedure\". The procedure is a fast "
-             "way of producing a candidate; substitution is what decides whether the "
-             "candidate is a solution. Those are two different jobs and later lessons "
-             "will produce candidates that fail."),
+             'It is not "whatever comes out of the procedure". The procedure is a fast way of producing a candidate; substitution is what decides whether the candidate is a solution. Those are two different jobs and later lessons will produce candidates that fail.'),
             ("Solving is a chain of equations with the same solutions",
              "Every legal move replaces an equation by another one with exactly the same "
              "solution set. That is the only reason the last line of the working, `x = 5`, "
@@ -112,11 +109,7 @@ LESSONS = [
                   "the information is gone. That is why the theorem says `c ≠ 0` and why "
                   "the restriction is not decoration."),
             ("example", ("What a single check does and does not establish",
-                         "Substituting `x = 5` into `3x − 4 = 11` and getting `11 = 11` "
-                         "proves that `5` is a solution. It proves nothing whatever about "
-                         "whether there are others. For this equation there are none, but "
-                         "that is a separate argument &mdash; it comes from the chain of "
-                         "equivalent equations, and lesson 6 states it exactly.")),
+                         'Substituting `x = 5` into `3x − 4 = 11` and getting `11 = 11` proves that `5` is a solution. It proves nothing whatever about whether there are others. For this equation there are none, but that is a separate argument &mdash; it comes from the chain of equivalent equations, and “Identities and Contradictions” states it exactly.')),
         ],
         "lab": ("equation", {
             "mode": "check",
@@ -227,15 +220,8 @@ LESSONS = [
              "keeping them separate is what makes the chain of equivalences readable."),
         ],
         "standard": ("Finish when you can decide, in exact arithmetic, whether a given number is a solution.",
-                     "Without the lab, test both `x = 3` and `x = 5/2` in `4x + 1 = 13`, "
-                     "showing the two side values and a verdict for each. Then explain why "
-                     "multiplying both sides by zero cannot preserve that solution set. "
-                     "Every later lesson produces candidates; this is how you find out "
-                     "what they are worth."),
-        "note": "Lesson 2 starts producing candidates instead of testing them, using "
-                "exactly the two properties stated above. Notice that the properties never "
-                "mention `x`: they are facts about numbers, and that is why they apply to "
-                "whatever the two sides of your equation happen to be.",
+                     'Without the lab, test both `x = 3` and `x = 5/2` in `4x + 1 = 13`, showing the two side values and a verdict for each. Then explain why multiplying both sides by zero cannot preserve that solution set. Every later lesson produces candidates; this is how you find out what they are worth.'),
+        "note": '“One- and Two-Step Equations” starts producing candidates instead of testing them, using exactly the two properties stated above. Notice that the properties never mention `x`: they are facts about numbers, and that is why they apply to whatever the two sides of your equation happen to be.',
     },
     # ---------------------------------------------------------------- 02
     {
@@ -288,9 +274,7 @@ LESSONS = [
                 "7x    = 2       divide both sides by 7         x = 2/7",
                 "x/7   = 2       multiply both sides by 7       x = 14",
             ]),
-            ("p", "The third line is the one people rewrite. `x = 2/7` is a finished "
-                  "answer. Turning it into `0.2857` makes it a different number, and "
-                  "lesson 1 showed what happens to a different number in the check."),
+            ("p", 'The third line is the one people rewrite. `x = 2/7` is a finished answer. Turning it into `0.2857` makes it a different number, and “What It Means to Solve an Equation” showed what happens to a different number in the check.'),
             ("h3", "Two steps"),
             ("p", "With both a coefficient and a constant, deal with the constant first:"),
             ("math", [
@@ -331,14 +315,9 @@ LESSONS = [
             ("thm", ("What the last step needs",
                      "An equation of the form `px = q` with `p ≠ 0` has exactly one "
                      "solution, `x = q/p`.",
-                     "Division by `p` is legal because `p ≠ 0`, and it is reversible, so "
-                     "the solution set does not change. What happens when `p = 0` is the "
-                     "subject of lesson 6.")),
+                     'Division by `p` is legal because `p ≠ 0`, and it is reversible, so the solution set does not change. What happens when `p = 0` is the subject of “Identities and Contradictions”.')),
             ("example", ("A fraction that is the answer",
-                         "`(3/4)x + 1/2 = 5/4`. Subtract `1/2` from both sides: "
-                         "`(3/4)x = 3/4`, since `5/4 − 1/2 = 5/4 − 2/4 = 3/4`. Divide both "
-                         "sides by `3/4`: `x = 1`. Lesson 4 shows a route through this "
-                         "kind of equation that avoids fractional arithmetic entirely.")),
+                         '`(3/4)x + 1/2 = 5/4`. Subtract `1/2` from both sides: `(3/4)x = 3/4`, since `5/4 − 1/2 = 5/4 − 2/4 = 3/4`. Divide both sides by `3/4`: `x = 1`. “Equations with Fractions” shows a route through this kind of equation that avoids fractional arithmetic entirely.')),
         ],
         "lab": ("equation", {
             "mode": "solve",
@@ -435,20 +414,11 @@ LESSONS = [
              "by, not a decoration on the term, and this is the single most common "
              "arithmetic slip in the lesson."),
             ("Rounding an exact answer to a decimal",
-             "`x = 7/3` is the answer; `2.33` is a nearby number that fails the check. "
-             "Fractions are exact, they are not harder to substitute, and the rest of this "
-             "path expects them."),
+             '`x = 7/3` is the answer; `2.33` is a nearby number that fails the check. Fractions are exact, they are not harder to substitute, and the rest of this path expects them.'),
         ],
         "standard": ("Finish when you can name every operation you apply and check the result without being asked.",
-                     "Solve `9 − 4x = −6` without the lab: name each operation, keep the "
-                     "answer as an exact fraction, and substitute it into the original. "
-                     "Then solve `3(x + 2) = 21` once by division first and once by "
-                     "distribution; the two routes must agree. Everything in lessons 3 "
-                     "to 5 adds new opening moves and finishes exactly like this."),
-        "note": "The lab shows one operation per row on purpose. When an equation goes "
-                "wrong it is almost never the strategy that failed &mdash; it is one row, "
-                "and a trace where every row is named tells you which one. Lesson 3 adds "
-                "the only genuinely new move on the course: subtracting a variable term.",
+                     'Solve `9 − 4x = −6` without the lab: name each operation, keep the answer as an exact fraction, and substitute it into the original. Then solve `3(x + 2) = 21` once by division first and once by distribution; the two routes must agree. Everything in “Variables on Both Sides”, “Equations with Fractions” and “Literal Equations and Formulas” adds new opening moves and finishes exactly like this.'),
+        "note": 'The lab shows one operation per row on purpose. When an equation goes wrong it is almost never the strategy that failed &mdash; it is one row, and a trace where every row is named tells you which one. “Variables on Both Sides” adds the only genuinely new move on the course: subtracting a variable term.',
     },
     # ---------------------------------------------------------------- 03
     {
@@ -490,9 +460,7 @@ LESSONS = [
         "read_title": "Getting the unknown onto one side",
         "read_intro": "Why the move is legal, why either direction works, and the sign that goes wrong.",
         "body": [
-            ("p", "`5x + 2 = 3x − 8` cannot be finished by lesson 2's routine. Undoing the "
-                  "`+ 2` leaves `5x = 3x − 10`, which still has `x` in two places. "
-                  "Something has to remove one of them."),
+            ("p", "`5x + 2 = 3x − 8` cannot be finished by “One- and Two-Step Equations”'s routine. Undoing the `+ 2` leaves `5x = 3x − 10`, which still has `x` in two places. Something has to remove one of them."),
             ("thm", ("Subtracting an expression from both sides",
                      "If `A = B` then `A − C = B − C`, whatever expression `C` is.",
                      "For any particular value of `x`, `A`, `B` and `C` are numbers, and "
@@ -540,20 +508,13 @@ LESSONS = [
                 "check    left   2(0 − 3) + 4  =  −6 + 4  =  −2",
                 "         right  3(0 + 1) − 5  =  3 − 5   =  −2",
             ]),
-            ("p", "`x = 0` is a solution like any other. It is a specific number that makes "
-                  "the statement true, and it is not the same as \"no solution\" &mdash; a "
-                  "confusion lesson 6 exists to clear up."),
+            ("p", '`x = 0` is a solution like any other. It is a specific number that makes the statement true, and it is not the same as "no solution" &mdash; a confusion “Identities and Contradictions” exists to clear up.'),
             ("p", "The subtraction trap is `3x − (x − 4)`. The minus applies to the whole "
                   "bracket: `3x − x + 4 = 2x + 4`. Writing `3x − x − 4` changes the "
                   "equation, and it is the error most likely to survive unnoticed, because "
                   "the answer it produces looks perfectly ordinary."),
             ("example", ("When every x disappears",
-                         "Collecting on `6x + 1 = 6x − 4` gives `1 = −4`, with no `x` left "
-                         "anywhere. Nothing has gone wrong: the equation is telling you it "
-                         "has no solution, since `1` is not `−4` whatever `x` is. Compare "
-                         "`6x + 1 = 6x + 1`, which collapses to `0 = 0` and is true for "
-                         "every number. Lesson 6 is about reading those two lines "
-                         "correctly.")),
+                         'Collecting on `6x + 1 = 6x − 4` gives `1 = −4`, with no `x` left anywhere. Nothing has gone wrong: the equation is telling you it has no solution, since `1` is not `−4` whatever `x` is. Compare `6x + 1 = 6x + 1`, which collapses to `0 = 0` and is true for every number. “Identities and Contradictions” is about reading those two lines correctly.')),
         ],
         "lab": ("equation", {
             "mode": "sides",
@@ -564,7 +525,7 @@ LESSONS = [
                            "agree.",
         }),
         "steps_title": "Solving with the variable on both sides",
-        "steps_intro": "One extra step at the front; the rest is lesson 2 unchanged.",
+        "steps_intro": 'One extra step at the front; the rest is “One- and Two-Step Equations” unchanged.',
         "steps": [
             ("Simplify both sides separately",
              "Multiply out every bracket, distributing any minus sign in front of one over "
@@ -575,8 +536,7 @@ LESSONS = [
              "the operation down: \"subtract `3x` from both sides\" is a step you can "
              "check."),
             ("Move the constants the other way",
-             "Add or subtract so that every plain number is on the side without the "
-             "variable. You are now looking at `px = q`, which is lesson 2's last line."),
+             "Add or subtract so that every plain number is on the side without the variable. You are now looking at `px = q`, which is “One- and Two-Step Equations”'s last line."),
             ("Divide by the coefficient and check in the original",
              "Sign included. Then substitute into the equation as it was first written "
              "&mdash; both sides had a variable in them, so both sides have to be "
@@ -650,9 +610,7 @@ LESSONS = [
              "different expression, and everything downstream of it is answering a "
              "different question."),
             ("Reading x = 0 as \"no solution\"",
-             "They are different results. `x = 0` says exactly one number works and names "
-             "it; \"no solution\" says none does. Lesson 6 gives the line of working that "
-             "genuinely means the second thing, and it does not look like `x = 0`."),
+             'They are different results. `x = 0` says exactly one number works and names it; "no solution" says none does. “Identities and Contradictions” gives the line of working that genuinely means the second thing, and it does not look like `x = 0`.'),
         ],
         "standard": ("Finish when the choice of side is deliberate and every sign survives the collecting.",
                      "Solve `3(x − 2) + 4 = 5x − 8` without the lab. Expand first, choose "
@@ -772,18 +730,9 @@ LESSONS = [
                   "reversible: divide by it and you are back where you started. The "
                   "solution set therefore cannot change, and no candidate needs to be "
                   "thrown out afterwards."),
-            ("p", "That guarantee depends on the multiplier being a number. When a "
-                  "denominator contains the variable &mdash; `3/(x − 2)` &mdash; the "
-                  "multiplier is zero for one value of `x`, the move is not reversible "
-                  "there, and a candidate can appear that solves nothing. Lesson 7 meets "
-                  "the first case of that, and course 5 treats it properly."),
+            ("p", 'That guarantee depends on the multiplier being a number. When a denominator contains the variable &mdash; `3/(x − 2)` &mdash; the multiplier is zero for one value of `x`, the move is not reversible there, and a candidate can appear that solves nothing. “Ratio, Proportion and Percent” meets the first case of that, and Rational and Radical Expressions treats it properly.'),
             ("example", ("When the fractions cancel completely",
-                         "`x/6 + x/3 = x/2`, multiplied through by 6, becomes "
-                         "`x + 2x = 3x`, that is `3x = 3x`. Every `x` cancels and `0 = 0` "
-                         "is left. The two sides were the same expression written "
-                         "differently &mdash; `x/6 + x/3 = x/6 + 2x/6 = 3x/6 = x/2` "
-                         "&mdash; so every number is a solution. Lesson 6 names this "
-                         "outcome.")),
+                         '`x/6 + x/3 = x/2`, multiplied through by 6, becomes `x + 2x = 3x`, that is `3x = 3x`. Every `x` cancels and `0 = 0` is left. The two sides were the same expression written differently &mdash; `x/6 + x/3 = x/6 + 2x/6 = 3x/6 = x/2` &mdash; so every number is a solution. “Identities and Contradictions” names this outcome.')),
         ],
         "lab": ("equation", {
             "mode": "fractions",
@@ -874,10 +823,7 @@ LESSONS = [
                    "Because fractions and whole numbers have the same solutions",
                    "It can change them, which is why the answer must be checked"],
              "c": 1,
-             "why": "Reversibility is the whole argument, and it needs only that the "
-                    "multiplier is not zero. Being least is a convenience. The last option "
-                    "describes what happens when the multiplier contains the variable, "
-                    "which is a different situation and belongs to lesson 7 and course 5."},
+             "why": 'Reversibility is the whole argument, and it needs only that the multiplier is not zero. Being least is a convenience. The last option describes what happens when the multiplier contains the variable, which is a different situation and belongs to “Ratio, Proportion and Percent” and Rational and Radical Expressions.'},
         ],
         "mistakes": [
             ("Multiplying only the terms that have denominators",
@@ -897,10 +843,7 @@ LESSONS = [
                      "power-of-ten multiplier, apply it to all four written terms, solve, "
                      "and check in the decimal original. Then find the LCD of 6, 8 and 12 "
                      "by prime powers and verify that each denominator divides it."),
-        "note": "Lesson 5 rearranges formulas, where the fractions are made of letters "
-                "rather than numbers and exactly the same multiplication clears them. The "
-                "condition that the multiplier be nonzero, which is free here, becomes the "
-                "main thing to state there.",
+        "note": '“Literal Equations and Formulas” rearranges formulas, where the fractions are made of letters rather than numbers and exactly the same multiplication clears them. The condition that the multiplier be nonzero, which is free here, becomes the main thing to state there.',
     },
     # ---------------------------------------------------------------- 05
     {
@@ -964,9 +907,7 @@ LESSONS = [
                 "check    C = 100  gives  F = (9/5)(100) + 32 = 180 + 32 = 212",
                 "         and      (5/9)(212 − 32) = (5/9)(180) = 100",
             ]),
-            ("p", "Every step is one of the four operations applied to both sides, named "
-                  "as it happens, exactly as in lesson 2. The letters change nothing about "
-                  "which moves are available."),
+            ("p", 'Every step is one of the four operations applied to both sides, named as it happens, exactly as in “One- and Two-Step Equations”. The letters change nothing about which moves are available.'),
             ("h3", "When the target appears more than once"),
             ("p", "Undoing operations one at a time cannot isolate a letter that occurs in "
                   "two places. Gather every term containing the target on one side, then "
@@ -986,14 +927,9 @@ LESSONS = [
             ("thm", ("Every linear rearrangement ends the same way",
                      "If an equation can be written `px = q`, where neither `p` nor `q` "
                      "contains `x`, then `x = q/p` whenever `p ≠ 0`.",
-                     "Collecting and factoring is how you get a formula into that shape. "
-                     "The letter you are solving for plays the part of `x`; every other "
-                     "letter is swept into `p` and `q`. What happens when `p = 0` is "
-                     "lesson 6.")),
+                     'Collecting and factoring is how you get a formula into that shape. The letter you are solving for plays the part of `x`; every other letter is swept into `p` and `q`. What happens when `p = 0` is “Identities and Contradictions”.')),
             ("h3", "When the target is on both sides"),
-            ("p", "Factoring two target terms on one side is not enough when they begin on "
-                  "opposite sides. Collect them first, exactly as in lesson 3, and only "
-                  "then factor the target:"),
+            ("p", 'Factoring two target terms on one side is not enough when they begin on opposite sides. Collect them first, exactly as in “Variables on Both Sides”, and only then factor the target:'),
             ("math", [
                 "ax + b = cx + d                    solve for x",
                 "     subtract cx             ax − cx + b = d",
@@ -1002,10 +938,7 @@ LESSONS = [
                 "     divide by a − c                 x = (d − b)/(a − c)",
                 "answer valid when a − c ≠ 0",
             ]),
-            ("p", "If `a − c = 0`, division is not available and the original formula "
-                  "must be read as lesson 6 reads it: `b = d` gives every `x`, while "
-                  "`b ≠ d` gives none. The condition records a real change in the answer, "
-                  "not a technical annoyance."),
+            ("p", 'If `a − c = 0`, division is not available and the original formula must be read as “Identities and Contradictions” reads it: `b = d` gives every `x`, while `b ≠ d` gives none. The condition records a real change in the answer, not a technical annoyance.'),
             ("h3", "The condition on the division"),
             ("p", "`A = (1/2)bh` solved for `h` gives `h = 2A/b`, and that statement is "
                   "valid when `b ≠ 0`. At `b = 0` the original equation becomes `A = 0`: "
@@ -1016,13 +949,7 @@ LESSONS = [
                   "`C = S/(1 + r)` the forbidden value is `r = −1`, not `r = 0`, because "
                   "it is `1 + r` that gets divided by. Read the divisor, not the letter."),
             ("example", ("A formula this method cannot rearrange",
-                         "`A = s²` solved for `s` is not a rearrangement of this kind. "
-                         "Adding, subtracting, multiplying and dividing undo a linear "
-                         "relationship, and `s²` is not linear in `s`. Undoing a square "
-                         "needs a square root, and for `A &gt; 0` it produces two answers, "
-                         "`s = ±√A`, which is course 6's subject &mdash; and for a length "
-                         "one of the two is then discarded on physical grounds, not "
-                         "algebraic ones.")),
+                         "`A = s²` solved for `s` is not a rearrangement of this kind. Adding, subtracting, multiplying and dividing undo a linear relationship, and `s²` is not linear in `s`. Undoing a square needs a square root, and for `A &gt; 0` it produces two answers, `s = ±√A`, which is Quadratics and Complex Numbers's subject &mdash; and for a length one of the two is then discarded on physical grounds, not algebraic ones.")),
         ],
         "lab": ("equation", {
             "mode": "literal",
@@ -1044,8 +971,7 @@ LESSONS = [
              "target. `A = P(1 + rt)` becomes `A = P + Prt`, and only then is it obvious "
              "where `r` lives."),
             ("Gather every term containing the target on one side",
-             "Everything else goes to the other side. If the target appears only once, "
-             "this is the ordinary collecting of lesson 3."),
+             'Everything else goes to the other side. If the target appears only once, this is the ordinary collecting of “Variables on Both Sides”.'),
             ("Factor the target out, divide by its coefficient, and state the condition",
              "The coefficient is whatever multiplies the target after factoring. Divide by "
              "it, and write down that the answer holds when that expression is not zero."),
@@ -1112,11 +1038,7 @@ LESSONS = [
                    "Exactly when `c ≠ b`",
                    "Exactly when `a`, `b` and `c` are whole numbers"],
              "c": 1,
-             "why": "The last step divided by `a`, which requires `a ≠ 0`. If `a = 0` the "
-                    "equation is `b = c`, which contains no `x` and is either true for "
-                    "every number or for none &mdash; the two outcomes of lesson 6. "
-                    "`c = b` merely makes the answer `0`, which is a perfectly good "
-                    "value."},
+             "why": 'The last step divided by `a`, which requires `a ≠ 0`. If `a = 0` the equation is `b = c`, which contains no `x` and is either true for every number or for none &mdash; the two outcomes of “Identities and Contradictions”. `c = b` merely makes the answer `0`, which is a perfectly good value.'},
         ],
         "mistakes": [
             ("Cancelling a letter that is a term rather than a factor",
@@ -1139,11 +1061,7 @@ LESSONS = [
                      "collect both target terms, factor, divide, and state the condition "
                      "on the divisor. Use exact values to spot-check the result, then say "
                      "why that one assignment checks signs but does not prove the formula."),
-        "note": "The condition `p ≠ 0` has now appeared in three lessons in three "
-                "disguises: the multiplication property in lesson 1, the final division in "
-                "lesson 2, and the divisor here. Lesson 6 asks what an equation is saying "
-                "when `p` really is zero, and the answer turns out to be one of exactly "
-                "two things.",
+        "note": 'The condition `p ≠ 0` has now appeared in three lessons in three disguises: the multiplication property in “What It Means to Solve an Equation”, the final division in “One- and Two-Step Equations”, and the divisor here. “Identities and Contradictions” asks what an equation is saying when `p` really is zero, and the answer turns out to be one of exactly two things.',
     },
     # ---------------------------------------------------------------- 06
     {
@@ -1228,11 +1146,7 @@ LESSONS = [
                   "Both misreadings come from the same habit &mdash; expecting the last "
                   "line of the working to have the shape `x = ` something."),
             ("h3", "The picture"),
-            ("p", "Draw each side as a graph, as the lab does. A conditional equation is "
-                  "two lines crossing at one point; an identity is one line drawn twice; a "
-                  "contradiction is two parallel lines that never meet. The graphs are a "
-                  "preview &mdash; lines are course 3 &mdash; and the argument above does "
-                  "not depend on them."),
+            ("p", "Draw each side as a graph, as the lab does. A conditional equation is two lines crossing at one point; an identity is one line drawn twice; a contradiction is two parallel lines that never meet. The graphs are a preview &mdash; lines are Lines, Functions and Graphs &mdash; and the argument above does not depend on them."),
             ("p", "Two cautions about identities. First, an identity is what you are "
                   "proving every time you expand a bracket, so they are not exotic. "
                   "Second, `x/2 + x/3 = (5/6)x` is an identity because "
@@ -1360,10 +1274,7 @@ LESSONS = [
                      "simplified remainder and write either the value, every real number, "
                      "or no solution. Then use `px = q` to explain why no linear equation "
                      "has exactly two solutions."),
-        "note": "Every method later on can produce these two lines, and they always mean "
-                "the same thing. In course 8 a system of equations collapsing to `0 = 0` "
-                "means the two equations were the same line, and one collapsing to `0 = 5` "
-                "means the lines are parallel &mdash; the same reading, one dimension up.",
+        "note": 'Every method later on can produce these two lines, and they always mean the same thing. In Systems and Matrices a system of equations collapsing to `0 = 0` means the two equations were the same line, and one collapsing to `0 = 5` means the lines are parallel &mdash; the same reading, one dimension up.',
     },
     # ---------------------------------------------------------------- 07
     {
@@ -1394,10 +1305,7 @@ LESSONS = [
              "such numbers are equal, so it is an ordinary equation and every move you "
              "already have applies to it."),
             ("Cross-multiplying is one multiplication, not a rule of its own",
-             "Multiply both sides of `a/b = c/d` by `bd` and the denominators cancel, "
-             "leaving `ad = bc`. Knowing that is what tells you when it is allowed: `b` "
-             "and `d` must not be zero. Completion work here uses numerical denominators; "
-             "variable-denominator equations belong to course 5."),
+             "Multiply both sides of `a/b = c/d` by `bd` and the denominators cancel, leaving `ad = bc`. Knowing that is what tells you when it is allowed: `b` and `d` must not be zero. Completion work here uses numerical denominators; variable-denominator equations belong to Rational and Radical Expressions."),
             ("Percent is a ratio with denominator 100",
              "`15%` is the number `15/100`, that is `3/20`. Every percent question is "
              "`part/whole = p/100` with one of the three quantities missing, and the only "
@@ -1423,12 +1331,7 @@ LESSONS = [
                 "Dividing `ad = bc` by the nonzero number `bd` returns `a/b = c/d`, so the "
                 "move is reversible and the two statements have the same solutions.",
             ]),
-            ("p", "The proof is where the conditions come from. In this lesson the "
-                  "denominators in the proportions you solve are stated nonzero numbers, "
-                  "so checking the condition is immediate. If a denominator contains the "
-                  "variable, multiplying by it may create a candidate at a value where the "
-                  "original quotient is undefined; that is a rational-equation issue, and "
-                  "course 5 supplies the full method."),
+            ("p", "The proof is where the conditions come from. In this lesson the denominators in the proportions you solve are stated nonzero numbers, so checking the condition is immediate. If a denominator contains the variable, multiplying by it may create a candidate at a value where the original quotient is undefined; that is a rational-equation issue, and Rational and Radical Expressions supplies the full method."),
             ("h3", "Setting one up"),
             ("p", "The two ratios must be built the same way round: if the left side is "
                   "kilometres over litres, so is the right. A car covers 150 km on 12 L; "
@@ -1470,19 +1373,12 @@ LESSONS = [
                          "The two percentages are taken on different bases. This is not a "
                          "trick question &mdash; it is the reason a percent is meaningless "
                          "until you say what it is a percent of.")),
-            ("p", "<strong>Preview, not completion work.</strong> The proportion lab can "
-                  "also accept a variable in a denominator and can show a candidate that "
-                  "makes that denominator zero. Use those presets to preview course 5 if "
-                  "you wish; they are not evidence that the domain method has been mastered "
-                  "here, and a quadratic cross product is outside this course."),
+            ("p", "<strong>Preview, not completion work.</strong> The proportion lab can also accept a variable in a denominator and can show a candidate that makes that denominator zero. Use those presets to preview Rational and Radical Expressions if you wish; they are not evidence that the domain method has been mastered here, and a quadratic cross product is outside this course."),
         ],
         "lab": ("equation", {
             "mode": "proportion",
             "panel_title": "Keep the ratio order, then cross-multiply",
-            "panel_intro": "Before running the first or third preset, label what each "
-                           "numerator and denominator measures and predict the two cross "
-                           "products. Presets with a variable denominator are a course-5 "
-                           "preview, not completion work for this lesson.",
+            "panel_intro": 'Before running the first or third preset, label what each numerator and denominator measures and predict the two cross products. Presets with a variable denominator are a preview of Rational and Radical Expressions, not completion work for this lesson.',
         }),
         "steps_title": "Solving a proportion",
         "steps_intro": "Most of the work is done before the algebra starts.",
@@ -1492,12 +1388,9 @@ LESSONS = [
              "proportion built out of order is a correctly solved answer to the wrong "
              "question."),
             ("Write down any value that would make a denominator zero",
-             "For this lesson both denominators are nonzero numbers, so this is a short "
-             "check rather than a new solve. A variable denominator starts the rational-"
-             "equation method deferred to course 5."),
+             "For this lesson both denominators are nonzero numbers, so this is a short check rather than a new solve. A variable denominator starts the rational-equation method deferred to Rational and Radical Expressions."),
             ("Multiply both sides by both denominators and solve",
-             "This is cross-multiplication, and it produces `ad = bc`. What follows is a "
-             "linear equation of the kind lesson 3 handles."),
+             'This is cross-multiplication, and it produces `ad = bc`. What follows is a linear equation of the kind “Variables on Both Sides” handles.'),
             ("Check the candidate against the excluded list, then in the original",
              "A candidate on the excluded list is not a solution and there may then be "
              "none. A candidate that survives still has to make the original proportion "
@@ -1563,10 +1456,7 @@ LESSONS = [
         ],
         "mistakes": [
             ("Treating a variable-denominator preview as an ordinary proportion",
-             "A denominator containing `x` can be zero for a candidate, so multiplying by "
-             "it is not automatically reversible. The lab can display that warning, but "
-             "course 5 owns the exclusion-and-check method; completion here uses stated "
-             "nonzero numerical denominators."),
+             "A denominator containing `x` can be zero for a candidate, so multiplying by it is not automatically reversible. The lab can display that warning, but Rational and Radical Expressions owns the exclusion-and-check method; completion here uses stated nonzero numerical denominators."),
             ("Building the two ratios in opposite orders",
              "`150/12 = d/18` compares km per litre on both sides. `150/12 = 18/d` "
              "compares km per litre with litres per km, and gives `d = 36/25` &mdash; a "
@@ -1578,13 +1468,7 @@ LESSONS = [
              "`(new − old)/old` says so explicitly."),
         ],
         "standard": ("Finish when you set the proportion up with matching units and identify the percent whole before you solve.",
-                     "Without the lab, model this rate: 5 kg cost 14, so what do 8 kg "
-                     "cost? Label both ratio units, cross-multiply and check the exact "
-                     "answer. Then solve `45/w = 18/100` and say why `w`, rather than 45, "
-                     "is the whole. Variable-denominator equations remain course-5 work."),
-        "note": "Lesson 8 takes the same step &mdash; turning a described situation into "
-                "an equation &mdash; without the proportion to hang it on, which makes "
-                "naming the unknown the main decision. The excluded-value habit built here "
-                "returns in course 5, where every rational equation begins with it.",
+                     'Without the lab, model this rate: 5 kg cost 14, so what do 8 kg cost? Label both ratio units, cross-multiply and check the exact answer. Then solve `45/w = 18/100` and say why `w`, rather than 45, is the whole. Variable-denominator equations remain the work of Rational and Radical Expressions.'),
+        "note": '“Modelling with Linear Equations” takes the same step &mdash; turning a described situation into an equation &mdash; without the proportion to hang it on, which makes naming the unknown the main decision. The excluded-value habit built here returns in Rational and Radical Expressions, where every rational equation begins with it.',
     },
 ]

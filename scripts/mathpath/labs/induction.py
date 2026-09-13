@@ -307,7 +307,7 @@ def recurrence_lab(cfg):
       closed: 'aₙ = n(n+1)/2',
       closedAt: function (n) { return n * (n + 1) / 2; },
       exact: function (n) { return BigInt(n) * BigInt(n + 1) / 2n; },
-      note: 'Nonhomogeneous with a linear f(n) = n, so the particular solution is quadratic. Unrolling gives the triangular numbers, which course 3 also proves by induction.'
+      note: 'Nonhomogeneous with a linear f(n) = n, so the particular solution is quadratic. Unrolling gives the triangular numbers, which “Induction with Sums and Products” also proves by induction.'
     },
     merge: {
       label: 'T(n) = 2T(n/2) + n, T(1) = 0, at n = 2ᵏ', init: [0n],

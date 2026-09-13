@@ -7,16 +7,14 @@ COURSE = {
     "title": "Sets, Relations, and Functions",
     "level": "Beginner",
     "summary": (
-        "The vocabulary the rest of the path is written in: sets and their algebra, "
-        "power sets and Cartesian products, relations and the two kinds that matter "
-        "(equivalence and order), functions and the three properties they may have, "
-        "cardinality, and the pigeonhole principle."
+        (
+        'The vocabulary the rest of the path is written in: sets and their algebra, power sets and Cartesian products, relations and the two kinds that matter (equivalence and order), functions and the three properties they may have, cardinality, and the pigeonhole principle.'
+    )
     ),
     "blurb": (
-        "Sets, the operations on them and the identities those obey; relations and "
-        "the two structures they produce &mdash; partitions and orderings; functions, "
-        "injections, surjections and bijections; countable and uncountable; and the "
-        "counting principle that follows from all of it."
+        (
+        'Sets, the operations on them and the identities those obey; relations and the two structures they produce &mdash; partitions and orderings; functions, injections, surjections and bijections; countable and uncountable; and the counting principle that follows from all of it.'
+    )
     ),
     "key": [
         "A ⊆ B        ⟺  ∀x (x ∈ A → x ∈ B)",
@@ -24,11 +22,12 @@ COURSE = {
         "equivalence relation  ⟺  partition",
         "|A| = |B|    ⟺  a bijection A → B exists",
     ],
-    "assumes_short": "Course 1",
+    "assumes_short": 'Logic and Proof',
     "assumes_long": "quantifiers and proof technique",
     "outcomes_intro": (
-        "By the end you have the objects every later course manipulates, and the "
-        "proof habits from course 1 applied to them."
+        (
+        'By the end you have the objects every later course manipulates, and the proof habits from Logic and Proof applied to them.'
+    )
     ),
     "outcomes": [
         ("Prove a set identity",
@@ -48,8 +47,9 @@ COURSE = {
          "a smaller, into a pigeonhole proof by inventing the boxes yourself."),
     ],
     "syllabus_intro": (
-        "Lessons 1 to 5 are sets, 6 to 9 relations, 10 to 12 functions, and 13 and 14 "
-        "the counting consequences that course 4 builds on."
+        (
+        'First sets, then relations, then functions, and last the counting consequences that Combinatorics and Counting builds on.'
+    )
     ),
     "how_to": [
         "Do the set proofs by double inclusion at least once each, even when a chain "
@@ -61,9 +61,7 @@ COURSE = {
         "preset and use as few elements as the claim needs &mdash; but the elements "
         "you leave untouched still count, so reflexivity fails until every one of "
         "them has its loop.",
-        "Pay attention to lesson 13. Countability is where intuition about size stops "
-        "working, and every argument after it depends on accepting bijection as the "
-        "definition of \"same size\".",
+        'Pay attention to “Cardinality and Countability”. Countability is where intuition about size stops working, and every argument after it depends on accepting bijection as the definition of "same size".',
     ],
     "not_covered": [
         "Axiomatic set theory. Sets here are naive: collections of objects. The "
@@ -71,8 +69,9 @@ COURSE = {
         "arithmetic beyond countable versus uncountable are a separate subject.",
         "Russell's paradox is mentioned where it explains a restriction, but the "
         "resolution &mdash; separating sets from classes &mdash; is not developed.",
-        "Ordinals, transfinite induction, and the continuum hypothesis. Lesson 13 "
-        "stops at the two cardinalities the rest of the path uses.",
+        (
+            'Ordinals, transfinite induction, and the continuum hypothesis. “Cardinality and Countability” stops at the two cardinalities the rest of the path uses.'
+        ),
     ],
     "footer_lead": (
         "The set, relation and function labs on this course decide every property by "

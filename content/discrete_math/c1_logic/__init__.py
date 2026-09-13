@@ -11,16 +11,14 @@ COURSE = {
     "title": "Logic and Proof",
     "level": "Beginner",
     "summary": (
-        "Propositional and predicate logic from truth values to written proofs: "
-        "connectives, truth tables, equivalence, normal forms, quantifiers and their "
-        "negations, rules of inference, and the four proof techniques the rest of the "
-        "path uses."
+        (
+        'Propositional and predicate logic from truth values to written proofs: connectives, truth tables, equivalence, normal forms, quantifiers and their negations, rules of inference, and the four proof techniques the rest of the path uses.'
+    )
     ),
     "blurb": (
-        "Make a statement precise enough to be true or false, then establish it. "
-        "Connectives and truth tables, logical equivalence, quantifiers and the order "
-        "they come in, valid inference, and direct, contrapositive, contradiction and "
-        "case proofs written out in full."
+        (
+        'Make a statement precise enough to be true or false, then establish it. Connectives and truth tables, logical equivalence, quantifiers and the order they come in, valid inference, and direct, contrapositive, contradiction and case proofs written out in full.'
+    )
     ),
     "key": [
         "p → q   ≡   ¬p ∨ q            the conditional, in disjunctive form",
@@ -28,7 +26,7 @@ COURSE = {
         "¬∀x P(x)  ≡  ∃x ¬P(x)         negation flips the quantifier",
         "p → q   ≡   ¬q → ¬p           contraposition: the basis of a proof method",
     ],
-    "assumes_short": "Nothing",
+    "assumes_short": 'Nothing',
     "assumes_long": "school algebra is enough",
     "outcomes_intro": (
         "By the end you can read a theorem statement exactly as written, and write a "
@@ -49,24 +47,9 @@ COURSE = {
          "claim invites which technique, and what each one owes the reader."),
     ],
     "syllabus_intro": (
-        "Lessons 1 to 7 are propositional logic, 8 to 10 add quantifiers, and 11 to 14 "
-        "turn all of it into proofs."
+        'Propositional logic comes first, then quantifiers are added, and then all of it is turned into proofs.'
     ),
-    "how_to": [
-        "Work forward. Lesson 5 assumes you can build a truth table; lesson 13 assumes "
-        "you know what the contrapositive is and why it is equivalent.",
-        "Use the labs adversarially. Most of them let you type your own formula or edit "
-        "the predicate. The fastest way to understand a claim is to spend two minutes "
-        "trying to make it false and finding out you cannot.",
-        "Write the proofs out. Lesson 11 ends with an argument to check, and lessons 12 "
-        "to 14 each end with a claim to prove yourself. Reading a proof and producing one "
-        "are different skills, and only the second transfers to the rest of the path.",
-        "Do not be put off by the continuity and convergence definitions in lessons 9 "
-        "and 10. They are there because they are the hardest quantifier strings most "
-        "people ever meet, and the point of those lessons is that you can read and "
-        "negate them mechanically without knowing what they mean. Nothing on this path "
-        "needs the calculus.",
-    ],
+    "how_to": ['Work forward. “Logical Equivalence” assumes you can build a truth table; “Contraposition and Contradiction” assumes you know what the contrapositive is and why it is equivalent.', 'Use the labs adversarially. Most of them let you type your own formula or edit the predicate. The fastest way to understand a claim is to spend two minutes trying to make it false and finding out you cannot.', 'Write the proofs out. “Rules of Inference” ends with an argument to check, and “Direct Proof”, “Contraposition and Contradiction” and “Cases, Counterexamples, and Writing a Proof” each end with a claim to prove yourself. Reading a proof and producing one are different skills, and only the second transfers to the rest of the path.', 'Do not be put off by the continuity and convergence definitions in “Nested Quantifiers” and “Negating Quantified Statements”. They are there because they are the hardest quantifier strings most people ever meet, and the point of those lessons is that you can read and negate them mechanically without knowing what they mean. Nothing on this path needs the calculus.'],
     "not_covered": [
         "Formal proof systems. This course teaches proof as mathematicians write it "
         "&mdash; rigorous prose &mdash; not natural deduction trees, sequent calculus, or "
@@ -78,11 +61,9 @@ COURSE = {
         "two-valued: every proposition is either true or false, and `p ∨ ¬p` always holds.",
     ],
     "footer_lead": (
-        "Truth tables, equivalences and quantifier evaluations on this course are "
-        "computed in your browser by evaluating the formula under every assignment, so "
-        "a column is right because the evaluation is right. Verifying a statement on "
-        "the cases shown is not a proof of it &mdash; lesson 14 and course 3 are about "
-        "exactly that gap."
+        (
+        'Truth tables, equivalences and quantifier evaluations on this course are computed in your browser by evaluating the formula under every assignment, so a column is right because the evaluation is right. Verifying a statement on the cases shown is not a proof of it &mdash; “Cases, Counterexamples, and Writing a Proof” and Induction and Recursion are about exactly that gap.'
+    )
     ),
     "lessons": part_a.LESSONS + part_b.LESSONS,
 }

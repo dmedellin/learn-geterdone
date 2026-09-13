@@ -78,15 +78,9 @@ LESSONS = [
                 "Then `n(T) = 1 + n(L) + n(R) ≤ 1 + (2^h − 1) + (2^h − 1) = 2·2^h − 1 "
                 "= 2^{h+1} − 1`.",
             ]),
-            ("p", "Both subtrees needed the hypothesis, which makes this structural "
-                  "induction with two recursive parts &mdash; the structural analogue of "
-                  "the two-term recurrence that forced strong induction in lesson 5."),
+            ("p", 'Both subtrees needed the hypothesis, which makes this structural induction with two recursive parts &mdash; the structural analogue of the two-term recurrence that forced strong induction in “Strong Induction”.'),
             ("h3", "Formulas"),
-            ("p", "The well-formed formulas of course 1 are a recursively defined set: a "
-                  "variable is a formula; if `A` is a formula so is `¬A`; if `A` and `B` "
-                  "are, so is `(A ∧ B)`, and similarly for the other binary connectives. "
-                  "Structural induction over that definition proves the syntactic facts "
-                  "course 1 used without proof."),
+            ("p", "The well-formed formulas of Logic and Proof are a recursively defined set: a variable is a formula; if `A` is a formula so is `¬A`; if `A` and `B` are, so is `(A ∧ B)`, and similarly for the other binary connectives. Structural induction over that definition proves the syntactic facts Logic and Proof used without proof."),
             ("example", ("Parentheses balance in every formula",
                          "Base: a variable has none of either. Negation adds none. Each "
                          "binary clause adds one of each. So every well-formed formula has "
@@ -134,9 +128,7 @@ LESSONS = [
                 "has an odd number of nodes.        ∎",
             ],
             "after": [
-                "The parity argument is course 1 lesson 12's result reused: the sum of two "
-                "odd integers is even. Structural induction supplied the two odd numbers; "
-                "elementary arithmetic finished the job."
+                "The parity argument reuses the result of “Direct Proof”, in Logic and Proof: the sum of two odd integers is even. Structural induction supplied the two odd numbers; elementary arithmetic finished the job."
             ],
         },
         "quiz_title": "Structural induction",
@@ -335,10 +327,7 @@ LESSONS = [
                 "Cost: at most 2·log₂ n calls — two odd steps never occur in a row.",
             ],
             "after": [
-                "Strong induction is essential here: the even branch reaches back to `n/2`, "
-                "not to `n − 1`. Ordinary induction would give a hypothesis about the wrong "
-                "value. Course 6 lesson 8 uses this algorithm as modular exponentiation, "
-                "where the saving is the difference between feasible and impossible."
+                'Strong induction is essential here: the even branch reaches back to `n/2`, not to `n − 1`. Ordinary induction would give a hypothesis about the wrong value. “Modular Exponentiation” in Number Theory and Cryptography uses this algorithm as modular exponentiation, where the saving is the difference between feasible and impossible.'
             ],
         },
         "quiz_title": "Recursive correctness",
@@ -380,15 +369,8 @@ LESSONS = [
              "used but not stated is a proof of a different theorem."),
         ],
         "standard": ("Finish when you can discharge both obligations in a paragraph.",
-                     "Write a recursive algorithm computing the `n`th Fibonacci number, "
-                     "prove it terminates and prove it correct. Then count the calls it "
-                     "makes: the naive version makes exponentially many &mdash; about `φⁿ`, "
-                     "the root lesson 10 finds for this recurrence &mdash; and course 8 "
-                     "lesson 10 returns to fix that."),
-        "note": "The naive recursive Fibonacci makes about `1.6ⁿ` calls because it "
-                "recomputes the same subproblems repeatedly. Storing results &mdash; "
-                "memoisation &mdash; drops it to `n` calls, and that observation is the "
-                "whole idea of dynamic programming in course 8 lesson 10.",
+                     'Write a recursive algorithm computing the `n`th Fibonacci number, prove it terminates and prove it correct. Then count the calls it makes: the naive version makes exponentially many &mdash; about `φⁿ`, the root “Solving Linear Recurrences” finds for this recurrence &mdash; and “Dynamic Programming” in Algorithms and Complexity returns to fix that.'),
+        "note": 'The naive recursive Fibonacci makes about `1.6ⁿ` calls because it recomputes the same subproblems repeatedly. Storing results &mdash; memoisation &mdash; drops it to `n` calls, and that observation is the whole idea of dynamic programming in “Dynamic Programming” in Algorithms and Complexity.',
     },
     # ---------------------------------------------------------------- 09
     {
@@ -409,16 +391,14 @@ LESSONS = [
         ],
         "key_label": "Vocabulary before technique",
         "concepts_intro": (
-            "Most of the difficulty in recurrences is setting them up. The solving "
-            "techniques of lessons 10 and 11 are mechanical once the recurrence is right."
+            'Most of the difficulty in recurrences is setting them up. The solving techniques of “Solving Linear Recurrences” and “Divide-and-Conquer Recurrences” are mechanical once the recurrence is right.'
         ),
         "concepts": [
             ("A recurrence plus initial conditions determines the sequence",
              "Order `k` needs `k` initial values. With them every term is determined; "
              "without them the recurrence describes a family."),
             ("Linear means the terms appear to the first power",
-             "`aₙ = 2aₙ₋₁ + 3aₙ₋₂` is linear. `aₙ = aₙ₋₁²` and `aₙ = aₙ₋₁ · aₙ₋₂` are not, "
-             "and the techniques of lesson 10 do not apply to them."),
+             '`aₙ = 2aₙ₋₁ + 3aₙ₋₂` is linear. `aₙ = aₙ₋₁²` and `aₙ = aₙ₋₁ · aₙ₋₂` are not, and the techniques of “Solving Linear Recurrences” do not apply to them.'),
             ("Homogeneous means no standalone term",
              "The `+ f(n)` in a nonhomogeneous recurrence is what makes the Tower of Hanoi "
              "`2aₙ₋₁ + 1` rather than `2aₙ₋₁`."),
@@ -475,21 +455,12 @@ LESSONS = [
                 "   = 2ⁿ⁻¹H₁ + (2ⁿ⁻² + … + 2 + 1)",
                 "   = 2ⁿ⁻¹ + 2ⁿ⁻¹ − 1       = 2ⁿ − 1",
             ]),
-            ("p", "The geometric sum from lesson 3 finished it. Unrolling works well for "
-                  "first-order recurrences and becomes unmanageable for higher orders, "
-                  "which is why lesson 10 exists."),
+            ("p", 'The geometric sum from “Induction with Sums and Products” finished it. Unrolling works well for first-order recurrences and becomes unmanageable for higher orders, which is why “Solving Linear Recurrences” exists.'),
         ],
         "lab": ("recurrence", {
             "preset": "hanoi",
             "panel_title": "Set up, unroll, compare",
-            "panel_intro": "Each preset shows the recurrence unrolled beside its closed "
-                           "form. The note under the status line explains where the closed "
-                           "form came from &mdash; which is lessons 10 and 11. The Tower of "
-                           "Hanoi here starts at `a₀ = 0` rather than the lesson's `H₁ = 1` "
-                           "and agrees from `a₁` on. Then select `aₙ = aₙ₋₁ + n`: it "
-                           "unrolls to 0, 1, 3, 6, 10, 15, the triangular numbers, and its "
-                           "closed form is lesson 3's first identity arrived at from the "
-                           "other direction.",
+            "panel_intro": "Each preset shows the recurrence unrolled beside its closed form. The note under the status line explains where the closed form came from &mdash; which is “Solving Linear Recurrences” and “Divide-and-Conquer Recurrences”. The Tower of Hanoi here starts at `a₀ = 0` rather than the lesson's `H₁ = 1` and agrees from `a₁` on. Then select `aₙ = aₙ₋₁ + n`: it unrolls to 0, 1, 3, 6, 10, 15, the triangular numbers, and its closed form is the first identity of “Induction with Sums and Products” arrived at from the other direction.",
         }),
         "steps_title": "Setting up a recurrence",
         "steps_intro": "Find the last decision; everything before it is a smaller instance.",
@@ -527,10 +498,7 @@ LESSONS = [
                 "Sequence: 2, 3, 5, 8, 13, 21, 34 …   = Fₙ₊₂",
             ],
             "after": [
-                "Same recurrence as Fibonacci, different initial conditions, so the "
-                "sequence is shifted. That is the general situation: the recurrence "
-                "determines the shape of the solution and the initial conditions select "
-                "which one, which is exactly what lesson 10 formalises."
+                'Same recurrence as Fibonacci, different initial conditions, so the sequence is shifted. That is the general situation: the recurrence determines the shape of the solution and the initial conditions select which one, which is exactly what “Solving Linear Recurrences” formalises.'
             ],
         },
         "quiz_title": "Recurrences",
@@ -566,8 +534,7 @@ LESSONS = [
              "Order `k` needs `k` of them. Fewer leaves the sequence undetermined; more "
              "may be inconsistent with the recurrence."),
             ("Treating an unrolled pattern as proved",
-             "Unrolling produces a conjecture. The induction proof is what turns it into a "
-             "solution, and course 1 lesson 14 explains why that step is not a formality."),
+             'Unrolling produces a conjecture. The induction proof is what turns it into a solution, and “Cases, Counterexamples, and Writing a Proof” in Logic and Proof explains why that step is not a formality.'),
         ],
         "standard": ("Finish when you can derive a recurrence and verify its first terms "
                      "by hand.",
@@ -833,21 +800,12 @@ LESSONS = [
                   "greater than 1, and `a/bᵈ` compared with 1 is `log_b a` compared with "
                   "`d`. That is the whole theorem."),
             ("def", ("The Θ notation, as much as is needed here",
-                     "`T(n) = Θ(g(n))` means `T(n)` is trapped between two positive "
-                     "constant multiples of `g(n)` for all large enough `n`: "
-                     "`c₁ g(n) ≤ T(n) ≤ c₂ g(n)` once `n` is past some threshold. It names "
-                     "a growth rate and discards the constants. Course 8 lesson 4 makes "
-                     "this precise and works with it; here it is only the shape of the "
-                     "answer the theorem reports.")),
+                     '`T(n) = Θ(g(n))` means `T(n)` is trapped between two positive constant multiples of `g(n)` for all large enough `n`: `c₁ g(n) ≤ T(n) ≤ c₂ g(n)` once `n` is past some threshold. It names a growth rate and discards the constants. “Big-O, Big-Omega and Big-Theta” in Algorithms and Complexity makes this precise and works with it; here it is only the shape of the answer the theorem reports.')),
             ("thm", ("Master theorem (polynomial form)",
                      "Let `T(n) = aT(n/b) + Θ(nᵈ)` with `a ≥ 1`, `b &gt; 1`, `d ≥ 0`. Then "
                      "`T(n) = Θ(nᵈ)` if `log_b a &lt; d`; `T(n) = Θ(nᵈ log n)` if "
                      "`log_b a = d`; and `T(n) = Θ(n^{log_b a})` if `log_b a &gt; d`.")),
-            ("p", "The cases are numbered here in the order of the comparison &mdash; "
-                  "less, equal, greater &mdash; so case 1 is the root dominating and case "
-                  "3 the leaves, and the lab below and course 8 use the same numbering. "
-                  "Some texts number them the other way round. When there is any doubt, "
-                  "name a case by what dominates rather than by its number."),
+            ("p", "The cases are numbered here in the order of the comparison &mdash; less, equal, greater &mdash; so case 1 is the root dominating and case 3 the leaves, and the lab below and Algorithms and Complexity use the same numbering. Some texts number them the other way round. When there is any doubt, name a case by what dominates rather than by its number."),
             ("example", ("Merge sort",
                          "`T(n) = 2T(n/2) + n`: `a = 2`, `b = 2`, `d = 1`, `log₂2 = 1 = d`. "
                          "Balanced case, so `Θ(n log n)`. Every level does `n` units of "
@@ -869,9 +827,7 @@ LESSONS = [
                   "exponent may lose on realistic inputs, which is why Karatsuba is used "
                   "for large numbers and schoolbook multiplication for small ones."),
             ("thm", ("Substituting to make it linear",
-                     "Setting `n = bᵏ` and `Sₖ = T(bᵏ)` turns `T(n) = aT(n/b) + nᵈ` into "
-                     "`Sₖ = aSₖ₋₁ + (bᵈ)ᵏ`, an ordinary linear recurrence that lesson 10 "
-                     "solves. The master theorem is that solution, read back.")),
+                     'Setting `n = bᵏ` and `Sₖ = T(bᵏ)` turns `T(n) = aT(n/b) + nᵈ` into `Sₖ = aSₖ₋₁ + (bᵈ)ᵏ`, an ordinary linear recurrence that “Solving Linear Recurrences” solves. The master theorem is that solution, read back.')),
         ],
         "lab": ("algorithm", {
             "mode": "master",
@@ -1077,16 +1033,7 @@ LESSONS = [
         "lab": ("algorithm", {
             "mode": "sort", "n": 20,
             "panel_title": "Insertion sort, counted",
-            "panel_intro": "This lab counts comparisons, which is course 8's question and "
-                           "not a proof of anything &mdash; a wrong sort could make exactly "
-                           "as many. What it does show is the inner `while` loop of the "
-                           "insertion sort above stopping at the gap: at `n = 20` on the "
-                           "lab's fixed shuffle, bubble sort makes `190 = 20 · 19 / 2` "
-                           "comparisons, insertion sort 112 and merge sort 66, and only the "
-                           "middle figure would change on a different permutation. The "
-                           "invariant is indifferent to it: `A[0..j]` is sorted and holds "
-                           "the same elements however many comparisons the inner loop took "
-                           "to find the gap.",
+            "panel_intro": "This lab counts comparisons, which is Algorithms and Complexity's question and not a proof of anything &mdash; a wrong sort could make exactly as many. What it does show is the inner `while` loop of the insertion sort above stopping at the gap: at `n = 20` on the lab's fixed shuffle, bubble sort makes `190 = 20 · 19 / 2` comparisons, insertion sort 112 and merge sort 66, and only the middle figure would change on a different permutation. The invariant is indifferent to it: `A[0..j]` is sorted and holds the same elements however many comparisons the inner loop took to find the gap.",
         }),
         "steps_title": "Proving a loop correct",
         "steps_intro": "State the invariant before writing anything else.",
@@ -1107,7 +1054,7 @@ LESSONS = [
         ],
         "worked": {
             "title": "Euclid's algorithm",
-            "intro": ["Course 6 lesson 5 uses this; here it is the correctness argument."],
+            "intro": ['“The Euclidean Algorithm” in Number Theory and Cryptography uses this; here it is the correctness argument.'],
             "lines": [
                 "GCD(a, b):",
                 "    while b ≠ 0:",
@@ -1178,9 +1125,6 @@ LESSONS = [
                      "invariant. Then check that at exit the invariant plus the loop "
                      "condition gives exactly `result = xⁿ` &mdash; if it needs an extra "
                      "sentence, the invariant was too weak."),
-        "note": "This is the whole of Hoare logic in miniature: preconditions, "
-                "postconditions and invariants, with a proof rule for each construct. "
-                "Course 8 lesson 2 returns to correctness as a property to be established "
-                "before efficiency is worth measuring.",
+        "note": 'This is the whole of Hoare logic in miniature: preconditions, postconditions and invariants, with a proof rule for each construct. “Correctness and Termination” in Algorithms and Complexity returns to correctness as a property to be established before efficiency is worth measuring.',
     },
 ]

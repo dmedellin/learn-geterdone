@@ -25,11 +25,9 @@ LESSONS = [
         ),
         "concepts": [
             ("A graph is a relation, drawn",
-             "Course 2's symmetric irreflexive relation on `V` is exactly a simple graph. "
-             "The picture adds nothing mathematically and a great deal practically."),
+             "Sets, Relations, and Functions's symmetric irreflexive relation on `V` is exactly a simple graph. The picture adds nothing mathematically and a great deal practically."),
             ("The drawing is not the graph",
-             "Position and edge shape carry no information. Two very different pictures "
-             "can be the same graph, which is lesson 5's subject."),
+             "Position and edge shape carry no information. Two very different pictures can be the same graph, which is “Subgraphs and Graph Isomorphism”'s subject."),
             ("The variants are not interchangeable",
              "Loops, multiple edges and directions each change which theorems hold. "
              "\"Simple graph\" is the default here and is stated where it matters."),
@@ -55,9 +53,7 @@ LESSONS = [
                 "directed graph    have a direction            dependencies, the web",
                 "weighted graph    carry a number              distances, costs",
             ]),
-            ("p", "Unless stated otherwise, \"graph\" on this course means a simple "
-                  "undirected graph. Lessons 9 and 12 attach weights; directions appear "
-                  "only in remarks."),
+            ("p", 'Unless stated otherwise, "graph" on this course means a simple undirected graph. “Shortest Paths and Dijkstra\'s Algorithm” and “Spanning Trees and Minimum Spanning Trees” attach weights; directions appear only in remarks.'),
             ("h3", "Standard families"),
             ("math", [
                 "Kₙ        complete graph        every pair joined      C(n,2) edges",
@@ -67,21 +63,13 @@ LESSONS = [
                 "Qₙ        hypercube             bit strings differing  n·2^{n−1} edges",
                 "                                in one position",
             ]),
-            ("p", "`K₅` and `K_{3,3}` matter later: lesson 14 shows they are precisely the "
-                  "obstructions to drawing a graph in the plane without crossings."),
+            ("p", "`K₅` and `K_{3,3}` matter later: “Planar Graphs and Euler's Formula” shows they are precisely the obstructions to drawing a graph in the plane without crossings."),
             ("h3", "Four models"),
             ("ul", [
-                "<strong>Social networks.</strong> Vertices are people, edges are "
-                "acquaintance. Course 2's pigeonhole result &mdash; two people share a "
-                "degree &mdash; is a statement about this graph.",
-                "<strong>Road networks.</strong> Vertices are junctions, edges are roads, "
-                "weights are distances. Shortest paths are lesson 9.",
-                "<strong>Dependencies.</strong> Vertices are tasks, directed edges are "
-                "\"must precede\". A valid schedule exists exactly when there is no cycle, "
-                "which is course 2's partial order again.",
-                "<strong>Molecules.</strong> Vertices are atoms, edges are bonds. Two "
-                "molecules with the same formula and different structures are non-isomorphic "
-                "graphs, which is lesson 5.",
+                "<strong>Social networks.</strong> Vertices are people, edges are acquaintance. Sets, Relations, and Functions's pigeonhole result &mdash; two people share a degree &mdash; is a statement about this graph.",
+                "<strong>Road networks.</strong> Vertices are junctions, edges are roads, weights are distances. Shortest paths are “Shortest Paths and Dijkstra's Algorithm”.",
+                '<strong>Dependencies.</strong> Vertices are tasks, directed edges are "must precede". A valid schedule exists exactly when there is no cycle, which is Sets, Relations, and Functions\'s partial order again.',
+                '<strong>Molecules.</strong> Vertices are atoms, edges are bonds. Two molecules with the same formula and different structures are non-isomorphic graphs, which is “Subgraphs and Graph Isomorphism”.',
             ]),
             ("p", "The common thread: whenever the data is \"a set of things and which "
                   "pairs are related\", it is a graph, and every theorem in this course "
@@ -91,9 +79,7 @@ LESSONS = [
                      "A simple graph on `n` vertices has at most `C(n,2) = n(n−1)/2` edges, "
                      "with equality exactly for `Kₙ`.")),
             ("proof", [
-                "Each edge is an unordered pair of distinct vertices, and no pair may "
-                "repeat, so the edges form a subset of the `C(n,2)` pairs. Course 4 lesson "
-                "4 counts them.",
+                'Each edge is an unordered pair of distinct vertices, and no pair may repeat, so the edges form a subset of the `C(n,2)` pairs. “Combinations” in Combinatorics and Counting counts them.',
             ]),
         ],
         "lab": ("graph", {
@@ -126,7 +112,7 @@ LESSONS = [
         ],
         "worked": {
             "title": "Counting edges in the standard families",
-            "intro": ["Each count is a small application of course 4."],
+            "intro": ["Each count is a small application of Combinatorics and Counting."],
             "lines": [
                 "Kₙ        every pair joined            C(n,2) = n(n−1)/2",
                 "          K₅ has 10 edges,  K₁₀ has 45",
@@ -143,9 +129,7 @@ LESSONS = [
                 "          each vertex has degree n, so |E| = n·2ⁿ/2 = n·2^{n−1}",
             ],
             "after": [
-                "The hypercube count used the handshake theorem of lesson 2 before it was "
-                "stated: `2|E| = Σ deg(v) = n · 2ⁿ`. Counting edges through degrees is the "
-                "standard move and it is worth having early."
+                'The hypercube count used the handshake theorem of “Degree and the Handshake Theorem” before it was stated: `2|E| = Σ deg(v) = n · 2ⁿ`. Counting edges through degrees is the standard move and it is worth having early.'
             ],
         },
         "quiz_title": "Graphs",
@@ -191,10 +175,7 @@ LESSONS = [
                      "Model \"which pairs of countries share a land border\" as a graph. "
                      "Say what the vertices are, what an edge means, and whether the graph "
                      "is simple &mdash; then ask what the degree of a vertex tells you."),
-        "note": "Graph theory begins with Euler's 1736 paper on the bridges of Königsberg, "
-                "which lesson 7 revisits. He solved it by discarding the map entirely and "
-                "keeping only which land masses were connected &mdash; the first abstraction "
-                "of this kind.",
+        "note": "Graph theory begins with Euler's 1736 paper on the bridges of Königsberg, which “Euler and Hamilton Paths” revisits. He solved it by discarding the map entirely and keeping only which land masses were connected &mdash; the first abstraction of this kind.",
     },
     # ---------------------------------------------------------------- 02
     {
@@ -246,9 +227,7 @@ LESSONS = [
                 "By edge: each edge has exactly two ends, giving `2|E|`.",
                 "One set counted twice, so the two expressions are equal.",
             ]),
-            ("p", "This is a combinatorial proof in the sense of course 4 lesson 13, and "
-                  "it is the cleanest example on the path: name the objects, count them "
-                  "two ways, conclude."),
+            ("p", 'This is a combinatorial proof in the sense of “Combinatorial Proof” in Combinatorics and Counting, and it is the cleanest example on the path: name the objects, count them two ways, conclude.'),
             ("thm", ("The handshake corollary",
                      "In any graph, the number of vertices of odd degree is even.")),
             ("proof", [
@@ -307,8 +286,7 @@ LESSONS = [
             ("Check no degree exceeds `n − 1`",
              "A vertex in a simple graph on `n` vertices has at most `n − 1` neighbours."),
             ("Use the sequence as an invariant",
-             "Different sorted sequences prove two graphs non-isomorphic. Equal sequences "
-             "prove nothing, as lesson 5 shows."),
+             'Different sorted sequences prove two graphs non-isomorphic. Equal sequences prove nothing, as “Subgraphs and Graph Isomorphism” shows.'),
         ],
         "worked": {
             "title": "Three existence questions",
@@ -368,17 +346,13 @@ LESSONS = [
              "`(5,3,3,2,1)` has an even sum and is impossible on five vertices. The "
              "maximum-degree condition is separate."),
             ("Using equal degree sequences as proof of isomorphism",
-             "They are necessary and not sufficient. Lesson 5 gives two non-isomorphic "
-             "graphs with identical sequences."),
+             'They are necessary and not sufficient. “Subgraphs and Graph Isomorphism” gives two non-isomorphic graphs with identical sequences.'),
         ],
         "standard": ("Finish when you check parity before attempting a construction.",
                      "Decide whether a graph exists with degree sequence "
                      "`(4,4,3,3,2,2)`, and say which test settles it. The sum is 18, so "
                      "`|E| = 9`, and no degree exceeds 5 &mdash; so try to build one."),
-        "note": "The handshake theorem is the most reused fact in this course. It supplies "
-                "the edge count in lesson 10's tree characterisation, the parity condition "
-                "in lesson 7's Euler criterion, and the counting argument in lesson 14's "
-                "planarity bound.",
+        "note": "The handshake theorem is the most reused fact in this course. It supplies the edge count in “Trees”'s tree characterisation, the parity condition in “Euler and Hamilton Paths”'s Euler criterion, and the counting argument in “Planar Graphs and Euler's Formula”'s planarity bound.",
     },
     # ---------------------------------------------------------------- 03
     {
@@ -431,14 +405,8 @@ LESSONS = [
                 "add an edge                      O(1)          O(1)",
                 "iterate all edges                O(n²)         Θ(n + |E|)",
             ]),
-            ("p", "The `O` and `Θ` in the table are course 3 lesson 11's notation: "
-                  "`Θ(n + |E|)` means proportional to `n + |E|` up to a constant factor, "
-                  "and `O(1)` means bounded by a constant. Course 8 lesson 4 makes both "
-                  "precise; here they are read as \"linear\" and \"constant\"."),
-            ("p", "The traversals of lesson 8 iterate neighbours constantly, so an "
-                  "adjacency list gives breadth-first search a running time of "
-                  "`Θ(n + |E|)` while a matrix gives `Θ(n²)`. On a sparse graph that is "
-                  "the difference between linear and quadratic."),
+            ("p", 'The `O` and `Θ` in the table are the notation of “Divide-and-Conquer Recurrences”, in Induction and Recursion: `Θ(n + |E|)` means proportional to `n + |E|` up to a constant factor, and `O(1)` means bounded by a constant. “Big-O, Big-Omega and Big-Theta” in Algorithms and Complexity makes both precise; here they are read as "linear" and "constant".'),
+            ("p", 'The traversals of “Breadth-First and Depth-First Search” iterate neighbours constantly, so an adjacency list gives breadth-first search a running time of `Θ(n + |E|)` while a matrix gives `Θ(n²)`. On a sparse graph that is the difference between linear and quadratic.'),
             ("p", "The matrix wins when the graph is dense, when adjacency tests dominate, "
                   "or when the linear algebra of the next theorem is wanted."),
             ("thm", ("Matrix powers count walks",
@@ -467,8 +435,7 @@ LESSONS = [
                   "examples of algebra outperforming combinatorics."),
             ("h3", "Other representations"),
             ("ul", [
-                "<strong>Edge list.</strong> Just the pairs. Minimal space, and every "
-                "query is a scan. Kruskal's algorithm in lesson 12 sorts exactly this.",
+                "<strong>Edge list.</strong> Just the pairs. Minimal space, and every query is a scan. Kruskal's algorithm in “Spanning Trees and Minimum Spanning Trees” sorts exactly this.",
                 "<strong>Incidence matrix.</strong> Rows are vertices, columns edges, with "
                 "a 1 where they meet. Useful in flow problems and rarely elsewhere here.",
             ]),
@@ -513,15 +480,12 @@ LESSONS = [
                 "A²[1][1] = 2:  the walks 1→2→1 and 1→4→1 — which is deg(1).",
                 "A²[1][3] = 2:  the walks 1→2→3 and 1→4→3.",
                 "A²[1][2] = 0:  no walk of length 2 joins adjacent vertices here,",
-                "               because C₄ is bipartite — lesson 6.",
+                '               because C₄ is bipartite — “Bipartite Graphs”.',
                 "",
                 "trace(A³) = 0, so C₄ contains no triangle.        ✓",
             ],
             "after": [
-                "The zeros in `A²` at adjacent positions are the bipartiteness of "
-                "lesson 6 showing up in the algebra: in a bipartite graph every walk of "
-                "even length ends on the same side it started, so it can never end at a "
-                "neighbour."
+                'The zeros in `A²` at adjacent positions are the bipartiteness of “Bipartite Graphs” showing up in the algebra: in a bipartite graph every walk of even length ends on the same side it started, so it can never end at a neighbour.'
             ],
         },
         "quiz_title": "Representations",
@@ -604,8 +568,7 @@ LESSONS = [
              "A walk may repeat anything; a path repeats no vertex; a cycle is a path "
              "that returns to its start."),
             ("Reachability is an equivalence relation",
-             "Reflexive, symmetric and transitive, so by course 2 lesson 8 it partitions "
-             "the vertices &mdash; and the blocks are the components."),
+             'Reflexive, symmetric and transitive, so by “Equivalence Relations and Partitions” in Sets, Relations, and Functions it partitions the vertices &mdash; and the blocks are the components.'),
             ("Connectivity needs at least `n − 1` edges",
              "Each edge can reduce the component count by at most one, and you start with "
              "`n` components."),
@@ -641,8 +604,7 @@ LESSONS = [
                 "Reflexive: the length-0 walk joins `v` to itself. Symmetric: reverse the "
                 "path. Transitive: concatenate two walks and extract a path by the theorem "
                 "above.",
-                "By course 2 lesson 8 the classes partition `V`, and each class induces a "
-                "maximal connected subgraph.",
+                'By “Equivalence Relations and Partitions” in Sets, Relations, and Functions the classes partition `V`, and each class induces a maximal connected subgraph.',
             ]),
             ("thm", ("The edge bound",
                      "A connected graph on `n` vertices has at least `n − 1` edges.")),
@@ -652,9 +614,7 @@ LESSONS = [
                 "two.",
                 "To reach one component from `n`, at least `n − 1` edges are required.",
             ]),
-            ("p", "Lesson 10 shows that `n − 1` edges suffice exactly when the graph is a "
-                  "tree, so trees are the minimally connected graphs &mdash; connected, "
-                  "and no edge to spare."),
+            ("p", '“Trees” shows that `n − 1` edges suffice exactly when the graph is a tree, so trees are the minimally connected graphs &mdash; connected, and no edge to spare.'),
             ("h3", "Weak points"),
             ("def", ("Cut vertex and bridge",
                      "A <strong>cut vertex</strong> is a vertex whose removal increases the "
@@ -689,7 +649,7 @@ LESSONS = [
         "steps_intro": "Search from one vertex; repeat for what is left.",
         "steps": [
             ("Search from any vertex",
-             "Breadth-first or depth-first (lesson 8). What you reach is its component."),
+             'Breadth-first or depth-first (“Breadth-First and Depth-First Search”). What you reach is its component.'),
             ("Repeat from an unvisited vertex",
              "Until every vertex is assigned. The number of searches is the number of "
              "components."),
@@ -728,10 +688,7 @@ LESSONS = [
              "a": ["it is shorter", "it repeats no vertex",
                    "it is closed", "it uses every edge"],
              "c": 1,
-             "why": "A walk may repeat anything; a path repeats no vertex, which forces it to repeat "
-                    "no edge either. A path need not be shorter than a given walk, need not be closed "
-                    "(a closed path is a cycle), and a route using every edge once is an Euler path, "
-                    "lesson 7's object."
+             "why": "A walk may repeat anything; a path repeats no vertex, which forces it to repeat no edge either. A path need not be shorter than a given walk, need not be closed (a closed path is a cycle), and a route using every edge once is an Euler path, “Euler and Hamilton Paths”'s object."
             },
             {"q": "A connected graph on 10 vertices has at least:",
              "a": ["10 edges", "9 edges", "45 edges", "1 edge"],
@@ -744,11 +701,7 @@ LESSONS = [
              "a": ["it joins two leaves", "it lies on no cycle",
                    "it has the largest weight", "the graph is a tree"],
              "c": 1,
-             "why": "On a cycle there is an alternative route, so removal disconnects nothing; off "
-                    "every cycle there is none. Joining two leaves is not required &mdash; `3–4` in the "
-                    "worked example is a bridge whose ends have degrees 3 and 1; weight is lesson 9's "
-                    "concern and has no bearing; and a tree is the case where EVERY edge is a bridge, "
-                    "not the condition for one."
+             "why": "On a cycle there is an alternative route, so removal disconnects nothing; off every cycle there is none. Joining two leaves is not required &mdash; `3–4` in the worked example is a bridge whose ends have degrees 3 and 1; weight is “Shortest Paths and Dijkstra's Algorithm”'s concern and has no bearing; and a tree is the case where EVERY edge is a bridge, not the condition for one."
             },
         ],
         "mistakes": [
@@ -766,10 +719,7 @@ LESSONS = [
                      "Take a graph on eight vertices with ten edges, identify its "
                      "components, and list its bridges by checking which edges lie on no "
                      "cycle. Both are one search each."),
-        "note": "Higher connectivity &mdash; how many vertices or edges must be removed to "
-                "disconnect a graph &mdash; is measured by the connectivity `κ(G)` and edge "
-                "connectivity `λ(G)`, and Menger's theorem relates them to the number of "
-                "disjoint paths between vertices. It is the natural sequel to this lesson.",
+        "note": "Higher connectivity &mdash; how many vertices or edges must be removed to disconnect a graph &mdash; is measured by the connectivity `κ(G)` and edge connectivity `λ(G)`, and Menger's theorem relates them to the number of disjoint paths between vertices. It is the natural sequel to this lesson.",
     },
     # ---------------------------------------------------------------- 05
     {
@@ -790,8 +740,7 @@ LESSONS = [
         ],
         "key_label": "Same graph, different labels",
         "concepts_intro": (
-            "Isomorphism is course 2's bijection with a structure-preserving condition "
-            "attached."
+            "Isomorphism is Sets, Relations, and Functions's bijection with a structure-preserving condition attached."
         ),
         "concepts": [
             ("It is a bijection that preserves adjacency",
@@ -861,10 +810,7 @@ LESSONS = [
                   "few natural problems occupy. Babai announced a quasi-polynomial "
                   "algorithm in 2015 &mdash; running in time `exp((log n)^{O(1)})`, faster "
                   "than exponential and slower than polynomial."),
-            ("p", "In practice, isomorphism testers handle graphs with thousands of "
-                  "vertices routinely, because real graphs have structure the worst case "
-                  "does not. This is the same gap between worst-case hardness and practical "
-                  "difficulty that course 1 noted for SAT."),
+            ("p", "In practice, isomorphism testers handle graphs with thousands of vertices routinely, because real graphs have structure the worst case does not. This is the same gap between worst-case hardness and practical difficulty that Logic and Proof noted for SAT."),
         ],
         "lab": ("graph", {
             "algo": "degree", "preset": "lesson", "n": 6,
@@ -1038,9 +984,7 @@ LESSONS = [
                      "vertices of the same colour, the graph is not bipartite and that edge "
                      "closes an odd cycle. Otherwise the colouring is a bipartition. The "
                      "cost is `Θ(n + |E|)`.")),
-            ("p", "Contrast that with lesson 13's chromatic number, where deciding "
-                  "3-colourability is NP-complete. Two colours is easy and three is hard, "
-                  "and the boundary is exactly here."),
+            ("p", "Contrast that with “Graph Colouring”'s chromatic number, where deciding 3-colourability is NP-complete. Two colours is easy and three is hard, and the boundary is exactly here."),
             ("h3", "Matching"),
             ("def", ("Matching",
                      "A <strong>matching</strong> is a set of edges no two of which share "
@@ -1136,9 +1080,7 @@ LESSONS = [
              "a": ["exponential time", "`Θ(n + |E|)` — one search",
                    "`Θ(n³)`", "it is NP-complete"],
              "c": 1,
-             "why": "One breadth-first search with a parity colouring: `Θ(n + |E|)`. Nothing "
-                    "exponential, nothing cubic, and nothing NP-complete &mdash; that is three colours, "
-                    "lesson 13, and the point is that two is easy."
+             "why": 'One breadth-first search with a parity colouring: `Θ(n + |E|)`. Nothing exponential, nothing cubic, and nothing NP-complete &mdash; that is three colours, “Graph Colouring”, and the point is that two is easy.'
             },
         ],
         "mistakes": [
@@ -1156,9 +1098,7 @@ LESSONS = [
                      "Two-colour a graph of your own until it fails, then trace the paths "
                      "from the root to both ends of the offending edge. Together with the "
                      "edge they form the odd cycle."),
-        "note": "The gap between 2-colouring and 3-colouring is one of the sharpest in "
-                "complexity theory: the first is linear time and the second is NP-complete. "
-                "Lesson 13 returns to it, and course 8 explains what NP-complete means.",
+        "note": 'The gap between 2-colouring and 3-colouring is one of the sharpest in complexity theory: the first is linear time and the second is NP-complete. “Graph Colouring” returns to it, and Algorithms and Complexity explains what NP-complete means.',
     },
     # ---------------------------------------------------------------- 07
     {
@@ -1190,8 +1130,7 @@ LESSONS = [
              "Every visit to a vertex uses two edge-ends, one in and one out. So a circuit "
              "requires every degree even."),
             ("Hamilton has no such criterion",
-             "Only sufficient conditions (Dirac, Ore) and no characterisation. Deciding it "
-             "is NP-complete, which course 8 defines."),
+             "Only sufficient conditions (Dirac, Ore) and no characterisation. Deciding it is NP-complete, which Algorithms and Complexity defines."),
         ],
         "read_title": "Euler and Hamilton",
         "read_intro": "Both definitions, Euler's theorem with its proof, and the contrast.",
@@ -1364,8 +1303,6 @@ LESSONS = [
                      "For a graph of your own, decide the Euler question by counting "
                      "degrees, then attempt Hamilton by hand and notice what changes: one "
                      "is a check, the other is a search."),
-        "note": "The travelling salesman problem is Hamilton with weights: find the "
-                "cheapest Hamilton circuit. It is the canonical hard optimisation problem, "
-                "and course 8 lesson 11 places it precisely.",
+        "note": 'The travelling salesman problem is Hamilton with weights: find the cheapest Hamilton circuit. It is the canonical hard optimisation problem, and “P, NP and NP-Completeness” in Algorithms and Complexity places it precisely.',
     },
 ]

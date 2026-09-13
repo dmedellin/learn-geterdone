@@ -57,9 +57,7 @@ LESSONS = [
                      "For any integer `a` and any positive integer `b`, there are unique "
                      "integers `q` and `r` with `a = qb + r` and `0 ≤ r &lt; b`.")),
             ("proof", [
-                "<strong>Existence.</strong> Let `S = {a − qb : q ∈ ℤ, a − qb ≥ 0}`. It is "
-                "nonempty (take `q` very negative) and consists of non-negative integers, "
-                "so by well-ordering (course 3 lesson 1) it has a least element `r = a − qb`.",
+                '<strong>Existence.</strong> Let `S = {a − qb : q ∈ ℤ, a − qb ≥ 0}`. It is nonempty (take `q` very negative) and consists of non-negative integers, so by well-ordering (“The Well-Ordering Principle” in Induction and Recursion) it has a least element `r = a − qb`.',
                 "If `r ≥ b` then `r − b = a − (q+1)b` is in `S` and smaller than `r`, "
                 "contradicting minimality. So `0 ≤ r &lt; b`.",
                 "<strong>Uniqueness.</strong> If `a = qb + r = q'b + r'` with both "
@@ -126,12 +124,7 @@ LESSONS = [
                 "Check:    4728 = 3 × 1576                        ✓",
             ],
             "after": [
-                "The whole argument is the linear-combination property used twice: once to "
-                "see that `Σ dᵢ(10ⁱ − 1)` is a multiple of 3, and once to pass divisibility "
-                "between `n` and its digit sum, whose difference that sum is. Nine divides "
-                "every `10ⁱ − 1` too, so the same test works for 9. Lesson 7 will give the "
-                "argument a notation &mdash; `10ⁱ ≡ 1 (mod 3)` &mdash; that makes it one "
-                "line, and will handle 11, where `10ⁱ − (−1)ⁱ` is the multiple."
+                'The whole argument is the linear-combination property used twice: once to see that `Σ dᵢ(10ⁱ − 1)` is a multiple of 3, and once to pass divisibility between `n` and its digit sum, whose difference that sum is. Nine divides every `10ⁱ − 1` too, so the same test works for 9. “Modular Arithmetic” will give the argument a notation &mdash; `10ⁱ ≡ 1 (mod 3)` &mdash; that makes it one line, and will handle 11, where `10ⁱ − (−1)ⁱ` is the multiple.'
             ],
         },
         "quiz_title": "Divisibility",
@@ -174,9 +167,7 @@ LESSONS = [
              "`b &gt; 0` as stated."),
         ],
         "standard": ("Finish when the linear-combination property is automatic.",
-                     "Prove that if `d | (a + b)` and `d | a` then `d | b`. It is one "
-                     "application of the property, and it is the shape of argument the "
-                     "next five lessons repeat."),
+                     "Prove that if `d | (a + b)` and `d | a` then `d | b`. It is one application of the property, and it is the shape of argument that every lesson from “Primes and Unique Factorisation” to “Bézout's Identity and Modular Inverses” repeats."),
         "note": "Everything in this course is a consequence of the division algorithm. "
                 "The Euclidean algorithm is it applied repeatedly, modular arithmetic is "
                 "its remainder, and RSA is modular arithmetic with large primes.",
@@ -188,9 +179,7 @@ LESSONS = [
         "module": "Divisibility",
         "one_line": "Every integer above 1 factors into primes, in exactly one way.",
         "summary": (
-            "The fundamental theorem of arithmetic. Primes are the multiplicative atoms, "
-            "there are infinitely many, and the uniqueness of the factorisation is what "
-            "makes almost every later argument possible."
+            'The fundamental theorem of arithmetic. Primes are the multiplicative atoms, there are infinitely many, and the uniqueness of the factorisation is what makes almost every later argument possible.'
         ),
         "key": [
             "prime: exactly two positive divisors, 1 and itself.  1 is NOT prime.",
@@ -211,8 +200,7 @@ LESSONS = [
              "Existence follows from strong induction in three lines. Uniqueness needs "
              "Euclid's lemma, which needs Bézout."),
             ("Trial division stops at `√n`",
-             "A composite `n` has a factor at most `√n`, so testing beyond that is "
-             "unnecessary &mdash; and it is why the sieve of lesson 3 stops where it does."),
+             'A composite `n` has a factor at most `√n`, so testing beyond that is unnecessary &mdash; and it is why the sieve of “The Sieve of Eratosthenes” stops where it does.'),
         ],
         "read_title": "Primes",
         "read_intro": "The definition, both halves of the fundamental theorem, and Euclid's proof.",
@@ -228,21 +216,10 @@ LESSONS = [
                      "Every integer `n &gt; 1` can be written as a product of primes, and "
                      "the factorisation is unique up to the order of the factors.")),
             ("proof", [
-                "<strong>Existence</strong>, by strong induction (course 3 lesson 5). If `n` is prime it is a "
-                "product of one prime. Otherwise `n = ab` with `1 &lt; a, b &lt; n`, and by "
-                "the inductive hypothesis both factor into primes; concatenating the two "
-                "factorisations gives one for `n`.",
-                "<strong>Uniqueness</strong> requires Euclid's lemma (lesson 6): if a prime "
-                "`p` divides `ab` then `p | a` or `p | b`. Given two factorisations of `n`, "
-                "the first prime of one divides the product forming the other, hence "
-                "divides one of its primes, hence equals it. Cancelling and repeating "
-                "matches the factorisations term by term.",
+                '<strong>Existence</strong>, by strong induction (“Strong Induction” in Induction and Recursion). If `n` is prime it is a product of one prime. Otherwise `n = ab` with `1 &lt; a, b &lt; n`, and by the inductive hypothesis both factor into primes; concatenating the two factorisations gives one for `n`.',
+                "<strong>Uniqueness</strong> requires Euclid's lemma (“Bézout's Identity and Modular Inverses”): if a prime `p` divides `ab` then `p | a` or `p | b`. Given two factorisations of `n`, the first prime of one divides the product forming the other, hence divides one of its primes, hence equals it. Cancelling and repeating matches the factorisations term by term.",
             ]),
-            ("p", "Uniqueness is not obvious and it is not universal. In the number system "
-                  "`{a + b√−5}` the number 6 factors as `2 · 3` and as "
-                  "`(1 + √−5)(1 − √−5)`, with all four factors irreducible. Unique "
-                  "factorisation is a property of `ℤ`, and it is what course 6 relies on "
-                  "throughout."),
+            ("p", "Uniqueness is not obvious and it is not universal. In the number system `{a + b√−5}` the number 6 factors as `2 · 3` and as `(1 + √−5)(1 − √−5)`, with all four factors irreducible. Unique factorisation is a property of `ℤ`, and it is what Number Theory and Cryptography relies on throughout."),
             ("thm", ("Euclid: infinitely many primes",
                      "For any finite list of primes there is a prime not on it.")),
             ("proof", [
@@ -312,10 +289,7 @@ LESSONS = [
                 "                   60,72,90,120,180,360        — 24 of them   ✓",
             ],
             "after": [
-                "The divisor count is a product rule application: a divisor is determined "
-                "by choosing an exponent for each prime independently, from 0 up to its "
-                "exponent in `n`. Course 4 lesson 1 is doing the work, and the fundamental "
-                "theorem is what guarantees the choice determines the divisor uniquely."
+                'The divisor count is a product rule application: a divisor is determined by choosing an exponent for each prime independently, from 0 up to its exponent in `n`. “The Sum and Product Rules” in Combinatorics and Counting is doing the work, and the fundamental theorem is what guarantees the choice determines the divisor uniquely.'
             ],
         },
         "quiz_title": "Primes",
@@ -364,10 +338,7 @@ LESSONS = [
                      "Factor 2520 completely and predict its divisor count from the "
                      "exponents before listing anything. `2520 = 2³·3²·5·7`, so there are "
                      "`4·3·2·2 = 48` divisors."),
-        "note": "Factoring is easy for small numbers and believed hard for large ones, and "
-                "that asymmetry is the entire basis of RSA in lesson 14. The best known "
-                "general algorithms are sub-exponential but not polynomial, and no proof "
-                "exists that factoring is genuinely hard.",
+        "note": 'Factoring is easy for small numbers and believed hard for large ones, and that asymmetry is the entire basis of RSA in “RSA Encryption”. The best known general algorithms are sub-exponential but not polynomial, and no proof exists that factoring is genuinely hard.',
     },
     # ---------------------------------------------------------------- 03
     {
@@ -376,9 +347,7 @@ LESSONS = [
         "module": "Divisibility",
         "one_line": "Cross out the multiples; what survives is prime.",
         "summary": (
-            "The oldest algorithm still in use. It finds every prime up to `n` by "
-            "removing multiples, stops at `√n` for the reason lesson 2 gave, and costs "
-            "far less than testing each number separately."
+            'The oldest algorithm still in use. It finds every prime up to `n` by removing multiples, stops at `√n` for the reason “Primes and Unique Factorisation” gave, and costs far less than testing each number separately.'
         ),
         "key": [
             "for each prime p ≤ √n:  cross out 2p, 3p, … — starting at p²",
@@ -399,8 +368,7 @@ LESSONS = [
              "Multiples of `p` below `p²` have a smaller prime factor and were already "
              "crossed out. Starting at `2p` is correct and wasteful."),
             ("Stop at `√n`",
-             "After sieving by every prime up to `√n`, anything uncrossed has no factor "
-             "below its square root and is prime, by lesson 2's bound."),
+             "After sieving by every prime up to `√n`, anything uncrossed has no factor below its square root and is prime, by “Primes and Unique Factorisation”'s bound."),
         ],
         "read_title": "The sieve",
         "read_intro": "The algorithm, its two optimisations, and its cost.",
@@ -425,10 +393,7 @@ LESSONS = [
             ("proof", [
                 "A prime is never crossed out: it is only removed as a multiple `kp` with "
                 "`k ≥ p ≥ 2`, so any crossed-out number is composite.",
-                "A composite `m` has a prime factor `p ≤ √m ≤ √n` by lesson 2. When the "
-                "outer loop reaches `p`, `p` is still a candidate (it is prime), and "
-                "`m = p·(m/p)` with `m/p ≥ p`, so `m ≥ p²` and `m` is a multiple of `p` at "
-                "or beyond `p²`. It is crossed out.",
+                'A composite `m` has a prime factor `p ≤ √m ≤ √n` by “Primes and Unique Factorisation”. When the outer loop reaches `p`, `p` is still a candidate (it is prime), and `m = p·(m/p)` with `m/p ≥ p`, so `m ≥ p²` and `m` is a multiple of `p` at or beyond `p²`. It is crossed out.',
             ]),
             ("h3", "Cost"),
             ("p", "The inner loop for prime `p` performs about `n/p` operations, so the "
@@ -556,9 +521,7 @@ LESSONS = [
         "module": "The Euclidean algorithm",
         "one_line": "The largest number dividing both, and how not to find it.",
         "summary": (
-            "`gcd(a,b)` is the largest common divisor. Computing it from prime "
-            "factorisations is correct and impractical; lesson 5's algorithm is what "
-            "makes it fast."
+            "`gcd(a,b)` is the largest common divisor. Computing it from prime factorisations is correct and impractical; “The Euclidean Algorithm”'s algorithm is what makes it fast."
         ),
         "key": [
             "gcd(a,b)  largest d with d | a and d | b",
@@ -579,8 +542,7 @@ LESSONS = [
              "`gcd · lcm = |ab|`, because min and max exponents together account for both "
              "exponents at each prime."),
             ("Coprime means no shared factor",
-             "`gcd(a,b) = 1`. Consecutive integers are always coprime, which is the fact "
-             "the Chinese remainder theorem uses in lesson 10."),
+             '`gcd(a,b) = 1`. Consecutive integers are always coprime, which is the fact the Chinese remainder theorem uses in “The Chinese Remainder Theorem”.'),
         ],
         "read_title": "gcd and lcm",
         "read_intro": "The definitions, the factorisation formulas, and why they are not the method.",
@@ -617,10 +579,7 @@ LESSONS = [
             ("p", "The formula requires factoring both numbers, and factoring is hard. For "
                   "two 100-digit numbers no known method factors them in reasonable time, "
                   "yet Euclid's algorithm computes their gcd in a few hundred divisions."),
-            ("p", "This gap is worth noticing. Computing the gcd is easy and factoring is "
-                  "hard, even though the formula above expresses the gcd in terms of the "
-                  "factorisations. An easy problem can have a hard-looking definition, and "
-                  "lesson 5 is the reason this one is easy."),
+            ("p", 'This gap is worth noticing. Computing the gcd is easy and factoring is hard, even though the formula above expresses the gcd in terms of the factorisations. An easy problem can have a hard-looking definition, and “The Euclidean Algorithm” is the reason this one is easy.'),
             ("def", ("Coprime",
                      "`a` and `b` are <strong>coprime</strong> (relatively prime) when "
                      "`gcd(a,b) = 1`: they share no prime factor. Neither number need "
@@ -630,17 +589,13 @@ LESSONS = [
             ("thm", ("Consecutive integers are coprime",
                      "`gcd(n, n+1) = 1` for every `n`.")),
             ("proof", [
-                "Any common divisor `d` divides the difference `(n+1) − n = 1`, so "
-                "`d = 1`. This is the linear-combination property of lesson 1.",
+                'Any common divisor `d` divides the difference `(n+1) − n = 1`, so `d = 1`. This is the linear-combination property of “Divisibility and the Division Algorithm”.',
             ]),
         ],
         "lab": ("number", {
             "mode": "euclid", "a": 264, "b": 84,
             "panel_title": "gcd without factoring",
-            "panel_intro": "The preset is the worked example: `gcd(264, 84) = 12` in two "
-                           "divisions, the algorithm having factored neither. Then enter "
-                           "two eight-digit numbers and count the rows &mdash; a handful, "
-                           "which is the point of lesson 5.",
+            "panel_intro": 'The preset is the worked example: `gcd(264, 84) = 12` in two divisions, the algorithm having factored neither. Then enter two eight-digit numbers and count the rows &mdash; a handful, which is the point of “The Euclidean Algorithm”.',
         }),
         "steps_title": "Computing gcd and lcm",
         "steps_intro": "Euclid for the gcd; the identity for the lcm.",
@@ -711,8 +666,7 @@ LESSONS = [
         ],
         "mistakes": [
             ("Computing gcds by factoring",
-             "Correct and impractical. Euclid's algorithm is the method, and lesson 5 "
-             "shows why it terminates so quickly."),
+             "Correct and impractical. Euclid's algorithm is the method, and “The Euclidean Algorithm” shows why it terminates so quickly."),
             ("Extending the product identity to three numbers",
              "`gcd(a,b,c)·lcm(a,b,c) ≠ abc` in general. `gcd(2,4,8)` and `lcm(2,4,8)` "
              "multiply to 16, not 64."),
@@ -724,9 +678,7 @@ LESSONS = [
                      "Compute `gcd(1071, 462)` and `lcm(1071, 462)` without factoring "
                      "either number. The gcd takes three divisions and the lcm follows "
                      "from the identity."),
-        "note": "The gap between computing gcds and factoring is one of the oldest known "
-                "examples of two closely related problems with very different difficulty. "
-                "RSA in lesson 14 depends on that gap remaining.",
+        "note": 'The gap between computing gcds and factoring is one of the oldest known examples of two closely related problems with very different difficulty. RSA in “RSA Encryption” depends on that gap remaining.',
     },
     # ---------------------------------------------------------------- 05
     {
@@ -780,10 +732,7 @@ LESSONS = [
                 "        (a, b) = (b, a mod b)",
                 "    return a",
             ]),
-            ("p", "<strong>Correctness</strong> is the loop invariant of course 3 lesson "
-                  "12: `gcd(a, b)` never changes, by the identity. <strong>Termination</strong> "
-                  "holds because `b` strictly decreases and is a non-negative integer. At "
-                  "exit `b = 0` and `gcd(a, 0) = a`."),
+            ("p", '<strong>Correctness</strong> is the loop invariant of “Loop Invariants and Program Correctness” in Induction and Recursion: `gcd(a, b)` never changes, by the identity. <strong>Termination</strong> holds because `b` strictly decreases and is a non-negative integer. At exit `b = 0` and `gcd(a, 0) = a`.'),
             ("h3", "How fast"),
             ("thm", ("Two steps halve",
                      "In two iterations, the first argument is at least halved.")),
@@ -797,10 +746,7 @@ LESSONS = [
                      "The number of division steps is at most five times the number of "
                      "decimal digits of the smaller input, and the worst case occurs "
                      "exactly for consecutive Fibonacci numbers.")),
-            ("p", "Fibonacci inputs are worst because every quotient is 1 &mdash; the "
-                  "slowest possible progress. `gcd(F_{n+1}, F_n)` takes `n − 1` steps, and "
-                  "since `F_n` grows like `φⁿ`, that is logarithmic in the input. Course 3 "
-                  "lesson 10 supplied the growth rate."),
+            ("p", 'Fibonacci inputs are worst because every quotient is 1 &mdash; the slowest possible progress. `gcd(F_{n+1}, F_n)` takes `n − 1` steps, and since `F_n` grows like `φⁿ`, that is logarithmic in the input. “Solving Linear Recurrences” in Induction and Recursion supplied the growth rate.'),
             ("math", [
                 "gcd(89, 55):    89 = 1·55 + 34",
                 "                55 = 1·34 + 21",
@@ -837,8 +783,7 @@ LESSONS = [
         "steps_intro": "Divide, keep the remainder, repeat.",
         "steps": [
             ("Divide the larger by the smaller",
-             "Record the quotient and the remainder. The quotient is not needed for the "
-             "gcd but is needed for lesson 6."),
+             "Record the quotient and the remainder. The quotient is not needed for the gcd but is needed for “Bézout's Identity and Modular Inverses”."),
             ("Replace the pair",
              "`(a, b)` becomes `(b, r)`. The gcd is unchanged, by the identity."),
             ("Repeat until the remainder is 0",
@@ -864,9 +809,7 @@ LESSONS = [
                 "                    common: 3 · 7 = 21                    ✓",
             ],
             "after": [
-                "Three divisions against the eight or so needed to factor both numbers "
-                "&mdash; and the gap widens without limit as the inputs grow. That "
-                "asymmetry is the practical content of lesson 4's warning."
+                "Three divisions against the eight or so needed to factor both numbers &mdash; and the gap widens without limit as the inputs grow. That asymmetry is the practical content of “Greatest Common Divisor”'s warning."
             ],
         },
         "quiz_title": "Euclid",
@@ -915,10 +858,7 @@ LESSONS = [
                      "starting: `144 = F₁₂` and `89 = F₁₁`, so the body's rule names the "
                      "number. Consecutive Fibonacci numbers give the maximum, and knowing "
                      "that in advance is the analysis working."),
-        "note": "Lesson 6 runs the same divisions backwards to produce Bézout's "
-                "coefficients, which is where modular inverses come from &mdash; and "
-                "therefore where RSA's private key comes from. The quotients recorded here "
-                "are exactly what that needs.",
+        "note": "“Bézout's Identity and Modular Inverses” runs the same divisions backwards to produce Bézout's coefficients, which is where modular inverses come from &mdash; and therefore where RSA's private key comes from. The quotients recorded here are exactly what that needs.",
     },
     # ---------------------------------------------------------------- 06
     {
@@ -961,9 +901,7 @@ LESSONS = [
                      "`ax + by = gcd(a,b)`. Moreover `gcd(a,b)` is the smallest positive "
                      "integer expressible in that form.")),
             ("proof", [
-                "Let `S = {ax + by : x, y ∈ ℤ, ax + by &gt; 0}`, which is nonempty (it "
-                "contains `|a|`). By well-ordering (course 3 lesson 1) it has a least "
-                "element `d = ax₀ + by₀`.",
+                'Let `S = {ax + by : x, y ∈ ℤ, ax + by &gt; 0}`, which is nonempty (it contains `|a|`). By well-ordering (“The Well-Ordering Principle” in Induction and Recursion) it has a least element `d = ax₀ + by₀`.',
                 "Divide: `a = qd + r` with `0 ≤ r &lt; d`. Then "
                 "`r = a − qd = a(1 − qx₀) + b(−qy₀)`, which is of the required form. Since "
                 "`0 ≤ r &lt; d` and `d` is the smallest positive such value, `r = 0`, so "
@@ -1017,21 +955,12 @@ LESSONS = [
                 "`p` divides `pbx`, and `p` divides `ab` hence `aby`. So `p` divides their "
                 "sum, which is `b`.",
             ]),
-            ("p", "Euclid's lemma is what makes prime factorisation unique, so lesson 2's "
-                  "fundamental theorem rests on Bézout, which rests on well-ordering. The "
-                  "chain of dependency is worth noticing: the most familiar fact in the "
-                  "course has the deepest justification."),
+            ("p", "Euclid's lemma is what makes prime factorisation unique, so “Primes and Unique Factorisation”'s fundamental theorem rests on Bézout, which rests on well-ordering. The chain of dependency is worth noticing: the most familiar fact in the course has the deepest justification."),
         ],
         "lab": ("number", {
             "mode": "bezout", "a": 17, "b": 3120,
             "panel_title": "The coefficients, computed",
-            "panel_intro": "The preset is the worked example. The table is the extended "
-                           "algorithm run forward, every row keeping `r = 17s + 3120t` "
-                           "true, so the back-substitution done by hand above never "
-                           "happens; the highlighted row reads `1 = 17·(−367) + 3120·2`. "
-                           "Because the gcd is 1 the status line reduces `−367` to 2753, "
-                           "the inverse of 17 modulo 3120 and lesson 14's private "
-                           "exponent. Enter 1071 and 462 for the body's `(−3, 7)`.",
+            "panel_intro": "The preset is the worked example. The table is the extended algorithm run forward, every row keeping `r = 17s + 3120t` true, so the back-substitution done by hand above never happens; the highlighted row reads `1 = 17·(−367) + 3120·2`. Because the gcd is 1 the status line reduces `−367` to 2753, the inverse of 17 modulo 3120 and “RSA Encryption”'s private exponent. Enter 1071 and 462 for the body's `(−3, 7)`.",
         }),
         "steps_title": "Finding Bézout coefficients",
         "steps_intro": "Forward for the gcd, backward for the coefficients.",
@@ -1065,7 +994,7 @@ LESSONS = [
                 "",
                 "   17 · 2753 = 46 801 = 15 · 3120 + 1        ✓",
                 "",
-                "2753 is the private exponent d for the RSA key in lesson 14.",
+                '2753 is the private exponent d for the RSA key in “RSA Encryption”.',
             ],
             "after": [
                 "The negative coefficient is normal and is corrected by adding the modulus. "
@@ -1100,11 +1029,7 @@ LESSONS = [
                    "that there are infinitely many primes",
                    "the sieve is correct"],
              "c": 1,
-             "why": "Existence of a factorisation is straightforward strong induction; "
-                    "uniqueness needs the lemma, which needs Bézout. The division "
-                    "algorithm rests on well-ordering alone; Euclid's infinitude proof "
-                    "uses only the linear-combination property; the sieve's correctness "
-                    "uses lesson 2's trial-division bound."},
+             "why": "Existence of a factorisation is straightforward strong induction; uniqueness needs the lemma, which needs Bézout. The division algorithm rests on well-ordering alone; Euclid's infinitude proof uses only the linear-combination property; the sieve's correctness uses “Primes and Unique Factorisation”'s trial-division bound."},
         ],
         "mistakes": [
             ("Leaving a negative inverse unreduced",
@@ -1118,9 +1043,7 @@ LESSONS = [
              "error every time."),
         ],
         "standard": ("Finish when you can produce a modular inverse on demand.",
-                     "Find the inverse of 7 modulo 26 by the extended algorithm and verify "
-                     "it. That is the decryption key for the affine cipher in lesson 13, "
-                     "and the same computation scaled up is RSA's private exponent."),
+                     "Find the inverse of 7 modulo 26 by the extended algorithm and verify it. That is the decryption key for the affine cipher in “Classical Ciphers”, and the same computation scaled up is RSA's private exponent."),
         "note": "Bézout is the constructive content of the gcd. Knowing that a common "
                 "divisor is greatest is a fact; knowing how to write it as a combination "
                 "is a tool, and every modular inverse in cryptography comes from it.",
@@ -1144,8 +1067,7 @@ LESSONS = [
         ],
         "key_label": "Almost ordinary arithmetic",
         "concepts_intro": (
-            "Congruence is course 2's equivalence relation applied to the integers, and "
-            "the classes support arithmetic."
+            "Congruence is Sets, Relations, and Functions's equivalence relation applied to the integers, and the classes support arithmetic."
         ),
         "concepts": [
             ("Congruence is an equivalence relation",
@@ -1168,9 +1090,7 @@ LESSONS = [
                      "It is reflexive (`m | 0`), symmetric (`m | (a−b)` gives `m | (b−a)`) "
                      "and transitive (`m | (a−b)` and `m | (b−c)` give `m | (a−c)` by the "
                      "linear-combination property).")),
-            ("p", "By course 2 lesson 8 it therefore partitions `ℤ` into equivalence "
-                  "classes. There are exactly `m` of them, one for each remainder "
-                  "`0, 1, …, m−1`, and the set of classes is written `ℤ/mℤ` or `ℤ_m`."),
+            ("p", 'By “Equivalence Relations and Partitions” in Sets, Relations, and Functions it therefore partitions `ℤ` into equivalence classes. There are exactly `m` of them, one for each remainder `0, 1, …, m−1`, and the set of classes is written `ℤ/mℤ` or `ℤ_m`.'),
             ("thm", ("Arithmetic is well defined",
                      "If `a ≡ b (mod m)` and `c ≡ d (mod m)`, then `a + c ≡ b + d` and "
                      "`ac ≡ bd (mod m)`.")),
@@ -1180,10 +1100,7 @@ LESSONS = [
                 "And `ac = (b + ms)(d + mt) = bd + m(bt + ds + mst)`, so the products are "
                 "congruent.",
             ]),
-            ("p", "This is the well-definedness check course 2 lesson 10 warned about, "
-                  "carried out. It says arithmetic on classes is legitimate: the answer "
-                  "does not depend on which representatives were used, so `[3] + [4] = [7]` "
-                  "is a statement about classes rather than about the numbers 3 and 4."),
+            ("p", 'This is the well-definedness check “Functions” in Sets, Relations, and Functions warned about, carried out. It says arithmetic on classes is legitimate: the answer does not depend on which representatives were used, so `[3] + [4] = [7]` is a statement about classes rather than about the numbers 3 and 4.'),
             ("p", "The practical consequence is that a computation may be reduced at any "
                   "point. To find `17 · 23 (mod 5)`, reduce first: `2 · 3 = 6 ≡ 1`, rather "
                   "than computing 391 and dividing."),
@@ -1194,8 +1111,7 @@ LESSONS = [
             ("thm", ("Cancellation law",
                      "If `ac ≡ bc (mod m)` and `gcd(c, m) = 1`, then `a ≡ b (mod m)`.")),
             ("proof", [
-                "`gcd(c,m) = 1` gives an inverse `c⁻¹` by lesson 6. Multiplying both sides "
-                "by it leaves `a ≡ b`.",
+                "`gcd(c,m) = 1` gives an inverse `c⁻¹` by “Bézout's Identity and Modular Inverses”. Multiplying both sides by it leaves `a ≡ b`.",
             ]),
             ("example", ("Zero divisors",
                          "`2 · 5 = 10 ≡ 0 (mod 10)` with neither factor zero. In `ℤ_10` "
@@ -1254,9 +1170,7 @@ LESSONS = [
                 "and a division.",
             ],
             "after": [
-                "The cycle length 4 is not a coincidence: `φ(10) = 4`, and Euler's theorem "
-                "in lesson 11 guarantees `7^{φ(10)} ≡ 1` whenever `gcd(7,10) = 1`. Lesson "
-                "8 turns this into a general algorithm."
+                "The cycle length 4 is not a coincidence: `φ(10) = 4`, and Euler's theorem in “Fermat's Little Theorem and Euler's Theorem” guarantees `7^{φ(10)} ≡ 1` whenever `gcd(7,10) = 1`. “Modular Exponentiation” turns this into a general algorithm."
             ],
         },
         "quiz_title": "Modular arithmetic",
@@ -1289,8 +1203,7 @@ LESSONS = [
             ("Cancelling a common factor without checking the gcd",
              "The one familiar rule that fails. `2·3 ≡ 2·8 (mod 10)` with `3 ≢ 8`."),
             ("Reducing exponents modulo `m`",
-             "`a^b (mod m)` does not let you reduce `b` mod `m`. Exponents reduce modulo "
-             "`φ(m)`, which is lesson 11."),
+             "`a^b (mod m)` does not let you reduce `b` mod `m`. Exponents reduce modulo `φ(m)`, which is “Fermat's Little Theorem and Euler's Theorem”."),
             ("Leaving negative representatives",
              "Correct but unconventional. Add `m` to land in `[0, m)`."),
         ],
@@ -1298,8 +1211,6 @@ LESSONS = [
                      "Compute `123 · 456 (mod 7)` by reducing each factor first. Two small "
                      "multiplications rather than one large one, and the answer is the same "
                      "because congruence respects multiplication."),
-        "note": "Modular arithmetic is the arithmetic of `ℤ/mℤ`, the quotient of the "
-                "integers by an equivalence relation. Course 2 lesson 8 built exactly that "
-                "structure; this course computes in it.",
+        "note": 'Modular arithmetic is the arithmetic of `ℤ/mℤ`, the quotient of the integers by an equivalence relation. “Equivalence Relations and Partitions” in Sets, Relations, and Functions built exactly that structure; this course computes in it.',
     },
 ]

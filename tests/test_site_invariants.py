@@ -2529,12 +2529,11 @@ def availability_claims(doc):
             claims.append((tag.group(0).strip(), numbers["now"], numbers["max"]))
     return claims
 
-# The site index shows MANY paths (one today, more being written), so its copy
-# must never speak of "the path" as though there were one. This is a phrase, not
-# a word: "a path", "each path", "paths" and "the path page" are all correct and
-# must keep passing, which is why the check is anchored on the definite article
-# followed by the bare noun.
-SINGULAR_PATH_PHRASE_RE = re.compile(r"(?i)\bthe\s+path\b(?!\s+page\b)")
+# IA phrases only: graph paths and filesystem paths are domain terminology.
+LIBRARY_TAXONOMY_RE = re.compile(
+    r"(?i)\blearning paths?\b|\bbrowse paths\b|\bthe path\b|"
+    r"\bpath is an ordered sequence\b"
+)
 
 
 class TestSharedChromeIsSubjectAgnostic(SiteFixture):
@@ -2592,25 +2591,13 @@ class TestSharedChromeIsSubjectAgnostic(SiteFixture):
                     word, metadata, "the site index's metadata assumes a subject"
                 )
 
-    def test_site_index_copy_never_says_the_path(self):
-        """One index, many paths: "the path" presumes there is only one.
-
-        The index held a single ordered path before the paths layer existed, and
-        its copy said so. Now a path is one row of a catalog, so the copy has to
-        read "a path" / "each path" / "paths". Comments are not copy (see
-        visible_text), so a note explaining this rule does not fail the build.
-        """
+    def test_site_index_copy_uses_subject_taxonomy(self):
         by_url = {served_path(doc.path): doc for doc in self.documents}
         doc = by_url.get(SITE_INDEX)
         self.assertIsNotNone(doc, "the site index is not published")
         copy = visible_text(doc.text) + " " + metadata_text(doc)
-        found = sorted({m.group(0) for m in SINGULAR_PATH_PHRASE_RE.finditer(copy)})
-        self.assertEqual(
-            [],
-            found,
-            "the site index copy says %s. The index lists paths in the plural; "
-            "write \"a path\", \"each path\" or \"paths\" instead." % found,
-        )
+        self.assertEqual([], LIBRARY_TAXONOMY_RE.findall(copy),
+                         "the library must describe subjects without required course order")
 
     def test_chrome_scanners_are_not_inert(self):
         """The two scanners above must detect what they forbid, and only that."""
@@ -2635,27 +2622,12 @@ class TestSharedChromeIsSubjectAgnostic(SiteFixture):
             "a notice marked class=risk is scoped to the courses it describes",
         )
 
-        documented = (
-            "<footer><!-- never write 'the path' here: the index lists paths -->"
-            "<p>Pick a path and take its courses in order.</p></footer>"
-        )
-        self.assertEqual(
-            [],
-            SINGULAR_PATH_PHRASE_RE.findall(visible_text(documented)),
-            "documenting the rule in a comment is not breaking it",
-        )
-        self.assertTrue(
-            SINGULAR_PATH_PHRASE_RE.search("Open the path and start at course 1."),
-            "the singular-path scanner must actually match",
-        )
-        self.assertFalse(
-            SINGULAR_PATH_PHRASE_RE.search("Every path is an ordered sequence."),
-            "the plural and the indefinite article are correct copy",
-        )
-        self.assertFalse(
-            SINGULAR_PATH_PHRASE_RE.search("Listed on the path page."),
-            '"the path page" names this site\'s page type, not a single path',
-        )
+        self.assertFalse(LIBRARY_TAXONOMY_RE.search(
+            visible_text("<!-- learning paths --> <p>Browse subjects.</p>")))
+        for rejected in ("Browse paths", "Every path is an ordered sequence.", "Open the path"):
+            self.assertTrue(LIBRARY_TAXONOMY_RE.search(rejected), rejected)
+        for domain in ("Shortest paths", "A filesystem path", "Sequences and Series"):
+            self.assertFalse(LIBRARY_TAXONOMY_RE.search(domain), domain)
 
 
 class TestFooterSiteIdentity(SiteFixture):
@@ -2744,37 +2716,30 @@ class TestFooterSiteIdentity(SiteFixture):
         )
 
 
-class TestPathPosition(SiteFixture):
-    """A course knows where it sits in the path, and how to leave in either direction.
-
-    The library is a path, not a shelf: course 3 assumes course 2. A reader who
-    lands on a course home from a search result has to be told which number they
-    are holding and what comes before and after it, or the ordering that the
-    whole path page exists to express is invisible one click deeper.
-    """
+class TestCourseContext(SiteFixture):
+    """Course homes name their subject and offer optional sibling navigation."""
 
     def course_pager(self, doc, direction):
         return [href for rel, href, _line in doc.pager if rel == direction]
 
-    def test_every_course_home_declares_its_position_in_the_path(self):
+    def test_every_course_home_declares_subject_and_page_kind(self):
         by_url = {served_path(doc.path): doc for doc in self.documents}
-        for subject, page, courses, total, _upcoming in PATHS:
-            for index, (title, home, _slugs) in enumerate(courses, start=1):
+        checked = 0
+        for subject, page, courses, _total, _upcoming in PATHS:
+            for title, home, _slugs in courses:
+                checked += 1
                 doc = by_url.get(home)
-                with self.subTest(path=subject, course=title):
+                with self.subTest(subject=subject, course=title):
                     self.assertIsNotNone(doc, "%s is not published" % home)
-                    position = re.compile(
-                        r"(?i)\bcourse\s+0?%d\s+of\s+%d\b" % (index, total)
-                    )
-                    self.assertRegex(
-                        visible_text(doc.text),
-                        position,
-                        "%s does not say it is course %d of %d. The %s path is %d "
-                        "courses long and all of them are published, so a course "
-                        "home stating a position out of any other number would "
-                        "describe a path that does not exist."
-                        % (home, index, total, page, total),
-                    )
+                    breadcrumb = re.search(r'<nav\b[^>]*class="crumbs"[^>]*>(.*?)</nav>', doc.text, re.S)
+                    self.assertIsNotNone(breadcrumb, home + " lacks its breadcrumb")
+                    copy = visible_text(breadcrumb.group(1))
+                    self.assertIn("Learn library", copy)
+                    self.assertIn(subject.title(), copy)
+                    self.assertIn(title, copy)
+                    self.assertIn('<span data-ui="page-kind">Course</span>', doc.text)
+                    self.assertNotRegex(copy, r"(?i)\bcourse\s+\d|\bpath\b")
+        self.assertEqual(25, checked, "every published course must be checked")
 
     def test_course_pager_points_at_the_adjacent_course_homes(self):
         by_url = {served_path(doc.path): doc for doc in self.documents}
@@ -2794,9 +2759,7 @@ class TestPathPosition(SiteFixture):
                     self.assertEqual(
                         [],
                         previous,
-                        "course 1 starts the path; nothing precedes it, so it "
-                        "ships the forward half of the pager alone rather than a "
-                        "disabled backward one",
+                        "the first displayed course has no previous sibling link",
                     )
                 else:
                     self.assertEqual(
@@ -2808,20 +2771,15 @@ class TestPathPosition(SiteFixture):
                     self.assertEqual(
                         homes[index - 1],
                         urllib.parse.urljoin(home, previous[0]),
-                        "prev must point at course %d's home" % index,
+                        "prev must point at the preceding displayed course home",
                     )
 
                 if index == len(homes) - 1:
                     self.assertEqual(
                         [],
                         following,
-                        "course %d is the LAST course on the path -- the path "
-                        "ends there, and no course %d was ever announced -- so "
-                        "there is nothing to link forward to and no placeholder "
-                        "to draw for one. The page may still link onward to the "
-                        "path page; that link carries no rel=\"next\", because "
-                        "the path page is not the next course."
-                        % (len(homes), len(homes) + 1),
+                        "the final displayed course has no following sibling; "
+                        "its subject return link carries no rel=next",
                     )
                 else:
                     self.assertEqual(
@@ -2833,7 +2791,7 @@ class TestPathPosition(SiteFixture):
                     self.assertEqual(
                         homes[index + 1],
                         urllib.parse.urljoin(home, following[0]),
-                        "next must point at course %d's home" % (index + 2),
+                        "next must point at the following displayed course home",
                     )
 
     def test_course_pager_targets_are_published_pages(self):
@@ -2860,16 +2818,7 @@ class TestPathPosition(SiteFixture):
 
 
 class TestPathPage(SiteFixture):
-    """The path page is the ordered spine of one subject.
-
-    It is the only page that shows the WHOLE path. It used to show two kinds of
-    entry -- published courses that link to their homes, and announced ones that
-    held their place in the order without pretending to be openable -- and the
-    second kind is gone: all eight courses are published. So what is asserted
-    here is that every one of the eight is listed, in order, and that every one
-    of them links; TestPathIsComplete asserts the other half, that nothing on
-    this page or anywhere else still describes a course as unavailable.
-    """
+    """Subject catalogs preserve complete links and a stable display order."""
 
     def path_document(self, page):
         by_url = {served_path(doc.path): doc for doc in self.documents}
@@ -2910,36 +2859,32 @@ class TestPathPage(SiteFixture):
                     "is a path nobody can open" % page,
                 )
 
-    def test_every_path_lists_its_courses_in_path_order(self):
+    def test_subject_catalog_preserves_authored_display_order(self):
+        from test_course_ui import Elements, words
+
+        def descendants(node):
+            yield node
+            for child in node['children']:
+                yield from descendants(child)
+
         for subject, page, courses, total, upcoming in PATHS:
-            doc = self.path_document(page)
-            copy = visible_text(doc.text)
-            names = [title for title, _home, _slugs in courses] + [
-                title for _n, title in upcoming
-            ]
+            doc = Elements(self.path_document(page).text)
+            catalogs = doc.find(**{'data-ui': 'course-list'})
             with self.subTest(path=subject):
-                self.assertEqual(
-                    total, len(names), "the %s path is %d courses long" % (page, total)
-                )
-            positions = []
-            for name in names:
-                index = copy.find(name)
-                with self.subTest(path=subject, course=name):
-                    self.assertNotEqual(
-                        -1,
-                        index,
-                        "%s names no course %r. A path page lists every course on "
-                        "its path, in order, and all of them are published."
-                        % (page, name),
-                    )
-                positions.append(index)
-            with self.subTest(path=subject):
-                self.assertEqual(
-                    sorted(positions),
-                    positions,
-                    "the courses are listed out of order: %s"
-                    % list(zip(names, positions)),
-                )
+                self.assertEqual(1, len(catalogs), 'catalog region must be unique')
+                cards = [n for n in descendants(catalogs[0]) if 'data-course' in n['attrs']]
+                self.assertEqual(total, len(cards), 'catalog must contain every course exactly once')
+                expected = [home.strip('/') for _title, home, _lessons in courses]
+                self.assertEqual(expected, [n['attrs']['data-course'] for n in cards],
+                                 'catalog cards must preserve authored display order')
+                for card, (title, home, _lessons) in zip(cards, courses):
+                    nodes = list(descendants(card))
+                    headings = [n for n in nodes if n['tag'] in ('strong', 'h3')]
+                    self.assertTrue(headings, 'catalog card needs a visible course heading')
+                    self.assertEqual(title, words(headings[0]), 'catalog card title must name its course')
+                    links = [urllib.parse.urljoin(page, n['attrs']['href']) for n in nodes
+                             if n['tag'] == 'a' and 'href' in n['attrs']]
+                    self.assertEqual([home], links, 'catalog card must link to its own course')
 
     def test_every_course_on_the_path_page_is_a_link(self):
         """No entry on the path page is inert any more.
@@ -3002,12 +2947,8 @@ class TestPathIsComplete(SiteFixture):
     def test_every_availability_count_reads_as_complete(self):
         """An availability claim has to name the WHOLE path, everywhere it appears.
 
-        "Course 7 of 8" is a POSITION and must keep passing -- it is what every
-        course home is required to state. What is checked here is the narrower
-        claim about how many courses a reader can OPEN, in both shapes the site
-        writes it: an availability sentence or chip, and the path page's progress
-        meter, whose numbers live in aria attributes where no copy sweep sees
-        them.
+        This scanner checks availability claims. Course identity and taxonomy
+        are checked separately; a scanner must not silently take on another rule.
         """
         for doc in self.documents:
             page = str(doc.path.relative_to(REPO_ROOT))
@@ -3052,7 +2993,7 @@ class TestPathIsComplete(SiteFixture):
         self.assertEqual(
             [],
             availability_claims(_Doc("<p>Course 7 of 8</p>")),
-            "a course POSITION is not an availability claim and must not be swept",
+            "an ordinal is not an availability claim; the taxonomy guard rejects it separately",
         )
         meter = availability_claims(
             _Doc('<div role="progressbar" aria-valuemin="0" aria-valuemax="8" '
@@ -3500,10 +3441,9 @@ class TestEveryLabBuilds(unittest.TestCase):
 # -- as every package so far has, which is why nothing here is relaxed to
 # accommodate one.
 
-# The light palette, one value per token. Contrast against --bg #edf4f8:
-# cyan 4.98, cyan-2 5.43, green 4.94, red 5.14, amber 5.33, purple 5.44,
-# blue 5.64, muted 4.91 -- all >= 4.5:1. A page declares only the tokens it
-# actually uses, but a token it DOES declare carries exactly this value.
+# The light palette is checked on rendered backgrounds, including tinted
+# panels and page glows. A bare --bg contrast calculation is insufficient.
+# A page declares only the tokens it uses; shared values remain pinned.
 LIGHT_PALETTE = {
     "--bg": "#edf4f8",
     "--bg-2": "#f9fbfd",
@@ -3512,13 +3452,13 @@ LIGHT_PALETTE = {
     "--panel-2": "#f3f8fb",
     "--panel-3": "#eaf2f7",
     "--text": "#102433",
-    "--muted": "#586c7c",
+    "--muted": "#4f6373",
     "--line": "rgba(24, 62, 88, 0.13)",
     "--line-strong": "rgba(24, 62, 88, 0.24)",
-    "--cyan": "#0e7382",
+    "--cyan": "#0b6875",
     "--cyan-2": "#0b6d79",
-    "--green": "#10784f",
-    "--red": "#c22a34",
+    "--green": "#0d6e48",
+    "--red": "#b9242e",
     "--amber": "#8a5a06",
     "--purple": "#6b46d6",
     "--blue": "#1d5fd0",
@@ -3542,25 +3482,15 @@ CSS_VARIABLE_RE = re.compile(r"(--[A-Za-z0-9_-]+)\s*:\s*([^;{}]+);")
 # The lesson pager, verbatim. Class names are exactly lesson-nav /
 # lesson-link prev / lesson-link next; the retired families below are the ones
 # the courses shipped separately and must never come back.
-LESSON_NAV_MARKUP = '<nav class="lesson-nav" aria-label="Lesson navigation">'
+LESSON_NAV_MARKUP = '<nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">'
 LESSON_NAV_RE = re.compile(r"<nav class=\"lesson-nav\"[^>]*>(.*?)</nav>", re.S)
 PAGER_ANCHOR_RE = re.compile(r"<a\s+([^>]*?)>(.*?)</a>", re.S)
 ATTRIBUTE_RE = re.compile(r"([A-Za-z_:][-\w:.]*)\s*=\s*\"([^\"]*)\"")
-# The <strong> body is pinned to "NN &middot; Title", not merely "something".
-# Spec B mandates that exact shape, and a bare `.+?` let the separator drift to
-# "-" or "|" across courses without a single test noticing -- the precise class
-# of cross-course drift TestPinnedConventions exists to stop.
+# Document links display the kind and literal destination title. Adjacency
+# metadata preserves existing URLs without prescribing a curriculum order.
 PAGER_BODY_RE = re.compile(
     r"\A\s*<span>([^<]+)</span>\s*<strong>(.+?)</strong>\s*\Z", re.S
 )
-# The <strong> label has exactly two legitimate shapes, and both are pinned so
-# the separator cannot drift to "-" or "|" across courses -- a bare `.+?` here
-# let precisely that happen once already.
-#   lesson -> lesson            "NN &middot; Title"
-#   last lesson -> course home  a plain label with no ordinal, because the
-#                               course home is not lesson number anything.
-PAGER_LABEL_RE = re.compile(r"\A\s*\d{2}\s*&middot;\s*\S.*\Z", re.S)
-PAGER_TERMINAL_LABEL_RE = re.compile(r"\A\s*[^<&]*\S[^<]*\Z", re.S)
 RETIRED_PAGER_MARKUP = (
     "lesson-pager", "pager-link",
     'class="prev"', 'class="next"', 'class="dir"', 'class="name"',
@@ -3823,18 +3753,19 @@ class TestPinnedConventions(SiteFixture):
                         self.assertRegex(
                             body,
                             PAGER_BODY_RE,
-                            "a pager anchor is <span>direction</span> then "
+                            "a pager anchor is <span>kind</span> then "
                             "<strong>label</strong>; no other elements",
                         )
-                        label = PAGER_BODY_RE.match(body).group(2)
+                        kind, label = PAGER_BODY_RE.match(body).groups()
                         terminal = attrs.get("href") == "../"
-                        self.assertRegex(
-                            label,
-                            PAGER_TERMINAL_LABEL_RE if terminal else PAGER_LABEL_RE,
-                            "a lesson-to-lesson pager label is pinned to "
-                            "'NN &middot; Title'; only the link out to the course "
-                            "home may use a plain label (href=%r)" % attrs.get("href"),
-                        )
+                        self.assertEqual("Course" if terminal else "Lesson", kind,
+                                         "neutral taxonomic document kind")
+                        target = by_url[urllib.parse.urljoin(url, attrs["href"])]
+                        from test_course_ui import Elements, words
+                        heading = Elements(target.text).find("title")
+                        self.assertEqual(1, len(heading))
+                        self.assertEqual(words(heading[0]).split(" | " + kind + " | ")[0], html.unescape(label),
+                                         "neutral literal document title; no pager ordinal")
 
     def test_pager_rel_asserts_only_true_document_relationships(self):
         """rel=prev/next inside a course; no rel on the link out of one.
@@ -3930,11 +3861,11 @@ class TestPinnedConventions(SiteFixture):
         )
 
         anchors = pager_anchors(
-            '<nav class="lesson-nav" aria-label="Lesson navigation">'
+            '<nav class="lesson-nav" aria-label="Course and lesson links">'
             '<a class="lesson-link prev" href="../a/" rel="prev">'
-            "<span>Previous lesson</span><strong>01 &middot; A</strong></a>"
+            "<span>Lesson</span><strong>A</strong></a>"
             '<a class="lesson-link next" href="../">'
-            "<span>Next</span><strong>Course home</strong></a></nav>"
+            "<span>Course</span><strong>Course home</strong></a></nav>"
         )
         self.assertEqual(
             ["lesson-link prev", "lesson-link next"],

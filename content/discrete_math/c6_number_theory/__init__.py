@@ -13,9 +13,9 @@ COURSE = {
         "remainder theorem, Fermat and Euler, and public-key encryption."
     ),
     "blurb": (
-        "Everything follows from one theorem about division with remainder. Primes, "
-        "gcds, congruences and modular inverses build up to RSA &mdash; which is "
-        "generated, used and then broken here on primes small enough to check by hand."
+        (
+        'Everything follows from one theorem about division with remainder. Primes, gcds, congruences and modular inverses build up to RSA &mdash; which is generated, used and then broken here on primes small enough to check by hand.'
+    )
     ),
     "key": [
         "a = qb + r,  0 ≤ r < b            unique q and r",
@@ -23,7 +23,7 @@ COURSE = {
         "a^{p−1} ≡ 1 (mod p)               Fermat, for prime p ∤ a",
         "ed ≡ 1 (mod φ(n))  ⟹  m^{ed} ≡ m  (mod n)     RSA",
     ],
-    "assumes_short": "Courses 1–3",
+    "assumes_short": "Proof and induction",
     "assumes_long": "proof technique and induction",
     "outcomes_intro": (
         "By the end you can compute in modular arithmetic confidently, judge the "
@@ -49,8 +49,7 @@ COURSE = {
          "&mdash; then break one from two letter frequencies."),
     ],
     "syllabus_intro": (
-        "Lessons 1 to 6 are divisibility and gcd, 7 to 11 are modular arithmetic, and "
-        "12 to 14 apply all of it."
+        'Divisibility and gcd come first, then modular arithmetic, and last the applications that use all of it.'
     ),
     "how_to": [
         "Use the workbench lab in every lesson. Each mode prints the algorithm's trace "
@@ -61,18 +60,13 @@ COURSE = {
         "Do the RSA lesson with the primes it starts with, then change them. Watching "
         "the key change and the ciphertext change with it is what makes the mechanism "
         "concrete.",
-        "Take the factoring demonstration in lesson 14 seriously. The lab breaks the "
-        "key it just generated, and understanding why that is easy here and hard in "
-        "practice is the whole security argument.",
+        'Take the factoring demonstration in “RSA Encryption” seriously. The lab breaks the key it just generated, and understanding why that is easy here and hard in practice is the whole security argument.',
     ],
     "not_covered": [
-        "Analytic number theory: the prime number theorem is quoted in lesson 3 and not "
-        "proved, and the Riemann hypothesis is mentioned only as context.",
+        'Analytic number theory: the prime number theorem is quoted in “The Sieve of Eratosthenes” and not proved, and the Riemann hypothesis is mentioned only as context.',
         "Elliptic curves, discrete logarithms and Diffie&ndash;Hellman. RSA is the one "
         "public-key system developed here.",
-        "Cryptographic engineering: padding schemes, key management, side channels and "
-        "protocol design. Lesson 14 is the mathematics of RSA, and textbook RSA is not "
-        "a system anyone should deploy.",
+        'Cryptographic engineering: padding schemes, key management, side channels and protocol design. “RSA Encryption” is the mathematics of RSA, and textbook RSA is not a system anyone should deploy.',
     ],
     "footer_lead": (
         "All arithmetic on this course is exact big-integer arithmetic, because modular "

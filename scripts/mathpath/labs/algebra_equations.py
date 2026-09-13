@@ -52,7 +52,7 @@ FORM_JS = r"""
       + '</th><td style="text-align:left;">' + detail + '</td></tr>';
   }
   function ttable(caption, rows) {
-    return '<div class="table-wrap"><table class="tt"><caption>' + caption
+    return '<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>' + caption
       + '</caption><tbody>' + rows.join('') + '</tbody></table></div>';
   }
   function chip(text, kind) { return '<span class="chip ' + kind + '">' + text + '</span>'; }
@@ -62,7 +62,7 @@ FORM_JS = r"""
       + items.map(function (t) { return '<td style="text-align:left;">' + t + '</td>'; }).join('') + '</tr>';
   }
   function tgrid(caption, head, rows) {
-    return '<div class="table-wrap"><table class="tt"><caption>' + caption + '</caption><thead><tr>'
+    return '<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>' + caption + '</caption><thead><tr>'
       + head.map(function (t) { return '<th>' + t + '</th>'; }).join('')
       + '</tr></thead><tbody>' + rows.join('') + '</tbody></table></div>';
   }
@@ -626,7 +626,7 @@ EQ_JS = r"""
   function degMsg(a, b) {
     return 'the highest power here is ' + V + '^' + Math.max(Pdeg(a), Pdeg(b))
       + ', and this lab solves LINEAR statements &mdash; one operation undone at a time. '
-      + 'A quadratic needs the four-method lab in course 6, not this one.';
+      + 'A quadratic needs the four-method lab in Quadratics and Complex Numbers; this lab solves linear statements.';
   }
 
   /* --------------------------------------------------------- the picture */
@@ -1005,8 +1005,8 @@ EQ_JS = r"""
       ]);
       return say('<strong>' + target + ' cannot be isolated by these steps.</strong> Adding, subtracting, '
         + 'multiplying and dividing both sides undo a linear relationship, and this one is not linear in '
-        + target + '. A squared letter needs a square root &mdash; and then BOTH signs, which is a course 6 '
-        + 'lesson, not a rearrangement.');
+        + target + '. A squared letter needs a square root &mdash; and then BOTH signs, which is covered in The Square Root Property; that '
+        + 'operation is not a linear rearrangement.');
     }
 
     var a = lin.a, b = lin.b;
@@ -2615,7 +2615,7 @@ INEQ_JS += r"""
     if (Pdeg(D) > 2) {
       return trouble('after moving everything to one side this is degree ' + Pdeg(D)
         + '. The sign analysis below works at any degree, but finding the roots of a cubic needs the '
-        + 'rational root theorem from course 4, so this mode stops at the quadratic.');
+        + 'rational root theorem from Polynomials and Factoring, so this mode stops at the quadratic.');
     }
 
     var svgLine = el('iqLine'), svgPlot = el('iqPlot');

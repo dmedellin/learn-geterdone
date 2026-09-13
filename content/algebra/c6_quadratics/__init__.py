@@ -10,7 +10,9 @@ COURSE = {
         "The quadratic, four ways: factoring, the square root property, completing the square and the formula that completing the square proves. Then the discriminant, the complex numbers that appear when it is negative, parabolas, optimisation and quadratic inequalities."
     ),
     "blurb": (
-        "One equation shape, four solution methods, and a number system that has to be extended so that every one of them always finishes. Completing the square is the centre of the course: it derives the formula and it puts a parabola in vertex form."
+        (
+        'One equation shape, four solution methods, and a number system that has to be extended so that every one of them always finishes. Completing the square is the centre of the course: it derives the formula and it puts a parabola in vertex form.'
+    )
     ),
     "key": [
         "ab = 0  ⟹  a = 0 or b = 0",
@@ -18,7 +20,7 @@ COURSE = {
         "b² − 4ac  >  0, = 0, <  0     two, one, none (real)",
         "i² = −1        y = a(x − h)² + k",
     ],
-    "assumes_short": "Courses 1–5",
+    "assumes_short": "Factoring and radicals",
     "assumes_long": "factoring and radical simplification",
     "outcomes_intro": (
         "By the end you can choose and carry out a solution method, classify the roots "
@@ -36,7 +38,7 @@ COURSE = {
          "Add, multiply and divide complex numbers, use the conjugate, and interpret a conjugate pair of roots as a parabola that misses the axis."),
     ],
     "syllabus_intro": (
-        "Lessons 1 to 6 solve quadratics and count their solutions; 7 to 9 build the complex numbers; 10 to 14 graph, optimise and extend."
+        'Quadratics are solved and their solutions counted first; the complex numbers are built next; and last they are graphed, optimised and extended.'
     ),
     "how_to": [
         "On each lesson, cover the complete worked example before attempting the faded rehearsal beneath it. The rehearsal supplies the first strategic decision but leaves the algebra and check to you; only then use the quiz as independent retrieval.",
@@ -46,7 +48,9 @@ COURSE = {
     ],
     "not_covered": [
         "Polar form of complex numbers, De Moivre's theorem and complex roots of unity, which need trigonometry.",
-        "Cubic and quartic formulas. Course 4's rational root theorem is the tool this path gives for higher degrees.",
+        (
+            "Cubic and quartic formulas. Polynomials and Factoring's rational root theorem is the tool this path gives for higher degrees."
+        ),
         "Conic sections in general. The parabola appears here as the graph of a quadratic function, not as a locus.",
     ],
     "footer_lead": (

@@ -84,8 +84,7 @@ LESSONS = [
                   "while `a^b` itself would have about `2^1024` bits."),
             ("h3", "Where it is used"),
             ("ul", [
-                "<strong>RSA</strong> (lesson 14): both encryption and decryption are a "
-                "single modular exponentiation, with 2048-bit exponents.",
+                '<strong>RSA</strong> (“RSA Encryption”): both encryption and decryption are a single modular exponentiation, with 2048-bit exponents.',
                 "<strong>Diffie&ndash;Hellman key exchange</strong> and the whole family of "
                 "discrete-logarithm systems.",
                 "<strong>Primality testing</strong>: Fermat and Miller&ndash;Rabin both "
@@ -138,9 +137,7 @@ LESSONS = [
                 "7 squarings and 3 multiplications, against 199 the naive way.",
             ],
             "after": [
-                "The powers began repeating &mdash; `3^4 ≡ 3^64 ≡ 31` &mdash; because the "
-                "multiplicative order of 3 modulo 50 divides `φ(50) = 20`. Lesson 11 "
-                "explains that, and it is why the answer came out as 1."
+                "The powers began repeating &mdash; `3^4 ≡ 3^64 ≡ 31` &mdash; because the multiplicative order of 3 modulo 50 divides `φ(50) = 20`. “Fermat's Little Theorem and Euler's Theorem” explains that, and it is why the answer came out as 1."
             ],
         },
         "quiz_title": "Modular exponentiation",
@@ -158,10 +155,7 @@ LESSONS = [
                    "It is optional",
                    "To make the exponent smaller"],
              "c": 1,
-             "why": "The answer would be the same without reducing; the numbers would be "
-                    "unrepresentable, so reduction is what makes it computable. It does "
-                    "nothing to the exponent &mdash; that is lesson 11's `φ(m)` &mdash; "
-                    "and it is optional only in the sense that fitting in memory is."},
+             "why": "The answer would be the same without reducing; the numbers would be unrepresentable, so reduction is what makes it computable. It does nothing to the exponent &mdash; that is “Fermat's Little Theorem and Euler's Theorem”'s `φ(m)` &mdash; and it is optional only in the sense that fitting in memory is."},
             {"q": "RSA encryption of one block is:",
              "a": ["a factorisation", "a single modular exponentiation",
                    "a gcd computation", "a table lookup"],
@@ -173,8 +167,7 @@ LESSONS = [
         ],
         "mistakes": [
             ("Reducing the exponent modulo `m`",
-             "Exponents reduce modulo `φ(m)`, not `m`, and only when the base is coprime "
-             "to `m`. Lesson 11 states the rule."),
+             "Exponents reduce modulo `φ(m)`, not `m`, and only when the base is coprime to `m`. “Fermat's Little Theorem and Euler's Theorem” states the rule."),
             ("Computing `a^b` before reducing",
              "The intermediate is astronomically large. Reducing at every step is the "
              "whole point."),
@@ -221,8 +214,7 @@ LESSONS = [
              "Not one, and not `m`. The solutions form one class modulo `m/g`, which "
              "splits into `g` classes modulo `m`."),
             ("Coprime is the clean case",
-             "`gcd(a,m) = 1` gives a unique solution `x ≡ a⁻¹b`, computed by the extended "
-             "algorithm of lesson 6."),
+             "`gcd(a,m) = 1` gives a unique solution `x ≡ a⁻¹b`, computed by the extended algorithm of “Bézout's Identity and Modular Inverses”."),
         ],
         "read_title": "Solving `ax ≡ b (mod m)`",
         "read_intro": "The criterion, the count, and the method.",
@@ -256,10 +248,7 @@ LESSONS = [
                          "inverse of 7 mod 26 is 15, since `7 · 15 = 105 = 4·26 + 1`. So "
                          "`x ≡ 45 ≡ 19 (mod 26)`.")),
             ("h3", "Why the count is the gcd"),
-            ("p", "The reduced congruence lives modulo `m/g` and has one solution there. "
-                  "Each class modulo `m/g` contains exactly `g` classes modulo `m`, so one "
-                  "solution downstairs becomes `g` upstairs. Answering \"one\" or \"m\" "
-                  "both miss this, and the count matters for the systems of lesson 10."),
+            ("p", 'The reduced congruence lives modulo `m/g` and has one solution there. Each class modulo `m/g` contains exactly `g` classes modulo `m`, so one solution downstairs becomes `g` upstairs. Answering "one" or "m" both miss this, and the count matters for the systems of “The Chinese Remainder Theorem”.'),
             ("h3", "Comparison with ordinary linear equations"),
             ("math", [
                 "over ℝ            ax = b            exactly one solution when a ≠ 0",
@@ -290,7 +279,7 @@ LESSONS = [
              "All three of `a`, `b` and the modulus. The reduced coefficient is now coprime "
              "to the reduced modulus."),
             ("Invert and solve",
-             "`x ≡ (a/g)⁻¹(b/g) (mod m/g)`, using the extended algorithm of lesson 6."),
+             "`x ≡ (a/g)⁻¹(b/g) (mod m/g)`, using the extended algorithm of “Bézout's Identity and Modular Inverses”."),
             ("Lift to the original modulus",
              "Add multiples of `m/g` to produce all `g` solutions modulo `m`, and check at "
              "least one by substitution."),
@@ -443,10 +432,7 @@ LESSONS = [
                   "The two exponentiations use numbers half the size, and modular "
                   "multiplication costs roughly the square of the operand size &mdash; so "
                   "each is about four times cheaper, and two of them together about twice."),
-            ("p", "In practice the exponents can also be reduced modulo `p − 1` and "
-                  "`q − 1` by Fermat's theorem (lesson 11), which is where the rest of the "
-                  "speed-up comes from. The overall gain is roughly a factor of four, and "
-                  "essentially every RSA implementation does this."),
+            ("p", "In practice the exponents can also be reduced modulo `p − 1` and `q − 1` by Fermat's theorem (“Fermat's Little Theorem and Euler's Theorem”), which is where the rest of the speed-up comes from. The overall gain is roughly a factor of four, and essentially every RSA implementation does this."),
         ],
         "lab": ("number", {
             "mode": "crt", "a": 2, "b": 3, "m": 3, "n": 5,
@@ -511,24 +497,14 @@ LESSONS = [
              "a": ["one solution mod 24", "no solution",
                    "two solutions", "one solution mod 12"],
              "c": 1,
-             "why": "The first forces `x` odd and the second forces it even: the moduli "
-                    "are not coprime and the remainders disagree modulo `gcd(4,6) = 2`. "
-                    "\"One solution mod 24\" assumes the theorem applies; \"one "
-                    "solution mod 12\" is the answer for a consistent pair such as "
-                    "remainders 1 and 3; \"two solutions\" confuses the count with the "
-                    "gcd, which governs lesson 9's single congruence, not a system."},
+             "why": 'The first forces `x` odd and the second forces it even: the moduli are not coprime and the remainders disagree modulo `gcd(4,6) = 2`. "One solution mod 24" assumes the theorem applies; "one solution mod 12" is the answer for a consistent pair such as remainders 1 and 3; "two solutions" confuses the count with the gcd, which governs “Linear Congruences”\'s single congruence, not a system.'},
             {"q": "RSA implementations use the theorem to:",
              "a": ["factor `n`",
                    "decrypt modulo `p` and `q` separately and recombine, about four times faster",
                    "generate primes",
                    "verify signatures"],
              "c": 1,
-             "why": "Two exponentiations on half-size numbers cost far less than one on "
-                    "full-size, because modular multiplication scales quadratically. It "
-                    "factors nothing &mdash; the owner of the key already has `p` and `q`; "
-                    "primes are generated by testing, lesson 11; and verification uses the "
-                    "public exponent, which is small enough that the trick is not worth "
-                    "applying there."},
+             "why": "Two exponentiations on half-size numbers cost far less than one on full-size, because modular multiplication scales quadratically. It factors nothing &mdash; the owner of the key already has `p` and `q`; primes are generated by testing, “Fermat's Little Theorem and Euler's Theorem”; and verification uses the public exponent, which is small enough that the trick is not worth applying there."},
         ],
         "mistakes": [
             ("Applying it without checking coprimality",
@@ -573,8 +549,7 @@ LESSONS = [
         ),
         "concepts": [
             ("`φ(m)` counts the units",
-             "The integers in `1, …, m` coprime to `m`. They are exactly the invertible "
-             "elements of `ℤ_m`, by lesson 6."),
+             "The integers in `1, …, m` coprime to `m`. They are exactly the invertible elements of `ℤ_m`, by “Bézout's Identity and Modular Inverses”."),
             ("Exponents reduce modulo `φ(m)`",
              "Not modulo `m`. `7^100 mod 10` becomes `7^{100 mod 4} = 7^0 = 1`, because "
              "`φ(10) = 4`."),
@@ -593,10 +568,7 @@ LESSONS = [
                      "multiplicative on coprime arguments, so "
                      "`φ(mn) = φ(m)φ(n)` when `gcd(m,n) = 1`. In general "
                      "`φ(n) = n Π_{p | n} (1 − 1/p)`.")),
-            ("p", "The multiplicativity is the Chinese remainder theorem in disguise: "
-                  "`ℤ_{mn} ≅ ℤ_m × ℤ_n` for coprime moduli, and an element is invertible in "
-                  "the product exactly when both components are. The product formula is "
-                  "inclusion and exclusion over the prime divisors, from course 4 lesson 9."),
+            ("p", 'The multiplicativity is the Chinese remainder theorem in disguise: `ℤ_{mn} ≅ ℤ_m × ℤ_n` for coprime moduli, and an element is invertible in the product exactly when both components are. The product formula is inclusion and exclusion over the prime divisors, from “The Inclusion-Exclusion Principle” in Combinatorics and Counting.'),
             ("math", [
                 "φ(7)  = 6              prime",
                 "φ(9)  = 9 − 3 = 6      = 3² − 3",
@@ -628,9 +600,7 @@ LESSONS = [
                          "`7^{1000} mod 13`. `φ(13) = 12` and `1000 = 83·12 + 4`, so "
                          "`7^{1000} ≡ 7⁴ (mod 13)`. And `7² = 49 ≡ 10`, `7⁴ ≡ 100 ≡ 9`. "
                          "The answer is 9, from two multiplications.")),
-            ("p", "Combined with lesson 8's fast exponentiation this makes essentially any "
-                  "modular power computable: reduce the exponent by `φ(m)` first, then "
-                  "square and multiply."),
+            ("p", "Combined with “Modular Exponentiation”'s fast exponentiation this makes essentially any modular power computable: reduce the exponent by `φ(m)` first, then square and multiply."),
             ("h3", "Primality testing"),
             ("p", "Fermat's theorem gives a test: if `a^{n−1} ≢ 1 (mod n)` for some `a` "
                   "coprime to `n`, then `n` is definitely composite. The converse fails "
@@ -730,9 +700,7 @@ LESSONS = [
         "standard": ("Finish when you reduce the exponent before anything else.",
                      "Compute `2^{1000000} mod 77`. `φ(77) = 60`, so the exponent becomes "
                      "`1000000 mod 60 = 40`, and `2^40 mod 77` is a short square-and-multiply."),
-        "note": "Euler's theorem is exactly what makes RSA work: choosing `d` with "
-                "`ed ≡ 1 (mod φ(n))` means `m^{ed} = m^{1 + kφ(n)} ≡ m` for `m` coprime to "
-                "`n`. Lesson 14 puts it to use.",
+        "note": "Euler's theorem is exactly what makes RSA work: choosing `d` with `ed ≡ 1 (mod φ(n))` means `m^{ed} = m^{1 + kφ(n)} ≡ m` for `m` coprime to `n`. “RSA Encryption” puts it to use.",
     },
     # ---------------------------------------------------------------- 12
     {
@@ -775,10 +743,7 @@ LESSONS = [
             ("def", ("Hash function",
                      "A function `h` mapping a large key space into `{0, 1, …, m−1}`. The "
                      "simplest is `h(k) = k mod m`.")),
-            ("p", "Since the key space is larger than the range, collisions are "
-                  "unavoidable: by the pigeonhole principle of course 2 lesson 14, some "
-                  "slot receives more than one key. A hash table is therefore designed "
-                  "around collisions &mdash; by chaining, or by probing for another slot."),
+            ("p", 'Since the key space is larger than the range, collisions are unavoidable: by the pigeonhole principle of “The Pigeonhole Principle” in Sets, Relations, and Functions, some slot receives more than one key. A hash table is therefore designed around collisions &mdash; by chaining, or by probing for another slot.'),
             ("thm", ("Why the modulus should be prime",
                      "If `m = 2^r`, then `k mod m` depends only on the low `r` bits of `k`. "
                      "Keys sharing those bits &mdash; addresses aligned to a boundary, "
@@ -788,11 +753,7 @@ LESSONS = [
                          "Hashing memory addresses with `m = 16` when every address is a "
                          "multiple of 16 sends every key to slot 0. With `m = 17` the same "
                          "keys spread across all seventeen slots.")),
-            ("p", "The birthday problem of course 5 lesson 2 gives the collision rate: with "
-                  "`m` slots and `n` keys, collisions become likely once `n` is around "
-                  "`√m`. A table of a million slots sees its first collision after about a "
-                  "thousand insertions, which is why load factors are managed rather than "
-                  "collisions avoided."),
+            ("p", 'The birthday problem of “Computing Probabilities” in Discrete Probability gives the collision rate: with `m` slots and `n` keys, collisions become likely once `n` is around `√m`. A table of a million slots sees its first collision after about a thousand insertions, which is why load factors are managed rather than collisions avoided.'),
             ("h3", "Linear congruential generators"),
             ("def", ("LCG",
                      "`x_{n+1} = (a·x_n + c) mod m`, from a seed `x₀`. The parameters "
@@ -881,11 +842,7 @@ LESSONS = [
                    "Modular arithmetic is imprecise",
                    "They are avoidable with a prime modulus"],
              "c": 1,
-             "why": "A map from a larger set to a smaller one cannot be injective "
-                    "(course 2 lesson 14), so the design question is how collisions are "
-                    "handled. A better hash function spreads them and cannot remove them; "
-                    "modular arithmetic is exact; and a prime modulus changes which keys "
-                    "collide, not whether some do."},
+             "why": 'A map from a larger set to a smaller one cannot be injective (“The Pigeonhole Principle” in Sets, Relations, and Functions), so the design question is how collisions are handled. A better hash function spreads them and cannot remove them; modular arithmetic is exact; and a prime modulus changes which keys collide, not whether some do.'},
             {"q": "`h(k) = k mod 2^r` is a poor choice because:",
              "a": ["it is slow",
                    "it uses only the low `r` bits of the key",
@@ -978,10 +935,7 @@ LESSONS = [
             ("def", ("Affine cipher",
                      "`E(x) = (ax + b) mod 26`, with `gcd(a, 26) = 1` so that `a` is "
                      "invertible. Decryption is `D(y) = a⁻¹(y − b) mod 26`.")),
-            ("p", "The coprimality condition is exactly lesson 6's: without it the map is "
-                  "not injective and decryption is impossible. Since `26 = 2 · 13`, the "
-                  "valid multipliers are the twelve values coprime to 26, giving "
-                  "`12 · 26 = 312` keys."),
+            ("p", "The coprimality condition is exactly “Bézout's Identity and Modular Inverses”'s: without it the map is not injective and decryption is impossible. Since `26 = 2 · 13`, the valid multipliers are the twelve values coprime to 26, giving `12 · 26 = 312` keys."),
             ("example", ("Encrypting and decrypting",
                          "`a = 5`, `b = 8`. The letter `H` is 7, so "
                          "`E(7) = 5·7 + 8 = 43 ≡ 17 = R`. To decrypt, `5⁻¹ ≡ 21 (mod 26)` "
@@ -1021,8 +975,7 @@ LESSONS = [
                   "with the same key satisfy `c₁ ⊕ c₂ = m₁ ⊕ m₂`, from which both plaintexts "
                   "can usually be recovered &mdash; the failure that broke the Soviet "
                   "VENONA traffic."),
-            ("p", "Lesson 14's RSA answers the key-distribution problem instead: no shared "
-                  "secret is needed at all."),
+            ("p", "“RSA Encryption”'s RSA answers the key-distribution problem instead: no shared secret is needed at all."),
         ],
         "lab": ("number", {
             "mode": "affine", "a": 5, "b": 8,
@@ -1070,9 +1023,7 @@ LESSONS = [
                 "Decrypt with a⁻¹ = 7:   D(y) = 7(y − 9) mod 26",
             ],
             "after": [
-                "Two frequency guesses gave a linear system, which lesson 9 solves. If the "
-                "decryption is nonsense the next guess is E→R, T→ something else, and there "
-                "are only a few to try. The cipher offers no resistance beyond that."
+                'Two frequency guesses gave a linear system, which “Linear Congruences” solves. If the decryption is nonsense the next guess is E→R, T→ something else, and there are only a few to try. The cipher offers no resistance beyond that.'
             ],
         },
         "quiz_title": "Classical ciphers",
@@ -1120,13 +1071,8 @@ LESSONS = [
              "recoverable. The pad is secure only for a single use."),
         ],
         "standard": ("Finish when you can break an affine cipher from two frequencies.",
-                     "Given that the two commonest ciphertext letters are K and D, solve "
-                     "for `a` and `b` assuming they correspond to E and T. The system is "
-                     "two linear congruences, which lesson 9 handles; the key comes out as "
-                     "`(3, 24)`, and the lab will confirm E → K and T → D."),
-        "note": "Every cipher here shares one weakness that lesson 14 removes: both parties "
-                "need the key in advance. Public-key cryptography changed that, and it is "
-                "the single most consequential idea in the subject.",
+                     'Given that the two commonest ciphertext letters are K and D, solve for `a` and `b` assuming they correspond to E and T. The system is two linear congruences, which “Linear Congruences” handles; the key comes out as `(3, 24)`, and the lab will confirm E → K and T → D.'),
+        "note": 'Every cipher here shares one weakness that “RSA Encryption” removes: both parties need the key in advance. Public-key cryptography changed that, and it is the single most consequential idea in the subject.',
     },
     # ---------------------------------------------------------------- 14
     {
@@ -1175,13 +1121,9 @@ LESSONS = [
                 "    PUBLIC KEY   (n, e)",
                 "    PRIVATE KEY  (n, d)      and p, q, φ(n) must stay secret",
             ]),
-            ("p", "Every step is a lesson from this course: primality testing from lesson "
-                  "11, the totient formula from lesson 11, coprimality from lesson 4, and "
-                  "the modular inverse from lesson 6."),
+            ("p", "Every step is a lesson from this course: primality testing from “Fermat's Little Theorem and Euler's Theorem”, the totient formula from “Fermat's Little Theorem and Euler's Theorem”, coprimality from “Greatest Common Divisor”, and the modular inverse from “Bézout's Identity and Modular Inverses”."),
             ("h3", "Encryption and decryption"),
-            ("p", "With the message encoded as an integer `m` with `0 ≤ m &lt; n`, "
-                  "encryption is `c = m^e mod n` and decryption is `m = c^d mod n`. Both "
-                  "are single modular exponentiations, computed by lesson 8's algorithm."),
+            ("p", "With the message encoded as an integer `m` with `0 ≤ m &lt; n`, encryption is `c = m^e mod n` and decryption is `m = c^d mod n`. Both are single modular exponentiations, computed by “Modular Exponentiation”'s algorithm."),
             ("thm", ("Correctness",
                      "For `0 ≤ m &lt; n`, `(m^e)^d ≡ m (mod n)`.")),
             ("proof", [
@@ -1200,7 +1142,7 @@ LESSONS = [
             ("math", [
                 "p = 61,  q = 53        n = 3233        φ(n) = 60 · 52 = 3120",
                 "e = 17                 gcd(17, 3120) = 1                  ✓",
-                "d = 17⁻¹ mod 3120 = 2753        (lesson 6 computed this)",
+                "d = 17⁻¹ mod 3120 = 2753        (“Bézout's Identity and Modular Inverses” computed this)",
                 "",
                 "encrypt m = 65:   65^17 mod 3233 = 2790",
                 "decrypt:        2790^2753 mod 3233 =   65        ✓",
@@ -1251,15 +1193,11 @@ LESSONS = [
              "`n = pq`. They must be distinct, or `φ(n) = p(p−1)` rather than `(p−1)²` and "
              "`n` is a square, trivially factorable."),
             ("Compute `φ(n) = (p−1)(q−1)`",
-             "Multiplicativity of `φ` from lesson 11. This value must never be published."),
+             "Multiplicativity of `φ` from “Fermat's Little Theorem and Euler's Theorem”. This value must never be published."),
             ("Choose `e` coprime to `φ(n)` and invert it",
-             "`gcd(e, φ(n)) = 1` by lesson 4, and `d = e⁻¹ mod φ(n)` by lesson 6. `e` need "
-             "not be prime, only coprime; 65537 is the usual choice because a prime is "
-             "coprime to `φ(n)` unless it divides it, one check, and `2¹⁶ + 1` has two set "
-             "bits, so `m^e` costs sixteen squarings and one multiplication."),
+             "`gcd(e, φ(n)) = 1` by “Greatest Common Divisor”, and `d = e⁻¹ mod φ(n)` by “Bézout's Identity and Modular Inverses”. `e` need not be prime, only coprime; 65537 is the usual choice because a prime is coprime to `φ(n)` unless it divides it, one check, and `2¹⁶ + 1` has two set bits, so `m^e` costs sixteen squarings and one multiplication."),
             ("Exponentiate to encrypt and decrypt",
-             "By lesson 8's square and multiply, which is what makes 2048-bit exponents "
-             "practical."),
+             "By “Modular Exponentiation”'s square and multiply, which is what makes 2048-bit exponents practical."),
         ],
         "worked": {
             "title": "A complete small key",
@@ -1280,7 +1218,7 @@ LESSONS = [
                 "    126·81 = 10206 = 71·143 + 53 ≡ 53;   53·9 = 477 ≡ 48   (mod 143)",
                 "    c = 48",
                 "",
-                "decrypt:  48^103 mod 143 = 9      (103 = 1100111₂, lesson 8)     ✓",
+                'decrypt:  48^103 mod 143 = 9      (103 = 1100111₂, “Modular Exponentiation”)     ✓',
             ],
             "after": [
                 "The public key `(143, 7)` is enough to encrypt and useless for decrypting "
@@ -1336,10 +1274,6 @@ LESSONS = [
                      "it, and then factor `n` to recover `d`. With `e = 3` you should find "
                      "`n = 391`, `φ(n) = 352` and `d = 235`. Doing the attack yourself is "
                      "what makes the security argument concrete rather than asserted."),
-        "note": "This course ends where cryptographic engineering begins. Padding schemes, "
-                "key management, side-channel resistance and protocol design are all "
-                "essential and none of them is number theory. What number theory supplies "
-                "is the core operation and an honest account of what it does and does not "
-                "guarantee.",
+        "note": 'This course ends where cryptographic engineering begins. Padding schemes, key management, side-channel resistance and protocol design are all essential and none of them is number theory. What number theory supplies is the core operation and an honest account of what it does and does not guarantee.',
     },
 ]

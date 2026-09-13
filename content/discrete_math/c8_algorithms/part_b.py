@@ -20,8 +20,7 @@ LESSONS = [
         ],
         "key_label": "One comparison decides",
         "concepts_intro": (
-            "Course 3 lesson 11 solved these recurrences; this lesson uses them to "
-            "compare algorithm designs."
+            '“Divide-and-Conquer Recurrences” in Induction and Recursion solved these recurrences; this lesson uses them to compare algorithm designs.'
         ),
         "concepts": [
             ("The three cases are which level dominates",
@@ -90,16 +89,7 @@ LESSONS = [
         "lab": ("algorithm", {
             "mode": "master", "abd": [4, 2, 1],
             "panel_title": "The cases, tabulated — and yours",
-            "panel_intro": "The top row is the recurrence you enter, and it opens on the "
-                           "worked example's baseline `4T(n/2) + n`: `log₂ 4 = 2 &gt; 1`, "
-                           "case 3, `Θ(n²)`. Set `d = 0` and the answer does not move "
-                           "&mdash; still `Θ(n²)`, the leaves already dominated. Set `a = 3` "
-                           "with `d = 1` and it becomes `Θ(n^1.585)`. The standard's "
-                           "`9T(n/3) + n²` lands in case 2, `Θ(n² log n)`. The fixed rows "
-                           "below compute `log_b a` for the algorithms in the body; "
-                           "Karatsuba and Strassen both improve by lowering `a`, and both "
-                           "keep the same `d`. The cases are numbered as course 3 lesson "
-                           "11 numbers them: 1 root, 2 balanced, 3 leaves.",
+            "panel_intro": "The top row is the recurrence you enter, and it opens on the worked example's baseline `4T(n/2) + n`: `log₂ 4 = 2 &gt; 1`, case 3, `Θ(n²)`. Set `d = 0` and the answer does not move &mdash; still `Θ(n²)`, the leaves already dominated. Set `a = 3` with `d = 1` and it becomes `Θ(n^1.585)`. The standard's `9T(n/3) + n²` lands in case 2, `Θ(n² log n)`. The fixed rows below compute `log_b a` for the algorithms in the body; Karatsuba and Strassen both improve by lowering `a`, and both keep the same `d`. The cases are numbered as “Divide-and-Conquer Recurrences” in Induction and Recursion numbers them: 1 root, 2 balanced, 3 leaves.",
         }),
         "steps_title": "Analysing a divide-and-conquer algorithm",
         "steps_intro": "Read off `a`, `b`, `d`; compare.",
@@ -261,10 +251,7 @@ LESSONS = [
                 "Adding the `n` insertions themselves, the total is under `3n`, so the "
                 "amortised cost per insertion is under 3 &mdash; a constant.",
             ]),
-            ("p", "The geometric series is doing the work: the expensive operations are "
-                  "rare and their cost grows exactly as fast as the gaps between them, so "
-                  "the total telescopes. Course 3 lesson 3's geometric sum is the "
-                  "calculation."),
+            ("p", "The geometric series is doing the work: the expensive operations are rare and their cost grows exactly as fast as the gaps between them, so the total telescopes. The geometric sum of “Induction with Sums and Products”, in Induction and Recursion, is the calculation."),
             ("p", "Doubling is essential. Growing by a fixed amount `c` instead means "
                   "copies at sizes `c, 2c, 3c, …`, totalling `Θ(n²)` moves &mdash; an "
                   "amortised cost of `Θ(n)` per insertion. The two policies differ by a "
@@ -470,10 +457,7 @@ LESSONS = [
                   "optimum can be modified to agree with greedy there without becoming "
                   "worse. Repeating turns the optimum into the greedy solution, so greedy is "
                   "optimal too."),
-            ("p", "This is exactly the argument used for the cut property in course 7 "
-                  "lesson 12: swapping the heavier edge for the lighter one in a minimum "
-                  "spanning tree does not increase the total. The technique is the same "
-                  "wherever greedy is correct."),
+            ("p", 'This is exactly the argument used for the cut property in “Spanning Trees and Minimum Spanning Trees” in Graphs and Trees: swapping the heavier edge for the lighter one in a minimum spanning tree does not increase the total. The technique is the same wherever greedy is correct.'),
             ("h3", "Huffman coding"),
             ("thm", ("Huffman codes are optimal",
                      "Repeatedly merging the two least frequent symbols into a combined "
@@ -578,18 +562,14 @@ LESSONS = [
              "Three plausible rules for interval scheduling, one correct. The proof is the "
              "only way to tell."),
             ("Testing instead of proving",
-             "Shortest-first passes the first example and fails the second. Course 1 lesson "
-             "14's point applies unchanged."),
+             "Shortest-first passes the first example and fails the second. The point of “Cases, Counterexamples, and Writing a Proof”, in Logic and Proof, applies unchanged."),
             ("Not saying which you have",
              "\"Optimal by exchange argument\" and \"a heuristic\" are both respectable. "
              "Presenting the second as the first is not."),
         ],
         "standard": ("Finish when you attempt the exchange argument before trusting a "
                      "greedy rule.",
-                     "For the fractional knapsack problem &mdash; items may be split "
-                     "&mdash; show that taking items in decreasing value-per-weight order "
-                     "is optimal. Then observe that the 0/1 version, where items cannot be "
-                     "split, defeats the same rule, and lesson 10 handles it."),
+                     'For the fractional knapsack problem &mdash; items may be split &mdash; show that taking items in decreasing value-per-weight order is optimal. Then observe that the 0/1 version, where items cannot be split, defeats the same rule, and “Dynamic Programming” handles it.'),
         "note": "The structure making greed provably correct is a matroid, and the "
                 "forests of a graph form one &mdash; which is why Kruskal's algorithm "
                 "works. Most problems have no such structure, and dynamic programming is "
@@ -661,10 +641,7 @@ LESSONS = [
                 "   best[6] = 1 + min(best[5], best[3], best[2]) = 1 + 1 = 2",
                 "   the two coins are 3 + 3 — which greedy missed",
             ]),
-            ("p", "The recurrence is the optimal substructure written down: the best way to "
-                  "make `v` uses some coin `c`, and the rest must be the best way to make "
-                  "`v − c`. Filling the table costs `Θ(v · |coins|)`, and the greedy failure "
-                  "of lesson 9 disappears."),
+            ("p", 'The recurrence is the optimal substructure written down: the best way to make `v` uses some coin `c`, and the rest must be the best way to make `v − c`. Filling the table costs `Θ(v · |coins|)`, and the greedy failure of “Greedy Algorithms” disappears.'),
             ("h3", "Longest common subsequence"),
             ("math", [
                 "L[i][j] = length of the longest common subsequence of the first i",
@@ -685,10 +662,7 @@ LESSONS = [
                          "because those may share vertices and the concatenation would not "
                          "be simple. The problem is NP-hard, and no dynamic program for it "
                          "exists.")),
-            ("p", "Contrast with the SHORTEST path, which does have optimal substructure "
-                  "&mdash; any subpath of a shortest path is shortest &mdash; and is "
-                  "solved in polynomial time by course 7's Dijkstra. Two problems whose "
-                  "statements differ by one word, on opposite sides of tractability."),
+            ("p", "Contrast with the SHORTEST path, which does have optimal substructure &mdash; any subpath of a shortest path is shortest &mdash; and is solved in polynomial time by Graphs and Trees's Dijkstra. Two problems whose statements differ by one word, on opposite sides of tractability."),
             ("h3", "Top-down or bottom-up"),
             ("math", [
                 "MEMOISED (top down)      recursion + a cache",
@@ -885,10 +859,7 @@ LESSONS = [
                      "&mdash; is NP-complete. It was the first problem shown to be so, and "
                      "every subsequent NP-completeness proof reduces from a problem already "
                      "known to be complete.")),
-            ("p", "Course 1 lesson 6 raised the question and named the result; here is what "
-                  "it means. Thousands of problems are now known to be NP-complete: "
-                  "Hamilton circuit, 3-colouring, subset sum, the travelling salesman "
-                  "decision problem, 0/1 knapsack, and clique among them."),
+            ("p", '“Tautology, Contradiction, Satisfiability” in Logic and Proof raised the question and named the result; here is what it means. Thousands of problems are now known to be NP-complete: Hamilton circuit, 3-colouring, subset sum, the travelling salesman decision problem, 0/1 knapsack, and clique among them.'),
             ("p", "They are all equivalent in the sense that matters: a polynomial-time "
                   "algorithm for any one would give one for all of them, and hence "
                   "`P = NP`. Fifty years of effort has produced neither such an algorithm "
@@ -901,8 +872,7 @@ LESSONS = [
                 "algorithm. Consider approximation algorithms with proved ratios, "
                 "heuristics with no guarantee, exact methods on restricted inputs, or "
                 "solvers that are fast in practice.",
-                "<strong>Undecidable.</strong> Stop entirely. No algorithm exists, and "
-                "lesson 12 is about what that means.",
+                '<strong>Undecidable.</strong> Stop entirely. No algorithm exists, and “Decidability and the Halting Problem” is about what that means.',
             ]),
             ("p", "Being NP-complete is a worst-case statement and does not mean instances "
                   "are hard in practice. Industrial SAT solvers routinely handle formulas "
@@ -941,7 +911,7 @@ LESSONS = [
         ],
         "worked": {
             "title": "Two similar problems, opposite sides",
-            "intro": ["The clearest pair on this path."],
+            "intro": ['The clearest pair on this path.'],
             "lines": [
                 "EULER CIRCUIT — does a circuit using every edge once exist?",
                 "   criterion: connected, all degrees even",
@@ -958,10 +928,7 @@ LESSONS = [
                 "The difficulty is a fact about the problems, not about the wording.",
             ],
             "after": [
-                "Course 7 lesson 7 presented both and noted the contrast; this is what the "
-                "contrast means. Verifying a Hamilton circuit is easy, which puts it in NP; "
-                "finding one is believed hard, which is the `P` versus `NP` question in "
-                "miniature."
+                '“Euler and Hamilton Paths” in Graphs and Trees presented both and noted the contrast; this is what the contrast means. Verifying a Hamilton circuit is easy, which puts it in NP; finding one is believed hard, which is the `P` versus `NP` question in miniature.'
             ],
         },
         "quiz_title": "Complexity classes",
@@ -992,12 +959,7 @@ LESSONS = [
                    "use a faster computer",
                    "rewrite in a faster language"],
              "c": 1,
-             "why": "It is actionable information about which approaches are worth "
-                    "attempting. Giving up is the response to undecidable, not to "
-                    "NP-complete &mdash; SAT solvers handle industrial instances daily. A "
-                    "faster computer or language changes the constant, and lesson 3 "
-                    "showed what a thousandfold speed-up buys an exponential algorithm: "
-                    "about ten more items."},
+             "why": 'It is actionable information about which approaches are worth attempting. Giving up is the response to undecidable, not to NP-complete &mdash; SAT solvers handle industrial instances daily. A faster computer or language changes the constant, and “The Growth of Functions” showed what a thousandfold speed-up buys an exponential algorithm: about ten more items.'},
         ],
         "mistakes": [
             ("Reading NP as \"not polynomial\"",
@@ -1006,8 +968,7 @@ LESSONS = [
              "It is a worst-case statement. SAT solvers handle industrial instances with "
              "millions of variables."),
             ("Confusing NP-complete with undecidable",
-             "NP-complete problems have algorithms that are slow. Undecidable problems have "
-             "no algorithm at all, which is lesson 12."),
+             'NP-complete problems have algorithms that are slow. Undecidable problems have no algorithm at all, which is “Decidability and the Halting Problem”.'),
         ],
         "standard": ("Finish when you can say what the classification changes.",
                      "For a problem you are handed, decide whether a solution is quickly "
@@ -1037,8 +998,7 @@ LESSONS = [
         ],
         "key_label": "The hard limit",
         "concepts_intro": (
-            "Undecidability is a theorem, not a state of ignorance, and its proof uses "
-            "the same self-reference course 1 excluded from propositions."
+            "Undecidability is a theorem, not a state of ignorance, and its proof uses the same self-reference Logic and Proof excluded from propositions."
         ),
         "concepts": [
             ("Undecidable is proved, not unknown",
@@ -1078,14 +1038,8 @@ LESSONS = [
                 "by construction `D` halts immediately. Contradiction.",
                 "Both cases are impossible, so `H` cannot exist.",
             ]),
-            ("p", "The structure is exactly course 2 lesson 13's diagonal argument: assume "
-                  "a complete listing or a complete decider, construct the object that "
-                  "differs from every entry, and derive a contradiction. Cantor used it "
-                  "against enumerations of the reals; Turing used it against deciders."),
-            ("p", "It is also the self-reference course 1 lesson 1 excluded from "
-                  "propositions, reappearing where it cannot be excluded: programs can take "
-                  "programs as input, and `D` is applied to itself. That is not a trick, "
-                  "it is what makes computation universal."),
+            ("p", "The structure is exactly the diagonal argument of “Cardinality and Countability”, in Sets, Relations, and Functions: assume a complete listing or a complete decider, construct the object that differs from every entry, and derive a contradiction. Cantor used it against enumerations of the reals; Turing used it against deciders."),
+            ("p", 'It is also the self-reference “Propositions and Truth Values” in Logic and Proof excluded from propositions, reappearing where it cannot be excluded: programs can take programs as input, and `D` is applied to itself. That is not a trick, it is what makes computation universal.'),
             ("h3", "Rice's theorem"),
             ("thm", ("Rice's theorem",
                      "Every nontrivial property of the function a program computes is "
@@ -1121,12 +1075,7 @@ LESSONS = [
                 "DECIDABLE               solvable eventually",
                 "UNDECIDABLE             no algorithm exists",
             ]),
-            ("p", "The path ends here, and the position is worth stating plainly. Course 1 "
-                  "made statements precise; course 3 gave the technique for proving them; "
-                  "courses 4 to 7 built the structures; and this course measured the cost "
-                  "of computing with them. The last two lessons say what cost cannot be "
-                  "paid at all &mdash; some problems are intractable, and some are outside "
-                  "the reach of any algorithm whatever."),
+            ("p", 'The path ends here, and the position is worth stating plainly. Logic and Proof made statements precise; Induction and Recursion gave the technique for proving them; counting, probability, number theory and graph theory built the structures; and this course measured the cost of computing with them. The last two lessons say what cost cannot be paid at all &mdash; some problems are intractable, and some are outside the reach of any algorithm whatever.'),
         ],
         "lab": ("algorithm", {
             "mode": "growth", "n": 20,
@@ -1193,23 +1142,14 @@ LESSONS = [
                    "P = NP",
                    "sorting needs `n log n`"],
              "c": 1,
-             "why": "Which is why static analysis is necessarily approximate: no tool can "
-                    "be both sound and complete for every program. \"All programs halt\" is "
-                    "false outright (a loop with no exit). `P = NP` is open and not a "
-                    "theorem of anyone's; the sorting bound is lesson 6's theorem, true and "
-                    "unrelated."},
+             "why": 'Which is why static analysis is necessarily approximate: no tool can be both sound and complete for every program. "All programs halt" is false outright (a loop with no exit). `P = NP` is open and not a theorem of anyone\'s; the sorting bound is “Searching and Sorting”\'s theorem, true and unrelated.'},
             {"q": "The halting proof works by:",
              "a": ["exhaustive search",
                    "constructing a program that does the opposite of what the decider predicts about it",
                    "counting programs",
                    "assuming P = NP"],
              "c": 1,
-             "why": "A diagonal argument: build the object that differs from every entry, "
-                    "here by applying `D` to itself. Exhaustive search over programs "
-                    "cannot finish, since there are infinitely many; counting them is "
-                    "course 2's route to \"some functions have no program\", which proves "
-                    "existence but names no problem; and `P = NP` is not assumed anywhere "
-                    "&mdash; the proof needs only that `H` is an algorithm."},
+             "why": 'A diagonal argument: build the object that differs from every entry, here by applying `D` to itself. Exhaustive search over programs cannot finish, since there are infinitely many; counting them is Sets, Relations, and Functions\'s route to "some functions have no program", which proves existence but names no problem; and `P = NP` is not assumed anywhere &mdash; the proof needs only that `H` is an algorithm.'},
         ],
         "mistakes": [
             ("Reading undecidable as \"very hard\"",
@@ -1223,9 +1163,7 @@ LESSONS = [
              "question, not by defeating the theorem."),
         ],
         "standard": ("Finish when you can reproduce the halting proof from memory.",
-                     "Seven lines: assume the decider, build the contrary program, apply it "
-                     "to itself, and read off both contradictions. It is the sharpest "
-                     "argument on this path and the shortest of the major ones."),
+                     'Seven lines: assume the decider, build the contrary program, apply it to itself, and read off both contradictions. It is the sharpest argument on this path and the shortest of the major ones.'),
         "note": "Turing's 1936 paper introduced the machine model, proved this result, and "
                 "established that a single universal machine can simulate any other &mdash; "
                 "the theoretical basis of the stored-program computer. The limits and the "

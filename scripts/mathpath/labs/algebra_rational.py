@@ -431,7 +431,7 @@ RF_SCRIPT = r"""
     return '<tr class="focus"><th class="rowhead">' + label + '</th><td style="text-align:left;">' + detail + '</td></tr>';
   }
   function table(caption, rows) {
-    return '<div class="table-wrap"><table class="tt"><caption>' + caption
+    return '<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>' + caption
       + '</caption><tbody>' + rows.join('') + '</tbody></table></div>';
   }
   function chip(kind, text) { return '<span class="chip ' + kind + '">' + text + '</span>'; }
@@ -1188,7 +1188,7 @@ RF_SCRIPT = r"""
       msg = '<strong>No real solution.</strong> Clearing the denominators gave ' + Ptext(E)
         + ' = 0' + (leftover && leftover.why === 'complex'
           ? ', whose discriminant is ' + Rtext(leftover.q.disc) + ' &mdash; negative, so no real x satisfies it. '
-            + 'Course 6 gives those roots a home; on the real line there is nothing here.'
+            + 'Quadratics and Complex Numbers gives those roots a home; on the real line there is nothing here.'
           : ', which no real x satisfies.');
     } else if (lost.length) {
       msg = '<strong>' + solutions.join(' and ') + ', and ' + lost.join(' and ') + ' is extraneous.</strong> '
@@ -1754,7 +1754,7 @@ CX_SCRIPT = r"""
     return '<tr class="focus"><th class="rowhead">' + label + '</th><td style="text-align:left;">' + detail + '</td></tr>';
   }
   function table(caption, rows) {
-    return '<div class="table-wrap"><table class="tt"><caption>' + caption
+    return '<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>' + caption
       + '</caption><tbody>' + rows.join('') + '</tbody></table></div>';
   }
   function chip(kind, text) { return '<span class="chip ' + kind + '">' + text + '</span>'; }

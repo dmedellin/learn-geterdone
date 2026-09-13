@@ -12,9 +12,9 @@ COURSE = {
         "shortest paths, trees, spanning trees, colouring and planarity."
     ),
     "blurb": (
-        "The discrete structure that models everything with a relation on it: networks, "
-        "dependencies, maps, molecules, schedules. Every theorem in this course is a "
-        "claim about all graphs, and the lab lets you try to break each one."
+        (
+        'The discrete structure that models everything with a relation on it: networks, dependencies, maps, molecules, schedules. Every theorem in this course is a claim about all graphs, and the lab lets you try to break each one.'
+    )
     ),
     "key": [
         "Σ deg(v) = 2|E|                     the handshake theorem",
@@ -22,7 +22,7 @@ COURSE = {
         "Euler circuit  ⟺  connected and every degree even",
         "|V| − |E| + |F| = 2                 Euler's formula, planar graphs",
     ],
-    "assumes_short": "Courses 1–4",
+    "assumes_short": "Proof, sets, and counting",
     "assumes_long": "proof, sets, relations and counting",
     "outcomes_intro": (
         "By the end you can model a problem as a graph, run the standard algorithms, "
@@ -48,23 +48,9 @@ COURSE = {
          "non-planarity before any drawing is attempted."),
     ],
     "syllabus_intro": (
-        "Lessons 1 to 3 are the basics, 4 to 6 the structure of a graph, 7 to 9 "
-        "traversals and paths, 10 to 12 trees, and 13 and 14 colouring and planarity."
+        'First the basics, then the structure of a graph, then traversals and paths, then trees, and last colouring and planarity.'
     ),
-    "how_to": [
-        "Use the workbench adversarially. Every theorem here is a claim about all "
-        "graphs, and the fastest way to understand one is two minutes spent trying to "
-        "build a counterexample.",
-        "Draw the small cases. Graph theory is one of the few parts of mathematics where "
-        "the picture is the object, and most of these proofs were found by drawing.",
-        "Where a lesson has a worked example that fits, its lab opens on it: the preset "
-        "\"This lesson's example\" is that graph, with the lesson's own weights where it "
-        "has them, and the panel quotes the figures you should see before you change "
-        "anything. Lessons 9 and 12 carry weights; lesson 4 names the bridges, lesson 11 "
-        "prints all four traversal orders, and lesson 14 runs the planarity counts.",
-        "Notice which criteria are one-pass checks and which are searches. That "
-        "distinction is what course 8 formalises, and it is visible here first.",
-    ],
+    "how_to": ['Use the workbench adversarially. Every theorem here is a claim about all graphs, and the fastest way to understand one is two minutes spent trying to build a counterexample.', 'Draw the small cases. Graph theory is one of the few parts of mathematics where the picture is the object, and most of these proofs were found by drawing.', 'Where a lesson has a worked example that fits, its lab opens on it: the preset "This lesson\'s example" is that graph, with the lesson\'s own weights where it has them, and the panel quotes the figures you should see before you change anything. “Shortest Paths and Dijkstra\'s Algorithm” and “Spanning Trees and Minimum Spanning Trees” carry weights; “Paths and Connectivity” names the bridges, “Rooted Trees and Traversals” prints all four traversal orders, and “Planar Graphs and Euler\'s Formula” runs the planarity counts.', 'Notice which criteria are one-pass checks and which are searches. That distinction is what Algorithms and Complexity formalises, and it is visible here first.'],
     "not_covered": [
         "Directed graphs beyond passing mentions. Everything here is undirected unless "
         "stated; digraphs, strong connectivity and topological sorting are noted where "

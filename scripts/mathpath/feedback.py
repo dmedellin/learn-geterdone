@@ -56,6 +56,7 @@ CSS = """
       font-size: 0.9rem;
       resize: vertical;
     }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
     .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
     .fb-actions {
       display: flex;
@@ -217,7 +218,7 @@ STORE_JS = """
 
 # What a LESSON shows: the form, the list, and an export of its own notes.
 MARKUP = """
-    <section class="lesson-feedback" id="lessonFeedback"
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
              data-lesson-id="%(id)s" data-lesson-title="%(lesson)s" data-course-title="%(course)s">
       <h2>Feedback and recommendations</h2>
       <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it

@@ -20,9 +20,7 @@ LESSONS = [
         ],
         "key_label": "The plane in four lines",
         "concepts_intro": (
-            "Course 2 solved equations in one unknown, and an answer there was a "
-            "number on a line. An equation in two unknowns has pairs for answers, "
-            "and pairs need two dimensions to be drawn."
+            "Linear Equations and Inequalities solved equations in one unknown, and an answer there was a number on a line. An equation in two unknowns has pairs for answers, and pairs need two dimensions to be drawn."
         ),
         "concepts": [
             ("A point is an ordered pair",
@@ -74,10 +72,7 @@ LESSONS = [
                 "<strong>Quadrant III</strong> &mdash; `x &lt; 0`, `y &lt; 0`. Lower left.",
                 "<strong>Quadrant IV</strong> &mdash; `x &gt; 0`, `y &lt; 0`. Lower right.",
             ]),
-            ("p", "Every inequality there is strict, so a point with a zero coordinate "
-                  "lies on an axis and in no quadrant. The origin lies on both axes. "
-                  "This is not pedantry: in lesson 10 the same strictness decides whether "
-                  "an endpoint belongs to a domain."),
+            ("p", 'Every inequality there is strict, so a point with a zero coordinate lies on an axis and in no quadrant. The origin lies on both axes. This is not pedantry: in “Domain and Range” the same strictness decides whether an endpoint belongs to a domain.'),
             ("h3", "The graph of an equation"),
             ("def", ("Graph",
                      "The <strong>graph</strong> of an equation in `x` and `y` is the set "
@@ -92,11 +87,7 @@ LESSONS = [
                          "`(6, 0)`: `12 + 0 = 12` &mdash; on. `(0, 4)`: `0 + 12 = 12` "
                          "&mdash; on. `(−3, 6)`: `−6 + 18 = 12` &mdash; on. `(1, 4)`: "
                          "`2 + 12 = 14` &mdash; off.")),
-            ("p", "One more practical point: the scale on the two axes need not match, "
-                  "and a graph drawn with a stretched axis is still correct. What a "
-                  "changed scale does distort is the <em>appearance</em> of steepness, "
-                  "which is exactly why lesson 3 defines slope as a ratio of numbers "
-                  "rather than as an angle you could measure with a protractor."),
+            ("p", 'One more practical point: the scale on the two axes need not match, and a graph drawn with a stretched axis is still correct. What a changed scale does distort is the <em>appearance</em> of steepness, which is exactly why “Slope” defines slope as a ratio of numbers rather than as an angle you could measure with a protractor.'),
         ],
         "lab": ("grapher", {
             "mode": "plane",
@@ -188,15 +179,8 @@ LESSONS = [
         ],
         "standard": ("Finish when you can plot a point, name its quadrant, and decide "
                      "membership of a graph by substituting rather than by looking.",
-                     "Given six pairs and an equation you should be able to place all "
-                     "six, classify each by sign, and say which are on the graph with "
-                     "the arithmetic that proves it. That substitution test is the "
-                     "definition every later lesson leans on, from the intercepts in "
-                     "lesson 2 to the inverse in lesson 14."),
-        "note": "The convention that `x` comes first is arbitrary but universal, and it "
-                "is the same convention that makes `f(x)` in lesson 9 an input and the "
-                "value it returns an output. Once a pair is written `(input, output)` "
-                "the whole course reads in one direction.",
+                     'Given six pairs and an equation you should be able to place all six, classify each by sign, and say which are on the graph with the arithmetic that proves it. That substitution test is the definition every later lesson leans on, from the intercepts in “Graphing a Linear Equation” to the inverse in “Inverse Functions”.'),
+        "note": 'The convention that `x` comes first is arbitrary but universal, and it is the same convention that makes `f(x)` in “Function Notation” an input and the value it returns an output. Once a pair is written `(input, output)` the whole course reads in one direction.',
     },
     # ---------------------------------------------------------------- 02
     {
@@ -217,9 +201,7 @@ LESSONS = [
         ],
         "key_label": "Drawing a line from its equation",
         "concepts_intro": (
-            "In course 2 an equation in one unknown usually had one answer. The same "
-            "sentence with a second unknown has endlessly many, and the graph is how "
-            "you hold all of them at once."
+            "In Linear Equations and Inequalities an equation in one unknown usually had one answer. The same sentence with a second unknown has endlessly many, and the graph is how you hold all of them at once."
         ),
         "concepts": [
             ("A linear equation has infinitely many solutions",
@@ -227,13 +209,9 @@ LESSONS = [
              "other pair on one straight line. Solving it means describing that whole "
              "set, not finding \"the\" answer."),
             ("Two points determine the line, three points check it",
-             "Geometry says two distinct points fix a line, so two solutions suffice. "
-             "Plot a third anyway: if it misses, one of the three is wrong, and you "
-             "find out now rather than in the next lesson."),
+             'Geometry says two distinct points fix a line, so two solutions suffice. Plot a third anyway: if it misses, one of the three is wrong, and you find out now rather than in “Slope”.'),
             ("Intercepts are the cheapest two points",
-             "Setting `y = 0` and then `x = 0` each collapses the equation to one "
-             "unknown, which is the case course 2 already solved. No other pair of "
-             "points is easier to get."),
+             "Setting `y = 0` and then `x = 0` each collapses the equation to one unknown, which is the case Linear Equations and Inequalities already solved. No other pair of points is easier to get."),
         ],
         "read_title": "Turning an equation into a line",
         "read_intro": "A table always works. Intercepts are faster. Two shapes are special.",
@@ -242,12 +220,7 @@ LESSONS = [
                      "An equation that can be written `ax + by = c` with `a` and `b` not "
                      "both zero. Its graph is a straight line, and every straight line "
                      "is the graph of such an equation.")),
-            ("p", "The word linear earns its name here rather than in course 2: what is "
-                  "straight is the graph. The defining feature on the algebra side is "
-                  "that `x` and `y` each appear to the first power only, never "
-                  "multiplied together, never inside a root or a denominator. `xy = 6` "
-                  "and `y = x²` are equations in two variables that are not linear, and "
-                  "their graphs are not lines."),
+            ("p", "The word linear earns its name here rather than in Linear Equations and Inequalities: what is straight is the graph. The defining feature on the algebra side is that `x` and `y` each appear to the first power only, never multiplied together, never inside a root or a denominator. `xy = 6` and `y = x²` are equations in two variables that are not linear, and their graphs are not lines."),
             ("h3", "The table method"),
             ("p", "Choose a value for `x`, substitute, solve the resulting one-unknown "
                   "equation for `y`, and record the pair. Repeat. This never fails and "
@@ -263,8 +236,7 @@ LESSONS = [
                 "   1  │  -2( 1) + 1 = -1│   -1  │  ( 1, -1)",
                 "   2  │  -2( 2) + 1 = -3│   -3  │  ( 2, -3)",
             ]),
-            ("p", "Four points, and they fall in a line: each step of one to the right "
-                  "drops `y` by two. That constant drop is the subject of lesson 3."),
+            ("p", 'Four points, and they fall in a line: each step of one to the right drops `y` by two. That constant drop is the subject of “Slope”.'),
             ("h3", "The intercept method"),
             ("def", ("Intercepts",
                      "The <strong>x-intercept</strong> is where the graph meets the "
@@ -290,22 +262,13 @@ LESSONS = [
                 "<strong>`y = b`</strong> &mdash; every point with y-coordinate `b`, "
                 "whatever `x` is. A <em>horizontal</em> line.",
             ]),
-            ("p", "Both are genuine linear equations under the definition above: `x = a` "
-                  "is `1·x + 0·y = a`. The instinct that `x = −2` should be a single "
-                  "point comes from course 2, where it was one; with a second variable "
-                  "present, `y` is unconstrained and the solution set is a whole line."),
-            ("p", "Keep `x = −2` in view. It is the one shape that will fail the test in "
-                  "lesson 8, and knowing what it looks like now is what makes that test "
-                  "obvious later."),
+            ("p", "Both are genuine linear equations under the definition above: `x = a` is `1·x + 0·y = a`. The instinct that `x = −2` should be a single point comes from Linear Equations and Inequalities, where it was one; with a second variable present, `y` is unconstrained and the solution set is a whole line."),
+            ("p", 'Keep `x = −2` in view. It is the one shape that will fail the test in “What a Function Is”, and knowing what it looks like now is what makes that test obvious later.'),
         ],
         "lab": ("line", {
             "mode": "graph",
             "panel_title": "Two points, and everything that follows from them",
-            "panel_intro": "The line, its two intercepts and the table of values are all "
-                           "computed from the points you choose, so moving a point moves "
-                           "all three together. Predict the table and intercepts first; "
-                           "the slope readout is a preview for lesson 3. The vertical "
-                           "preset shows one x-value serving every y.",
+            "panel_intro": 'The line, its two intercepts and the table of values are all computed from the points you choose, so moving a point moves all three together. Predict the table and intercepts first; the slope readout is a preview for “Slope”. The vertical preset shows one x-value serving every y.',
         }),
         "steps_title": "Graphing ax + by = c",
         "steps_intro": "Intercepts first, table as the fallback, third point always.",
@@ -314,8 +277,7 @@ LESSONS = [
              "If only `x` appears the line is vertical; if only `y`, horizontal. Draw it "
              "and stop &mdash; no table is needed."),
             ("Set y = 0 and solve for x",
-             "This is a one-unknown equation of the kind course 2 handled. The result is "
-             "the x-intercept `(x, 0)`."),
+             "This is a one-unknown equation of the kind Linear Equations and Inequalities handled. The result is the x-intercept `(x, 0)`."),
             ("Set x = 0 and solve for y",
              "Same again, giving `(0, y)`. If both intercepts came out at the origin, "
              "pick any other `x` and get a second point from the equation."),
@@ -341,15 +303,7 @@ LESSONS = [
                 "          x:  (6 + 0)/2 = 3        y:  (0 + 4)/2 = 2",
             ],
             "after": [
-                "The check point landing exactly midway is not luck. Equal steps in `x` "
-                "produce equal steps in `y` on a line, which is the property lesson 3 "
-                "isolates and names. What it confirms is that the three points are "
-                "collinear &mdash; consistent with each other &mdash; and not that any "
-                "of them satisfies `2x + 3y = 12`. Misread the constant as `24` and you "
-                "get `(12, 0)`, `(0, 8)` and `(6, 4)`, which pass the midway check just "
-                "as cleanly while every one of them is wrong for this equation. "
-                "Correctness still rests on the substitutions: a third point can reveal "
-                "an error, not certify its absence.",
+                'The check point landing exactly midway is not luck. Equal steps in `x` produce equal steps in `y` on a line, which is the property “Slope” isolates and names. What it confirms is that the three points are collinear &mdash; consistent with each other &mdash; and not that any of them satisfies `2x + 3y = 12`. Misread the constant as `24` and you get `(12, 0)`, `(0, 8)` and `(6, 4)`, which pass the midway check just as cleanly while every one of them is wrong for this equation. Correctness still rests on the substitutions: a third point can reveal an error, not certify its absence.',
                 "For a faded graph, start `3x − 2y = 12` with the supplied x-intercept "
                 "`(4, 0)`. Find the y-intercept, choose a third input that is not zero "
                 "or four, verify all three pairs in the original equation, and only "
@@ -394,9 +348,7 @@ LESSONS = [
              "Two points always look consistent, because two points always lie on a "
              "line. The third point is the only one that can reveal an error."),
             ("Reading `x = −2` as a point",
-             "With two variables in play the equation constrains `x` and says nothing "
-             "about `y`, so the solution set is a vertical line. The one-variable habit "
-             "from course 2 is what needs unlearning."),
+             "With two variables in play the equation constrains `x` and says nothing about `y`, so the solution set is a vertical line. The one-variable habit from Linear Equations and Inequalities is what needs unlearning."),
         ],
         "standard": ("Finish when you can graph any `ax + by = c` from its intercepts and "
                      "know when to fall back on a table.",
@@ -405,10 +357,7 @@ LESSONS = [
                      "say which method you used and why. Recognising that the "
                      "through-the-origin case defeats the intercept shortcut is the part "
                      "that distinguishes a method from a memorised procedure."),
-        "note": "Notice what the table in this lesson showed: a step of one in `x` always "
-                "changed `y` by the same amount. That number is the entire subject of "
-                "lesson 3, and every form of a line in lessons 4 and 5 is built around "
-                "it.",
+        "note": 'Notice what the table in this lesson showed: a step of one in `x` always changed `y` by the same amount. That number is the entire subject of “Slope”, and every form of a line in “Slope-Intercept Form” and “Point-Slope and Standard Form” is built around it.',
     },
     # ---------------------------------------------------------------- 03
     {
@@ -429,8 +378,7 @@ LESSONS = [
         ],
         "key_label": "Slope in four lines",
         "concepts_intro": (
-            "Lesson 2 noticed that equal steps in `x` gave equal steps in `y`. Slope is "
-            "that observation turned into a number that can be computed and compared."
+            '“Graphing a Linear Equation” noticed that equal steps in `x` gave equal steps in `y`. Slope is that observation turned into a number that can be computed and compared.'
         ),
         "concepts": [
             ("Slope is a ratio, not an angle",
@@ -496,11 +444,7 @@ LESSONS = [
                 "<strong>undefined</strong> &mdash; vertical. The run is zero, and "
                 "division by zero is not an operation.",
             ]),
-            ("p", "The last two are worth separating carefully, because English blurs "
-                  "them. \"No slope\" is ambiguous and best avoided; say `m = 0` for "
-                  "horizontal and \"slope undefined\" for vertical. The distinction "
-                  "returns with consequences in lesson 6, where the perpendicular rule "
-                  "needs both slopes to exist, and again in lesson 8."),
+            ("p", 'The last two are worth separating carefully, because English blurs them. "No slope" is ambiguous and best avoided; say `m = 0` for horizontal and "slope undefined" for vertical. The distinction returns with consequences in “Parallel and Perpendicular Lines”, where the perpendicular rule needs both slopes to exist, and again in “What a Function Is”.'),
             ("example", ("Four slopes",
                          "`(−2, 1)` to `(4, 10)`: `9/6 = 3/2`, rising. `(1, 7)` to "
                          "`(3, 1)`: `−6/2 = −3`, falling. `(−3, 4)` to `(6, 4)`: "
@@ -557,8 +501,7 @@ LESSONS = [
                 "The step `4 − (−2) = 6` is where arithmetic errors cluster. Subtracting "
                 "a negative adds, and writing the parentheses rather than doing it in "
                 "your head is what keeps the run from coming out as 2.",
-                "That every pair gives `3/2` is the theorem in action. It is also the "
-                "reason lesson 5 can build the line from whichever point is convenient.",
+                'That every pair gives `3/2` is the theorem in action. It is also the reason “Point-Slope and Standard Form” can build the line from whichever point is convenient.',
                 "For a faded computation, use `(−5, 4)` and `(1, −8)`. The numerator "
                 "is supplied as `−8 − 4 = −12`; write the denominator in the matching "
                 "order, simplify the ratio, and check its sign against the right-and-down "
@@ -596,9 +539,7 @@ LESSONS = [
              "`(y₁ − y₂)/(x₁ − x₂)` are both fine; one of each is a sign error that the "
              "answer alone will not reveal."),
             ("Writing run over rise",
-             "The definition is vertical change divided by horizontal change. Inverting "
-             "it turns a slope of `3` into `1/3`, which is a genuinely different line "
-             "and, as lesson 6 shows, not even the perpendicular one."),
+             'The definition is vertical change divided by horizontal change. Inverting it turns a slope of `3` into `1/3`, which is a genuinely different line and, as “Parallel and Perpendicular Lines” shows, not even the perpendicular one.'),
             ("Saying a vertical line has slope zero",
              "Zero rise gives `m = 0` and describes a horizontal line. Zero run gives no "
              "slope at all. Merging them makes the flattest and the steepest lines "
@@ -607,11 +548,7 @@ LESSONS = [
         "standard": ("Finish when you can compute a slope from any two points, including "
                      "negative coordinates, and classify the two degenerate cases "
                      "correctly.",
-                     "Given eight point pairs, some with negative coordinates, one "
-                     "horizontal and one vertical, you should produce eight correct "
-                     "answers with the right signs and the word \"undefined\" exactly "
-                     "once. Slope feeds every form in lessons 4 and 5, so a sign error "
-                     "here is a wrong line there."),
+                     'Given eight point pairs, some with negative coordinates, one horizontal and one vertical, you should produce eight correct answers with the right signs and the word "undefined" exactly once. Slope feeds every form in “Slope-Intercept Form” and “Point-Slope and Standard Form”, so a sign error here is a wrong line there.'),
         "note": "Slope is the first rate of change in this library. The same quotient, "
                 "taken between two points that are brought closer and closer together, "
                 "is the derivative &mdash; which is calculus and out of scope here. What "
@@ -646,13 +583,9 @@ LESSONS = [
              "the y-intercept. No work is required to extract them &mdash; which is the "
              "entire reason for rearranging into this shape."),
             ("Getting there is one goal: isolate y",
-             "Whatever the equation looks like, the procedure is course 2's: undo the "
-             "additions, then undo the multiplication. The only new demand is finishing "
-             "in exactly the shape `mx + b`."),
+             "Whatever the equation looks like, the procedure is Linear Equations and Inequalities's: undo the additions, then undo the multiplication. The only new demand is finishing in exactly the shape `mx + b`."),
             ("Every non-vertical line has one such equation",
-             "Vertical lines are the sole exception, since they cannot be solved for `y` "
-             "at all. That exception is not an inconvenience; it is a signal, and lesson "
-             "8 explains what it signals."),
+             'Vertical lines are the sole exception, since they cannot be solved for `y` at all. That exception is not an inconvenience; it is a signal, and “What a Function Is” explains what it signals.'),
         ],
         "read_title": "Solving for y, and what that buys",
         "read_intro": "The rearrangement, the reading, and the graphing method it enables.",
@@ -666,10 +599,7 @@ LESSONS = [
                   "`x = 0` the height is `b`, at `x = 1` it is `m + b`, so a run of 1 "
                   "produces a rise of `m`."),
             ("h3", "Rearranging into the form"),
-            ("p", "The work is course 2's, applied to an equation that keeps `x` around "
-                  "as a passenger. Move every term that is not `y` to the other side, "
-                  "then divide by whatever multiplies `y` &mdash; dividing the "
-                  "<em>whole</em> side, every term:"),
+            ("p", "The work is Linear Equations and Inequalities's, applied to an equation that keeps `x` around as a passenger. Move every term that is not `y` to the other side, then divide by whatever multiplies `y` &mdash; dividing the <em>whole</em> side, every term:"),
             ("math", [
                 "2x + 3y = 12",
                 "     3y = -2x + 12          subtract 2x from both sides",
@@ -678,11 +608,7 @@ LESSONS = [
                 "",
                 "                  m = -2/3        b = 4",
             ]),
-            ("p", "The last step is where a term gets dropped. `(-2x + 12)/3` is "
-                  "`-(2/3)x + 4`, not `-(2/3)x + 12`: the divisor applies to every term "
-                  "of the numerator. Checking against lesson 2 settles it &mdash; the "
-                  "intercepts there were `(0, 4)` and `(6, 0)`, and `-(2/3)(6) + 4 = 0` "
-                  "confirms both."),
+            ("p", 'The last step is where a term gets dropped. `(-2x + 12)/3` is `-(2/3)x + 4`, not `-(2/3)x + 12`: the divisor applies to every term of the numerator. Checking against “Graphing a Linear Equation” settles it &mdash; the intercepts there were `(0, 4)` and `(6, 0)`, and `-(2/3)(6) + 4 = 0` confirms both.'),
             ("example", ("4x − 2y = 10",
                          "`−2y = −4x + 10`, then dividing by `−2` gives `y = 2x − 5`. "
                          "Both signs change, because both terms are divided by a negative. "
@@ -705,9 +631,7 @@ LESSONS = [
                   "instruction is 1 right and 2 up. Forgetting the invisible denominator "
                   "is what turns a slope of 2 into a step of 2 right and 2 up, which is a "
                   "line of slope 1."),
-            ("p", "The form also makes comparison trivial, and that is what lesson 6 "
-                  "will use: two lines written this way can be checked for parallelism "
-                  "by looking at two coefficients, with no computation at all."),
+            ("p", 'The form also makes comparison trivial, and that is what “Parallel and Perpendicular Lines” will use: two lines written this way can be checked for parallelism by looking at two coefficients, with no computation at all.'),
         ],
         "lab": ("line", {
             "mode": "forms",
@@ -803,16 +727,8 @@ LESSONS = [
         ],
         "standard": ("Finish when you can convert any non-vertical line to `y = mx + b` "
                      "and graph it from the two numbers without a table.",
-                     "Given five equations in mixed arrangements, including one with a "
-                     "negative `y`-coefficient and one horizontal, you should produce "
-                     "correct slope-intercept forms and sketch each from `(0, b)` and a "
-                     "slope step. Lesson 6 compares lines in this form, so fluency here "
-                     "is what makes parallel and perpendicular a matter of looking."),
-        "note": "This form is the one to reach for when the question is \"what does the "
-                "line look like\" or \"how do two lines compare\". When the question "
-                "instead hands you a point and a slope, lesson 5's point-slope form gets "
-                "there with less algebra &mdash; the forms are tools, and part of the "
-                "skill is picking one.",
+                     'Given five equations in mixed arrangements, including one with a negative `y`-coefficient and one horizontal, you should produce correct slope-intercept forms and sketch each from `(0, b)` and a slope step. “Parallel and Perpendicular Lines” compares lines in this form, so fluency here is what makes parallel and perpendicular a matter of looking.'),
+        "note": 'This form is the one to reach for when the question is "what does the line look like" or "how do two lines compare". When the question instead hands you a point and a slope, “Point-Slope and Standard Form”\'s point-slope form gets there with less algebra &mdash; the forms are tools, and part of the skill is picking one.',
     },
     # ---------------------------------------------------------------- 05
     {
@@ -839,18 +755,14 @@ LESSONS = [
         ),
         "concepts": [
             ("Point-slope is the definition of slope, rearranged",
-             "Slope from `(x₁, y₁)` to a general point `(x, y)` is "
-             "`(y − y₁)/(x − x₁) = m`. Multiplying up gives the form. It is not a new "
-             "fact to memorise, it is lesson 3 with the fraction cleared."),
+             'Slope from `(x₁, y₁)` to a general point `(x, y)` is `(y − y₁)/(x − x₁) = m`. Multiplying up gives the form. It is not a new fact to memorise, it is “Slope” with the fraction cleared.'),
             ("Either point gives the same line",
              "Given two points you may build from whichever you prefer. The two "
              "equations look different and simplify to the same thing, which is worth "
              "seeing once so that a mismatch with a textbook answer does not read as an "
              "error."),
             ("Standard form is symmetric, and that is its use",
-             "`Ax + By = C` treats the two variables alike, so it covers vertical lines, "
-             "hands you both intercepts cheaply, and is the shape course 8 needs for "
-             "elimination. It hides the slope, which is the price."),
+             "`Ax + By = C` treats the two variables alike, so it covers vertical lines, hands you both intercepts cheaply, and is the shape Systems and Matrices needs for elimination. It hides the slope, which is the price."),
         ],
         "read_title": "Two forms and the choice between them",
         "read_intro": "Where each comes from, what each makes easy, and how to convert.",
@@ -859,20 +771,14 @@ LESSONS = [
                      "The line through `(x₁, y₁)` with slope `m` is "
                      "`y − y₁ = m(x − x₁)`.")),
             ("thm", ("Why the form is what it is",
-                     "Let `(x, y)` be any other point on the line. By lesson 3 the slope "
-                     "computed from `(x₁, y₁)` to `(x, y)` must equal `m`, so "
-                     "`(y − y₁)/(x − x₁) = m`. Multiplying both sides by `(x − x₁)` "
-                     "gives `y − y₁ = m(x − x₁)`. The multiplication also admits the "
-                     "point `(x₁, y₁)` itself, which the fraction had to exclude.")),
+                     'Let `(x, y)` be any other point on the line. By “Slope” the slope computed from `(x₁, y₁)` to `(x, y)` must equal `m`, so `(y − y₁)/(x − x₁) = m`. Multiplying both sides by `(x − x₁)` gives `y − y₁ = m(x − x₁)`. The multiplication also admits the point `(x₁, y₁)` itself, which the fraction had to exclude.')),
             ("p", "That derivation is worth following once, because it explains the "
                   "minus signs. The form contains `x − x₁`, so a point with a negative "
                   "coordinate produces a double negative: through `(−2, 1)` the form is "
                   "`y − 1 = m(x − (−2))`, that is, `y − 1 = m(x + 2)`. Writing the "
                   "substitution before simplifying is what keeps that straight."),
             ("h3", "From two points"),
-            ("p", "Two points is the most common starting position, and it is handled in "
-                  "two moves: compute the slope by lesson 3, then feed it and either "
-                  "point into point-slope. Nothing else is needed."),
+            ("p", 'Two points is the most common starting position, and it is handled in two moves: compute the slope by “Slope”, then feed it and either point into point-slope. Nothing else is needed.'),
             ("math", [
                 "through (-2, 1) and (4, 10)",
                 "",
@@ -908,10 +814,7 @@ LESSONS = [
                   "line: `x = 5` is `1·x + 0·y = 5`. Point-slope needs a slope to exist "
                   "and slope-intercept needs to be solvable for `y`, so both fail on "
                   "vertical lines, while standard form does not notice the difference."),
-            ("p", "Choosing between the forms is part of the skill. Point and slope, or "
-                  "two points, go to point-slope. A question about shape, steepness or "
-                  "comparison goes to slope-intercept. Intercepts, or a system to be "
-                  "solved by elimination in course 8, go to standard."),
+            ("p", "Choosing between the forms is part of the skill. Point and slope, or two points, go to point-slope. A question about shape, steepness or comparison goes to slope-intercept. Intercepts, or a system to be solved by elimination in Systems and Matrices, go to standard."),
         ],
         "lab": ("line", {
             "mode": "pointslope",
@@ -1024,10 +927,7 @@ LESSONS = [
                      "form each time and verify with a point that was not used in the "
                      "construction. That verification habit is what makes the answer "
                      "yours rather than the back of the book's."),
-        "note": "Point-slope is the form that generalises furthest. Later courses write "
-                "the tangent to a curve at a point in exactly this shape, because a point "
-                "and a direction is all a tangent is; what changes is where the slope "
-                "comes from, not the form it feeds.",
+        "note": 'Point-slope is the form that generalises furthest. Later courses write the tangent to a curve at a point in exactly this shape, because a point and a direction is all a tangent is; what changes is where the slope comes from, not the form it feeds.',
     },
     # ---------------------------------------------------------------- 06
     {
@@ -1076,11 +976,7 @@ LESSONS = [
                   "slopes mean equal rise per unit run, so the vertical gap between the "
                   "lines is the same at every `x`. If that gap is zero the lines "
                   "coincide, and if it is anything else they never touch."),
-            ("p", "In slope-intercept form the test is pure inspection. `y = 2x + 1` and "
-                  "`y = 2x − 5` are parallel: same `m`, different `b`. This is what "
-                  "lesson 4 was buying &mdash; and note that `4x − 2y = 10` is the second "
-                  "of those lines in disguise, which no amount of staring at the "
-                  "standard form would reveal."),
+            ("p", 'In slope-intercept form the test is pure inspection. `y = 2x + 1` and `y = 2x − 5` are parallel: same `m`, different `b`. This is what “Slope-Intercept Form” was buying &mdash; and note that `4x − 2y = 10` is the second of those lines in disguise, which no amount of staring at the standard form would reveal.'),
             ("def", ("Perpendicular",
                      "Two lines are <strong>perpendicular</strong> when they meet at a "
                      "right angle. For lines with slopes `m₁` and `m₂`, this happens "
@@ -1119,10 +1015,7 @@ LESSONS = [
                          "`y = −3x + 5`. Perpendicular: slope `1/3`, so "
                          "`y − 2 = (1/3)(x − 1)` gives `y = (1/3)x + 5/3`. Both pass "
                          "through `(1, 2)`, and `−3 × 1/3 = −1`.")),
-            ("p", "Notice the shape of both answers: identify the required slope, then "
-                  "hand it to lesson 5's point-slope form. Every question of this type "
-                  "reduces to those two moves, and the only new content in this lesson "
-                  "is how to get the slope."),
+            ("p", "Notice the shape of both answers: identify the required slope, then hand it to “Point-Slope and Standard Form”'s point-slope form. Every question of this type reduces to those two moves, and the only new content in this lesson is how to get the slope."),
         ],
         "lab": ("line", {
             "mode": "parallel",
@@ -1133,7 +1026,7 @@ LESSONS = [
                            "watch the product stop being computable.",
         }),
         "steps_title": "Finding a line through a point, parallel or perpendicular to a given line",
-        "steps_intro": "Get the given slope, transform it, then it is lesson 5.",
+        "steps_intro": 'Get the given slope, transform it, then it is “Point-Slope and Standard Form”.',
         "steps": [
             ("Put the given line into slope-intercept form",
              "Solve for `y` and read `m`. If there is no `y` the given line is vertical "
@@ -1236,11 +1129,7 @@ LESSONS = [
                      "should produce both companions for each and justify the vertical "
                      "case in words. Knowing why the product test does not apply there is "
                      "the difference between using a theorem and reciting it."),
-        "note": "Course 8 solves pairs of linear equations. The three possible outcomes "
-                "there &mdash; one solution, none, or infinitely many &mdash; are exactly "
-                "the three cases here: different slopes, equal slopes with different "
-                "intercepts, and the same line twice. The algebra in that course is "
-                "counting what this lesson sees.",
+        "note": "Systems and Matrices solves pairs of linear equations. The three possible outcomes there &mdash; one solution, none, or infinitely many &mdash; are exactly the three cases here: different slopes, equal slopes with different intercepts, and the same line twice. The algebra in that course is counting what this lesson sees.",
     },
     # ---------------------------------------------------------------- 07
     {
@@ -1266,9 +1155,7 @@ LESSONS = [
         ),
         "concepts": [
             ("Exactly one means at least one and at most one",
-             "The rule must produce an output for each input it claims to accept, and it "
-             "must never produce two. Both halves can fail, and lesson 10 is largely "
-             "about the first half."),
+             'The rule must produce an output for each input it claims to accept, and it must never produce two. Both halves can fail, and “Domain and Range” is largely about the first half.'),
             ("Many-to-one is allowed; one-to-many is not",
              "`f(x) = x²` sends both `3` and `−3` to `9`, and that is a function. "
              "`y² = x` sends `4` to both `2` and `−2`, and that is not. The asymmetry is "
@@ -1287,12 +1174,7 @@ LESSONS = [
                      "<em>exactly one</em> output. The input set is the "
                      "<strong>domain</strong>; the outputs form the "
                      "<strong>range</strong>.")),
-            ("p", "Every word is load-bearing. \"Each\" forbids an input the rule cannot "
-                  "handle. \"Exactly one\" forbids an input with two answers. A rule that "
-                  "fails either is not a function, and calling it one anyway breaks "
-                  "everything downstream &mdash; notation in lesson 9 assumes `f(3)` "
-                  "names a single number, and an inverse in lesson 14 assumes the "
-                  "assignment can be run backwards."),
+            ("p", 'Every word is load-bearing. "Each" forbids an input the rule cannot handle. "Exactly one" forbids an input with two answers. A rule that fails either is not a function, and calling it one anyway breaks everything downstream &mdash; notation in “Function Notation” assumes `f(3)` names a single number, and an inverse in “Inverse Functions” assumes the assignment can be run backwards.'),
             ("h3", "What the definition permits"),
             ("p", "The asymmetry surprises people, so state it plainly: outputs may "
                   "repeat, inputs may not. Several inputs sharing one output is ordinary "
@@ -1317,12 +1199,7 @@ LESSONS = [
                      "if no vertical line meets it more than once. A vertical line "
                      "consists of all points with one fixed `x`, so two intersections are "
                      "exactly one input with two outputs.")),
-            ("p", "This is where lesson 2's vertical line returns. The graph of `x = 5` "
-                  "is itself a vertical line, so a vertical line meets it infinitely "
-                  "often: the input `5` has every number as an output. Of all the lines "
-                  "in this course, the vertical ones are precisely the non-functions "
-                  "&mdash; which is the same exception that blocked slope in lesson 3 and "
-                  "slope-intercept form in lesson 4, now explained rather than noted."),
+            ("p", "This is where “Graphing a Linear Equation”'s vertical line returns. The graph of `x = 5` is itself a vertical line, so a vertical line meets it infinitely often: the input `5` has every number as an output. Of all the lines in this course, the vertical ones are precisely the non-functions &mdash; which is the same exception that blocked slope in “Slope” and slope-intercept form in “Slope-Intercept Form”, now explained rather than noted."),
             ("h3", "Checking the other representations"),
             ("ul", [
                 "<strong>A table.</strong> Look for a repeated input with different "
@@ -1363,12 +1240,9 @@ LESSONS = [
              "In a table, look for a repeated input. In an equation, solve for the output "
              "and watch for a `±` or an even root. On a graph, sweep a vertical line."),
             ("Ask whether any claimed input gets none",
-             "A rule that says nothing about some input in its stated domain is not a "
-             "function on that domain. Lesson 9 turns this into finding the domain."),
+             'A rule that says nothing about some input in its stated domain is not a function on that domain. “Domain and Range” turns this into finding the domain.'),
             ("If it fails, name the input that breaks it",
-             "\"Not a function\" is half an answer. \"Not a function: `x = 4` gives both "
-             "`2` and `−2`\" is the whole one, and it is the form that transfers to every "
-             "later lesson."),
+             '"Not a function" is half an answer. "Not a function: `x = 4` gives both `2` and `−2`" is the whole one, and it is the form that transfers to every later lesson.'),
         ],
         "worked": {
             "title": "Six rules, classified with reasons",
@@ -1442,13 +1316,9 @@ LESSONS = [
              "`y = x²` sends `3` and `−3` to `9` and is a function. Only a repeated "
              "<em>input</em> with different outputs disqualifies a rule."),
             ("Applying the horizontal line test to decide functionhood",
-             "A horizontal line meeting a graph twice says the function is not one-to-one, "
-             "which is a real property and the subject of lesson 14. It says nothing "
-             "about whether the graph is a function."),
+             'A horizontal line meeting a graph twice says the function is not one-to-one, which is a real property and the subject of “Inverse Functions”. It says nothing about whether the graph is a function.'),
             ("Answering \"not a function\" without a witness",
-             "Name the input that breaks it. Saying `x = 4` gives both `2` and `−2` is "
-             "the answer that survives into lesson 10's domain work and lesson 14's "
-             "restrictions; the bare verdict does not."),
+             "Name the input that breaks it. Saying `x = 4` gives both `2` and `−2` is the answer that survives into “Domain and Range”'s domain work and “Inverse Functions”'s restrictions; the bare verdict does not."),
         ],
         "standard": ("Finish when you can apply the definition to a rule in any of its "
                      "four representations and name the offending input whenever one "
@@ -1458,10 +1328,6 @@ LESSONS = [
                      "with two outputs. This is the definition the remaining seven "
                      "lessons build on: notation, domain, transformation, composition and "
                      "inverse all presuppose that an input has one answer."),
-        "note": "The definition explains an exception that has come up three times "
-                "already. Vertical lines have no slope, cannot be written `y = mx + b`, "
-                "and are not functions &mdash; all three because a single `x` is paired "
-                "with many `y`. From lesson 9 onward everything in this course is a "
-                "function, and that is why the notation `f(x)` is about to be safe to use.",
+        "note": 'The definition explains an exception that has come up three times already. Vertical lines have no slope, cannot be written `y = mx + b`, and are not functions &mdash; all three because a single `x` is paired with many `y`. From “Function Notation” onward everything in this course is a function, and that is why the notation `f(x)` is about to be safe to use.',
     },
 ]

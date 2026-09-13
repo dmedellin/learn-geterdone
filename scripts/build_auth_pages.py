@@ -46,16 +46,6 @@ from mathpath import feedback as _feedback  # noqa: E402
 # recommendations are always WRITTEN on the lesson they are about.
 FEEDBACK_STORE_JS = _feedback.STORE_JS
 
-# The library's own brand glyph, the same one the site index draws. It is
-# markup, so it reaches topbar() as markup; the previous "&#10003;" was escaped
-# on the way through and shipped as the literal text &#10003;.
-BRAND_MARK = (
-    '<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="6" '
-    'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" '
-    'focusable="false"><path d="M14 45L26 33L38 41L51 18" /></svg>'
-)
-
-
 def library_inventory():
     """Every lesson a reader can actually TICK, as compact JSON.
 
@@ -125,13 +115,9 @@ def page(*, title, description, canonical_path, up, body, script, extra_css=""):
     return "".join([
         chrome.head(title=title, description=description,
                     canonical_path=canonical_path, favicon=chrome.FAVICON_PATH,
-                    extra_css=extra_css),
-        chrome.topbar(home_href=up, home_label="Back to the Learn library",
-                      mark=BRAND_MARK, strong="Learn", sub="geterdone.io",
-                      nav=[("Library", up, False)],
-                      signin_href=up + "progress/",
-                      signin_current=(canonical_path == "/progress/")),
-        chrome.crumbs([("Learn library", up), (title.split(" |")[0], None)]),
+                    extra_css=extra_css, page_kind="progress" if canonical_path == "/progress/" else "auth"),
+        chrome.topbar(up=up, current=(canonical_path == "/progress/")),
+        chrome.crumbs([("Learn library", up), ("Progress" if canonical_path == "/progress/" else "Signing in", None)]),
         '\n    <main id="main">\n',
         body,
         "    </main>\n",
@@ -140,8 +126,7 @@ def page(*, title, description, canonical_path, up, body, script, extra_css=""):
             "audited: nothing checks them and nothing is graded. They are kept in "
             "this browser, and signing in only lets them follow you to another "
             "device &mdash; it unlocks no material, because none of it is locked.",
-            "every figure is computed in your browser from the stated definition, "
-            "and a step that gives the right answer here is not thereby a valid rule."),
+            "completion marks and recommendations are personal notes, not grades or proof of understanding."),
         chrome.close(script),
     ])
 
@@ -317,7 +302,7 @@ PROGRESS_CSS = """
     .pg-courses { list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 9px; }
     .pg-course {
       display: grid;
-      grid-template-columns: 34px minmax(0, 1fr) auto;
+      grid-template-columns: minmax(0, 1fr) auto;
       gap: 13px;
       align-items: center;
       padding: 11px 13px;
@@ -373,13 +358,13 @@ PROGRESS_BODY = """    <noscript>
       </div>
     </noscript>
 
-    <section class="hero">
+    <section class="hero" data-ui="hero">
       <div>
         <span class="eyebrow"><span class="pulse" aria-hidden="true"></span>Your progress</span>
-        <h1>What you have <span class="gradient-text">finished so far.</span></h1>
+        <h1>Your progress</h1>
         <p class="lead">A completion mark is a note you make to yourself: you tick a lesson when you
         have done it. Nothing checks them, nothing is graded, and no material is locked behind them.</p>
-        <div class="hero-actions">
+        <div class="hero-actions" data-ui="primary-actions">
           <a class="btn primary" href="../">Back to the library</a>
           <a class="btn ghost" href="#account">Carry marks to another device</a>
         </div>
@@ -396,17 +381,16 @@ PROGRESS_BODY = """    <noscript>
       </div>
     </section>
 
-    <dl class="stats" id="stats">
-      <div><dt>Lessons ticked</dt><dd><span id="statLessons">0</span><small id="statLessonsOf">&nbsp;</small></dd></div>
-      <div><dt>Courses finished</dt><dd><span id="statCourses">0</span><small id="statCoursesOf">&nbsp;</small></dd></div>
-      <div><dt>Subjects started</dt><dd><span id="statPaths">0</span><small id="statPathsOf">&nbsp;</small></dd></div>
+    <dl class="stats" id="stats" data-ui="metadata">
+      <div><dt>Lessons marked</dt><dd><span id="statLessons">0</span><small id="statLessonsOf">&nbsp;</small></dd></div>
+      <div><dt>Courses fully marked</dt><dd><span id="statCourses">0</span><small id="statCoursesOf">&nbsp;</small></dd></div>
       <div><dt>Last marked</dt><dd><span id="statLast">&#8212;</span><small id="statLastNote">&nbsp;</small></dd></div>
     </dl>
 
     <div class="status" id="status" hidden></div>
 
     <h2>By subject</h2>
-    <div id="paths"></div>
+    <div id="paths" data-ui="course-list"></div>
 
     <h2>Recently marked</h2>
     <div id="recent"></div>
@@ -532,16 +516,14 @@ PROGRESS_PAGE_JS = """
       document.getElementById('ringPct').textContent = p + '%%';
       document.getElementById('ringSub').textContent = t.done + ' OF ' + t.total;
       document.getElementById('ring').setAttribute('aria-label',
-        t.done + ' of ' + t.total + ' lessons complete (' + p + '%%)');
+        t.done + ' of ' + t.total + ' lessons marked complete (' + p + '%%)');
     }
 
     function paintStats(t) {
       document.getElementById('statLessons').textContent = t.done;
-      document.getElementById('statLessonsOf').textContent = 'of ' + t.total + ' tickable';
+      document.getElementById('statLessonsOf').textContent = 'of ' + t.total + ' lessons';
       document.getElementById('statCourses').textContent = t.courses;
       document.getElementById('statCoursesOf').textContent = 'of ' + TOTAL_COURSES;
-      document.getElementById('statPaths').textContent = t.paths;
-      document.getElementById('statPathsOf').textContent = 'of ' + LIBRARY.length;
       var latest = null;
       Object.keys(read()).forEach(function (id) {
         var d = read()[id];
@@ -556,12 +538,11 @@ PROGRESS_PAGE_JS = """
         var courses = row.courses.map(function (c) {
           var done = c.done === c.total && c.total;
           return '<a class="pg-course' + (done ? ' is-done' : '') + '" href="../' + esc(c.course.slug) + '/">' +
-                 '<span class="pg-num">' + (done ? '&#10003;' : c.course.n) + '</span>' +
                  '<span><span class="pg-course-name">' + esc(c.course.title) + '</span>' + bar(c.done, c.total) + '</span>' +
                  '<span class="pg-count">' + c.done + ' / ' + c.total + '</span></a>';
         }).join('');
         return '<section class="card pg-path"><div class="pg-path-head">' +
-               '<h3>' + esc(row.path.title) + '</h3>' +
+               '<h3><a href="../paths/' + esc(row.path.slug) + '/">' + esc(row.path.title) + '</a></h3>' +
                '<span class="pg-count">' + row.done + ' of ' + row.total + ' lessons &middot; ' +
                pct(row.done, row.total) + '%%</span></div>' +
                bar(row.done, row.total) +
@@ -772,10 +753,13 @@ def main():
     for relative, canonical, up, title, description, body, script, extra_css in pages:
         target = ROOT / relative
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(page(title=title, description=description,
-                               canonical_path=canonical, up=up, body=body, script=script,
-                               extra_css=extra_css),
-                          encoding="utf-8")
+        rendered = page(title=title, description=description,
+                        canonical_path=canonical, up=up, body=body, script=script,
+                        extra_css=extra_css)
+        if target.is_file() and target.read_text(encoding="utf-8") == rendered:
+            print("current site/%s (0 rewritten)" % relative)
+            continue
+        target.write_text(rendered, encoding="utf-8")
         print("wrote site/%s (%d bytes)" % (relative, target.stat().st_size))
 
 

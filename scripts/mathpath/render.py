@@ -105,29 +105,23 @@ def lesson_page(*, path, course, lesson, index, prev_lesson, next_lesson):
 
     parts = [
         chrome.head(
-            title="%s | %s | Learn · geterdone.io" % (lesson["title"], course["title"]),
+            title="%s | Lesson | %s | %s | Learn · geterdone.io" % (lesson["title"], course["title"], path["title"]),
             description=plain(lesson["summary"]),
             canonical_path=url,
-            favicon=chrome.FAVICON_LESSON,
+            favicon=chrome.FAVICON_LESSON, page_kind="lesson",
         ),
-        chrome.topbar(
-            home_href="../",
-            home_label="Back to the %s course home" % course["title"],
-            mark=number,
-            strong=course["title"],
-            sub="Course %d · Lesson %s of %d" % (course["number"], number, total),
-            signin_href="../../progress/",
-        ),
+        chrome.topbar(up="../../"),
         chrome.crumbs([
             ("Learn library", "../../"),
+            (path["title"], "../../paths/%s/" % path["slug"]),
             (course["title"], "../"),
-            ("Lesson %s · %s" % (number, lesson["title"]), None),
+            (lesson["title"], None),
         ]),
         chrome.noscript(
             "<strong>JavaScript is required for the interactive lesson.</strong> "
             "The %s is computed in your browser, so it stays blank while scripting "
             "is off. Everything written &mdash; the definitions, the worked example, "
-            "the common mistakes and the completion standard &mdash; reads normally."
+            "the common mistakes and the understanding check &mdash; reads normally."
             % lab.title.lower()
         ),
         '\n    <main id="main">\n',
@@ -135,13 +129,13 @@ def lesson_page(*, path, course, lesson, index, prev_lesson, next_lesson):
 
     # -- hero ---------------------------------------------------------------
     parts.append(
-        '    <section class="hero">\n'
+        '    <section class="hero" data-ui="hero">\n'
         "      <div>\n"
         '        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span>'
-        "Course %d &middot; Lesson %s &middot; %s</span>\n"
+        '<span data-ui="page-kind">Lesson</span> &middot; %s &middot; %s</span>\n'
         "        <h1>%s</h1>\n"
         "        <p>%s</p>\n"
-        '        <div class="hero-actions">'
+        '        <div class="hero-actions" data-ui="primary-actions">'
         '<a class="btn primary" href="#lab">Open the interactive lesson</a>'
         '<a class="btn ghost" href="#practice">Practice</a></div>\n'
         "      </div>\n"
@@ -151,7 +145,7 @@ def lesson_page(*, path, course, lesson, index, prev_lesson, next_lesson):
         "      </div>\n"
         "    </section>\n"
         % (
-            course["number"], number, esc(lesson["module"]),
+            esc(course["title"]), esc(lesson["module"]),
             esc(lesson["title"]), inline(lesson["summary"]),
             _mathblock(lesson["key"]),
             esc_inline(lesson.get("key_label", "The statement in symbols")),
@@ -257,7 +251,7 @@ def lesson_page(*, path, course, lesson, index, prev_lesson, next_lesson):
         '      <div class="grid-2">\n'
         '        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3>'
         '<div class="lesson-list">%s</div></article>\n'
-        '        <article class="card card-pad"><h3 style="margin-top:0;">Completion standard</h3>'
+        '        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3>'
         '<div class="callout"><div class="mark">&#10003;</div><div><strong>%s</strong><p>%s</p></div></div>'
         '<div class="note" style="margin-top:12px;"><strong>Note:</strong> %s</div></article>\n'
         "      </div>\n"
@@ -272,16 +266,16 @@ def lesson_page(*, path, course, lesson, index, prev_lesson, next_lesson):
     if prev_lesson is not None:
         prev = (
             "../%s/" % prev_lesson["slug"],
-            "%02d &middot; %s" % (index, esc(prev_lesson["title"])),
+            esc(prev_lesson["title"]),
         )
     if next_lesson is not None:
         nxt = (
             "../%s/" % next_lesson["slug"],
-            "%02d &middot; %s" % (index + 2, esc(next_lesson["title"])),
+            esc(next_lesson["title"]),
             False,
         )
     else:
-        nxt = ("../", "%s &middot; course home" % esc(course["title"]), True)
+        nxt = ("../", esc(course["title"]), True)
     # The completion mark sits between the material and the pager: the moment a
     # reader has finished. localStorage only, no request, never a gate.
     lesson_id = "%s/%s" % (course["slug"], lesson["slug"])
@@ -318,7 +312,7 @@ def lesson_page(*, path, course, lesson, index, prev_lesson, next_lesson):
                              + progress.LESSON_JS % json.dumps(lesson_id)
                              + feedback.STORE_JS
                              + feedback.LESSON_JS))
-    return "".join(parts)
+    return chrome.name_horizontal_scrollers("".join(parts))
 
 
 def course_home(*, course, index, courses, path):
@@ -328,9 +322,9 @@ def course_home(*, course, index, courses, path):
     lessons = course["lessons"]
 
     syllabus = "".join(
-        '<a class="syllabus-item" href="./%s/" data-lesson="%s/%s"><div class="num">%02d</div>'
-        "<div><strong>%s</strong><span>%s</span></div></a>"
-        % (lesson["slug"], course["slug"], lesson["slug"], i + 1,
+        '<a class="syllabus-item" href="./%s/" data-lesson="%s/%s"><div class="num" aria-hidden="true"></div>'
+        '<div><strong>%s</strong><span>%s</span><span class="lesson-state">Not marked</span></div></a>'
+        % (lesson["slug"], course["slug"], lesson["slug"],
            esc(lesson["title"]), esc_inline(lesson["one_line"]))
         for i, lesson in enumerate(lessons)
     )
@@ -345,94 +339,78 @@ def course_home(*, course, index, courses, path):
         before = courses[index - 1]
         nav.append(
             '        <a class="path-move prev" href="../%s/" rel="prev">'
-            "<span>Previous course</span><strong>Course %d &middot; %s</strong></a>"
-            % (before["slug"], before["number"], esc(before["title"]))
+            "<span>Related course</span><strong>%s</strong></a>"
+            % (before["slug"], esc(before["title"]))
         )
     if index < total_courses - 1:
         after = courses[index + 1]
         nav.append(
             '        <a class="path-move next" href="../%s/" rel="next">'
-            "<span>Next course</span><strong>Course %d &middot; %s</strong></a>"
-            % (after["slug"], after["number"], esc(after["title"]))
+            "<span>Related course</span><strong>%s</strong></a>"
+            % (after["slug"], esc(after["title"]))
         )
     else:
         nav.append(
-            '        <a class="path-move next is-complete" href="../paths/%s/">'
-            "<span>End of the path</span><strong>All %d courses &middot; see the whole "
-            "%s path</strong></a>" % (path["slug"], total_courses, esc(path["title"]))
+            '        <a class="path-move next" href="../paths/%s/">'
+            "<strong>All %s courses</strong></a>" % (path["slug"], esc(path["title"]))
         )
 
     parts = [
         chrome.head(
-            title="%s | Learn · geterdone.io" % course["title"],
+            title="%s | Course | %s | Learn · geterdone.io" % (course["title"], path["title"]),
             description=plain(course["summary"]),
             canonical_path=url,
-            favicon=chrome.FAVICON_COURSE,
+            favicon=chrome.FAVICON_COURSE, page_kind="course",
         ),
-        chrome.topbar(
-            home_href="../",
-            home_label="Back to the Learn library",
-            mark="%02d" % course["number"],
-            strong=course["title"],
-            sub="Course %d of %d · %s path" % (course["number"], total_courses, path["title"]),
-            nav=[
-                ("Syllabus", "#syllabus", False),
-                ("The path", "../paths/%s/" % path["slug"], False),
-            ],
-            signin_href="../progress/",
-        ),
+        chrome.topbar(up="../"),
         chrome.crumbs([
             ("Learn library", "../"),
-            ("%s path" % path["title"], "../paths/%s/" % path["slug"]),
+            (path["title"], "../paths/%s/" % path["slug"]),
             (course["title"], None),
         ]),
         '\n    <main id="main">\n',
-        '    <section class="hero">\n'
+        '    <section class="hero" data-ui="hero">\n'
         "      <div>\n"
         '        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span>'
-        "Course %d of %d &middot; %s path</span>\n"
+        '<span data-ui="page-kind">Course</span> &middot; %s</span>\n'
         "        <h1>%s</h1>\n"
         "        <p>%s</p>\n"
-        '        <div class="hero-actions">'
-        '<a class="btn primary" href="./%s/">Start lesson 01</a>'
-        '<a class="btn ghost" href="#syllabus">See all %d lessons</a></div>\n'
+        '        <div class="hero-actions" data-ui="primary-actions">'
+        '<a class="btn primary" href="#syllabus">View lessons</a>'
+        '<a class="btn ghost" href="#background">Recommended background</a></div>\n'
         "      </div>\n"
         '      <div class="hero-visual">\n        %s\n'
         '        <div class="float-label" style="right:16px;bottom:16px;">What this course is about</div>\n'
         "      </div>\n"
         "    </section>\n"
         % (
-            course["number"], total_courses, esc(path["title"]),
+            esc(path["title"]),
             esc(course["title"]), inline(course["blurb"]),
-            lessons[0]["slug"], len(lessons),
             _mathblock(course["key"]),
         ),
-        '    <section class="section">\n'
+        '    <section class="section" data-ui="metadata">\n'
         '      <dl class="stats">\n'
-        "        <div><dt>Lessons</dt><dd>%d<small>in a fixed order</small></dd></div>\n"
-        "        <div><dt>Position</dt><dd>%d of %d<small>on the %s path</small></dd></div>\n"
-        "        <div><dt>Assumes</dt><dd>%s<small>%s</small></dd></div>\n"
-        "        <div><dt>Format</dt><dd>Interactive<small>one self-contained page each</small></dd></div>\n"
+        "        <div><dt>Subject</dt><dd>%s</dd></div>\n"
+        "        <div><dt>Lessons</dt><dd>%d</dd></div>\n"
+        "        <div><dt>Format</dt><dd>Interactive</dd></div>\n"
         "      </dl>\n"
-        "    </section>\n"
-        % (
-            len(lessons), course["number"], total_courses, esc(path["title"]),
-            esc(course["assumes_short"]), esc(course["assumes_long"]),
-        ),
-        '    <section class="section">\n'
-        '      <div class="section-head"><div><p class="kicker">Outcomes</p>'
+        "    </section>\n" % (esc(path["title"]), len(lessons)),
+        '    <section class="section" data-ui="overview">\n'
+        '      <div class="section-head"><div><p class="kicker">Overview</p>'
         "<h2>What you will be able to do</h2></div><p>%s</p></div>\n"
         '      <div class="grid-4">%s</div>\n'
         "    </section>\n" % (inline(course["outcomes_intro"]), outcomes),
-        '    <section class="section" id="syllabus">\n'
-        '      <div class="section-head"><div><p class="kicker">Syllabus</p>'
-        '<h2>All %d lessons, in order</h2>'
+        '    <section class="section" id="syllabus" data-ui="lesson-list">\n'
+        '      <div class="section-head"><div><p class="kicker">Lessons</p>'
+        '<h2>%d lessons</h2>'
         '<p class="course-progress" id="courseProgress"></p></div><p>%s</p></div>\n'
         '      <div class="syllabus">%s</div>\n'
         "    </section>\n" % (len(lessons), inline(course["syllabus_intro"]), syllabus),
+        '    <section class="section" id="background" data-ui="background">'
+        '<h2>Recommended background</h2><p>%s.</p></section>\n' % esc(course["assumes_long"].capitalize().rstrip(".")),
         '    <section class="section">\n'
         '      <div class="grid-2">\n'
-        '        <article class="card card-pad prose"><h3>How to take this course</h3>%s</article>\n'
+        '        <article class="card card-pad prose"><h3>Practice suggestions</h3>%s</article>\n'
         '        <article class="card card-pad prose"><h3>What it does not cover</h3>%s</article>\n'
         "      </div>\n"
         "    </section>\n"
@@ -441,104 +419,55 @@ def course_home(*, course, index, courses, path):
             "".join("<p>%s</p>" % inline(p) for p in course["not_covered"]),
         ),
         "    </main>\n",
-        '\n    <nav class="path-nav" aria-label="Course navigation">\n%s\n      </nav>\n' % "\n".join(nav),
+        '\n    <nav class="path-nav" data-ui="course-navigation" aria-label="Course navigation">\n%s\n      </nav>\n' % "\n".join(nav),
         chrome.footer(
             "<strong>%s.</strong> %s" % (esc(course["title"]), inline(course["footer_lead"])),
             path["material"],
         ),
         chrome.close(progress.PROGRESS_JS + progress.COURSE_JS),
     ]
-    return "".join(parts)
+    return chrome.name_horizontal_scrollers("".join(parts))
 
 
 def path_page(path):
-    """The path page: /paths/<slug>/ ."""
+    """Subject catalog at the stable /paths/<slug>/ URL."""
     courses = path["courses"]
     total_lessons = sum(len(c["lessons"]) for c in courses)
-    url = "/paths/%s/" % path["slug"]
-
-    spine = "".join(
-        '<a class="spine-item" href="../../%s/" data-course="%s" data-lessons="%d"><div class="spine-num">%02d</div>'
+    cards = "".join(
+        '<a class="spine-item" href="../../%s/" data-course="%s" data-lessons="%d">'
         '<div class="spine-body"><strong>%s</strong><p>%s</p>'
-        '<div class="spine-meta"><span>%d lessons</span><span>%s</span><span>Available now</span><span class="spine-progress"></span></div>'
-        "</div></a>"
-        % (
-            course["slug"], course["slug"], len(course["lessons"]),
-            course["number"], esc(course["title"]),
-            inline(course["blurb"]), len(course["lessons"]), esc(course["level"]),
-        )
-        for course in courses
-    )
-
-    parts = [
-        chrome.head(
-            title="%s Path · Learn · geterdone.io" % path["title"],
-            description=plain(path["description"]),
-            canonical_path=url,
-            favicon=chrome.FAVICON_PATH,
-        ),
-        chrome.topbar(
-            home_href="../../",
-            home_label="Back to the Learn library",
-            mark=(
-                '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" '
-                'aria-hidden="true" focusable="false"><path d="M6 6h12" /><path d="M6 6v10" />'
-                '<path d="M6 16l12-10" /><circle cx="6" cy="6" r="2.2" fill="currentColor" />'
-                '<circle cx="18" cy="6" r="2.2" fill="currentColor" />'
-                '<circle cx="6" cy="16" r="2.2" fill="currentColor" />'
-                '<circle cx="18" cy="17" r="2.2" fill="currentColor" /></svg>'
-            ),
-            strong="Learn",
-            sub="geterdone.io",
-            nav=[("Library", "../../", False), ("Courses", "#courses", False)],
-            signin_href="../../progress/",
-        ),
-        chrome.crumbs([("Learn library", "../../"), ("%s path" % path["title"], None)]),
-        '\n    <main id="main">\n',
-        '    <section class="hero">\n'
-        "      <div>\n"
-        '        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span>'
-        "Path &middot; %d courses &middot; %d lessons</span>\n"
-        "        <h1>%s</h1>\n"
-        "        <p>%s</p>\n"
-        '        <div class="hero-actions">'
-        '<a class="btn primary" href="../../%s/">Start course 1</a>'
-        '<a class="btn ghost" href="#courses">See the whole sequence</a></div>\n'
-        "      </div>\n"
-        '      <div class="hero-visual">\n        %s\n'
-        '        <div class="float-label" style="right:16px;bottom:16px;">Where the path arrives</div>\n'
-        "      </div>\n"
-        "    </section>\n"
-        % (
-            len(courses), total_lessons, esc(path["title"]), inline(path["tagline"]),
-            courses[0]["slug"], _mathblock(path["key"]),
-        ),
-        '    <section class="section">\n'
-        '      <dl class="stats">\n'
-        "        <div><dt>Courses</dt><dd>%d<small>in a fixed order</small></dd></div>\n"
-        "        <div><dt>Available now</dt><dd>%d<small>%d lessons</small></dd></div>\n"
-        "        <div><dt>Status</dt><dd>Complete<small>every course published</small></dd></div>\n"
-        "        <div><dt>Level</dt><dd>%s<small>%s</small></dd></div>\n"
-        "      </dl>\n"
-        "    </section>\n"
-        % (len(courses), len(courses), total_lessons, esc(path["level"]), esc(path["level_note"])),
-        '    <section class="section" id="courses">\n'
-        '      <div class="section-head"><div><p class="kicker">The sequence</p>'
-        "<h2>All %d courses, in order</h2></div><p>%s</p></div>\n"
-        '      <div class="spine">%s</div>\n'
-        "    </section>\n" % (len(courses), inline(path["sequence_intro"]), spine),
-        '    <section class="section">\n'
-        '      <div class="grid-2">\n'
-        '        <article class="card card-pad prose"><h3>Why this order</h3>%s</article>\n'
-        '        <article class="card card-pad prose"><h3>What you need first</h3>%s</article>\n'
-        "      </div>\n"
-        "    </section>\n"
-        % (
-            "".join("<p>%s</p>" % inline(p) for p in path["why_order"]),
-            "".join("<p>%s</p>" % inline(p) for p in path["prerequisites"]),
-        ),
-        "    </main>\n",
+        '<div class="spine-meta"><span>%d lessons</span><span>%s</span>'
+        '<span class="spine-progress"></span></div></div></a>'
+        % (c["slug"], c["slug"], len(c["lessons"]), esc(c["title"]),
+           inline(c["blurb"]), len(c["lessons"]), esc(c["level"])) for c in courses)
+    return chrome.name_horizontal_scrollers("".join([
+        chrome.head(title="%s | Subject | Learn · geterdone.io" % path["title"],
+                    description=plain(path["description"]),
+                    canonical_path="/paths/%s/" % path["slug"], favicon=chrome.FAVICON_PATH, page_kind="subject"),
+        chrome.topbar(up="../../"),
+        chrome.crumbs([("Learn library", "../../"), (path["title"], None)]),
+        '<main id="main">\n',
+        '<section class="hero" data-ui="hero"><div>'
+        '<span class="eyebrow"><span data-ui="page-kind">Subject</span> &middot; Learn library</span>'
+        '<h1>%s</h1><p>%s</p>'
+        '<div class="hero-actions" data-ui="primary-actions">'
+        '<a class="btn primary" href="#courses">View courses</a>'
+        '<a class="btn ghost" href="#background">Recommended background</a></div></div>'
+        '<div class="hero-visual">%s</div></section>\n'
+        % (esc(path["title"]), inline(path["tagline"]), _mathblock(path["key"])),
+        '<section class="section" data-ui="metadata"><dl class="stats">'
+        '<div><dt>Courses</dt><dd>%d</dd></div><div><dt>Lessons</dt><dd>%d</dd></div>'
+        '<div><dt>Level</dt><dd>%s</dd></div></dl></section>\n'
+        % (len(courses), total_lessons, esc(path["level"])),
+        '<section class="section prose" data-ui="overview"><h2>Overview</h2>%s</section>\n'
+        % "".join('<p>%s</p>' % inline(p) for p in path["why_order"]),
+        '<section class="section" id="courses" data-ui="course-list">'
+        '<div class="section-head"><div><h2>Courses</h2></div><p>%s</p></div>'
+        '<div class="spine">%s</div></section>\n' % (inline(path["sequence_intro"]), cards),
+        '<section class="section prose" id="background" data-ui="background">'
+        '<h2>Recommended background</h2>%s</section>\n'
+        % "".join('<p>%s</p>' % inline(p) for p in path["prerequisites"]),
+        '</main>\n',
         chrome.footer(inline(path["footer_lead"]), path["material"]),
         chrome.close(progress.PROGRESS_JS + progress.PATH_JS),
-    ]
-    return "".join(parts)
+    ]))

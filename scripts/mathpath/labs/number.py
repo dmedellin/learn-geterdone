@@ -235,7 +235,7 @@ def number_lab(cfg):
     out.innerHTML = '';
     status.innerHTML = '<strong>' + what + ' is too large for this lab.</strong> Its only method is trial division up to '
       + 'the square root, which is fine below 10<sup>12</sup> and would freeze this page for minutes above it. That '
-      + 'the cost climbs like that is exactly what lesson 14 relies on; a number this size is best factored on paper, '
+      + 'the cost climbs like that is exactly what “RSA Encryption” relies on; a number this size is best factored on paper, '
       + 'which is to say not at all.';
   }
   function letter(x) { return String.fromCharCode(65 + Number(x)); }

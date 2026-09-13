@@ -54,10 +54,7 @@ LESSONS = [
                   "value of `x`. The system asks for the pairs the two equations have "
                   "in common, so the solution set of the system is the "
                   "<em>intersection</em> of the two solution sets, never their union."),
-            ("p", "Course 3 established that the graph of `ax + by = c` is a line. So "
-                  "the solution set of a two-equation system is the set of points lying "
-                  "on both lines, and the question \"how many solutions\" becomes the "
-                  "question \"how do two lines meet\"."),
+            ("p", "Lines, Functions and Graphs established that the graph of `ax + by = c` is a line. So the solution set of a two-equation system is the set of points lying on both lines, and the question \"how many solutions\" becomes the question \"how do two lines meet\"."),
             ("thm", ("Two lines meet in nothing, one point, or a whole line",
                      "Two lines in the plane share no point, exactly one point, or every "
                      "point of the line. No other count is possible &mdash; in "
@@ -86,13 +83,7 @@ LESSONS = [
                 "",
                 "same slope, different intercept   →   parallel, distinct   →   none",
             ]),
-            ("p", "Vertical lines do not have slopes, so slope-intercept form is not "
-                  "always the right comparison. In standard form, ask whether one "
-                  "equation's two variable coefficients are a common multiple of the "
-                  "other's. If not, the lines cross once. If they are, the constants "
-                  "decide whether the equations are the same multiple or a "
-                  "contradiction. Lesson 8 packages that coefficient comparison into "
-                  "one number, the determinant."),
+            ("p", "Vertical lines do not have slopes, so slope-intercept form is not always the right comparison. In standard form, ask whether one equation's two variable coefficients are a common multiple of the other's. If not, the lines cross once. If they are, the constants decide whether the equations are the same multiple or a contradiction. “Determinants and Cramer's Rule” packages that coefficient comparison into one number, the determinant."),
             ("example", ("The same line, written twice",
                          "`x − 2y = 4` and `−3x + 6y = −12`. The second equation is "
                          "`−3` times the first, so every pair satisfying one satisfies "
@@ -155,10 +146,7 @@ LESSONS = [
                 "      the same line   →   infinitely many:  {(x, y) : x − 2y = 4}",
             ],
             "after": [
-                "System (b) has no solution, and that is a complete answer. Pushing on "
-                "with algebra produces a false statement &mdash; doubling the first equation "
-                "gives `4x + 6y = 12` against `4x + 6y = 7`, so `0 = 5` &mdash; which is "
-                "the signature the next two lessons teach you to read rather than to fear.",
+                'System (b) has no solution, and that is a complete answer. Pushing on with algebra produces a false statement &mdash; doubling the first equation gives `4x + 6y = 12` against `4x + 6y = 7`, so `0 = 5` &mdash; which is the signature “Solving by Substitution” and “Solving by Elimination” teach you to read rather than to fear.',
                 "System (c) is the one that gets reported wrongly. The answer is a "
                 "line, and it has to be written as a line &mdash; either as the equation "
                 "`x − 2y = 4` or in the parameter form `(2t + 4, t)`. \"Infinitely "
@@ -199,10 +187,7 @@ LESSONS = [
                    "That the system is inconsistent",
                    "Nothing whatever"],
              "c": 1,
-             "why": "Crossing lines settle the case &mdash; one solution &mdash; and "
-                    "locate it roughly, which is worth having. The exact pair is "
-                    "`(5/3, 2/3)`, and no drawing separates `5/3` from `1.7`; only "
-                    "the algebra of the next two lessons does."},
+             "why": 'Crossing lines settle the case &mdash; one solution &mdash; and locate it roughly, which is worth having. The exact pair is `(5/3, 2/3)`, and no drawing separates `5/3` from `1.7`; only the algebra of “Solving by Substitution” and “Solving by Elimination” does.'},
         ],
         "mistakes": [
             ("Reporting x and stopping",
@@ -223,11 +208,7 @@ LESSONS = [
                      "produce the pair and check it in both equations. Naming the case "
                      "first is what turns an inconsistent system into a two-line answer "
                      "instead of a page of algebra ending in `0 = 14`."),
-        "note": "The three cases survive every enlargement of the problem. Lesson 4 has "
-                "three variables and the same three answers; lesson 6 reads them "
-                "straight off a row-reduced matrix without any geometry at all. The "
-                "determinant in lesson 8 will compress the coefficient comparison into "
-                "a single test for the first case.",
+        "note": "The three cases survive every enlargement of the problem. “Systems in Three Variables” has three variables and the same three answers; “Gaussian Elimination” reads them straight off a row-reduced matrix without any geometry at all. The determinant in “Determinants and Cramer's Rule” will compress the coefficient comparison into a single test for the first case.",
     },
     # ---------------------------------------------------------------- 02
     {
@@ -260,8 +241,7 @@ LESSONS = [
              "entire justification, and it is why the expression must go into the "
              "equation you have not used."),
             ("The target is one equation in one unknown",
-             "Everything else is bookkeeping. Course 2 already solves any linear "
-             "equation in one variable; this lesson is about manufacturing one."),
+             "Everything else is bookkeeping. Linear Equations and Inequalities already solves any linear equation in one variable; this lesson is about manufacturing one."),
             ("What you isolate is a free choice with consequences",
              "A variable whose coefficient is `1` or `−1` isolates with no division. "
              "Any other choice produces a fraction, which is survivable &mdash; "
@@ -320,11 +300,7 @@ LESSONS = [
                   "expression in the first place. Information comes from the equation "
                   "that has not yet been spent."),
             ("h3", "When the variable disappears"),
-            ("p", "Sometimes the substitution removes both variables and leaves a "
-                  "statement about numbers. Course 2 met these as contradictions and "
-                  "identities, and they mean here exactly what they meant there: a "
-                  "false statement means no pair works, a true one means the equation "
-                  "placed no new restriction and the whole line survives."),
+            ("p", "Sometimes the substitution removes both variables and leaves a statement about numbers. Linear Equations and Inequalities met these as contradictions and identities, and they mean here exactly what they meant there: a false statement means no pair works, a true one means the equation placed no new restriction and the whole line survives."),
             ("math", [
                 "x − 2y = 3     →   x = 2y + 3",
                 "2x − 4y = 1        2(2y + 3) − 4y = 1   →   4y + 6 − 4y = 1   →   6 = 1",
@@ -342,10 +318,7 @@ LESSONS = [
                          "The letter is arbitrary and the description is not unique: "
                          "`{(s, (s − 3)/2)}` describes the same line. Any correct "
                          "description of the set is a correct answer.")),
-            ("p", "The check at the end is a check of both original equations. This is "
-                  "the same discipline as lesson 1 and for the same reason: an "
-                  "arithmetic slip in the substitution produces a pair that fits the "
-                  "equation it came out of."),
+            ("p", 'The check at the end is a check of both original equations. This is the same discipline as “Systems of Two Linear Equations” and for the same reason: an arithmetic slip in the substitution produces a pair that fits the equation it came out of.'),
         ],
         "lab": ("system", {
             "mode": "substitution",
@@ -378,8 +351,7 @@ LESSONS = [
         "worked": {
             "title": "5x − 2y = 4 and 3x + y = 9",
             "intro": [
-                "The second equation has a `y` with coefficient `1`, so that is what to "
-                "isolate. Everything after that is one-variable algebra from course 2."
+                "The second equation has a `y` with coefficient `1`, so that is what to isolate. Everything after that is one-variable algebra from Linear Equations and Inequalities."
             ],
             "lines": [
                 "5x − 2y = 4",
@@ -459,12 +431,7 @@ LESSONS = [
                      "unchanged: multiply through and the denominator goes. The standard "
                      "is a system in which no coefficient is `1`, solved in exact "
                      "fractions, with the pair checked in both original equations."),
-        "note": "Substitution is the method that generalises furthest. It is how lesson "
-                "4 finishes a three-variable system once elimination has done the "
-                "reduction, and it is what \"back-substitution\" means in lesson 6. "
-                "Elimination, next, is usually quicker when both equations are already "
-                "in standard form &mdash; and slower when one variable is sitting there "
-                "with a coefficient of `1`.",
+        "note": 'Substitution is the method that generalises furthest. It is how “Systems in Three Variables” finishes a three-variable system once elimination has done the reduction, and it is what "back-substitution" means in “Gaussian Elimination”. Elimination is usually quicker when both equations are already in standard form &mdash; and slower when one variable is sitting there with a coefficient of `1`.',
     },
     # ---------------------------------------------------------------- 03
     {
@@ -499,11 +466,7 @@ LESSONS = [
              "equation back. Multiplying by `0` is forbidden: `0 = 0` is satisfied by "
              "every pair, and there is no operation that recovers what was there."),
             ("The new system is equivalent, not merely implied",
-             "Replacing the second equation by second plus `k` times first can be "
-             "undone by subtracting `k` times the first. Nothing is lost and nothing is "
-             "invented. Operations that cannot be undone &mdash; squaring both sides, "
-             "in course 5 &mdash; are exactly the ones that produce solutions that were "
-             "never there."),
+             "Replacing the second equation by second plus `k` times first can be undone by subtracting `k` times the first. Nothing is lost and nothing is invented. Operations that cannot be undone &mdash; squaring both sides, in Rational and Radical Expressions &mdash; are exactly the ones that produce solutions that were never there."),
         ],
         "read_title": "Elimination, and why the new system is equivalent",
         "read_intro": "Two operations, the theorem that licenses them, and the three endings.",
@@ -606,9 +569,7 @@ LESSONS = [
              "equation the sign that makes them opposites. Choosing the cheaper "
              "variable here is the whole of the skill."),
             ("Add the equations and solve what is left",
-             "One variable, one equation, course 2. If both variables vanish, read the "
-             "numeric statement instead: false means no solution, true means infinitely "
-             "many and the answer is a line."),
+             "One variable, one equation, Linear Equations and Inequalities. If both variables vanish, read the numeric statement instead: false means no solution, true means infinitely many and the answer is a line."),
             ("Back-substitute into an original equation, then check in both",
              "Use an equation you were given rather than one you multiplied &mdash; "
              "fewer chances to carry a stray factor. Then test the pair in both "
@@ -696,15 +657,8 @@ LESSONS = [
              "which, for `2x − 6y = 4`, is not even on that line."),
         ],
         "standard": ("Finish when you choose the cheaper variable before starting.",
-                     "Look at the four coefficients, decide which variable costs one "
-                     "multiplication instead of two, and carry it through in exact "
-                     "fractions. Both routes give the same pair; being able to say which "
-                     "is shorter, and why, is the judgement that survives into lesson 6, "
-                     "where the choice is made for you by position on the page."),
-        "note": "Elimination is the rest of this half of the course. Lesson 4 performs "
-                "it twice to remove one variable from a three-equation system; lesson 5 "
-                "writes it without the letters, as operations on the rows of a matrix; "
-                "lesson 6 turns it into an algorithm with no decisions left in it.",
+                     'Look at the four coefficients, decide which variable costs one multiplication instead of two, and carry it through in exact fractions. Both routes give the same pair; being able to say which is shorter, and why, is the judgement that survives into “Gaussian Elimination”, where the choice is made for you by position on the page.'),
+        "note": 'Elimination is the rest of this half of the course. “Systems in Three Variables” performs it twice to remove one variable from a three-equation system; “Matrices and Row Operations” writes it without the letters, as operations on the rows of a matrix; “Gaussian Elimination” turns it into an algorithm with no decisions left in it.',
     },
     # ---------------------------------------------------------------- 04
     {
@@ -752,11 +706,7 @@ LESSONS = [
                      "<strong>solution</strong> of a system of such equations is an "
                      "ordered triple `(x, y, z)` satisfying every equation in the "
                      "system.")),
-            ("p", "The method: choose a variable, eliminate it from two different pairs "
-                  "of equations, and you are left with two equations in the remaining "
-                  "two unknowns &mdash; the situation of lesson 3. Solve that, then "
-                  "back-substitute into any original equation to recover the variable "
-                  "that was eliminated."),
+            ("p", 'The method: choose a variable, eliminate it from two different pairs of equations, and you are left with two equations in the remaining two unknowns &mdash; the situation of “Solving by Elimination”. Solve that, then back-substitute into any original equation to recover the variable that was eliminated.'),
             ("thm", ("The reduction finds every solution and no others",
                      "Suppose `x` is eliminated from `E₁` and `E₂` to give `A`, and "
                      "from `E₁` and `E₃` to give `B`, where the coefficient of `x` in "
@@ -764,12 +714,7 @@ LESSONS = [
                      "satisfies `A` and `B`; and for each pair `(y, z)` satisfying `A` "
                      "and `B`, equation `E₁` determines exactly one `x`, and the "
                      "resulting triple solves the original system.")),
-            ("p", "The theorem is lesson 3's theorem used twice, which is why every "
-                  "elimination must keep `E₁` intact and combine it with something "
-                  "else. It also explains the requirement that the two new equations "
-                  "come from different pairs: two combinations of `E₁` and `E₂` alone "
-                  "tell you only what `E₁` and `E₂` already said, and `E₃` never enters "
-                  "the calculation."),
+            ("p", "The theorem is “Solving by Elimination”'s theorem used twice, which is why every elimination must keep `E₁` intact and combine it with something else. It also explains the requirement that the two new equations come from different pairs: two combinations of `E₁` and `E₂` alone tell you only what `E₁` and `E₂` already said, and `E₃` never enters the calculation."),
             ("h3", "What the three planes are doing"),
             ("ul", [
                 "<strong>Exactly one solution.</strong> The three planes have a single "
@@ -781,11 +726,7 @@ LESSONS = [
                 "&mdash; one free variable &mdash; or all three equations may describe "
                 "the same plane, in which case two variables are free.",
             ]),
-            ("p", "That picture is worth having and is not worth relying on. Nobody "
-                  "reads a triple off a drawing of three planes, and the prism case in "
-                  "particular is invisible until the algebra produces a false "
-                  "statement. The algebra is the arbiter here even more completely than "
-                  "in lesson 1."),
+            ("p", 'That picture is worth having and is not worth relying on. Nobody reads a triple off a drawing of three planes, and the prism case in particular is invisible until the algebra produces a false statement. The algebra is the arbiter here even more completely than in “Systems of Two Linear Equations”.'),
             ("example", ("A third equation that adds nothing",
                          "Replace `E₃` above by `3x + 4z = 15`, which is `E₁ + E₂`. "
                          "Eliminating `x` twice now ends in `0 = 0`, and the solution "
@@ -808,10 +749,7 @@ LESSONS = [
                 "last variable found first, then the second, then the one that left "
                 "first.",
             ]),
-            ("p", "This bookkeeping is the entire content of the next lesson. Once the "
-                  "columns are aligned and every coefficient has a fixed position, the "
-                  "letters `x`, `y`, `z` are doing no work, and deleting them costs "
-                  "nothing."),
+            ("p", 'This bookkeeping is the entire content of “Matrices and Row Operations”. Once the columns are aligned and every coefficient has a fixed position, the letters `x`, `y`, `z` are doing no work, and deleting them costs nothing.'),
         ],
         "lab": ("system", {
             "mode": "three",
@@ -931,15 +869,8 @@ LESSONS = [
              "`E1`, `E2` and `E3` as they were given."),
         ],
         "standard": ("Finish when the plan is written before the arithmetic starts.",
-                     "State which variable is leaving and which two pairs will remove "
-                     "it, then execute in exact fractions and check in all three "
-                     "original equations. A three-variable system solved by improvising "
-                     "comes out right about half the time; solved to a plan it is "
-                     "routine, and the plan is precisely what lesson 6 automates."),
-        "note": "From here to lesson 9 this is the same arithmetic with the letters "
-                "deleted. The next lesson writes `x + y + z = 6` as the row `1 1 1 | 6` "
-                "and `E2 − 2E1` as `R2 − 2R1`; nothing about the numbers changes, which "
-                "is exactly why it is worth having done one of these by hand first.",
+                     'State which variable is leaving and which two pairs will remove it, then execute in exact fractions and check in all three original equations. A three-variable system solved by improvising comes out right about half the time; solved to a plan it is routine, and the plan is precisely what “Gaussian Elimination” automates.'),
+        "note": 'From here to “Inverse Matrices” this is the same arithmetic with the letters deleted. “Matrices and Row Operations” writes `x + y + z = 6` as the row `1 1 1 | 6` and `E2 − 2E1` as `R2 − 2R1`; nothing about the numbers changes, which is exactly why it is worth having done one of these by hand first.',
     },
     # ---------------------------------------------------------------- 05
     {
@@ -961,8 +892,7 @@ LESSONS = [
         ],
         "key_label": "The system, the matrix, the three legal moves",
         "concepts_intro": (
-            "Nothing is proved in this lesson that was not proved in lesson 3. What is "
-            "new is a notation, and the discipline the notation demands."
+            'Nothing is proved in this lesson that was not proved in “Solving by Elimination”. What is new is a notation, and the discipline the notation demands.'
         ),
         "concepts": [
             ("A matrix is bookkeeping, not a new idea",
@@ -1025,12 +955,7 @@ LESSONS = [
                      "exactly the same solution set. Such matrices are called "
                      "<strong>row equivalent</strong>.")),
             ("proof", [
-                "Each of the three operations is a restatement of something already "
-                "settled. Swapping two rows reorders the equations, and a solution "
-                "satisfies a set of equations regardless of the order they are written "
-                "in. Scaling a row by `k ≠ 0` is lesson 3's second claim. Replacing "
-                "`R3` by `R3 + kR1` is lesson 3's first claim, with `R1` left in place "
-                "as that theorem requires.",
+                "Each of the three operations is a restatement of something already settled. Swapping two rows reorders the equations, and a solution satisfies a set of equations regardless of the order they are written in. Scaling a row by `k ≠ 0` is “Solving by Elimination”'s second claim. Replacing `R3` by `R3 + kR1` is “Solving by Elimination”'s first claim, with `R1` left in place as that theorem requires.",
                 "Each operation has an inverse of the same kind, so any solution "
                 "of the new system is a solution of the old one as well. A sequence of "
                 "reversible steps is reversible: undo them in the opposite order.",
@@ -1044,24 +969,14 @@ LESSONS = [
                   "`0 1 | 1`, adding each to the other simultaneously gives `1 1 | 2` "
                   "twice, turning a unique solution into a line."),
             ("example", ("Two operations, written out",
-                         "Start from the augmented matrix of the lesson-4 system. "
-                         "`R2 − 2R1 → R2` gives the row `0 −3 1 | −3`, and "
-                         "`R3 + R1 → R3` gives `0 3 5 | 21`.",
-                         "Those are the equations `A` and `B` of lesson 4, entry for "
-                         "entry. The matrix has not made the arithmetic easier; it has "
-                         "made the position of every number decidable in advance.")),
-            ("p", "Write each operation beside the row it produces, exactly as the "
-                  "combinations were labelled in lesson 4. The next lesson performs "
-                  "eight or ten of these in a row, and an unlabelled sequence of "
-                  "matrices is impossible to debug."),
+                         'Start from the augmented matrix of the system in “Systems in Three Variables”. `R2 − 2R1 → R2` gives the row `0 −3 1 | −3`, and `R3 + R1 → R3` gives `0 3 5 | 21`.',
+                         'Those are the equations `A` and `B` of “Systems in Three Variables”, entry for entry. The matrix has not made the arithmetic easier; it has made the position of every number decidable in advance.')),
+            ("p", 'Write each operation beside the row it produces, exactly as the combinations were labelled in “Systems in Three Variables”. “Gaussian Elimination” performs eight or ten of these in a row, and an unlabelled sequence of matrices is impossible to debug.'),
         ],
         "lab": ("matrix", {
             "mode": "rows",
             "panel_title": "Apply one operation",
-            "panel_intro": "Type an augmented matrix and apply a single row operation at "
-                           "a time. Run the operations from lesson 4 &mdash; `R2 − 2R1` "
-                           "and `R3 + R1` &mdash; and compare the entries with the "
-                           "equations there: the same numbers, in fixed places.",
+            "panel_intro": 'Type an augmented matrix and apply a single row operation at a time. Run the operations from “Systems in Three Variables” &mdash; `R2 − 2R1` and `R3 + R1` &mdash; and compare the entries with the equations there: the same numbers, in fixed places.',
         }),
         "steps_title": "From a system to a matrix and back",
         "steps_intro": "Four moves. The first two are where the meaning is fixed.",
@@ -1082,11 +997,9 @@ LESSONS = [
              "admiring the final matrix."),
         ],
         "worked": {
-            "title": "The lesson-4 system, as a matrix",
+            "title": 'The system in “Systems in Three Variables”, as a matrix',
             "intro": [
-                "The same two eliminations as lesson 4, written without letters. Every "
-                "number below appears in the worked example there; only the layout has "
-                "changed."
+                'The same two eliminations as “Systems in Three Variables”, written without letters. Every number below appears in the worked example there; only the layout has changed.'
             ],
             "lines": [
                 " x +  y +  z =  6            1   1   1 |  6      R1",
@@ -1104,11 +1017,7 @@ LESSONS = [
                 "                             0   3   5 | 21",
             ],
             "after": [
-                "The constant column takes part in every operation. `9 − 2(6) = −3` is "
-                "the right-hand side of `E2 − 2E1` from lesson 4, and omitting it is the "
-                "commonest way to end up with a matrix that no longer represents the "
-                "system it started as &mdash; a matrix which then reduces perfectly and "
-                "reports a wrong triple.",
+                'The constant column takes part in every operation. `9 − 2(6) = −3` is the right-hand side of `E2 − 2E1` from “Systems in Three Variables”, and omitting it is the commonest way to end up with a matrix that no longer represents the system it started as &mdash; a matrix which then reduces perfectly and reports a wrong triple.',
                 "Notice what the two operations achieved: the first column below the top "
                 "row is now zero. That is `x` eliminated, and it is the first column "
                 "rather than the first variable only because of where it was written.",
@@ -1167,11 +1076,7 @@ LESSONS = [
                      "row operations and name the inverse of each. If you cannot name "
                      "the inverse, the step you performed was probably not one of the "
                      "three."),
-        "note": "Nothing has been gained yet: this is the same arithmetic in less ink. "
-                "What it buys is the next lesson. With the letters gone there is an "
-                "obvious order in which to do the operations &mdash; leftmost column "
-                "first, then the next &mdash; and an order that obvious is an algorithm "
-                "rather than a decision.",
+        "note": 'Nothing has been gained yet: this is the same arithmetic in less ink. What it buys is “Gaussian Elimination”. With the letters gone there is an obvious order in which to do the operations &mdash; leftmost column first, then the next &mdash; and an order that obvious is an algorithm rather than a decision.',
     },
     # ---------------------------------------------------------------- 06
     {
@@ -1320,11 +1225,9 @@ LESSONS = [
              "parameter form, or the empty set."),
         ],
         "worked": {
-            "title": "Reducing the lesson-4 matrix to the answer",
+            "title": 'Reducing the matrix from “Systems in Three Variables” to the answer',
             "intro": [
-                "The same system once more, carried all the way to reduced row echelon "
-                "form. Compare the first two operations with lesson 5 and the whole of "
-                "it with lesson 4."
+                'The same system once more, carried all the way to reduced row echelon form. Compare the first two operations with “Matrices and Row Operations” and the whole of it with “Systems in Three Variables”.'
             ],
             "lines": [
                 "                     1   1   1 |  6",
@@ -1422,12 +1325,7 @@ LESSONS = [
                      "augmented matrix to reduced row echelon form in exact fractions, "
                      "and name which of the three cases you are in before writing any "
                      "solution down."),
-        "note": "Lesson 7 leaves systems for a moment and asks what else can be done "
-                "with a matrix: added, scaled, and multiplied. The product is what lets "
-                "a whole system be written `Ax = b`, and lessons 8 and 9 answer the "
-                "question this lesson leaves open &mdash; which coefficient matrices "
-                "give exactly one solution, and whether the answer can be had in one "
-                "step instead of ten.",
+        "note": "“Matrix Products” leaves systems for a moment and asks what else can be done with a matrix: added, scaled, and multiplied. The product is what lets a whole system be written `Ax = b`, and “Determinants and Cramer's Rule” and “Inverse Matrices” answer the question this lesson leaves open &mdash; which coefficient matrices give exactly one solution, and whether the answer can be had in one step instead of ten.",
     },
     # ---------------------------------------------------------------- 07
     {
@@ -1454,9 +1352,7 @@ LESSONS = [
         ),
         "concepts": [
             ("Addition is entrywise and needs matching sizes",
-             "`A + B` exists only when `A` and `B` have the same number of rows and the "
-             "same number of columns, and then it is what it looks like. Every rule of "
-             "addition from course 1 carries over, one position at a time."),
+             "`A + B` exists only when `A` and `B` have the same number of rows and the same number of columns, and then it is what it looks like. Every rule of addition from Foundations of Algebra carries over, one position at a time."),
             ("The product runs rows against columns",
              "Multiply each entry of row `i` of `A` by the matching entry of column `j` "
              "of `B` and add the results. The row length of `A` must equal the column "
@@ -1521,12 +1417,7 @@ LESSONS = [
                 "CD =    2  −5             DC exists too, and is 3 × 3",
                 "       26  14",
             ]),
-            ("p", "The definition looks arbitrary until a system is written with it. "
-                  "Take the coefficient matrix of the lesson-4 system, a column of the "
-                  "three unknowns, and a column of the three constants. The product of "
-                  "the first two is a column whose entries are the left-hand sides of "
-                  "the three equations, so the whole system is the single statement "
-                  "`Ax = b`."),
+            ("p", 'The definition looks arbitrary until a system is written with it. Take the coefficient matrix of the system in “Systems in Three Variables”, a column of the three unknowns, and a column of the three constants. The product of the first two is a column whose entries are the left-hand sides of the three equations, so the whole system is the single statement `Ax = b`.'),
             ("math", [
                 " 1   1   1     x            6",
                 " 2  −1   3     y     =      9",
@@ -1536,12 +1427,7 @@ LESSONS = [
                 "                 2(1) − 1(2) + 3(3)  =   9    ✓",
                 "                −1(1) + 2(2) + 4(3)  =  15    ✓",
             ]),
-            ("p", "Even when both products exist, order must be preserved: `AB` and "
-                  "`BA` can have different sizes or different entries. The arithmetic "
-                  "lesson here is deliberately narrow &mdash; decide existence, state "
-                  "the output size, and build each entry from the named row and column. "
-                  "Lesson 9 introduces the identity and inverse when a system needs a "
-                  "matrix operation to be undone."),
+            ("p", 'Even when both products exist, order must be preserved: `AB` and `BA` can have different sizes or different entries. The arithmetic lesson here is deliberately narrow &mdash; decide existence, state the output size, and build each entry from the named row and column. “Inverse Matrices” introduces the identity and inverse when a system needs a matrix operation to be undone.'),
         ],
         "lab": ("matrix", {
             "mode": "arith",
@@ -1659,16 +1545,7 @@ LESSONS = [
              "sizes down before reaching for the arithmetic."),
         ],
         "standard": ("Finish when the size of the answer is the first thing you write.",
-                     "Before computing a single entry, write `m × p` down. It catches an "
-                     "impossible product before any arithmetic happens, it tells you how "
-                     "many entries you owe, and it is the habit that makes `Ax = b` in "
-                     "lesson 9 read as one equation rather than as three."),
-        "note": "Writing a system as `Ax = b` invites the obvious move: divide by `A`. "
-                "There is no division of matrices, but there is sometimes a matrix that "
-                "undoes multiplication by `A`. Lesson 8 produces the "
-                "single number that decides whether such a matrix exists, and lesson 9 "
-                "defines it as `A⁻¹`, constructs it by row reduction, and turns the "
-                "system into `x = A⁻¹b` &mdash; which is the reason this course did "
-                "lesson 6 first.",
+                     'Before computing a single entry, write `m × p` down. It catches an impossible product before any arithmetic happens, it tells you how many entries you owe, and it is the habit that makes `Ax = b` in “Inverse Matrices” read as one equation rather than as three.'),
+        "note": "Writing a system as `Ax = b` invites the obvious move: divide by `A`. There is no division of matrices, but there is sometimes a matrix that undoes multiplication by `A`. “Determinants and Cramer's Rule” produces the single number that decides whether such a matrix exists, and “Inverse Matrices” defines it as `A⁻¹`, constructs it by row reduction, and turns the system into `x = A⁻¹b` &mdash; which is the reason this course did “Gaussian Elimination” first.",
     },
 ]

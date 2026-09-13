@@ -8,10 +8,7 @@ LESSONS = [
         "module": "Factoring",
         "one_line": "Factor ax² + bx + c by an exhaustive ac pair search followed by grouping.",
         "summary": (
-            "When the leading coefficient is not `1`, guessing the two binomials is a "
-            "search with too many branches. The AC method replaces the guess with "
-            "arithmetic: one product to compute, one pair of integers to find, and "
-            "then the grouping of lesson 6 finishes the job."
+            'When the leading coefficient is not `1`, guessing the two binomials is a search with too many branches. The AC method replaces the guess with arithmetic: one product to compute, one pair of integers to find, and then the grouping of “Factoring by Grouping” finishes the job.'
         ),
         "key": [
             "ax² + bx + c            a ≠ 1",
@@ -42,11 +39,7 @@ LESSONS = [
         "read_title": "The AC method",
         "read_intro": "Why splitting the middle term is legal, and what an empty search proves.",
         "body": [
-            ("p", "Lesson 7 factored `x² + bx + c` by finding two numbers that multiply "
-                  "to `c` and add to `b`. That shortcut depends on the leading "
-                  "coefficient being `1`. Once `a ≠ 1`, the constant term of the product "
-                  "is no longer the product of the two numbers you are looking for, "
-                  "because the `a` distributes into both binomials."),
+            ("p", '“Factoring Simple Trinomials” factored `x² + bx + c` by finding two numbers that multiply to `c` and add to `b`. That shortcut depends on the leading coefficient being `1`. Once `a ≠ 1`, the constant term of the product is no longer the product of the two numbers you are looking for, because the `a` distributes into both binomials.'),
             ("def", ("The AC method",
                      "To factor `ax² + bx + c` with integer coefficients: compute `ac`; "
                      "find integers `m` and `n` with `mn = ac` and `m + n = b`; rewrite "
@@ -83,11 +76,7 @@ LESSONS = [
                          "`6`; the negative pairs `(-1)(-8)` and `(-2)(-4)` give `-9` and "
                          "`-6`. None is `3`, and the theorem above shows why the completed "
                          "list rules out every product of integer-coefficient binomials.")),
-            ("p", "Take the common factor out first, always. `12x² + 22x + 6` has `ac = "
-                  "72` and a messier pair list, but `12x² + 22x + 6 = 2(6x² + 11x + 3) = "
-                  "2(3x + 1)(2x + 3)` reduces it to the example above. Lesson 5 put the "
-                  "common factor at the top of the decision list for exactly this "
-                  "reason."),
+            ("p", 'Take the common factor out first, always. `12x² + 22x + 6` has `ac = 72` and a messier pair list, but `12x² + 22x + 6 = 2(6x² + 11x + 3) = 2(3x + 1)(2x + 3)` reduces it to the example above. “Factoring Out the Greatest Common Factor” put the common factor at the top of the decision list for exactly this reason.'),
         ],
         "lab": ("factoring", {
             "mode": "ac",
@@ -189,20 +178,14 @@ LESSONS = [
              "If your two brackets come out as `3x - 2` and `-3x + 2`, factor `-1` out "
              "of the second and continue."),
             ("Treating a failed search as a failed attempt",
-             "Running out of pairs is the method succeeding. It has told you the "
-             "trinomial is irreducible over the integers, which is exactly what "
-             "lesson 12 will need you to be able to conclude."),
+             'Running out of pairs is the method succeeding. It has told you the trinomial is irreducible over the integers, which is exactly what “The Factor Theorem and Rational Roots” will need you to be able to conclude.'),
         ],
         "standard": ("Finish when an empty pair list reads as a result rather than a dead end.",
                      "You should be able to factor `6x² - 7x - 20` and `12x² - 17x + 6` "
                      "without hesitation, and to say of `2x² + 3x + 4` that it does not "
                      "factor into integer-coefficient binomials &mdash; naming the completed "
                      "ac pair search as your reason."),
-        "note": "The lab prints the whole pair list rather than only the winning pair, "
-                "because the list is the argument. A pair that is simply asserted is a "
-                "guess that happened to work; a list that has been exhausted is a "
-                "proof, and lesson 12 runs the same kind of complete search over a "
-                "candidate list of roots.",
+        "note": 'The lab prints the whole pair list rather than only the winning pair, because the list is the argument. A pair that is simply asserted is a guess that happened to work; a list that has been exhausted is a proof, and “The Factor Theorem and Rational Roots” runs the same kind of complete search over a candidate list of roots.',
     },
     # ---------------------------------------------------------------- 09
     {
@@ -211,10 +194,7 @@ LESSONS = [
         "module": "Factoring",
         "one_line": "Test a polynomial against four special forms, apply a match, and retest every factor.",
         "summary": (
-            "Four patterns, recognised rather than derived. Each is one of the special "
-            "products of lesson 4 read backwards, and each is worth knowing on sight "
-            "because the general methods are slower and, for the cubes, will not find "
-            "the factorisation at all."
+            'Four patterns, recognised rather than derived. Each is one of the special products of “Special Products” read backwards, and each is worth knowing on sight because the general methods are slower and, for the cubes, will not find the factorisation at all.'
         ),
         "key": [
             "a² - b²   =  (a - b)(a + b)",
@@ -248,9 +228,7 @@ LESSONS = [
         "read_title": "The four special forms",
         "read_intro": "How to recognise each, and the two that are most often faked.",
         "body": [
-            ("p", "Lesson 4 multiplied these out. Every identity here is one of those "
-                  "products with the two sides exchanged, which is why they need no "
-                  "proof beyond expanding the right-hand side."),
+            ("p", '“Special Products” multiplied these out. Every identity here is one of those products with the two sides exchanged, which is why they need no proof beyond expanding the right-hand side.'),
             ("h3", "Difference of squares"),
             ("thm", ("a² - b² = (a - b)(a + b)",
                      "Expanding the right side gives `a² + ab - ab - b² = a² - b²`; the "
@@ -276,10 +254,7 @@ LESSONS = [
                          "matches: it is `(x + 6)²`. For the second, `25x² = (5x)²`, "
                          "`4 = 2²`, and `2 · 5x · 2 = 20x` matches the middle term with "
                          "the sign negative: it is `(5x - 2)²`.")),
-            ("p", "The middle-term test is what makes this a theorem rather than a "
-                  "guess. `x² + 13x + 36` has square outer terms too, but `2 · 1 · 6 = "
-                  "12`, not `13`, so it is not a perfect square. It happens to factor "
-                  "as `(x + 4)(x + 9)`, by the method of lesson 7."),
+            ("p", 'The middle-term test is what makes this a theorem rather than a guess. `x² + 13x + 36` has square outer terms too, but `2 · 1 · 6 = 12`, not `13`, so it is not a perfect square. It happens to factor as `(x + 4)(x + 9)`, by the method of “Factoring Simple Trinomials”.'),
             ("h3", "Sums and differences of cubes"),
             ("thm", ("a³ - b³ = (a - b)(a² + ab + b²)   and   a³ + b³ = (a + b)(a² - ab + b²)",
                      "Unlike squares, a SUM of cubes does factor. In both identities the "
@@ -316,9 +291,7 @@ LESSONS = [
              "factorability argument. Both a sum and a difference of rational perfect "
              "cubes match their cube identities. Check the powers before naming a pattern."),
             ("Three terms: test the middle term",
-             "If the outer terms are perfect squares, compute twice the product of "
-             "their roots. If that equals the middle term, it is a perfect square "
-             "trinomial; if not, use lesson 7 or lesson 8."),
+             'If the outer terms are perfect squares, compute twice the product of their roots. If that equals the middle term, it is a perfect square trinomial; if not, use “Factoring Simple Trinomials” or “The AC Method”.'),
             ("Factor each piece again",
              "Apply the list to every factor you produced. Stop only when no factor "
              "matches any pattern and none factors by the AC method."),
@@ -397,12 +370,7 @@ LESSONS = [
                      "should factor the first three on sight and say of the fourth that "
                      "the conjugate pattern does not apply; because it stays positive, it "
                      "also has no real linear factor. Neither conclusion is a failure to spot something."),
-        "note": "These patterns matter beyond factoring. Course 5 cancels a difference "
-                "of squares out of a rational expression on almost every page, and "
-                "course 6 returns to `a² + b²` once `i` exists and factors it properly. "
-                "This lesson factors over rational coefficients unless it explicitly says "
-                "otherwise. Course 6 enlarges the coefficient system; naming the system is "
-                "part of every claim that a factor does or does not exist.",
+        "note": "These patterns matter beyond factoring. Rational and Radical Expressions cancels a difference of squares out of a rational expression on almost every page, and Quadratics and Complex Numbers returns to `a² + b²` once `i` exists and factors it properly. This lesson factors over rational coefficients unless it explicitly says otherwise. Quadratics and Complex Numbers enlarges the coefficient system; naming the system is part of every claim that a factor does or does not exist.",
     },
     # ---------------------------------------------------------------- 10
     {
@@ -472,19 +440,13 @@ LESSONS = [
                          "-x³` and `0x² - 4x² = -4x²`. Both signs come from the "
                          "subtraction, and both are places where a term is commonly "
                          "lost.")),
-            ("p", "Subtracting a polynomial means subtracting every one of its terms. "
-                  "Lesson 2 made this point about `-(x - 3)`; here the same slip costs "
-                  "you the rest of the division, because each line feeds the next. If "
-                  "you find it easier, negate the product and add."),
+            ("p", 'Subtracting a polynomial means subtracting every one of its terms. “Adding and Subtracting Polynomials” made this point about `-(x - 3)`; here the same slip costs you the rest of the division, because each line feeds the next. If you find it easier, negate the product and add.'),
             ("h3", "Reading the result"),
             ("p", "The division above ends with `q = 2x² - x - 5` and `r = 2x + 9`. "
                   "The remainder has degree `1`, the divisor degree `2`, so the "
                   "stopping rule is satisfied and the work is finished. Written out in "
                   "full: `2x⁴ - 3x³ + 5x - 1 = (x² - x + 2)(2x² - x - 5) + (2x + 9)`."),
-            ("p", "Because `r ≠ 0`, the divisor is not a factor. Had the remainder "
-                  "been `0`, we would have a factorisation of a quartic into a "
-                  "quadratic times a quadratic &mdash; which is how division earns its "
-                  "place in a course about factoring, and what lesson 12 exploits."),
+            ("p", 'Because `r ≠ 0`, the divisor is not a factor. Had the remainder been `0`, we would have a factorisation of a quartic into a quadratic times a quadratic &mdash; which is how division earns its place in a course about factoring, and what “The Factor Theorem and Rational Roots” exploits.'),
             ("thm", ("Degrees add",
                      "If `r = 0` then `deg f = deg d + deg q`. So dividing a degree-4 "
                      "polynomial by a degree-2 one gives a degree-2 quotient, and a "
@@ -565,8 +527,7 @@ LESSONS = [
              "a": ["`d` is a factor of `f`", "`f` has no real roots",
                    "`d` and `f` have the same degree", "The division was done incorrectly"],
              "c": 0,
-             "why": "A zero remainder means `f = dq` exactly, so `d` divides `f`. This "
-                    "is the observation lesson 12 turns into the factor theorem."},
+             "why": 'A zero remainder means `f = dq` exactly, so `d` divides `f`. This is the observation “The Factor Theorem and Rational Roots” turns into the factor theorem.'},
             {"q": "Divide `x³ - 4x² + x + 6` by `x - 2`. What is the result?",
              "a": ["`x² - 2x - 3`, remainder `0`", "`x² + 2x - 3`, remainder `0`",
                    "`x² - 2x + 3`, remainder `12`", "`x² - 4x + 1`, remainder `6`"],
@@ -595,10 +556,7 @@ LESSONS = [
                      "full identity with the remainder in place, and verify it by "
                      "multiplying out &mdash; which is the only step here that "
                      "confirms every sign at once."),
-        "note": "Long division works for a divisor of any degree, and that generality "
-                "is why it comes first. Lesson 11's synthetic division is faster but "
-                "applies only when the divisor is `x - c`; when a divisor is quadratic "
-                "or worse, this is the method, and there is no shortcut waiting.",
+        "note": "Long division works for a divisor of any degree, and that generality is why it comes first. “Synthetic Division and the Remainder Theorem”'s synthetic division is faster but applies only when the divisor is `x - c`; when a divisor is quadratic or worse, this is the method, and there is no shortcut waiting.",
     },
     # ---------------------------------------------------------------- 11
     {
@@ -607,10 +565,7 @@ LESSONS = [
         "module": "Division and roots",
         "one_line": "Use synthetic division for x - c and verify that its last entry equals f(c).",
         "summary": (
-            "When the divisor is `x - c`, the long division of lesson 10 repeats the "
-            "same three symbols on every line and can be compressed to one row of "
-            "numbers. The remainder it leaves is not merely a leftover: it is `f(c)`, "
-            "which is the fact the next lesson is built on."
+            'When the divisor is `x - c`, the long division of “Polynomial Long Division” repeats the same three symbols on every line and can be compressed to one row of numbers. The remainder it leaves is not merely a leftover: it is `f(c)`, which is the fact “The Factor Theorem and Rational Roots” is built on.'
         ),
         "key": [
             "divisor must be  x - c     (degree 1, leading coefficient 1)",
@@ -631,9 +586,7 @@ LESSONS = [
              "`x` in the same columns, so the powers carry no information. Strip them "
              "and only the coefficients are left."),
             ("It applies only to a divisor x - c",
-             "Degree one, leading coefficient one. For `x² - x + 2`, or for `2x - 1` "
-             "as written, the compression does not work and lesson 10's method is the "
-             "method."),
+             "Degree one, leading coefficient one. For `x² - x + 2`, or for `2x - 1` as written, the compression does not work and “Polynomial Long Division”'s method is the method."),
             ("The remainder is the function value",
              "Dividing `f` by `x - c` leaves a constant remainder, and that constant "
              "is `f(c)`. So synthetic division evaluates a polynomial as a side "
@@ -687,11 +640,7 @@ LESSONS = [
                   "54 - 45 + 9 - 7 = 11`, which is the remainder the synthetic "
                   "division produced. On the second, `g(-4) = -64 + 32 + 20 + 1 = -11`, "
                   "again the remainder."),
-            ("p", "This is worth pausing on, because it points in two directions. It "
-                  "gives a fast way to evaluate a polynomial &mdash; three "
-                  "multiplications and three additions for a cubic, against the powers "
-                  "you would otherwise compute. And it says that a remainder of zero "
-                  "means `f(c) = 0`, which is where lesson 12 begins."),
+            ("p", 'This is worth pausing on, because it points in two directions. It gives a fast way to evaluate a polynomial &mdash; three multiplications and three additions for a cubic, against the powers you would otherwise compute. And it says that a remainder of zero means `f(c) = 0`, which is where “The Factor Theorem and Rational Roots” begins.'),
         ],
         "lab": ("polynomial", {
             "mode": "synthetic",
@@ -790,10 +739,7 @@ LESSONS = [
                      "you should evaluate `f(2) = 16 - 6 + 1 = 11` and stop. Reaching "
                      "for the division at that point means the theorem has not yet "
                      "replaced the procedure."),
-        "note": "Synthetic division is a compression of lesson 10, not a separate "
-                "theory, and it earns its keep by being cheap enough to run many times. "
-                "Lesson 12 tests a list of candidate roots one after another; doing "
-                "that by long division would be accurate and unusable.",
+        "note": 'Synthetic division is a compression of “Polynomial Long Division”, not a separate theory, and it earns its keep by being cheap enough to run many times. “The Factor Theorem and Rational Roots” tests a list of candidate roots one after another; doing that by long division would be accurate and unusable.',
     },
     # ---------------------------------------------------------------- 12
     {
@@ -917,10 +863,7 @@ LESSONS = [
              "Evaluate `f` at each, by synthetic division so that a hit hands you the "
              "quotient immediately. `f(c) = 0` means `(x - c)` is a factor."),
             ("Repeat on the quotient, and stop at degree 2",
-             "The quotient is one degree lower; search it the same way. Once it is a "
-             "quadratic, use the pair or ac method already taught. If those searches are "
-             "empty, record that no rational linear factor remains; Course 6 classifies "
-             "its irrational or complex roots."),
+             "The quotient is one degree lower; search it the same way. Once it is a quadratic, use the pair or ac method already taught. If those searches are empty, record that no rational linear factor remains; Quadratics and Complex Numbers classifies its irrational or complex roots."),
         ],
         "worked": {
             "title": "Factoring 2x³ - 3x² - 8x - 3",
@@ -1001,21 +944,14 @@ LESSONS = [
              "`±1, ±2, ±1/3, ±2/3` &mdash; eight candidates, of which only `-1` "
              "happens to be a root &mdash; and miss the actual root `-1/2` entirely."),
             ("Continuing to test candidates after the degree drops to two",
-             "Once the quotient is a quadratic, use the pair or ac method from lessons 7 and 8. "
-             "Further candidate testing can only rediscover what those methods give "
-             "directly, and an empty rational search must not be inflated into a claim "
-             "that the quadratic has no real or complex roots."),
+             'Once the quotient is a quadratic, use the pair or ac method from “Factoring Simple Trinomials” and “The AC Method”. Further candidate testing can only rediscover what those methods give directly, and an empty rational search must not be inflated into a claim that the quadratic has no real or complex roots.'),
         ],
         "standard": ("Finish when a complete search that finds nothing reads as a proof.",
                      "You should factor `2x³ - 3x² - 8x - 3` down to three linear "
                      "factors, and state of `x³ - 2` that it has no rational root "
                      "&mdash; citing the four tested candidates as the reason rather "
                      "than reporting that you could not find one."),
-        "note": "This is the lesson the course was arranged around. Course 5 needs "
-                "factored denominators, course 6 needs the roots of quadratics, and "
-                "lesson 13 needs the factored form to draw a graph. All three are "
-                "downstream of a search that either produces exact factors or proves "
-                "there are none.",
+        "note": 'This is the lesson the course was arranged around. Rational and Radical Expressions needs factored denominators, Quadratics and Complex Numbers needs the roots of quadratics, and “Graphs of Polynomial Functions” needs the factored form to draw a graph. All three are downstream of a search that either produces exact factors or proves there are none.',
     },
     # ---------------------------------------------------------------- 13
     {
@@ -1101,11 +1037,7 @@ LESSONS = [
             ("p", "The y-intercept is always `f(0)`, which is the constant term in "
                   "standard form and the product of the constants in factored form. It "
                   "anchors the sign intervals to one exact point away from the roots."),
-            ("p", "A touch forces a local turn at its even-multiplicity root, but these "
-                  "data do not locate any other turning points. Exact turning-point "
-                  "locations require calculus; Course 6 handles the one case algebra can "
-                  "do on its own, the vertex of a parabola. Draw a qualitative sketch "
-                  "here and let the evaluated lab supply the metric picture."),
+            ("p", "A touch forces a local turn at its even-multiplicity root, but these data do not locate any other turning points. Exact turning-point locations require calculus; Quadratics and Complex Numbers handles the one case algebra can do on its own, the vertex of a parabola. Draw a qualitative sketch here and let the evaluated lab supply the metric picture."),
         ],
         "lab": ("grapher", {
             "mode": "polynomial",
@@ -1125,8 +1057,7 @@ LESSONS = [
         "steps_intro": "Ends first, then the axis, then the one point you should always plot.",
         "steps": [
             ("Factor it, if it is not factored already",
-             "Everything below is read off the factored form. Lessons 5 to 9 and the "
-             "search of lesson 12 exist to get you here."),
+             'Everything below is read off the factored form. The common-factor, grouping, trinomial and special-form techniques and the search in “The Factor Theorem and Rational Roots” exist to get you here.'),
             ("Fix the two ends",
              "Look at the degree and the leading coefficient only. Even degree: both "
              "ends together. Odd degree: opposite ends. Positive leading coefficient: "
@@ -1225,11 +1156,6 @@ LESSONS = [
                      "shape from the ends, the three roots with their multiplicities "
                      "and `f(0)` alone &mdash; using sample values only to confirm the "
                      "signs, never to discover them."),
-        "note": "This is where the course arrives. The graph is drawn from the "
-                "factored form, the factored form came from the search in lesson 12, "
-                "and that search was made possible by the techniques of lessons 5 to "
-                "9. Anything the lab plots is computed by evaluating the polynomial "
-                "you entered, so a curve that looks wrong is telling you something "
-                "about the polynomial rather than about the drawing.",
+        "note": 'This is where the course arrives. The graph is drawn from the factored form, the factored form came from the search in “The Factor Theorem and Rational Roots”, and that search was made possible by the common-factor, grouping, trinomial and special-form techniques. Anything the lab plots is computed by evaluating the polynomial you entered, so a curve that looks wrong is telling you something about the polynomial rather than about the drawing.',
     },
 ]

@@ -20,16 +20,14 @@ LESSONS = [
         ],
         "key_label": "Two objects, one assumption",
         "concepts_intro": (
-            "Getting the sample space right is most of the work. The arithmetic that "
-            "follows is course 4."
+            "Getting the sample space right is most of the work. The arithmetic that follows is Combinatorics and Counting."
         ),
         "concepts": [
             ("An outcome is a complete result",
              "For two dice the outcomes are ordered pairs, not sums. Choosing the wrong "
              "granularity is the first and most damaging error."),
             ("An event is a subset",
-             "\"The sum is 7\" is the set of six pairs that sum to 7. Set operations from "
-             "course 2 apply unchanged: `∪` is \"or\", `∩` is \"and\", complement is \"not\"."),
+             "\"The sum is 7\" is the set of six pairs that sum to 7. Set operations from Sets, Relations, and Functions apply unchanged: `∪` is \"or\", `∩` is \"and\", complement is \"not\"."),
             ("Equally likely is a modelling choice",
              "It is justified by symmetry of the physical situation, and it must be "
              "checked. Sums of two dice are not equally likely; pairs are."),
@@ -41,11 +39,7 @@ LESSONS = [
                      "The <strong>sample space</strong> `S` is the set of all possible "
                      "outcomes of an experiment. An <strong>outcome</strong> is one "
                      "element of `S`; an <strong>event</strong> is a subset of `S`.")),
-            ("p", "The outcomes must be <strong>mutually exclusive</strong> (no two "
-                  "happen together) and <strong>exhaustive</strong> (at least one "
-                  "happens), so that exactly one happens. Those are the two obligations "
-                  "a proof by cases carries in course 1 lesson 14 &mdash; overlap nowhere, "
-                  "cover everything &mdash; and they fail in the same ways."),
+            ("p", 'The outcomes must be <strong>mutually exclusive</strong> (no two happen together) and <strong>exhaustive</strong> (at least one happens), so that exactly one happens. Those are the two obligations a proof by cases carries in “Cases, Counterexamples, and Writing a Proof” in Logic and Proof &mdash; overlap nowhere, cover everything &mdash; and they fail in the same ways.'),
             ("example", ("Two dice, two models",
                          "Model A: `S` is the 36 ordered pairs `(1,1)` through `(6,6)`, all "
                          "equally likely. Model B: `S` is the 11 sums `2, …, 12`. Both are "
@@ -66,13 +60,9 @@ LESSONS = [
                 "exactly one of A, B      A △ B",
                 "A and B cannot both      A ∩ B = ∅     (mutually exclusive)",
             ]),
-            ("p", "Every identity from course 2 lesson 4 therefore applies, and De Morgan "
-                  "is used constantly: \"not (A or B)\" is \"neither A nor B\", which is "
-                  "usually the easier event to count."),
+            ("p", 'Every identity from “Set Identities and Proofs” in Sets, Relations, and Functions therefore applies, and De Morgan is used constantly: "not (A or B)" is "neither A nor B", which is usually the easier event to count.'),
             ("def", ("Probability of an event (equally likely case)",
-                     "When the outcomes of a finite `S` are equally likely, "
-                     "`P(E) = |E| / |S|`. Every probability in this course's early lessons "
-                     "is this ratio, computed with course 4's tools.")),
+                     "When the outcomes of a finite `S` are equally likely, `P(E) = |E| / |S|`. Every probability in this course's early lessons is this ratio, computed with Combinatorics and Counting's tools.")),
             ("example", ("Choosing a granularity",
                          "Flip three coins and ask for the probability of exactly two "
                          "heads. Outcomes as ordered triples: 8 equally likely, of which "
@@ -85,14 +75,7 @@ LESSONS = [
             "a": 0,
             "b": 3,
             "panel_title": "Every outcome, listed",
-            "panel_intro": "The 36 ordered pairs are drawn in full, and the two events "
-                           "open on the worked example: A = sum is 7 (six cyan chips) and "
-                           "B = a double (six purple), with no chip green because "
-                           "`A ∩ B = ∅`. Switch B to \"the first die is 4\" and one chip "
-                           "turns green: `(4,3)`, the `1/36` of the worked example. "
-                           "`P(A)`, `P(B)` and `P(A ∩ B)` are the rows to read now; the "
-                           "conditional rows, the `P(A)·P(B)` row and the status line's "
-                           "verdict belong to lessons 4 and 5.",
+            "panel_intro": 'The 36 ordered pairs are drawn in full, and the two events open on the worked example: A = sum is 7 (six cyan chips) and B = a double (six purple), with no chip green because `A ∩ B = ∅`. Switch B to "the first die is 4" and one chip turns green: `(4,3)`, the `1/36` of the worked example. `P(A)`, `P(B)` and `P(A ∩ B)` are the rows to read now; the conditional rows, the `P(A)·P(B)` row and the status line\'s verdict belong to “Conditional Probability” and “Independence”.',
         }),
         "steps_title": "Building a probability model",
         "steps_intro": "Outcomes first, and choose them fine enough.",
@@ -107,8 +90,7 @@ LESSONS = [
              "\"At least one 6\" is a specific set of pairs. Writing it out is what makes "
              "the count possible."),
             ("Count and divide",
-             "Course 4 supplies the counting. The division is the only new step in this "
-             "lesson."),
+             "Combinatorics and Counting supplies the counting. The division is the only new step in this lesson."),
         ],
         "worked": {
             "title": "Two dice, three events",
@@ -127,10 +109,7 @@ LESSONS = [
                 "P(A ∪ C) = 6/36 + 6/36 − 1/36 = 11/36",
             ],
             "after": [
-                "`A` and `B` are mutually exclusive and `A` and `C` are not, even though "
-                "all three have the same probability. Exclusivity is a fact about the sets, "
-                "not about their sizes &mdash; and lesson 5 shows that independence is a "
-                "third, different property again."
+                '`A` and `B` are mutually exclusive and `A` and `C` are not, even though all three have the same probability. Exclusivity is a fact about the sets, not about their sizes &mdash; and “Independence” shows that independence is a third, different property again.'
             ],
         },
         "quiz_title": "Sample spaces",
@@ -150,23 +129,14 @@ LESSONS = [
              "a": ["a single outcome", "a subset of the sample space",
                    "a probability", "a random variable"],
              "c": 1,
-             "why": "Any subset, including `∅` (probability 0) and `S` (probability 1). A "
-                    "single outcome is an element of `S`; the event is the one-element "
-                    "set containing it. A probability is a number attached to an event, "
-                    "and a random variable (lesson 7) is a function on outcomes &mdash; "
-                    "neither is a subset."},
+             "why": 'Any subset, including `∅` (probability 0) and `S` (probability 1). A single outcome is an element of `S`; the event is the one-element set containing it. A probability is a number attached to an event, and a random variable (“Random Variables”) is a function on outcomes &mdash; neither is a subset.'},
             {"q": "Outcomes must be mutually exclusive, meaning:",
              "a": ["they are equally likely",
                    "no two of them can occur together",
                    "there are finitely many",
                    "they are independent"],
              "c": 1,
-             "why": "Exclusive is \"at most one occurs\"; exhaustive is \"at least one\"; "
-                    "together, exactly one, which is what makes the probabilities sum to "
-                    "1. Equal likelihood is a modelling assumption the lesson says to "
-                    "check, not a requirement; finitely many is not required either "
-                    "(lesson 12's space is infinite); and two distinct outcomes are "
-                    "disjoint events, which lesson 5 shows is the opposite of independent."},
+             "why": 'Exclusive is "at most one occurs"; exhaustive is "at least one"; together, exactly one, which is what makes the probabilities sum to 1. Equal likelihood is a modelling assumption the lesson says to check, not a requirement; finitely many is not required either (“The Geometric Distribution and Waiting Times”’s space is infinite); and two distinct outcomes are disjoint events, which “Independence” shows is the opposite of independent.'},
         ],
         "mistakes": [
             ("Choosing outcomes too coarse",
@@ -183,10 +153,7 @@ LESSONS = [
                      "For \"draw two cards from a standard deck\", write down what an "
                      "outcome is, how many there are, and whether they are equally likely "
                      "&mdash; before touching any event."),
-        "note": "For countably infinite sample spaces &mdash; \"flip until the first "
-                "head\" &mdash; the equally-likely model is unavailable and probabilities "
-                "are assigned directly. Lesson 12 does exactly that for the geometric "
-                "distribution.",
+        "note": 'For countably infinite sample spaces &mdash; "flip until the first head" &mdash; the equally-likely model is unavailable and probabilities are assigned directly. “The Geometric Distribution and Waiting Times” does exactly that for the geometric distribution.',
     },
     # ---------------------------------------------------------------- 02
     {
@@ -195,9 +162,7 @@ LESSONS = [
         "module": "The model",
         "one_line": "Counting the event, counting the space, dividing.",
         "summary": (
-            "With equally likely outcomes, every probability is a ratio of two counts, "
-            "so course 4 is the whole technique. Complementary counting is as useful "
-            "here as it was there."
+            "With equally likely outcomes, every probability is a ratio of two counts, so Combinatorics and Counting is the whole technique. Complementary counting is as useful here as it was there."
         ),
         "key": [
             "P(E) = |E| / |S|",
@@ -207,16 +172,14 @@ LESSONS = [
         ],
         "key_label": "Two counts and a division",
         "concepts_intro": (
-            "Nothing new is needed beyond course 4. What is new is that the answer must "
-            "lie between 0 and 1, which is a free check."
+            "Nothing new is needed beyond Combinatorics and Counting. What is new is that the answer must lie between 0 and 1, which is a free check."
         ),
         "concepts": [
             ("Count with the same tools",
              "Permutations, combinations, complements and inclusion&ndash;exclusion. The "
              "denominator is a count too and is often the easier one."),
             ("The complement rule saves work",
-             "`P(at least one) = 1 − P(none)`, exactly as in course 4 lesson 2 and for "
-             "the same reason."),
+             '`P(at least one) = 1 − P(none)`, exactly as in “Counting with Restrictions” in Combinatorics and Counting and for the same reason.'),
             ("The answer is bounded",
              "Any probability outside `[0, 1]` is a counting error, and that check costs "
              "nothing."),
@@ -240,12 +203,7 @@ LESSONS = [
                          "= 1 − 625/1296 = 671/1296 ≈ 0.518`. Counting the ways to get at "
                          "least one six directly requires inclusion and exclusion over the "
                          "four dice; the complement is one line.")),
-            ("p", "The answer most people give first is `4 × 1/6 = 2/3`. That adds the "
-                  "four events \"die `i` shows a 6\", which overlap &mdash; the roll "
-                  "`(6,6,1,2)` is counted twice &mdash; and the same reasoning with six "
-                  "dice would give a probability of 1. Adding gives an upper bound, which "
-                  "lesson 3 names the union bound, and it gives the answer only when the "
-                  "events are disjoint."),
+            ("p", 'The answer most people give first is `4 × 1/6 = 2/3`. That adds the four events "die `i` shows a 6", which overlap &mdash; the roll `(6,6,1,2)` is counted twice &mdash; and the same reasoning with six dice would give a probability of 1. Adding gives an upper bound, which “The Probability Axioms” names the union bound, and it gives the answer only when the events are disjoint.'),
             ("h3", "The birthday problem"),
             ("thm", ("Shared birthdays",
                      "With `n` people and 365 equally likely birthdays, "
@@ -264,30 +222,16 @@ LESSONS = [
                   "<em>pairs</em>: 23 people form `C(23,2) = 253` pairs, and each has about "
                   "a `1/365` chance of matching. The intuition that fails is comparing 23 "
                   "with 365 rather than 253 with 365."),
-            ("p", "This is a different question from the pigeonhole statement in course 2 "
-                  "lesson 14. "
-                  "That one said 367 people <em>guarantee</em> a match; this one says 23 "
-                  "make it likely. Certainty and probability are different claims and "
-                  "neither implies the other."),
+            ("p", 'This is a different question from the pigeonhole statement in “The Pigeonhole Principle” in Sets, Relations, and Functions. That one said 367 people <em>guarantee</em> a match; this one says 23 make it likely. Certainty and probability are different claims and neither implies the other.'),
             ("h3", "When outcomes are not equally likely"),
-            ("p", "Then probabilities are assigned to outcomes directly, subject to being "
-                  "non-negative and summing to 1, and `P(E) = Σ_{s ∈ E} P(s)`. A loaded "
-                  "die, a biased coin and a weighted lottery all work this way, and lesson "
-                  "3 states the axioms that govern them."),
+            ("p", 'Then probabilities are assigned to outcomes directly, subject to being non-negative and summing to 1, and `P(E) = Σ_{s ∈ E} P(s)`. A loaded die, a biased coin and a weighted lottery all work this way, and “The Probability Axioms” states the axioms that govern them.'),
         ],
         "lab": ("probability", {
             "experiment": "cards",
             "a": 2,
             "b": 0,
             "panel_title": "Count, count, divide",
-            "panel_intro": "The 66 two-card hands from the 12-card deck are the chips, "
-                           "and every row of the table is a count over a count before it "
-                           "is a fraction. A = at least one A holds in 21 of them, and 21 "
-                           "is `66 − C(10,2) = 66 − 45`: the complement rule on the "
-                           "screen, with the 45 hands drawn from the ten non-aces the "
-                           "chips that are neither cyan nor green. B = a pair holds in 6, "
-                           "so `P(B) = 6/66 = 1/11`, and the one green chip is the pair of "
-                           "aces. The conditional rows are lesson 4's.",
+            "panel_intro": 'The 66 two-card hands from the 12-card deck are the chips, and every row of the table is a count over a count before it is a fraction. A = at least one A holds in 21 of them, and 21 is `66 − C(10,2) = 66 − 45`: the complement rule on the screen, with the 45 hands drawn from the ten non-aces the chips that are neither cyan nor green. B = a pair holds in 6, so `P(B) = 6/66 = 1/11`, and the one green chip is the pair of aces. The conditional rows are “Conditional Probability”’s.',
         }),
         "steps_title": "Computing a probability",
         "steps_intro": "Denominator first; it is often easier and it anchors the model.",
@@ -296,7 +240,7 @@ LESSONS = [
              "This confirms what an outcome is. If `|S|` is hard to write down, the model "
              "is probably wrong."),
             ("Count the event",
-             "Using course 4. Classify by order and repetition exactly as there."),
+             "Using Combinatorics and Counting. Classify by order and repetition exactly as there."),
             ("Consider the complement",
              "\"At least one\" and \"not all\" almost always count more easily the other "
              "way round."),
@@ -323,9 +267,7 @@ LESSONS = [
                 " = 1712304 + 778320 + 103776 + 4512 + 48  =  2 598 960     ✓",
             ],
             "after": [
-                "The check is Vandermonde's identity from course 4 lesson 5, appearing as "
-                "a probability check: the five disjoint cases must exhaust the hands. It "
-                "would catch a wrong `C(48,3)` immediately."
+                "The check is Vandermonde's identity from “Binomial Coefficients and Pascal's Triangle” in Combinatorics and Counting, appearing as a probability check: the five disjoint cases must exhaust the hands. It would catch a wrong `C(48,3)` immediately."
             ],
         },
         "quiz_title": "Computing probabilities",
@@ -366,8 +308,7 @@ LESSONS = [
             ("Counting \"at least one\" directly",
              "It produces overlapping cases. `1 − P(none)` cannot double-count."),
             ("Confusing certainty with high probability",
-             "367 people guarantee a shared birthday; 23 make it likely. Course 2's "
-             "pigeonhole and this lesson answer different questions."),
+             "367 people guarantee a shared birthday; 23 make it likely. Sets, Relations, and Functions's pigeonhole and this lesson answer different questions."),
         ],
         "standard": ("Finish when you check your answer against a complementary count.",
                      "Compute the probability that a five-card hand contains at least one "
@@ -408,8 +349,7 @@ LESSONS = [
              "`P(Ē) = 1 − P(E)` and `P(A ∪ B) = P(A) + P(B) − P(A ∩ B)` are proved, not "
              "assumed."),
             ("Additivity needs disjointness",
-             "For overlapping events the general rule is inclusion and exclusion, which is "
-             "course 4 lesson 9 with probabilities in place of counts."),
+             'For overlapping events the general rule is inclusion and exclusion, which is “The Inclusion-Exclusion Principle” in Combinatorics and Counting with probabilities in place of counts.'),
         ],
         "read_title": "The axioms and what follows",
         "read_intro": "The three rules, then six theorems derived from them.",
@@ -420,9 +360,7 @@ LESSONS = [
                      "(A1) `P(E) ≥ 0` for every event `E`; "
                      "(A2) `P(S) = 1`; "
                      "(A3) `P(A ∪ B) = P(A) + P(B)` whenever `A ∩ B = ∅`.")),
-            ("p", "Nothing here says what probability means. The axioms constrain how "
-                  "probabilities combine, and the equally-likely model of lesson 2 is one "
-                  "assignment satisfying them &mdash; not the only one."),
+            ("p", 'Nothing here says what probability means. The axioms constrain how probabilities combine, and the equally-likely model of “Computing Probabilities” is one assignment satisfying them &mdash; not the only one.'),
             ("thm", ("Consequences of the axioms",
                      "`P(∅) = 0`; `P(Ē) = 1 − P(E)`; `P(E) ≤ 1`; if `A ⊆ B` then "
                      "`P(A) ≤ P(B)`; `P(A ∪ B) = P(A) + P(B) − P(A ∩ B)`; and "
@@ -454,9 +392,7 @@ LESSONS = [
                          "equally, so each has `2/15`. Check: `1/3 + 5 · 2/15 = 1/3 + 2/3 = "
                          "1`. Then `P(even) = 2/15 + 2/15 + 1/3 = 3/5`, which the "
                          "equally-likely model would have put at `1/2`.")),
-            ("p", "Notice that the axioms did all the work and the equally-likely "
-                  "assumption did none. Everything in lessons 4 to 12 is proved from the "
-                  "axioms and therefore holds for loaded dice too."),
+            ("p", 'Notice that the axioms did all the work and the equally-likely assumption did none. Everything from “Conditional Probability” on is proved from the axioms and therefore holds for loaded dice too.'),
         ],
         "lab": ("probability", {
             "experiment": "urn",
@@ -523,12 +459,7 @@ LESSONS = [
                    "nothing",
                    "`P(A) = P(B)`"],
              "c": 1,
-             "why": "Axiom A3 is additivity over DISJOINT events. Independence is a "
-                    "different condition (lesson 5) under which the sum overcounts by "
-                    "exactly `P(A)P(B)`; \"nothing\" is wrong because any overlap is "
-                    "counted twice; and equal probabilities are neither necessary nor "
-                    "sufficient &mdash; two disjoint events of different sizes add, and two "
-                    "copies of the same event do not."},
+             "why": 'Axiom A3 is additivity over DISJOINT events. Independence is a different condition (“Independence”) under which the sum overcounts by exactly `P(A)P(B)`; "nothing" is wrong because any overlap is counted twice; and equal probabilities are neither necessary nor sufficient &mdash; two disjoint events of different sizes add, and two copies of the same event do not.'},
             {"q": "`A ⊆ B`. What follows about their probabilities?",
              "a": ["`P(A) = P(B)`", "`P(A) ≤ P(B)`", "`P(A) ≥ P(B)`", "nothing"],
              "c": 1,
@@ -564,9 +495,7 @@ LESSONS = [
                      "Derive `P(A ∪ B ∪ C)` from the axioms by splitting into disjoint "
                      "pieces. It is the three-set inclusion&ndash;exclusion formula, and "
                      "deriving it is more useful than memorising the signs."),
-        "note": "Kolmogorov's axioms add countable additivity, which matters for infinite "
-                "sample spaces and is what makes the geometric distribution of lesson 12 "
-                "legitimate. For finite spaces the three rules here are the whole story.",
+        "note": "Kolmogorov's axioms add countable additivity, which matters for infinite sample spaces and is what makes the geometric distribution of “The Geometric Distribution and Waiting Times” legitimate. For finite spaces the three rules here are the whole story.",
     },
     # ---------------------------------------------------------------- 04
     {
@@ -657,17 +586,7 @@ LESSONS = [
             "a": 0,
             "b": 2,
             "panel_title": "Conditioning, visibly",
-            "panel_intro": "Event B is the condition, and the table shows `P(A|B)` as the "
-                           "count in both divided by the count in B &mdash; the restricted "
-                           "sample space, not the original. A = sum is 7 and B = the first "
-                           "die is 4 is the dice example in the body: B holds in 6 of the "
-                           "36 chips and A in one of those, `(4,3)`, so `P(A|B) = 1/6`. "
-                           "Now switch B to \"at least one 6\": the numerator is two "
-                           "chips, `(1,6)` and `(6,1)`, but `P(A|B) = 2/11` while "
-                           "`P(B|A) = 2/6 = 1/3` &mdash; same numerator, different "
-                           "denominators, and the ratio of the two answers is "
-                           "`P(A)/P(B) = 6/11`, which is lesson 6's theorem before it is "
-                           "stated.",
+            "panel_intro": 'Event B is the condition, and the table shows `P(A|B)` as the count in both divided by the count in B &mdash; the restricted sample space, not the original. A = sum is 7 and B = the first die is 4 is the dice example in the body: B holds in 6 of the 36 chips and A in one of those, `(4,3)`, so `P(A|B) = 1/6`. Now switch B to "at least one 6": the numerator is two chips, `(1,6)` and `(6,1)`, but `P(A|B) = 2/11` while `P(B|A) = 2/6 = 1/3` &mdash; same numerator, different denominators, and the ratio of the two answers is `P(A)/P(B) = 6/11`, which is “Bayes\' Theorem”\'s theorem before it is stated.',
         }),
         "steps_title": "Conditioning correctly",
         "steps_intro": "Say which event is the condition, out loud.",
@@ -682,8 +601,7 @@ LESSONS = [
              "Each draw conditions on the previous ones. Without replacement, the "
              "denominators shrink."),
             ("Ask whether you wanted the other conditional",
-             "The two are related by Bayes, which is lesson 6. Computing the wrong one is "
-             "the most consequential error in this course."),
+             "The two are related by Bayes, which is “Bayes' Theorem”. Computing the wrong one is the most consequential error in this course."),
         ],
         "worked": {
             "title": "The two-child problem",
@@ -716,10 +634,7 @@ LESSONS = [
             {"q": "`P(A|B)` is defined as:",
              "a": ["`P(A)P(B)`", "`P(A ∩ B)/P(B)`", "`P(A ∩ B)/P(A)`", "`P(A ∪ B)/P(B)`"],
              "c": 1,
-             "why": "The outcomes in both, out of the outcomes in `B`; it requires "
-                    "`P(B) &gt; 0`. `P(A)P(B)` equals `P(A ∩ B)` only for independent "
-                    "events (lesson 5); `P(A ∩ B)/P(A)` is the other conditional, "
-                    "`P(B|A)`; and `P(A ∪ B)/P(B)` is at least 1, which no probability is."},
+             "why": 'The outcomes in both, out of the outcomes in `B`; it requires `P(B) &gt; 0`. `P(A)P(B)` equals `P(A ∩ B)` only for independent events (“Independence”); `P(A ∩ B)/P(A)` is the other conditional, `P(B|A)`; and `P(A ∪ B)/P(B)` is at least 1, which no probability is.'},
             {"q": "Two cards drawn without replacement. `P(second is an ace | first is an ace)`:",
              "a": ["4/52", "3/51", "4/51", "1/13"],
              "c": 1,
@@ -743,8 +658,7 @@ LESSONS = [
         ],
         "mistakes": [
             ("Swapping the two conditionals",
-             "`P(A|B)` and `P(B|A)` are different numbers with the same numerator. Lesson "
-             "6 gives the exact relationship."),
+             "`P(A|B)` and `P(B|A)` are different numbers with the same numerator. “Bayes' Theorem” gives the exact relationship."),
             ("Forgetting the denominator changed",
              "Conditioning restricts the sample space. Dividing by `|S|` instead of `|B|` "
              "gives `P(A ∩ B)`, not `P(A|B)`."),
@@ -829,11 +743,7 @@ LESSONS = [
                   "Intuitively: knowing `B` occurred tells you `A` did not, which is a "
                   "large change in your information. The only way to be both disjoint and "
                   "independent is for one of them to have probability 0."),
-            ("p", "Nor is the union of independent events the sum: "
-                  "`P(A ∪ B) = P(A) + P(B) − P(A)P(B)`, by lesson 3's inclusion and "
-                  "exclusion with the product put in for the intersection. \"Independent, "
-                  "so add\" and \"disjoint, so multiply\" are the two halves of one "
-                  "confusion, and both come from treating the two properties as one."),
+            ("p", 'Nor is the union of independent events the sum: `P(A ∪ B) = P(A) + P(B) − P(A)P(B)`, by “The Probability Axioms”’s inclusion and exclusion with the product put in for the intersection. "Independent, so add" and "disjoint, so multiply" are the two halves of one confusion, and both come from treating the two properties as one.'),
             ("h3", "Mutual independence"),
             ("def", ("Mutually independent",
                      "Events `A₁, …, A_n` are <strong>mutually independent</strong> when "
@@ -957,10 +867,7 @@ LESSONS = [
                      "Take three events in the two-dice experiment and determine which "
                      "pairs are independent, computing all three probabilities each time. "
                      "At least one answer will not be the one you expected."),
-        "note": "Independence of random variables (lesson 7) is the same idea applied to "
-                "every pair of values at once: `X` and `Y` are independent when "
-                "`P(X = a, Y = b) = P(X = a)P(Y = b)` for all `a` and `b`. Lesson 9 shows "
-                "that expectation adds without needing it.",
+        "note": 'Independence of random variables (“Random Variables”) is the same idea applied to every pair of values at once: `X` and `Y` are independent when `P(X = a, Y = b) = P(X = a)P(Y = b)` for all `a` and `b`. “Linearity of Expectation” shows that expectation adds without needing it.',
     },
     # ---------------------------------------------------------------- 06
     {

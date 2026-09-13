@@ -201,7 +201,7 @@ def esc(text):
 
 
 def head(*, title, description, canonical_path, favicon, og_description=None,
-         extra_css=""):
+         extra_css="", page_kind="auth"):
     """The <head> of any page on this path.
 
     canonical_path is the published directory URL ("/paths/discrete-math/").
@@ -243,7 +243,7 @@ def head(*, title, description, canonical_path, favicon, og_description=None,
 
 {prepaint}
 </head>
-<body>
+<body data-page-kind="{page_kind}">
   <a class="skip-link" href="#main">Skip to content</a>
 """.format(
         title=esc(title),
@@ -254,47 +254,31 @@ def head(*, title, description, canonical_path, favicon, og_description=None,
         css=stylesheet(),
         extra_css=extra_css,
         prepaint=PREPAINT,
+        page_kind=esc(page_kind),
     )
 
 
-def topbar(*, home_href, home_label, mark, strong, sub, nav=None,
-           signin_href=None, signin_current=False):
-    """The masthead: brand link home, optional in-page nav, theme toggle."""
-    # A mark that is already markup passes through: an SVG logo, or a bare
-    # character entity. Escaping "&#10003;" is what put the literal text
-    # "&#10003;" in the masthead of both sign-in pages.
-    if mark.startswith("<") or (mark.startswith("&") and mark.endswith(";")):
-        mark_markup = mark
-    else:
-        mark_markup = esc(mark)
-    nav_markup = ""
-    if nav:
-        links = "".join(
-            '\n        <a href="%s"%s>%s</a>'
-            % (esc(href), ' aria-current="page"' if current else "", esc(label))
-            for label, href, current in nav
-        )
-        nav_markup = (
-            '\n      <nav class="topnav" aria-label="Primary">%s\n      </nav>\n' % links
-        )
-    return """  <div class="shell">
-    <header class="topbar">
-      <a class="brand" href="{home_href}" aria-label="{home_label}">
-        <span class="brand-mark" aria-hidden="true">{mark}</span>
-        <span class="brand-copy"><strong>{strong}</strong><span>{sub}</span></span>
+def masthead(up, *, current=False):
+    """Global navigation. Page identity belongs in the breadcrumb and hero."""
+    return """    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="{up}" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
       </a>
-{nav}      <div class="topbar-actions">{signin}{toggle}</div>
+      <nav class="topnav" aria-label="Primary">
+        <a href="{up}#paths">Subjects</a>
+        <a href="{up}#courses">Courses</a>
+        <a href="{up}progress/"{current}>Progress</a>
+      </nav>
+      <div class="topbar-actions">{signin}{toggle}</div>
     </header>
-""".format(
-        home_href=esc(home_href),
-        home_label=esc(home_label),
-        mark=mark_markup,
-        strong=esc(strong),
-        sub=esc(sub),
-        nav=nav_markup,
-        signin=signin_control(signin_href, current=signin_current),
-        toggle=THEME_TOGGLE,
-    )
+""".format(up=esc(up), current=' aria-current="page"' if current else "",
+           signin=signin_control(up + "progress/", current=current), toggle=THEME_TOGGLE)
+
+
+def topbar(*, up, current=False):
+    """Open the shared shell and its global masthead."""
+    return '  <div class="shell">\n' + masthead(up, current=current)
 
 
 def crumbs(trail):
@@ -310,7 +294,7 @@ def crumbs(trail):
         else:
             parts.append('<a href="%s">%s</a>' % (esc(href), esc(label)))
     return (
-        '    <nav class="crumbs" aria-label="Breadcrumb">\n      '
+        '    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">\n      '
         + "\n      ".join(parts)
         + "\n    </nav>\n"
     )
@@ -325,7 +309,7 @@ def noscript(message):
 
 # The lesson pager, in the library's pinned form. Class names are exactly
 # lesson-nav / lesson-link prev / lesson-link next; each anchor carries only
-# class, href and rel; the body is <span>direction</span><strong>label</strong>.
+# class, href and rel; the body is <span>kind</span><strong>literal title</strong>.
 # The FIRST lesson omits the prev anchor entirely rather than shipping a
 # disabled one, and the LAST lesson's forward link points at the course home
 # and carries NO rel, because the course home is not the next document.
@@ -335,18 +319,18 @@ def pager(*, prev=None, next=None):
         href, label = prev
         rows.append(
             '      <a class="lesson-link prev" href="%s" rel="prev">'
-            "<span>Previous lesson</span><strong>%s</strong></a>" % (esc(href), label)
+            "<span>Lesson</span><strong>%s</strong></a>" % (esc(href), label)
         )
     if next:
         href, label, is_terminal = next
         rel = "" if is_terminal else ' rel="next"'
-        direction = "Finish the course" if is_terminal else "Next lesson"
+        direction = "Course" if is_terminal else "Lesson"
         rows.append(
             '      <a class="lesson-link next" href="%s"%s>'
             "<span>%s</span><strong>%s</strong></a>" % (esc(href), rel, direction, label)
         )
     return (
-        '\n    <nav class="lesson-nav" aria-label="Lesson navigation">\n'
+        '\n    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">\n'
         + "\n".join(rows)
         + "\n    </nav>\n"
     )
@@ -364,7 +348,7 @@ def footer(lead_html, material):
     forgetting to state its own.
     """
     return """
-    <footer class="footer">
+    <footer class="footer" data-ui="footer">
       <p>{lead}</p>
       <p>{licence}</p>
       <p><a href="{origin}">learn.geterdone.io</a></p>
@@ -376,3 +360,72 @@ def footer(lead_html, material):
 def close(scripts):
     return "  <script>%s%s%s  </script>\n</body>\n</html>\n" % (
         THEME_SCRIPT, SIGNIN_SCRIPT, scripts)
+
+
+def name_horizontal_scrollers(text):
+    """Give authored table/notation/SVG overflow owners a keyboard stop and name.
+
+    Parse actual tags so JavaScript strings and instructional examples stay
+    untouched. A lab stage is included only when its actual markup owns an SVG.
+    Existing names and native keyboard semantics take precedence.
+    """
+    from html.parser import HTMLParser
+
+    offsets = [0]
+    for line in text.splitlines(keepends=True):
+        offsets.append(offsets[-1] + len(line))
+    edits = {}
+
+    class Scrollers(HTMLParser):
+        VOID = {'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input',
+                'link', 'meta', 'param', 'source', 'track', 'wbr'}
+
+        def __init__(self):
+            super().__init__()
+            self.stack = []
+
+        def add(self, tag, attrs, label, at):
+            if at in edits:
+                return
+            extra = ''
+            if 'tabindex' not in attrs:
+                extra += ' tabindex="0"'
+            if not any(k in attrs for k in ('aria-label', 'aria-labelledby')):
+                extra += (' role="region"' if tag != 'table' else '') + ' aria-label="%s"' % label
+            if extra:
+                edits[at] = edits.get(at, '') + extra
+
+        def handle_starttag(self, tag, attrs):
+            attrs = dict(attrs)
+            classes = attrs.get('class', '').split()
+            label = next((name for cls, name in (
+                ('mathblock', 'Mathematical notation'), ('table-wrap', 'Data table'),
+                ('data-table', 'Data table'), ('heatmap-wrap', 'Sensitivity grid'),
+                ('calc-table', 'Calculation table'), ('schema-output', 'Exported plan data'),
+                ('footprint', 'Bid and ask volume by price'),
+                ('market-chart-scroll', 'Interactive chart; scroll horizontally for complete chart labels')
+            ) if cls in classes), None)
+            line, column = self.getpos()
+            at = offsets[line - 1] + column + len(self.get_starttag_text()) - 1
+            if label:
+                self.add(tag, attrs, label, at)
+            if tag == 'svg':
+                owner = next((row for row in reversed(self.stack)
+                              if 'lab-stage' in row[1]), None)
+                if owner:
+                    self.add(owner[0], owner[2],
+                             'Interactive diagram; scroll horizontally for complete labels',
+                             owner[3])
+            if tag not in self.VOID:
+                self.stack.append((tag, classes, attrs, at))
+
+        def handle_endtag(self, tag):
+            for index in range(len(self.stack) - 1, -1, -1):
+                if self.stack[index][0] == tag:
+                    self.stack = self.stack[:index]
+                    return
+
+    Scrollers().feed(text)
+    for at, extra in sorted(edits.items(), reverse=True):
+        text = text[:at] + extra + text[at:]
+    return text

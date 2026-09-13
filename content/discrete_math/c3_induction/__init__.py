@@ -13,10 +13,9 @@ COURSE = {
         "divide-and-conquer recurrences, and loop invariants."
     ),
     "blurb": (
-        "Course 1 ended by showing that checking cases is not proving. This is the "
-        "answer: prove `P(k) → P(k+1)` once and the claim holds for every `n` you "
-        "could ever check and every one you could not. Then the same idea applied to "
-        "definitions, to data, to algorithms and to recurrences."
+        (
+        'Logic and Proof ended by showing that checking cases is not proving. This is the answer: prove `P(k) → P(k+1)` once and the claim holds for every `n` you could ever check and every one you could not. Then the same idea applied to definitions, to data, to algorithms and to recurrences.'
+    )
     ),
     "key": [
         "P(base)   and   ∀k ≥ base. P(k) → P(k+1)      ⟹   ∀n ≥ base. P(n)",
@@ -24,11 +23,12 @@ COURSE = {
         "aₙ = c₁aₙ₋₁ + c₂aₙ₋₂   ⟹  characteristic equation r² = c₁r + c₂",
         "T(n) = aT(n/b) + nᵈ    ⟹  compare log_b a with d",
     ],
-    "assumes_short": "Courses 1–2",
+    "assumes_short": "Proof and set notation",
     "assumes_long": "proof technique and set notation",
     "outcomes_intro": (
-        "By the end you can prove a statement about every natural number, solve the "
-        "recurrences course 8 will produce, and prove an algorithm does what it claims."
+        (
+        'By the end you can prove a statement about every natural number, solve the recurrences Algorithms and Complexity will produce, and prove an algorithm does what it claims.'
+    )
     ),
     "outcomes": [
         ("Write a correct induction proof",
@@ -44,22 +44,16 @@ COURSE = {
          "Linear homogeneous by characteristic roots, nonhomogeneous by a particular "
          "solution, and divide-and-conquer by the master theorem."),
         ("Prove an algorithm correct",
-         "Termination by a quantity that strictly decreases and is bounded below, and "
-         "correctness by strong induction on the input for a recursion or by an "
-         "invariant for a loop &mdash; the two obligations of lessons 8 and 12, neither "
-         "of which is worth anything alone."),
+         'Termination by a quantity that strictly decreases and is bounded below, and correctness by strong induction on the input for a recursion or by an invariant for a loop &mdash; the two obligations of “Recursive Algorithms and Correctness” and “Loop Invariants and Program Correctness”, neither of which is worth anything alone.'),
     ],
     "syllabus_intro": (
-        "Lessons 1 to 5 are induction, 6 to 8 recursion, 9 to 11 recurrences, and 12 "
-        "applies all three to program correctness."
+        'Induction comes first, then recursion, then recurrences, and “Loop Invariants and Program Correctness” applies all three to program correctness.'
     ),
     "how_to": [
         "Write every proof out in full, including the sentence that says where the "
         "inductive hypothesis was used. A step that never invokes `P(k)` is not an "
         "induction proof, however true its conclusion.",
-        "Spend real time in lesson 1's lab. Two of its statements are false and survive "
-        "dozens of checks; meeting them is the reason this course exists. Lessons 2 and "
-        "5 name them, so look before then.",
+        'Spend real time in the lab of “The Well-Ordering Principle”. Two of its statements are false and survive dozens of checks; meeting them is the reason this course exists. “Mathematical Induction” and “Strong Induction” name them, so look before then.',
         "Do the recurrence arithmetic by hand once per lesson before using the lab. "
         "The lab compares your closed form against the iteration, which is only useful "
         "if you produced a closed form to compare.",
@@ -67,11 +61,10 @@ COURSE = {
     "not_covered": [
         "Transfinite induction and induction over ordinals. Everything here is "
         "induction over `ℕ` or over a well-founded recursive structure.",
-        "Generating functions as a recurrence-solving technique. Course 4 lesson 12 "
-        "introduces them for counting; using them to solve recurrences is a natural "
-        "next step this path does not take.",
-        "Formal verification tools. Lesson 12 writes loop invariants as mathematics, "
-        "not as annotations a checker consumes.",
+        (
+            'Generating functions as a recurrence-solving technique. “Generating Functions” in Combinatorics and Counting introduces them for counting; using them to solve recurrences is a natural next step this path does not take.'
+        ),
+        'Formal verification tools. “Loop Invariants and Program Correctness” writes loop invariants as mathematics, not as annotations a checker consumes.',
     ],
     "footer_lead": (
         "The induction lab on this course checks a statement for the values you select "

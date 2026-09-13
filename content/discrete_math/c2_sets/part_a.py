@@ -50,10 +50,7 @@ LESSONS = [
                      "`A = B` exactly when every member of `A` is a member of `B` and "
                      "conversely &mdash; that is, `∀x (x ∈ A ↔ x ∈ B)`. A set carries no "
                      "information beyond its membership.")),
-            ("p", "Two consequences follow immediately, and both surprise people once. "
-                  "Order carries no information: `{1, 2} = {2, 1}`. Repetition carries "
-                  "none either: `{1, 1, 2} = {1, 2}`. If you need order, you need a "
-                  "sequence or a tuple, which lesson 5 supplies."),
+            ("p", 'Two consequences follow immediately, and both surprise people once. Order carries no information: `{1, 2} = {2, 1}`. Repetition carries none either: `{1, 1, 2} = {1, 2}`. If you need order, you need a sequence or a tuple, which “Cartesian Products and Tuples” supplies.'),
             ("def", ("The empty set",
                      "`∅` (also written `{}`) is the set with no members. There is exactly "
                      "one: any two sets with no members satisfy extensionality vacuously.")),
@@ -69,14 +66,9 @@ LESSONS = [
                 "ℝ    real numbers",
                 "ℂ    complex numbers",
             ]),
-            ("p", "Whether `0 ∈ ℕ` is a convention, not a fact, and sources differ. This "
-                  "path includes it, and says so wherever it matters &mdash; a base case "
-                  "at `n = 0` versus `n = 1` is exactly the kind of detail course 3 "
-                  "cannot leave ambiguous."),
+            ("p", 'Whether `0 ∈ ℕ` is a convention, not a fact, and sources differ. This path includes it, and says so wherever it matters &mdash; a base case at `n = 0` versus `n = 1` is exactly the kind of detail Induction and Recursion cannot leave ambiguous.'),
             ("def", ("Cardinality",
-                     "For a finite set `A`, `|A|` is the number of members. `|{1, 2, 3}| = 3` "
-                     "and `|∅| = 0`. Lesson 13 extends this to infinite sets, where it "
-                     "stops behaving the way the notation suggests.")),
+                     'For a finite set `A`, `|A|` is the number of members. `|{1, 2, 3}| = 3` and `|∅| = 0`. “Cardinality and Countability” extends this to infinite sets, where it stops behaving the way the notation suggests.')),
             ("example", ("Set-builder can hide emptiness",
                          "`{x ∈ ℝ : x² &lt; 0}` is `∅`, written in a form that does not "
                          "look empty. A set-builder description says which objects belong; "
@@ -118,7 +110,7 @@ LESSONS = [
                 "Is −2 ∈ A?  −2 = 3(−1) + 1    yes, with k = −1",
                 "",
                 "So A = {…, −5, −2, 1, 4, 7, 10, …}   — the integers ≡ 1 (mod 3).",
-                "Course 6 gives that description its own notation.",
+                "Number Theory and Cryptography gives that description its own notation.",
             ],
             "after": [
                 "Note that `−2` required a negative `k`. Set-builder conditions quantify "
@@ -153,11 +145,9 @@ LESSONS = [
         ],
         "mistakes": [
             ("Confusing `∈` with `⊆`",
-             "`1 ∈ {1, 2}` is true; `1 ⊆ {1, 2}` is not even well formed, because 1 is "
-             "not a set. Lesson 2 makes the distinction sharp."),
+             '`1 ∈ {1, 2}` is true; `1 ⊆ {1, 2}` is not even well formed, because 1 is not a set. “Subsets and Power Sets” makes the distinction sharp.'),
             ("Reading `{∅}` as empty",
-             "It has one element. This matters immediately in lesson 2, where the power "
-             "set of `∅` is `{∅}` &mdash; a set with one member."),
+             'It has one element. This matters immediately in “Subsets and Power Sets”, where the power set of `∅` is `{∅}` &mdash; a set with one member.'),
             ("Forgetting the domain in set-builder notation",
              "`{x : x² = 2}` is empty over `ℚ` and has two elements over `ℝ`. The part "
              "before the colon is half the definition."),
@@ -167,10 +157,7 @@ LESSONS = [
                      "Given `{2, 4, 6, 8, 10}`, write a set-builder description; given "
                      "`{x ∈ ℤ : x² &lt; 10}`, write the roster. If the second gives you "
                      "seven elements you have remembered the negatives."),
-        "note": "Naive set theory &mdash; \"a set is any collection\" &mdash; is "
-                "inconsistent if pushed: the set of all sets that do not contain "
-                "themselves cannot exist. Every set on this path is built from a stated "
-                "domain, which is enough to stay clear of the problem.",
+        "note": 'Naive set theory &mdash; "a set is any collection" &mdash; is inconsistent if pushed: the set of all sets that do not contain themselves cannot exist. Every set on this path is built from a stated domain, which is enough to stay clear of the problem.',
     },
     # ---------------------------------------------------------------- 02
     {
@@ -196,8 +183,7 @@ LESSONS = [
         ),
         "concepts": [
             ("Subset is a conditional, quantified",
-             "`A ⊆ B` says every member of `A` is a member of `B`. Course 1's rules for "
-             "`∀` and `→` apply unchanged."),
+             "`A ⊆ B` says every member of `A` is a member of `B`. Logic and Proof's rules for `∀` and `→` apply unchanged."),
             ("The empty set is a subset of everything",
              "`∀x (x ∈ ∅ → x ∈ B)` is vacuously true, since nothing is in `∅`. This is "
              "not a special case; it is the definition applied honestly."),
@@ -225,10 +211,7 @@ LESSONS = [
             ]),
             ("thm", ("Set equality by double inclusion",
                      "`A = B` if and only if `A ⊆ B` and `B ⊆ A`.")),
-            ("p", "This is the workhorse. To prove two sets equal, take an arbitrary "
-                  "element of one and show it belongs to the other, then do the same in "
-                  "reverse. Each half is a direct proof of a conditional, which is "
-                  "exactly what course 1 lesson 12 taught."),
+            ("p", 'This is the workhorse. To prove two sets equal, take an arbitrary element of one and show it belongs to the other, then do the same in reverse. Each half is a direct proof of a conditional, which is exactly what “Direct Proof” in Logic and Proof taught.'),
             ("def", ("Power set",
                      "The <strong>power set</strong> `P(A)` is the set of all subsets of "
                      "`A`: `P(A) = {S : S ⊆ A}`. Its members are sets.")),
@@ -243,8 +226,7 @@ LESSONS = [
                 "of the `n` elements: is it in, or out? Two choices, made `n` times "
                 "independently, give `2ⁿ` distinct subsets, and distinct choice patterns "
                 "give distinct subsets because a set is determined by its members.",
-                "Course 4 formalises this as the product rule; course 3 proves it again "
-                "by induction on `n`.",
+                "Combinatorics and Counting formalises this as the product rule; Induction and Recursion proves it again by induction on `n`.",
             ]),
             ("p", "The doubling is why power sets are not something to enumerate casually. "
                   "A ten-element set has 1024 subsets; a thirty-element set has over a "
@@ -255,13 +237,7 @@ LESSONS = [
         "lab": ("counting", {
             "n": 4, "r": 2, "rule": "c",
             "panel_title": "Subsets by size",
-            "panel_intro": "This is course 4's lab, and only the row marked C is this "
-                           "lesson's: `C(n, r)` counts the subsets of size `r`, and the "
-                           "enumeration underneath lists them. Ignore the other three "
-                           "rows for now. Move `r` from 0 to 4 and add up the C row: "
-                           "`1 + 4 + 6 + 4 + 1 = 16 = 2⁴`, which is the power set counted "
-                           "size by size &mdash; the identity course 4 lesson 5 reads off "
-                           "Pascal's triangle.",
+            "panel_intro": "This is Combinatorics and Counting's lab, and only the row marked C is this lesson's: `C(n, r)` counts the subsets of size `r`, and the enumeration underneath lists them. Ignore the other three rows for now. Move `r` from 0 to 4 and add up the C row: `1 + 4 + 6 + 4 + 1 = 16 = 2⁴`, which is the power set counted size by size &mdash; the identity “Binomial Coefficients and Pascal's Triangle” in Combinatorics and Counting reads off Pascal's triangle.",
         }),
         "steps_title": "Proving a containment or an equality",
         "steps_intro": "One arbitrary element, followed all the way through.",
@@ -280,9 +256,7 @@ LESSONS = [
         ],
         "worked": {
             "title": "One set, two descriptions: prove them equal",
-            "intro": ["Lesson 1's set `A = {x ∈ ℤ : x = 3k + 1 for some k ∈ ℤ}` against "
-                      "`B = {x ∈ ℤ : x = 3m − 2 for some m ∈ ℤ}`. Two inclusions, one "
-                      "arbitrary element each."],
+            "intro": ["“Sets and Membership”'s set `A = {x ∈ ℤ : x = 3k + 1 for some k ∈ ℤ}` against `B = {x ∈ ℤ : x = 3m − 2 for some m ∈ ℤ}`. Two inclusions, one arbitrary element each."],
             "lines": [
                 "(⊆)  Let x ∈ A be arbitrary.   Then x = 3k + 1 for some integer k.",
                 "     x = 3k + 1 = 3k + 3 − 2 = 3(k + 1) − 2,   and k + 1 ∈ ℤ.",
@@ -299,13 +273,7 @@ LESSONS = [
                 "  The reverse is FALSE:  3 is a multiple of 3 and not of 6.",
             ],
             "after": [
-                "Each inclusion took an arbitrary element, unfolded the set-builder "
-                "condition, and rewrote until the other condition appeared &mdash; step 2 "
-                "of the method, and course 1's direct proof with `x ∈ A` as the "
-                "hypothesis. The last two lines are the other half of the technique. "
-                "Having proved one inclusion it is tempting to assume the reverse; one "
-                "element, 3, shows it fails, and one element is all a refutation ever "
-                "needs."
+                "Each inclusion took an arbitrary element, unfolded the set-builder condition, and rewrote until the other condition appeared &mdash; step 2 of the method, and Logic and Proof's direct proof with `x ∈ A` as the hypothesis. The last two lines are the other half of the technique. Having proved one inclusion it is tempting to assume the reverse; one element, 3, shows it fails, and one element is all a refutation ever needs."
             ],
         },
         "quiz_title": "Subsets",
@@ -339,17 +307,11 @@ LESSONS = [
              "`A ⊆ B` is half of `A = B`. The other half needs its own argument, and is "
              "often the half that fails."),
             ("Forgetting `A ⊆ A`",
-             "Every set is a subset of itself, so `⊆` is reflexive while `⊂` is not. "
-             "That difference is what makes `⊆` a partial order in lesson 9."),
+             'Every set is a subset of itself, so `⊆` is reflexive while `⊂` is not. That difference is what makes `⊆` a partial order in “Partial Orders”.'),
         ],
         "standard": ("Finish when double inclusion is your reflex for any set equality.",
-                     "Prove `{n ∈ ℤ : n = 2k + 1 for some k ∈ ℤ} = {n ∈ ℤ : n = 2m − 1 "
-                     "for some m ∈ ℤ}` by double inclusion. Both directions are three "
-                     "lines in the shape of the worked example, and writing them is what "
-                     "makes lesson 4's chain of laws safe to use as a shortcut."),
-        "note": "`|P(A)| = 2^|A|` holds for infinite sets too, in the sense that `P(A)` "
-                "is always strictly larger than `A` &mdash; Cantor's theorem, which "
-                "lesson 13 proves in four lines.",
+                     "Prove `{n ∈ ℤ : n = 2k + 1 for some k ∈ ℤ} = {n ∈ ℤ : n = 2m − 1 for some m ∈ ℤ}` by double inclusion. Both directions are three lines in the shape of the worked example, and writing them is what makes “Set Identities and Proofs”'s chain of laws safe to use as a shortcut."),
+        "note": "`|P(A)| = 2^|A|` holds for infinite sets too, in the sense that `P(A)` is always strictly larger than `A` &mdash; Cantor's theorem, which “Cardinality and Countability” proves in four lines.",
     },
     # ---------------------------------------------------------------- 03
     {
@@ -358,9 +320,7 @@ LESSONS = [
         "module": "Sets",
         "one_line": "Union, intersection, difference, complement, symmetric difference.",
         "summary": (
-            "Five operations, each defined by a connective from course 1. Union is `∨`, "
-            "intersection is `∧`, complement is `¬` &mdash; which is why the set "
-            "identities are the logical equivalences wearing different symbols."
+            "Five operations, each defined by a connective from Logic and Proof. Union is `∨`, intersection is `∧`, complement is `¬` &mdash; which is why the set identities are the logical equivalences wearing different symbols."
         ),
         "key": [
             "A ∪ B = {x : x ∈ A  ∨  x ∈ B}",
@@ -370,8 +330,7 @@ LESSONS = [
         ],
         "key_label": "Each operation is a connective",
         "concepts_intro": (
-            "Every set operation is a logical connective applied to membership. That "
-            "correspondence is the reason to have done course 1 first."
+            "Every set operation is a logical connective applied to membership. That correspondence is the reason to have done Logic and Proof first."
         ),
         "concepts": [
             ("Union is inclusive",
@@ -398,10 +357,7 @@ LESSONS = [
                      "`A △ B = (A \\ B) ∪ (B \\ A)` &mdash; the elements in exactly one of "
                      "the two. Equivalently `(A ∪ B) \\ (A ∩ B)`.")),
             ("def", ("Disjoint",
-                     "`A` and `B` are <strong>disjoint</strong> when `A ∩ B = ∅`. A "
-                     "collection is <strong>pairwise disjoint</strong> when every two "
-                     "distinct members of it are disjoint &mdash; the condition lesson 8 "
-                     "needs for partitions.")),
+                     '`A` and `B` are <strong>disjoint</strong> when `A ∩ B = ∅`. A collection is <strong>pairwise disjoint</strong> when every two distinct members of it are disjoint &mdash; the condition “Equivalence Relations and Partitions” needs for partitions.')),
             ("h3", "The correspondence with logic"),
             ("math", [
                 "set operation        membership condition       connective",
@@ -412,10 +368,7 @@ LESSONS = [
                 "A △ B                x ∈ A  ⊕  x ∈ B            ⊕",
                 "A ⊆ B                x ∈ A  →  x ∈ B            →",
             ]),
-            ("p", "This is not an analogy. Every set identity in lesson 4 is a logical "
-                  "equivalence from course 1 lesson 5, applied pointwise to membership. "
-                  "De Morgan for sets and De Morgan for propositions are the same theorem "
-                  "in two notations, and knowing that halves what has to be memorised."),
+            ("p", 'This is not an analogy. Every set identity in “Set Identities and Proofs” is a logical equivalence from “Logical Equivalence” in Logic and Proof, applied pointwise to membership. De Morgan for sets and De Morgan for propositions are the same theorem in two notations, and knowing that halves what has to be memorised.'),
             ("thm", ("Inclusion-exclusion for two sets",
                      "For finite sets, `|A ∪ B| = |A| + |B| − |A ∩ B|`.")),
             ("proof", [
@@ -423,9 +376,7 @@ LESSONS = [
                 "in each term &mdash; and every other element of `A ∪ B` once. Subtracting "
                 "`|A ∩ B|` removes exactly the surplus.",
             ]),
-            ("p", "Course 4 lesson 9 generalises this to any number of sets, where the "
-                  "alternating signs are less obvious and the correction is larger. The "
-                  "two-set case is worth having by heart now."),
+            ("p", '“The Inclusion-Exclusion Principle” in Combinatorics and Counting generalises this to any number of sets, where the alternating signs are less obvious and the correction is larger. The two-set case is worth having by heart now.'),
             ("example", ("Difference is not symmetric",
                          "With `A = {1, 2, 3}` and `B = {3, 4}`: `A \\ B = {1, 2}` and "
                          "`B \\ A = {4}`. Their union `{1, 2, 4}` is `A △ B`, and "
@@ -434,15 +385,7 @@ LESSONS = [
         "lab": ("sets", {
             "default": ["A \\ B", "B \\ A"],
             "panel_title": "Evaluate any expression",
-            "panel_intro": "Both expressions are evaluated against the same membership, "
-                           "and the row labelled \"difference\" is their symmetric "
-                           "difference &mdash; the elements in exactly one of them. With "
-                           "`A \\ B` against `B \\ A` at the starting membership it reads "
-                           "`{1, 2, 3, 7, 8, 9}`: the two differences share nothing, and "
-                           "their union is `A △ B`. Cycle element 4 until it is in `A` "
-                           "only and it joins `A \\ B`. The distributive pair further down "
-                           "the list gives an empty row on every membership; lesson 4 says "
-                           "why.",
+            "panel_intro": 'Both expressions are evaluated against the same membership, and the row labelled "difference" is their symmetric difference &mdash; the elements in exactly one of them. With `A \\ B` against `B \\ A` at the starting membership it reads `{1, 2, 3, 7, 8, 9}`: the two differences share nothing, and their union is `A △ B`. Cycle element 4 until it is in `A` only and it joins `A \\ B`. The distributive pair further down the list gives an empty row on every membership; “Set Identities and Proofs” says why.',
         }),
         "steps_title": "Evaluating a set expression",
         "steps_intro": "Translate to membership conditions, then evaluate elementwise.",
@@ -515,13 +458,8 @@ LESSONS = [
         ],
         "standard": ("Finish when you can translate any set expression into a membership "
                      "condition without hesitating.",
-                     "Take `(A △ B) \\ C` and write the condition for `x` to belong. If "
-                     "you produce `(x ∈ A ⊕ x ∈ B) ∧ x ∉ C`, the rest of the course's set "
-                     "algebra is course 1 in different symbols."),
-        "note": "`A △ B` is associative and every element is its own inverse under it, "
-                "which makes the subsets of `U` a group under symmetric difference. That "
-                "structure is why `△` behaves like addition modulo 2, the same connection "
-                "`⊕` had in course 1.",
+                     "Take `(A △ B) \\ C` and write the condition for `x` to belong. If you produce `(x ∈ A ⊕ x ∈ B) ∧ x ∉ C`, the rest of the course's set algebra is Logic and Proof in different symbols."),
+        "note": "`A △ B` is associative and every element is its own inverse under it, which makes the subsets of `U` a group under symmetric difference. That structure is why `△` behaves like addition modulo 2, the same connection `⊕` had in Logic and Proof.",
     },
     # ---------------------------------------------------------------- 04
     {
@@ -530,9 +468,7 @@ LESSONS = [
         "module": "Sets",
         "one_line": "The laws, and the two ways to prove one.",
         "summary": (
-            "The set identities are course 1's logical equivalences in set notation. "
-            "Prove them by double inclusion or by a chain of laws &mdash; and know when "
-            "a Venn diagram is a case check and when it is only a picture."
+            "The set identities are Logic and Proof's logical equivalences in set notation. Prove them by double inclusion or by a chain of laws &mdash; and know when a Venn diagram is a case check and when it is only a picture."
         ),
         "key": [
             "(A ∪ B)‾ = Ā ∩ B̄               De Morgan",
@@ -542,8 +478,7 @@ LESSONS = [
         ],
         "key_label": "Four identities worth knowing",
         "concepts_intro": (
-            "Every identity here is a logical equivalence in disguise, which means "
-            "course 1 already did most of the work."
+            "Every identity here is a logical equivalence in disguise, which means Logic and Proof already did most of the work."
         ),
         "concepts": [
             ("Every set law mirrors a logical law",
@@ -576,11 +511,7 @@ LESSONS = [
                 "complement      A ∪ Ā = U            A ∩ Ā = ∅",
                 "difference      A \\ B = A ∩ B̄",
             ]),
-            ("p", "Set every one of these beside the corresponding line in course 1 "
-                  "lesson 5 and the correspondence is exact: `∪` for `∨`, `∩` for `∧`, "
-                  "overbar for `¬`, `U` for `T`, `∅` for `F`. The last line is the most "
-                  "useful in practice, because it removes `\\` from an expression and "
-                  "leaves only operations the laws speak about."),
+            ("p", 'Set every one of these beside the corresponding line in “Logical Equivalence” in Logic and Proof and the correspondence is exact: `∪` for `∨`, `∩` for `∧`, overbar for `¬`, `U` for `T`, `∅` for `F`. The last line is the most useful in practice, because it removes `\\` from an expression and leaves only operations the laws speak about.'),
             ("thm", ("De Morgan for sets",
                      "`(A ∪ B)‾ = Ā ∩ B̄` for all sets `A`, `B` inside a universe `U`.")),
             ("proof", [
@@ -703,10 +634,7 @@ LESSONS = [
                      "are `A △ B` &mdash; once by double inclusion and once by chaining "
                      "laws. The second will be shorter; the first will be the one you can "
                      "always produce."),
-        "note": "Sets under `∪`, `∩` and complement form a Boolean algebra, exactly as "
-                "propositions under `∨`, `∧` and `¬` do. That is why the two lists of "
-                "laws match line for line, and why course 1 lesson 7's remarks about "
-                "circuits apply here too.",
+        "note": "Sets under `∪`, `∩` and complement form a Boolean algebra, exactly as propositions under `∨`, `∧` and `¬` do. That is why the two lists of laws match line for line, and why the remarks about circuits in “Normal Forms and Boolean Algebra”, in Logic and Proof, apply here too.",
     },
     # ---------------------------------------------------------------- 05
     {
@@ -735,8 +663,7 @@ LESSONS = [
              "`(1, 2) ≠ (2, 1)` while `{1, 2} = {2, 1}`. Tuples also allow repetition: "
              "`(1, 1)` is a perfectly good pair."),
             ("The product multiplies sizes",
-             "`|A × B| = |A| · |B|`, because each of `|A|` first coordinates can be paired "
-             "with each of `|B|` second ones. This is course 4's product rule."),
+             "`|A × B| = |A| · |B|`, because each of `|A|` first coordinates can be paired with each of `|B|` second ones. This is Combinatorics and Counting's product rule."),
             ("The product is not commutative",
              "`A × B` and `B × A` contain different pairs unless `A = B` or one is empty. "
              "There is a natural bijection between them, which is a weaker statement."),
@@ -770,22 +697,15 @@ LESSONS = [
                          "contains `(a,1)`, a different object from `(1,a)`.")),
             ("h3", "Where products are used"),
             ("ul", [
-                "<strong>Relations</strong> (lesson 6) are subsets of `A × B`. \"`x` is "
-                "less than `y`\" is the set of pairs where that holds.",
-                "<strong>Functions</strong> (lesson 10) are relations with an extra "
-                "condition, so they too are sets of pairs.",
+                '<strong>Relations</strong> (“Binary Relations”) are subsets of `A × B`. "`x` is less than `y`" is the set of pairs where that holds.',
+                '<strong>Functions</strong> (“Functions”) are relations with an extra condition, so they too are sets of pairs.',
                 "<strong>The plane</strong> is `ℝ × ℝ`, written `ℝ²`. Coordinate geometry "
                 "is the observation that points are ordered pairs.",
                 "<strong>Bit strings</strong> of length `n` are elements of `{0, 1}ⁿ`, "
                 "and there are `2ⁿ` of them &mdash; the same count as the subsets of an "
                 "`n`-element set, for the same reason.",
             ]),
-            ("p", "That last coincidence is worth pausing on. A subset of an `n`-element "
-                  "set is exactly a choice of in-or-out for each element, which is exactly "
-                  "a bit string of length `n`. The bijection between `P(A)` and `{0,1}ⁿ` "
-                  "is why both are counted by `2ⁿ`. It is a preview of lesson 11, which "
-                  "names such a pairing a bijection, and of lesson 13, which makes it "
-                  "the definition of size."),
+            ("p", 'That last coincidence is worth pausing on. A subset of an `n`-element set is exactly a choice of in-or-out for each element, which is exactly a bit string of length `n`. The bijection between `P(A)` and `{0,1}ⁿ` is why both are counted by `2ⁿ`. It is a preview of “Injective, Surjective, Bijective”, which names such a pairing a bijection, and of “Cardinality and Countability”, which makes it the definition of size.'),
             ("def", ("Cardinality of a product of a set with itself",
                      "`|Aⁿ| = |A|ⁿ`. With `|A| = 2` this gives `2ⁿ`; with `|A| = 26` and "
                      "`n = 4` it gives the number of four-letter strings, 456 976.")),
@@ -793,12 +713,7 @@ LESSONS = [
         "lab": ("counting", {
             "n": 3, "r": 2, "rule": "pr",
             "panel_title": "Ordered with repetition is a product",
-            "panel_intro": "This is course 4's lab; the first row, `nʳ`, is this lesson's. "
-                           "It counts exactly the elements of `Aʳ` when `|A| = n`, and the "
-                           "enumeration below lists them, which is the product written "
-                           "out. Slide `r` to 4 and the row reads 81 while the `P` row "
-                           "underneath reads 0 &mdash; the worked example's two counts. "
-                           "The other three rows are course 4's rules; leave them for now.",
+            "panel_intro": "This is Combinatorics and Counting's lab; the first row, `nʳ`, is this lesson's. It counts exactly the elements of `Aʳ` when `|A| = n`, and the enumeration below lists them, which is the product written out. Slide `r` to 4 and the row reads 81 while the `P` row underneath reads 0 &mdash; the worked example's two counts. The other three rows are Combinatorics and Counting's rules; leave them for now.",
         }),
         "steps_title": "Working with products",
         "steps_intro": "Coordinates first, then count.",
@@ -807,14 +722,12 @@ LESSONS = [
              "`A × B` takes its first coordinate from `A`. Reversing this silently "
              "produces a different set."),
             ("Count by multiplying",
-             "`|A × B × C| = |A| · |B| · |C|`. Independent choices multiply; this is the "
-             "product rule course 4 states in general."),
+             "`|A × B × C| = |A| · |B| · |C|`. Independent choices multiply; this is the product rule Combinatorics and Counting states in general."),
             ("Enumerate systematically when listing",
              "Vary the last coordinate fastest, exactly as truth table rows do. The "
              "pattern makes a missing tuple visible."),
             ("Remember that a subset of a product is a relation",
-             "This is the whole content of lesson 6: any set of pairs is a relation, and "
-             "any relation is a set of pairs."),
+             'This is the whole content of “Binary Relations”: any set of pairs is a relation, and any relation is a set of pairs.'),
         ],
         "worked": {
             "title": "Counting with a product",
@@ -830,12 +743,10 @@ LESSONS = [
                 "   third  1 choice",
                 "   fourth 0 choices          ⟹  0 such strings",
                 "",
-                "Length 4 from a 3-letter alphabet must repeat: pigeonhole (lesson 14).",
+                'Length 4 from a 3-letter alphabet must repeat: pigeonhole (“The Pigeonhole Principle”).',
             ],
             "after": [
-                "The second count is the pigeonhole principle arriving early, and by "
-                "arithmetic rather than by argument: four positions, three letters, so "
-                "some letter is used twice. Lesson 14 states it in general."
+                'The second count is the pigeonhole principle arriving early, and by arithmetic rather than by argument: four positions, three letters, so some letter is used twice. “The Pigeonhole Principle” states it in general.'
             ],
         },
         "quiz_title": "Products",
@@ -865,21 +776,14 @@ LESSONS = [
              "They contain different objects. There is a natural bijection between them, "
              "which is a statement about size, not about equality."),
             ("Adding sizes instead of multiplying",
-             "`|A × B|` is a product because the choices are made together, not "
-             "alternatively. Course 4 lesson 1 draws the line between the two rules."),
+             '`|A × B|` is a product because the choices are made together, not alternatively. “The Sum and Product Rules” in Combinatorics and Counting draws the line between the two rules.'),
             ("Writing `{a, b}` when order matters",
              "If swapping the entries changes the meaning, you need a tuple. Using a set "
              "throws away exactly the information you were relying on."),
         ],
         "standard": ("Finish when you can say why `2ⁿ` counts both subsets and bit strings.",
-                     "Describe the bijection explicitly: given a subset, produce its bit "
-                     "string; given a bit string, produce its subset. That construction "
-                     "is what lesson 11 calls a bijection, what lesson 13 turns into the "
-                     "definition of same size, and what course 4 uses constantly."),
-        "note": "Formally an ordered pair can be defined purely in terms of sets, as "
-                "`(a, b) = {{a}, {a, b}}` &mdash; Kuratowski's definition &mdash; which "
-                "does satisfy the equality property. Nothing on this path needs it; it is "
-                "worth knowing that order is not an extra primitive.",
+                     'Describe the bijection explicitly: given a subset, produce its bit string; given a bit string, produce its subset. That construction is what “Injective, Surjective, Bijective” calls a bijection, what “Cardinality and Countability” turns into the definition of same size, and what Combinatorics and Counting uses constantly.'),
+        "note": "Formally an ordered pair can be defined purely in terms of sets, as `(a, b) = {{a}, {a, b}}` &mdash; Kuratowski's definition &mdash; which does satisfy the equality property. Nothing on this path needs it; it is worth knowing that order is not an extra primitive.",
     },
     # ---------------------------------------------------------------- 06
     {
@@ -900,8 +804,7 @@ LESSONS = [
         ],
         "key_label": "Pairs, and what you can do with them",
         "concepts_intro": (
-            "The definition is deliberately weak: any set of pairs qualifies. The "
-            "interesting relations are the ones with extra properties, from lesson 7 on."
+            'The definition is deliberately weak: any set of pairs qualifies. The interesting relations are the ones with extra properties, from “Properties of Relations” on.'
         ),
         "concepts": [
             ("A relation is just a set of pairs",
@@ -933,13 +836,9 @@ LESSONS = [
                 "<strong>As a matrix.</strong> An `n × n` grid with a 1 in row `a`, "
                 "column `b` when `a R b`. Reflexivity is the diagonal, symmetry is "
                 "the matrix equalling its transpose.",
-                "<strong>As a directed graph.</strong> A dot per element, an arrow from "
-                "`a` to `b` when `a R b`. Transitivity becomes \"every two-step path has "
-                "a one-step shortcut\", which is the reading course 7 uses.",
+                "<strong>As a directed graph.</strong> A dot per element, an arrow from `a` to `b` when `a R b`. Transitivity becomes \"every two-step path has a one-step shortcut\", which is the reading Graphs and Trees uses.",
             ]),
-            ("p", "The matrix is what the lab shows, because the four properties of "
-                  "lesson 7 are all visible in it: the diagonal, the transpose, and the "
-                  "presence of both `(a,b)` and `(b,a)` for distinct `a`, `b`."),
+            ("p", 'The matrix is what the lab shows, because the four properties of “Properties of Relations” are all visible in it: the diagonal, the transpose, and the presence of both `(a,b)` and `(b,a)` for distinct `a`, `b`.'),
             ("def", ("Inverse relation",
                      "`R⁻¹ = {(b, a) : (a, b) ∈ R}` &mdash; every pair reversed. As a "
                      "matrix this is the transpose.")),
@@ -959,21 +858,12 @@ LESSONS = [
                      "If `M_R` and `M_S` are the boolean matrices of `R` and `S`, then "
                      "the matrix of `S ∘ R` is the boolean product `M_R M_S`, where "
                      "multiplication is `∧` and addition is `∨`.")),
-            ("p", "That is the same computation as counting walks of length 2 in course 7 "
-                  "lesson 3, with `∨` in place of `+`. Composition of relations and paths "
-                  "in a directed graph are the same idea."),
+            ("p", 'That is the same computation as counting walks of length 2 in “Graph Representations” in Graphs and Trees, with `∨` in place of `+`. Composition of relations and paths in a directed graph are the same idea.'),
         ],
         "lab": ("relation", {
             "size": 5, "preset": "succ",
             "panel_title": "A relation as a matrix",
-            "panel_intro": "Every cell is one pair, and the grid is the matrix: row `a`, "
-                           "column `b`, a 1 where `a R b`. The presets give relations you "
-                           "know by name; clicking cells gives you ones nobody named. The "
-                           "property table and the verdict under it are lesson 7's and "
-                           "can wait. What is this lesson's: set the closure selector to "
-                           "transitive, and the amber cells complete `b = a + 1` into "
-                           "`a &lt; b` &mdash; the worked example's last line, on five "
-                           "elements.",
+            "panel_intro": "Every cell is one pair, and the grid is the matrix: row `a`, column `b`, a 1 where `a R b`. The presets give relations you know by name; clicking cells gives you ones nobody named. The property table and the verdict under it are “Properties of Relations”'s and can wait. What is this lesson's: set the closure selector to transitive, and the amber cells complete `b = a + 1` into `a &lt; b` &mdash; the worked example's last line, on five elements.",
         }),
         "steps_title": "Reading a relation",
         "steps_intro": "Choose the presentation that makes your question easy.",
@@ -1008,10 +898,7 @@ LESSONS = [
                 "relation \"a < b\", which is the transitive closure of R.",
             ],
             "after": [
-                "The last line is lesson 7's transitive closure computed by hand: the "
-                "union of all powers of `R` is exactly the pairs joined by a path of any "
-                "length. Warshall's algorithm in the lab does this without enumerating "
-                "the powers."
+                "The last line is “Properties of Relations”'s transitive closure computed by hand: the union of all powers of `R` is exactly the pairs joined by a path of any length. Warshall's algorithm in the lab does this without enumerating the powers."
             ],
         },
         "quiz_title": "Relations",
@@ -1050,10 +937,7 @@ LESSONS = [
                      "Take `R = {(1,1),(1,2),(2,3),(3,1)}` on `{1,2,3}`, write its matrix, "
                      "sketch its digraph, and compute `R ∘ R` in whichever presentation is "
                      "easiest. Then check the answer in a second presentation."),
-        "note": "Relations need not be on one set: `R ⊆ A × B` with `A ≠ B` is a "
-                "<em>bipartite</em> relation, and lesson 10's functions are exactly the "
-                "relations from `A` to `B` in which every element of `A` appears exactly "
-                "once as a first coordinate.",
+        "note": "Relations need not be on one set: `R ⊆ A × B` with `A ≠ B` is a <em>bipartite</em> relation, and “Functions”'s functions are exactly the relations from `A` to `B` in which every element of `A` appears exactly once as a first coordinate.",
     },
     # ---------------------------------------------------------------- 07
     {
@@ -1074,8 +958,7 @@ LESSONS = [
         ],
         "key_label": "Four definitions to check, not recall",
         "concepts_intro": (
-            "Each property is a sentence from course 1. Deciding whether it holds is "
-            "evaluating that sentence, and refuting it is naming one bad pair."
+            "Each property is a sentence from Logic and Proof. Deciding whether it holds is evaluating that sentence, and refuting it is naming one bad pair."
         ),
         "concepts": [
             ("Antisymmetric is not \"not symmetric\"",

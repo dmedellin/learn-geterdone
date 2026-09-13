@@ -54,7 +54,7 @@ SHARED_JS = r"""
     return '<tr><th class="rowhead">' + label + '</th><td style="text-align:left;">' + detail + '</td></tr>';
   }
   function table(caption, rows) {
-    return '<div class="table-wrap"><table class="tt"><caption>' + caption
+    return '<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>' + caption
       + '</caption><tbody>' + rows.join('') + '</tbody></table></div>';
   }
   function chip(text, kind) {
@@ -865,7 +865,7 @@ def line_lab(cfg):
           + (L.kind === 'vertical' ? (Requ(xv, L.x) ? 'every y' : 'no y') : Rtext(Peval([L.b, L.m], xv)))
           + '</td></tr>');
       }
-      blocks.push('<div class="table-wrap"><table class="tt"><caption>A table of values, evaluated one at a time'
+      blocks.push('<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>A table of values, evaluated one at a time'
         + '</caption><thead><tr><th>x</th><th>y</th></tr></thead><tbody>' + vals.join('') + '</tbody></table></div>');
       msg = L.kind === 'vertical'
         ? '<strong>This line is vertical, so it is not a function of x.</strong> The equation is x = '
@@ -1257,8 +1257,8 @@ def grapher_lab(cfg):
     polynomial_empty_search = (r"""        msg = '<strong>No rational zero exists, and the search proves it rather than assuming it.</strong> '
           + 'Every candidate p/q with p dividing ' + Rtext(c0) + ' and q dividing ' + Rtext(lead)
           + ' was substituted, and none gave 0. A rational-root search alone does not say whether '
-          + 'a non-rational zero is real or complex; Course 6 supplies the quadratic methods that '
-          + 'make that later distinction. The evaluated curve above is a picture, not a replacement '
+          + 'a non-rational zero is real or complex; Quadratics and Complex Numbers supplies the quadratic methods that '
+          + 'make that real-or-complex distinction. The evaluated curve above is a picture, not a replacement '
           + 'for that argument.';""" if mode == "polynomial" else r"""        msg = '<strong>No rational zero exists, and the search proves it rather than assuming it.</strong> '
           + 'Every candidate p/q with p dividing ' + Rtext(c0) + ' and q dividing ' + Rtext(lead)
           + ' was substituted, and none gave 0. '
@@ -1363,7 +1363,7 @@ def grapher_lab(cfg):
           + '</td><td>' + quadrant(p) + '</td><td>' + dist.text
           + (dist.exact ? '' : ' = ' + approx(dist.num, 4) + ' rounded') + '</td></tr>';
       });
-      blocks.push('<div class="table-wrap"><table class="tt"><caption>Each point, read from its two '
+      blocks.push('<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>Each point, read from its two '
         + 'coordinates</caption><thead><tr><th>point</th><th>x</th><th>y</th><th>quadrant</th>'
         + '<th>distance from (0, 0)</th></tr></thead><tbody>' + prows.join('') + '</tbody></table></div>');
 
@@ -1525,7 +1525,7 @@ def grapher_lab(cfg):
       if (!zrows.length) {
         zrows.push('<tr><td colspan="5">the rational root search returned nothing</td></tr>');
       }
-      blocks.push('<div class="table-wrap"><table class="tt"><caption>Zeros, each one SEARCHED for and '
+      blocks.push('<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>Zeros, each one SEARCHED for and '
         + 'then verified by substitution</caption><thead><tr><th>zero</th><th>multiplicity</th>'
         + '<th>at the axis</th><th>f = 0?</th><th>sign either side</th></tr></thead><tbody>'
         + zrows.join('') + '</tbody></table></div>');
@@ -1535,7 +1535,7 @@ def grapher_lab(cfg):
         var xv = R(BigInt(i));
         vrows.push('<tr><td>' + i + '</td><td>' + Rtext(Peval(poly, xv)) + '</td></tr>');
       }
-      blocks.push('<div class="table-wrap"><table class="tt"><caption>A table of values, each one an '
+      blocks.push('<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>A table of values, each one an '
         + 'exact evaluation</caption><thead><tr><th>x</th><th>f(x)</th></tr></thead><tbody>'
         + vrows.join('') + '</tbody></table></div>');
 
@@ -1623,7 +1623,7 @@ def grapher_lab(cfg):
             : (b.r ? valuetext(tree, b.r, 'x') : approx(fn(b.val), 5) + ' (rounded)')) + '</td></tr>';
     });
     if (brows.length) {
-      blocks.push('<div class="table-wrap"><table class="tt"><caption>The boundaries, solved from the '
+      blocks.push('<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>The boundaries, solved from the '
         + 'demands above</caption><thead><tr><th>where</th><th>kind</th><th>verdict</th>'
         + '<th>f there</th></tr></thead><tbody>' + brows.join('') + '</tbody></table></div>');
     }
@@ -1635,7 +1635,7 @@ def grapher_lab(cfg):
         : '<span class="tone-red">not defined</span>') + '</td><td>'
         + (ok ? chip('in', 'ok') : chip('out', 'no')) + '</td></tr>');
     }
-    blocks.push('<div class="table-wrap"><table class="tt"><caption>Values, and the x that have '
+    blocks.push('<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>Values, and the x that have '
       + 'none</caption><thead><tr><th>x</th><th>f(x)</th><th>domain</th></tr></thead><tbody>'
       + vrows2.join('') + '</tbody></table></div>');
 
@@ -2004,7 +2004,7 @@ def transform_lab(cfg):
         + '<td>' + (agrees ? chip('on the curve', 'ok') : chip('off the curve', 'no')) + '</td></tr>';
     });
     if (!prows.length) prows.push('<tr><td colspan="4">this parent has no value at the sample points</td></tr>');
-    blocks.push('<div class="table-wrap"><table class="tt"><caption>Every sample point of the parent, and '
+    blocks.push('<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>Every sample point of the parent, and '
       + 'where it lands &mdash; then the drawn image is evaluated there to check'
       + '</caption><thead><tr><th>on the parent</th><th>new x</th><th>new y</th><th>check</th></tr></thead>'
       + '<tbody>' + prows.join('') + '</tbody></table></div>');
@@ -2498,7 +2498,7 @@ def funcops_lab(cfg):
       return '<tr><td>' + Rtext(g2.x) + '</td><td>' + g2.ys.map(Rtext).join(', ') + '</td><td>'
         + (g2.ys.length > 1 ? chip(g2.ys.length + ' outputs', 'no') : chip('one output', 'ok')) + '</td></tr>';
     });
-    blocks.push('<div class="table-wrap"><table class="tt"><caption>Every input, with the outputs it '
+    blocks.push('<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>Every input, with the outputs it '
       + 'was given</caption><thead><tr><th>x</th><th>y values</th><th>verdict</th></tr></thead><tbody>'
       + rows.join('') + '</tbody></table></div>');
     blocks.push(table('The two questions, which are not the same question', [
@@ -2626,7 +2626,7 @@ def funcops_lab(cfg):
       return '<tr><td>' + t + '</td><td>' + (ex !== null ? Rtext(ex)
         : (isFinite(num) ? approx(num, 5) + ' (rounded)' : 'undefined')) + '</td></tr>';
     });
-    blocks.push('<div class="table-wrap"><table class="tt"><caption>The machine, run on six inputs'
+    blocks.push('<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>The machine, run on six inputs'
       + '</caption><thead><tr><th>input</th><th>output</th></tr></thead><tbody>' + vals.join('')
       + '</tbody></table></div>');
     work.innerHTML = blocks.join('');
@@ -2857,7 +2857,7 @@ FUNCOPS_TAIL = r"""
                                               + ' but there is no value' : 'not defined') + '</span>')
         + '</td></tr>');
     }
-    blocks.push('<div class="table-wrap"><table class="tt"><caption>Values, and the inputs that have '
+    blocks.push('<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>Values, and the inputs that have '
       + 'none</caption><thead><tr><th>x</th><th>f(x)</th></tr></thead><tbody>' + vrows.join('')
       + '</tbody></table></div>');
     work.innerHTML = blocks.join('');
@@ -3050,7 +3050,7 @@ FUNCOPS_TAIL = r"""
            : (hi === null ? 'no exact value' : Rtext(hi) + (p.iv.hiClosed ? ' (filled)' : ' (hollow)')))
         + '</td></tr>';
     });
-    var blocks = ['<div class="table-wrap"><table class="tt"><caption>Each piece, on its own interval'
+    var blocks = ['<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>Each piece, on its own interval'
       + '</caption><thead><tr><th>rule</th><th>where</th><th>at the left end</th>'
       + '<th>at the right end</th></tr></thead><tbody>' + prows.join('') + '</tbody></table></div>'];
 
@@ -3220,7 +3220,7 @@ FUNCOPS_TAIL = r"""
         + (isFinite(fgv) ? (fgPoly ? Rtext(Peval(fgPoly, xk)) : approx(fgv, 4)) : 'undefined') + '</td><td>'
         + (isFinite(gfv) ? (gfPoly ? Rtext(Peval(gfPoly, xk)) : approx(gfv, 4)) : 'undefined') + '</td></tr>');
     }
-    blocks.push('<div class="table-wrap"><table class="tt"><caption>One input, through both machines, '
+    blocks.push('<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>One input, through both machines, '
       + 'in both orders</caption><thead><tr><th>x</th><th>g(x)</th><th>f(g(x))</th><th>g(f(x))</th>'
       + '</tr></thead><tbody>' + vrows.join('') + '</tbody></table></div>');
     work.innerHTML = blocks.join('');

@@ -143,13 +143,7 @@ LESSONS = [
                          "six. `3/40 = 0.075` exactly, because `40 = 2³·5` and a "
                          "denominator built only from `2`s and `5`s can be turned into "
                          "a power of ten: `3/40 = 75/1000`.")),
-            ("p", "Putting the two directions together: a number is rational exactly "
-                  "when its decimal expansion terminates or repeats. Course 1 sorted "
-                  "the reals into rational and irrational and asserted this; the "
-                  "geometric series is what turns the assertion into an argument. It "
-                  "also gives a way to write down an irrational number on demand &mdash; "
-                  "`0.101001000100001…` , with one more zero in each gap, never repeats "
-                  "and so cannot be a fraction."),
+            ("p", "Putting the two directions together: a number is rational exactly when its decimal expansion terminates or repeats. Foundations of Algebra sorted the reals into rational and irrational and asserted this; the geometric series is what turns the assertion into an argument. It also gives a way to write down an irrational number on demand &mdash; `0.101001000100001…` , with one more zero in each gap, never repeats and so cannot be a fraction."),
         ],
         "lab": ("sequence", {
             "mode": "repeating",
@@ -287,12 +281,7 @@ LESSONS = [
                      "cases, and defend `0.999… = 1` without appealing to authority. "
                      "Being able to say why `1/7` repeats and `3/40` does not is part "
                      "of it."),
-        "note": "Everything so far has summed abstract terms. The next lesson spends "
-                "the same two formulas on money: a payment made at the end of every "
-                "period, each one earning interest for a different length of time, is a "
-                "geometric series in disguise, and the question of what a stream of "
-                "payments continuing for ever is worth today is an `|r| &lt; 1` "
-                "question with a bank behind it.",
+        "note": 'Everything so far has summed abstract terms. “Annuities and Accumulated Payments” spends the same two formulas on money: a payment made at the end of every period, each one earning interest for a different length of time, is a geometric series in disguise, and the question of what a stream of payments continuing for ever is worth today is an `|r| &lt; 1` question with a bank behind it.',
     },
     # ---------------------------------------------------------------- 08
     {
@@ -580,12 +569,7 @@ LESSONS = [
                      "from the same series read the other way, and explain why a "
                      "perpetuity has a finite value while an annuity with `r &gt; 1` "
                      "still has a perfectly good finite sum over `n` periods."),
-        "note": "That is the last of the sums. The remaining lessons follow a different "
-                "pattern &mdash; the numbers that appear when a single bracket is raised "
-                "to a power &mdash; and the link back is that those numbers, like the "
-                "terms of a series, count something definite. The next lesson builds the "
-                "table of them by addition alone, before any formula for computing one "
-                "directly is given.",
+        "note": "That is the last of the sums. “Pascal's Triangle”, “The Binomial Theorem” and “The General Term of an Expansion” follow a different pattern &mdash; the numbers that appear when a single bracket is raised to a power &mdash; and the link back is that those numbers, like the terms of a series, count something definite. “Pascal's Triangle” builds the table of them by addition alone, before any formula for computing one directly is given.",
     },
     # ---------------------------------------------------------------- 09
     {
@@ -594,12 +578,7 @@ LESSONS = [
         "module": "The binomial theorem",
         "one_line": "Construct and check a row of Pascal's triangle, then interpret one entry as a choice count.",
         "summary": (
-            "Start with a single `1` and make every entry the sum of the two above it. "
-            "The rows that come out are the coefficients of `(a + b)ⁿ`, and each entry "
-            "counts something exact: the number of ways to choose `k` things from `n`. "
-            "This lesson builds the triangle and establishes what its entries count; "
-            "the formula for computing one without building the rows above it comes "
-            "next."
+            'Start with a single `1` and make every entry the sum of the two above it. The rows that come out are the coefficients of `(a + b)ⁿ`, and each entry counts something exact: the number of ways to choose `k` things from `n`. This lesson builds the triangle and establishes what its entries count; the formula for computing one without building the rows above it comes next.'
         ),
         "key": [
             "row 4      1   4   6   4   1      each entry the sum of the two above",
@@ -655,12 +634,7 @@ LESSONS = [
                 "the 1s down each edge have only one entry above them, so",
                 "nothing is added to them",
             ]),
-            ("p", "Write `C(n,k)` for the entry in row `n` at position `k`. In this "
-                  "lesson that is all the symbol means &mdash; a name for a number read "
-                  "off the array &mdash; and the building rule is "
-                  "`C(n,k) = C(n-1,k-1) + C(n-1,k)` for `0 &lt; k &lt; n`, with "
-                  "`C(n,0) = C(n,n) = 1`. The next lesson gives a formula in factorials "
-                  "that produces `C(n,k)` directly, without the rows above it."),
+            ("p", 'Write `C(n,k)` for the entry in row `n` at position `k`. In this lesson that is all the symbol means &mdash; a name for a number read off the array &mdash; and the building rule is `C(n,k) = C(n-1,k-1) + C(n-1,k)` for `0 &lt; k &lt; n`, with `C(n,0) = C(n,n) = 1`. “The Binomial Theorem” gives a formula in factorials that produces `C(n,k)` directly, without the rows above it.'),
             ("h3", "What the entries count"),
             ("p", "Here is a question with nothing to do with triangles. A group of "
                   "three people, `A`, `B` and `C`, must send a delegation. How many "
@@ -688,11 +662,7 @@ LESSONS = [
                 "`k` from the other `n - 1`, and there are `N(n-1,k)`. No selection is "
                 "in both groups and none is outside them, so "
                 "`N(n,k) = N(n-1,k-1) + N(n-1,k)`.",
-                "So `N` starts as the triangle does and grows by the same rule, which "
-                "forces the two tables to agree row by row. Stating that last step "
-                "properly is what mathematical induction is for, and the Discrete "
-                "Mathematics path does it; the two rules and the two starting rows are "
-                "what this course checks.",
+                'So `N` starts as the triangle does and grows by the same rule, which forces the two tables to agree row by row. Stating that last step properly is what mathematical induction is for, and the Discrete Mathematics path does it; the two rules and the two starting rows are what this course checks.',
             ]),
             ("p", "There is a second count in the same picture. Start at the apex and "
                   "walk down, going left or right at each step. The number of routes "
@@ -706,17 +676,8 @@ LESSONS = [
                   "subset exactly once, and a set of `n` things has `2ⁿ` subsets, one "
                   "for each way of saying yes or no to each thing. Row 6 gives "
                   "`1 + 6 + 15 + 20 + 15 + 6 + 1 = 64`, and `2⁶ = 64`."),
-            ("p", "With alternating signs the same rows give `0`, for every `n ≥ 1`. "
-                  "Row 4 gives `1 - 4 + 6 - 4 + 1 = 0` and row 7 gives "
-                  "`1 - 7 + 21 - 35 + 35 - 21 + 7 - 1 = 0`. For odd `n` the symmetry "
-                  "pairs each entry with an equal one of the opposite sign, which "
-                  "settles that case; for even `n` the cancellation is real but the "
-                  "clean reason for it is the binomial theorem with `a = 1` and "
-                  "`b = -1`, which is the next lesson."),
-            ("p", "The entries grow quickly: `C(20,10) = 184756`, and reaching it by "
-                  "addition means building twenty rows, one hundred and ninety "
-                  "additions. That is the argument for a formula, and it is what the next "
-                  "lesson supplies."),
+            ("p", 'With alternating signs the same rows give `0`, for every `n ≥ 1`. Row 4 gives `1 - 4 + 6 - 4 + 1 = 0` and row 7 gives `1 - 7 + 21 - 35 + 35 - 21 + 7 - 1 = 0`. For odd `n` the symmetry pairs each entry with an equal one of the opposite sign, which settles that case; for even `n` the cancellation is real but the clean reason for it is the binomial theorem with `a = 1` and `b = -1`, which is the subject of “The Binomial Theorem”.'),
+            ("p", 'The entries grow quickly: `C(20,10) = 184756`, and reaching it by addition means building twenty rows, one hundred and ninety additions. That is the argument for a formula, and it is what “The Binomial Theorem” supplies.'),
         ],
         "lab": ("sequence", {
             "mode": "pascal",
@@ -844,11 +805,7 @@ LESSONS = [
                      "read `C(8,3)` off it with the positions counted correctly, and "
                      "say why the entry is the answer to a question about choosing "
                      "delegations. The `2ⁿ` check should be automatic."),
-        "note": "So far the triangle is a table with a counting interpretation. The next "
-                "lesson connects it to algebra: expanding `(a + b)ⁿ` means choosing an "
-                "`a` or a `b` from each of `n` brackets, which is the same choosing "
-                "problem, so row `n` turns out to be the list of coefficients. Having "
-                "the rows already in hand is what makes that lesson short.",
+        "note": 'So far the triangle is a table with a counting interpretation. “The Binomial Theorem” connects it to algebra: expanding `(a + b)ⁿ` means choosing an `a` or a `b` from each of `n` brackets, which is the same choosing problem, so row `n` turns out to be the list of coefficients. Having the rows already in hand is what makes that lesson short.',
     },
     # ---------------------------------------------------------------- 10
     {
@@ -892,10 +849,7 @@ LESSONS = [
         "read_title": "Pascal's triangle and the binomial theorem",
         "read_intro": "The coefficients, the formula that produces them, and the reason they are counts.",
         "body": [
-            ("p", "Course 4 expanded `(a + b)²` and `(a + b)³` by hand. `(a + b)⁵` is "
-                  "possible with patience, and `(a + b)¹²` is not: multiplying out "
-                  "twelve brackets means `2¹² = 4096` products before any collecting "
-                  "starts. The theorem below skips all of it."),
+            ("p", "Polynomials and Factoring expanded `(a + b)²` and `(a + b)³` by hand. `(a + b)⁵` is possible with patience, and `(a + b)¹²` is not: multiplying out twelve brackets means `2¹² = 4096` products before any collecting starts. The theorem below skips all of it."),
             ("math", [
                 "(a + b)⁰ = 1",
                 "(a + b)¹ = a + b",
@@ -922,10 +876,7 @@ LESSONS = [
                 "15 = 5 + 10:  each entry is the sum of the two above it",
             ]),
             ("def", ("Binomial coefficient",
-                     "For integers `0 ≤ k ≤ n`, `C(n, k) = n!/(k!(n - k)!)`, read \"`n` "
-                     "choose `k`\". It is also written with `n` above `k` in a single "
-                     "pair of brackets. The factorials are the ones from lesson 1, "
-                     "with `0! = 1`.")),
+                     'For integers `0 ≤ k ≤ n`, `C(n, k) = n!/(k!(n - k)!)`, read "`n` choose `k`". It is also written with `n` above `k` in a single pair of brackets. The factorials are the ones from “Sequences and Recursion”, with `0! = 1`.')),
             ("example", ("Computing C(9, 4) without computing 9!",
                          "`C(9,4) = 9!/(4!5!)`. The `5!` cancels most of the `9!`, "
                          "leaving `(9·8·7·6)/(4·3·2·1) = 3024/24 = 126`. Four factors "
@@ -1078,17 +1029,7 @@ LESSONS = [
                      "row 5, compute a binomial coefficient by cancelling factorials, "
                      "and expand `(2x - 3)⁴` correctly including signs. For a complete "
                      "expansion, the `x = 1` check should be automatic."),
-        "note": "This theorem is the last new identity of the course. Lesson 11 "
-                "specialises it into a method for picking a single term out of an "
-                "expansion without writing the rest, and "
-                "it ends where counting begins: `C(n,k)` was defined here as a formula and used "
-                "as a count, and the Combinatorics and Counting course on the Discrete "
-                "Mathematics path takes it up as a subject in its own right. The "
-                "algebra was the point, though. Every step of this path &mdash; "
-                "elimination, row reduction, the determinant and the corner points in "
-                "course 8, the two sequence families here &mdash; was legal because "
-                "some property of the real numbers said so, which is the thing "
-                "course 1 opened with.",
+        "note": 'This theorem is the last new identity of the course. “The General Term of an Expansion” specialises it into a method for picking a single term out of an expansion without writing the rest, and it ends where counting begins: `C(n,k)` was defined here as a formula and used as a count, and the Combinatorics and Counting course on the Discrete Mathematics path takes it up as a subject in its own right. The algebra was the point, though. Every step of this path &mdash; elimination, row reduction, the determinant and the corner points in Systems and Matrices, the two sequence families here &mdash; was legal because some property of the real numbers said so, which is the thing Foundations of Algebra opened with.',
     },
     # ---------------------------------------------------------------- 11
     {
@@ -1345,12 +1286,6 @@ LESSONS = [
                      "plainly when no such term exists. Getting `C(n,k)` from a row of "
                      "the triangle or from the factorial formula, and the sign from "
                      "`(-1)ᵏ`, should be routine by now."),
-        "note": "That closes the course. It began with a sequence as a function on the "
-                "positive integers, moved to the sums of their terms, and needed a "
-                "limit of partial sums before an infinite one could mean anything; it ends "
-                "with a coefficient that is a count. The three habits worth keeping are "
-                "the ones the course kept insisting on: derive the closed form rather "
-                "than reciting it, check the condition before applying the formula, and "
-                "say exactly what a check has established and what it has not.",
+        "note": 'That closes the course. It began with a sequence as a function on the positive integers, moved to the sums of their terms, and needed a limit of partial sums before an infinite one could mean anything; it ends with a coefficient that is a count. The three habits worth keeping are the ones the course kept insisting on: derive the closed form rather than reciting it, check the condition before applying the formula, and say exactly what a check has established and what it has not.',
     },
 ]
