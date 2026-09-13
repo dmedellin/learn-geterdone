@@ -3,6 +3,38 @@
 Read this before changing anything. It is the contract between whoever (human or
 agent) edits this repository and the platform that will eventually serve it.
 
+## 0. Work in progress: three Subjects are present and none of them is live
+
+`content/system_design/`, `content/algorithms/` and `content/operations_research/`
+are in the tree. **None of them publishes a single page, and that is deliberate.**
+
+A generated path becomes real only by joining `GENERATED_PATHS` in
+`scripts/build_paths.py`, and none of the three has. Until one does: no page is
+built, no URL declaration moves, `tests/content_preservation.json` does not walk
+the package, and every count in section 1 below is still correct. The live site
+is exactly the 369 pages it has been.
+
+| Subject | state |
+|---|---|
+| System Design | **complete** — 10 courses, 114 lessons, 10 lab kits, all gates passing. Ready to wire. |
+| Algorithms | `algo_core.py` written (21 blocks). 14 kits and 109 lessons to go. |
+| Operations Research | `or_core.py` written — an exact simplex, 13 blocks. 12 kits and 94 lessons to go. |
+
+A course module still being authored exports `COURSE = None`, which
+`content/<subject>/__init__.py` filters out. That is the state most of them are
+in, and it is visible in the source rather than hidden by omission.
+
+**Before wiring any of them**, read the two things that will otherwise cost you a
+day: section 1's note on what adding a Subject actually touches (it is about two
+dozen files, not the five the URL rule names), and `content_errors` in
+`tests/test_review_remediation.py`, which builds its inventory *from*
+`GENERATED_PATHS` and compares with a symmetric difference — so joining that
+tuple makes every `.py` file in the package mandatory in the preservation
+contract, with no partial option and no warning.
+
+Half-finished lab kits for the other two Subjects are parked, unverified, on
+the `wip/or-and-algorithms-kits` branch. Nothing on `main` depends on them.
+
 ## 1. What this repository is
 
 An educational static site published as **Learn** at `https://learn.geterdone.io`:
@@ -36,6 +68,23 @@ agree: `REQUIRED_PAGES` in `tests/test_site_invariants.py`, `scripts/smoke.py`,
 `acceptance.checks` in `release/contract.json`, the "Published URL space is
 complete" step in `.github/workflows/ci.yml`, and the publish guards in
 `.github/workflows/pages.yml` and `Containerfile.release`.
+
+Those five govern WHICH URLS EXIST. **Adding or removing a whole Subject is a
+bigger change than that**, and the five are not the whole of it: roughly two
+dozen files carry a hardcoded count of pages, lessons, courses or Subjects, and
+several of the per-path constants in `tests/test_site_invariants.py` and
+`scripts/smoke.py` are patterns to extend rather than numbers to bump. Find them
+before starting, not one red test at a time.
+
+The one that is invisible until it fires is `content_errors` in
+`tests/test_review_remediation.py`. It builds its inventory **from
+`GENERATED_PATHS` itself** and compares it to `tests/content_preservation.json`
+with a symmetric difference, so the moment a new path joins that tuple, every
+`.py` file in its content package becomes mandatory in the preservation
+contract, each with an AST fingerprint. There is no "guard the old paths only"
+option and nothing warns you. Generate those entries with `/usr/bin/python3`;
+the fingerprint is Python-version sensitive and the file carries
+`AST_DUMP_OPTIONS` for exactly that reason.
 
 Every lesson carries a completion toggle and a feedback panel, so a lesson page
 is also a piece of UI. The trading lessons are hand-written and were given those
@@ -110,23 +159,45 @@ Self-containment means every lesson inlines the whole lab it uses, and the
 generated labs share a large exact-arithmetic core. So pages get heavier as the
 labs get richer:
 
-| page | raw | gzipped |
+Measured, not estimated -- these are medians and maxima over the pages actually
+published, and every figure in the previous version of this table understated
+the truth by 40% or more, which is how a budget quietly stops being a budget:
+
+| page | raw (median / max) | gzipped (median / max) |
 | --- | --- | --- |
-| Discrete Mathematics lesson | ~57 KB | ~15 KB |
-| Algebra, course 1 (5-mode lab) | ~89 KB | ~24 KB |
-| Algebra, course 9 (11-mode lab) | ~183 KB | ~50 KB |
+| Discrete Mathematics lesson (106 pages) | 94 KB / 129 KB | 24 KB / 33 KB |
+| Algebra, course 1 (5-mode lab, 13 pages) | 131 KB / 137 KB | 34 KB / 36 KB |
+| Algebra, course 9 (11-mode lab, 11 pages) | 230 KB / 233 KB | 61 KB / 62 KB |
+
+Re-derive them rather than trusting them; they go stale every time a lab grows:
+
+```
+/usr/bin/python3 - <<'PY'
+import gzip, pathlib
+for line in open('scripts/generated-pages.txt'):
+    p = pathlib.Path(line.strip())
+    if p.is_file():
+        b = p.read_bytes()
+        print(len(gzip.compress(b, 9)), len(b), p)
+PY
+```
 
 The second factor is the number of MODES a lab has. One function serves every
 mode of a lab, so a page ships all of them: a reader on the sigma-notation
 lesson downloads the annuity and Pascal code as well. Emitting only the active
 mode is a real optimisation and a real change to the lab kit; it has not been
-made, and 50 KB on the wire does not justify making it yet.
+made, and 62 KB on the wire does not justify making it yet.
 
-38 KB on the wire is not a problem and needs no action. It IS the number to
-check before anyone proposes "just extract the shared JavaScript into one file
-both paths load" -- that would halve the bytes and break the invariant in
-section 2, which is the one rule this repository does not trade away. If page
-weight ever does become a problem, the fix is a smaller lab, not a shared file.
+**62 KB gzipped is the current ceiling, and it is the number to check** before
+anyone proposes "just extract the shared JavaScript into one file both paths
+load" -- that would cut the bytes sharply and break the invariant in section 2,
+which is the one rule this repository does not trade away. If page weight ever
+does become a problem, the fix is a smaller lab, not a shared file.
+
+A kit author designing a lab with ten or more modes should measure the page
+before believing it fits. The heaviest page in the repository today is
+`sequences-and-series/infinite-geometric-series` at 62 KB gzipped, and it is an
+eleven-mode lab.
 
 ## 2. The self-containment invariant (non-negotiable)
 

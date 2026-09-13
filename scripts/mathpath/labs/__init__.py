@@ -16,13 +16,23 @@ from . import (
     algebra_rational,
     algebra_systems,
     algorithms,
+    avail,
+    cache,
     counting,
+    estimate,
     graph,
     induction,
+    latency,
     logic,
+    measure,
     number,
     probability,
+    queue,
+    replica,
+    scale,
     sets,
+    shard,
+    storage,
 )
 from .common import QUIZ_MARKUP, QUIZ_SCRIPT, Lab, cfg_literal
 
@@ -70,6 +80,20 @@ REGISTRY = {
     "matrix": algebra_systems.matrix_lab,
     "sequence": algebra_systems.sequence_lab,
     "quadratic": algebra_quadratic.quadratic_lab,
+
+    # The System Design path. Its labs share the exact engine in
+    # sysdesign_core.py on top of algebra_core's rationals: one kit per
+    # course, with the mode chosen by cfg["mode"].
+    "estimate": estimate.estimate_lab,
+    "latency": latency.latency_lab,
+    "cache": cache.cache_lab,
+    "queue": queue.queue_lab,
+    "avail": avail.avail_lab,
+    "replica": replica.replica_lab,
+    "shard": shard.shard_lab,
+    "storage": storage.storage_lab,
+    "scale": scale.scale_lab,
+    "measure": measure.measure_lab,
 }
 
 
