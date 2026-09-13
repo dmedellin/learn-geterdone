@@ -862,7 +862,7 @@ def _roundtrips(cfg):
 """
     return Lab(
         title="Counting round trips",
-        subtitle="k &times; RTT + bytes &divide; bandwidth, with k the part you can change",
+        subtitle="k × RTT + bytes ÷ bandwidth, with k the part you can change",
         markup=markup,
         controls=controls,
         panel_title=cfg.get("panel_title", "Turn handshakes on and off"),
@@ -1366,7 +1366,7 @@ def _fanout(cfg):
 """
     return Lab(
         title="What a fan-out does to a tail",
-        subtitle="p&#8319;, and the width at which a per-call p99 becomes the request's median",
+        subtitle="pⁿ, and the width at which a per-call p99 becomes the request's median",
         markup=markup,
         controls=controls,
         panel_title=cfg.get("panel_title", "Set the fan-out"),

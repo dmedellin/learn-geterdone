@@ -887,7 +887,7 @@ def _rates(cfg):
 """
     return Lab(
         title="Rates, not latencies",
-        subtitle="&rho; = &lambda;/&mu; is a ratio of two rates, and &rho; &ge; 1 is a straight line",
+        subtitle="ρ = λ/μ is a ratio of two rates, and ρ ≥ 1 is a straight line",
         markup=markup,
         controls=controls,
         panel_title=cfg.get("panel_title", "Set the load and the service"),
@@ -1071,7 +1071,7 @@ def _trace(cfg):
 """
     return Lab(
         title="Little's Law, proved by counting",
-        subtitle="L = &lambda;W with no distribution in it anywhere",
+        subtitle="L = λW with no distribution in it anywhere",
         markup=markup,
         controls=controls,
         panel_title=cfg.get("panel_title", "Edit the trace"),
@@ -1470,7 +1470,7 @@ def _slotted(cfg):
 """
     return Lab(
         title="Why queues form below full utilisation",
-        subtitle="A seeded slotted run against a clockwork one, at exactly the same &rho;",
+        subtitle="A seeded slotted run against a clockwork one, at exactly the same ρ",
         markup=markup,
         controls=controls,
         panel_title=cfg.get("panel_title", "Set the slotted model"),
@@ -2693,7 +2693,7 @@ def _finite(cfg):
 """
     return Lab(
         title="Bounded queues and loss",
-        subtitle="&pi;<sub>K</sub>, the admitted rate, and the two W values it separates",
+        subtitle="πₖ, the admitted rate, and the two W values it separates",
         markup=markup,
         controls=controls,
         panel_title=cfg.get("panel_title", "Set the buffer"),

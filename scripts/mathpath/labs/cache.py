@@ -739,7 +739,7 @@ def _hitrate_load(cfg):
     return _lab(
         cfg,
         title="A hit rate is a statement about the backend",
-        subtitle="(1 &minus; h)&lambda; is what arrives there, and &rho; is what it does",
+        subtitle="(1 − h)λ is what arrives there, and ρ is what it does",
         markup=markup,
         controls=controls,
         script=script,

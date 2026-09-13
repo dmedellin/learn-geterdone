@@ -741,7 +741,7 @@ def _nines(cfg):
 """
     return Lab(
         title="Nines are minutes",
-        subtitle="Downtime is (1 &minus; A) &times; period, and each nine is a factor of ten",
+        subtitle="Downtime is (1 − A) × period, and each nine is a factor of ten",
         markup=markup,
         controls=controls,
         panel_title=cfg.get("panel_title", "Pick a target, or pick a budget"),
@@ -896,7 +896,7 @@ def _mtbf(cfg):
 """
     return Lab(
         title="Availability is uptime over a cycle",
-        subtitle="MTBF &divide; (MTBF + MTTR), and why repairing faster is the cheaper lever",
+        subtitle="MTBF ÷ (MTBF + MTTR), and why repairing faster is the cheaper lever",
         markup=markup,
         controls=controls,
         panel_title=cfg.get("panel_title", "Move the two levers independently"),
@@ -1195,7 +1195,7 @@ def _parallel(cfg):
 """
     return Lab(
         title="Parallel: redundancy, and its bill",
-        subtitle="Two 99% paths give 99.99% &mdash; if they are independent and the switch is free",
+        subtitle="Two 99% paths give 99.99% — if they are independent and the switch is free",
         markup=markup,
         controls=controls,
         panel_title=cfg.get("panel_title", "Add paths, then charge for the switch"),
@@ -1486,7 +1486,7 @@ def _correlated(cfg):
 """
     return Lab(
         title="Correlated failure",
-        subtitle="A 0.1% common cause swamps a pair whose independent product is 10&#8315;&#8308;",
+        subtitle="A 0.1% common cause swamps a pair whose independent product is 10⁻⁴",
         markup=markup,
         controls=controls,
         panel_title=cfg.get("panel_title", "Move the common cause up from zero"),
@@ -1937,7 +1937,7 @@ def _storm(cfg):
 """
     return Lab(
         title="Retry storms",
-        subtitle="A feedback loop, iterated to its fixed point &mdash; which can sit above capacity",
+        subtitle="A feedback loop, iterated to its fixed point — which can sit above capacity",
         markup=markup,
         controls=controls,
         panel_title=cfg.get("panel_title", "Set the load and the retry policy"),
