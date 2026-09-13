@@ -103,7 +103,8 @@ QUEUE_KIT_JS = r"""
   /* ---------------------------------------------------------------- output
 
      Rdec goes through Number, and this course produces rationals Number cannot
-     hold: (19/20)^400 has a 521-digit numerator and Number() of it is 0, while
+     hold: (19/20)^400 is a 512-digit numerator over a 521-digit denominator,
+     and Number() of it is 0, while
      M/M/1/K at K = 20 has a denominator of 21 digits. So decimals here are long
      division in BigInt, rounded half up at the last digit printed. */
   function Rfixed(a, places) {
@@ -1682,7 +1683,8 @@ def _memoryless(cfg):
 
 # How finely the window is chopped. The list stops at 20 for a reason worth
 # stating rather than hiding: the binomial column here is EXACT, and (19/20)^480
-# is a 625-digit fraction whose greatest common divisor costs real time to take.
+# is a 614-digit numerator over a 625-digit denominator, whose greatest common
+# divisor costs real time to take.
 # Chopping a hundred times finer is a two-second redraw, so the page offers the
 # three steps that show the limit and says why there is not a fourth.
 _OPPORTUNITIES = [("2", "n = 2m opportunities, each with probability 1/2"),

@@ -43,6 +43,8 @@ const ALGO_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'algorithms.py');
 const algoSrc = fs.readFileSync(ALGO_SOURCE, 'utf8');
 const SYSD_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'sysdesign_core.py');
 const sysdSrc = fs.readFileSync(SYSD_SOURCE, 'utf8');
+const ALGOCORE_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'algo_core.py');
+const algoCoreSrc = fs.readFileSync(ALGOCORE_SOURCE, 'utf8');
 const ESTIMATE_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'estimate.py');
 const estimateSrc = fs.readFileSync(ESTIMATE_SOURCE, 'utf8');
 const LATENCY_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'latency.py');
@@ -64,6 +66,7 @@ function probBlock(name) { return blockFrom(probSrc, name, PROB_SOURCE); }
 function numberBlock(name) { return blockFrom(numberSrc, name, NUMBER_SOURCE); }
 function graphBlock(name) { return blockFrom(graphSrc, name, GRAPH_SOURCE); }
 function algoBlock(name) { return blockFrom(algoSrc, name, ALGO_SOURCE); }
+function algoCoreBlock(name) { return blockFrom(algoCoreSrc, name, ALGOCORE_SOURCE); }
 
 let fails = 0;
 function eq(got, want, label) {
@@ -4398,6 +4401,1304 @@ console.log('system design: measurement, aggregation, sampling and alerts');
      three here -- the lever the lesson recommends, computed rather than said. */
   eq(Rcmp(availKofN(perr, 6, 200), Rdiv(availKofN(perr, 5, 200), R(3n, 1n))) < 0, true,
      'one more error on the threshold cuts the false-alarm rate by more than three');
+}
+
+
+// ==========================================================================
+// Operations Research: the exact simplex, and the twelve kits' shared engine
+// ==========================================================================
+//
+// scripts/mathpath/labs/or_core.py is thirteen raw-string blocks and this is
+// where they are exercised directly, before any kit dresses them in modes.
+//
+// TWO NAMED REGRESSION TESTS carry the whole section: Beale's cycling example
+// and the Klee-Minty cube. Both are lessons ABOUT things floating point
+// destroys -- "the tableau is identical entry for entry" is a claim about
+// equality of numbers, and a pivot count of 2^n - 1 survives only if every
+// degenerate comparison lands exactly -- so if the arithmetic ever stops being
+// exact, these two fail first and loudest.
+console.log('operations research: the exact simplex, duality, networks and the rest');
+{
+  const OR_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'or_core.py');
+  const orSrc = fs.readFileSync(OR_SOURCE, 'utf8');
+  const SYSTEMS_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'algebra_systems.py');
+  const systemsSrc = fs.readFileSync(SYSTEMS_SOURCE, 'utf8');
+  const orBlock = (n) => blockFrom(orSrc, n, OR_SOURCE);
+  const sysBlock = (n) => blockFrom(systemsSrc, n, SYSTEMS_SOURCE);
+
+  eval(countingBlock('BIGINT_JS') + sysdBlock('HARMONIC_JS') + sysdBlock('RCEIL_JS')
+     + sysdBlock('PMF_JS') + sysdBlock('QUEUE_JS')
+     + sysBlock('FORMAT_JS') + sysBlock('LINEAR_JS') + sysBlock('MATRIX_JS') + sysBlock('FEAS_JS')
+     + orBlock('ORFMT_JS') + orBlock('TABLEAU_JS') + orBlock('PHASE_JS') + orBlock('DUAL_JS')
+     + orBlock('RANGE_JS') + orBlock('NET_JS') + orBlock('TRANS_JS') + orBlock('IP_JS')
+     + orBlock('SCHED_JS') + orBlock('DPSEQ_JS') + orBlock('CHAIN_JS') + orBlock('SIM_JS')
+     + orBlock('INV_JS'));
+
+  const ri = (v) => R(BigInt(v), 1n);
+  const rf = (n, d) => R(BigInt(n), BigInt(d));
+
+  /* --- ORFMT: the printer this path actually needs ------------------------
+     algebra_core's Rdec goes through Number, and this path produces rationals
+     Number cannot hold. That is not a hypothetical: both figures below are
+     measured, and the second one is Rdec returning NaN for a probability. */
+  eq(Rfixed(rf(1, 3), 6), '0.333333', 'Rfixed is long division in BigInt');
+  eq(Rfixed(rf(2, 3), 4), '0.6667', 'rounded half up at the last digit');
+  eq(Rfixed(rf(-1, 8), 3), '-0.125', 'and it keeps the sign');
+  const decayed = Rpow(rf(19, 20), 400);
+  eq(String(decayed.n).length + '/' + String(decayed.d).length, '512/521',
+     '(19/20)^400 is 512 digits over 521 -- measured here, because queue.py\'s comment says "521-digit numerator" and 521 is the DENOMINATOR');
+  eq(Rfixed(decayed, 12), '0.000000001229', 'which Rfixed prints');
+  eq(Rdec(decayed, 12), 'NaN', 'and Rdec, going through Number, does not -- this is why ORFMT_JS exists');
+  eq(Rshort(rf(1, 3)), '1/3', 'Rshort keeps a fraction a reader can read');
+  eq(Rshort(decayed, 6), Rfixed(decayed, 6), 'and falls back to a decimal when the fraction has run away');
+  eq(Rpct(rf(1, 8), 2), '12.50%', 'Rpct');
+  eq(Rtext(Rfrac(rf(7, 3))), '1/3', 'the fractional part of 7/3');
+  eq(Rtext(Rfrac(rf(-7, 3))), '2/3', 'and of -7/3 it is 2/3, not -1/3 -- Gomory cuts depend on it');
+  eq(String(bifloor(999999n)), '999', 'bifloor floors the integer square root');
+  eq(String(bifloor(2n)), '1', 'and never returns null, which is what algebra_core bisqrt does');
+  eq(surdDec(Rsurd(ri(2)), 10), '1.4142135624', 'surdDec -- the one function here that rounds');
+  eq(surdDec({ q: ri(40), k: 3n }, 6), '69.282032', '40 sqrt 3, to six places');
+  eq(surdDec({ q: ri(-2), k: 7n }, 5), '-5.29150', 'and it carries a sign');
+
+  /* --- REGRESSION TEST 1: BEALE'S CYCLING EXAMPLE (1955) ------------------
+     max (3/4)x1 - 150x2 + (1/50)x3 - 6x4  subject to three rows and x >= 0.
+     From the slack basis {x5, x6, x7}:
+       * Dantzig's rule with the lowest-row-index ratio tie-break returns to
+         that basis after exactly 6 pivots, with the tableau IDENTICAL entry
+         for entry and z = 0 throughout;
+       * Bland's rule terminates after 6 pivots at z* = 1/20.
+     Same count, different ending. That contrast is C2 L7, and a float
+     implementation cannot show it, because "the tableau is identical" is a
+     claim about equality of numbers. */
+  const beale = {
+    max: true, names: ['x1', 'x2', 'x3', 'x4'],
+    obj: [rf(3, 4), ri(-150), rf(1, 50), ri(-6)],
+    cons: [
+      { a: [rf(1, 4), ri(-60), rf(-1, 25), ri(9)], rel: 'le', b: ri(0), name: 'row 1' },
+      { a: [rf(1, 2), ri(-90), rf(-1, 50), ri(3)], rel: 'le', b: ri(0), name: 'row 2' },
+      { a: [ri(0), ri(0), ri(1), ri(0)], rel: 'le', b: ri(1), name: 'row 3' }]
+  };
+  {
+    const d = lpSolve(beale, { rule: 'dantzig', maxPivots: 60 });
+    eq(d.status, 'cycled', 'Beale under Dantzig CYCLES -- not "limit reached", which would teach the wrong thing');
+    eq(d.run.pivots, 6, 'and it takes exactly 6 pivots to come back');
+    eq(d.run.steps.map((s) => s.enterName).join(','), 'x1,x2,x3,x4,s1,s2',
+       'entering x1 x2 x3 x4 x5 x6, in that order');
+    eq(d.run.steps.map((s) => s.row + 1).join(','), '1,2,1,2,1,2', 'with the leaving rows alternating 1,2');
+    eq(d.run.path.every((t) => Rzero(t.z[t.n])), true, 'z is 0 at every step: every pivot is degenerate');
+    eq(d.run.cycle.from, 0, 'the basis it returns to is the one it started from');
+    /* IDENTICAL ENTRY FOR ENTRY -- the claim the lesson makes. */
+    const first = d.run.path[0], last = d.run.path[d.run.path.length - 1];
+    let identical = first.basis.join(',') === last.basis.join(',');
+    for (let i = 0; i < first.m; i += 1) {
+      for (let j = 0; j <= first.n; j += 1) if (!Requ(first.T[i][j], last.T[i][j])) identical = false;
+    }
+    for (let j = 0; j <= first.n; j += 1) if (!Requ(first.z[j], last.z[j])) identical = false;
+    eq(identical, true, 'and the sixth tableau equals the first ENTRY FOR ENTRY, not nearly');
+    const b = lpSolve(beale, { rule: 'bland', maxPivots: 60 });
+    eq(b.status, 'optimal', 'Bland terminates on the same problem');
+    eq(b.run.pivots, 6, 'in the same 6 pivots');
+    eq(Rtext(b.zOrig), '1/20', 'at z* = 1/20');
+    eq(Rtext(lpSolve(beale, { rule: 'bestImprovement' }).zOrig), '1/20',
+       'best improvement reaches the same optimum');
+    eq(Rtext(lpSolve(beale, { rule: 'lastIndex' }).zOrig), '1/20', 'and so does the last-index rule');
+  }
+
+  /* --- REGRESSION TEST 2: THE KLEE-MINTY CUBE ----------------------------
+     max sum 10^(n-j) x_j  subject to  2 sum_{j<i} 10^(i-j) x_j + x_i <= 100^(i-1).
+     Dantzig's rule visits every one of the 2^n vertices: 3, 7, 15 pivots at
+     n = 2, 3, 4, with z* = 100^(n-1). Bland's rule gives 3, 5, 9 -- the "run
+     another rule and count fewer" figure C2 L9 is built on. */
+  const kleeMinty = (n) => {
+    const obj = [], names = [], cons = [];
+    for (let j = 1; j <= n; j += 1) { obj.push(R(10n ** BigInt(n - j), 1n)); names.push('x' + j); }
+    for (let i = 1; i <= n; i += 1) {
+      const a = [];
+      for (let j = 1; j <= n; j += 1) {
+        a.push(j < i ? R(2n * 10n ** BigInt(i - j), 1n) : (j === i ? R1 : R0));
+      }
+      cons.push({ a: a, rel: 'le', b: R(100n ** BigInt(i - 1), 1n), name: 'row ' + i });
+    }
+    return { max: true, names: names, obj: obj, cons: cons };
+  };
+  for (const [n, dantzig, bland, star] of [[2, 3, 3, '100'], [3, 7, 5, '10000'], [4, 15, 9, '1000000']]) {
+    const m = kleeMinty(n);
+    const d = lpSolve(m, { rule: 'dantzig', maxPivots: 200 });
+    const b = lpSolve(m, { rule: 'bland', maxPivots: 200 });
+    eq(d.run.pivots, dantzig, 'Klee-Minty n = ' + n + ': Dantzig takes 2^n - 1 = ' + dantzig + ' pivots');
+    eq(b.run.pivots, bland, 'and Bland takes ' + bland + ' -- run another rule and count fewer');
+    eq(Rtext(d.zOrig), star, 'both stop at z* = 100^(n-1) = ' + star);
+    eq(Rtext(b.zOrig), star, 'whichever rule got there');
+  }
+  eq(lpSolve(kleeMinty(3), { rule: 'bestImprovement' }).run.pivots, 1,
+     'and best improvement walks straight to the far corner in one');
+
+  /* THE TIE-BREAKS THEMSELVES, on an LP built so that they bite: both columns
+     start with the same most-negative reduced cost, so the ONLY thing choosing
+     between them is the rule. Neither Beale nor Klee-Minty exercises this --
+     their reduced costs are all distinct -- and a tie-break nobody tests is a
+     tie-break that was chosen by accident, which is what C2 L7 is about. */
+  {
+    const tied = { max: true, names: ['x1', 'x2'], obj: [ri(1), ri(1)],
+      cons: [{ a: [ri(1), ri(2)], rel: 'le', b: ri(4), name: 'A' },
+             { a: [ri(2), ri(1)], rel: 'le', b: ri(4), name: 'B' }] };
+    const start = tabInit(stdForm(tied));
+    const rates = tabEnter(start, 'dantzig').rates;
+    eq(Rtext(rates[0].reduced) + ',' + Rtext(rates[1].reduced), '-1,-1',
+       'both columns start at the same reduced cost, so only the tie-break can choose');
+    eq(tabEnter(start, 'dantzig').enter, 0, 'Dantzig breaks the tie on the LOWEST column index');
+    eq(tabEnter(start, 'bland').enter, 0, 'Bland takes the smallest index with a negative reduced cost');
+    eq(tabEnter(start, 'lastIndex').enter, 1, 'and the last-index rule takes the other one');
+    eq(lpSolve(tied, { rule: 'dantzig' }).run.steps[0].enterName, 'x1', 'so Dantzig enters x1 first');
+    eq(lpSolve(tied, { rule: 'lastIndex' }).run.steps[0].enterName, 'x2', 'and last-index enters x2 first');
+    eq(Rtext(lpSolve(tied, { rule: 'dantzig' }).zOrig), Rtext(lpSolve(tied, { rule: 'lastIndex' }).zOrig),
+       'both reach the same optimum, by different corners');
+    /* rate times step really is the change in z, which is C2 L4's panel */
+    eq(rates[0].step !== null && Requ(Rmul(rates[0].rate, rates[0].step), rates[0].delta), true,
+       'and every candidate column carries its own rate, step and rate x step');
+    const first = lpSolve(tied, { rule: 'bestImprovement' }).run.steps[0];
+    eq(Requ(first.delta, Rmul(first.rates[first.enter].rate, first.rates[first.enter].step)), true,
+       'best improvement picks the largest of them, and z really moves by that much');
+    const ratio = tabRatio(start, 0, 'dantzig');
+    eq(ratio.rows.map((r) => (r.eligible ? Rtext(r.ratio) : '-')).join(','), '4,2',
+       'the ratio test on that column is 4 and 2');
+    eq(ratio.leave, 1, 'so the second row leaves');
+  }
+
+  /* --- THE INDEPENDENT ORACLE: corner enumeration -------------------------
+     algebra_systems.Ccorners already enumerates the corners of a two-variable
+     region exactly. Every two-variable LP can be solved both ways, and the two
+     answers must agree -- a check the solver cannot fake, because Ccorners
+     knows nothing about tableaux. */
+  {
+    const cornerOpt = (model) => {
+      const cons = model.cons.map((k) => Cnew(k.a[0], k.a[1], k.b, false, ''))
+        .concat([Cnew(ri(-1), ri(0), ri(0), false, ''), Cnew(ri(0), ri(-1), ri(0), false, '')]);
+      const cs = Ccorners(cons);
+      if (!cs.length) return { empty: true };
+      if (Cunbounded(cons) && Cgrows(cons, model.obj[0], model.obj[1])) return { unbounded: true };
+      let best = null;
+      for (const p of cs) {
+        const v = Radd(Rmul(model.obj[0], p.x), Rmul(model.obj[1], p.y));
+        if (best === null || Rcmp(v, best) > 0) best = v;
+      }
+      return { z: best };
+    };
+    let x = 20260913n;
+    const next = () => { x = (1103515245n * x + 12345n) % 2147483648n; return Number(x % 100n); };
+    let agreed = 0, unbounded = 0;
+    for (let t = 0; t < 200; t += 1) {
+      const obj = [ri(1 + next() % 9), ri(1 + next() % 9)];
+      const cons = [];
+      for (let i = 0; i < 2 + t % 3; i += 1) {
+        cons.push({ a: [ri(next() % 7 - 1), ri(next() % 7 - 1)], rel: 'le', b: ri(next() % 30), name: 'r' + i });
+      }
+      const model = { max: true, names: ['x', 'y'], obj: obj, cons: cons };
+      const enumerated = cornerOpt(model), solved = lpSolve(model, { rule: 'dantzig', maxPivots: 200 });
+      if (enumerated.unbounded) {
+        if (solved.status === 'unbounded') unbounded += 1;
+        else { fails += 1; console.log('  FAIL LP ' + t + ' should be unbounded, got ' + solved.status); }
+        continue;
+      }
+      if (solved.status !== 'optimal' || !Requ(solved.zOrig, enumerated.z)) {
+        fails += 1;
+        console.log('  FAIL LP ' + t + ': simplex ' + solved.status + ' vs corner enumeration ' + Rtext(enumerated.z));
+        continue;
+      }
+      /* and the point it reports is feasible and attains the value */
+      const attained = Radd(Rmul(obj[0], solved.x[0]), Rmul(obj[1], solved.x[1]));
+      if (!Requ(attained, solved.zOrig)) { fails += 1; console.log('  FAIL LP ' + t + ': the reported point misses its own objective'); }
+      for (const k of cons) {
+        if (Rcmp(Radd(Rmul(k.a[0], solved.x[0]), Rmul(k.a[1], solved.x[1])), k.b) > 0) {
+          fails += 1; console.log('  FAIL LP ' + t + ': the reported point is infeasible');
+        }
+      }
+      /* strong duality, on every one of them */
+      const dv = dualVector(solved.tab);
+      if (!Requ(dv.value, solved.zOrig)) { fails += 1; console.log('  FAIL LP ' + t + ': y.b != z*'); }
+      if (!dv.ok) { fails += 1; console.log('  FAIL LP ' + t + ': the dual vector is infeasible'); }
+      /* and B^-1 A rebuilt from the ORIGINAL matrix is the tableau, entry for entry */
+      const bi = basisInverse(solved.tab);
+      for (let i = 0; i < solved.tab.m; i += 1) {
+        for (let j = 0; j < solved.tab.n; j += 1) {
+          if (!Requ(bi.BinvA[i][j], solved.tab.T[i][j])) { fails += 1; console.log('  FAIL LP ' + t + ': B^-1 A is not the tableau'); i = 99; break; }
+        }
+      }
+      agreed += 1;
+    }
+    eq(agreed, 178, '178 two-variable LPs solved by simplex and by corner enumeration agree, exactly');
+    eq(unbounded, 22, 'and the other 22 are unbounded, which both methods say');
+  }
+
+  /* --- duality: the second program, and the certificate ------------------ */
+  {
+    const p = { max: true, names: ['x1', 'x2'], obj: [ri(3), ri(5)],
+      cons: [{ a: [ri(1), ri(0)], rel: 'le', b: ri(4), name: 'A' },
+             { a: [ri(0), ri(2)], rel: 'le', b: ri(12), name: 'B' },
+             { a: [ri(3), ri(2)], rel: 'le', b: ri(18), name: 'C' }] };
+    const s = lpSolve(p);
+    eq(Rtext(s.zOrig), '36', 'the textbook LP has z* = 36');
+    eq(s.x.map(Rtext).join(','), '2,6', 'at (2, 6)');
+    eq(dualVector(s.tab).y.map(Rtext).join(','), '0,3/2,1', 'with shadow prices 0, 3/2, 1');
+    const d = dualModel(p), dd = dualModel(d);
+    eq(lpSolve(d).status === 'optimal' && Requ(lpSolve(d).zOrig, s.zOrig), true, 'the dual attains the same value');
+    eq(dd.max, true, 'the dual of the dual is a maximisation again');
+    eq(dd.cons.map((k) => k.rel).join(','), 'le,le,le', 'with the primal\'s relations');
+    eq(dd.obj.map(Rtext).join(','), p.obj.map(Rtext).join(','), 'and the primal\'s objective');
+    eq(d.pairs.filter((q) => q.kind === 'row').every((q) => q.sign === 'ge0'), true,
+       'every <= row of a maximisation prices at y >= 0');
+    /* dualVector must report WHICH columns it read B^-1 from -- on a >= row
+       the slack is the surplus column and holds nothing of the sort, which is
+       C2 L8's named misconception. */
+    const mixed = { max: true, names: ['x', 'y'], obj: [ri(1), ri(1)],
+      cons: [{ a: [ri(1), ri(1)], rel: 'le', b: ri(10), name: 'cap' },
+             { a: [ri(1), ri(0)], rel: 'ge', b: ri(2), name: 'floor' }] };
+    const ms = lpSolve(mixed);
+    const cols = dualVector(ms.tab).columns;
+    eq(cols.map((c) => c.kind).join(','), 'slack,artificial',
+       'on a >= row the identity column is the ARTIFICIAL, not the surplus beside it');
+    eq(cols.filter((c) => c.isSlack).length, 1, 'so only one of the two rows reads B^-1 out of a slack');
+    /* Farkas: an empty region certified rather than asserted */
+    const empty = { max: true, names: ['x', 'y'], obj: [ri(1), ri(1)],
+      cons: [{ a: [ri(1), ri(1)], rel: 'le', b: ri(1), name: 'first' },
+             { a: [ri(1), ri(1)], rel: 'ge', b: ri(4), name: 'second' }] };
+    const e = lpSolve(empty);
+    eq(e.status, 'infeasible', 'x + y <= 1 with x + y >= 4 has no solution');
+    eq(e.certificate.y.map(Rtext).join(','), '-1,1', 'and the Farkas multipliers are (-1, 1)');
+    eq(e.certificate.ok, true, "y'A <= 0 and y'b > 0, verified row by row rather than claimed");
+    eq(Rtext(e.certificate.checks.b.value), '3', "y'b = 3 > 0");
+  }
+
+  /* --- the two conventions a kit is most likely to get wrong -------------- */
+  {
+    /* A MINIMISATION is negated on the way in. Reading tab.z[n] and printing it
+       is the sign error the maximised/zOrig convention exists to prevent. */
+    const m = { max: false, names: ['x', 'y'], obj: [ri(2), ri(3)],
+      cons: [{ a: [ri(1), ri(1)], rel: 'ge', b: ri(4), name: 'need' },
+             { a: [ri(1), ri(0)], rel: 'le', b: ri(3), name: 'cap' }] };
+    const s = lpSolve(m, { rule: 'bland' });
+    eq(s.status, 'optimal', 'a minimisation with a >= row solves through Phase I');
+    eq(Rtext(s.zOrig), '9', 'and its minimum is 9');
+    eq(s.x.map(Rtext).join(','), '3,1', 'at (3, 1)');
+    eq(Rsign(s.z) < 0, true, 'while the INTERNAL value is negative, because the solver always maximises');
+    eq(Requ(zOriginal(s.std, s.z), s.zOrig), true, 'and zOriginal is what turns one into the other');
+    /* A FREE variable is carried as the difference of two columns, so it can go
+       negative -- which is what makes the dual of an equality row solvable. */
+    const free = { max: true, names: ['u', 'v'], obj: [ri(0), ri(1)], free: [0],
+      cons: [{ a: [ri(1), ri(1)], rel: 'eq', b: ri(2), name: 'sum' },
+             { a: [ri(0), ri(1)], rel: 'le', b: ri(5), name: 'cap' }] };
+    const fs = lpSolve(free, { rule: 'bland' });
+    eq(fs.x.map(Rtext).join(','), '-3,5', 'u goes NEGATIVE, which a >= 0 column could not do');
+    eq(Requ(Radd(fs.x[0], fs.x[1]), ri(2)), true, 'and the equality still holds at the point reported');
+    eq(stdForm(free).kinds.slice(0, 3).join(','), 'decision,decision,decision',
+       'because u became the two columns u+ and u-');
+  }
+
+  /* --- sensitivity: every answer a ratio test on the final tableau -------- */
+  {
+    const p = { max: true, names: ['x1', 'x2'], obj: [ri(3), ri(5)],
+      cons: [{ a: [ri(1), ri(0)], rel: 'le', b: ri(4), name: 'A' },
+             { a: [ri(0), ri(2)], rel: 'le', b: ri(12), name: 'B' },
+             { a: [ri(3), ri(2)], rel: 'le', b: ri(18), name: 'C' }] };
+    const s = lpSolve(p);
+    const r1 = rhsRange(s.tab, 1), r2 = rhsRange(s.tab, 2);
+    eq(Rtext(r1.lo) + '..' + Rtext(r1.hi), '6..18', 'row B holds its basis for b in [6, 18]');
+    eq(Rtext(r2.lo) + '..' + Rtext(r2.hi), '12..24', 'and row C for b in [12, 24]');
+    const c0 = costRange(s.tab, 0), c1 = costRange(s.tab, 1);
+    eq(c0.basic && c1.basic, true, 'both decision variables are basic here');
+    eq(Rtext(c0.lo) + '..' + Rtext(c0.hi), '0..15/2', 'c_1 may range over [0, 15/2]');
+    eq(c1.hi, null, 'and c_2 has NO upper limit -- a one-sided interval is a real answer');
+    eq(Rtext(c1.lo), '2', 'with 2 underneath');
+    /* a nonbasic cost is a different formula, which is the misconception */
+    const nb = { max: true, names: ['x', 'y'], obj: [ri(1), ri(5)],
+      cons: [{ a: [ri(1), ri(1)], rel: 'le', b: ri(4), name: 'r' }] };
+    const ns = lpSolve(nb);
+    eq(costRange(ns.tab, 0).basic, false, 'x is nonbasic at the optimum');
+    eq(Rtext(costRange(ns.tab, 0).hi), '5', 'so its cost may rise only to 5, where it ties');
+    eq(costRange(ns.tab, 0).lo, null, 'and may fall forever');
+    /* the whole piecewise-linear z*(b), checked against fresh solves */
+    const curve = rhsCurve(p, 2, ri(0), ri(40));
+    eq(curve.pieces.length, 3, 'z*(b_C) has three linear pieces on [0, 40]');
+    eq(curve.breakpoints.map(Rtext).join(','), '12,24', 'breaking at 12 and 24');
+    eq(curve.pieces.map((q) => Rtext(q.slope)).join(','), '5/2,1,0', 'with slopes 5/2, 1 and 0');
+    for (const piece of curve.pieces) {
+      for (const at of [piece.from, piece.to, Rdiv(Radd(piece.from, piece.to), ri(2))]) {
+        const again = lpSolve({ max: true, names: p.names, obj: p.obj,
+          cons: p.cons.map((k, q) => (q === 2 ? { a: k.a, rel: k.rel, b: at, name: k.name } : k)) });
+        eq(Requ(again.zOrig, Radd(piece.z, Rmul(piece.slope, Rsub(at, piece.from)))), true,
+           'the curve at b = ' + Rtext(at) + ' is what a fresh solve there gives');
+      }
+    }
+    /* the efficient frontier of two objectives, and its exact breakpoint */
+    const front = paramFront(p, [ri(3), ri(5)], [ri(5), ri(3)]);
+    eq(front.corners.length, 2, 'two supported efficient corners');
+    eq(Rtext(front.breakpoints[0]), '9/10', 'swapping at lambda = 9/10 exactly');
+    eq(front.corners.map((c) => '(' + Rtext(c.f1) + ',' + Rtext(c.f2) + ')').join(' '), '(36,28) (27,29)',
+       'at (36, 28) and (27, 29)');
+    /* THE SAME MACHINERY ON >=, = AND FLIPPED ROWS. All three go through Phase
+       I, so the column holding B^-1 is an ARTIFICIAL rather than a slack, and a
+       row whose right-hand side was negative was multiplied by -1 on the way in
+       -- a range quoted in those flipped units is a wrong answer that looks
+       right. Every endpoint below is checked against a fresh solve, and every
+       point just outside is checked to break the linear prediction. */
+    for (const [label, m] of [
+      ['a minimisation with two >= rows', { max: false, names: ['x', 'y'], obj: [ri(2), ri(3)],
+        cons: [{ a: [ri(1), ri(1)], rel: 'ge', b: ri(4), name: 'need' },
+               { a: [ri(1), ri(0)], rel: 'le', b: ri(3), name: 'cap' },
+               { a: [ri(0), ri(1)], rel: 'ge', b: ri(1), name: 'floor' }] }],
+      ['an equality row', { max: true, names: ['x', 'y'], obj: [ri(5), ri(4)],
+        cons: [{ a: [ri(6), ri(4)], rel: 'le', b: ri(24), name: 'A' },
+               { a: [ri(1), ri(2)], rel: 'le', b: ri(6), name: 'B' },
+               { a: [ri(1), ri(1)], rel: 'eq', b: ri(3), name: 'exact' }] }],
+      ['a row the solver had to flip', { max: true, names: ['x', 'y'], obj: [ri(1), ri(2)],
+        cons: [{ a: [ri(-1), ri(-1)], rel: 'le', b: ri(-2), name: 'flipped' },
+               { a: [ri(1), ri(1)], rel: 'le', b: ri(8), name: 'cap' }] }]]) {
+      const sol = lpSolve(m, { rule: 'bland', maxPivots: 300 });
+      eq(sol.status, 'optimal', label + ' solves');
+      const dual = dualVector(sol.tab), inv = basisInverse(sol.tab);
+      eq(Requ(dual.value, sol.zOrig), true, label + ': strong duality still holds');
+      eq(dual.ok, true, label + ': and the dual vector is feasible');
+      let matches = true;
+      for (let i = 0; i < sol.tab.m; i += 1) {
+        for (let j = 0; j < sol.tab.n; j += 1) if (!Requ(inv.BinvA[i][j], sol.tab.T[i][j])) matches = false;
+      }
+      eq(matches, true, label + ": B^-1 A rebuilt from the original matrix is still the tableau");
+      for (let i = 0; i < m.cons.length; i += 1) {
+        const range = rhsRange(sol.tab, i);
+        eq(Requ(range.b, m.cons[i].b), true, label + ', row ' + (i + 1) + ': the range is quoted against the READER\'s b');
+        const solveAt = (v) => lpSolve({ max: m.max, names: m.names, obj: m.obj,
+          cons: m.cons.map((k, q) => (q === i ? { a: k.a, rel: k.rel, b: v, name: k.name } : k)) },
+          { rule: 'bland', maxPivots: 300 });
+        for (const [end, step] of [[range.lo, rf(-1, 100)], [range.hi, rf(1, 100)]]) {
+          if (end === null) continue;
+          const predict = (b) => Radd(sol.zOrig, Rmul(range.y_i, Rsub(b, range.b)));
+          const again = solveAt(end);
+          eq(again.status === 'optimal' && Requ(again.zOrig, predict(end)), true,
+             label + ', row ' + (i + 1) + ': z at b = ' + Rtext(end) + ' is what the shadow price predicts');
+          const outside = Radd(end, step), past = solveAt(outside);
+          eq(past.status === 'optimal' && Requ(past.zOrig, predict(outside)), false,
+             label + ', row ' + (i + 1) + ': and the prediction BREAKS just past ' + Rtext(end) + ', so the endpoint is tight');
+        }
+      }
+    }
+
+    /* pricing a new activity, and adding a constraint after the fact */
+    const priced = priceColumn(s.tab, [ri(1), ri(1), ri(1)], ri(4));
+    eq(Rtext(priced.reduced), '3/2', 'a new product earning 4 and using one of each is worth 3/2 more than it costs');
+    eq(priced.enters, true, 'so it enters');
+    eq(Rtext(priced.after.z[priced.after.n]), '39', 'and one pivot takes z from 36 to 39');
+    const added = addRow(s.tab, { a: [ri(1), ri(1)], rel: 'le', b: ri(5) });
+    const fresh = lpSolve({ max: true, names: p.names, obj: p.obj,
+      cons: p.cons.concat([{ a: [ri(1), ri(1)], rel: 'le', b: ri(5), name: 'D' }]) });
+    eq(added.status, 'optimal', 'a constraint appended after the fact is restored by dual simplex');
+    eq(Requ(added.run.zOrig, fresh.zOrig), true, 'to exactly what a fresh solve gives');
+    eq(Rtext(added.run.zOrig), '25', 'which is 25');
+  }
+
+  /* --- networks ---------------------------------------------------------- */
+  {
+    const nodes = ['s', 'a', 'b', 't'];
+    const arcs = [{ from: 's', to: 'a' }, { from: 's', to: 'b' }, { from: 'a', to: 'b' },
+                  { from: 'a', to: 't' }, { from: 'b', to: 't' }];
+    eq(unimodularSweep(incidence(nodes, arcs), 4).unimodular, true,
+       'a node-arc incidence matrix is totally unimodular, checked determinant by determinant');
+    const odd = [[R1, R1, R0], [R1, R0, R1], [R0, R1, R1]];
+    eq(Rtext(submatrixDet(odd, [0, 1, 2], [0, 1, 2])), '-2', 'an odd cycle has a determinant of -2');
+    eq(unimodularSweep(odd, 3).bad.length, 1, 'so it is not unimodular, and the sweep names the submatrix');
+    const acts = [{ id: 'A', dur: ri(3), pred: [] }, { id: 'B', dur: ri(2), pred: ['A'] },
+                  { id: 'C', dur: ri(4), pred: ['A'] }, { id: 'D', dur: ri(2), pred: ['B', 'C'] },
+                  { id: 'E', dur: ri(1), pred: ['D'] }];
+    const cpm = cpmPasses(acts);
+    eq(Rtext(cpm.makespan), '10', 'the project takes 10');
+    eq(cpm.critical.join(''), 'ACDE', 'B is the only activity with slack');
+    eq(Rtext(cpm.slack[1]), '2', 'and it has two units of it');
+    eq(cpm.paths.length, 1, 'one critical path');
+    eq(cpmPasses(acts.map((a) => (a.id === 'C' ? { id: 'C', dur: ri(2), pred: ['A'] } : a))).paths.length, 2,
+       'shorten C and a SECOND path becomes critical -- the whole of C4 L7');
+    eq(topoOrder(['a', 'b', 'c'], [{ from: 'a', to: 'b' }, { from: 'b', to: 'c' }, { from: 'c', to: 'a' }]).cycle.length,
+       3, 'a cyclic project has no order, and the cycle is named');
+    const wnodes = ['s', 'a', 'b', 't'];
+    const warcs = [{ from: 's', to: 'a', cost: ri(4) }, { from: 's', to: 'b', cost: ri(2) },
+                   { from: 'b', to: 'a', cost: ri(1) }, { from: 'a', to: 't', cost: ri(3) },
+                   { from: 'b', to: 't', cost: ri(7) }];
+    const bf = bellmanRounds(wnodes, warcs, 's');
+    eq(bf.dist.map(Rtext).join(','), '0,3,2,6', 'Bellman-Ford labels, on rational arc costs');
+    eq(potentialCheck(wnodes, warcs, bf.dist, 's', 't').ok, true,
+       'and those labels are feasible potentials: pi_j - pi_i <= c_ij on every arc');
+    eq(potentialCheck(wnodes, warcs, bf.dist, 's', 't').tight.length, 3, 'three arcs are tight');
+    const neg = bellmanRounds(['x', 'y', 'z'],
+      [{ from: 'x', to: 'y', cost: ri(1) }, { from: 'y', to: 'z', cost: ri(-3) },
+       { from: 'z', to: 'x', cost: ri(1) }, { from: 'x', to: 'z', cost: ri(5) }], 'x');
+    eq(neg.negative, true, 'an n-th round improvement certifies a negative cycle');
+    eq(Rtext(neg.cycleCost), '-1', 'and the cycle it names really does sum to -1');
+    const cnodes = ['s', 'a', 'b', 't'];
+    const carcs = [{ from: 's', to: 'a', cap: ri(3) }, { from: 's', to: 'b', cap: ri(2) },
+                   { from: 'a', to: 'b', cap: ri(2) }, { from: 'a', to: 't', cap: ri(2) },
+                   { from: 'b', to: 't', cap: ri(3) }];
+    const flow = [ri(3), ri(2), ri(1), ri(2), ri(3)];
+    const cut = cutCapacity(cnodes, carcs, reachable(cnodes, residual(carcs, flow), 's').set);
+    eq(Rtext(cut.capacity), '5', 'max flow 5 equals the cut the residual network shades');
+    eq(Rcmp(cutCapacity(cnodes, carcs, ['s', 'a']).capacity, cut.capacity) >= 0, true,
+       'and ANY other cut is at least as big, which is what makes it a proof');
+    const match = bipartiteMatch(['1', '2', '3'], ['a', 'b', 'c'],
+      [['1', 'a'], ['1', 'b'], ['2', 'a'], ['2', 'b'], ['3', 'a'], ['3', 'b']]);
+    eq(match.size, 2, 'three workers competing for two jobs match only two');
+    eq(match.cover.size, match.size, "Koenig: the minimum cover is the maximum matching, COMPUTED -- not drawn");
+    eq(match.deficient.S.length > match.deficient.N.length, true, "Hall: |N(S)| < |S| on the deficient set");
+    eq(match.deficient.S.join('') + '/' + match.deficient.N.join(''), '123/ab', 'which is all three onto two');
+  }
+
+  /* --- transportation and assignment -------------------------------------- */
+  {
+    const C = [[10, 2, 20, 11], [12, 7, 9, 20], [4, 14, 16, 18]].map((r) => r.map(ri));
+    const S = [ri(15), ri(25), ri(10)], D = [ri(5), ri(15), ri(15), ri(15)];
+    /* the transportation LP, solved by the simplex, is the oracle MODI is held to */
+    const obj = [], names = [], cons = [];
+    for (let i = 0; i < 3; i += 1) for (let j = 0; j < 4; j += 1) { obj.push(C[i][j]); names.push('x' + i + j); }
+    for (let i = 0; i < 3; i += 1) {
+      const a = []; for (let p = 0; p < 3; p += 1) for (let q = 0; q < 4; q += 1) a.push(p === i ? R1 : R0);
+      cons.push({ a: a, rel: 'eq', b: S[i], name: 'supply ' + (i + 1) });
+    }
+    for (let j = 0; j < 4; j += 1) {
+      const a = []; for (let p = 0; p < 3; p += 1) for (let q = 0; q < 4; q += 1) a.push(q === j ? R1 : R0);
+      cons.push({ a: a, rel: 'eq', b: D[j], name: 'demand ' + (j + 1) });
+    }
+    const oracle = lpSolve({ max: false, names: names, obj: obj, cons: cons }, { rule: 'bland', maxPivots: 400 });
+    eq(Rtext(oracle.zOrig), '435', 'the transportation LP costs 435 -- solved through Phase I, with equality rows');
+    for (const start of [northwest(C, S, D), leastCost(C, S, D)]) {
+      eq(start.count, start.want, start.rule + ' leaves m + n - 1 = ' + start.want + ' basic cells');
+      let basis = start.basis.map((c) => ({ i: c.i, j: c.j, x: c.x }));
+      const x = start.x.map((r) => r.slice());
+      for (let guard = 0; guard < 30; guard += 1) {
+        const uv = uvPotentials(C, basis, 3, 4);
+        for (const c of basis) {
+          if (!Requ(Radd(uv.u[c.i], uv.v[c.j]), C[c.i][c.j])) { fails += 1; console.log('  FAIL u + v = c fails on a basic cell'); }
+        }
+        if (uv.optimal) break;
+        const cyc = stoneCycle(basis, uv.entering, 3, 4);
+        if (!cyc.found || cyc.cells.length % 2 !== 0) { fails += 1; console.log('  FAIL the stepping-stone cycle is not a cycle'); break; }
+        for (const c of cyc.cells) x[c.i][c.j] = c.sign > 0 ? Radd(x[c.i][c.j], cyc.theta) : Rsub(x[c.i][c.j], cyc.theta);
+        basis = basis.filter((c) => !(c.i === cyc.leaving.i && c.j === cyc.leaving.j))
+                     .concat([{ i: uv.entering.i, j: uv.entering.j }])
+                     .map((c) => ({ i: c.i, j: c.j, x: x[c.i][c.j] }));
+      }
+      let total = R0;
+      for (let i = 0; i < 3; i += 1) for (let j = 0; j < 4; j += 1) total = Radd(total, Rmul(C[i][j], x[i][j]));
+      eq(Rtext(total), '435', 'MODI from the ' + start.rule + ' start reaches the LP optimum');
+    }
+    eq(northwest([[4, 8], [6, 2]].map((r) => r.map(ri)), [ri(5), ri(5)], [ri(5), ri(5)]).epsilon.length, 1,
+       'a tie leaves a NAMED epsilon cell rather than a basis one cell short');
+    eq(balance([ri(10)], [ri(4)]).dummy, 'col', 'surplus supply gets a dummy destination');
+    eq(balance([ri(4)], [ri(10)]).dummy, 'row', 'and unmet demand a dummy source');
+    /* Hungarian against exhaustive assignment */
+    for (const cm of [[[9, 11, 14, 11, 7], [6, 15, 13, 13, 10], [12, 13, 6, 8, 8], [11, 9, 10, 12, 9], [7, 12, 14, 10, 14]],
+                      [[4, 2, 8], [4, 3, 7], [3, 1, 6]],
+                      [[10, 19, 8, 15], [10, 18, 7, 17], [13, 16, 9, 14], [12, 19, 8, 18]]]) {
+      const cost = cm.map((r) => r.map(ri)), n = cost.length;
+      const h = hungarian(cost);
+      let best = null;
+      const walk = (k, used, sum) => {
+        if (k === n) { if (best === null || Rcmp(sum, best) < 0) best = sum; return; }
+        for (let j = 0; j < n; j += 1) { if (used[j]) continue; used[j] = 1; walk(k + 1, used, Radd(sum, cost[k][j])); used[j] = 0; }
+      };
+      walk(0, {}, R0);
+      eq(h.complete, true, 'the Hungarian method assigns everybody at n = ' + n);
+      eq(Requ(h.value, best), true, 'and its value is the exhaustive optimum, ' + Rtext(best));
+      eq(new Set(h.assignment).size, n, 'the assignment is a permutation');
+      eq(h.steps.filter((s) => s.kind === 'cover').every((s) => s.size === s.matching.length), true,
+         'every cover it drew was the size of a matching, by Koenig');
+    }
+  }
+
+  /* --- integer programming ------------------------------------------------ */
+  {
+    const ip = { max: true, names: ['x1', 'x2'], obj: [ri(1), ri(1)],
+      cons: [{ a: [ri(2), ri(5)], rel: 'le', b: ri(16), name: 'A' },
+             { a: [ri(6), ri(5)], rel: 'le', b: ri(30), name: 'B' }] };
+    eq(Rtext(lpSolve(ip).zOrig), '53/10', 'the relaxation stops at 53/10, which no integer plan can do');
+    const lattice = latticePoints(ip, [[0n, 6n], [0n, 4n]]);
+    let bestInt = null;
+    for (const q of lattice.points) if (q.feasible && (bestInt === null || Rcmp(q.objective, bestInt) > 0)) bestInt = q.objective;
+    eq(Rtext(bestInt), '5', 'and the exhaustive integer optimum is 5');
+    for (const order of ['depthFirst', 'bestBound']) {
+      const tree = bbTree(ip, { order: order, maxNodes: 60 });
+      eq(tree.status, 'optimal', 'branch and bound under ' + order + ' finishes');
+      eq(Requ(tree.best, bestInt), true, 'at the same 5 the lattice found');
+      eq(tree.nodes.slice(1).every((n) => n.sol.from === 'dual simplex on the parent tableau'), true,
+         'and every child was re-solved from its parent tableau, not from scratch');
+    }
+    eq(bbTree(ip, { maxNodes: 2 }).refused, true, 'a node cap REFUSES rather than reporting an unproved optimum');
+    /* a Gomory cut must cut off the fractional point and keep every integer one */
+    const relaxed = lpSolve(ip);
+    let cutRow = -1;
+    for (let i = 0; i < relaxed.tab.m; i += 1) if (!Rint(relaxed.tab.T[i][relaxed.tab.n])) { cutRow = i; break; }
+    const cut = gomoryCut(relaxed.tab, cutRow);
+    let here = R0;
+    for (let j = 0; j < 2; j += 1) here = Radd(here, Rmul(cut.inOriginal.a[j], relaxed.x[j]));
+    eq(Rcmp(here, cut.inOriginal.b) < 0, true, 'the cut excludes the fractional optimum');
+    for (const q of lattice.points) {
+      if (!q.feasible) continue;
+      let v = R0;
+      for (let j = 0; j < 2; j += 1) v = Radd(v, Rmul(cut.inOriginal.a[j], q.x[j]));
+      if (Rcmp(v, cut.inOriginal.b) < 0) { fails += 1; console.log('  FAIL a Gomory cut removed a feasible integer point'); }
+    }
+    eq(Rzero(Rfrac(cut.fracB)), false, 'and it was derived from a row with a fractional right-hand side');
+    const items = [{ name: 'a', value: ri(60), weight: ri(10) }, { name: 'b', value: ri(100), weight: ri(20) },
+                   { name: 'c', value: ri(120), weight: ri(30) }];
+    const knap = knapsackExact(items, ri(50));
+    eq(Rtext(knap.relaxation), '240', 'the knapsack relaxation is 240');
+    eq(Rtext(knap.optimum), '220', 'the exact optimum is 220');
+    eq(Rtext(knap.greedy), '160', 'and greed gets 160 -- all three from one call, which is the lesson');
+    eq(knap.fractionalItem.name, 'c', 'with exactly one item split');
+    const d4 = [[0, 20, 42, 35], [20, 0, 30, 34], [42, 30, 0, 12], [35, 34, 12, 0]].map((r) => r.map(ri));
+    eq(tspExact(d4).count, 3, 'four cities have (n-1)!/2 = 3 DISTINCT tours, not 6');
+    eq(Rtext(tspExact(d4).best.cost), '97', 'the shortest is 97');
+    eq(Requ(tspBranch(d4).best, tspExact(d4).best.cost), true, 'and branch and bound agrees');
+    /* tspBranch's assignment bound is a SUBSET RECURSION in IP_JS; transport's
+       hungarian is Koenig covers and reductions in TRANS_JS. Two different
+       algorithms for one number, so their agreement is arithmetic and not a
+       shared implementation -- and `integer` does not have to carry TRANS_JS. */
+    for (const cm of [[[9, 11, 14, 11, 7], [6, 15, 13, 13, 10], [12, 13, 6, 8, 8], [11, 9, 10, 12, 9], [7, 12, 14, 10, 14]],
+                      [[4, 2, 8], [4, 3, 7], [3, 1, 6]],
+                      [[10, 19, 8, 15], [10, 18, 7, 17], [13, 16, 9, 14], [12, 19, 8, 18]]]) {
+      const cost = cm.map((r) => r.map(ri));
+      eq(Requ(assignMin(cost).value, hungarian(cost).value), true,
+         'the subset recursion and the Hungarian method agree at n = ' + cost.length);
+    }
+    const d6 = [[0, 3, 93, 13, 33, 9], [4, 0, 77, 42, 21, 16], [45, 17, 0, 36, 16, 28],
+                [39, 90, 80, 0, 56, 7], [28, 46, 88, 33, 0, 25], [3, 88, 18, 46, 92, 0]].map((r) => r.map(ri));
+    eq(tspExact(d6).count, 120, 'an ASYMMETRIC six-city instance has 5! = 120 tours, not 60');
+    eq(Requ(tspBranch(d6, { maxNodes: 300 }).best, tspExact(d6).best.cost), true,
+       'and the assignment bound with subtour cuts still finds the best of them');
+  }
+
+  /* --- scheduling ---------------------------------------------------------- */
+  {
+    const jobs = [{ id: 'A', p: ri(6), w: ri(1), d: ri(8) }, { id: 'B', p: ri(4), w: ri(2), d: ri(4) },
+                  { id: 'C', p: ri(5), w: ri(4), d: ri(12) }, { id: 'D', p: ri(3), w: ri(3), d: ri(6) },
+                  { id: 'E', p: ri(7), w: ri(1), d: ri(20) }];
+    const byKey = (f) => jobs.map((_, k) => k).sort((a, b) => Rcmp(f(jobs[a]), f(jobs[b])));
+    const spt = byKey((j) => j.p), wspt = byKey((j) => Rdiv(j.p, j.w)), edd = byKey((j) => j.d);
+    eq(bestSequence(jobs, 'sumC').count, 120, 'five jobs is 120 orders, all of them checked');
+    eq(Requ(seqObjectives(spt, jobs).sumC, bestSequence(jobs, 'sumC').value), true, 'SPT minimises sum C');
+    eq(Requ(seqObjectives(wspt, jobs).sumWC, bestSequence(jobs, 'sumWC').value), true, "and Smith's order minimises sum wC");
+    eq(Requ(seqObjectives(edd, jobs).Lmax, bestSequence(jobs, 'Lmax').value), true, 'and EDD minimises Lmax');
+    eq(Rcmp(seqObjectives(edd, jobs).sumT, bestSequence(jobs, 'sumT').value) > 0, true,
+       'but EDD LOSES on sum T to a sequence only exhaustive search finds');
+    eq(Rtext(seqObjectives(spt, jobs).makespan), '25', 'while the makespan is 25 whatever the order');
+    for (let i = 0; i < 4; i += 1) {
+      const sw = adjacentSwap([0, 1, 2, 3, 4], i, jobs);
+      eq(sw.checkC && sw.checkWC, true,
+         'swapping positions ' + (i + 1) + ' and ' + (i + 2) + ' moves the objectives by exactly p_b - p_a and w_a p_b - w_b p_a');
+    }
+    eq(mooreHodgson(jobs).sumU, Number(bestSequence(jobs, (o) => R(BigInt(o.sumU), 1n)).value.n),
+       'Moore-Hodgson attains the minimum number of late jobs');
+    const fs = [{ id: '1', p1: ri(5), p2: ri(2) }, { id: '2', p1: ri(1), p2: ri(6) },
+                { id: '3', p1: ri(9), p2: ri(7) }, { id: '4', p1: ri(3), p2: ri(8) },
+                { id: '5', p1: ri(10), p2: ri(4) }];
+    let bestFlow = null;
+    const permute = (used, acc) => {
+      if (acc.length === fs.length) { const v = flowshopMakespan(acc, fs).value; if (bestFlow === null || Rcmp(v, bestFlow) < 0) bestFlow = v; return; }
+      for (let k = 0; k < fs.length; k += 1) { if (used[k]) continue; used[k] = 1; acc.push(k); permute(used, acc); acc.pop(); used[k] = 0; }
+    };
+    permute({}, []);
+    eq(Requ(johnsonRule(fs).makespan.value, bestFlow), true, "Johnson's rule attains the minimum two-machine makespan");
+    const par = parallelAssign([7, 6, 5, 4, 4, 4, 4].map((p, k) => ({ id: 'j' + k, p: ri(p) })), 3, 'LPT');
+    eq(Rtext(par.makespan) + '/' + Rtext(par.optimum), '13/12', 'LPT gets 13 where the exhaustive optimum is 12');
+    eq(Rcmp(par.ratio, rf(4, 3)) <= 0, true, 'which is inside the 4/3 ratio it is proved to');
+    eq(Rtext(par.bounds.average) + ' and ' + Rtext(par.bounds.longest), '34/3 and 7',
+       'and both lower bounds the proof uses are reported, not just the heuristic');
+    const shop = jobShopAll([{ job: 'J1', machine: 'M1', dur: ri(3) }, { job: 'J1', machine: 'M2', dur: ri(2) },
+                             { job: 'J2', machine: 'M2', dur: ri(4) }, { job: 'J2', machine: 'M1', dur: ri(1) }]);
+    eq(shop.total, 4, 'two disjunctive pairs is four orientations');
+    eq(Rtext(shop.best.makespan), '6', 'the best of which finishes at 6');
+    eq(shop.cyclic, 1, 'and one of them DEADLOCKS, which is an answer and not an error');
+    const crashActs = [{ id: 'A', normal: ri(6), crash: ri(4), normalCost: ri(100), crashCost: ri(140), pred: [] },
+                       { id: 'B', normal: ri(4), crash: ri(2), normalCost: ri(80), crashCost: ri(120), pred: ['A'] },
+                       { id: 'C', normal: ri(5), crash: ri(3), normalCost: ri(60), crashCost: ri(90), pred: ['A'] },
+                       { id: 'D', normal: ri(3), crash: ri(2), normalCost: ri(50), crashCost: ri(80), pred: ['B', 'C'] }];
+    const crash = crashModel(crashActs, ri(14));
+    eq(Rtext(cpmPasses(crashActs.map((a) => ({ id: a.id, dur: a.normal, pred: a.pred }))).makespan), '14',
+       'CPM says the uncrashed project takes 14');
+    eq(Rzero(lpSolve(crash.model, { rule: 'bland', maxPivots: 400 }).zOrig), true, 'so at a 14-day deadline the crash bill is 0');
+    const tc = rhsCurve(crash.model, crash.deadlineRow, ri(9), ri(14), { rule: 'bland', maxPivots: 400 });
+    eq(tc.pieces.map((q) => Rtext(q.slope)).join(','), '-35,-30,-20,-15',
+       'and the exact time-cost curve is rhsCurve on the deadline row -- the same function, not a second one');
+    for (const piece of tc.pieces) {
+      const again = lpSolve(crashModel(crashActs, piece.from).model, { rule: 'bland', maxPivots: 400 });
+      eq(Requ(again.zOrig, piece.z), true, 'the curve at a deadline of ' + Rtext(piece.from) + ' is what a fresh solve gives');
+    }
+  }
+
+  /* --- dynamic programming ------------------------------------------------- */
+  {
+    const stages = [['A'], ['B', 'C'], ['D', 'E'], ['F']];
+    const arcs = [{ from: 'A', to: 'B', cost: ri(2) }, { from: 'A', to: 'C', cost: ri(4) },
+                  { from: 'B', to: 'D', cost: ri(7) }, { from: 'B', to: 'E', cost: ri(4) },
+                  { from: 'C', to: 'D', cost: ri(3) }, { from: 'C', to: 'E', cost: ri(2) },
+                  { from: 'D', to: 'F', cost: ri(1) }, { from: 'E', to: 'F', cost: ri(4) }];
+    const back = backwardStages(stages, arcs);
+    eq(Rtext(back.value), '8', 'the cheapest route costs 8');
+    eq(back.policy.map((p) => p.join('')).join('|'), 'ACDF', 'and here it is unique');
+    eq(back.ties.length, 1, 'but the TIE at B is kept rather than silently resolved');
+    const tied = backwardStages(stages, arcs.map((a) => (a.from === 'A' && a.to === 'B' ? { from: 'A', to: 'B', cost: R0 } : a)));
+    eq(tied.policy.length, 3, 'and when a tie is ON the optimal route, every optimal route comes back');
+    const demand = [ri(10), ri(62), ri(12), ri(130), ri(154), ri(129)];
+    const ww = wagnerWhitin(demand, ri(54), ri(2));
+    let bestPlan = null;
+    for (let mask = 0; mask < (1 << (demand.length - 1)); mask += 1) {
+      const orders = [0];
+      for (let k = 1; k < demand.length; k += 1) if (mask & (1 << (k - 1))) orders.push(k);
+      let cost = R0;
+      for (let a = 0; a < orders.length; a += 1) {
+        const from = orders[a], to = a + 1 < orders.length ? orders[a + 1] : demand.length;
+        cost = Radd(cost, ri(54));
+        for (let t = from; t < to; t += 1) cost = Radd(cost, Rmul(ri(2), Rmul(ri(t - from), demand[t])));
+      }
+      if (bestPlan === null || Rcmp(cost, bestPlan) < 0) bestPlan = cost;
+    }
+    eq(Requ(ww.cost, bestPlan), true, 'Wagner-Whitin is the exact optimum over all 32 order patterns');
+    eq(Rtext(ww.cost), '294', 'which is 294');
+    const heur = lotsizeHeuristics(demand, ri(54), ri(2));
+    eq(Rzero(heur.silverMeal.gap), true, 'Silver-Meal happens to find it here');
+    eq(Rtext(heur.leastUnitCost.gap), '306', 'and least-unit-cost is 306 worse -- two heuristics, two answers');
+    const s4 = secretaryExact(4);
+    eq(s4.probs.map((q) => Rtext(q.p)).join(','), '1/4,11/24,5/12,1/4', 'the secretary problem at n = 4, exactly');
+    eq(s4.best, 2, 'look at one, then take the next best');
+    eq(secretaryExact(100).best, 38, 'at n = 100 look at 37');
+    eq(Rfixed(secretaryExact(100).bestP, 6), '0.371043', 'and succeed 37.1043% of the time');
+    const offers = [[ri(10), rf(1, 3)], [ri(20), rf(1, 3)], [ri(30), rf(1, 3)]];
+    const stop = stopThresholds(offers, 3, ri(1));
+    eq(stop.rows.map((q) => Rtext(q.threshold)).join(','), '22,19,0', 'the stopping threshold falls as the deadline nears');
+    const tree = { root: { kind: 'decision', children: [
+        { label: 'build', node: { kind: 'chance', children: [
+          { p: rf(3, 10), node: { kind: 'leaf', value: ri(100) } },
+          { p: rf(7, 10), node: { kind: 'leaf', value: ri(-20) } }] } },
+        { label: 'wait', node: { kind: 'leaf', value: ri(0) } }] },
+      payoff: [[ri(100), ri(-20)], [ri(0), ri(0)]], prior: [rf(3, 10), rf(7, 10)] };
+    const folded = foldBack(tree);
+    eq(Rtext(folded.value), '16', 'the tree folds back to 16');
+    eq(folded.root.choiceLabel, 'build', 'so build');
+    eq(Rtext(folded.evpi), '14', 'and perfect information is worth 30 - 16 = 14');
+    eq(folded.evsi, null, 'EVSI comes back null without a likelihood rather than being invented');
+    const P = [[rf(1, 2), rf(1, 2)], [rf(1, 4), rf(3, 4)]];
+    const sdp = stochasticDp(['a', 'b'], ['hold', 'act'],
+      [[[rf(1, 2), rf(1, 2)], [rf(1, 4), rf(3, 4)]], [[rf(3, 4), rf(1, 4)], [rf(1, 2), rf(1, 2)]]],
+      [[ri(1), ri(3)], [ri(2), ri(1)]], 3);
+    eq(sdp.V[0].map(Rtext).join(','), '53/8,67/8', 'the three-period stochastic recursion, exactly');
+    eq(sdp.policy[0].map((a) => ['hold', 'act'][a]).join(','), 'act,hold',
+       'and the action it chooses in each state at the first stage');
+    const dv = discountedValue(P, [ri(1), ri(3)], rf(1, 2), 20);
+    eq(dv.v.map(Rtext).join(','), '22/7,38/7', 'the exact fixed point (I - gamma P)^-1 r');
+    eq(Rcmp(Rabs(dv.gap[0]), rf(1, 100000)) < 0, true, 'which twenty iterations reach to five places');
+    eq(String(dv.iterations[20][0].d).length > String(dv.iterations[3][0].d).length, true,
+       'and the denominators grow on the way, which is worth seeing');
+  }
+
+  /* --- Markov chains and the birth-death queue ----------------------------- */
+  {
+    const P = [[rf(1, 2), rf(1, 2)], [rf(1, 4), rf(3, 4)]];
+    eq(Rtext(chainPow(P, 2)[0][0]), '3/8', 'P^2 by repeated Mmul');
+    const five = [[rf(1, 5), rf(1, 5), rf(1, 5), rf(1, 5), rf(1, 5)],
+                  [rf(1, 20), rf(3, 20), rf(7, 20), rf(4, 20), rf(5, 20)],
+                  [rf(2, 20), rf(2, 20), rf(6, 20), rf(7, 20), rf(3, 20)],
+                  [rf(9, 20), rf(1, 20), rf(1, 20), rf(4, 20), rf(5, 20)],
+                  [rf(3, 20), rf(4, 20), rf(6, 20), rf(2, 20), rf(5, 20)]];
+    const p12 = chainPow(five, 12)[0][0];
+    eq(String(p12.n).length + '/' + String(p12.d).length, '15/16',
+       'P^12 on a five-state chain is 15 digits over 16 -- past what Number holds, which is why chainPow is exact');
+    eq(chainPeriod([[R0, R1, R0], [R0, R0, R1], [R1, R0, R0]], [0, 1, 2]).period, 3, 'a 3-cycle has period 3');
+    eq(chainPeriod(P, [0, 1]).period, 1, 'and a chain with a self-loop is aperiodic');
+    const leaky = chainClasses([[rf(1, 2), rf(1, 2), R0], [R0, R1, R0], [R0, R0, R1]]);
+    eq(leaky.classes.map((c) => (c.recurrent ? 'R' : 'T')).join(''), 'TRR', 'a state that can leave and not return is transient');
+    const ss = steadyState(P);
+    eq(ss.pi.map(Rtext).join(','), '1/3,2/3', 'pi P = pi with sum pi = 1');
+    eq(ss.dropped, 1, 'and the dropped equation is named rather than left implicit');
+    eq(ss.system.length, 2, 'and the system SHOWN has n rows, not n + 1: one balance equation really was replaced');
+    eq(Requ(steadyState(P, 0).pi[0], ss.pi[0]), true, 'dropping a different one gives the same pi');
+    eq(Rcmp(Rabs(Rsub(chainPow(P, 30)[0][0], ss.pi[0])), rf(1, 1000000)) < 0, true, 'and P^30 approaches it');
+    const ruin = [[R1, R0, R0, R0, R0], [rf(1, 2), R0, rf(1, 2), R0, R0],
+                  [R0, rf(1, 2), R0, rf(1, 2), R0], [R0, R0, rf(1, 2), R0, rf(1, 2)],
+                  [R0, R0, R0, R0, R1]];
+    const abs = absorbing(ruin, [0, 4]);
+    eq(abs.t.map(Rtext).join(','), '3,4,3', "the gambler's expected steps to ruin or riches from 1, 2, 3");
+    eq(Rtext(abs.B[1][1]), '1/2', 'and from 2 the two ends are equally likely');
+    eq(Requ(abs.partials[6][0][0], Radd(abs.partials[5][0][0], chainPow(abs.Q, 6)[0][0])), true,
+       'the partials really are I + Q + ... + Q^k, which is what N sums to');
+    const acts = [[[rf(1, 2), rf(1, 2)], [rf(1, 4), rf(3, 4)]], [[rf(3, 4), rf(1, 4)], [rf(1, 2), rf(1, 2)]]];
+    const rew = [[ri(1), ri(3)], [ri(2), ri(1)]];
+    const pol = policyIterate(acts, rew, rf(9, 10));
+    let bestValue = null, bestPolicy = null;
+    for (const a of [0, 1]) for (const b of [0, 1]) {
+      const v = policyEvaluate(acts, rew, [a, b], rf(9, 10)).v;
+      if (bestValue === null || (Rcmp(v[0], bestValue[0]) >= 0 && Rcmp(v[1], bestValue[1]) >= 0)) { bestValue = v; bestPolicy = [a, b]; }
+    }
+    eq(pol.policy.join(','), bestPolicy.join(','), 'policy iteration finds the best of all four policies');
+    eq(Requ(pol.v[0], bestValue[0]), true, 'with its exact value ' + Rtext(bestValue[0]));
+    /* THE KIT'S UNIFYING OBJECT: M/M/1 and M/M/s are one set of cut equations,
+       and sysdesign_core's closed forms are the check panel beside them. */
+    const lam = [], mu = [];
+    for (let n = 0; n < 60; n += 1) { lam.push(ri(3)); mu.push(ri(5)); }
+    const bd = birthDeath(lam, mu);
+    eq(Rcmp(Rabs(Rsub(bd.L, mm1(ri(3), ri(5)).L)), rf(1, 1000000)) < 0, true,
+       'the cut equations give the same L as sysdesign_core mm1 -- the two subjects CANNOT disagree');
+    eq(bd.stable, true, 'lam < mu, so it is stable');
+    eq(birthDeath([ri(5), ri(5), ri(5)], [ri(3), ri(3), ri(3)]).stable, false, 'and lam > mu is reported unstable');
+    const lam2 = [], mu2 = [];
+    for (let n = 0; n < 80; n += 1) { lam2.push(ri(2)); mu2.push(ri(Math.min(n + 1, 3))); }
+    const mms = birthDeath(lam2, mu2, { servers: 3 });
+    let waiting = R0;
+    for (let n = 3; n < mms.pi.length; n += 1) waiting = Radd(waiting, mms.pi[n]);
+    eq(Rcmp(Rabs(Rsub(waiting, erlangC(ri(2), ri(1), 3).pWait)), rf(1, 1000000)) < 0, true,
+       'and Erlang C falls out of the SAME pi as a reading, not as a second formula');
+    eq(Rcmp(Rabs(Rsub(mms.Lq, erlangC(ri(2), ri(1), 3).Lq)), rf(1, 1000000)) < 0, true, 'Lq with it');
+  }
+
+  /* --- simulation output, exactly ------------------------------------------ */
+  {
+    const xs = [2, 4, 4, 4, 5, 5, 7, 9].map(ri);
+    eq(Rtext(sampleMean(xs)), '5', 'the sample mean');
+    eq(Rtext(sampleVar(xs)), '32/7', 'and the sample variance, with n - 1 = 7 underneath');
+    const ys = xs.map((x) => Radd(Rmul(ri(2), x), ri(1)));
+    eq(Rtext(rhoSquared(xs, ys)), '1', 'a perfect line has rho^2 = 1 -- and rho^2 is the only one ever printed, because rho is a surd');
+    eq(Requ(sampleCov(xs, ys), Rmul(ri(2), sampleVar(xs))), true, 'Cov(X, 2X + 1) = 2 Var X');
+    const cov = chebyshevCover([9, 10, 11, 14, 6, 10].map(ri), ri(10), ri(2), ri(4));
+    eq(Rtext(cov.bound), '3/4', 'the Chebyshev bound at k = 2');
+    eq(cov.outside, 2, 'two replicates are two standard deviations out, counted by comparing SQUARES -- no root is taken');
+    eq(cov.holds, false, 'and 4 of 6 falls short of the bound, which the field reports rather than hides');
+    const cs = [1, 3, 2, 5, 4, 6, 8, 7].map(ri);
+    const ctl = controlB(xs, cs);
+    eq(Rtext(ctl.bStar), '31/42', 'the control-variate b* = Cov / Var C');
+    eq(Requ(ctl.varAt, Rmul(ctl.varRaw, Rsub(R1, ctl.rho2))), true, 'and Var at b* is exactly Var X (1 - rho^2)');
+    for (const d of [rf(1, 7), rf(-1, 3), ri(1), ri(-2)]) {
+      eq(Rcmp(controlVarAt(ctl.quadratic, Radd(ctl.bStar, d)), ctl.varAt) >= 0, true, 'b* minimises the quadratic');
+    }
+    const p = [[ri(0), rf(9, 10)], [ri(1), rf(9, 100)], [ri(2), rf(1, 100)]];
+    const q = [[ri(0), rf(1, 2)], [ri(1), rf(3, 10)], [ri(2), rf(1, 5)]];
+    const imp = importanceRun(p, q, (x) => Rcmp(x, ri(2)) >= 0);
+    eq(Rtext(imp.estimate), '1/100', 'both estimators are unbiased for the same 1/100');
+    eq(Rtext(imp.ratio), '99/4', 'and importance sampling cuts the variance by 99/4');
+    const refused = importanceRun(p, [[ri(0), rf(1, 2)], [ri(1), rf(1, 2)], [ri(2), R0]], (x) => Rcmp(x, ri(2)) >= 0);
+    eq(refused.refused && refused.estimate === null, true,
+       'q(x) = 0 where p(x) > 0 is REFUSED -- an estimator that skips the outcome is biased and no variance figure shows it');
+    const des = desRun([0, 1, 2, 9].map(ri), [4, 3, 1, 2].map(ri));
+    eq(des.events.map((e) => Rtext(e.t) + e.kind.charAt(0) + e.who).join(' '),
+       '0a0 1a1 2a2 4d0 7d1 8d2 9a3 11d3', 'the event calendar, in order');
+    eq(des.events[2].inSystem, 3, 'three in the system after the third arrival');
+    eq(Rtext(des.meanWait), '2', 'the mean wait is 2');
+    eq(Rtext(des.utilisation), '10/11', 'and the server was busy 10 of 11');
+    const run = [];
+    for (let k = 1; k <= 20; k += 1) run.push(ri(k));
+    const bm = batchMeans(run, 4, 4);
+    eq(bm.means.map(Rtext).join(','), '13/2,21/2,29/2,37/2', 'four batch means after a warm-up discard of four');
+    eq(Rtext(bm.grand) + ' vs ' + Rtext(bm.naive), '25/2 vs 21/2', 'and the discard changes the answer, which is the point');
+  }
+
+  /* --- inventory ------------------------------------------------------------ */
+  {
+    const e = eoq(ri(100), ri(1200), ri(6));
+    eq(e.Qsurd.k === 1n && Rtext(e.Qsurd.q) === '200', true, 'EOQ(100, 1200, 6) = 200, and this one is rational');
+    eq(Requ(eoqCostAt(ri(200), ri(100), ri(1200), ri(6)), ri(1200)), true, 'costing 1200 at it');
+    const irr = eoq(ri(50), ri(600), ri(5));
+    eq(Rtext(irr.Qsurd.q) + 'sqrt' + irr.Qsurd.k, '20sqrt30', 'EOQ(50, 600, 5) is 20 sqrt 30 and STAYS a surd');
+    eq(surdDec(irr.Qsurd, 4), '109.5445', 'printed as 109.5445 only where the page says it is rounded');
+    const merged = eoqDiscriminant(ri(100), ri(1200), ri(6), ri(1200));
+    eq(merged.atMinimum && merged.roots.kind === 'double', true,
+       'at T = C* the discriminant of hQ^2/2 - TQ + KD is exactly zero');
+    eq(Rtext(merged.roots.roots[0]), '200', 'and the double root IS the EOQ -- derived, not asserted');
+    eq(eoqDiscriminant(ri(100), ri(1200), ri(6), ri(1300)).roots.roots.map(Rtext).join(','), '400/3,300',
+       'above C* an interval of quantities is cheap enough');
+    eq(eoqDiscriminant(ri(100), ri(1200), ri(6), ri(1100)).feasible, false, 'and below it, none is');
+    eq(Rtext(eoqRatio(ri(2))) + ',' + Rtext(eoqRatio(rf(1, 2))), '5/4,5/4', 'twice the EOQ and half of it cost the same 25% more');
+    eq(Rtext(eoqRatio(rf(6, 5))), '61/60', 'while a 20% error costs 1/60 -- under 2%, which is why the EOQ is worth using badly');
+    const epq = epqCost(ri(100), ri(1200), ri(6), ri(2400), R0, R0);
+    eq(Rtext(epq.factor), '1/2', 'producing at twice demand halves the effective holding rate');
+    eq(Requ(epqCostAt(ri(400), R0, ri(100), ri(1200), ri(6), ri(2400), R0),
+            eoqCostAt(ri(400), ri(100), ri(1200), ri(3))), true, 'and at b = 0 the EPQ IS the EOQ with h scaled by f');
+    const back = epqCost(ri(100), ri(1200), ri(6), ri(2400), null, ri(6));
+    eq(Rtext(back.Qsurd.q) + '/' + Rtext(back.costSurd.q), '400/600', 'with backorders at pi = h, Q* = 400 and the cost is 600');
+    eq(Requ(epqCostAt(ri(400), ri(100), ri(100), ri(1200), ri(6), ri(2400), ri(6)), ri(600)), true,
+       'which is what the cost formula gives at that Q and b* = 100');
+    const demandPmf = [[0, rf(1, 10)], [1, rf(2, 10)], [2, rf(3, 10)], [3, rf(3, 10)], [4, rf(1, 10)]];
+    const nv = newsvendor(demandPmf, ri(7), ri(3));
+    eq(Rtext(nv.ratio), '7/10', 'the newsvendor critical ratio');
+    eq(nv.Q, 3, 'crossed first at Q = 3');
+    eq(nv.agrees, true, 'and that Q really is the cheapest on the whole tabulated curve');
+    const per = [[0, rf(1, 4)], [1, rf(1, 2)], [2, rf(1, 4)]];
+    const rp = reorderPoint(per, 2, 2);
+    eq(Rtext(rp.meanDemand), '2', 'two periods of mean-1 demand, by pmfConvolve');
+    eq(Rtext(rp.shortage), '3/8', 'and a reorder point of 2 still runs 3/8 of a unit short per cycle');
+    const bs = baseStock(per, 2, 1, rf(9, 10));
+    eq(bs.periods, 3, 'periodic review covers R + L = 3 periods, not one');
+    eq(bs.S, 5, 'so the 90% base-stock level is 5');
+    const bands = [{ from: ri(0), price: ri(10), h: rf(2, 1) },
+                   { from: ri(500), price: ri(9), h: rf(18, 10) },
+                   { from: ri(1000), price: ri(8), h: rf(16, 10) }];
+    const disc = discountCandidates(bands, ri(40), ri(1200), ri(2));
+    eq(disc.candidates.map((c) => c.at).join(' | '), 'the EOQ | the band edge | the band edge',
+       'one candidate per band: its EOQ when that falls inside, the band edge when it does not');
+    eq(Rtext(disc.candidates[0].cost.r) + ' + ' + Rtext(disc.candidates[0].cost.s.q) + 'sqrt' + disc.candidates[0].cost.s.k,
+       '12000 + 80sqrt30', 'the first band costs an exact surd');
+    eq(disc.best, 2, 'and the cheapest plan buys into the deepest discount, compared without rounding');
+    eq(surdValueCmp(surdValue(ri(0), Rsurd(ri(2))), surdValue(ri(0), Rsurd(ri(3)))), -1, 'sqrt 2 < sqrt 3, exactly');
+    eq(surdValueCmp(surdValue(ri(0), { q: ri(3), k: 2n }), surdValue(ri(0), { q: ri(2), k: 5n })), -1, '3 sqrt 2 < 2 sqrt 5');
+    eq(surdValueCmp(surdValue(ri(0), { q: ri(3), k: 2n }), surdValue(ri(0), { q: ri(1), k: 17n })), 1, '3 sqrt 2 > sqrt 17');
+    eq(surdValueCmp(surdValue(ri(1), Rsurd(ri(2))), surdValue(ri(1), Rsurd(ri(2)))), 0, 'and equal values compare equal');
+  }
+}
+
+
+// ------------------------------------------------------------- algo_core
+console.log('algorithms: counts, exact expectations, and the oracles they agree with');
+{
+  /* The Algorithms path's shared engine. Two things this section is for.
+     First, the arithmetic: exact expectations, exact probabilities, exact
+     determinants and the four quantities that are NOT exact. Second, and more
+     valuable, the ORACLE AGREEMENTS: four routines here answer a question
+     graph.py already answers by brute force, and where two implementations
+     written from different definitions agree, both are evidence. */
+  eval(algoCoreBlock('COUNT_JS'));
+  eval(algoCoreBlock('RFIXED_JS'));
+  eval(algoCoreBlock('SERIES_JS'));
+  eval(algoCoreBlock('SEEDED_JS'));
+  eval(algoCoreBlock('TREEDRAW_JS'));
+  eval(algoCoreBlock('DIGRAPH_JS'));
+  eval(algoCoreBlock('ORACLE_JS'));
+  eval(algoCoreBlock('SEQ_JS'));
+  eval(algoCoreBlock('HEAP_JS'));
+  eval(algoCoreBlock('HASH_JS'));
+  eval(algoCoreBlock('TREE_JS'));
+  eval(algoCoreBlock('SORT_JS'));
+  eval(algoCoreBlock('GRAPHKIT_JS'));
+  eval(algoCoreBlock('FLOW_JS'));
+  eval(algoCoreBlock('GREEDY_JS'));
+  eval(algoCoreBlock('DP_JS'));
+  eval(algoCoreBlock('STRINGS_JS'));
+  eval(algoCoreBlock('GEOM_JS'));
+  eval(algoCoreBlock('RANDOM_JS'));
+  eval(algoCoreBlock('REDUCTION_JS'));
+  eval(algoCoreBlock('COPING_JS'));
+  eval(graphBlock('GRAPH_JS'));
+  const loadPreset = (preset, n) => { LESSON = null; useLessonWeights = false; N = n; A = PRESETS[preset](n); };
+  const loadLesson = (n, list) => { LESSON = lessonFrom(list); useLessonWeights = true; N = n; A = PRESETS.lesson(n); };
+  const pair = (u, v) => Math.min(u, v) + '-' + Math.max(u, v);
+  const inf = (d) => (d === null ? Infinity : d);
+
+  /* --- the seeded stream, and the defect it exists to avoid -------------- */
+  {
+    const bins = [0, 0, 0, 0];
+    lcgStream(1103515245, 12345, 2147483648, 7, 1200).forEach((x) => { bins[x % 4] += 1; });
+    eq(bins.join(','), '300,300,300,300',
+       'the glibc modulus is a power of two, so 1200 draws mod 4 come out PERFECTLY level');
+    const mine = [0, 0, 0, 0];
+    algoStream(7, 1200).forEach((x) => { mine[x % 4] += 1; });
+    eq(mine.join(',') === '300,300,300,300', false, 'MINSTD, whose modulus 2^31 - 1 is prime, does not');
+    const raw = [1, 2, 3, 4, 5, 6].map((s) => lcgStream(16807, 0, 2147483647, s, 1)[0]);
+    eq(raw.join(','), '16807,33614,50421,67228,84035,100842',
+       'and an unmixed seed is affine in the seed: six seeds, one straight line');
+    const mixed = [1, 2, 3, 4, 5, 6].map((s) => algoStream(s, 1)[0]);
+    eq(new Set(mixed.slice(1).map((v, i) => v - mixed[i])).size, 5,
+       'splitmix64 before the state breaks that: five different gaps');
+    eq(algoStream(3, 5).join(','), algoStream(3, 5).join(','), 'and the stream is still reproducible');
+  }
+
+  /* --- ORACLE AGREEMENT: the new graph code against graph.py's brute force */
+  const LIST = [[1,2,4],[1,3,3],[2,3,2],[2,4,5],[3,4,7],[4,5,1],[5,6,6],[5,7,8],[6,7,2]];
+  loadLesson(7, LIST);
+  const G7 = dgFromLesson(7, LIST, false);
+  eq(G7.arcs.length + ',' + edges().length, '9,9', 'both representations hold the same nine edges');
+  eq(G7.arcs.map((a) => a.w).join(','), edges().map((e) => e[2]).join(','), 'at the same weights');
+  eq(kruskalRun(G7).result.weight, kruskal().total,
+     'kruskalRun agrees with GRAPH_JS.kruskal on the minimum spanning tree');
+  eq(primRun(G7, 0).result.weight, kruskal().total, 'and so does Prim, from the cut property instead');
+  for (const s of [0, 3, 6]) {
+    eq(relaxRun(G7, s, 'heap').result.dist.map(inf).join(','), dijkstra(s).dist.join(','),
+       'relaxRun agrees with GRAPH_JS.dijkstra from vertex ' + (s + 1));
+    eq(relaxRun(G7, s, 'insertion').result.dist.map(inf).join(','), dijkstra(s).dist.join(','),
+       'and relaxing in arc order reaches the same distances from ' + (s + 1));
+  }
+  eq(relaxRun(G7, 0, 'heap').counts.relaxations === relaxRun(G7, 0, 'insertion').counts.relaxations, false,
+     'the schedule changes the WORK and not the answer');
+  for (const [preset, n] of [['cycle', 6], ['tree', 7], ['path', 6], ['petersen', 6], ['complete', 5], ['star', 6]]) {
+    loadPreset(preset, n);
+    const Gp = dgFromMatrix(A, n, weight, false), mine = lowLink(Gp), theirs = cuts();
+    eq(mine.result.bridges.map((b) => pair(b.u, b.v)).sort().join(' '),
+       theirs.bridges.map((b) => pair(b.edge[0], b.edge[1])).sort().join(' '),
+       'lowLink agrees with delete-and-recount on the bridges of ' + preset);
+    eq(mine.result.cutVertices.join(','), theirs.cutVertices.join(','),
+       'and on its cut vertices');
+    eq(kruskalRun(Gp).result.weight, kruskal().total, 'and the MST weight agrees on ' + preset);
+    eq(hamiltonBrute(Gp).result.circuit !== null, hamilton().circuit !== null,
+       'hamiltonBrute agrees with GRAPH_JS.hamilton about a circuit on ' + preset);
+    eq(cliqueBrute(Gp).result.size, cliqueNumber().size,
+       'and cliqueBrute agrees with GRAPH_JS.cliqueNumber on ' + preset);
+  }
+  loadPreset('petersen', 6);
+  {
+    const Gp = dgFromMatrix(A, 6, weight, false), comp = complementGraph(Gp);
+    const id = checkComplementIdentity(Gp);
+    N = 6; A = dgToMatrix(comp);
+    eq(cliqueBrute(comp).result.size, cliqueNumber().size,
+       'the complement, handed back to GRAPH_JS through dgToMatrix, has the clique number this code found');
+    eq(id.identityHolds, true, 'and |independent set| + |vertex cover| = V');
+    eq(id.cliqueMatches, true, 'an independent set being a clique in the complement');
+  }
+
+  /* --- what GRAPH_JS cannot express: direction, negative weights, capacity */
+  {
+    const D = dgFromLesson(6, [[1,2],[2,3],[3,1],[3,4],[4,5],[5,6],[4,6]], true);
+    const kinds = edgeKindCounts(classifyEdges(D, dfsTimes(D, [0]).result));
+    eq([kinds.tree, kinds.back, kinds.forward, kinds.cross].join(','), '5,1,1,0',
+       'the triangle contributes a back edge and 4 -> 6 a forward one');
+    eq(topoDfs(D).result.acyclic + ',' + (topoKahn(D).result.order === null), 'false,true',
+       'so neither topological order exists, and both say so');
+    eq(kosaraju(D).result.components.map((c) => '{' + c.map((v) => v + 1).join(' ') + '}').join(' '),
+       '{1 2 3} {4} {5} {6}', 'Kosaraju finds the one non-trivial strongly connected component');
+    eq(kosaraju(D).result.condensationAcyclic, true, 'and the condensation is acyclic');
+    const dag = dgFromLesson(6, [[1,2,3],[1,3,2],[2,4,4],[3,4,1],[4,5,2],[3,5,7],[5,6,1]], true);
+    eq(dagRelax(dag, 0, 1).result.dist.join(','), '0,3,2,3,5,6', 'one pass in topological order gives shortest paths');
+    eq(dagRelax(dag, 0, -1).result.dist.join(','), '0,3,2,7,9,10', 'and with the sign flipped, LONGEST paths');
+    eq(relaxRun(dag, 0, 'heap').result.dist.join(','), dagRelax(dag, 0, 1).result.dist.join(','),
+       'agreeing with Dijkstra on the same DAG');
+    const neg = dgFromLesson(5, [[1,2,6],[1,3,7],[2,3,8],[2,4,5],[2,5,-4],[3,4,-3],[3,5,9],[4,2,-2],[5,1,2],[5,4,7]], true);
+    eq(bellmanFordRounds(neg, 0).result.dist.join(','), '0,2,7,4,-2',
+       'Bellman-Ford under NEGATIVE weights, which GRAPH_JS cannot hold at all');
+    eq(floydSteps(dgWeightMatrix(neg)).result.dist[0].join(','), bellmanFordRounds(neg, 0).result.dist.join(','),
+       'and Floyd agrees with it row for row');
+    const cyc = dgFromLesson(4, [[1,2,1],[2,3,-3],[3,4,1],[4,2,1]], true);
+    eq(bellmanFordRounds(cyc, 0).result.negativeCycle.map((v) => v + 1).join(' -> '), '2 -> 3 -> 4 -> 2',
+       'a negative cycle comes back as the cycle itself, not as a boolean');
+    const tricky = dgFromLesson(4, [[1,2,6],[2,4,9],[3,2,2],[4,3,8]], true);
+    eq(floydSteps(dgWeightMatrix(tricky)).result.dist[0][2], 23,
+       'Floyd reaches 1 -> 3 at 23 through two interior vertices, which the k loop must be outermost to find');
+  }
+  {
+    const net = dgFromLesson(6, [[1,2,0,16],[1,3,0,13],[2,3,0,10],[3,2,0,4],[2,4,0,12],
+                                 [3,5,0,14],[4,3,0,9],[5,4,0,7],[4,6,0,20],[5,6,0,4]], true);
+    const mf = maxflow(net, 0, 5), cut = minCutFrom(net, mf.result.flow, 0);
+    eq(mf.result.value + ',' + mf.result.conserved, '23,true', 'the maximum flow is 23 and conserves at every interior vertex');
+    eq(cut.capacity + ',' + cut.allSaturated, '23,true', 'the minimum cut has the same capacity and every crossing arc saturated');
+    eq(cut.S.map((v) => v + 1).join(','), '1,2,3,5', 'with {1, 2, 3, 5} on the source side');
+    const trap = dgFromLesson(4, [[1,2,0,1],[1,3,0,1],[2,3,0,1],[2,4,0,1],[3,4,0,1]], true);
+    const first = augment(trap, zeroFlow(trap), residual(trap, zeroFlow(trap)), [0, 2, 4]);
+    eq(bfsPath(residual(trap, first.flow, { reverse: false }), 0, 3).path, null,
+       'push one unit down the middle and WITHOUT a backward arc there is no second path');
+    const back = bfsPath(residual(trap, first.flow), 0, 3);
+    eq(flowValue(trap, augment(trap, first.flow, residual(trap, first.flow), back.path).flow, 0), 2,
+       'and with one there is: the flow reaches 2 by undoing the middle arc');
+    const net2 = matchingNetwork(3, 3, [[0,0],[0,1],[1,0],[2,1],[2,2]]);
+    const m2 = maxflow(net2.graph, net2.s, net2.t);
+    eq(m2.result.value + ',' + konigCover(net2, m2.result.flow).size, '3,3',
+       "Konig: the matching and the cover read off the cut are the same size");
+  }
+
+  /* --- the exact expectations, and the four things that are not exact ----- */
+  eq(Rtext(quickExpected(3)), '8/3', 'E[quicksort comparisons] at n = 3 is 8/3 -- (1/3)(2) + (2/3)(3), by hand');
+  eq(Rtext(quickExpected(5)), '37/5', 'and 37/5 at n = 5, from an exact H_5');
+  eq(Requ(quickExpected(5), Rsub(Rmul(R(12n, 1n), harmonic(5, 1)), R(20n, 1n))), true,
+     'which is 2(n+1)H_n - 4n with harmonic() reused as it ships');
+  eq(Rtext(buildSumExact(7).total), '4', 'Floyd build: sum ceil(7/2^{h+1})h = 0 + 2 + 2 = 4');
+  eq(Rcmp(buildSumExact(7).total, R(7n, 1n)) < 0, true, 'which is under n -- the linear claim, evaluated');
+  eq(Rtext(chainRun([1,2,3,4,5,6,7,8,9,10], 5, 'division').result.expectedSuccessful), '9/5',
+     'expected probes in a chain: 1 + a/2 - a/2m = 9/5');
+  eq(Rtext(chainRun([1,2,3,4,5,6,7,8,9,10], 5, 'division').result.measuredMean), '3/2',
+     'beside the 3/2 the page measured by running all ten searches');
+  eq(Rtext(ballsExact(23, 365).expectedPairs) + ',' + ballsExact(23, 365).birthdayN, '253/365,23',
+     'balls in bins, exactly, and the birthday number by exact product');
+  eq(Rtext(bloomExact(8, 2, 2)), '2873025/16777216', 'the exact Bloom rate at m = 8, n = 2, k = 2');
+  eq(Number.isNaN(Rnum(bloomExact(1000, 100, 7))), true,
+     'at m = 1000 the exact rate overflows a double -- which is why Rfixed divides the BigInts');
+  eq(Rfixed(bloomExact(1000, 100, 7), 6), '0.008214', 'and prints 0.008214');
+  eq(bloomApprox(1000, 100, 7).toFixed(6), '0.008194',
+     'while the independent-hash idealisation says 0.008194 -- LABELLED, and the gap is the lesson');
+  eq(knuthProbeApprox(0.99), null, 'the clustering curve is refused above alpha = 0.98, not extrapolated');
+  eq(knuthProbeApprox(0.5).unsuccessful, 2.5, 'and reads 2.5 at alpha = 1/2 -- an approximation, and it says so');
+  near(randomBstDepthApprox(15), 5.4161, 1e-3, '2 ln n is 5.416 at n = 15');
+  eq(bstFromOrder([8,4,12,2,6,10,14,1,3,5,7,9,11,13,15]).result.height, 3,
+     'while the balanced tree on 15 keys has height 3: the ASYMPTOTE is not the tree');
+  eq(Rtext(countMinRun([1,1,1,2,2,3,4,4,4,4], 8, 3).result.delta), '1/8',
+     'count-min quotes the Markov guarantee 2^-d = 1/8, which this library proves');
+  eq(countMinRun([1,1,1,2,2,3,4,4,4,4], 8, 3).result.neverUnder, true, 'and it never underestimates');
+
+  /* --- counted algorithms, each against the baseline it claims to beat ---- */
+  {
+    const asc = [];
+    for (let i = 1; i <= 31; i += 1) asc.push(i);
+    eq(floydBuild(asc, true).counts.compares < insertBuild(asc, true).counts.compares, true,
+       'Floyd builds a heap in fewer comparisons than 31 insertions');
+    eq(floydBuild(asc, true).counts.swaps <= 31, true, 'and at most n swaps');
+    eq(heapsortRun([5,3,8,1,9,2]).result.sorted.join(','), '1,2,3,5,8,9', 'heapsort sorts');
+    const runs = [[1,4,9],[2,5,8],[3,6,7]];
+    eq(kwayMerge(runs).result.merged.join(','), pairwiseMerge(runs).result.merged.join(','),
+       'the k-way merge and the pairwise passes produce the same sequence');
+    eq(quickRun(asc, 'last').counts.compares, 465, 'a last-element pivot on sorted input is the quadratic worst case');
+    eq(quickRun(asc, 'median3').counts.compares < 465, true, 'and median-of-three is not');
+    eq(quickRun(asc, 'random', 3).result.sorted.join(',') === asc.join(','), true, 'a seeded pivot still sorts');
+    eq(radixRun([329,457,657,839,436,720,355], 10, true).result.sorted.join(','),
+       '329,355,436,457,657,720,839', 'LSD radix sorts when its pass is stable');
+    eq(radixRun([329,457,657,839,436,720,355], 10, false).result.correct, false, 'and does not when it is not');
+    eq(stableRun(stableRecords([2,2,1]), 'selection').result.stable, false, 'selection sort is not stable');
+    eq(stableRun(stableRecords([2,2,1]), 'insertion').result.stable, true, 'and insertion sort is');
+    eq(momRun([7,2,9,4,1,8,3,6,5,10,11,12], 5, 5).result.agrees, true,
+       'median of medians and quickselect find the same 5th smallest');
+    eq(Rtext(levelSums(R(1n, 5n), R(7n, 10n), 100, 6).geometric), '1000',
+       'and its recursion tree sums to 10n exactly, which is why it is linear');
+    eq(tournament([3,1,4,1,5,9,2,6]).counts.compares <= tournament([3,1,4,1,5,9,2,6]).result.bound, true,
+       'the tournament finds the second largest within n - 1 + ceil(log n) - 1 comparisons');
+    eq(twoStackRun([1,2,3].map((k) => ({ op: 'enqueue', key: k }))
+        .concat([{ op: 'dequeue' }, { op: 'dequeue' }, { op: 'dequeue' }])).result.order.join(','),
+       '1,2,3', 'two stacks make a queue');
+    eq(twoStackRun([1,2,3].map((k) => ({ op: 'enqueue', key: k }))
+        .concat([{ op: 'dequeue' }, { op: 'dequeue' }, { op: 'dequeue' }])).result.withinBound, true,
+       'inside the 3m the credit argument allows');
+    eq(unionFindRun([0,1,2,3,4,5,6].map((i) => ({ op: 'union', a: i, b: i + 1 }))
+        .concat([{ op: 'find', a: 0 }]), {}, 8).result.worstHops, 7,
+       'chained unions with no rank rule make a path of length 7');
+    eq(unionFindRun([0,1,2,3,4,5,6].map((i) => ({ op: 'union', a: i, b: i + 1 }))
+        .concat([{ op: 'find', a: 0 }]), { rank: true }, 8).result.rankBoundHolds, true,
+       'and a rank-r root has at least 2^r descendants');
+    eq(avlInsert([1,2,3,4,5,6,7]).result.height + ',' + avlInsert([1,2,3,4,5,6,7]).result.plainHeight, '2,6',
+       'AVL holds the height at 2 where the plain BST is a path of 6');
+    eq(minAvlNodes(4).n, 12, 'and N(4) = 12 is the fewest nodes an AVL tree of height 4 can hold');
+    const aug = bstFromOrder([9,4,13,2,6,11,15]).result.root;
+    eq(augmentWalk(aug, { op: 'select', i: 3 }).result.value + ','
+       + augmentWalk(aug, { op: 'rank', key: 13 }).result.value, '6,6',
+       'the order-statistic tree selects the 3rd key and ranks 13, by walking subtree sizes');
+    {
+      const keys = bstInorder(aug);
+      let bad = 0;
+      for (let lo = 0; lo <= 16; lo += 1) for (let hi = lo; hi <= 16; hi += 1) {
+        if (augmentWalk(aug, { op: 'range', lo: lo, hi: hi }).result.value
+            !== keys.filter((k) => k >= lo && k <= hi).length) bad += 1;
+      }
+      eq(bad, 0, 'and its range count agrees with a scan on all 153 intervals, while being two walks');
+    }
+    const t1 = treapInsert([5,2,8,1], [30,10,20,5]), t2 = treapInsert([1,8,2,5], [5,20,10,30]);
+    eq(t1.result.heapOrdered + ',' + (t1.result.height === t2.result.height), 'true,true',
+       'two insertion orders of the same (key, priority) set give the same treap');
+  }
+
+  /* --- greedy, DP and the optima they are checked against ---------------- */
+  {
+    const I = [{s:0,f:6},{s:1,f:4},{s:3,f:5},{s:3,f:8},{s:4,f:7},{s:5,f:9},{s:6,f:10},{s:8,f:11}];
+    eq(greedyTrace(I, 'earliestFinish').result.matchesOptimum, true,
+       'earliest finish time matches the brute-force optimum');
+    eq(greedyTrace(I, 'earliestFinish').result.rows.every((r) => r.ahead !== false), true,
+       'staying ahead at every step');
+    eq(greedyTrace([{s:0,f:5},{s:4,f:6},{s:5,f:10}], 'shortest').result.matchesOptimum, false,
+       'and the shortest-first rule does not, on the instance built to break it');
+    eq(partitionRooms(I, 'start').result.optimal, true, 'interval partitioning uses exactly the depth');
+    const F = [{symbol:'a',weight:45},{symbol:'b',weight:13},{symbol:'c',weight:12},
+               {symbol:'d',weight:16},{symbol:'e',weight:9},{symbol:'f',weight:5}];
+    const codes = huffmanBuild(F).result.codes, cost = codeCost(codes, F);
+    eq(Rtext(cost.expected) + ' = ' + Rfixed(cost.expected, 2), '56/25 = 2.24',
+       "Huffman on CLRS's example costs 56/25 bits per symbol, exactly");
+    const small = [{symbol:'a',weight:5},{symbol:'b',weight:2},{symbol:'c',weight:1},{symbol:'d',weight:1}];
+    const bestShape = allFullBinaryTrees(4)
+      .map((s) => shapeCost(s, small.map((x) => x.weight)))
+      .reduce((a, b) => (b < a ? b : a));
+    eq(String(codeCost(huffmanBuild(small).result.codes, small).bits), String(bestShape),
+       'and it attains the minimum over every full binary tree on four leaves');
+    const items = [{w:10,v:60},{w:20,v:100},{w:30,v:120}];
+    eq(Rtext(fractionalKnapsack(items, 50).result.value) + ',' + fractionalKnapsack(items, 50).result.integralValue,
+       '240,220', 'the fractional optimum is 240 and the 0/1 optimum 220');
+    eq(Rtext(fractionalKnapsack(items, 50).result.picks[2].take), '2/3', 'taking two thirds of the last item');
+    const uni = independenceEnumerate([0,1,2,3], (m) => m.length <= 2);
+    eq(exchangeTest(uni.result.family).isMatroid, true, 'the uniform family is a matroid');
+    eq(matroidGreedy(uni.result.family, [7,5,3,1], [0,1,2,3]).result.matches, true, 'so greedy is optimal on it');
+    eq(replayPolicy([1,2,3,1,4,1,2,5,1,2,3,4,5], 3, 'opt').hits
+       >= replayPolicy([1,2,3,1,4,1,2,5,1,2,3,4,5], 3, 'lru').hits, true,
+       'and greedy.caching is replayPolicy, reused: farthest-in-future beats LRU');
+    const its = [{w:1,v:1},{w:3,v:4},{w:4,v:5},{w:5,v:7}];
+    const ks = dpFill({ rows: its.length + 1, cols: 8,
+      cell: (i, j, get) => {
+        if (i === 0) return { v: 0, from: null };
+        const skip = get(i - 1, j);
+        if (its[i - 1].w > j) return { v: skip, from: [i - 1, j] };
+        const take = its[i - 1].v + get(i - 1, j - its[i - 1].w);
+        return take > skip ? { v: take, from: [i - 1, j - its[i - 1].w] } : { v: skip, from: [i - 1, j] };
+      } });
+    eq(ks.result.table[its.length][7], knapsackBrute(its, 7).result.value,
+       'the knapsack table agrees with brute force');
+    eq(ks.result.deps[2][5].length > 0, true, 'and every cell records the cells it actually read');
+    const dims = [30,35,15,5,10,20,25];
+    const mc = dpFill({ rows: 6, cols: 6, order: 'bylength',
+      cell: (i, j, get) => {
+        if (i === j) return { v: 0, from: null };
+        let best = null, at = null;
+        for (let k = i; k < j; k += 1) {
+          const v = get(i, k) + get(k + 1, j) + dims[i] * dims[k + 1] * dims[j + 1];
+          if (best === null || v < best) { best = v; at = [i, k]; }
+        }
+        return { v: best, from: at };
+      } });
+    eq(mc.result.table[0][5], 15125, "the matrix chain optimum is CLRS's 15125, filled by length");
+    eq(lisTails([1,5,6,2,3,4]).result.subsequence.join(','), '1,2,3,4',
+       'the LIS comes from predecessors, not from the tails array');
+    const tree = { 0: [1, 2], 1: [0, 3, 4], 2: [0], 3: [1], 4: [1] }, w = [3,4,2,1,5];
+    eq(treeDp(tree, w).result.value, misBrute(tree, w).result.value,
+       'the tree DP agrees with brute force on the weighted independent set');
+    eq(String(countWays([1,2,5], 5, 'combinations').result.count) + ','
+       + String(countWays([1,2,5], 5, 'permutations').result.count), '4,9',
+       'four combinations make 5 from {1, 2, 5} and nine ordered sequences do -- the loop order is the answer');
+    eq(gameLabels((p) => [p - 1, p - 2, p - 3].filter((q) => q >= 0), [0,1,2,3,4,5,6,7,8]).result.losing.join(','),
+       '0,4,8', 'the subtraction game {1, 2, 3} loses exactly at the multiples of 4');
+    const D4 = [[0,2,9,10],[1,0,6,4],[15,7,0,8],[6,3,12,0]];
+    eq(heldKarp(D4).result.length, tspBrute(D4).result.length, 'Held-Karp agrees with the brute-force tour');
+    eq(String(heldKarp(D4).result.heldKarpWork) + ' vs ' + String(heldKarp(D4).result.bruteWork), '256 vs 6',
+       'and prints n^2 2^n against (n - 1)! as exact integers');
+  }
+
+  /* --- strings, geometry, randomness ------------------------------------- */
+  {
+    const t = 'abababcabababcabc', p = 'ababc';
+    eq(naiveRun(t, p).result.hits.join(','), '2,9', 'naive matching finds two occurrences');
+    eq(kmpRun(t, p).result.hits.join(','), '2,9', 'KMP the same two');
+    eq(horspoolRun(t, p).result.hits.join(','), '2,9', 'Horspool the same two');
+    eq(rollingHash(t, p, 256, 101).result.hits.join(','), '2,9', 'and Rabin-Karp the same two');
+    eq(dfaRun(t, dfaTable(p, ['a','b','c']).table, 5).result.hits.join(','), '2,9',
+       'and the automaton, in exactly n steps');
+    eq(kmpRun(t, p).counts.compares <= 2 * t.length, true, 'KMP inside its 2n bound');
+    eq(failureFn('ababaca').result.fail.join(','), '-1,0,0,1,2,3,0,1', 'the failure function of ababaca');
+    eq(Rtext(expectedPerAlignment(26)), '26/25', 'expected characters per alignment over 26 letters');
+    eq(suffixArray('banana').result.suffixes.join(' '), 'a ana anana banana na nana', 'the suffix array of banana');
+    eq(kasai('banana', suffixArray('banana').result.sa).result.lcp.join(','), '0,1,3,0,0,2', 'and its LCP array');
+    eq(String(kasai('banana', suffixArray('banana').result.sa).result.distinctSubstrings), '15',
+       'so banana has 15 distinct substrings');
+    eq(ahoRun('ushers', ahoLinks(trieBuild(['he','she','his','hers']))).result.hits.length, 3,
+       'Aho-Corasick reports three matches in one pass');
+
+    eq(String(orient2([0,0],[134217729,134217728],[134217728,134217727])), '-1',
+       'the exact determinant calls these three a right turn');
+    eq(orient2Float([0,0],[134217729,134217728],[134217728,134217727]), 0,
+       'and a double calls them collinear -- a wrong SIGN, not a rounding, which is why this block is BigInt');
+    const pts = [[0,0],[1,3],[2,1],[3,4],[4,0],[5,2],[2,5],[6,3]];
+    const key = (h) => h.slice().sort((x, y) => x[0] - y[0] || x[1] - y[1]).map((q) => q.join(',')).join(' ');
+    eq(key(jarvis(pts).result.hull), key(monotoneChain(pts).result.hull),
+       "Jarvis's march and the monotone chain find the same hull");
+    eq(String(calipers(monotoneChain(pts).result.hull).result.d2), String(diameterBrute(pts).d2),
+       'rotating calipers finds the same squared diameter as every pair');
+    eq(String(shoelace2([[0,0],[4,0],[4,4],[0,4]])), '32', 'the doubled area of a 4x4 square is 32');
+    eq(rayParity([[0,0],[4,0],[2,4]], [2,0]).onBoundary + ',' + rayParity([[0,0],[4,0],[2,4]], [2,1]).inside,
+       'true,true', 'a ray through a vertex does not double count');
+    const P6 = [[0,0],[10,10],[1,1],[20,20],[2,3],[30,30]];
+    let brute = null;
+    for (let i = 0; i < P6.length; i += 1) for (let j = i + 1; j < P6.length; j += 1) {
+      const d = dist2(P6[i], P6[j]);
+      if (brute === null || d < brute) brute = d;
+    }
+    eq(String(closestPair(P6).result.d2), String(brute), 'divide and conquer finds the same closest pair as every pair');
+    eq(closestPair(P6).result.stripCompares <= closestPair(P6).result.bound, true,
+       'with the strip comparisons under 7n');
+
+    const pmf = [[0, R(1n,2n)], [1, R(1n,4n)], [4, R(1n,4n)]];
+    eq(Rtext(exactTail(pmf, 4)) + ' <= ' + Rtext(markovBound(pmf, 4).bound), '1/4 <= 5/16',
+       "the exact tail sits under Markov's bound, both exact");
+    eq(Rcmp(exactDeviation(pmf, 2), chebyshevBound(pmf, 2).bound) <= 0, true, 'and under Chebyshev too');
+    const fy = shuffleFrequencies(4, 'fisheryates'), nv = shuffleFrequencies(4, 'naive');
+    eq(fy.tapes + ',' + fy.distinct + ',' + fy.uniform, '24,24,true',
+       'Fisher-Yates: 24 tapes, 24 permutations, each exactly once');
+    eq(nv.tapes + ',' + nv.uniform, '256,false',
+       'the naive shuffle has 256 tapes and cannot be uniform -- 4^4 is not a multiple of 4!');
+    const C4 = dgFromLesson(4, [[1,2],[2,3],[3,4],[4,1]], false);
+    eq(Rtext(kargerExact(C4, [0,0,1,1]).probability), '1/6',
+       'Karger keeps a given minimum cut of C4 with probability exactly 1/6 -- a memoised recursion, not a sample');
+    eq(Requ(kargerExact(C4, [0,0,1,1]).probability, kargerExact(C4, [0,0,1,1]).bound), true,
+       'which is exactly the 2/(n(n-1)) bound: C4 is a tight instance');
+    eq(minCutBrute(C4).size, 2, 'and C4 does have a minimum cut of 2');
+    eq(strongTest(561, 2).witness + ',' + witnessCount(561).prime, 'true,false',
+       '561 is a Carmichael number: the Fermat test misses it and the strong test does not');
+    eq(Rcmp(witnessCount(561).fraction, R(3n, 4n)) >= 0, true, 'at least three quarters of its bases are witnesses');
+    eq(witnessCount(97).prime, true, 'and 97 has none at all');
+    eq(strongTest(2047, 2).witness, false, '2047 is a strong pseudoprime to base 2');
+    eq(witnessCount(2047, 4096).prime, false, 'but not to every base -- the cap is a parameter, raised here');
+    const F3 = { n: 4, clauses: [[1,2,3],[-1,2,4],[1,-3,-4],[-2,3,4]] };
+    eq(Rtext(max3satEnumerate(F3).mean) + ',' + max3satEnumerate(F3).matchesSevenEighths, '7/2,true',
+       'over all 16 assignments the mean satisfied count is exactly 7m/8');
+    eq(max3satEnumerate({ n: 3, clauses: [[1,1,2],[-1,2,3]] }).matchesSevenEighths, false,
+       'and a clause that repeats a variable breaks that identity');
+  }
+
+  /* --- reductions and the coping strategies ------------------------------ */
+  {
+    const F = { n: 3, clauses: [[1,2,-3],[-1,-2,3],[1,-2,3]] };
+    eq(selfReduce(F).result.verified, true, 'search from decision: n oracle calls build a satisfying assignment');
+    eq(checkIndependentSetReduction(F).agree, true, 'the 3-SAT to independent-set reduction agrees with brute-force SAT');
+    eq(checkIndependentSetReduction(F).readBackSatisfies, true, 'and the set reads back as an assignment that satisfies');
+    for (const [preset, n] of [['cycle', 5], ['path', 5], ['complete', 5]]) {
+      loadPreset(preset, n);
+      eq(checkTspReduction(dgFromMatrix(A, n, weight, false)).agree, true,
+         'the TSP instance from ' + preset + ' is within budget exactly when a Hamilton circuit exists');
+    }
+    const ss = satToSubsetSum({ n: 2, clauses: [[1,2],[-1,2]] });
+    eq(String(ss.target) + ',' + subsetSumDp(ss.rows.map((r) => r.value), ss.target).result.found, '1144,true',
+       'the subset-sum digit table has a subset hitting its target of 1s and 4s');
+    const tri = dgFromLesson(3, [[1,2],[2,3],[3,1]], false);
+    eq(colouringEnumerate(tri, 2).count + ',' + colouringEnumerate(tri, 3).count, '0,6',
+       'a triangle has no proper 2-colouring and exactly six 3-colourings');
+
+    const items = [{w:2,v:3},{w:3,v:4},{w:4,v:5},{w:5,v:6}];
+    eq(branchBound(items, 8, true).result.correct, true, 'branch and bound finds the optimum');
+    eq(branchBound(items, 8, true).counts.nodes < branchBound(items, 8, false).counts.nodes, true,
+       'and the fractional bound -- the greedy lesson`s own algorithm -- prunes the tree');
+    loadPreset('cycle', 6);
+    const C6 = dgFromMatrix(A, 6, weight, false);
+    eq(maximalMatching(C6).result.withinTwo, true, 'the matching cover is within twice the optimum');
+    eq(Rtext(maximalMatching(dgFromLesson(4, [[1,2],[3,4]], false)).result.ratio), '2',
+       'and on a perfect matching the ratio is exactly 2 -- the tight case');
+    const metric = [[0,2,3,4],[2,0,2,3],[3,2,0,2],[4,3,2,0]];
+    eq(mstTour(metric).result.metric + ',' + mstTour(metric).result.withinTwo, 'true,true',
+       'the doubled-MST tour is within twice the optimum on a metric instance');
+    eq(mstTour([[0,1,1,50],[1,0,1,1],[1,1,0,1],[50,1,1,0]]).result.metric, false,
+       'and the toggle that drops the triangle inequality says so');
+    const sets = [[1,2,3,4,5,6],[1,2,3,4],[5,6,7,8],[1,5],[2,6],[3,7],[4,8]];
+    const sc = greedySetCover(sets, [1,2,3,4,5,6,7,8]);
+    eq(sc.result.chargesSumToSize, true, 'the set-cover charges sum to exactly the number of sets chosen');
+    eq(Rtext(sc.result.Hn) + ',' + sc.result.withinBound, '761/280,true',
+       'and the cover is inside H_8 * OPT, with H_8 = 761/280 exactly');
+    eq(fptasScale(items, 8, R(1n, 2n)).result.withinPromise, true, 'the FPTAS loses no more than eps * OPT');
+    eq(fptasScale(items, 8, R(1n, 100n)).result.loss, 0, 'and at a small epsilon it finds the optimum');
+    const F5 = { n: 4, clauses: [[1,2,3],[-1,2,4],[1,-3,-4],[-2,3,4],[-1,-2,-3]] };
+    eq(Rtext(derandomise(F5).result.expectation) + ',' + derandomise(F5).result.atLeastExpectation, '35/8,true',
+       'conditional expectations reach at least the 35/8 the random assignment averages');
+    eq(fptVertexCover(C6, 3).result.correct + ',' + fptVertexCover(C6, 2).result.exists, 'true,false',
+       'FPT vertex cover agrees with brute force at k = 3 and reports none at k = 2');
+    eq(fptVertexCover(C6, 3).counts.nodes <= fptVertexCover(C6, 3).result.treeBound, true,
+       'inside a search tree of 2^(k+1) nodes however big the graph is');
+    eq(dpllRun(F5).result.agrees + ',' + dpllRun(F5).result.verified, 'true,true', 'DPLL agrees with brute-force SAT');
+    eq(dpllRun({ n: 3, clauses: [[1,2],[1,-2],[-1,3],[-1,-3]] }).result.satisfiable, false,
+       'and proves an unsatisfiable formula unsatisfiable');
+  }
+
+  /* --- the two drawings, asserted on the strings they return -------------- */
+  {
+    const sc = seriesScale([{ values: [0, 5, 10, 10] }], [1, 2, 3, 4], {});
+    eq(sc.y(10) + ',' + sc.y(0) + ',' + sc.x(0) + ',' + sc.x(3), '14,200,26,496',
+       'the series scale puts the maximum on the top of the box and zero on the baseline');
+    const svg = drawSeries(null, [
+      { label: 'measured', values: [1, 2, 3, 4], colour: 'var(--cyan)', points: true },
+      { label: 'n log n', values: [0, 2, 4.7, 8], colour: 'var(--amber)', dashed: true }], [1, 2, 3, 4], {});
+    eq(svg.indexOf('stroke-dasharray') !== -1, true, 'a predicted curve is dashed and a measured one is not');
+    eq((svg.match(/<circle /g) || []).length, 4, 'with the measured samples marked');
+    const Gd = dgNew(4, true);
+    dgAdd(Gd, 0, 1, -3); dgAdd(Gd, 1, 2, 5); dgAdd(Gd, 2, 0, 2); dgAdd(Gd, 1, 0, 7);
+    const gsvg = drawGraph(null, Gd, {});
+    eq((gsvg.match(/<polygon /g) || []).length, 4, 'every arc of a directed graph gets an arrowhead');
+    eq((gsvg.match(/ Q/g) || []).length, 2, 'and the antiparallel pair is bowed so neither hides the other');
+    eq(drawTree(null, bstFromOrder([9,4,13,2,6,11,15]).result.root, bstKids, (n) => n.key)
+       .match(/<circle /g).length, 7, 'the tree renderer draws every node');
+    eq(matrixHtml([[0, 1], [1, 0]], { caption: 'A' }).indexOf('<caption>A</caption>'), 0,
+       'and the matrix painter returns its own markup, with no element involved');
+  }
+
+  /* --- the caps refuse rather than freeze the tab ------------------------ */
+  {
+    const refuses = (f) => { try { f(); return false; } catch (e) { return /exceeds/.test(e.message); } };
+    eq(refuses(() => knapsackBrute(new Array(13).fill({ w: 1, v: 1 }), 4)), true, 'thirteen knapsack items are refused');
+    eq(refuses(() => allSpanningTrees(dgFromLesson(9, [[1,2]], false))), true, 'nine vertices of spanning trees are refused');
+    eq(refuses(() => allFullBinaryTrees(6)), true, 'six leaves of full binary trees are refused');
+    eq(refuses(() => witnessCount(3001)), true, 'and n = 3001 witnesses is refused -- not slow, refused');
+  }
 }
 
 if (fails) {
