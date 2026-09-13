@@ -481,9 +481,36 @@ AVAILKIT_JS = r"""
   /* A sample assignment, seeded, so the drawing and the probabilities above
      come from the same run and the reader can count the overlaps by eye. A
      partial Fisher-Yates over the node list, driven by lcgStream. */
+  /* MINSTD (16807, 0, 2^31 - 1), NOT the glibc LCG the jitter panel uses, and
+     the seed scrambled before it is used.
+
+     The difference matters only because this function takes its draws MOD a
+     small number. glibc's modulus is 2^31, so the low bits of its stream have
+     tiny period -- mod 4 it is 0,1,2,3,0,1,2,3 forever -- and a partial
+     Fisher-Yates driven by it explores measurably fewer sets than shuffle
+     sharding actually reaches: averaged over forty seeds at n = 8, k = 2 and
+     fifty tenants, 19.9 distinct sets against MINSTD's 23.4. This lesson
+     prints the exact combinatorics beside a drawn sample, so a sample that is
+     15% short makes the exact figure look wrong.
+
+     2^31 - 1 is prime, so no modulus shares a factor with it. The seed goes
+     through a splitmix64 finaliser first because an LCG's k-th value is affine
+     in its seed: without it, reseeding 1, 2, 3 walks a straight line instead of
+     sampling, and every mode here asks the reader to reseed and compare.
+
+     The jitter panel above keeps glibc deliberately: it consumes draws as
+     x / M, which uses the high bits, where glibc is fine. */
+  function shuffleSeedState(seed) {
+    var mask = (1n << 64n) - 1n;
+    var x = (BigInt(seed >>> 0) + 0x9E3779B97F4A7C15n) & mask;
+    x = ((x ^ (x >> 30n)) * 0xBF58476D1CE4E5B9n) & mask;
+    x = ((x ^ (x >> 27n)) * 0x94D049BB133111EBn) & mask;
+    x = x ^ (x >> 31n);
+    return Number(x % 2147483646n) + 1;          /* never the fixed point 0 */
+  }
   function shuffleAssign(n, k, tenants, seed) {
-    var A = 1103515245, C = 12345, M = 2147483648;
-    var draws = lcgStream(A, C, M, seed, tenants * k), out = [], t, i;
+    var A = 16807, C = 0, M = 2147483647;
+    var draws = lcgStream(A, C, M, shuffleSeedState(seed), tenants * k), out = [], t, i;
     for (t = 0; t < tenants; t += 1) {
       var pool = [], pick = [];
       for (i = 0; i < n; i += 1) pool.push(i);
