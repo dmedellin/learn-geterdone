@@ -211,6 +211,102 @@ AVAIL_JS = r"""
   function retrySuccess(p, r) { return Rsub(R(1n, 1n), Rpow(p, r + 1)); }
 """
 
+SLOTTED_JS = r"""
+  /* The discrete-time queue: Bernoulli arrivals (p per slot), geometric service
+     (q per slot), late arrival with departure first.
+
+     This exists because a slotted simulation is NOT M/M/1 at finite slot size,
+     and a lesson that checks the continuous formula against the simulation is
+     checking it against a different model. At p = 2/5, q = 1/2 the exact mean
+     here is 12/5, while rho/(1 - rho) at rho = p/q = 4/5 is 4 -- the continuous
+     formula overstates it by 5/3. The two agree only as the slot shrinks, and
+     the convergence panel is the lesson.
+
+     pi_1/pi_0 = p/(q(1-p)); pi_{n+1}/pi_n = p(1-q)/(q(1-p)) for n >= 1. */
+  function geoGeo1(p, q) {
+    var one = R(1n, 1n);
+    var ratio = Rdiv(Rmul(p, Rsub(one, q)), Rmul(q, Rsub(one, p)));
+    var first = Rdiv(p, Rmul(q, Rsub(one, p)));
+    if (Rcmp(ratio, one) >= 0) return { ratio: ratio, stable: false };
+    var tail = Rdiv(one, Rsub(one, ratio));
+    var p0 = Rinv(Radd(one, Rmul(first, tail)));
+    /* sum_{n>=1} n r^{n-1} = 1/(1-r)^2 */
+    var L = Rmul(p0, Rmul(first, Rmul(tail, tail)));
+    return { ratio: ratio, stable: true, p0: p0, L: L, rho: Rdiv(p, q) };
+  }
+"""
+
+TRACE_JS = r"""
+  /* Little's Law from a trace, which is how this library proves it: the area
+     under the number-in-system curve is both the integral of N and the sum of
+     the customers' times, so L = lambda*W is an identity about averages and
+     needs no model at all.
+
+     Arrivals and departures are integer slot indices, paired by index. */
+  function littleFromTrace(arrivals, departures) {
+    var n = arrivals.length, i, horizon = 0;
+    for (i = 0; i < n; i += 1) if (departures[i] > horizon) horizon = departures[i];
+    var area = 0, totalTime = 0;
+    for (i = 0; i < n; i += 1) {
+      var w = departures[i] - arrivals[i];
+      totalTime += w;          /* sum of times in system */
+      area += w;               /* which IS the area under N(t) */
+    }
+    var T = R(BigInt(horizon), 1n);
+    return {
+      horizon: horizon,
+      L: Rdiv(R(BigInt(area), 1n), T),
+      lambda: Rdiv(R(BigInt(n), 1n), T),
+      W: Rdiv(R(BigInt(totalTime), 1n), R(BigInt(n), 1n)),
+      area: area
+    };
+  }
+
+  /* N(t) as a step function, for drawing the curve the area is under. */
+  function occupancyTrace(arrivals, departures, horizon) {
+    var out = [], t, i;
+    for (t = 0; t < horizon; t += 1) {
+      var c = 0;
+      for (i = 0; i < arrivals.length; i += 1) {
+        if (arrivals[i] <= t && departures[i] > t) c += 1;
+      }
+      out.push(c);
+    }
+    return out;
+  }
+"""
+
+STREAM_JS = r"""
+  /* A seeded stream. number.py's lcgRun detects the cycle of a generator, which
+     is a different job; a lab that samples needs the values in order and needs
+     the same values every time the page is opened, or a reader cannot check
+     what they were told. */
+  function lcgStream(a, c, m, seed, count) {
+    /* BigInt, not Number. A typical multiplier times a typical state exceeds
+       2^53 on the SECOND step, and a double silently rounds it -- the stream
+       then looks reproducible, because it is reproducibly wrong. */
+    var A = BigInt(a), C = BigInt(c), M = BigInt(m);
+    var out = [], x = ((BigInt(seed) % M) + M) % M;
+    for (var i = 0; i < count; i += 1) { x = (A * x + C) % M; out.push(Number(x)); }
+    return out;
+  }
+  /* Uniform rationals in [0, 1) from that stream. */
+  function streamUniform(a, c, m, seed, count) {
+    return lcgStream(a, c, m, seed, count).map(function (x) {
+      return R(BigInt(x), BigInt(m));
+    });
+  }
+  /* Inverse-transform sampling from a pmf given as [value, rational] pairs. */
+  function sampleFromPmf(pairs, u) {
+    var cum = R(0n, 1n);
+    for (var i = 0; i < pairs.length; i += 1) {
+      cum = Radd(cum, pairs[i][1]);
+      if (Rcmp(u, cum) < 0) return pairs[i][0];
+    }
+    return pairs[pairs.length - 1][0];
+  }
+"""
+
 APPROX_JS = r"""
   /* The four places this subject cannot be exact. Each says how it rounds.
 
@@ -234,6 +330,18 @@ APPROX_JS = r"""
   }
   /* Standard error of a proportion. A square root, so it rounds. */
   function standardErrorApprox(p, n) { return Math.sqrt(p * (1 - p) / n); }
+  /* The Zipf normaliser past the point where its exact form is unreadable.
+     harmonic() stays exact and is what the lessons use; this is for the
+     lesson that asks what happens at a million keys. */
+  function harmonicApprox(n, s) {
+    if (s === 1) return Math.log(n) + 0.5772156649015329 + 1 / (2 * n);
+    var t = 0;
+    for (var k = 1; k <= n && k <= 100000; k += 1) t += 1 / Math.pow(k, s);
+    return t;
+  }
+  /* Bits per key for a target false-positive rate: 1.44 * log2(1/p). */
+  function bitsPerKeyApprox(target) { return Math.log2(1 / target) / Math.LN2 * Math.LN2 * 1.4426950408889634; }
 """
 
-__all__ = ["HARMONIC_JS", "PERCENTILE_JS", "PMF_JS", "QUEUE_JS", "AVAIL_JS", "APPROX_JS"]
+__all__ = ["HARMONIC_JS", "PERCENTILE_JS", "PMF_JS", "QUEUE_JS", "SLOTTED_JS",
+           "TRACE_JS", "STREAM_JS", "AVAIL_JS", "APPROX_JS"]

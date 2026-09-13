@@ -869,7 +869,8 @@ console.log('algorithm counts and the witness verdict (course 8 lab)');
 console.log('system design: exact capacity, queueing and availability');
 {
   eval(countingBlock('BIGINT_JS') + sysdBlock('HARMONIC_JS') + sysdBlock('PERCENTILE_JS')
-       + sysdBlock('PMF_JS') + sysdBlock('QUEUE_JS') + sysdBlock('AVAIL_JS')
+       + sysdBlock('PMF_JS') + sysdBlock('QUEUE_JS') + sysdBlock('SLOTTED_JS')
+       + sysdBlock('TRACE_JS') + sysdBlock('STREAM_JS') + sysdBlock('AVAIL_JS')
        + sysdBlock('APPROX_JS'));
 
   /* Zipf popularity: the cache hit rate is a ratio of harmonics, and it is the
@@ -939,6 +940,53 @@ console.log('system design: exact capacity, queueing and availability');
   eq(Rtext(retryAttempts(R(1n, 2n), 2)), '7/4', 'two retries at p = 1/2 cost 7/4 attempts');
   eq(Rtext(retrySuccess(R(1n, 2n), 2)), '7/8', 'and succeed 7/8 of the time');
   eq(Rtext(retryAttempts(R(9n, 10n), 3)), '3439/1000', 'at p = 0.9 the amplification approaches r + 1');
+
+  /* The slotted queue is NOT M/M/1, and this is the assertion that stops a
+     lesson claiming the continuous formula is "checked against the simulation".
+     At p = 2/5, q = 1/2 the exact slotted mean is 12/5; rho/(1 - rho) is 4. */
+  const slot = geoGeo1(R(2n, 5n), R(1n, 2n));
+  eq(Rtext(slot.ratio), '2/3', 'Geo/Geo/1 ratio p(1-q)/(q(1-p))');
+  eq(Rtext(slot.p0), '1/5', 'and its empty probability');
+  eq(Rtext(slot.L), '12/5', 'the EXACT slotted mean');
+  eq(Rtext(slot.rho), '4/5', 'at the same utilisation');
+  eq(Rtext(mm1(R(4n, 5n), R(1n, 1n)).L), '4', 'where the continuous formula says 4');
+  eq(Rcmp(slot.L, mm1(R(4n, 5n), R(1n, 1n)).L), -1,
+     'the slotted mean is strictly below M/M/1 -- the two agree only in the limit');
+  /* A second point with q != 1/2. At q = 1/2, (1 - q) = q and the ratio
+     p(1-q)/(q(1-p)) is indistinguishable from pq/(q(1-p)) -- so one point
+     cannot check the formula at all. */
+  const slot2 = geoGeo1(R(1n, 4n), R(1n, 3n));
+  eq(Rtext(slot2.ratio), '2/3', 'Geo/Geo/1 ratio at p = 1/4, q = 1/3');
+  eq(Rtext(slot2.p0) + ' ' + Rtext(slot2.L), '1/4 9/4', 'its empty probability and exact mean');
+  eq(Rtext(mm1(R(3n, 4n), R(1n, 1n)).L), '3', 'against 3 from the continuous formula');
+
+  /* Little's Law as an identity about a trace, which is how it is proved here.
+     Three customers, each in the system 2 slots, over a horizon of 6:
+     area 6, L = 1, lambda = 1/2, W = 2, and L = lambda*W exactly. */
+  const tr = littleFromTrace([0, 2, 4], [2, 4, 6]);
+  eq(Rtext(tr.L) + ' ' + Rtext(tr.lambda) + ' ' + Rtext(tr.W), '1 1/2 2', 'L, lambda, W from the trace');
+  eq(Rtext(tr.L), Rtext(Rmul(tr.lambda, tr.W)), 'L = lambda * W, exactly, with no model');
+  eq(occupancyTrace([0, 2, 4], [2, 4, 6], 6).join(''), '111111', 'N(t) is 1 throughout');
+  /* The same three customers, arriving together instead of spread out: the same
+     total time in system over a third of the horizon, so L triples and W does
+     not move. That is the identity doing work. */
+  const tr2 = littleFromTrace([0, 0, 0], [2, 2, 2]);
+  eq(Rtext(tr2.L) + ' ' + Rtext(tr2.W), '3 2', 'stacked arrivals triple L and leave W alone');
+  eq(Rtext(tr2.L), Rtext(Rmul(tr2.lambda, tr2.W)), 'and the identity still holds');
+
+  /* A seeded stream: same seed, same values, or a reader cannot check a lab. */
+  eq(lcgStream(1103515245, 12345, 2147483648, 1, 3).join(','),
+     '1103527590,377401575,662824084', 'the stream is these values, not merely repeatable');
+  eq(lcgStream(1103515245, 12345, 2147483648, 1, 3).join(','),
+     lcgStream(1103515245, 12345, 2147483648, 1, 3).join(','), 'and the same on a second call');
+  const fair = [[1, R(1n, 2n)], [2, R(1n, 2n)]];
+  eq(sampleFromPmf(fair, R(1n, 4n)), 1, 'inverse transform below the first mass');
+  eq(sampleFromPmf(fair, R(3n, 4n)), 2, 'and above it');
+  /* The boundary: u exactly at the cumulative mass. Half-open [lo, hi) is what
+     keeps the sampler's frequencies equal to the pmf, so u = 1/2 is the SECOND
+     value, and a <= here would bias every sampled distribution low. */
+  eq(sampleFromPmf(fair, R(1n, 2n)), 2, 'u exactly on the boundary falls to the second value');
+  eq(sampleFromPmf(fair, R(0n, 1n)), 1, 'and u = 0 to the first');
 
   /* The four places this subject rounds, and only these. */
   near(expNegApprox(1, 1e-15), Math.exp(-1), 1e-12, 'e^-1 by series');
