@@ -3322,6 +3322,80 @@ class TestEveryLabBuilds(unittest.TestCase):
                     "cannot redraw it and a broken control would go unnoticed" % key,
                 )
 
+    def _every_mode(self):
+        """(key, mode, lab) for every mode of every registered kit.
+
+        Iterating the REGISTRY rather than the lessons is deliberate: a kit is
+        written before its course is, so the modes that most need checking are
+        exactly the ones no lesson names yet. A kit that declares no MODES
+        tuple is skipped; a mode that refuses an incomplete cfg is behaving
+        correctly and is skipped too.
+        """
+        import importlib
+        for key in sorted(self.labs.REGISTRY):
+            module = importlib.import_module(self.labs.REGISTRY[key].__module__)
+            for mode in getattr(module, "MODES", ()) or ():
+                try:
+                    yield key, mode, self.labs.build(key, {"mode": mode})
+                except Exception:          # needs a preset or a view: correct
+                    continue
+
+    def test_lab_headings_carry_no_html(self):
+        """A lab's own headings are escaped, so an entity there ships as text.
+
+        render.py passes `lab.title` and `lab.subtitle` through `esc()` and
+        `lab.panel_title` through `esc_inline()`, which escapes first. Writing
+        `&minus;` in one of them therefore shows the reader the six characters
+        `&minus;` in the heading above the widget -- and because these fields
+        are nearly always arithmetic notation, it reads as a broken lab rather
+        than a broken page.
+
+        There is a sibling guard for the LESSON fields the renderer escapes.
+        There was none for the lab's own, which is why twelve of these shipped
+        across four kits before anyone looked at a rendered page.
+        """
+        import re
+        suspicious = re.compile(r"&[a-z]+;|&#\d+;|<[a-z/][^>]*>")
+        for key, mode, lab in self._every_mode():
+            for name, value in (("title", lab.title), ("subtitle", lab.subtitle),
+                                ("panel_title", lab.panel_title)):
+                with self.subTest(lab=key, mode=mode, field=name):
+                    hit = suspicious.search(value or "")
+                    self.assertIsNone(
+                        hit,
+                        "%s:%s %s contains %r, which this field shows literally "
+                        "because the renderer escapes it" % (key, mode, name,
+                                                             hit.group(0) if hit else ""),
+                    )
+
+    def test_no_lab_duplicates_an_element_id(self):
+        """Two elements with one id resolve differently here and in a browser.
+
+        `document.getElementById` returns the FIRST match in document order.
+        The shim in scripts/labcheck.js stores ids in a Map, so the LAST
+        registration wins. A duplicated id can therefore resolve to the right
+        element under labcheck and the wrong one for every reader, which is a
+        gap labcheck cannot close by getting better -- it is what this check is
+        for.
+
+        Both instances found this way were silent: a slider sharing its id with
+        the svg above it read `undefined` and computed NaN, and two KPI rows
+        sharing theirs with sliders had innerHTML written onto a range input
+        and never updated.
+        """
+        import re
+        pattern = re.compile(r'\bid="([A-Za-z0-9_\-]+)"')
+        for key, mode, lab in self._every_mode():
+            with self.subTest(lab=key, mode=mode):
+                ids = pattern.findall((lab.markup or "") + (lab.controls or ""))
+                dupes = sorted({i for i in ids if ids.count(i) > 1})
+                self.assertEqual(
+                    [], dupes,
+                    "%s:%s declares %s twice; a browser resolves getElementById "
+                    "to the first, labcheck's shim to the last"
+                    % (key, mode, ", ".join(dupes)),
+                )
+
     def test_no_lab_reaches_through_parent_element(self):
         """A lab must find an element by its own id, not by walking the tree.
 
