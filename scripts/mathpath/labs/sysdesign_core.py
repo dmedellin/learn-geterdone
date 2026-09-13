@@ -403,8 +403,14 @@ APPROX_JS = r"""
     for (var k = 1; k <= n && k <= 100000; k += 1) t += 1 / Math.pow(k, s);
     return t;
   }
-  /* Bits per key for a target false-positive rate: log2(1/p)/ln 2, which is the
-     familiar 1.44 * log2(1/p). At p = 0.01 this is 9.57. */
+  /* Bits per key for a target false-positive rate: log2(1/p)/ln 2.
+
+     NOT "the familiar 1.44 * log2(1/p)", and the difference is the point of
+     the lesson that uses this. 1.44 is a two-digit rounding of 1/ln 2 =
+     1.4427, so at p = 0.01 the textbook constant gives 9.567 and this gives
+     9.585. Both are printed on storage's `bloom` page, each under its own
+     name. This rounds -- it is a logarithm -- like the other Approx functions
+     around it. */
   function bitsPerKeyApprox(target) { return Math.log2(1 / target) / Math.LN2; }
   /* A root that rounds, by Newton from a rational start. Rsqrt returns null for
      a non-square, which is right for exactness and useless for a geometric-mean

@@ -24,10 +24,15 @@ from . import (
     induction,
     latency,
     logic,
+    measure,
     number,
     probability,
     queue,
+    replica,
+    scale,
     sets,
+    shard,
+    storage,
 )
 from .common import QUIZ_MARKUP, QUIZ_SCRIPT, Lab, cfg_literal
 
@@ -84,6 +89,11 @@ REGISTRY = {
     "cache": cache.cache_lab,
     "queue": queue.queue_lab,
     "avail": avail.avail_lab,
+    "replica": replica.replica_lab,
+    "shard": shard.shard_lab,
+    "storage": storage.storage_lab,
+    "scale": scale.scale_lab,
+    "measure": measure.measure_lab,
 }
 
 
