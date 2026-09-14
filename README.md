@@ -788,7 +788,7 @@ That map is declared in five places, and all five must agree:
   `release/contract.schema.json` requires every one of those ids by name — all
   142 of them — so a check cannot be quietly dropped;
 - `.github/workflows/ci.yml` → the "Published URL space is complete" step;
-- `Containerfile.release` and `.github/workflows/pages.yml` (publish-time guards).
+- `Containerfile.release` (the publish-time guard).
 
 A page added to one of them and not the others is a page nothing checks.
 
@@ -902,22 +902,13 @@ scripts/validate_release_contract.py  stdlib JSON Schema checker for the two abo
 scripts/smoke.py          standard-library acceptance smoke client
 tests/                    on-disk invariant suite (standard library, no install)
 .github/workflows/ci.yml       PR checks: HTML, self-containment, links, container
-.github/workflows/pages.yml    GitHub Pages publish (the live delivery path)
 .github/workflows/release.yml  protected-main build, publish, release metadata
 AGENTS.md                 working agreement — read before changing anything
 ```
 
-## Two delivery paths
+## How this is served
 
-**1. GitHub Pages — live.** `.github/workflows/pages.yml` uploads `site/` on every
-push to `main` and deploys it to `learn.geterdone.io` (`site/CNAME` holds the
-custom domain). Before uploading it re-checks self-containment, asserts that all
-359 pages exist, and parses all eight published JSON assets. This path does not
-touch platform-ops, the shared Caddy edge, or any registry reservation, and it
-is **not** a shortcut around those gates — they govern the Hetzner platform,
-which is a different path.
-
-**2. The Hetzner container platform — active.** The host serves this application
+**The Hetzner container platform, and nothing else.** The host serves this application
 through the already-onboarded `shared-private-edge` model: the image listens on
 plain HTTP port `8080`, the root-owned wrapper attaches it to the external
 `platform-private-edge` network at fixed private IPv4 `10.89.2.22`, and host Caddy
@@ -959,9 +950,14 @@ Platform onboarding is **built and active**, not pending:
   identity on the private and public paths, and the public site routes are probed
   during cutover, with rollback on failure.
 
-`pages.yml` is a **secondary, optional** delivery path and is not how production is
-served. It requires the repository to be public with Settings > Pages > Source set
-to "GitHub Actions"; while that is unset the workflow fails fast and changes nothing.
+There was once a second delivery path, `.github/workflows/pages.yml`, which
+published `site/` to GitHub Pages. It has been removed. It was never how
+production was served, this README described it in one place as "the live
+delivery path" and in another as "secondary, optional and not how production is
+served", and after the repository went public it ran on every push to `main` and
+failed every time, because Pages was never enabled in Settings. A check that is
+always red teaches you to stop reading checks, which is worse than not having
+the check.
 
 ## License
 
