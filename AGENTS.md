@@ -26,7 +26,7 @@ in, and it is visible in the source rather than hidden by omission.
 
 **Before wiring any of them**, read the two things that will otherwise cost you a
 day: section 1's note on what adding a Subject actually touches (it is about two
-dozen files, not the five the URL rule names), and `content_errors` in
+dozen files, not the four the URL rule names), and `content_errors` in
 `tests/test_review_remediation.py`, which builds its inventory *from*
 `GENERATED_PATHS` and compares with a symmetric difference — so joining that
 tuple makes every `.py` file in the package mandatory in the preservation
@@ -63,14 +63,19 @@ it separately rather than classifying pages by URL shape.
 an extra directory level in `site/` becomes an extra path segment in the public URL.
 
 The full 369-page map (plus eight published JSON assets) is in
-[README.md](README.md#url-layout), and it is enforced in five places that must
+[README.md](README.md#url-layout), and it is enforced in four places that must
 agree: `REQUIRED_PAGES` in `tests/test_site_invariants.py`, `scripts/smoke.py`,
 `acceptance.checks` in `release/contract.json`, the "Published URL space is
-complete" step in `.github/workflows/ci.yml`, and the publish guards in
-`.github/workflows/pages.yml` and `Containerfile.release`.
+complete" step in `.github/workflows/ci.yml`, and the publish guard in
+`Containerfile.release`.
 
-Those five govern WHICH URLS EXIST. **Adding or removing a whole Subject is a
-bigger change than that**, and the five are not the whole of it: roughly two
+(It was five until `.github/workflows/pages.yml` was removed. That workflow was
+a second delivery path to GitHub Pages, it was never how production is served,
+and it failed on every push to main because Pages was never enabled on the
+repository. Production is the Hetzner container platform and always was.)
+
+Those four govern WHICH URLS EXIST. **Adding or removing a whole Subject is a
+bigger change than that**, and the four are not the whole of it: roughly two
 dozen files carry a hardcoded count of pages, lessons, courses or Subjects, and
 several of the per-path constants in `tests/test_site_invariants.py` and
 `scripts/smoke.py` are patterns to extend rather than numbers to bump. Find them
@@ -140,7 +145,7 @@ of `content/` — which paths are published is a decision, and it should be
 readable in one place.
 
 Adding a lesson: add a dict to the course module, run the build, then add the URL
-to the five declarations listed in section 1 — the suite tells you which are
+to the four declarations listed in section 1 — the suite tells you which are
 missing.
 
 **Each path states its own material clause.** The licence line in the shared
