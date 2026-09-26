@@ -315,6 +315,10 @@ def lesson_page(*, path, course, lesson, index, prev_lesson, next_lesson):
     return chrome.name_horizontal_scrollers("".join(parts))
 
 
+def _first_upper(text):
+    return text[:1].upper() + text[1:]
+
+
 def course_home(*, course, index, courses, path):
     """One course home: /<course-slug>/ ."""
     total_courses = len(courses)
@@ -407,7 +411,15 @@ def course_home(*, course, index, courses, path):
         '      <div class="syllabus">%s</div>\n'
         "    </section>\n" % (len(lessons), inline(course["syllabus_intro"]), syllabus),
         '    <section class="section" id="background" data-ui="background">'
-        '<h2>Recommended background</h2><p>%s.</p></section>\n' % esc(course["assumes_long"].capitalize().rstrip(".")),
+        # First character up, and NOTHING else touched. str.capitalize()
+        # lowercases the rest of the string, so every proper noun in this field
+        # was destroyed: "Discrete Mathematics" shipped as "discrete
+        # mathematics" and a course named by title as "queues and utilisation".
+        # The two live paths never noticed because they wrote the field entirely
+        # in lower case; the first course to name a sibling by title, which is
+        # what the no-ordinals rule asks for, hit it immediately.
+        '<h2>Recommended background</h2><p>%s.</p></section>\n'
+        % esc(_first_upper(course["assumes_long"]).rstrip(".")),
         '    <section class="section">\n'
         '      <div class="grid-2">\n'
         '        <article class="card card-pad prose"><h3>Practice suggestions</h3>%s</article>\n'

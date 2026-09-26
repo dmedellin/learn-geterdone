@@ -23,9 +23,9 @@ COURSE = {
     ],
     "assumes_short": "Capacity Estimation and Queues and Utilisation; independence, binomials, combinations",
     "assumes_long": (
-        "C1, C3. Discrete Mathematics independence, binomial-distribution, "
-        "combinations, conditional-probability, expected-value. Algebra "
-        "geometric-sequences-and-series"
+        "Capacity Estimation and Queues and Utilisation. Discrete Mathematics: "
+        "independence, the binomial distribution, combinations, conditional "
+        "probability and expected value. Algebra: geometric sequences and series"
     ),
     "outcomes_intro": (
         "By the end you can convert nines into minutes, compose availability in series "
