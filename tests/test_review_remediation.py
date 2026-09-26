@@ -30,6 +30,15 @@ def content_fingerprint(source):
 
 
 def content_errors(root, contract):
+    # Each module entry carries baseline_ast_sha256, expected_ast_sha256 and
+    # clauses. Only the second and third are checked, and that is deliberate:
+    # `baseline` records where a module started and is PROVENANCE, not a
+    # constraint. Nothing reads it, here or anywhere else in the repository.
+    #
+    # Said out loud because the alternative is that the next person to add a
+    # Subject greps for it, finds no reader, and has to decide whether that is
+    # a bug or the design. For new content the baseline IS the introduction,
+    # so generators set it equal to expected.
     expected = contract['modules']
     # Cover all source modules, a superset of changed modules; no Git-history or
     # shallow-checkout dependency can silently switch off omission detection.

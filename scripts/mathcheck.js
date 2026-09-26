@@ -4438,9 +4438,19 @@ console.log('operations research: the exact simplex, duality, networks and the r
   const rf = (n, d) => R(BigInt(n), BigInt(d));
 
   /* --- ORFMT: the printer this path actually needs ------------------------
-     algebra_core's Rdec goes through Number, and this path produces rationals
-     Number cannot hold. That is not a hypothetical: both figures below are
-     measured, and the second one is Rdec returning NaN for a probability. */
+     This block used to assert that algebra_core's Rdec returned NaN on the
+     figure below, and offered that as the reason ORFMT_JS exists. Rdec went
+     through Number, and (19/20)^400 has a 521-digit denominator.
+
+     Rdec is BigInt long division now, so it handles this and the assertion
+     that it fails would be pinning a bug as a requirement. Both printers are
+     checked against each other instead.
+
+     ORFMT_JS still earns its place, for the reason it should have given in
+     the first place: Rdec strips trailing zeros, so it cannot render a fixed
+     number of decimal places, and a table of figures that do not line up is
+     harder to read than one that does. Rshort and Rpct are likewise about
+     presentation, not about reach. */
   eq(Rfixed(rf(1, 3), 6), '0.333333', 'Rfixed is long division in BigInt');
   eq(Rfixed(rf(2, 3), 4), '0.6667', 'rounded half up at the last digit');
   eq(Rfixed(rf(-1, 8), 3), '-0.125', 'and it keeps the sign');
@@ -4448,7 +4458,10 @@ console.log('operations research: the exact simplex, duality, networks and the r
   eq(String(decayed.n).length + '/' + String(decayed.d).length, '512/521',
      '(19/20)^400 is 512 digits over 521 -- measured here, because queue.py\'s comment says "521-digit numerator" and 521 is the DENOMINATOR');
   eq(Rfixed(decayed, 12), '0.000000001229', 'which Rfixed prints');
-  eq(Rdec(decayed, 12), 'NaN', 'and Rdec, going through Number, does not -- this is why ORFMT_JS exists');
+  eq(Rdec(decayed, 12), '0.000000001229',
+     'and Rdec agrees, now that it is long division too -- it used to return NaN here');
+  eq(Rfixed(rf(1, 2), 4), '0.5000', 'Rfixed pads to the places asked for');
+  eq(Rdec(rf(1, 2), 4), '0.5', 'where Rdec strips them, which is why both exist');
   eq(Rshort(rf(1, 3)), '1/3', 'Rshort keeps a fraction a reader can read');
   eq(Rshort(decayed, 6), Rfixed(decayed, 6), 'and falls back to a decimal when the fraction has run away');
   eq(Rpct(rf(1, 8), 2), '12.50%', 'Rpct');
