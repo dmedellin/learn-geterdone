@@ -448,7 +448,8 @@ class TestAuthoredSemanticCopy(unittest.TestCase):
         self.assertEqual(len(expected), 131)
         all_courses = (set(semantic['courses']) | {'sets-relations-functions'} |
                        set(contract['algebra_semantic_copy']['courses']) |
-                       set(contract['discrete_semantic_copy']['courses']))
+                       set(contract['discrete_semantic_copy']['courses']) |
+                       set(contract['system_design_semantic_copy']['courses']))
         registered = {c['slug'] for p in ui.build_paths.GENERATED_PATHS for c in p['courses']}
         registered.update(c['slug'] for c in trading)
         self.assertEqual(all_courses, registered)
