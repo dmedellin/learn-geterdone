@@ -730,15 +730,18 @@ MATH_COURSE_LESSONS = tuple(
 # ---------------------------------------------------------------------------
 # The third path: ALGEBRA. Same shape, its own material promise.
 # ---------------------------------------------------------------------------
+# Lesson order here is CONTENT order, and a test asserts it stays that way.
+# It drifted once and the damage surfaced in the release contract, whose
+# per-lesson descriptions were generated from this ordering and so numbered
+# sixteen lessons by a position they no longer occupied.
 ALGEBRA_COURSES = (
     ("algebra-foundations", "Foundations of Algebra", (
-        "real-numbers-and-the-number-line",
-        "properties-of-the-real-numbers", "order-of-operations",
+        "real-numbers-and-the-number-line", "order-of-operations",
+        "algebraic-expressions-and-terms", "properties-of-the-real-numbers",
         "absolute-value", "integer-exponents", "scientific-notation",
-        "roots-and-radicals", "rational-exponents",
-        "algebraic-expressions-and-terms", "the-distributive-law",
+        "roots-and-radicals", "rational-exponents", "the-distributive-law",
         "combining-like-terms", "evaluating-expressions",
-        "translating-words-into-algebra",
+        "translating-words-into-algebra"
     )),
     ("linear-equations-and-inequalities", "Linear Equations and Inequalities", (
         "what-it-means-to-solve-an-equation", "one-and-two-step-equations",
@@ -747,15 +750,16 @@ ALGEBRA_COURSES = (
         "ratio-proportion-and-percent", "modelling-with-linear-equations",
         "linear-inequalities", "compound-inequalities",
         "absolute-value-equations", "absolute-value-inequalities",
-        "interval-and-set-builder-notation",
+        "interval-and-set-builder-notation"
     )),
     ("lines-functions-and-graphs", "Lines, Functions and Graphs", (
         "the-coordinate-plane", "graphing-a-linear-equation", "slope",
         "slope-intercept-form", "point-slope-and-standard-form",
-        "parallel-and-perpendicular-lines", "what-a-function-is",
+        "parallel-and-perpendicular-lines",
+        "linear-inequalities-in-two-variables", "what-a-function-is",
         "function-notation", "domain-and-range", "piecewise-functions",
         "transformations-of-graphs", "composition-of-functions",
-        "inverse-functions", "linear-inequalities-in-two-variables",
+        "inverse-functions"
     )),
     ("polynomials-and-factoring", "Polynomials and Factoring", (
         "polynomials-degree-and-standard-form",
@@ -766,7 +770,7 @@ ALGEBRA_COURSES = (
         "polynomial-long-division",
         "synthetic-division-and-the-remainder-theorem",
         "the-factor-theorem-and-rational-roots",
-        "graphs-of-polynomial-functions",
+        "graphs-of-polynomial-functions"
     )),
     ("rational-and-radical-expressions", "Rational and Radical Expressions", (
         "rational-expressions-and-their-domains",
@@ -776,7 +780,7 @@ ALGEBRA_COURSES = (
         "solving-rational-equations", "graphs-and-asymptotes",
         "simplifying-radical-expressions", "operations-with-radicals",
         "rationalizing-denominators", "solving-radical-equations",
-        "radical-functions-and-their-graphs",
+        "radical-functions-and-their-graphs"
     )),
     ("quadratics-and-complex-numbers", "Quadratics and Complex Numbers", (
         "quadratic-equations-and-the-zero-product-property",
@@ -787,7 +791,7 @@ ALGEBRA_COURSES = (
         "graphs-of-quadratic-functions",
         "vertex-form-and-the-axis-of-symmetry",
         "maximum-and-minimum-problems", "quadratic-inequalities",
-        "equations-reducible-to-quadratic-form",
+        "equations-reducible-to-quadratic-form"
     )),
     ("exponential-and-logarithmic-functions", "Exponential and Logarithmic Functions", (
         "exponential-functions", "growth-and-decay", "the-number-e",
@@ -795,15 +799,14 @@ ALGEBRA_COURSES = (
         "the-laws-of-logarithms", "common-and-natural-logarithms",
         "change-of-base", "solving-exponential-equations",
         "solving-logarithmic-equations",
-        "compound-interest-and-continuous-growth", "logarithmic-scales",
+        "compound-interest-and-continuous-growth", "logarithmic-scales"
     )),
     ("systems-and-matrices", "Systems and Matrices", (
         "systems-of-two-linear-equations", "solving-by-substitution",
         "solving-by-elimination", "systems-in-three-variables",
         "matrices-and-row-operations", "gaussian-elimination",
         "matrix-arithmetic", "determinants-and-cramers-rule",
-        "inverse-matrices",
-        "systems-of-inequalities-and-linear-programming",
+        "inverse-matrices", "systems-of-inequalities-and-linear-programming"
     )),
     ("sequences-and-series", "Sequences and Series", (
         "sequences-and-recursion", "sigma-notation",
@@ -811,7 +814,7 @@ ALGEBRA_COURSES = (
         "partial-sums-and-telescoping", "infinite-geometric-series",
         "repeating-decimals-as-series",
         "annuities-and-accumulated-payments", "pascals-triangle",
-        "the-binomial-theorem", "the-general-term-of-an-expansion",
+        "the-binomial-theorem", "the-general-term-of-an-expansion"
     )),
 )
 

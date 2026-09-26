@@ -53,6 +53,7 @@ import html
 import json
 import os
 import re
+import importlib
 import sys
 import unittest
 import urllib.parse
@@ -1476,6 +1477,48 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "declares (only in smoke: %s; only here: %s)"
             % (sorted(probed - set(NON_HTML_ASSETS)), sorted(set(NON_HTML_ASSETS) - probed)),
         )
+
+    def test_smoke_declares_lessons_in_the_order_content_renders_them(self):
+        """smoke.py's per-course lesson tuples must be in content order.
+
+        smoke.py is standard-library only on purpose: it is the client that
+        verifies a DEPLOYED site, so it cannot import content/. That leaves its
+        course tuples hand-maintained, and a hand-maintained copy of an order
+        can drift from the order without anything noticing -- the URL-set tests
+        above compare sets, and a set does not have an order.
+
+        It already drifted once, and the damage landed somewhere else entirely.
+        The release contract's per-lesson descriptions were generated from this
+        ordering, so sixteen Algebra lessons were described by a position they
+        no longer occupied: order-of-operations as "lesson 03" where the reader
+        meets it second. Right when written, silently wrong after the course was
+        reordered, and invisible because nothing re-reads a description.
+
+        So: compare the order, not just the set.
+        """
+        import smoke
+        sys.path.insert(0, str(REPO_ROOT / "content"))
+        declared = {
+            "algebra": getattr(smoke, "ALGEBRA_COURSES", ()),
+            "discrete_math": getattr(smoke, "MATH_COURSES", ()),
+            "system_design": getattr(smoke, "SYSDESIGN_COURSES", ()),
+        }
+        for package, courses in declared.items():
+            if not courses:
+                continue
+            path = importlib.import_module(package).PATH
+            by_slug = {c["slug"]: [l["slug"] for l in c["lessons"]]
+                       for c in path["courses"]}
+            for slug, _title, lessons in courses:
+                with self.subTest(package=package, course=slug):
+                    self.assertIn(slug, by_slug,
+                                  "%s declares a course content does not have" % slug)
+                    self.assertEqual(
+                        by_slug[slug], list(lessons),
+                        "smoke.py lists %s's lessons in a different order than "
+                        "content/%s renders them; a generator keyed on this "
+                        "order will number lessons wrongly" % (slug, package),
+                    )
 
     def test_smoke_check_ids_are_release_contract_check_ids(self):
         """One smoke report line maps onto one acceptance check, by id.
