@@ -455,10 +455,18 @@ def path_page(path):
         '<a class="btn ghost" href="#background">Recommended background</a></div></div>'
         '<div class="hero-visual">%s</div></section>\n'
         % (esc(path["title"]), inline(path["tagline"]), _mathblock(path["key"])),
+        # `level_note` was declared in every PATH dict and rendered nowhere. It
+        # is the one thing a reader browsing Subjects most wants next to a
+        # level -- every value is a statement about what is assumed ("no
+        # calculus required", "assumes Discrete Mathematics in full") -- so it
+        # is its own stat rather than a parenthetical inside Level, which would
+        # have changed a block other guards pin.
         '<section class="section" data-ui="metadata"><dl class="stats">'
         '<div><dt>Courses</dt><dd>%d</dd></div><div><dt>Lessons</dt><dd>%d</dd></div>'
-        '<div><dt>Level</dt><dd>%s</dd></div></dl></section>\n'
-        % (len(courses), total_lessons, esc(path["level"])),
+        '<div><dt>Level</dt><dd>%s</dd></div>'
+        '<div><dt>Assumes</dt><dd>%s</dd></div></dl></section>\n'
+        % (len(courses), total_lessons, esc(path["level"]),
+           esc(path["level_note"])),
         '<section class="section prose" data-ui="overview"><h2>Overview</h2>%s</section>\n'
         % "".join('<p>%s</p>' % inline(p) for p in path["why_order"]),
         '<section class="section" id="courses" data-ui="course-list">'
