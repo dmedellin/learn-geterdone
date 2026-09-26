@@ -35,6 +35,13 @@ contract, with no partial option and no warning.
 Half-finished lab kits for the other two Subjects are parked, unverified, on
 the `wip/or-and-algorithms-kits` branch. Nothing on `main` depends on them.
 
+Seven further Subjects have been proposed and none is scheduled:
+[docs/FUTURE-SUBJECTS.md](docs/FUTURE-SUBJECTS.md) records them with the only
+question that decides whether each can be built the way this library builds
+things — what does the reader compute? For one of them the answer is "nothing",
+and that is written down rather than engineered around. **Do not start a seventh
+Subject while two are half-built.**
+
 ## 1. What this repository is
 
 An educational static site published as **Learn** at `https://learn.geterdone.io`:
