@@ -35,7 +35,7 @@ class TestCatalogDestinations(unittest.TestCase):
         courses,lessons,links=catalog_inventory(ui.SITE)
         self.assertEqual(35,len(courses))
         self.assertEqual(450,len(lessons))
-        self.assertEqual(351,len(links))
+        self.assertEqual(465,len(links))
         self.assertEqual(lessons,{a['target'] for a in links})
         self.assertEqual(set(courses),{a['course'] for a in links})
         bad=[a for a in links if ordinal(a['text'])]

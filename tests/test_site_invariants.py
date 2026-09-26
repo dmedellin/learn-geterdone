@@ -1244,7 +1244,13 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             + len(ALGEBRA_COURSES)
             + sum(len(slugs) for _t, _h, slugs in ALGEBRA_COURSES)
         )
-        course_tree = 1 + trading_tree + math_tree + algebra_tree  # 1 for the index
+        sysdesign_tree = (
+            1  # the system design path page
+            + len(SYSDESIGN_COURSES)
+            + sum(len(slugs) for _t, _h, slugs in SYSDESIGN_COURSES)
+        )
+        course_tree = (1 + trading_tree + math_tree + algebra_tree
+                       + sysdesign_tree)  # 1 for the index
         self.assertEqual(
             127,
             trading_tree,
@@ -1264,9 +1270,15 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "pages, got %d" % algebra_tree,
         )
         self.assertEqual(
-            365,
+            125,
+            sysdesign_tree,
+            "the system design path is 1 + 10 + 10 + 11 + 13 + 10 + 13 + 13 + 12 + 11 "
+            "+ 11 + 10 = 125 pages, got %d" % sysdesign_tree,
+        )
+        self.assertEqual(
+            490,
             course_tree,
-            "the site index plus all three path trees is 365 pages, got %d" % course_tree,
+            "the site index plus all four path trees is 490 pages, got %d" % course_tree,
         )
         self.assertEqual(
             2,
@@ -1859,7 +1871,7 @@ class TestContent(SiteFixture):
         ]
         self.assertTrue(course_pages, "no course page found under %s" % SITE_ROOT)
         self.assertEqual(
-            361,
+            485,
             len(course_pages),
             "thirty-five course homes and 450 lessons carry a material "
             "disclaimer; found %d pages, so a page has been added or removed "

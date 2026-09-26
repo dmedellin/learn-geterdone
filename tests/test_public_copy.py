@@ -92,7 +92,7 @@ class TestPublicCopy(unittest.TestCase):
         for file in SITE.rglob('*.html'):
             if copy.Document(file.read_text()).family in ('library', 'subject'):
                 owners.append(file.relative_to(SITE))
-        self.assertEqual(len(owners), 4, 'shared mutation sweep must cover all owners')
+        self.assertEqual(len(owners), 5, 'shared mutation sweep must cover all owners')
         with tempfile.TemporaryDirectory(prefix='shared-copy-', dir='/tmp') as tmp:
             site = Path(tmp)
             for relative in owners:
