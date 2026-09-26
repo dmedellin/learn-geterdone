@@ -1,0 +1,2591 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CDN Egress and Origin Load | Lesson | Caching and Hit Rates | System Design | Learn · geterdone.io</title>
+  <meta name="description" content="A CDN is billed in bytes, so the hit rate that decides the invoice is a byte hit rate: the share of bytes served from the edge, not the share of requests. The two come apart whenever object size varies with popularity, and it usually does in the unhelpful direction — the popular objects are the small ones, so the cheap hits are the cheap ones." />
+  <link rel="canonical" href="https://learn.geterdone.io/caching-and-hit-rates/cdn-egress-and-origin-load/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="CDN Egress and Origin Load | Lesson | Caching and Hit Rates | System Design | Learn · geterdone.io" />
+  <meta property="og:description" content="A CDN is billed in bytes, so the hit rate that decides the invoice is a byte hit rate: the share of bytes served from the edge, not the share of requests. The two come apart whenever object size varies with popularity, and it usually does in the unhelpful direction — the popular objects are the small ones, so the cheap hits are the cheap ones." />
+  <meta property="og:url" content="https://learn.geterdone.io/caching-and-hit-rates/cdn-egress-and-origin-load/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="CDN Egress and Origin Load | Lesson | Caching and Hit Rates | System Design | Learn · geterdone.io" />
+  <meta name="twitter:description" content="A CDN is billed in bytes, so the hit rate that decides the invoice is a byte hit rate: the share of bytes served from the edge, not the share of requests. The two come apart whenever object size varies with popularity, and it usually does in the unhelpful direction — the popular objects are the small ones, so the cheap hits are the cheap ones." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/caching-and-hit-rates/cdn-egress-and-origin-load/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    @media (max-width: 920px) {
+      body[data-page-kind="supplemental"] [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/system-design/">System Design</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Caching and Hit Rates</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">CDN Egress and Origin Load</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The cdn egress and origin load is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Caching and Hit Rates &middot; Beyond one cache</span>
+        <h1>CDN Egress and Origin Load</h1>
+        <p>A CDN is billed in bytes, so the hit rate that decides the invoice is a byte hit rate: the share of bytes served from the edge, not the share of requests. The two come apart whenever object size varies with popularity, and it usually does in the unhelpful direction &mdash; the popular objects are the small ones, so the cheap hits are the cheap ones.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">request hit rate = share of REQUESTS served at the edge
+byte hit rate    = share of BYTES served at the edge
+
+N = 20, s = 1, top C = 4 cached, size ∝ rank¹
+    requests  57.91%        bytes  20.00%        a gap of 37.91 points
+
+origin GB/day = (1 − byte hit) × total GB/day
+    50 000 GB/day → 40 000 GB/day to the origin → $24 000 over 30 days</div>
+        <div class="float-label" style="right:16px;bottom:16px;">Two hit rates, and the one the invoice uses</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>The same harmonic ratio as the skew lessons, weighted differently. The weighting is the entire content, and it changes the answer by a factor of three here.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>The byte hit rate weights each rank by its size</h3><p>The request hit rate sums <span class="math">p_i</span> over the cached ranks. The byte hit rate sums <span class="math">p_i × size_i</span> over the same ranks, divided by the same sum over all ranks. With <span class="math">size_i ∝ i^b</span> the weights are <span class="math">i^(b−s)</span>, so it is the identical harmonic ratio at exponent <span class="math">s − b</span> &mdash; one formula, not a second model.</p></article><article class="card concept-card"><div class="icon">2</div><h3>They are equal only when size does not vary with rank</h3><p>At <span class="math">b = 0</span> every object is the same size and the two rates are the same number under two names: that is the control. Move <span class="math">b</span> off zero and they separate, and at <span class="math">b = s</span> the byte hit rate collapses to exactly <span class="math">C/N</span>, the uniform rate, because size grows exactly as fast as popularity falls.</p></article><article class="card concept-card"><div class="icon">3</div><h3>The gap runs the wrong way for a CDN</h3><p>Real edge workloads have <span class="math">b > 0</span>: thumbnails and API responses are popular and small, video segments and installers are unpopular and large. So the byte hit rate is the lower of the two, and an origin-load estimate made from the request hit rate is optimistic. At <span class="math">N = 20</span>, <span class="math">s = 1</span>, <span class="math">C = 4</span> and <span class="math">b = 1</span> it is <span class="math">57.91%</span> against <span class="math">20.00%</span>.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>Two hit rates, the size profile that separates them, and the bill</h2></div><p>One weighted sum, three cases that fall out of it, and the invoice that follows the second number.</p></div>
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Request hit rate and byte hit rate</span><p>For a cache holding the top <span class="math">C</span> of <span class="math">N</span> ranked objects, the <strong>request hit rate</strong> is the share of requests served from it and the <strong>byte hit rate</strong> is the share of bytes served from it. With Zipf popularity <span class="math">p_i ∝ 1/iˢ</span> and sizes <span class="math">size_i ∝ i^b</span>, the second is <span class="math">Σ i^(b−s)</span> over the cached ranks divided by the same sum over all ranks.</p><p><span class="math">b</span> is a <strong>size exponent</strong>, positive when popular objects are small. Setting <span class="math">b = 0</span> recovers the request hit rate exactly, which is how you can tell the two formulas are one formula.</p></div><p>Everything that follows is that one ratio evaluated at three exponents, and each case arrives as arithmetic rather than as an assertion.</p><ul><li><span class="math">b = 0</span> &mdash; every object the same size. Byte hit rate equals request hit rate. The control.</li><li><span class="math">b = s</span> &mdash; size grows exactly as fast as popularity falls, so every rank carries the same bytes and the byte hit rate is exactly <span class="math">C/N</span>, the uniform answer.</li><li><span class="math">b > 0</span> in general &mdash; popular objects are smaller, so the byte hit rate is below the request hit rate, and the gap widens with <span class="math">b</span>.</li></ul><div class="example"><span class="label">Example &middot; Twenty objects, classic Zipf, size proportional to rank</span><p><span class="math">N = 20</span>, <span class="math">s = 1</span>, <span class="math">C = 4</span>, <span class="math">b = 1</span>. The top four objects are <span class="math">57.91%</span> of the requests and exactly <span class="math">20.00%</span> of the bytes &mdash; which is <span class="math">C/N = 4/20</span>, because <span class="math">b = s</span> here. A gap of <span class="math">37.91</span> points between two numbers people use interchangeably.</p></div><p>Push the size profile harder and the gap widens. At <span class="math">b = 2</span> on the same catalogue the byte hit rate falls to <span class="math">4.76%</span> while the request hit rate is unchanged at <span class="math">57.91%</span>: the edge is still serving more than half of the requests and is now serving one twentieth of the bytes, because the objects it is not holding are enormous.</p><h3>The invoice follows the byte rate</h3><p>Origin egress is <span class="math">(1 − byte hit rate) × total bytes</span>, and the bill is that times the price per gigabyte times the days. At <span class="math">50 000 GB/day</span> of edge egress with a <span class="math">20.00%</span> byte hit rate, <span class="math">40 000 GB/day</span> still leaves the origin, and at two cents a gigabyte over thirty days that is <span class="math">$24 000</span>.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">total edge egress      50 000 GB/day
+byte hit rate          20.00%
+
+origin  = (1 − 0.20) × 50 000  =  40 000 GB/day
+bill    = 40 000 × 30 × $0.02  =  $24 000.00
+
+billing from the REQUEST hit rate instead (57.91%):
+origin  = (1 − 0.5791) × 50 000 ≈  21 047 GB/day
+bill    ≈ $12 627.98                  barely half the real invoice</div><p>Nearly twice the bill, from using the number that was on the dashboard. And the error is one-sided: because <span class="math">b > 0</span> is the normal shape of an edge workload, substituting the request hit rate always <em>under</em>-estimates origin egress. A capacity plan made this way is optimistic exactly where being wrong is expensive.</p><p>The same gap applies to the origin&rsquo;s capacity, not only its bill. The origin must actually serve <span class="math">40 000 GB</span> a day; the request hit rate predicted <span class="math">21 047 GB</span>, and a link, an origin fleet and an autoscaling policy sized against the second number meet the first one on the day the video catalogue gets popular.</p><h3>What to do about it</h3><p>Two moves change the byte rate rather than the request rate. Caching by <em>bytes served</em> rather than by request count &mdash; admitting large popular objects even though they cost more slots &mdash; moves the byte hit rate directly. And splitting large objects into range-cacheable pieces turns one big miss into many small hits, which is why video is served in segments.</p><p>One caution on the model. <span class="math">size_i ∝ i^b</span> is a smooth profile, and real catalogues are lumpy: a handful of very large objects can dominate the byte totals without being anywhere near a clean curve. Use this to understand the direction and the rough size of the gap, and measure the byte hit rate itself before writing a number into a budget.</p></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>CDN egress and origin load</h2></div><p>The byte hit rate is a different number, and it is the one on the invoice</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Request hits and byte hits are two numbers</strong><span>a CDN is billed in bytes, and the popular objects are the small ones</span></div>
+        <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>request hit rate</span><span class="tone-purple"><i class="legend-swatch"></i>byte hit rate</span><span class="tone-red"><i class="legend-swatch"></i>origin bytes</span><span class="tone-muted"><i class="legend-swatch"></i>object size by rank</span></div>
+      </div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="hbPlot" viewBox="0 0 520 210" role="img" aria-label="Requests by rank and bytes by rank drawn as two profiles, with the cached prefix shaded in each."></svg></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="hbTable"></table></div>
+      <div class="status-banner" id="hbStatus" style="margin-top:12px;"></div>
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>Set the catalogue, the skew and the size profile</h3>
+          <p>The byte hit rate is not a second slider: it is computed from the same ranks, weighted by object size. Set b = 0 and the two rates coincide.</p>
+        <div>
+          <div class="range-row"><label class="small-copy" for="hbN">Catalogue size N (objects)</label><span class="range-value" id="hbNOut">20</span></div>
+          <input id="hbN" type="range" min="4" max="120" step="1" value="20" />
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="hbS">Popularity exponent s</label><span class="range-value" id="hbSOut">1</span></div>
+          <input id="hbS" type="range" min="0" max="3" step="1" value="1" />
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="hbC">Objects cached at the edge, C</label><span class="range-value" id="hbCOut">4</span></div>
+          <input id="hbC" type="range" min="1" max="120" step="1" value="4" />
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="hbB">Size exponent b &mdash; size &prop; rank<sup>b</sup></label><span class="range-value" id="hbBOut">1</span></div>
+          <input id="hbB" type="range" min="-1" max="3" step="1" value="1" />
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="hbEgress">Total edge egress (GB/day)</label><span class="range-value" id="hbEgressOut">50000</span></div>
+          <input id="hbEgress" type="range" min="100" max="200000" step="100" value="50000" />
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="hbPrice">Origin egress price (cents/GB)</label><span class="range-value" id="hbPriceOut">2</span></div>
+          <input id="hbPrice" type="range" min="1" max="20" step="1" value="2" />
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Request hit rate</span><strong id="hbReq">&mdash;</strong></div>
+          <div class="kpi"><span>Byte hit rate</span><strong id="hbByte">&mdash;</strong></div>
+          <div class="kpi"><span>Origin GB/day</span><strong id="hbOrigin">&mdash;</strong></div>
+          <div class="kpi"><span>Origin egress, 30 days</span><strong id="hbCost">&mdash;</strong></div>
+        </div>
+        <p class="small-copy" id="hbHint" style="margin:0;">Both hit rates are the same harmonic ratio: the request one weights each rank by its popularity, the byte one by popularity times size. At b = 0 they are equal, which is the control; at b = s the byte hit rate is exactly C/N.</p>
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Estimating origin load and egress cost</h2></div><p>Get the byte hit rate first. Every number after it is a multiplication, and every one of them is wrong if you used the other rate.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Ask which hit rate you have been given</h3><p>A CDN dashboard reports both and they are labelled similarly. If only one is available, assume it is the request hit rate, because that is the one that is easier to compute and the one more often displayed by default.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Get or estimate the byte hit rate</h3><p>Measure it if you can: bytes served from the edge over total bytes served. If you have to estimate, use the size profile &mdash; the same harmonic ratio at exponent <span class="math">s − b</span> &mdash; and carry an interval rather than a figure.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Multiply out the origin egress</h3><p><span class="math">(1 − byte hit rate) × total bytes per day</span>. Keep decimal gigabytes, <span class="math">1 GB = 10⁹ B</span>, because that is what egress is billed in and mixing it with binary gibibytes moves the answer by seven per cent.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Price it, and state the gap</h3><p>Multiply by the price per gigabyte and the days. Then compute what the request hit rate would have predicted and report both, because the difference between them is the single most useful sentence in the estimate.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>Bytes, requests and invoices</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>Twenty objects, size proportional to rank, 50 000 GB a day</h3><p>Two hit rates off the same ranks, and then the invoice each of them would have produced.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">N = 20 objects,  s = 1,  edge holds the top C = 4,  size ∝ rank¹ (b = 1)
+
+request hit rate = H(4,1)/H(20,1) = 6466460/11167027 = 57.91%
+
+byte hit rate: weights are i^(b−s) = i⁰ = 1, so every rank weighs the same
+               = C/N = 4/20 = 1/5 = 20.00%           b = s exactly
+
+gap  57.91 − 20.00 = 37.91 points
+
+total edge egress 50 000 GB/day,  origin price 2 ¢/GB
+  origin = (1 − 1/5) × 50 000       = 40 000 GB/day
+  bill   = 40 000 × 30 × $0.02      = $24 000.00
+
+if you had billed from the request hit rate:
+  origin ≈ 21 047 GB/day            bill ≈ $12 627.98
+  the forecast would have been barely half the real invoice</div><p>The <span class="math">b = s</span> coincidence is worth noticing rather than relying on: at this catalogue the byte hit rate is exactly the uniform rate <span class="math">C/N</span>, which makes the arithmetic clean and is not a general fact. Move <span class="math">b</span> to <span class="math">2</span> and it falls to <span class="math">4.76%</span>, taking the bill to <span class="math">$28 571.43</span>.</p><p>For a faded rehearsal, keep <span class="math">N = 20</span> and <span class="math">s = 1</span> but set <span class="math">b = 0</span>. The supplied first move is that the two hit rates must now be equal; confirm that, compute the origin egress and the bill, and say which of the three cases &mdash; <span class="math">b = 0</span>, <span class="math">b = s</span>, <span class="math">b > 0</span> &mdash; describes a video CDN and which describes a cache of thumbnails.</p><p>The lab draws the share of requests by rank and the share of bytes by rank as two profiles with the cached prefix shaded in both. The gap between the two shaded areas is the whole lesson, and setting <span class="math">b = 0</span> closes it.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Using the request hit rate to forecast egress</strong><span>At <span class="math">N = 20</span>, <span class="math">s = 1</span>, <span class="math">C = 4</span> and <span class="math">b = 1</span> the request rate is <span class="math">57.91%</span> and the byte rate is <span class="math">20.00%</span>: the bill is <span class="math">$24 000</span> and the forecast made from the wrong rate is <span class="math">$12 627.98</span>. Because <span class="math">b > 0</span> is the normal shape of an edge workload, this error is one-sided and always optimistic.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Assuming the two rates must be close</strong><span>They are equal only at <span class="math">b = 0</span>, where every object is the same size. Nothing bounds the gap otherwise: at <span class="math">b = 2</span> on the same catalogue the byte hit rate is <span class="math">4.76%</span> against a request hit rate of <span class="math">57.91%</span>, a factor of twelve. Check the size profile before assuming either number stands in for the other.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Mixing decimal and binary gigabytes</strong><span>Egress is billed in decimal units, <span class="math">1 GB = 10⁹ B</span>. Computing origin volume in gibibytes and pricing it as gigabytes overstates or understates the bill by about seven per cent, which is small enough to survive review and large enough to matter on a <span class="math">$24 000</span> line.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “which hit rate is that” is the first thing you ask a CDN dashboard.</strong><p>You should be able to distinguish a request hit rate from a byte hit rate, compute the second from a size profile, turn it into origin gigabytes per day and a monthly bill, and state the gap between the two forecasts as the reason the distinction is worth making.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> That is the course: a cache is a miss rate, and every question about one &mdash; backend load, latency, size, policy, staleness, bursts, writes, levels and bytes &mdash; is arithmetic on that number. What it cannot tell you is what happens when a component is simply gone, which is where “Nines and Downtime” starts the next course.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../multi-level-caches/" rel="prev"><span>Lesson</span><strong>Multi-level Caches</strong></a>
+      <a class="lesson-link next" href="../"><span>Course</span><strong>Caching and Hit Rates</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="caching-and-hit-rates/cdn-egress-and-origin-load" data-lesson-title="CDN Egress and Origin Load" data-course-title="Caching and Hit Rates">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Caching and Hit Rates.</strong> Hit rates, harmonic sums, stale fractions and policy hit counts on this course are exact fractions. The Zipf normaliser <span class="math">H(N, s)</span> is summed exactly for catalogues up to about fifty keys, which is where its exact form stays readable; past that the lab prints a rounded value and says so.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure on this path is computed in your browser from the model the lesson states, and a model&rsquo;s answer is only as true as its assumptions &mdash; independence, memorylessness and steady state are named where they are used, and each lesson says where its own fails.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "At <span class=\"math\">N = 20<\/span>, <span class=\"math\">s = 1<\/span>, <span class=\"math\">C = 4<\/span> and <span class=\"math\">b = 1<\/span>, the request hit rate is <span class=\"math\">57.91%<\/span>. What is the byte hit rate?", "a": ["<span class=\"math\">57.91%<\/span>, since they measure the same cache", "<span class=\"math\">20.00%<\/span>", "<span class=\"math\">4.76%<\/span>", "<span class=\"math\">42.09%<\/span>, the complement"], "c": 1, "why": "With <span class=\"math\">b = s<\/span> the size weights are <span class=\"math\">i\u2070 = 1<\/span>, so every rank carries the same bytes and the byte hit rate is exactly <span class=\"math\">C/N = 4/20 = 20%<\/span>. They would be equal only at <span class=\"math\">b = 0<\/span>; <span class=\"math\">4.76%<\/span> is the answer at <span class=\"math\">b = 2<\/span>, where large objects dominate the byte totals even more."}, {"q": "A CDN serves <span class=\"math\">50 000 GB<\/span> a day with a <span class=\"math\">20%<\/span> byte hit rate. Origin egress costs two cents a gigabyte. What is the thirty-day bill?", "a": ["<span class=\"math\">$24 000.00<\/span>", "<span class=\"math\">$30 000.00<\/span>", "<span class=\"math\">$6 000.00<\/span>", "<span class=\"math\">$12 627.98<\/span>"], "c": 0, "why": "<span class=\"math\">(1 \u2212 0.20)(50 000) = 40 000 GB/day<\/span> to the origin, times thirty days times two cents is <span class=\"math\">$24 000.00<\/span>. <span class=\"math\">$6 000<\/span> bills the <span class=\"math\">20%<\/span> that was <em>cached<\/em>, <span class=\"math\">$30 000<\/span> bills the whole egress, and <span class=\"math\">$12 627.98<\/span> is what the request hit rate of <span class=\"math\">57.91%<\/span> would have predicted &mdash; the error this lesson exists to prevent."}, {"q": "Why is the byte hit rate usually below the request hit rate on a CDN?", "a": ["Because caches evict large objects first", "Because the popular objects tend to be the small ones, so cached hits carry fewer bytes than their share of requests", "Because byte counting includes protocol overhead", "Because the origin compresses what it serves"], "c": 1, "why": "Object size tends to grow with rank &mdash; <span class=\"math\">b > 0<\/span> &mdash; so the cheap-to-cache objects are also the ones that carry few bytes. The formula makes this exact: the byte hit rate is the same harmonic ratio at exponent <span class=\"math\">s \u2212 b<\/span>, and at <span class=\"math\">b = 0<\/span> the two rates coincide, which is the control."}];
+
+  (function () {
+
+  /* Exact rational arithmetic over BigInt.
+
+     Every number a lesson calls "the answer" lives in this type. BigInt rather
+     than Number because a few steps of elimination on a 3x3 system produces
+     numerators that leave the exact-integer range of a double, and a solution
+     that is silently wrong in the last digits is worse than no solution. */
+  function bgcd(a, b) {
+    if (a < 0n) a = -a;
+    if (b < 0n) b = -b;
+    while (b) { var t = a % b; a = b; b = t; }
+    return a;
+  }
+  function R(n, d) {
+    if (d === undefined) d = 1n;
+    n = BigInt(n); d = BigInt(d);
+    if (d === 0n) throw new Error('division by zero');
+    if (d < 0n) { n = -n; d = -d; }
+    var g = bgcd(n, d) || 1n;
+    return { n: n / g, d: d / g };
+  }
+  var R0 = R(0n), R1 = R(1n);
+  function Radd(a, b) { return R(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function Rsub(a, b) { return R(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function Rmul(a, b) { return R(a.n * b.n, a.d * b.d); }
+  function Rdiv(a, b) { return R(a.n * b.d, a.d * b.n); }
+  function Rneg(a) { return R(-a.n, a.d); }
+  function Rabs(a) { return a.n < 0n ? Rneg(a) : a; }
+  function Rinv(a) { return R(a.d, a.n); }
+  function Rzero(a) { return a.n === 0n; }
+  function Rsign(a) { return a.n === 0n ? 0 : (a.n < 0n ? -1 : 1); }
+  function Requ(a, b) { return a.n === b.n && a.d === b.d; }
+  function Rcmp(a, b) { var l = a.n * b.d, r = b.n * a.d; return l < r ? -1 : (l > r ? 1 : 0); }
+  function Rint(a) { return a.d === 1n; }
+  function Rpow(a, k) {
+    var out = R1, base = a, e = k < 0 ? -k : k;
+    while (e > 0) { if (e & 1) out = Rmul(out, base); base = Rmul(base, base); e >>= 1; }
+    return k < 0 ? Rinv(out) : out;
+  }
+  /* The reader's form: "3", "-7/4". Never "3/1", never "0/5". */
+  function Rtext(a) { return a.d === 1n ? String(a.n) : a.n + '/' + a.d; }
+  /* Parenthesised when it would otherwise glue onto a neighbouring symbol. */
+  function Rterm(a) { return (a.n < 0n || a.d !== 1n) ? '(' + Rtext(a) + ')' : Rtext(a); }
+  function Rnum(a) { return Number(a.n) / Number(a.d); }
+  /* A decimal, for the one place a lesson asks for one. Exact when it can be. */
+  function Rdec(a, places) {
+    if (places === undefined) places = 6;
+    var v = Rnum(a);
+    if (Rint(a)) return String(a.n);
+    var s = v.toFixed(places);
+    return s.indexOf('.') >= 0 ? s.replace(/0+$/, '').replace(/\.$/, '') : s;
+  }
+  function Rparse(text) {
+    var s = String(text).trim();
+    var m = /^([+-]?\d+)\s*\/\s*(\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]), BigInt(m[2]));
+    m = /^([+-]?\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]));
+    m = /^([+-]?)(\d*)\.(\d+)$/.exec(s);
+    if (m) {
+      var whole = m[2] || '0', frac = m[3];
+      var num = BigInt(whole + frac), den = 10n ** BigInt(frac.length);
+      return R(m[1] === '-' ? -num : num, den);
+    }
+    return null;
+  }
+  /* Is this rational a perfect square? Needed wherever a lesson must decide
+     between an exact answer and a radical one -- sqrt(4/9) is 2/3 and belongs
+     on the page as 2/3, while sqrt(2) must stay sqrt(2). */
+  function bisqrt(n) {
+    if (n < 0n) return null;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x * x === n ? x : null;
+  }
+  function Rsqrt(a) {
+    if (a.n < 0n) return null;
+    var p = bisqrt(a.n), q = bisqrt(a.d);
+    return (p === null || q === null) ? null : R(p, q);
+  }
+
+  /* Ceiling and floor of an exact rational, as BigInt.
+
+     Capacity answers are counts of machines, shards and tree levels, and the
+     whole point of a sizing lesson is that 3.2 machines is four. Integer
+     division truncates toward zero, so a negative rational needs the sign. */
+  function Rfloor(a) {
+    var q = a.n / a.d;
+    if (a.n < 0n && q * a.d !== a.n) q -= 1n;
+    return q;
+  }
+  function Rceil(a) {
+    var q = a.n / a.d;
+    if (a.n > 0n && q * a.d !== a.n) q += 1n;
+    return q;
+  }
+
+  /* Generalised harmonic H(n,s) = sum_{k=1..n} 1/k^s, exact for integer s.
+
+     The Zipf popularity model needs it twice: as the normaliser of the whole
+     key space and as the partial sum over the cached prefix, and a cache hit
+     rate is their ratio. Kept exact because the ratio of two large harmonics
+     loses its leading digits in floating point exactly when the tail matters,
+     which is the case a caching lesson is about. */
+  function harmonic(n, s) {
+    var total = R(0n, 1n);
+    for (var k = 1; k <= n; k += 1) {
+      var kb = BigInt(k), den = 1n;
+      for (var j = 0; j < s; j += 1) den *= kb;
+      total = Radd(total, R(1n, den));
+    }
+    return total;
+  }
+
+  /* The Zipf hit rate: the c most popular of n keys, exponent s.
+     H(c,s)/H(n,s) -- exact, and the reason a small cache of a skewed
+     workload holds most of the traffic. */
+  function zipfHit(c, n, s) {
+    if (c <= 0) return R(0n, 1n);
+    if (c >= n) return R(1n, 1n);
+    return Rdiv(harmonic(c, s), harmonic(n, s));
+  }
+
+  /* Birth-death queues, exact for rational arrival and service rates.
+
+     M/M/1 is derived in the lessons from the cut balance equations, so these
+     are the closed forms that result, not a separate model: rho = lam/mu,
+     pi_n = (1-rho)rho^n, L = rho/(1-rho), W = L/lam. */
+  function mm1(lam, mu) {
+    var rho = Rdiv(lam, mu);
+    if (Rcmp(rho, R(1n, 1n)) >= 0) return { rho: rho, stable: false };
+    var one = R(1n, 1n), free = Rsub(one, rho);
+    var L = Rdiv(rho, free);
+    var Lq = Rdiv(Rmul(rho, rho), free);
+    return {
+      rho: rho, stable: true, p0: free, L: L, Lq: Lq,
+      W: Rdiv(L, lam), Wq: Rdiv(Lq, lam)
+    };
+  }
+
+  /* Erlang C: the probability an arrival waits with s servers.
+     Rational throughout -- the factorials are BigInt, so a 20-server desk is
+     still an exact fraction. */
+  function erlangC(lam, mu, s) {
+    var a = Rdiv(lam, mu), rho = Rdiv(a, R(BigInt(s), 1n));
+    if (Rcmp(rho, R(1n, 1n)) >= 0) return { rho: rho, stable: false };
+    var sum = R(0n, 1n), n;
+    for (n = 0; n < s; n += 1) sum = Radd(sum, Rdiv(Rpow(a, n), R(fact(n), 1n)));
+    var last = Rdiv(Rpow(a, s), Rmul(R(fact(s), 1n), Rsub(R(1n, 1n), rho)));
+    var p0 = Rinv(Radd(sum, last));
+    var pw = Rmul(last, p0);
+    var Lq = Rdiv(Rmul(pw, rho), Rsub(R(1n, 1n), rho));
+    return {
+      rho: rho, stable: true, p0: p0, pWait: pw, Lq: Lq,
+      Wq: Rdiv(Lq, lam), L: Radd(Lq, a), W: Rdiv(Radd(Lq, a), lam)
+    };
+  }
+
+  /* M/M/1/K: finite capacity. Stable at any rho because the queue cannot grow,
+     which is the lesson -- and the arrival rate Little's law may use is the
+     EFFECTIVE one, lam(1 - pK). */
+  function mm1k(lam, mu, K) {
+    var rho = Rdiv(lam, mu), n, un = [], total = R(0n, 1n);
+    for (n = 0; n <= K; n += 1) { var t = Rpow(rho, n); un.push(t); total = Radd(total, t); }
+    var pi = un.map(function (t) { return Rdiv(t, total); });
+    var L = R(0n, 1n);
+    for (n = 0; n <= K; n += 1) L = Radd(L, Rmul(R(BigInt(n), 1n), pi[n]));
+    var pK = pi[K], lamEff = Rmul(lam, Rsub(R(1n, 1n), pK));
+    return { rho: rho, pi: pi, blocking: pK, lamEff: lamEff, L: L, W: Rdiv(L, lamEff) };
+  }
+
+  /* Replay a reference trace through a cache of k slots.
+
+     Farthest-in-future is here rather than in the kit because it is the BOUND
+     the whole replacement lesson rests on -- no online policy beats it -- and a
+     bound that cannot be tested in isolation is a bound nobody has checked.
+     Returns hits, misses and the exact hit rate. */
+  function replayPolicy(trace, k, policy) {
+    var cache = [], hits = 0, i, j;
+    for (i = 0; i < trace.length; i += 1) {
+      var key = trace[i], at = cache.indexOf(key);
+      if (at >= 0) {
+        hits += 1;
+        if (policy === 'lru') { cache.splice(at, 1); cache.push(key); }
+        continue;
+      }
+      if (cache.length < k) { cache.push(key); continue; }
+      var victim = 0;
+      if (policy === 'lru' || policy === 'fifo') {
+        victim = 0;                       /* both evict the front; LRU refreshes on hit */
+      } else if (policy === 'opt') {
+        /* evict whichever cached key is next used farthest ahead, or never */
+        var best = -1;
+        for (j = 0; j < cache.length; j += 1) {
+          var next = trace.indexOf(cache[j], i + 1);
+          if (next === -1) { victim = j; best = Infinity; break; }
+          if (next > best) { best = next; victim = j; }
+        }
+      }
+      cache.splice(victim, 1);
+      cache.push(key);
+    }
+    return {
+      hits: hits, misses: trace.length - hits,
+      rate: R(BigInt(hits), BigInt(trace.length))
+    };
+  }
+
+  /* The four places this subject cannot be exact. Each says how it rounds.
+
+     Everything else in the module returns a rational. These return Numbers, and
+     every lesson that calls one states that it is an approximation -- which is
+     the library's rule, not a courtesy. */
+
+  /* e^-x, as the reciprocal of a POSITIVE-term series.
+
+     The obvious implementation sums the alternating series for e^-x directly,
+     and it is wrong in a way that looks right at the arguments a test usually
+     picks. Terms of alternating sign near cancel, losing roughly 2x/ln(10)
+     significant digits: exact at x = 5, 0.4% out at x = 17, 173% out at x = 20,
+     and past x = 21 the SIGN is wrong -- a probability comes back negative.
+
+     Summing e^x instead has every term positive, so nothing cancels, and one
+     division at the end is exact to a rounding. */
+  function expNegApprox(x, tol) {
+    tol = tol || 1e-15;
+    if (x < 0) return 1 / expNegApprox(-x, tol);
+    if (x > 700) return 0;            /* e^700 is the edge of a double */
+    var t = 1, s = 1, k = 1;
+    while (t > tol * s && k < 1000) { t = t * x / k; s += t; k += 1; }
+    return 1 / s;
+  }
+  /* The Bloom false-positive rate. The exact form (1 - 1/m)^(kn) is available
+     as a rational; this is the (1 - e^(-kn/m))^k idealisation lessons compare
+     it against. */
+  function bloomApprox(m, n, k) {
+    return Math.pow(1 - expNegApprox(k * n / m, 1e-15), k);
+  }
+  /* Standard error of a proportion. A square root, so it rounds. */
+  function standardErrorApprox(p, n) { return Math.sqrt(p * (1 - p) / n); }
+  /* The Zipf normaliser past the point where its exact form is unreadable.
+     harmonic() stays exact and is what the lessons use; this is for the
+     lesson that asks what happens at a million keys. */
+  function harmonicApprox(n, s) {
+    if (s === 1) return Math.log(n) + 0.5772156649015329 + 1 / (2 * n);
+    var t = 0;
+    for (var k = 1; k <= n && k <= 100000; k += 1) t += 1 / Math.pow(k, s);
+    return t;
+  }
+  /* Bits per key for a target false-positive rate: log2(1/p)/ln 2.
+
+     NOT "the familiar 1.44 * log2(1/p)", and the difference is the point of
+     the lesson that uses this. 1.44 is a two-digit rounding of 1/ln 2 =
+     1.4427, so at p = 0.01 the textbook constant gives 9.567 and this gives
+     9.585. Both are printed on storage's `bloom` page, each under its own
+     name. This rounds -- it is a logarithm -- like the other Approx functions
+     around it. */
+  function bitsPerKeyApprox(target) { return Math.log2(1 / target) / Math.LN2; }
+  /* A root that rounds, by Newton from a rational start. Rsqrt returns null for
+     a non-square, which is right for exactness and useless for a geometric-mean
+     centre or a square-root scaling law. */
+  function sqrtApprox(a, tol) {
+    var x = Number(a.n) / Number(a.d);
+    if (x < 0) return NaN;
+    if (x === 0) return 0;
+    tol = tol || 1e-15;
+    var g = x, prev = 0;
+    while (Math.abs(g - prev) > tol * Math.max(1, g)) { prev = g; g = (g + x / g) / 2; }
+    return g;
+  }
+  /* Natural log, for the two max-load results this subject STATES rather than
+     proves. Everywhere else a logarithm is an exact integer search instead. */
+  function logApprox(x) { return Math.log(x); }
+
+  /* ---------------------------------------------------------------- output
+
+     algebra_core's Rdec goes through Number(a.n)/Number(a.d), and this course
+     produces rationals a double cannot hold: H(50,2) has a forty-three-digit
+     denominator and a byte weight at b - s = 2 over fifty ranks is worse. So
+     the decimals here are long division in BigInt, rounded half up at the last
+     digit printed, exact at every size up to that one rounding. */
+  function Rshow(a, places) {
+    if (places === undefined) places = 3;
+    var neg = a.n < 0n, n = neg ? -a.n : a.n, d = a.d;
+    var scale = 10n ** BigInt(places);
+    var q = (2n * n * scale + d) / (2n * d);          /* round half up */
+    var whole = q / scale, frac = (q % scale).toString();
+    while (frac.length < places) frac = '0' + frac;
+    var body = places > 0 ? whole + '.' + frac : String(whole);
+    return (neg ? '-' : '') + body;
+  }
+  /* A percentage of an exact probability, exact until the last digit printed. */
+  function Rpercent(a, places) {
+    return Rshow(Rmul(a, R(100n, 1n)), places === undefined ? 2 : places) + '%';
+  }
+  /* A float for PLOTTING only. Never for a figure: it goes through Rshow, so
+     it cannot be the NaN that Number(huge)/Number(huge) produces. */
+  function Rfloat(a) { return parseFloat(Rshow(a, 9)); }
+  /* Digit grouping. 1000000 and 1 000 000 are the same number and only one of
+     them can be read at a glance. */
+  function groupNum(value) {
+    var s = String(value), sign = '';
+    if (s.charAt(0) === '-') { sign = '-'; s = s.slice(1); }
+    return sign + s.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  }
+  /* Decimal byte units, which is what egress is billed in: 1 GB = 10^9 B. */
+  function bytesText(bytes) {
+    var b = Number(bytes);
+    if (b >= 1000000000) return Rshow(R(BigInt(bytes), 1000000000n), 2) + ' GB';
+    if (b >= 1000000) return Rshow(R(BigInt(bytes), 1000000n), 2) + ' MB';
+    if (b >= 1000) return Rshow(R(BigInt(bytes), 1000n), 2) + ' kB';
+    return groupNum(bytes) + ' B';
+  }
+  /* Money. Held in cents so that a price of a tenth of a cent per gigabyte is
+     an integer and a monthly bill is an exact fraction of a dollar. */
+  function moneyText(cents) {
+    return '$' + groupNum(Rshow(Rdiv(cents, R(100n, 1n)), 2));
+  }
+
+  /* ============ L1: the backend sees the MISS rate, not the hit rate ========
+
+     Everything the backend experiences is (1 - h)*lambda. That is why 90% to
+     99% is a tenfold cut in backend load rather than "nine per cent better":
+     the quantity that moved is 1/10 to 1/100, and the ratio of those is 10. */
+  function backendRate(lam, h) { return Rmul(Rsub(R(1n, 1n), h), lam); }
+  function backendRho(lam, h, cap) { return Rdiv(backendRate(lam, h), cap); }
+  /* How many times smaller the backend load is at hTo than at hFrom. The whole
+     of L1 in one fraction: at 90% and 99% this is 10. */
+  function missMultiple(hFrom, hTo) {
+    var to = Rsub(R(1n, 1n), hTo);
+    if (Rzero(to)) return null;                       /* a perfect cache has no ratio */
+    return Rdiv(Rsub(R(1n, 1n), hFrom), to);
+  }
+
+  /* ============ L2: an expectation, and a percentile that is not one ========
+
+     The mean is h*t_hit + (1-h)*t_miss, a weighted average that lands between
+     the two and equals neither. The percentile is a RANK on a two-atom
+     distribution: P(X <= t_hit) = h, so the q-quantile is t_hit exactly when
+     h >= q and t_miss otherwise. It does not interpolate and it does not move
+     smoothly -- it steps, once, at h = q. That step is the lesson: at a 99%
+     hit rate the p99 is still the miss latency, and at 99.1% it is not. */
+  function meanLatency(h, tHit, tMiss) {
+    return Radd(Rmul(h, tHit), Rmul(Rsub(R(1n, 1n), h), tMiss));
+  }
+  function latencyQuantile(h, tHit, tMiss, q) {
+    return Rcmp(h, q) >= 0 ? tHit : tMiss;
+  }
+  /* The hit rate at which that quantile stops being the miss latency. It IS q,
+     and saying so is the point: to move the p99 you need h > 0.99. */
+  function quantileFlip(q) { return q; }
+
+  /* ================= L3, L4, L10: Zipf popularity, exactly =================
+
+     p_i proportional to 1/i^s over N keys, so the top-C share is
+     H(C,s)/H(N,s) -- which is zipfHit in sysdesign_core.py. The exponent is an
+     integer here and the pages say why: at a fractional s every term 1/i^s is
+     irrational and there is no exact fraction to print at all. s = 0 is the
+     uniform control, where H(n,0) = n and the share collapses to C/N. */
+
+  /* i^e as an exact rational, for e of either sign. The negative side is what
+     a size profile needs when popular objects are the LARGE ones. */
+  function rankTerm(i, e) {
+    var p = 1n, kb = BigInt(i), m = e < 0 ? -e : e, j;
+    for (j = 0; j < m; j += 1) p *= kb;
+    return e < 0 ? R(1n, p) : R(p, 1n);
+  }
+  /* The probability of rank i itself: (1/i^s)/H(N,s). */
+  function zipfProb(i, n, s) { return Rdiv(rankTerm(i, -s), harmonic(n, s)); }
+
+  /* The top-C share, exact below the limit and ROUNDED above it.
+
+     harmonic() is exact and costs O(n*s) BigInt operations against a growing
+     denominator; it is comfortable to about fifty keys, which is also where
+     the printed fraction stops being readable by a human. Past that the core's
+     harmonicApprox rounds, and this returns rounded: true so that the caller
+     can say so on the page. A lab that switched silently would be telling the
+     reader that an approximation is an exact fraction. */
+  function zipfShare(c, n, s, limit) {
+    if (c <= 0) return { rounded: false, exact: R(0n, 1n), value: 0 };
+    if (c >= n) return { rounded: false, exact: R(1n, 1n), value: 1 };
+    if (n <= limit) {
+      var r = zipfHit(c, n, s);
+      return { rounded: false, exact: r, value: Rfloat(r) };
+    }
+    return { rounded: true, exact: null, value: harmonicApprox(c, s) / harmonicApprox(n, s) };
+  }
+
+  /* The smallest C whose share reaches the target. An exact scan with a
+     running prefix, so H(N,s) is summed once rather than C times. Returns N
+     when no prefix reaches it, which can only happen at target > 1. */
+  function sizeForTarget(n, s, target) {
+    var Hn = harmonic(n, s), acc = R(0n, 1n), i;
+    for (i = 1; i <= n; i += 1) {
+      acc = Radd(acc, rankTerm(i, -s));
+      if (Rcmp(Rdiv(acc, Hn), target) >= 0) return i;
+    }
+    return n;
+  }
+  /* The same search once the catalogue is past the exact limit. It rounds,
+     because harmonicApprox rounds, and sizeTarget below labels it. */
+  function sizeForTargetApprox(n, s, target) {
+    var hn = harmonicApprox(n, s), t = Rfloat(target), acc = 0, i;
+    for (i = 1; i <= n; i += 1) {
+      acc += 1 / Math.pow(i, s);
+      if (acc / hn >= t) return i;
+    }
+    return n;
+  }
+  function sizeTarget(n, s, target, limit) {
+    if (n <= limit) return { c: sizeForTarget(n, s, target), rounded: false };
+    return { c: sizeForTargetApprox(n, s, target), rounded: true };
+  }
+  /* h(C) for every C from 1 to N, for drawing the curve the target is read off.
+     Plot values only -- every figure the page states comes from zipfShare. */
+  function hitCurve(n, s, limit) {
+    var out = [], i;
+    if (n <= limit) {
+      var Hn = harmonic(n, s), acc = R(0n, 1n);
+      for (i = 1; i <= n; i += 1) { acc = Radd(acc, rankTerm(i, -s)); out.push(Rfloat(Rdiv(acc, Hn))); }
+      return out;
+    }
+    var hn = harmonicApprox(n, s), a = 0;
+    for (i = 1; i <= n; i += 1) { a += 1 / Math.pow(i, s); out.push(a / hn); }
+    return out;
+  }
+
+  /* ---- L10: the same sum, weighted by size, which is a different number ----
+
+     A CDN is billed in bytes, so the hit rate that matters is a BYTE hit rate:
+     sum over the cached ranks of p_i * size_i, over the same sum across all
+     ranks. With size_i proportional to i^b the weights are i^(b-s), so this is
+     the identical harmonic ratio at exponent s - b, and three cases fall out
+     of one formula rather than out of three assertions:
+
+       b = 0   every object the same size    byte hit rate  =  request hit rate
+       b = s   size grows exactly as fast as popularity falls    =  C/N, uniform
+       b > 0   popular objects are smaller   byte hit rate  <  request hit rate
+
+     The last is the real shape of a CDN workload and the reason the two
+     numbers must not be confused: the cheap hits are the small ones. */
+  function byteWeight(n, s, b) {
+    var total = R(0n, 1n), i;
+    for (i = 1; i <= n; i += 1) total = Radd(total, rankTerm(i, b - s));
+    return total;
+  }
+  function byteHit(c, n, s, b) {
+    if (c <= 0) return R(0n, 1n);
+    if (c >= n) return R(1n, 1n);
+    return Rdiv(byteWeight(c, s, b), byteWeight(n, s, b));
+  }
+  /* The same two sums in floating point, for a catalogue past the exact limit.
+     harmonicApprox cannot stand in for this: its exponent must be at least 0
+     and b - s is routinely negative here, which is the ordinary case of large
+     unpopular objects. Summed term by term, and every caller says it rounds. */
+  function byteWeightApprox(n, s, b) {
+    var t = 0, i;
+    for (i = 1; i <= n && i <= 100000; i += 1) t += Math.pow(i, b - s);
+    return t;
+  }
+  function byteHitApprox(c, n, s, b) {
+    if (c <= 0) return 0;
+    if (c >= n) return 1;
+    return byteWeightApprox(c, s, b) / byteWeightApprox(n, s, b);
+  }
+  /* The object at rank i, in bytes, under that profile. */
+  function objectBytes(i, b, baseBytes) {
+    return Rmul(R(BigInt(baseBytes), 1n), rankTerm(i, b));
+  }
+  /* What the origin still has to serve, and what a month of it costs. Cents
+     per gigabyte is an integer, so the bill is an exact fraction of a cent. */
+  function originBytes(totalBytes, bHit) { return Rmul(totalBytes, Rsub(R(1n, 1n), bHit)); }
+  function egressCost(bytesPerDay, centsPerGb, days) {
+    return Rmul(Rdiv(bytesPerDay, R(1000000000n, 1n)), Rmul(centsPerGb, R(BigInt(days), 1n)));
+  }
+
+  /* ============= L5: replacement on a trace, stepped and counted ===========
+
+     replayPolicy in sysdesign_core.py counts hits and is the tested one; it
+     does not report the cache contents, and a lesson whose point is that you
+     can WATCH a policy make its mistake needs them. So this steps the same
+     rules and mathcheck.js pins it against the core on every policy the core
+     implements. The one it does not implement is LFU, whose rule is stated
+     here rather than inherited: evict the smallest use count, ties broken by
+     insertion order, and a count dies with the entry it belongs to.
+
+     An unknown policy throws. The core's replayPolicy quietly treats anything
+     it does not recognise as FIFO, which would show a reader a FIFO run under
+     an LFU heading and nothing downstream would notice. */
+  function replayTrace(trace, k, policy) {
+    if (policy !== 'fifo' && policy !== 'lru' && policy !== 'lfu' && policy !== 'opt') {
+      throw new Error('replayTrace: unknown policy ' + policy);
+    }
+    var cache = [], count = {}, hits = 0, steps = [], i, j;
+    for (i = 0; i < trace.length; i += 1) {
+      var key = trace[i], at = cache.indexOf(key), evicted = null, hit = at >= 0;
+      if (hit) {
+        hits += 1;
+        if (policy === 'lru') { cache.splice(at, 1); cache.push(key); }
+        count[key] += 1;
+      } else {
+        if (cache.length >= k) {
+          var victim = 0;
+          if (policy === 'opt') {
+            /* evict whichever resident key is next used farthest ahead, or
+               never used again -- the bound, and the one rule that cannot be
+               run online because it reads the rest of the trace. */
+            var best = -1;
+            for (j = 0; j < cache.length; j += 1) {
+              var next = trace.indexOf(cache[j], i + 1);
+              if (next === -1) { victim = j; best = Infinity; break; }
+              if (next > best) { best = next; victim = j; }
+            }
+          } else if (policy === 'lfu') {
+            var low = -1;
+            for (j = 0; j < cache.length; j += 1) {
+              var c = count[cache[j]];
+              if (low < 0 || c < low) { low = c; victim = j; }
+            }
+          }
+          evicted = cache[victim];
+          cache.splice(victim, 1);
+          delete count[evicted];
+        }
+        cache.push(key);
+        count[key] = 1;
+      }
+      steps.push({ key: key, hit: hit, evicted: evicted, cache: cache.slice() });
+    }
+    return {
+      steps: steps, hits: hits, misses: trace.length - hits,
+      rate: trace.length ? R(BigInt(hits), BigInt(trace.length)) : R(0n, 1n)
+    };
+  }
+
+  /* Misses at every cache size from 1 to kmax. */
+  function missBySize(trace, policy, kmax) {
+    var out = [], k;
+    for (k = 1; k <= kmax; k += 1) out.push(replayTrace(trace, k, policy).misses);
+    return out;
+  }
+  /* Belady's anomaly, FOUND rather than asserted: the first cache size whose
+     next size up misses MORE. FIFO is not a stack algorithm, so its miss count
+     is not monotone in k; LRU, LFU-by-this-rule on a stack trace and OPT come
+     back null on the traces this lesson uses, and the page reports which.
+     Returning the actual k and the two counts is what lets the page name the
+     anomaly on the reader's own trace instead of promising it. */
+  function firstAnomaly(trace, policy, kmax) {
+    var m = missBySize(trace, policy, kmax), k;
+    for (k = 0; k + 1 < m.length; k += 1) {
+      if (m[k + 1] > m[k]) return { k: k + 1, up: k + 2, from: m[k], to: m[k + 1] };
+    }
+    return null;
+  }
+  /* The reader's own reference string. Keys are alphanumeric tokens; anything
+     else is a separator, so "A B C" and "A,B,C" and "a-b-c" all parse. */
+  function parseTrace(text) {
+    var raw = String(text).toUpperCase().split(/[^A-Z0-9]+/), out = [], i;
+    for (i = 0; i < raw.length; i += 1) if (raw[i]) out.push(raw[i]);
+    return out;
+  }
+  /* The distinct keys of a trace, in first-use order: the compulsory misses no
+     policy and no cache size can avoid. */
+  function traceKeys(trace) {
+    var seen = {}, out = [], i;
+    for (i = 0; i < trace.length; i += 1) {
+      if (!Object.prototype.hasOwnProperty.call(seen, trace[i])) { seen[trace[i]] = true; out.push(trace[i]); }
+    }
+    return out;
+  }
+
+  /* ==================== L6: a TTL is a staleness budget ====================
+
+     Under updates every U and a TTL of T, with the phase between them uniform,
+     the expected stale fraction is piecewise:
+
+       T <= U    T/(2U)        an update lands inside the window with
+                               probability T/U, half the window old on average
+       T >= U    1 - U/(2T)    the window outlives the update, so it is stale
+                               for all but the first U/2 of it on average
+
+     Both halves come from E[max(0, T - G)]/T with G uniform on [0,U), and they
+     agree at T = U, where both give 1/2. */
+  function staleFraction(T, U) {
+    var two = R(2n, 1n);
+    if (Rcmp(T, U) <= 0) return Rdiv(T, Rmul(two, U));
+    return Rsub(R(1n, 1n), Rdiv(U, Rmul(two, T)));
+  }
+  /* What a short TTL costs: a key read lambda times a second and expiring
+     every T seconds misses once per TTL, so the miss rate is 1/(lambda*T),
+     which is 1 once the TTL is shorter than the gap between reads. */
+  function ttlMissRate(lamKey, T) {
+    var d = Rmul(lamKey, T);
+    if (Rcmp(d, R(1n, 1n)) <= 0) return R(1n, 1n);
+    return Rinv(d);
+  }
+  /* The first update STRICTLY after t, under updates at phase + kU. Strictly,
+     because a refresh at the same instant as an update picks up the new value:
+     that boundary is the difference between a stale fraction and a wrong one. */
+  function nextUpdateAfter(t, phase, U) {
+    var k = Rfloor(Rdiv(Rsub(t, phase), U)) + 1n;
+    return Radd(phase, Rmul(R(k, 1n), U));
+  }
+  /* One concrete run, so the model's assumptions are on the page rather than
+     in a footnote: refreshes at 0, T, 2T, ..., updates at phase + kU, and the
+     copy is stale from the first update inside a window until the window ends. */
+  function staleRun(T, U, phase, windows) {
+    var spans = [], stale = R(0n, 1n), j;
+    for (j = 0; j < windows; j += 1) {
+      var lo = Rmul(R(BigInt(j), 1n), T), hi = Radd(lo, T);
+      var g = nextUpdateAfter(lo, phase, U);
+      if (Rcmp(g, hi) < 0) { spans.push([g, hi]); stale = Radd(stale, Rsub(hi, g)); }
+    }
+    var total = Rmul(R(BigInt(windows), 1n), T);
+    return { spans: spans, stale: stale, total: total, fraction: Rdiv(stale, total) };
+  }
+  /* The same run averaged over m phases, sampled at the MIDPOINT of each of m
+     equal slices of [0,U). This is the "uniform refresh phase" of the formula
+     made into something that runs.
+
+     Midpoints rather than left endpoints, and the difference is not cosmetic:
+     the quantity being averaged is max(0, T - G), which is linear in G, and a
+     midpoint sample is exact on a linear piece while a left-endpoint sample is
+     not. At U = 60, T = 10 the left-endpoint grid includes G = 0 exactly --
+     the case where an update lands on a refresh and nothing is ever stale --
+     and misses the other end, which drags 1/12 down to 1/16. The average would
+     then disagree with the formula for a reason that is about the sampling
+     rather than about the model, which is the opposite of what this page is
+     for. With midpoints the two agree wherever T divides U, and the residual
+     disagreement is the model's own. */
+  function staleAverage(T, U, m, windows) {
+    var tot = R(0n, 1n), j;
+    for (j = 0; j < m; j += 1) {
+      tot = Radd(tot, staleRun(T, U, Rmul(R(BigInt(2 * j + 1), BigInt(2 * m)), U), windows).fraction);
+    }
+    return Rdiv(tot, R(BigInt(m), 1n));
+  }
+
+  /* ======================= L7: the stampede at expiry ======================
+
+     The moment a hot key expires, every request that arrives before the first
+     miss has been filled goes through to the backend. By Little's Law the
+     number in that window is lambda*d -- a rate times a time, nothing else --
+     and coalescing (one in-flight fill per key, the rest waiting on it) makes
+     it one. A cache does not protect a backend during the miss window; the
+     coalescing does. */
+  function stampedeSize(lamKey, missMs) {
+    return Rmul(lamKey, Rdiv(missMs, R(1000n, 1n)));
+  }
+  /* Whole requests, because three-tenths of a request does not arrive: the
+     ceiling is what the backend actually counts. */
+  function stampedeCount(lamKey, missMs) { return Rceil(stampedeSize(lamKey, missMs)); }
+  /* The same burst from k independent hot keys expiring together, which is
+     what a fleet-wide TTL set at deploy time produces. */
+  function stampedeTotal(lamKey, missMs, keys) {
+    return Rmul(stampedeSize(lamKey, missMs), R(BigInt(keys), 1n));
+  }
+
+  /* ==================== L8: write-through and write-back ===================
+
+     Write-through sends every write. Write-back sends the DISTINCT keys in
+     each flush window, so the ratio it buys is writes over distinct keys --
+     and the price is a loss window: everything dirty at the moment of a crash
+     is gone. The distinct count and the peak dirty set both come off the
+     reader's own trace. */
+  function distinctPerWindow(trace, w) {
+    var out = [], i, j;
+    if (w < 1) w = 1;
+    for (i = 0; i < trace.length; i += w) {
+      var seen = {}, keys = [], n = 0;
+      for (j = i; j < i + w && j < trace.length; j += 1) {
+        n += 1;
+        if (!Object.prototype.hasOwnProperty.call(seen, trace[j])) { seen[trace[j]] = true; keys.push(trace[j]); }
+      }
+      out.push({ start: i, writes: n, keys: keys, distinct: keys.length });
+    }
+    return out;
+  }
+  function coalescing(trace, w) {
+    var wins = distinctPerWindow(trace, w), writes = 0, distinct = 0, peak = 0, i;
+    for (i = 0; i < wins.length; i += 1) {
+      writes += wins[i].writes;
+      distinct += wins[i].distinct;
+      if (wins[i].distinct > peak) peak = wins[i].distinct;
+    }
+    return {
+      windows: wins, writes: writes, distinct: distinct, peak: peak,
+      ratio: distinct ? R(BigInt(writes), BigInt(distinct)) : R(0n, 1n)
+    };
+  }
+  /* Bytes at risk: the largest dirty set a flush interval ever holds, times
+     the object size. Not an average -- an average loss window is not what a
+     crash takes. */
+  function bytesAtRisk(peakDistinct, objBytes) {
+    return Rmul(R(BigInt(peakDistinct), 1n), R(BigInt(objBytes), 1n));
+  }
+
+  /* ================= L9: the second level is CONDITIONAL ===================
+
+     h2 is measured on the requests that MISSED L1, so it is a conditional
+     probability and the global miss rate is the product (1-h1)(1-h2|miss), not
+     a sum and not h2. The latency is the same conditioning read forwards:
+     every request pays t1, the (1-h1) that miss pay t2, and the (1-h1)(1-h2)
+     that miss both pay t3. */
+  function globalHit(h1, h2) { return Radd(h1, Rmul(Rsub(R(1n, 1n), h1), h2)); }
+  function globalMiss(h1, h2) { return Rmul(Rsub(R(1n, 1n), h1), Rsub(R(1n, 1n), h2)); }
+  function levelLatency(h1, h2, t1, t2, t3) {
+    return Radd(t1, Rmul(Rsub(R(1n, 1n), h1), Radd(t2, Rmul(Rsub(R(1n, 1n), h2), t3))));
+  }
+  /* The two wrong answers this lesson exists to kill, computed so that the
+     page can print them beside the right one rather than describe them. */
+  function naiveSumHit(h1, h2) { return Radd(h1, h2); }
+  function conditionalShare(h1, h2) { return Rmul(Rsub(R(1n, 1n), h1), h2); }
+  var PRESET = {"n": 20, "s": 1, "c": 4, "b": 1, "gb": 50000, "price": 2, "limit": 50};
+
+  var nS = document.getElementById('hbN');
+  var sS = document.getElementById('hbS');
+  var cS = document.getElementById('hbC');
+  var bS = document.getElementById('hbB');
+  var gbS = document.getElementById('hbEgress');
+  var priceS = document.getElementById('hbPrice');
+  var plot = document.getElementById('hbPlot');
+  var table = document.getElementById('hbTable');
+  var status = document.getElementById('hbStatus');
+
+  function redraw() {
+    var n = +nS.value, s = +sS.value, b = +bS.value, gb = +gbS.value, price = +priceS.value;
+    var c = Math.min(+cS.value, n);
+    document.getElementById('hbNOut').textContent = n + ' objects';
+    document.getElementById('hbSOut').textContent = 's = ' + s;
+    document.getElementById('hbCOut').textContent = 'top ' + c + ' (' + Rpercent(R(BigInt(c), BigInt(n)), 1) + ' of the catalogue)';
+    document.getElementById('hbBOut').textContent = 'b = ' + b;
+    document.getElementById('hbEgressOut').textContent = groupNum(gb) + ' GB/day';
+    document.getElementById('hbPriceOut').textContent = price + '&cent;/GB';
+
+    var rounded = n > PRESET.limit;
+    var req = zipfShare(c, n, s, PRESET.limit);
+    var byteR = rounded ? null : byteHit(c, n, s, b);
+    var byteValue = rounded ? byteHitApprox(c, n, s, b) : Rfloat(byteR);
+
+    document.getElementById('hbReq').textContent = req.rounded
+      ? '~' + (100 * req.value).toFixed(2) + '%'
+      : Rpercent(req.exact, 2);
+    document.getElementById('hbByte').textContent = rounded
+      ? '~' + (100 * byteValue).toFixed(2) + '%'
+      : Rpercent(byteR, 2);
+
+    /* Origin bytes and the bill, from the BYTE hit rate -- the whole point of
+       the page is that using the request one here is the error. */
+    var totalBytes = Rmul(R(BigInt(gb), 1n), R(1000000000n, 1n));
+    var bh = rounded ? R(BigInt(Math.round(1000000 * byteValue)), 1000000n) : byteR;
+    var origin = originBytes(totalBytes, bh);
+    var originGb = Rdiv(origin, R(1000000000n, 1n));
+    var cost = egressCost(origin, R(BigInt(price), 1n), 30);
+    var wrongOrigin = originBytes(totalBytes, rounded
+      ? R(BigInt(Math.round(1000000 * req.value)), 1000000n) : req.exact);
+    var wrongCost = egressCost(wrongOrigin, R(BigInt(price), 1n), 30);
+
+    document.getElementById('hbOrigin').textContent = groupNum(Rshow(originGb, 0)) + ' GB';
+    document.getElementById('hbCost').textContent = moneyText(cost);
+
+    var rows = '', shown = Math.min(n, 8), i;
+    for (i = 1; i <= shown; i += 1) {
+      var p = rounded ? null : zipfProb(i, n, s);
+      var size = objectBytes(i, b, 100000);
+      rows += '<tr><td>' + i + '</td><td>' + (rounded ? '&mdash;' : Rtext(p)) + '</td><td>'
+        + bytesText(size.n / size.d) + '</td><td>'
+        + (rounded ? '&mdash;' : Rtext(Rmul(p, rankTerm(i, b)))) + '</td><td>'
+        + (i <= c ? '<span class="tone-cyan">cached</span>' : '<span class="tone-red">origin</span>')
+        + '</td></tr>';
+    }
+    if (n > shown) rows += '<tr><td colspan="5" class="tone-muted">&hellip; ' + (n - shown)
+      + ' further ranks, all computed</td></tr>';
+    table.innerHTML = '<thead><tr><th>rank i</th><th>p<sub>i</sub></th><th>size at 100 kB base</th>'
+      + '<th>p<sub>i</sub> &times; rank<sup>b</sup></th><th>where it is served</th></tr></thead><tbody>'
+      + rows + '</tbody>';
+
+    /* Two profiles: the share of REQUESTS each rank takes, and the share of
+       BYTES. The cached prefix is shaded in both, and the gap between the two
+       shaded areas is the whole lesson. */
+    var x0 = 30, wid = 460, barW = Math.max(1.5, wid / n - 1);
+    var pv = [], bv = [], pmax = 0, bmax = 0;
+    var Hs = rounded ? null : harmonic(n, s), Wb = rounded ? null : byteWeight(n, s, b);
+    for (i = 1; i <= n; i += 1) {
+      var pi = rounded ? (1 / Math.pow(i, s)) / harmonicApprox(n, s) : Rfloat(Rdiv(rankTerm(i, -s), Hs));
+      var bi = rounded ? Math.pow(i, b - s) / byteWeightApprox(n, s, b)
+                       : Rfloat(Rdiv(rankTerm(i, b - s), Wb));
+      pv.push(pi); bv.push(bi);
+      if (pi > pmax) pmax = pi;
+      if (bi > bmax) bmax = bi;
+    }
+    var sSvg = '<text x="' + x0 + '" y="14" font-size="11" fill="var(--cyan)">share of REQUESTS by rank</text>';
+    for (i = 0; i < n; i += 1) {
+      var hgt = Math.max(1, 58 * (pv[i] / (pmax || 1)));
+      sSvg += '<rect x="' + (x0 + i * (wid / n)) + '" y="' + (78 - hgt) + '" width="' + barW
+        + '" height="' + hgt + '" fill="var(--cyan)" opacity="' + (i < c ? '0.95' : '0.28') + '" />';
+    }
+    sSvg += '<text x="' + x0 + '" y="100" font-size="11" fill="var(--purple)">share of BYTES by rank</text>';
+    for (i = 0; i < n; i += 1) {
+      var hgt2 = Math.max(1, 58 * (bv[i] / (bmax || 1)));
+      sSvg += '<rect x="' + (x0 + i * (wid / n)) + '" y="' + (164 - hgt2) + '" width="' + barW
+        + '" height="' + hgt2 + '" fill="var(--purple)" opacity="' + (i < c ? '0.95' : '0.28') + '" />';
+    }
+    var edge = x0 + c * (wid / n);
+    sSvg += '<line x1="' + edge + '" y1="18" x2="' + edge + '" y2="170" stroke="var(--amber)" '
+      + 'stroke-width="2" stroke-dasharray="4 3" />'
+      + '<text x="' + (edge + 4) + '" y="182" font-size="10" fill="var(--amber)">cache edge at C = ' + c + '</text>'
+      + '<text x="' + x0 + '" y="200" font-size="10" fill="var(--muted)">solid bars are cached: '
+      + 'the left one covers ' + (100 * req.value).toFixed(1) + '% of the requests and '
+      + (100 * byteValue).toFixed(1) + '% of the bytes</text>';
+    plot.innerHTML = sSvg;
+
+    var gap = req.value - byteValue;
+    status.innerHTML = 'The edge holds the top ' + c + ' of ' + n + ' objects. That is <strong>'
+      + (100 * req.value).toFixed(2) + '%</strong> of the requests but <strong>'
+      + (100 * byteValue).toFixed(2) + '%</strong> of the bytes'
+      + (b === 0
+          ? ' &mdash; and they are equal, because at b = 0 every object is the same size and a '
+            + 'byte hit rate is a request hit rate under another name. That is the control: move b '
+            + 'off zero and watch them separate.'
+          : (b === s
+              ? ' &mdash; and the byte hit rate is exactly C/N = ' + Rtext(R(BigInt(c), BigInt(n)))
+                + ', the UNIFORM rate, because at b = s size grows exactly as fast as popularity '
+                + 'falls and every rank carries the same bytes.'
+              : (gap > 0
+                  ? ' &mdash; a gap of ' + (100 * gap).toFixed(2) + ' points, because the popular '
+                    + 'objects are the small ones and caching them buys requests more cheaply than bytes.'
+                  : ' &mdash; the byte rate is the HIGHER one here, because at b = ' + b
+                    + ' the popular objects are the large ones. That is a thumbnail cache, not a CDN.')))
+      + ' The bill follows the byte rate: <strong>' + groupNum(Rshow(originGb, 0))
+      + ' GB/day</strong> to the origin, <strong>' + moneyText(cost) + '</strong> over thirty days. '
+      + 'Billing from the request hit rate instead would have predicted ' + moneyText(wrongCost) + '.'
+      + (rounded
+          ? ' <span class="tone-red">Both rates above are rounded.</span> At N = ' + n
+            + ' &mdash; past ' + PRESET.limit + ' &mdash; the exact harmonic is a fraction whose '
+            + 'denominator runs to dozens of digits, so this page calls harmonicApprox and the '
+            + 'figures carry a ~. Drop N to ' + PRESET.limit + ' or below for exact fractions.'
+          : ' Every figure here is an exact fraction.');
+  }
+
+  [nS, sS, cS, bS, gbS, priceS].forEach(function (el) { el.addEventListener('input', redraw); });
+  nS.value = PRESET.n; sS.value = PRESET.s; cS.value = PRESET.c; bS.value = PRESET.b;
+  gbS.value = PRESET.gb; priceS.value = PRESET.price;
+  redraw();
+  window.redrawLab = redraw;
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "caching-and-hit-rates/cdn-egress-and-origin-load";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+  </script>
+</body>
+</html>

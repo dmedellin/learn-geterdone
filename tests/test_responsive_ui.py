@@ -297,7 +297,7 @@ class TestResponsiveUI(unittest.TestCase):
                         if chain[-1][0] == "td" and axis == "height":
                             size = px(style.get("height"))
                         self.assertGreaterEqual(size, 44, route + ": button-like hit box " + axis)
-        self.assertEqual(336, count, "all lessons must enforce control hit boxes")
+        self.assertEqual(450, count, "all lessons must enforce control hit boxes")
 
     def test_lab_grids_respect_their_container(self):
         capabilities = {"grid-2": 0, "kpi-grid": 0}

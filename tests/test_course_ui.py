@@ -78,7 +78,7 @@ class TestPublishedUI(unittest.TestCase):
         families += [(url, "subject") for url in PATH_PAGES]
         families += [(url, "course") for _title, url, _lessons in ALL_COURSES]
         families += [(url + lesson + "/", "lesson") for _title, url, lessons in ALL_COURSES for lesson in lessons]
-        self.assertEqual({"library": 1, "subject": 3, "course": 25, "lesson": 336, "progress": 1},
+        self.assertEqual({"library": 1, "subject": 4, "course": 35, "lesson": 450, "progress": 1},
                          {kind: sum(k == kind for _u, k in families) for _url, kind in families})
         required = {"library": ["hero", "subject-list", "course-search"],
                     "subject": ["breadcrumbs", "hero", "metadata", "overview", "course-list", "background"],
@@ -283,7 +283,7 @@ assert(!/\bpath\b/i.test(context.emptyState('missing').textContent));
 const inventory=/var COURSES = (\[[\s\S]*?\n      \]);/.exec(source);
 assert(inventory,'course search inventory missing');
 const courses=vm.runInNewContext(inventory[1]);
-assert.equal(courses.length,25,'search must cover every published course');
+assert.equal(courses.length,35,'search must cover every published course');
 for(const c of courses) assert(!/\b(?:the|this|learning|Trading|Algebra|Discrete Mathematics) path\b|\bcourse\s+\d/i.test(context.resultItem(c,'').textContent),c.title+' has curricular search copy');
 assert.deepStrictEqual(JSON.parse(JSON.stringify(courses.map(c=>[c.path,c.title,c.href,c.lessons]))),EXPECTED_INVENTORY);
 console.log('library search: subject names, factual lesson counts, neutral empty state');

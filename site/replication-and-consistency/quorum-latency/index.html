@@ -1,0 +1,2845 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quorum Latency: the W-th Fastest | Lesson | Replication and Consistency | System Design | Learn · geterdone.io</title>
+  <meta name="description" content="A quorum write is acknowledged when W of N replicas have replied, so it waits for an order statistic rather than for everyone: P(ack by t) = P(at least W of N replied by t), the same binomial tail that a k-of-n availability is. Hold W fixed and raise N and the write gets faster — 8 ms at N = 3, 4 ms at N = 4 — which is the opposite of what everyone expects, and it quietly breaks the overlap condition on the way." />
+  <link rel="canonical" href="https://learn.geterdone.io/replication-and-consistency/quorum-latency/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="Quorum Latency: the W-th Fastest | Lesson | Replication and Consistency | System Design | Learn · geterdone.io" />
+  <meta property="og:description" content="A quorum write is acknowledged when W of N replicas have replied, so it waits for an order statistic rather than for everyone: P(ack by t) = P(at least W of N replied by t), the same binomial tail that a k-of-n availability is. Hold W fixed and raise N and the write gets faster — 8 ms at N = 3, 4 ms at N = 4 — which is the opposite of what everyone expects, and it quietly breaks the overlap condition on the way." />
+  <meta property="og:url" content="https://learn.geterdone.io/replication-and-consistency/quorum-latency/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Quorum Latency: the W-th Fastest | Lesson | Replication and Consistency | System Design | Learn · geterdone.io" />
+  <meta name="twitter:description" content="A quorum write is acknowledged when W of N replicas have replied, so it waits for an order statistic rather than for everyone: P(ack by t) = P(at least W of N replied by t), the same binomial tail that a k-of-n availability is. Hold W fixed and raise N and the write gets faster — 8 ms at N = 3, 4 ms at N = 4 — which is the opposite of what everyone expects, and it quietly breaks the overlap condition on the way." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/replication-and-consistency/quorum-latency/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    @media (max-width: 920px) {
+      body[data-page-kind="supplemental"] [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/system-design/">System Design</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Replication and Consistency</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">Quorum Latency: the W-th Fastest</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The quorum latency: the w-th fastest is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Replication and Consistency &middot; Quorums</span>
+        <h1>Quorum Latency: the W-th Fastest</h1>
+        <p>A quorum write is acknowledged when <span class="math">W</span> of <span class="math">N</span> replicas have replied, so it waits for an order statistic rather than for everyone: <span class="math">P(ack by t) = P(at least W of N replied by t)</span>, the same binomial tail that a <span class="math">k</span>-of-<span class="math">n</span> availability is. Hold <span class="math">W</span> fixed and raise <span class="math">N</span> and the write gets <em>faster</em> — <span class="math">8 ms</span> at <span class="math">N = 3</span>, <span class="math">4 ms</span> at <span class="math">N = 4</span> — which is the opposite of what everyone expects, and it quietly breaks the overlap condition on the way.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">P(ack by t) = P(at least W of N replies ≤ t),  a binomial tail at p = F(t)
+W = 2, N = 3   p99 = 8 ms        W = 2, N = 4   p99 = 4 ms
+W = 2, N = 8   p99 = 2 ms        W = 3, N = 3   p99 = 24 ms
+more replicas at fixed W is FASTER, not slower
+and R + W &gt; N is what a fixed W stops satisfying</div>
+        <div class="float-label" style="right:16px;bottom:16px;">A binomial tail, and the trap underneath it</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>One distributional fact, one counter-intuitive consequence, and the cost the consequence hides.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>The quorum waits for the W-th fastest, not for everyone</h3><p>The coordinator sends to all <span class="math">N</span> and acknowledges as soon as <span class="math">W</span> have come back. The wait is therefore the <span class="math">W</span>-th smallest of <span class="math">N</span> reply times, and <span class="math">P(ack by t)</span> is the probability that at least <span class="math">W</span> of <span class="math">N</span> independent replies landed by <span class="math">t</span> — exactly the binomial tail Availability and Failure used for <span class="math">k</span>-of-<span class="math">n</span>, with success probability <span class="math">F(t)</span>.</p></article><article class="card concept-card"><div class="icon">2</div><h3>More replicas at fixed W is more chances to be early</h3><p>At a fixed <span class="math">t</span>, each replica independently has probability <span class="math">F(t)</span> of having replied. Adding another replica adds another Bernoulli trial without raising the threshold <span class="math">W</span>, so the probability of reaching <span class="math">W</span> by <span class="math">t</span> goes up, and the p99 goes down or stays put. On the distribution here <span class="math">W = 2</span> costs <span class="math">8 ms</span> at <span class="math">N = 3</span>, <span class="math">4 ms</span> at <span class="math">N = 4</span> and <span class="math">2 ms</span> at <span class="math">N = 8</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Latency is not the only thing N moves</h3><p>Raising <span class="math">N</span> with <span class="math">W</span> fixed is free latency and expensive correctness: the overlap condition <span class="math">R + W > N</span> has an <span class="math">N</span> on the wrong side of it. Going from three replicas to four with <span class="math">R = W = 2</span> takes a configuration that overlapped to one that does not, and the read now misses the write one time in six. The fast answer and the correct answer are different answers.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>The W-th fastest, and what the sweep in N really costs</h2></div><p>Where the binomial tail comes from, why a larger <span class="math">N</span> is faster, and what the same change does to the overlap.</p></div>
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Quorum write, and its acknowledged-by distribution</span><p>A <strong>quorum write</strong> with parameters <span class="math">(N, W)</span> is sent to all <span class="math">N</span> replicas and acknowledged when <span class="math">W</span> of them have replied. If replies are independent with CDF <span class="math">F</span>, then <span class="math">P(acked by t) = Σ C(N,k) F(t)^k (1 − F(t))^(N−k)</span> summed over <span class="math">k = W</span> to <span class="math">N</span> — the probability that at least <span class="math">W</span> of <span class="math">N</span> replies arrived by <span class="math">t</span>.</p></div><p>This is the same sum as a <span class="math">k</span>-of-<span class="math">n</span> availability and the lab computes it with the same code, which is the point: “at least <span class="math">W</span> of <span class="math">N</span> replied by <span class="math">t</span>” and “at least <span class="math">k</span> of <span class="math">n</span> are up” are one question asked of two different Bernoulli trials.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">per-replica reply time as in the synchronous-write lesson
+F(2) = 0.6   F(4) = 0.9   F(8) = 0.97   F(16) = 0.992   F(24) = 0.998
+
+W = 2, sweeping N              p99 of the quorum ack
+  N = 2    wait for both                 24 ms
+  N = 3                                   8 ms
+  N = 4                                   4 ms
+  N = 5                                   4 ms
+  N = 8                                   2 ms
+
+and for comparison, waiting for everybody
+  N = 3, W = 3                           24 ms</div><p>Two of the rows are worth pausing on. <span class="math">W = N</span> is the synchronous write of an earlier lesson and it costs <span class="math">24 ms</span>; relaxing the same three-node cluster to <span class="math">W = 2</span> costs <span class="math">8 ms</span>, a third as much, for a write that is still on two machines. And then adding a fourth replica — a change everybody describes as making writes more expensive — halves it again.</p><h3>Why a larger N is faster</h3><p>Because <span class="math">W</span> is a threshold and <span class="math">N</span> is the number of attempts at it. Each replica is an independent chance to be among the first two back; more chances means the second one arrives sooner. The write is not waiting for the extra replica, it is racing it, and a race with more entrants finishes its second place earlier.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">at t = 4 ms a replica has replied with probability F(4) = 9/10
+
+N = 3, W = 2   P = C(3,2)(9/10)²(1/10) + C(3,3)(9/10)³
+                 = 3(81/100)(1/10) + 729/1000
+                 = 243/1000 + 729/1000
+                 = 972/1000 = 0.972          &lt; 0.99
+
+N = 4, W = 2   P = 1 − (1/10)⁴ − C(4,1)(9/10)(1/10)³
+                 = 1 − 1/10 000 − 36/10 000
+                 = 9963/10 000 = 0.9963      ≥ 0.99
+
+so the p99 falls from 8 ms to 4 ms when the fourth replica is added</div><p>Nothing about the fourth replica is faster than the first three. What changed is that the event “fewer than two replies by <span class="math">4 ms</span>” now requires three or four stragglers instead of two, and stragglers are rare enough that requiring one more of them pushes the probability below the <span class="math">1%</span> the p99 is asking about.</p><div class="example"><span class="label">Example &middot; The fourth replica, and the read that stopped overlapping</span><p>The same cluster runs <span class="math">R = 2, W = 2</span> at <span class="math">N = 3</span>: <span class="math">R + W = 4 > 3</span>, so it overlaps and the minimum overlap is <span class="math">1</span>. Add the fourth replica for the latency and now <span class="math">R + W = 4 = N</span>, which overlaps nothing — and “Sloppy Quorums and the Miss Probability” prices the damage as <span class="math">C(N−W, R)/C(N, R) = C(2,2)/C(4,2) = 1/6</span>. One read in six misses the write. Restoring the guarantee means <span class="math">R = 3</span>, which makes every read wait for the third fastest of four instead of the second of three. The write got faster by making the read slower, and no dashboard would have shown the trade.</p></div><p>So the useful rule is not “more replicas are slower” or “more replicas are faster”. It is that <span class="math">N</span> moves the latency of a fixed-<span class="math">W</span> quorum down and moves the overlap condition against you at the same time, and both effects have to be computed whenever <span class="math">N</span> changes.</p></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Quorum latency: the W-th fastest</h2></div><p>A binomial tail, and why more replicas make a fixed-W write faster</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>A quorum waits for the W-th fastest</strong><span>P(ack by t) = P(at least W of N replied by t) &mdash; a binomial tail</span></div>
+        <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>P(ack by t) at this N</span><span class="tone-muted"><i class="legend-swatch"></i>the other N</span><span class="tone-purple"><i class="legend-swatch"></i>the p99</span><span class="tone-green"><i class="legend-swatch"></i>larger N, sooner</span></div>
+      </div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="qlCurve" viewBox="0 0 520 200" role="img" aria-label="P(quorum acked by t) for several fleet sizes at a fixed W."></svg></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="qlTable"></table></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="qlSweep"></table></div>
+      <div class="status-banner" id="qlStatus" style="margin-top:12px;"></div>
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>Set the quorum and the reply times</h3>
+          <p>The tail is summed exactly at every attainable time, and the sweep in <span class="math">N</span> is computed rather than extrapolated. Work the binomial tail at <span class="math">N = 3</span> and <span class="math">N = 4</span> by hand before you read the verdict — this is the one result on the course most readers refuse until they have done that.</p>
+        <div class="field">
+          <label for="qlPmf">One replica&rsquo;s reply time, as ms:weight pairs</label>
+          <input id="qlPmf" type="text" value="2:600, 4:300, 8:70, 16:22, 24:6, 40:2" inputmode="text" autocomplete="off">
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="qlN">Replicas asked, N</label><span class="range-value" id="qlNOut">3</span></div>
+          <input id="qlN" type="range" min="1" max="9" step="1" value="3" />
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="qlW">Replies waited for, W</label><span class="range-value" id="qlWOut">2</span></div>
+          <input id="qlW" type="range" min="1" max="9" step="1" value="2" />
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Quorum p99 at this N</span><strong id="qlP99">&mdash;</strong></div>
+          <div class="kpi"><span>p99 if you asked one more replica</span><strong id="qlNext">&mdash;</strong></div>
+          <div class="kpi"><span>p99 waiting for ALL N</span><strong id="qlAll">&mdash;</strong></div>
+          <div class="kpi"><span>P(quorum by the one-replica p50)</span><strong id="qlByP50">&mdash;</strong></div>
+          <div class="kpi"><span>Extra replies bought</span><strong id="qlSlack">&mdash;</strong></div>
+          <div class="kpi"><span>Binomial terms summed</span><strong id="qlTerms">&mdash;</strong></div>
+        </div>
+        <p class="small-copy" id="qlHint" style="margin:0;">The tail is availKofN &mdash; the same sum Availability and Failure uses for a k-of-n availability, at success probability F(t). Watch the p99 column as N rises with W held still: more replicas give the quorum more chances to be met early, so the write gets faster.</p>
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Computing a quorum&#x27;s latency</h2></div><p>The arithmetic is a binomial tail. The discipline is remembering that <span class="math">N</span> appears in two places in your design and you have only changed one of them.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Fix <span class="math">W</span> and get the per-replica reply CDF</h3><p><span class="math">W</span> is the threshold the quorum is defined by. <span class="math">F</span> is a measurement, and as with any tail question you need the distribution rather than a mean.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Evaluate the binomial tail at each attainable time</h3><p><span class="math">P(at least W of N by t)</span> with success probability <span class="math">F(t)</span>. Sum from <span class="math">k = W</span> to <span class="math">N</span>, or subtract the terms below <span class="math">W</span> from one, whichever is shorter — at small <span class="math">W</span> the second is much shorter.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Take the smallest <span class="math">t</span> where the tail reaches your percentile</h3><p>That is the quorum's p99. Compare it with the <span class="math">W = N</span> case, which is the synchronous write, to see what the relaxation bought.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Re-check <span class="math">R + W &gt; N</span> before you accept the <span class="math">N</span> you chose</h3><p>Every increase in <span class="math">N</span> at fixed <span class="math">W</span> improves the latency and erodes the overlap. If the configuration no longer overlaps, either raise <span class="math">R</span> — and recompute the read's latency by this same method — or keep the smaller <span class="math">N</span>.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>Order statistics and thresholds</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>Two of three, then two of four</h3><p>A three-node cluster acknowledges writes at two replicas. The p99 is <span class="math">8 ms</span> and the team wants it lower. Somebody proposes removing a replica, on the grounds that fewer machines are fewer things to wait for.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">per-replica reply CDF
+  F(2) = 6/10,   F(4) = 9/10,   F(8) = 97/100
+
+N = 3, W = 2
+  t = 2    P = C(3,2)(6/10)²(4/10) + (6/10)³
+             = 3(36/100)(4/10) + 216/1000
+             = 432/1000 + 216/1000 = 648/1000     &lt; 0.99
+  t = 4    P = 972/1000 = 0.972                   &lt; 0.99
+  t = 8    P = 3(97/100)²(3/100) + (97/100)³
+             = 0.084681 + 0.912673 = 0.997354     ≥ 0.99   p99 = 8 ms
+
+N = 4, W = 2
+  t = 4    P = 1 − (1/10)⁴ − 4(9/10)(1/10)³
+             = 1 − 0.0001 − 0.0036 = 0.9963       ≥ 0.99   p99 = 4 ms
+
+N = 2, W = 2   the proposal:  P = F(t)², p99 = 24 ms
+
+so removing a replica TRIPLES the p99, and adding one halves it</div><p>The proposal is exactly backwards and the binomial tail says why in one line: with <span class="math">W</span> fixed at two, each replica is another chance to be one of the first two back. At <span class="math">N = 2</span> there are no spare chances at all and the write waits for both, which is the <span class="math">24 ms</span> maximum of the synchronous lesson.</p><p>The second line of the lab's arithmetic is the one to keep. Between <span class="math">N = 3</span> and <span class="math">N = 4</span> the p99 halves, and between <span class="math">N = 4</span> and <span class="math">N = 8</span> it halves again to <span class="math">2 ms</span>, which is the floor of this distribution — no configuration can beat the fastest time any replica ever replies in.</p><p>For a faded rehearsal, the team accepts <span class="math">N = 4</span> for the write and now has <span class="math">R = W = 2</span> on four nodes. The supplied first move is that <span class="math">R + W = 4</span> is no longer greater than <span class="math">N = 4</span>. Work out what <span class="math">R</span> must become, compute the read's p99 at that <span class="math">R</span> by the same binomial tail, and state the net change to a read-then-write round trip before checking either figure.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Assuming more replicas make a fixed-<span class="math">W</span> write slower</strong><span>This is the misconception the lesson exists for. The coordinator waits for <span class="math">W</span> replies and ignores the rest, so extra replicas are extra racers and not extra waits. The arithmetic that makes it obvious is the binomial tail: adding a trial without raising the threshold can only raise <span class="math">P(at least W by t)</span>.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Raising <span class="math">N</span> without re-checking <span class="math">R + W &gt; N</span></strong><span>Latency work and correctness work touch the same parameter from opposite sides. Every time <span class="math">N</span> moves, both the quorum p99 and the overlap condition have to be recomputed, and the second one fails quietly: nothing gets slower, nothing logs an error, and a fraction of reads simply stop seeing recent writes.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Quoting the quorum&#x27;s p99 as though it were the slowest replica&#x27;s</strong><span><span class="math">W = 2</span> of three costs <span class="math">8 ms</span> here and <span class="math">W = 3</span> of three costs <span class="math">24 ms</span>. Those are different statistics of the same replicas — the second fastest and the slowest — and treating a quorum write as though it waited for everyone over-charges it by a factor of three on this distribution.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “we added a replica, so writes will be slower” prompts you to ask what W is.</strong><p>You should be able to write <span class="math">P(ack by t)</span> as a binomial tail, evaluate it at a handful of times, read a p99 off it, sweep <span class="math">N</span> and predict the direction before computing, and state what the same sweep did to <span class="math">R + W > N</span>.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The last example on this page left a configuration where <span class="math">R + W = N</span>, which is a guarantee you no longer have. “Sloppy Quorums and the Miss Probability” computes exactly what that costs — and the answer at three replicas with one read and one write is not a small number.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../quorums-overlap/" rel="prev"><span>Lesson</span><strong>Quorums Overlap</strong></a>
+      <a class="lesson-link next" href="../sloppy-quorums/" rel="next"><span>Lesson</span><strong>Sloppy Quorums and the Miss Probability</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="replication-and-consistency/quorum-latency" data-lesson-title="Quorum Latency: the W-th Fastest" data-course-title="Replication and Consistency">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Replication and Consistency.</strong> Every probability on this course is exact: the order statistics are computed from enumerated distributions, the quorum tails are binomial sums over exact fractions, the overlap counts are combinations, and the linearizations are enumerated rather than estimated. Where a lab caps its input size — six operations for the linearizability check — the cap is the factorial growth of the enumeration, and the lesson says so.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure on this path is computed in your browser from the model the lesson states, and a model&rsquo;s answer is only as true as its assumptions &mdash; independence, memorylessness and steady state are named where they are used, and each lesson says where its own fails.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "<span class=\"math\">W<\/span> is fixed at <span class=\"math\">2<\/span> and <span class=\"math\">N<\/span> goes from <span class=\"math\">3<\/span> to <span class=\"math\">4<\/span>. What happens to the write's p99?", "a": ["It rises, because there is one more replica to wait for", "It falls, from <span class=\"math\">8 ms<\/span> to <span class=\"math\">4 ms<\/span>", "It is unchanged, because <span class=\"math\">W<\/span> did not change", "It falls only if <span class=\"math\">W<\/span> rises with <span class=\"math\">N<\/span>"], "c": 1, "why": "The quorum waits for the <span class=\"math\">W<\/span>-th fastest, so an extra replica is an extra chance to supply the second reply early. The coordinator never waits for the fourth replica at all \u2014 it stops at two \u2014 which is why the first option's intuition does not apply."}, {"q": "<span class=\"math\">N = 4<\/span>, <span class=\"math\">W = 2<\/span>, and a replica has replied by <span class=\"math\">4 ms<\/span> with probability <span class=\"math\">9/10<\/span>. What is <span class=\"math\">P(ack by 4 ms)<\/span>?", "a": ["<span class=\"math\">0.9963<\/span>", "<span class=\"math\">0.972<\/span>", "<span class=\"math\">0.81<\/span>", "<span class=\"math\">0.9<\/span>"], "c": 0, "why": "<span class=\"math\">1 \u2212 P(no replies) \u2212 P(exactly one) = 1 \u2212 (1/10)\u2074 \u2212 4(9/10)(1/10)\u00b3 = 0.9963<\/span>. <span class=\"math\">0.972<\/span> is the same tail at <span class=\"math\">N = 3<\/span>; <span class=\"math\">0.81<\/span> is the probability that two specific replicas have both replied; <span class=\"math\">0.9<\/span> is one replica alone."}, {"q": "You raise <span class=\"math\">N<\/span> from <span class=\"math\">3<\/span> to <span class=\"math\">4<\/span> for the latency and leave <span class=\"math\">R = W = 2<\/span>. What did that change break?", "a": ["Nothing \u2014 the write quorum is still two machines", "The overlap: <span class=\"math\">R + W = 4<\/span> is no longer greater than <span class=\"math\">N = 4<\/span>, so a read set and a write set can be disjoint", "The write latency, which now rises", "Only the storage bill, which is <span class=\"math\">4\u00d7<\/span> instead of <span class=\"math\">3\u00d7<\/span>"], "c": 1, "why": "<span class=\"math\">R + W > N<\/span> is the condition and it has <span class=\"math\">N<\/span> on the wrong side. At <span class=\"math\">N = 4<\/span> with <span class=\"math\">R = W = 2<\/span> the miss probability is <span class=\"math\">C(2,2)/C(4,2) = 1/6<\/span>. The write latency fell rather than rose, and the storage bill did rise \u2014 but a correctness guarantee disappearing silently is the change that matters."}];
+
+  (function () {
+
+  /* Exact rational arithmetic over BigInt.
+
+     Every number a lesson calls "the answer" lives in this type. BigInt rather
+     than Number because a few steps of elimination on a 3x3 system produces
+     numerators that leave the exact-integer range of a double, and a solution
+     that is silently wrong in the last digits is worse than no solution. */
+  function bgcd(a, b) {
+    if (a < 0n) a = -a;
+    if (b < 0n) b = -b;
+    while (b) { var t = a % b; a = b; b = t; }
+    return a;
+  }
+  function R(n, d) {
+    if (d === undefined) d = 1n;
+    n = BigInt(n); d = BigInt(d);
+    if (d === 0n) throw new Error('division by zero');
+    if (d < 0n) { n = -n; d = -d; }
+    var g = bgcd(n, d) || 1n;
+    return { n: n / g, d: d / g };
+  }
+  var R0 = R(0n), R1 = R(1n);
+  function Radd(a, b) { return R(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function Rsub(a, b) { return R(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function Rmul(a, b) { return R(a.n * b.n, a.d * b.d); }
+  function Rdiv(a, b) { return R(a.n * b.d, a.d * b.n); }
+  function Rneg(a) { return R(-a.n, a.d); }
+  function Rabs(a) { return a.n < 0n ? Rneg(a) : a; }
+  function Rinv(a) { return R(a.d, a.n); }
+  function Rzero(a) { return a.n === 0n; }
+  function Rsign(a) { return a.n === 0n ? 0 : (a.n < 0n ? -1 : 1); }
+  function Requ(a, b) { return a.n === b.n && a.d === b.d; }
+  function Rcmp(a, b) { var l = a.n * b.d, r = b.n * a.d; return l < r ? -1 : (l > r ? 1 : 0); }
+  function Rint(a) { return a.d === 1n; }
+  function Rpow(a, k) {
+    var out = R1, base = a, e = k < 0 ? -k : k;
+    while (e > 0) { if (e & 1) out = Rmul(out, base); base = Rmul(base, base); e >>= 1; }
+    return k < 0 ? Rinv(out) : out;
+  }
+  /* The reader's form: "3", "-7/4". Never "3/1", never "0/5". */
+  function Rtext(a) { return a.d === 1n ? String(a.n) : a.n + '/' + a.d; }
+  /* Parenthesised when it would otherwise glue onto a neighbouring symbol. */
+  function Rterm(a) { return (a.n < 0n || a.d !== 1n) ? '(' + Rtext(a) + ')' : Rtext(a); }
+  function Rnum(a) { return Number(a.n) / Number(a.d); }
+  /* A decimal, for the one place a lesson asks for one. Exact when it can be. */
+  function Rdec(a, places) {
+    if (places === undefined) places = 6;
+    var v = Rnum(a);
+    if (Rint(a)) return String(a.n);
+    var s = v.toFixed(places);
+    return s.indexOf('.') >= 0 ? s.replace(/0+$/, '').replace(/\.$/, '') : s;
+  }
+  function Rparse(text) {
+    var s = String(text).trim();
+    var m = /^([+-]?\d+)\s*\/\s*(\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]), BigInt(m[2]));
+    m = /^([+-]?\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]));
+    m = /^([+-]?)(\d*)\.(\d+)$/.exec(s);
+    if (m) {
+      var whole = m[2] || '0', frac = m[3];
+      var num = BigInt(whole + frac), den = 10n ** BigInt(frac.length);
+      return R(m[1] === '-' ? -num : num, den);
+    }
+    return null;
+  }
+  /* Is this rational a perfect square? Needed wherever a lesson must decide
+     between an exact answer and a radical one -- sqrt(4/9) is 2/3 and belongs
+     on the page as 2/3, while sqrt(2) must stay sqrt(2). */
+  function bisqrt(n) {
+    if (n < 0n) return null;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x * x === n ? x : null;
+  }
+  function Rsqrt(a) {
+    if (a.n < 0n) return null;
+    var p = bisqrt(a.n), q = bisqrt(a.d);
+    return (p === null || q === null) ? null : R(p, q);
+  }
+
+  /* Counting is done in BigInt. 21! already exceeds what a double can hold
+     exactly, so a lab that used ordinary numbers would start printing
+     confidently wrong totals somewhere around n = 21 with nothing to mark the
+     boundary. Every count below is exact for every n the controls allow. */
+  function fact(n) { var r = 1n; for (var i = 2n; i <= BigInt(n); i += 1n) r *= i; return r; }
+  function perm(n, r) {
+    if (r > n || r < 0) return 0n;
+    var out = 1n;
+    for (var i = 0; i < r; i += 1) out *= BigInt(n - i);
+    return out;
+  }
+  function comb(n, r) {
+    if (r < 0 || r > n) return 0n;
+    r = Math.min(r, n - r);
+    var num = 1n, den = 1n;
+    for (var i = 0; i < r; i += 1) { num *= BigInt(n - i); den *= BigInt(i + 1); }
+    return num / den;
+  }
+  function group(x) { return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+
+  /* Ceiling and floor of an exact rational, as BigInt.
+
+     Capacity answers are counts of machines, shards and tree levels, and the
+     whole point of a sizing lesson is that 3.2 machines is four. Integer
+     division truncates toward zero, so a negative rational needs the sign. */
+  function Rfloor(a) {
+    var q = a.n / a.d;
+    if (a.n < 0n && q * a.d !== a.n) q -= 1n;
+    return q;
+  }
+  function Rceil(a) {
+    var q = a.n / a.d;
+    if (a.n > 0n && q * a.d !== a.n) q += 1n;
+    return q;
+  }
+
+  /* Nearest-rank percentile: the smallest value at or above q of the sample.
+
+     Nearest rank rather than an interpolating definition because it returns a
+     value that was actually observed. A p99 of 412ms that no request took is a
+     worse answer for this subject than one that a request did. */
+  function percentileRank(n, q) {
+    /* q is a rational in [0,1]; the rank is ceil(q*n), at least 1. */
+    var rank = Rceil(Rmul(q, R(BigInt(n), 1n)));
+    if (rank < 1n) rank = 1n;
+    if (rank > BigInt(n)) rank = BigInt(n);
+    return Number(rank);
+  }
+  function percentile(sorted, q) {
+    if (!sorted.length) return null;
+    return sorted[percentileRank(sorted.length, q) - 1];
+  }
+
+  /* P(X <= t) for a sample: a rational, count over total. */
+  function empiricalCdf(sorted, t) {
+    var c = 0;
+    for (var i = 0; i < sorted.length; i += 1) if (sorted[i] <= t) c += 1;
+    return R(BigInt(c), BigInt(sorted.length));
+  }
+
+  /* Discrete distributions as [value, probability] pairs with rational
+     probabilities. Convolution is the sum of two independent draws, which is
+     how a latency budget adds a serial chain and how periodic review covers
+     R+L periods of demand. Exact, so a 12-step convolution is still a fraction. */
+  function pmfNormalise(pairs) {
+    var total = R(0n, 1n), i;
+    for (i = 0; i < pairs.length; i += 1) total = Radd(total, pairs[i][1]);
+    if (Rzero(total)) return pairs.slice();
+    var out = [];
+    for (i = 0; i < pairs.length; i += 1) out.push([pairs[i][0], Rdiv(pairs[i][1], total)]);
+    return out;
+  }
+  function pmfConvolve(a, b) {
+    var acc = {}, i, j;
+    for (i = 0; i < a.length; i += 1) {
+      for (j = 0; j < b.length; j += 1) {
+        var v = a[i][0] + b[j][0], p = Rmul(a[i][1], b[j][1]);
+        acc[v] = acc[v] ? Radd(acc[v], p) : p;
+      }
+    }
+    var keys = Object.keys(acc).map(Number).sort(function (x, y) { return x - y; });
+    return keys.map(function (v) { return [v, acc[v]]; });
+  }
+  function pmfMean(pairs) {
+    var m = R(0n, 1n);
+    for (var i = 0; i < pairs.length; i += 1) {
+      m = Radd(m, Rmul(R(BigInt(pairs[i][0]), 1n), pairs[i][1]));
+    }
+    return m;
+  }
+  /* P(X > t): the tail a stale-read or a timeout lesson asks for. */
+  function pmfTail(pairs, t) {
+    var s = R(0n, 1n);
+    for (var i = 0; i < pairs.length; i += 1) if (pairs[i][0] > t) s = Radd(s, pairs[i][1]);
+    return s;
+  }
+  /* The pmf of the maximum of k independent copies -- the fan-out lesson's
+     whole point: P(max <= t) = F(t)^k, so the tail is what k does to it. */
+  function pmfMax(pairs, k) {
+    var sorted = pairs.slice().sort(function (x, y) { return x[0] - y[0]; });
+    var out = [], cum = R(0n, 1n), prev = R(0n, 1n);
+    for (var i = 0; i < sorted.length; i += 1) {
+      cum = Radd(cum, sorted[i][1]);
+      var here = Rpow(cum, k);
+      out.push([sorted[i][0], Rsub(here, prev)]);
+      prev = here;
+    }
+    return out;
+  }
+
+  /* Availability composition. Series multiplies down, parallel multiplies up,
+     k-of-n is a binomial tail -- all exact, which matters because the
+     interesting answers are differences in the fourth decimal place. */
+  function availSeries(list) {
+    var a = R(1n, 1n);
+    for (var i = 0; i < list.length; i += 1) a = Rmul(a, list[i]);
+    return a;
+  }
+  function availParallel(list) {
+    var down = R(1n, 1n);
+    for (var i = 0; i < list.length; i += 1) down = Rmul(down, Rsub(R(1n, 1n), list[i]));
+    return Rsub(R(1n, 1n), down);
+  }
+  /* P(at least k of n independent components up), each up with probability a. */
+  function availKofN(a, k, n) {
+    var total = R(0n, 1n), q = Rsub(R(1n, 1n), a);
+    for (var j = k; j <= n; j += 1) {
+      total = Radd(total, Rmul(R(comb(n, j), 1n), Rmul(Rpow(a, j), Rpow(q, n - j))));
+    }
+    return total;
+  }
+  /* Expected attempts and success under a retry policy of r retries at failure
+     probability p: the geometric sum the retry-storm lesson iterates on. */
+  function retryAttempts(p, r) {
+    var num = Rsub(R(1n, 1n), Rpow(p, r + 1));
+    return Rdiv(num, Rsub(R(1n, 1n), p));
+  }
+  function retrySuccess(p, r) { return Rsub(R(1n, 1n), Rpow(p, r + 1)); }
+
+  /* ================================================================= output
+
+     Rdec goes through Number(a.n)/Number(a.d), and this course builds
+     rationals a double cannot hold at either end: F(t)^(N-1) for a
+     thousand-weight pmf has a denominator of thirty digits by N = 5, and the
+     majority of nine nodes at five nines has one of forty-five. So decimals
+     here are long division in BigInt, rounded half up at the last digit. */
+  function Rfixed(a, places) {
+    if (places === undefined) places = 3;
+    var neg = a.n < 0n, n = neg ? -a.n : a.n, d = a.d;
+    var scale = 10n ** BigInt(places);
+    var q = (2n * n * scale + d) / (2n * d);          /* round half up */
+    var whole = q / scale, frac = (q % scale).toString();
+    while (frac.length < places) frac = '0' + frac;
+    var body = places > 0 ? whole + '.' + frac : String(whole);
+    return (neg ? '-' : '') + body;
+  }
+  function Rpct(a, places) {
+    return Rfixed(Rmul(a, R(100n, 1n)), places === undefined ? 2 : places) + '%';
+  }
+  /* How many nines: the largest k with 1 - A <= 10^-k, by an exact search over
+     powers of ten. No logarithm goes anywhere near a number this page asserts. */
+  function ninesOf(a) {
+    var down = Rsub(R(1n, 1n), a);
+    if (down.n <= 0n) return 99;
+    var k = 0, bound = R(1n, 10n);
+    while (k < 15 && Rcmp(down, bound) <= 0) { k += 1; bound = Rdiv(bound, R(10n, 1n)); }
+    return k;
+  }
+  /* A percentage with enough places to be worth printing. A majority of five
+     at four nines each is 99.999999940%, and a fixed two places renders that
+     as 100.00% -- which is the claim course 5 and this course both deny. */
+  function RpctAuto(a) {
+    if (Requ(a, R(1n, 1n))) return '100%';
+    if (Rzero(a)) return '0%';
+    return Rpct(a, Math.min(14, Math.max(3, ninesOf(a) + 3)));
+  }
+  /* Decimal byte units, which is what a replication stream is quoted in:
+     1 kB = 1000 B. Stated rather than assumed. */
+  function bytesText(bytes) {
+    var b = Number(bytes);
+    if (b >= 1000000000) return Rfixed(R(BigInt(bytes), 1000000000n), 2) + ' GB';
+    if (b >= 1000000) return Rfixed(R(BigInt(bytes), 1000000n), 2) + ' MB';
+    if (b >= 1000) return Rfixed(R(BigInt(bytes), 1000n), 2) + ' kB';
+    return group(BigInt(bytes)) + ' B';
+  }
+  /* A rational rounded DOWN to a whole number of bytes, for a figure that is a
+     count of bytes rather than a rate. Rfloor is the core's. */
+  function bytesFloor(a) { return Rfloor(a); }
+
+  /* ========================================= the distributions three modes share
+
+     A replica's reply time, a follower's lag and a quorum's per-replica
+     latency are all one shape: a pmf the reader types as value:weight pairs,
+     with the probabilities the exact fractions of those weights. The weights
+     are integers, so a 5-atom distribution raised to the 8th power is still a
+     fraction and the tail of it is still exact. */
+  function parsePmfSpec(text) {
+    var parts = String(text).split(','), out = [], i;
+    for (i = 0; i < parts.length; i += 1) {
+      var s = parts[i].trim();
+      if (!s) continue;
+      var m = /^([0-9]+)\s*:\s*([0-9]+)$/.exec(s);
+      if (!m) return null;
+      if (Number(m[2]) <= 0) return null;
+      out.push([Number(m[1]), Number(m[2])]);
+    }
+    return out.length ? out : null;
+  }
+  function pmfFromSpec(spec) {
+    var total = 0n, i;
+    for (i = 0; i < spec.length; i += 1) total += BigInt(spec[i][1]);
+    if (total === 0n) return null;
+    var out = [];
+    for (i = 0; i < spec.length; i += 1) out.push([spec[i][0], R(BigInt(spec[i][1]), total)]);
+    return out.sort(function (a, b) { return a[0] - b[0]; });
+  }
+  /* F(t) = P(X <= t), exact. */
+  function pmfCdfAt(pairs, t) {
+    var s = R(0n, 1n);
+    for (var i = 0; i < pairs.length; i += 1) if (pairs[i][0] <= t) s = Radd(s, pairs[i][1]);
+    return s;
+  }
+  /* The q-th percentile of a pmf, by the same rank rule sysdesign_core uses on
+     a sample: the smallest attainable value whose cumulative probability
+     reaches q. A percentile printed here is a value some reply actually took. */
+  function pmfPercentile(pairs, q) {
+    var sorted = pairs.slice().sort(function (a, b) { return a[0] - b[0]; });
+    var cum = R(0n, 1n);
+    for (var i = 0; i < sorted.length; i += 1) {
+      cum = Radd(cum, sorted[i][1]);
+      if (Rcmp(cum, q) >= 0) return sorted[i][0];
+    }
+    return sorted.length ? sorted[sorted.length - 1][0] : null;
+  }
+  /* The attainable values, ascending: the only instants at which any of these
+     step functions can change, so every search below is over this grid rather
+     than over a continuum. */
+  function pmfSupport(pairs) {
+    var out = [], i;
+    for (i = 0; i < pairs.length; i += 1) out.push(pairs[i][0]);
+    return out.sort(function (a, b) { return a - b; });
+  }
+  /* The mass strictly above a RATIONAL threshold. pmfTail takes a number; the
+     mean of a pmf is a fraction, and L3's whole argument is about the mass
+     past the mean. */
+  function tailPastRational(pairs, x) {
+    var s = R(0n, 1n);
+    for (var i = 0; i < pairs.length; i += 1) {
+      if (Rcmp(R(BigInt(pairs[i][0]), 1n), x) > 0) s = Radd(s, pairs[i][1]);
+    }
+    return s;
+  }
+
+  /* =========================================== L1: what a replication factor buys
+
+     N replicas serve reads in parallel and every one of them must apply every
+     write. So the four multipliers are N, 1, N and N, and the cluster's
+     throughput is whatever that leaves. With rho reads per write, a replica
+     carries ALL the writes plus 1/N of the reads:
+
+         T/(1 + rho) + (T rho/(1 + rho))/N  <=  c
+         T(N)  =  c N (1 + rho) / (N + rho)
+
+     which rises with N and stops at c(1 + rho). That ceiling is the read/write
+     ratio and nothing else -- it is the number course 1 computed, and it is
+     what decides whether a replication factor pays. At rho = 0, T(N) = c for
+     every N: a write-only workload gets nothing at all from replication. */
+  function fanoutSpeedup(n, rho) {
+    var N = R(BigInt(n), 1n), one = R(1n, 1n);
+    return Rdiv(Rmul(N, Radd(one, rho)), Radd(N, rho));
+  }
+  function fanoutCeiling(rho) { return Radd(R(1n, 1n), rho); }
+  function fanoutPlan(perReplica, n, rho) {
+    var c = perReplica, one = R(1n, 1n), N = R(BigInt(n), 1n);
+    var speedup = fanoutSpeedup(n, rho);
+    var total = Rmul(c, speedup);
+    var writes = Rdiv(total, Radd(one, rho));
+    var reads = Rsub(total, writes);
+    return {
+      readCapacity: Rmul(c, N),        /* N x, if every op were a read */
+      writeCapacity: c,                /* 1 x, whatever N is */
+      workMultiplier: N,               /* N x the write work */
+      storageMultiplier: N,            /* N x the bytes */
+      total: total, reads: reads, writes: writes,
+      speedup: speedup, ceiling: fanoutCeiling(rho),
+      perReplicaLoad: Radd(writes, Rdiv(reads, N))
+    };
+  }
+
+  /* ======================================== L2: a sync write waits for the slowest
+
+     The write is acknowledged when the LAST of the N - 1 followers has acked,
+     so its distribution is the maximum of N - 1 independent copies and
+     P(max <= t) = F(t)^(N-1). pmfMax does that exactly.
+
+     At N = 1 there is no follower to wait for, so the wait is zero rather than
+     one copy of the distribution -- the degenerate case has to be right or the
+     "N times one replica" comparison starts from the wrong place. */
+  function syncAckPmf(pairs, n) {
+    if (n <= 1) return [[0, R(1n, 1n)]];
+    return pmfMax(pairs, n - 1);
+  }
+  /* The misconception, computed rather than asserted: N times one replica's
+     own percentile, which is exactly what "synchronising to three replicas
+     costs three times one replica's latency" predicts. The write waits for
+     the MAXIMUM of N - 1 replicas, and a maximum is not a sum. */
+  function naiveSyncCost(pairs, n, q) {
+    return pmfPercentile(pairs, q) * n;
+  }
+  /* The asynchronous alternative charges no latency and risks bytes instead:
+     the writes that have left the leader and reached nobody. */
+  function asyncAtRiskBytes(writesPerSec, lagMs, bytesPerWrite) {
+    return Rdiv(Rmul(Rmul(R(BigInt(writesPerSec), 1n), lagMs), R(BigInt(bytesPerWrite), 1n)),
+                R(1000n, 1n));
+  }
+
+  /* ================================================ L3: a stale read is the TAIL
+
+     A read issued t after the write is stale exactly when the follower's lag
+     exceeds t, so P(stale) = P(lag > t). Read-your-writes and monotonic reads
+     are the two guarantees that fail on precisely this mass. */
+  function staleProb(pairs, t) { return pmfTail(pairs, t); }
+  function staleReadsPerSec(pairs, t, ratePerSec) {
+    return Rmul(pmfTail(pairs, t), R(BigInt(ratePerSec), 1n));
+  }
+  /* The delay at which staleness has fallen to 1 - q. */
+  function freshDelay(pairs, q) { return pmfPercentile(pairs, q); }
+
+  /* ============================================== L4: overlap, by the pigeonhole
+
+     A read set of R and a write set of W have R + W members between them among
+     N nodes. If R + W > N they cannot all be distinct, so at least R + W - N
+     of them are the same node -- and that minimum is attained, which is why
+     the number is the minimum and not merely a bound.
+
+     The sets are enumerated rather than counted because L4's objective is to
+     exhibit a disjoint pair when one exists. C(9,4) = 126, so the worst case
+     the controls allow is 126 x 126 = 15 876 pairs. */
+  function quorumOverlap(n, r, w) { return r + w - n; }
+  function quorumOverlaps(n, r, w) { return r + w > n; }
+  /* Every k-subset of {0..n-1}, in lexicographic order. */
+  function subsets(n, k) {
+    var out = [], idx = [], i;
+    if (k < 0 || k > n) return out;
+    for (i = 0; i < k; i += 1) idx.push(i);
+    for (;;) {
+      out.push(idx.slice());
+      var j = k - 1;
+      while (j >= 0 && idx[j] === n - k + j) j -= 1;
+      if (j < 0) return out;
+      idx[j] += 1;
+      for (i = j + 1; i < k; i += 1) idx[i] = idx[i - 1] + 1;
+    }
+  }
+  function overlapSize(a, b) {
+    var c = 0;
+    for (var i = 0; i < a.length; i += 1) if (b.indexOf(a[i]) >= 0) c += 1;
+    return c;
+  }
+  /* The smallest overlap over every (write set, read set) pair, and the first
+     pair that misses entirely -- the counterexample the lesson exhibits. */
+  function quorumScan(n, r, w) {
+    var W = subsets(n, w), Rs = subsets(n, r), i, j;
+    if (!W.length || !Rs.length) {
+      return { min: 0, disjoint: 0, witness: null, writeSets: W, readSets: Rs, pairs: 0 };
+    }
+    var min = n + 1, disjoint = 0, witness = null;
+    for (i = 0; i < W.length; i += 1) {
+      for (j = 0; j < Rs.length; j += 1) {
+        var o = overlapSize(W[i], Rs[j]);
+        if (o < min) min = o;
+        if (o === 0) { disjoint += 1; if (!witness) witness = { write: W[i], read: Rs[j] }; }
+      }
+    }
+    return { min: min, disjoint: disjoint, witness: witness,
+             writeSets: W, readSets: Rs, pairs: W.length * Rs.length };
+  }
+  /* The same count without enumerating: C(n,w) write sets, each missed by the
+     C(n-w,r) read sets drawn from the nodes the write did not touch. The page
+     computes both and prints their agreement. */
+  function disjointPairCount(n, r, w) { return comb(n, w) * comb(n - w, r); }
+
+  /* =================================== L5: a quorum waits for the W-th fastest
+
+     P(ack by t) = P(at least W of the N replies have arrived by t), which is
+     the binomial tail at success probability F(t) -- availKofN, the same sum
+     course 5 uses for a k-of-n availability. It is not rewritten here.
+
+     With W fixed, raising N adds terms to that tail and can only raise it. So
+     MORE REPLICAS MAKE THE WRITE FASTER, which is the one result on this
+     course readers refuse until they have computed it. */
+  function quorumAckBy(pairs, t, w, n) {
+    if (w <= 0) return R(1n, 1n);
+    if (w > n) return R(0n, 1n);
+    return availKofN(pmfCdfAt(pairs, t), w, n);
+  }
+  function quorumPercentile(pairs, w, n, q) {
+    var vals = pmfSupport(pairs), i;
+    for (i = 0; i < vals.length; i += 1) {
+      if (Rcmp(quorumAckBy(pairs, vals[i], w, n), q) >= 0) return vals[i];
+    }
+    return null;
+  }
+  function quorumSweep(pairs, w, maxN, q) {
+    var rows = [], n;
+    for (n = w; n <= maxN; n += 1) {
+      rows.push({ n: n, p: quorumPercentile(pairs, w, n, q) });
+    }
+    return rows;
+  }
+
+  /* ============================================ L6: what a sloppy quorum misses
+
+     With R + W <= N a read set can miss every node the write touched. The
+     write landed on some W of the N; the read picks R of the N, and it misses
+     the write entirely when all R come from the N - W the write did not touch:
+
+         P(miss) = C(N - W, R) / C(N, R)
+
+     At N = 3, R = W = 1 that is C(2,1)/C(3,1) = 2/3. Two reads in three miss a
+     write that was acknowledged. comb returns 0 for R > N - W, which is the
+     right answer and not a guard: past that point no read set can avoid the
+     write. */
+  function sloppyMiss(n, r, w) {
+    var whole = comb(n, r);
+    if (whole === 0n) return null;
+    return R(comb(n - w, r), whole);
+  }
+  function sloppyHit(n, r, w) {
+    var m = sloppyMiss(n, r, w);
+    return m === null ? null : Rsub(R(1n, 1n), m);
+  }
+
+  /* =============================== L7: 2f + 1, and the node that buys nothing
+
+     A majority of n is floor(n/2) + 1, so a cluster survives n - (floor(n/2) +
+     1) = floor((n - 1)/2) failures. Four nodes tolerate one, exactly as three
+     do. Worse: the majority of four is THREE, so its availability is the
+     probability three of four are up -- lower than two of three. The fourth
+     node costs money and buys negative reliability. */
+  function majoritySize(n) { return Math.floor(n / 2) + 1; }
+  function faultsTolerated(n) { return Math.floor((n - 1) / 2); }
+  function majorityAvail(a, n) { return availKofN(a, majoritySize(n), n); }
+  function evenIsWasted(n) { return n >= 2 && n % 2 === 0; }
+
+  /* ================================================ L8: the split vote, exactly
+
+     n candidates each pick one of T slots uniformly. The election is clean when
+     exactly one candidate holds the strictly earliest slot: choose that
+     candidate (n ways), choose its slot j (probability 1/T), and require the
+     other n - 1 to land strictly later, which they do with probability
+     ((T - j)/T)^(n-1).
+
+         P(clean) = sum_{j=1..T} n (1/T) ((T - j)/T)^(n-1)
+
+     At T = 1 every term carries a factor of zero, so a FIXED timeout is a
+     guaranteed tie for n >= 2. That is the whole reason the timeout is
+     randomised, and it falls straight out of the formula. */
+  function electionTerm(n, T, j) {
+    return Rmul(R(BigInt(n), BigInt(T)), Rpow(R(BigInt(T - j), BigInt(T)), n - 1));
+  }
+  function electionClean(n, T) {
+    var s = R(0n, 1n), j;
+    if (n <= 0 || T <= 0) return R(0n, 1n);
+    for (j = 1; j <= T; j += 1) s = Radd(s, electionTerm(n, T, j));
+    return s;
+  }
+  /* Rounds until one succeeds: a geometric mean, 1/P. Null when P is zero,
+     because "expected rounds" is then not a number and printing a large one
+     would be a lie about a process that never terminates. */
+  function electionRounds(n, T) {
+    var p = electionClean(n, T);
+    return Rzero(p) ? null : Rinv(p);
+  }
+  /* The window a target clean-election rate needs. P(clean) rises with T --
+     more slots, fewer ties -- so a binary search is exact, and it matters:
+     scanning to 400 evaluates eighty thousand exact-power terms and a reader
+     dragging the candidate slider feels every one of them. */
+  function slotsForClean(n, target, limit) {
+    if (Rcmp(electionClean(n, 1), target) >= 0) return 1;
+    if (Rcmp(electionClean(n, limit), target) < 0) return null;
+    var lo = 1, hi = limit;
+    while (lo + 1 < hi) {
+      var mid = (lo + hi) >> 1;
+      if (Rcmp(electionClean(n, mid), target) >= 0) hi = mid; else lo = mid;
+    }
+    return hi;
+  }
+
+  /* ======================================= L9, L10: a message diagram, stamped
+
+     The spec a reader edits is "A:4 B:4 C:3; A2 to B2; B3 to C2", meaning
+     three processes with that many local events each, a message sent at A's
+     second event and delivered at B's second, and another from B's third to
+     C's second. "to", "->", ">" and "-" are all accepted as the arrow, and the
+     presets use the word: a ">" inside an HTML attribute value truncates the
+     tag for every regex-based reader of a page, labcheck's DOM shim included,
+     so a default carrying one would arrive at the lab empty.
+
+     Parsing returns null on anything that is not a diagram: a typo must not
+     print confident stamps for a graph that does not exist. */
+  function parseDiagram(text) {
+    var chunks = String(text).split(';'), i;
+    var head = (chunks[0] || '').trim();
+    if (!head) return null;
+    var procs = [], names = {}, parts = head.split(/\s+/);
+    for (i = 0; i < parts.length; i += 1) {
+      var m = /^([A-Z]):([1-9]|10)$/.exec(parts[i].trim());
+      if (!m) return null;
+      if (Object.prototype.hasOwnProperty.call(names, m[1])) return null;
+      names[m[1]] = procs.length;
+      procs.push({ name: m[1], count: Number(m[2]) });
+    }
+    if (!procs.length || procs.length > 4) return null;
+    var msgs = [], taken = {}, sent = {};
+    for (i = 1; i < chunks.length; i += 1) {
+      var s = chunks[i].trim();
+      if (!s) continue;
+      var g = /^([A-Z])([0-9]+)\s*(?:to|->|>|-)\s*([A-Z])([0-9]+)$/.exec(s);
+      if (!g) return null;
+      if (!Object.prototype.hasOwnProperty.call(names, g[1])) return null;
+      if (!Object.prototype.hasOwnProperty.call(names, g[3])) return null;
+      var from = names[g[1]], fe = Number(g[2]) - 1;
+      var to = names[g[3]], te = Number(g[4]) - 1;
+      if (from === to) return null;
+      if (fe >= procs[from].count || te >= procs[to].count) return null;
+      var rk = to + ':' + te, sk = from + ':' + fe;
+      if (taken[rk] || sent[rk] || taken[sk] || sent[sk]) return null;
+      taken[rk] = true;
+      sent[sk] = true;
+      msgs.push({ from: from, fromEvent: fe, to: to, toEvent: te });
+    }
+    return { procs: procs, msgs: msgs };
+  }
+  /* The events in one flat list, process by process, with the two edges that
+     define happens-before: the previous event on the same process, and the
+     send a receive is waiting for. The flat order makes the previous event on
+     a process exactly index - 1, which is what lets one pass be correct. */
+  function diagramEvents(d) {
+    var out = [], p, e, i;
+    for (p = 0; p < d.procs.length; p += 1) {
+      for (e = 0; e < d.procs[p].count; e += 1) {
+        out.push({ proc: p, index: e, name: d.procs[p].name + (e + 1), recv: -1, send: -1 });
+      }
+    }
+    var at = {};
+    for (i = 0; i < out.length; i += 1) at[out[i].proc + ':' + out[i].index] = i;
+    for (var m = 0; m < d.msgs.length; m += 1) {
+      var s = at[d.msgs[m].from + ':' + d.msgs[m].fromEvent];
+      var r = at[d.msgs[m].to + ':' + d.msgs[m].toEvent];
+      out[r].recv = s;
+      out[s].send = r;
+    }
+    return out;
+  }
+  /* A topological order of the events, or null if the messages make a cycle --
+     a diagram in which a message is received before it was sent. Kahn, so the
+     null is a proof rather than an iteration limit. */
+  function diagramOrder(events) {
+    var n = events.length, indeg = [], adj = [], i, k;
+    for (i = 0; i < n; i += 1) { indeg.push(0); adj.push([]); }
+    for (i = 0; i < n; i += 1) {
+      if (events[i].index > 0) { adj[i - 1].push(i); indeg[i] += 1; }
+      if (events[i].recv >= 0) { adj[events[i].recv].push(i); indeg[i] += 1; }
+    }
+    var queue = [], order = [];
+    for (i = 0; i < n; i += 1) if (indeg[i] === 0) queue.push(i);
+    while (queue.length) {
+      var v = queue.shift();
+      order.push(v);
+      for (k = 0; k < adj[v].length; k += 1) {
+        indeg[adj[v][k]] -= 1;
+        if (indeg[adj[v][k]] === 0) queue.push(adj[v][k]);
+      }
+    }
+    return order.length === n ? order : null;
+  }
+  /* L(e) = max(L of the previous event on this process, L of the send this
+     event receives) + 1. */
+  function lamportStamps(d) {
+    var events = diagramEvents(d), order = diagramOrder(events), i;
+    if (!order) return null;
+    var L = [];
+    for (i = 0; i < events.length; i += 1) L.push(0);
+    for (i = 0; i < order.length; i += 1) {
+      var v = order[i], best = 0;
+      if (events[v].index > 0 && L[v - 1] > best) best = L[v - 1];
+      if (events[v].recv >= 0 && L[events[v].recv] > best) best = L[events[v].recv];
+      L[v] = best + 1;
+    }
+    return L;
+  }
+  /* The vector version: elementwise maximum of the same two predecessors, then
+     increment this process's own component. */
+  function vectorStamps(d) {
+    var events = diagramEvents(d), order = diagramOrder(events), i, j;
+    if (!order) return null;
+    var k = d.procs.length, V = [];
+    for (i = 0; i < events.length; i += 1) {
+      var z = [];
+      for (j = 0; j < k; j += 1) z.push(0);
+      V.push(z);
+    }
+    for (i = 0; i < order.length; i += 1) {
+      var v = order[i], cur = [];
+      for (j = 0; j < k; j += 1) cur.push(0);
+      if (events[v].index > 0) for (j = 0; j < k; j += 1) { if (V[v - 1][j] > cur[j]) cur[j] = V[v - 1][j]; }
+      if (events[v].recv >= 0) {
+        for (j = 0; j < k; j += 1) { if (V[events[v].recv][j] > cur[j]) cur[j] = V[events[v].recv][j]; }
+      }
+      cur[events[v].proc] += 1;
+      V[v] = cur;
+    }
+    return V;
+  }
+  /* -1 if a happens before b, 1 if b before a, 0 if equal, NULL if neither --
+     which is what concurrent means. Not "at the same time": incomparable. */
+  function vecCompare(a, b) {
+    var le = true, ge = true, i;
+    for (i = 0; i < a.length; i += 1) {
+      if (a[i] > b[i]) le = false;
+      if (a[i] < b[i]) ge = false;
+    }
+    if (le && ge) return 0;
+    if (le) return -1;
+    if (ge) return 1;
+    return null;
+  }
+  function concurrentPairs(V) {
+    var out = [], i, j;
+    for (i = 0; i < V.length; i += 1) {
+      for (j = i + 1; j < V.length; j += 1) if (vecCompare(V[i], V[j]) === null) out.push([i, j]);
+    }
+    return out;
+  }
+  /* L9's counterexample: a pair with L(a) < L(b) where a does NOT happen
+     before b. Lamport's converse fails exactly here, and the only way to know
+     it failed is the vector clock of L10. */
+  function lamportFalsePairs(L, V) {
+    var out = [], i, j;
+    for (i = 0; i < L.length; i += 1) {
+      for (j = 0; j < L.length; j += 1) {
+        if (i === j) continue;
+        if (L[i] < L[j] && vecCompare(V[i], V[j]) === null) out.push([i, j]);
+      }
+    }
+    return out;
+  }
+  /* The direction that DOES hold: a happens before b implies L(a) < L(b). The
+     page checks it on the reader's own diagram rather than asserting it. */
+  function lamportConsistent(L, V) {
+    var i, j;
+    for (i = 0; i < L.length; i += 1) {
+      for (j = 0; j < L.length; j += 1) {
+        if (i === j) continue;
+        if (vecCompare(V[i], V[j]) === -1 && !(L[i] < L[j])) return false;
+      }
+    }
+    return true;
+  }
+
+  /* ========================================== L11: drift, skew and commit-wait
+
+     A clock drifting d parts per million gains or loses d MICROSECONDS every
+     second -- that is what ppm means -- so between corrections s seconds apart
+     it can be off by d*s microseconds. Two clocks can be off in opposite
+     directions, so the uncertainty on comparing their timestamps is 2*epsilon,
+     and waiting 2*epsilon before committing turns a bound into an order.
+
+     NTP does not make clocks equal. It bounds how far apart they drift between
+     corrections, and this is that bound. */
+  function skewMicros(ppm, intervalSec) {
+    return Rmul(R(BigInt(ppm), 1n), R(BigInt(intervalSec), 1n));
+  }
+  function commitWaitMicros(ppm, intervalSec) {
+    return Rmul(R(2n, 1n), skewMicros(ppm, intervalSec));
+  }
+  /* Wall-clock order is trustworthy only when the true separation exceeds the
+     window. Inside it, the two timestamps can disagree with reality and
+     nothing on either machine can tell. */
+  function orderTrustworthy(gapMicros, ppm, intervalSec) {
+    return Rcmp(gapMicros, commitWaitMicros(ppm, intervalSec)) > 0;
+  }
+  /* How many times the true gap the uncertainty window is. Above one, the
+     order is undecidable from the clocks alone. */
+  function windowRatio(gapMicros, ppm, intervalSec) {
+    if (Rzero(gapMicros)) return null;
+    return Rdiv(commitWaitMicros(ppm, intervalSec), gapMicros);
+  }
+
+  /* ========================================= L12: linearizability by enumeration
+
+     A history is linearizable exactly when SOME total order of its operations
+     is both consistent with real time -- if a returned before b was invoked,
+     a comes first -- and legal for a register: a read returns the value of the
+     most recent write. So enumerate the orders and count the legal ones. The
+     count is a proof either way, and zero is a violation.
+
+     SIX OPERATIONS, AND THE CAP IS THE LESSON. 6! is 720 orders, 7! is 5040,
+     10! is 3 628 800. The enumeration is factorial and no amount of care makes
+     it otherwise, which is why a real checker searches with pruning instead
+     and why the general problem is NP-hard. The refusal below prints the
+     factorial it declined to compute rather than silently truncating. */
+  function parseHistory(text) {
+    /* Split on ";" and not "," -- the interval [2, 6] contains a comma, and a
+       separator that appears inside an operation is a separator that silently
+       cuts every operation in half. */
+    var parts = String(text).split(';'), out = [], i;
+    for (i = 0; i < parts.length; i += 1) {
+      var s = parts[i].trim();
+      if (!s) continue;
+      var m = /^([A-Z])\s*(w|r)\s*([0-9]+)\s*\[\s*([0-9]+)\s*,\s*([0-9]+)\s*\]$/.exec(s);
+      if (!m) return null;
+      var st = Number(m[4]), en = Number(m[5]);
+      if (en <= st) return null;
+      out.push({ client: m[1], kind: m[2], value: Number(m[3]), start: st, end: en,
+                 name: m[1] + ' ' + (m[2] === 'w' ? 'write ' : 'read ') + m[3],
+                 shortName: m[1] + '.' + m[2] + m[3] });
+    }
+    if (!out.length || out.length > 12) return null;
+    return out;
+  }
+  /* The real-time partial order: a precedes b when a RETURNED before b was
+     INVOKED. Overlapping operations are concurrent and may go either way,
+     which is the freedom the enumeration searches. */
+  function realTimeBefore(a, b) { return a.end <= b.start; }
+  function orderRespectsRealTime(ops, perm) {
+    var i, j;
+    for (i = 0; i < perm.length; i += 1) {
+      for (j = i + 1; j < perm.length; j += 1) {
+        if (realTimeBefore(ops[perm[j]], ops[perm[i]])) return false;
+      }
+    }
+    return true;
+  }
+  /* Legal for a register starting at `initial`: every read returns whatever
+     the last write put there. */
+  function orderLegal(ops, perm, initial) {
+    var value = initial, i;
+    for (i = 0; i < perm.length; i += 1) {
+      var op = ops[perm[i]];
+      if (op.kind === 'w') { value = op.value; continue; }
+      if (op.value !== value) return false;
+    }
+    return true;
+  }
+  /* Every permutation of 0..k-1. Built by insertion, so the count is exactly
+     k! and mathcheck can check it against fact(k). */
+  function permutations(k) {
+    if (k <= 0) return [[]];
+    var base = permutations(k - 1), out = [], i, j;
+    for (i = 0; i < base.length; i += 1) {
+      for (j = 0; j <= base[i].length; j += 1) {
+        var p = base[i].slice();
+        p.splice(j, 0, k - 1);
+        out.push(p);
+      }
+    }
+    return out;
+  }
+  function linearizations(ops, initial) {
+    var perms = permutations(ops.length), valid = [], rt = 0, i;
+    for (i = 0; i < perms.length; i += 1) {
+      if (!orderRespectsRealTime(ops, perms[i])) continue;
+      rt += 1;
+      if (orderLegal(ops, perms[i], initial)) valid.push(perms[i]);
+    }
+    return { total: perms.length, realTime: rt, valid: valid };
+  }
+  /* The two counts a reader should be able to check by hand on three
+     operations: the concurrent pairs, and the pairs real time has already
+     decided. Together they are C(k,2). */
+  function historyPairs(ops) {
+    var forced = 0, concurrent = 0, i, j;
+    for (i = 0; i < ops.length; i += 1) {
+      for (j = i + 1; j < ops.length; j += 1) {
+        if (realTimeBefore(ops[i], ops[j]) || realTimeBefore(ops[j], ops[i])) forced += 1;
+        else concurrent += 1;
+      }
+    }
+    return { forced: forced, concurrent: concurrent };
+  }
+
+  /* ================================== L13: what each merge throws away, counted
+
+     The trace is a list of updates: "B:5:+3" is replica B adding three at time
+     5. No replica has seen any other's update, which is what makes them
+     concurrent.
+
+     LAST-WRITER-WINS keeps one replica's register and discards the rest. The
+     winner holds the largest timestamp -- ties broken by replica name, which is
+     what a real LWW register does and is why "the clocks are accurate" does
+     not save it -- and its value is the sum of ITS OWN deltas. Every update at
+     any other replica is gone, and the page lists them by name.
+
+     THE COUNTER CRDT keeps one count per replica. The merge is the elementwise
+     maximum and the value is the sum, and because maximum is commutative,
+     associative and idempotent the merged state does not depend on the order
+     the replicas met in or on how many times they met. Nothing is discarded,
+     and the total is the sum of every delta in the trace. */
+  function parseTrace(text) {
+    var parts = String(text).split(','), out = [], i;
+    for (i = 0; i < parts.length; i += 1) {
+      var s = parts[i].trim();
+      if (!s) continue;
+      var m = /^([A-Z])\s*:\s*([0-9]+)\s*:\s*\+?([0-9]+)$/.exec(s);
+      if (!m) return null;
+      var delta = Number(m[3]);
+      if (delta <= 0) return null;          /* a grow-only counter grows */
+      out.push({ replica: m[1], ts: Number(m[2]), delta: delta,
+                 name: m[1] + ' +' + delta + ' at t=' + Number(m[2]) });
+    }
+    if (!out.length || out.length > 12) return null;
+    return out;
+  }
+  function traceReplicas(trace) {
+    var seen = [], i;
+    for (i = 0; i < trace.length; i += 1) {
+      if (seen.indexOf(trace[i].replica) < 0) seen.push(trace[i].replica);
+    }
+    return seen.sort();
+  }
+  function traceTotal(trace) {
+    var t = 0;
+    for (var i = 0; i < trace.length; i += 1) t += trace[i].delta;
+    return t;
+  }
+  function lwwMerge(trace) {
+    var i, best = 0, tied = false;
+    for (i = 1; i < trace.length; i += 1) {
+      if (trace[i].ts > trace[best].ts) { best = i; tied = false; continue; }
+      if (trace[i].ts === trace[best].ts && trace[i].replica !== trace[best].replica) {
+        tied = true;
+        if (trace[i].replica > trace[best].replica) best = i;
+      }
+    }
+    var winner = trace[best].replica, value = 0, kept = [], lost = [];
+    for (i = 0; i < trace.length; i += 1) {
+      if (trace[i].replica === winner) { value += trace[i].delta; kept.push(trace[i].name); }
+      else lost.push(trace[i].name);
+    }
+    return { winner: winner, value: value, kept: kept, lost: lost,
+             tieBroken: tied, discarded: traceTotal(trace) - value };
+  }
+  function crdtCounts(trace) {
+    var reps = traceReplicas(trace), counts = {}, i;
+    for (i = 0; i < reps.length; i += 1) counts[reps[i]] = 0;
+    for (i = 0; i < trace.length; i += 1) counts[trace[i].replica] += trace[i].delta;
+    return counts;
+  }
+  function crdtValue(counts) {
+    var t = 0, k;
+    for (k in counts) if (Object.prototype.hasOwnProperty.call(counts, k)) t += counts[k];
+    return t;
+  }
+  /* The merge itself, so the three laws can be checked rather than claimed. */
+  function crdtJoin(a, b) {
+    var out = {}, k;
+    for (k in a) if (Object.prototype.hasOwnProperty.call(a, k)) out[k] = a[k];
+    for (k in b) {
+      if (!Object.prototype.hasOwnProperty.call(b, k)) continue;
+      out[k] = (out[k] === undefined || b[k] > out[k]) ? b[k] : out[k];
+    }
+    return out;
+  }
+  function countsEqual(a, b) {
+    var k;
+    for (k in a) if (Object.prototype.hasOwnProperty.call(a, k) && b[k] !== a[k]) return false;
+    for (k in b) if (Object.prototype.hasOwnProperty.call(b, k) && a[k] !== b[k]) return false;
+    return true;
+  }
+  /* The per-replica state after a replica has applied only its own updates --
+     which is the state the merges above are merging. */
+  function replicaStates(trace) {
+    var reps = traceReplicas(trace), out = {}, i, j;
+    for (i = 0; i < reps.length; i += 1) {
+      var v = {};
+      for (j = 0; j < reps.length; j += 1) v[reps[j]] = 0;
+      for (j = 0; j < trace.length; j += 1) if (trace[j].replica === reps[i]) v[reps[i]] += trace[j].delta;
+      out[reps[i]] = v;
+    }
+    return out;
+  }
+
+  var pmfIn = document.getElementById('qlPmf'), nS = document.getElementById('qlN');
+  var wS = document.getElementById('qlW');
+  var curve = document.getElementById('qlCurve'), table = document.getElementById('qlTable');
+  var sweep = document.getElementById('qlSweep'), status = document.getElementById('qlStatus');
+  var KPIS = ['qlP99', 'qlNext', 'qlAll', 'qlByP50', 'qlSlack', 'qlTerms'];
+
+  function redraw() {
+    var n = +nS.value, w = Math.min(+wS.value, n);
+    document.getElementById('qlNOut').textContent = n;
+    document.getElementById('qlWOut').textContent = w + (w === +wS.value ? '' : ' (capped at N)');
+
+    var spec = parsePmfSpec(pmfIn.value), base = spec ? pmfFromSpec(spec) : null;
+    if (!base) {
+      curve.innerHTML = '';
+      table.innerHTML = '';
+      sweep.innerHTML = '';
+      KPIS.forEach(function (id) { document.getElementById(id).textContent = '—'; });
+      status.innerHTML = '<span class="tone-red">That is not a distribution.</span> Type ms:weight '
+        + 'pairs, like <span class="tone-muted">2:600, 4:250, 8:120, 16:25, 40:5</span>.';
+      return;
+    }
+
+    var q99 = R(99n, 100n), q50 = R(1n, 2n);
+    var here = quorumPercentile(base, w, n, q99);
+    var next = quorumPercentile(base, w, n + 1, q99);
+    var all = quorumPercentile(base, n, n, q99);
+    var p50one = pmfPercentile(base, q50);
+    var byP50 = quorumAckBy(base, p50one, w, n);
+
+    document.getElementById('qlP99').textContent = (here === null ? 'never' : here + ' ms');
+    document.getElementById('qlNext').textContent = (next === null ? 'never' : next + ' ms')
+      + ' (N = ' + (n + 1) + ')';
+    document.getElementById('qlAll').textContent = (all === null ? 'never' : all + ' ms');
+    document.getElementById('qlByP50').textContent = Rpct(byP50, 3);
+    document.getElementById('qlSlack').textContent = (n - w) + ' of ' + n + ' may be slow or dead';
+    document.getElementById('qlTerms').textContent = (n - w + 1) + ' term'
+      + (n - w + 1 === 1 ? '' : 's') + ', j = ' + w + ' to ' + n;
+
+    var vals = pmfSupport(base), rows = '', i;
+    for (i = 0; i < vals.length; i += 1) {
+      var f = pmfCdfAt(base, vals[i]);
+      var pq = quorumAckBy(base, vals[i], w, n);
+      var first = Rcmp(pq, q99) >= 0 && (i === 0 || Rcmp(quorumAckBy(base, vals[i - 1], w, n), q99) < 0);
+      rows += '<tr' + (first ? ' class="tone-purple"' : '') + '><td>' + vals[i] + '</td>'
+        + '<td>' + Rtext(f) + '</td>'
+        + '<td>' + Rfixed(pq, 8) + '</td>'
+        + '<td>' + Rfixed(quorumAckBy(base, vals[i], n, n), 8) + '</td>'
+        + '<td>' + (first ? 'first to reach 99/100' : '') + '</td></tr>';
+    }
+    table.innerHTML = '<thead><tr><th>t (ms)</th><th>F(t), one replica</th>'
+      + '<th>P(&ge; ' + w + ' of ' + n + ' by t)</th><th>P(all ' + n + ' by t)</th><th></th>'
+      + '</tr></thead><tbody>' + rows + '</tbody><tfoot><tr><td colspan="5" class="small-copy">'
+      + 'Column three is availKofN(F(t), ' + w + ', ' + n + '): the binomial tail, summed exactly '
+      + 'over BigInt coefficients. Column four is the same sum at k = n, which is what a write '
+      + 'that waits for everybody pays.</td></tr></tfoot>';
+
+    var srows = '', k, prevP = null;
+    for (k = w; k <= 9; k += 1) {
+      var p = quorumPercentile(base, w, k, q99);
+      var move = prevP === null ? '&mdash;'
+        : (p === null ? 'never' : (p < prevP ? '<span class="tone-green">' + (prevP - p)
+            + ' ms faster</span>' : (p > prevP ? (p - prevP) + ' ms slower' : 'unchanged')));
+      srows += '<tr' + (k === n ? ' class="tone-cyan"' : '') + '><td>' + k + '</td>'
+        + '<td>' + w + '</td><td>' + (k - w) + '</td>'
+        + '<td>' + (p === null ? 'never' : p + ' ms') + '</td>'
+        + '<td>' + move + '</td></tr>';
+      prevP = p;
+    }
+    sweep.innerHTML = '<thead><tr><th>N</th><th>W</th><th>replies you do not wait for</th>'
+      + '<th>quorum p99</th><th>against the row above</th></tr></thead><tbody>' + srows
+      + '</tbody><tfoot><tr><td colspan="5" class="small-copy">W is held at ' + w
+      + ' down the whole column. Nothing about a replica changed; only how many there are to '
+      + 'race.</td></tr></tfoot>';
+
+    var hi = vals[vals.length - 1] || 1;
+    function px(t) { return 34 + (t / hi) * 466; }
+    function py(p) { return 162 - p * 132; }
+    var s = '', kk;
+    for (kk = w; kk <= 9; kk += 1) {
+      var pts = [], j;
+      for (j = 0; j < vals.length; j += 1) {
+        pts.push(px(vals[j]) + ',' + py(parseFloat(Rfixed(quorumAckBy(base, vals[j], w, kk), 9))));
+      }
+      s += '<polyline points="' + pts.join(' ') + '" fill="none" stroke="var('
+        + (kk === n ? '--cyan' : '--line-strong') + ')" stroke-width="' + (kk === n ? 2.8 : 1.2)
+        + '" opacity="' + (kk === n ? 1 : 0.55) + '" />';
+    }
+    s += '<line x1="34" y1="' + py(0.99) + '" x2="500" y2="' + py(0.99) + '" stroke="var(--muted)" '
+      + 'stroke-width="1" stroke-dasharray="3 3" />'
+      + '<text x="34" y="' + (py(0.99) - 4) + '" font-size="10" fill="var(--muted)">99/100</text>';
+    if (here !== null) {
+      s += '<line x1="' + px(here) + '" y1="24" x2="' + px(here) + '" y2="162" stroke="var(--purple)" '
+        + 'stroke-width="2" /><text x="' + Math.min(px(here) + 5, 320) + '" y="36" font-size="10" '
+        + 'fill="var(--purple)" font-weight="700">p99 at N = ' + n + ' is ' + here + ' ms</text>';
+    }
+    if (next !== null && next !== here) {
+      s += '<line x1="' + px(next) + '" y1="24" x2="' + px(next) + '" y2="162" stroke="var(--green)" '
+        + 'stroke-width="2" stroke-dasharray="4 3" /><text x="' + Math.min(px(next) + 5, 320)
+        + '" y="52" font-size="10" fill="var(--green)">p99 at N = ' + (n + 1) + ' is ' + next + ' ms</text>';
+    }
+    s += '<line x1="34" y1="162" x2="500" y2="162" stroke="var(--line-strong)" stroke-width="1" />'
+      + '<text x="34" y="178" font-size="10" fill="var(--muted)">0 ms</text>'
+      + '<text x="500" y="178" text-anchor="end" font-size="10" fill="var(--muted)">' + hi + ' ms</text>'
+      + '<text x="34" y="194" font-size="10" fill="var(--muted)">one curve per N from ' + w
+      + ' to 9, W held at ' + w + '. Higher curves are larger fleets.</text>';
+    curve.innerHTML = s;
+
+    var faster = next !== null && here !== null && next < here;
+    status.innerHTML = 'Waiting for <strong>' + w + ' of ' + n + '</strong> replies gives a p99 of '
+      + '<strong>' + (here === null ? 'never — the quorum cannot be met' : here + ' ms') + '</strong>, '
+      + 'against ' + (all === null ? 'never' : all + ' ms') + ' if the write waited for all ' + n + '. '
+      + (faster
+          ? '<span class="tone-green">Asking one more replica makes the write FASTER</span>: at N = '
+            + (n + 1) + ' the same W = ' + w + ' quorum has a p99 of ' + next + ' ms, '
+            + (here - next) + ' ms better. Nothing about any replica changed. The tail gained a term '
+            + '&mdash; there are more ways for ' + w + ' of ' + (n + 1) + ' to be quick than for '
+            + w + ' of ' + n + ' &mdash; and a sum of more non-negative terms is larger.'
+          : (next !== null && here !== null && next === here
+              ? 'At N = ' + (n + 1) + ' the p99 is the same ' + next + ' ms: the tail did rise, but '
+                + 'not far enough to cross 99/100 at an earlier attainable time. It never falls.'
+              : 'Raise N with W held still and watch the column: the tail can only rise.'))
+      + ' The quorum is met by the one-replica median, ' + p50one + ' ms, with probability '
+      + Rpct(byP50, 3) + ', and it tolerates ' + (n - w) + ' slow or dead replica'
+      + (n - w === 1 ? '' : 's') + ' at no latency cost at all.';
+  }
+
+  [nS, wS].forEach(function (el) { el.addEventListener('input', redraw); });
+  pmfIn.addEventListener('input', redraw);
+  redraw();
+  window.redrawLab = redraw;
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "replication-and-consistency/quorum-latency";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+  </script>
+</body>
+</html>

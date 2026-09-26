@@ -1,0 +1,2749 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Why Queues Form at ρ &lt; 1 | Lesson | Queues and Utilisation | System Design | Learn · geterdone.io</title>
+  <meta name="description" content="A server busy four fifths of the time has a fifth of itself spare, and yet work waits. It waits because arrivals bunch: run clockwork arrivals and clockwork service at ρ = 4/5 and nothing ever queues, then run random ones at exactly the same ρ and the mean number in the system triples. Bunching, not overload." />
+  <link rel="canonical" href="https://learn.geterdone.io/queues-and-utilisation/why-queues-form-below-full-utilisation/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="Why Queues Form at ρ &lt; 1 | Lesson | Queues and Utilisation | System Design | Learn · geterdone.io" />
+  <meta property="og:description" content="A server busy four fifths of the time has a fifth of itself spare, and yet work waits. It waits because arrivals bunch: run clockwork arrivals and clockwork service at ρ = 4/5 and nothing ever queues, then run random ones at exactly the same ρ and the mean number in the system triples. Bunching, not overload." />
+  <meta property="og:url" content="https://learn.geterdone.io/queues-and-utilisation/why-queues-form-below-full-utilisation/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Why Queues Form at ρ &lt; 1 | Lesson | Queues and Utilisation | System Design | Learn · geterdone.io" />
+  <meta name="twitter:description" content="A server busy four fifths of the time has a fifth of itself spare, and yet work waits. It waits because arrivals bunch: run clockwork arrivals and clockwork service at ρ = 4/5 and nothing ever queues, then run random ones at exactly the same ρ and the mean number in the system triples. Bunching, not overload." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/queues-and-utilisation/why-queues-form-below-full-utilisation/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    @media (max-width: 920px) {
+      body[data-page-kind="supplemental"] [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/system-design/">System Design</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Queues and Utilisation</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">Why Queues Form at ρ &lt; 1</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The why queues form below full utilisation is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Queues and Utilisation &middot; Randomness</span>
+        <h1>Why Queues Form at ρ &lt; 1</h1>
+        <p>A server busy four fifths of the time has a fifth of itself spare, and yet work waits. It waits because arrivals bunch: run clockwork arrivals and clockwork service at <span class="math">ρ = 4/5</span> and nothing ever queues, then run random ones at exactly the same <span class="math">ρ</span> and the mean number in the system triples. Bunching, not overload.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">clockwork in, clockwork out     nothing waits at all below ρ = 1
+Bernoulli(p) in, Geometric(q)   ρ = p/q, and now things wait
+p = 2/5, q = 1/2, ρ = 4/5       D/D/1: L = 4/5    Geo/Geo/1: L = 12/5
+12/5 ÷ 4/5 = 3                  three times as many, at the same ρ
+ρ/(1 − ρ) = 4                   a different model&#x27;s answer: 5/3 too big here</div>
+        <div class="float-label" style="right:16px;bottom:16px;">Two arrival patterns, one utilisation</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>The comparison is the lesson. Both arms have identical rates, identical utilisation and identical mean service time, and one of them never queues.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Determinism does not queue below one</h3><p>One arrival every five slots, served in exactly four: the server is busy <span class="math">4/5</span> of the time and no second customer ever exists. The mean number in the system is exactly <span class="math">4/5</span> &mdash; the one in service, counted for the fraction of time it is there &mdash; and the largest the system ever holds is one.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Randomness bunches, and bunching waits</h3><p>Keep <span class="math">ρ = 4/5</span> and make the arrivals random and the service random. Now the mean number in the system is <span class="math">12/5</span>, three times the clockwork answer. The server is idle exactly as often as before; it is idle at the wrong moments, and the work that arrives while it is busy is what waits.</p></article><article class="card concept-card"><div class="icon">3</div><h3>A simulation is a model, so it has to be named</h3><p>&ldquo;I ran a simulation&rdquo; is not a measurement of anything until the model is stated. This one is a Bernoulli arrival per slot, a geometric service, and a rule about what happens when both land in the same slot. Change any of the three and the number changes.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>The same utilisation, twice</h2></div><p>What clockwork does, what randomness does, exactly which model the simulation is, and which number in it is exact.</p></div>
+      <article class="card card-pad prose"><p>&ldquo;We are only at 70% &mdash; nobody should be waiting.&rdquo; The sentence assumes that a server with headroom is a server with no queue, and it is true of exactly one system: the one where work arrives on a timetable and takes the same time every time.</p><div class="example"><span class="label">Example &middot; Clockwork, at ρ = 4/5</span><p>One arrival every five slots; each takes exactly four slots to serve. The server finishes a slot before the next arrival appears, so the system holds one customer four slots in five and none in the fifth. <span class="math">L = 4/5</span>, and the largest number ever present is <span class="math">1</span>. Nothing queues, ever, at any utilisation below one.</p></div><div class="defbox"><span class="label">Definition &middot; The slotted model, named</span><p>Time advances in slots. In each slot <strong>one arrival occurs with probability <span class="math">p</span></strong>, independently of everything else. A customer in service <strong>completes with probability <span class="math">q</span></strong> in each slot, so service times are geometric with mean <span class="math">1/q</span> slots. Within a slot the departure is resolved first and the arrival second &mdash; the <strong>late-arrival convention</strong> &mdash; so a customer arriving in slot <span class="math">t</span> cannot leave before slot <span class="math">t + 1</span>.</p><p>That is a discrete-time chain, written <strong>Geo/Geo/1</strong>. It is not M/M/1, and the convention in the last sentence is part of the model: change it and the exact answer changes.</p></div><p>The utilisation of that chain is <span class="math">ρ = p/q</span>: arrivals come at <span class="math">p</span> per slot, each takes <span class="math">1/q</span> slots of the server, so the server is busy <span class="math">p/q</span> of the time. At <span class="math">p = 2/5</span> and <span class="math">q = 1/2</span> that is <span class="math">ρ = 4/5</span> &mdash; the same utilisation as the clockwork run, the same mean service time of two slots, and the same throughput.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">at ρ = 4/5, three numbers for the mean number in system
+
+clockwork  D/D/1          L = 4/5   = 0.8     and never more than 1
+slotted    Geo/Geo/1      L = 12/5  = 2.4     exact, p = 2/5, q = 1/2
+
+12/5 ÷ 4/5 = 3            randomness alone, at identical utilisation
+
+for comparison, the continuous M/M/1 formula
+           M/M/1          ρ/(1 − ρ) = 4
+4 ÷ 12/5   = 5/3          which is a different model, not this one</div><p>The <span class="math">12/5</span> is exact, and it is not this lesson's to derive. The chain above is solved in closed form in Operations Research, <span class="math">markov-chains-decisions-and-queues/queues-in-discrete-time</span>, which gives the stationary distribution and the mean <span class="math">L = p(1 − p)/(q − p)</span> &mdash; equivalently <span class="math">ρ(1 − p)/(1 − ρ)</span> &mdash; for any <span class="math">p</span> and <span class="math">q</span> under this convention. What belongs here is the phenomenon: waiting appears well below <span class="math">ρ = 1</span>, and the lab shows it happening.</p><p>Note what the third line of the table does <em>not</em> say. <span class="math">ρ/(1 − ρ)</span> is <span class="math">4</span> at this utilisation, and <span class="math">4</span> is not the slotted system's answer: it overstates the exact <span class="math">12/5</span> by a factor of <span class="math">5/3</span>. The continuous formula describes the limit of this chain as the slot shrinks, not the chain at a slot of one. &ldquo;The M/M/1 Queue&rdquo; states that limit precisely and shows the convergence; treating the two as the same model is the error that comparison is designed to prevent.</p><h3>The simulation starts empty</h3><p>A run begins with nothing in the system, which is a state the settled chain visits only a fifth of the time. Averaging from <span class="math">t = 0</span> therefore includes a stretch that is unrepresentatively quiet, and the mean comes out biased low. The lab prints the mean twice &mdash; from <span class="math">t = 0</span> and after discarding a warm-up &mdash; and draws the ensemble occupancy rising from zero so that the bias is visible rather than argued about. The general treatment is Operations Research, <span class="math">simulation/warm-up-and-the-initial-transient</span>.</p><p>Neither printed mean is the exact answer. One run is a sample: the same seed gives the same run and a different seed gives a different number, and with a few thousand slots the sampling error is larger than the difference between many wrong formulas. What is stable across seeds is the comparison &mdash; the random arm above the clockwork arm, by a factor near three &mdash; and that comparison is what the lesson claims.</p><ul><li>Identical in both arms: the arrival rate, the mean service time, the utilisation <span class="math">ρ = 4/5</span>, and the throughput.</li><li>Different in the random arm: when the arrivals land, and how long each service actually takes.</li><li>Consequence: a mean number in system of <span class="math">12/5</span> rather than <span class="math">4/5</span>, from nothing but the pattern.</li></ul><p>So the honest version of the opening sentence is: at 70% utilisation the server is idle 30% of the time, and whether anyone waits depends entirely on how that idleness is distributed. Randomness guarantees it is distributed badly.</p></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Why queues form below full utilisation</h2></div><p>A seeded slotted run against a clockwork one, at exactly the same ρ</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Bunching, not overload</strong><span>Bernoulli arrivals against a clockwork schedule, at exactly the same &rho;</span></div>
+        <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>Bernoulli arrivals</span><span class="tone-green"><i class="legend-swatch"></i>D/D/1, same &rho;</span><span class="tone-amber"><i class="legend-swatch"></i>running mean</span><span class="tone-purple"><i class="legend-swatch"></i>exact Geo/Geo/1</span></div>
+      </div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="slPlot" viewBox="0 0 520 210" role="img" aria-label="The random queue-length trace above a deterministic one, with both running means below."></svg><svg id="slTrans" viewBox="0 0 520 128" role="img" aria-label="The mean occupancy at each slot averaged over many runs, rising from zero."></svg></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="slTable"></table></div>
+      <div class="status-banner" id="slStatus" style="margin-top:12px;"></div>
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>Set the slotted model and run both arms</h3>
+          <p><span class="math">p</span> and <span class="math">q</span> set the chain; the clockwork arm is drawn at the same <span class="math">ρ</span> beside it. The mean from <span class="math">t = 0</span>, the mean after the warm-up you discard, and the exact Geo/Geo/1 answer are printed together, so the sampling error and the initial bias are both visible.</p>
+        <div>
+          <div class="range-row"><label class="small-copy" id="slPLab" for="slP">p &mdash; arrival probability per slot (twentieths)</label><span class="range-value" id="slPOut">8</span></div>
+          <input id="slP" type="range" min="1" max="19" step="1" value="8" />
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" id="slQLab" for="slQ">q &mdash; service completion probability per slot (twentieths)</label><span class="range-value" id="slQOut">10</span></div>
+          <input id="slQ" type="range" min="2" max="20" step="1" value="10" />
+        </div>
+        <div class="field">
+          <label for="slSub">Slot size</label>
+          <select id="slSub"><option value="1" selected>&Delta; = 1 (one slot per time unit)</option><option value="2">&Delta; = 1/2</option><option value="5">&Delta; = 1/5</option><option value="10">&Delta; = 1/10</option></select>
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" id="slSeedLab" for="slSeed">Seed</label><span class="range-value" id="slSeedOut">7</span></div>
+          <input id="slSeed" type="range" min="1" max="40" step="1" value="7" />
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" id="slWarmLab" for="slWarm">Warm-up discarded (% of the run)</label><span class="range-value" id="slWarmOut">10</span></div>
+          <input id="slWarm" type="range" min="0" max="40" step="1" value="10" />
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Mean N from t = 0</span><strong id="slMean0">&mdash;</strong></div>
+          <div class="kpi"><span>Mean N after warm-up</span><strong id="slMeanW">&mdash;</strong></div>
+          <div class="kpi"><span>D/D/1 mean at the same &rho;</span><strong id="slMeanD">&mdash;</strong></div>
+          <div class="kpi"><span>Random &divide; clockwork</span><strong id="slRatio">&mdash;</strong></div>
+        </div>
+        <p class="small-copy" id="slHint" style="margin:0;">The model is named, because a slotted simulation is a model and not a measurement: one Bernoulli arrival per slot with probability p, geometric service with parameter q, under the <em>late-arrival</em> convention &mdash; a departure is resolved before an arrival inside the same slot. That is the Geo/Geo/1 chain, and its exact answer is solved in Operations Research, <span class="tt">queues-in-discrete-time</span>. It is not M/M/1, and at &Delta; = 1 it is not close to it.</p>
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Comparing two arrival patterns honestly</h2></div><p>The comparison is only worth anything if the two arms differ in exactly one respect.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Fix the utilisation before anything else</h3><p><span class="math">ρ = p/q</span> for the random arm. Choose <span class="math">p</span> and <span class="math">q</span> first, compute <span class="math">ρ</span>, and give the clockwork arm the same one. A comparison at two different <span class="math">ρ</span> values measures nothing.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Read the clockwork arm&#x27;s mean</h3><p>It is exact and it is small: at <span class="math">ρ = 4/5</span> the mean number in system is <span class="math">4/5</span>, and the maximum is <span class="math">1</span>. This arm has no sampling error because there is nothing random in it.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Run the random arm and discard a warm-up</h3><p>Take the mean from <span class="math">t = 0</span> and the mean after the warm-up and note the gap between them. The run starts empty, so the first is the biased one.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Change the seed and run it again</h3><p>Whatever moves between seeds is sampling error, not signal. The factor of about three does not move; the third decimal place does.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Compare against the exact chain, not against ρ/(1 − ρ)</h3><p>The exact answer for this model is <span class="math">12/5</span>. <span class="math">ρ/(1 − ρ) = 4</span> is the answer for a different model and is <span class="math">5/3</span> too large here, so a run landing near <span class="math">2.4</span> is agreement and a run landing near <span class="math">4</span> would be a bug.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>Bunching against overload</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>Two queues at ρ = 4/5</h3><p>Both columns have the same utilisation and the same mean service time. Only the pattern differs, and that is the entire cause of the third number.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">clockwork     one arrival every 5 slots, service exactly 4 slots
+              ρ = 4/5    L = 4/5    most ever in the system = 1
+
+slotted       arrival:  Bernoulli, p = 2/5 per slot
+              service:  geometric, q = 1/2 per slot (mean 2 slots)
+              ρ = p/q = (2/5)/(1/2) = 4/5          the same ρ
+
+exact chain   Operations Research&#x27;s closed form for this convention
+              L = p(1 − p)/(q − p)
+                = (2/5)(3/5)/(1/10) = 12/5 = 2.4
+
+the effect    12/5 ÷ 4/5 = 3       three times, from the pattern alone
+
+not this      ρ/(1 − ρ) = (4/5)/(1/5) = 4
+              4 ÷ 12/5 = 5/3       the continuous formula, overstating</div><p>The clockwork column is the intuition being corrected: it really is true that a deterministic system with headroom never queues. Every real system fails its assumption, and the cost of failing it is the factor of three.</p><p>The last block is worth reading twice. <span class="math">ρ/(1 − ρ)</span> is the right formula for a different model, and reaching for it here would overstate the queue by <span class="math">5/3</span>. The two agree only in the limit of a vanishing slot, which is the subject of &ldquo;The M/M/1 Queue&rdquo;.</p><p>For a faded rehearsal, set <span class="math">p = 1/4</span> and <span class="math">q = 1/2</span>. The supplied first move is <span class="math">ρ = 1/2</span>. Predict whether the gap between the random and clockwork arms is larger or smaller than it was at <span class="math">ρ = 4/5</span>, then run it and see.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>“At 70% utilisation nobody waits”</strong><span>Utilisation says how much of the time the server is busy, not when. Random arrivals put work in front of a busy server and leave the idle time scattered where nothing needs it, and the result at <span class="math">ρ = 4/5</span> is three times the clockwork queue. The threshold at which waiting begins is not <span class="math">ρ = 1</span>; there is no such threshold.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading a simulated mean as the exact answer</strong><span>One seeded run of a few thousand slots is a sample, and it starts empty, so it carries both sampling error and a downward bias. Quote it as a demonstration of the effect, and quote the chain's closed form &mdash; <span class="math">12/5</span> here &mdash; when an exact number is wanted.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Expecting this simulation to produce <span class="math">ρ/(1 − ρ)</span></strong><span>It will not, and a run that did would mean the simulator was wrong. At <span class="math">p = 2/5</span>, <span class="math">q = 1/2</span> the exact slotted mean is <span class="math">12/5</span> while <span class="math">ρ/(1 − ρ)</span> is <span class="math">4</span> &mdash; the continuous formula overstates this system by <span class="math">5/3</span>. They meet only as the slot shrinks, which is a limit rather than a check.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when “we have headroom, so nothing is waiting” reads as a statement about a timetable.</strong><p>You should be able to compute <span class="math">ρ = p/q</span> for the slotted model, say what the clockwork arm does at that <span class="math">ρ</span>, name the model a simulation is running, and say why <span class="math">ρ/(1 − ρ)</span> is not the number to compare a slotted run against.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The random service time above was geometric: a fixed chance of finishing in each slot, whatever has happened so far. “Memoryless Waiting: from Geometric to Exponential” takes that property seriously, shrinks the slot, and arrives at the exponential distribution without writing a density.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../sizing-with-littles-law/" rel="prev"><span>Lesson</span><strong>Sizing with Little&#x27;s Law</strong></a>
+      <a class="lesson-link next" href="../memoryless-waiting/" rel="next"><span>Lesson</span><strong>Memoryless Waiting: from Geometric to Exponential</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="queues-and-utilisation/why-queues-form-below-full-utilisation" data-lesson-title="Why Queues Form at ρ &lt; 1" data-course-title="Queues and Utilisation">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Queues and Utilisation.</strong> Utilisations, queue lengths, waiting times, blocking probabilities and token-bucket admissions on this course are exact fractions computed from the rational rates you set, so <span class="math">ρ/(1 − ρ)</span> at <span class="math">ρ = 4/5</span> prints as <span class="math">4</span>, not as <span class="math">3.9999999999999996</span>. Three figures are not exact and say so: the exponential tail <span class="math">e^(−λt)</span>, the Poisson probabilities that use it, and Kingman's formula &mdash; whose arithmetic is exact but whose model is an approximation, which the lab demonstrates by disagreeing with the simulation.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure on this path is computed in your browser from the model the lesson states, and a model&rsquo;s answer is only as true as its assumptions &mdash; independence, memorylessness and steady state are named where they are used, and each lesson says where its own fails.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "Arrivals come every 5 slots exactly and each takes exactly 4 slots to serve. How many customers wait, on average, behind the one in service?", "a": ["<span class=\"math\">4/5<\/span>", "None &mdash; nothing ever waits", "<span class=\"math\">4<\/span>", "<span class=\"math\">12/5<\/span>"], "c": 1, "why": "The next arrival appears a slot after the previous customer has left, so a second customer never exists. <span class=\"math\">4/5<\/span> is the mean number in the <em>system<\/em>, which is the one being served counted over the fraction of time it is there; <span class=\"math\">12/5<\/span> and <span class=\"math\">4<\/span> belong to the random arm and to a different model respectively."}, {"q": "Bernoulli arrivals with <span class=\"math\">p = 2/5<\/span>, geometric service with <span class=\"math\">q = 1/2<\/span>. What is the exact mean number in the system?", "a": ["<span class=\"math\">4/5<\/span>", "<span class=\"math\">12/5<\/span>", "<span class=\"math\">4<\/span>", "<span class=\"math\">2/5<\/span>"], "c": 1, "why": "<span class=\"math\">12/5<\/span>, which is the exact answer for this chain under the late-arrival convention. <span class=\"math\">4/5<\/span> is the clockwork answer at the same <span class=\"math\">\u03c1<\/span>, and it is also <span class=\"math\">\u03c1<\/span> itself; <span class=\"math\">4<\/span> is <span class=\"math\">\u03c1/(1 \u2212 \u03c1)<\/span>, which describes a continuous-time model and overstates this one by <span class=\"math\">5/3<\/span>."}, {"q": "Why does a mean taken from <span class=\"math\">t = 0<\/span> come out below the chain's true mean?", "a": ["Because the seed biases the early slots", "Because the run starts empty and spends its first slots in states the settled chain visits rarely", "Because Bernoulli arrivals are lighter than Poisson ones", "Because the slot size is too large"], "c": 1, "why": "An empty start is a state the settled chain is in only <span class=\"math\">1 \u2212 \u03c1<\/span> of the time, so the opening stretch is unrepresentatively quiet and drags the average down. Discarding a warm-up removes it. The seed decides which particular run you get, not which direction the early bias points."}, {"q": "Which quantity is identical in the clockwork and random arms of the comparison?", "a": ["The mean number in the system", "The utilisation <span class=\"math\">\u03c1<\/span>", "The largest queue observed", "The pattern of arrival times"], "c": 1, "why": "Holding <span class=\"math\">\u03c1<\/span> fixed is what makes the comparison mean anything: same arrival rate, same mean service time, same fraction of time busy. Everything else in the list differs, and the mean number in system differs by a factor of three."}];
+
+  (function () {
+
+  /* Exact rational arithmetic over BigInt.
+
+     Every number a lesson calls "the answer" lives in this type. BigInt rather
+     than Number because a few steps of elimination on a 3x3 system produces
+     numerators that leave the exact-integer range of a double, and a solution
+     that is silently wrong in the last digits is worse than no solution. */
+  function bgcd(a, b) {
+    if (a < 0n) a = -a;
+    if (b < 0n) b = -b;
+    while (b) { var t = a % b; a = b; b = t; }
+    return a;
+  }
+  function R(n, d) {
+    if (d === undefined) d = 1n;
+    n = BigInt(n); d = BigInt(d);
+    if (d === 0n) throw new Error('division by zero');
+    if (d < 0n) { n = -n; d = -d; }
+    var g = bgcd(n, d) || 1n;
+    return { n: n / g, d: d / g };
+  }
+  var R0 = R(0n), R1 = R(1n);
+  function Radd(a, b) { return R(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function Rsub(a, b) { return R(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function Rmul(a, b) { return R(a.n * b.n, a.d * b.d); }
+  function Rdiv(a, b) { return R(a.n * b.d, a.d * b.n); }
+  function Rneg(a) { return R(-a.n, a.d); }
+  function Rabs(a) { return a.n < 0n ? Rneg(a) : a; }
+  function Rinv(a) { return R(a.d, a.n); }
+  function Rzero(a) { return a.n === 0n; }
+  function Rsign(a) { return a.n === 0n ? 0 : (a.n < 0n ? -1 : 1); }
+  function Requ(a, b) { return a.n === b.n && a.d === b.d; }
+  function Rcmp(a, b) { var l = a.n * b.d, r = b.n * a.d; return l < r ? -1 : (l > r ? 1 : 0); }
+  function Rint(a) { return a.d === 1n; }
+  function Rpow(a, k) {
+    var out = R1, base = a, e = k < 0 ? -k : k;
+    while (e > 0) { if (e & 1) out = Rmul(out, base); base = Rmul(base, base); e >>= 1; }
+    return k < 0 ? Rinv(out) : out;
+  }
+  /* The reader's form: "3", "-7/4". Never "3/1", never "0/5". */
+  function Rtext(a) { return a.d === 1n ? String(a.n) : a.n + '/' + a.d; }
+  /* Parenthesised when it would otherwise glue onto a neighbouring symbol. */
+  function Rterm(a) { return (a.n < 0n || a.d !== 1n) ? '(' + Rtext(a) + ')' : Rtext(a); }
+  function Rnum(a) { return Number(a.n) / Number(a.d); }
+  /* A decimal, for the one place a lesson asks for one. Exact when it can be. */
+  function Rdec(a, places) {
+    if (places === undefined) places = 6;
+    var v = Rnum(a);
+    if (Rint(a)) return String(a.n);
+    var s = v.toFixed(places);
+    return s.indexOf('.') >= 0 ? s.replace(/0+$/, '').replace(/\.$/, '') : s;
+  }
+  function Rparse(text) {
+    var s = String(text).trim();
+    var m = /^([+-]?\d+)\s*\/\s*(\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]), BigInt(m[2]));
+    m = /^([+-]?\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]));
+    m = /^([+-]?)(\d*)\.(\d+)$/.exec(s);
+    if (m) {
+      var whole = m[2] || '0', frac = m[3];
+      var num = BigInt(whole + frac), den = 10n ** BigInt(frac.length);
+      return R(m[1] === '-' ? -num : num, den);
+    }
+    return null;
+  }
+  /* Is this rational a perfect square? Needed wherever a lesson must decide
+     between an exact answer and a radical one -- sqrt(4/9) is 2/3 and belongs
+     on the page as 2/3, while sqrt(2) must stay sqrt(2). */
+  function bisqrt(n) {
+    if (n < 0n) return null;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x * x === n ? x : null;
+  }
+  function Rsqrt(a) {
+    if (a.n < 0n) return null;
+    var p = bisqrt(a.n), q = bisqrt(a.d);
+    return (p === null || q === null) ? null : R(p, q);
+  }
+
+  /* Counting is done in BigInt. 21! already exceeds what a double can hold
+     exactly, so a lab that used ordinary numbers would start printing
+     confidently wrong totals somewhere around n = 21 with nothing to mark the
+     boundary. Every count below is exact for every n the controls allow. */
+  function fact(n) { var r = 1n; for (var i = 2n; i <= BigInt(n); i += 1n) r *= i; return r; }
+  function perm(n, r) {
+    if (r > n || r < 0) return 0n;
+    var out = 1n;
+    for (var i = 0; i < r; i += 1) out *= BigInt(n - i);
+    return out;
+  }
+  function comb(n, r) {
+    if (r < 0 || r > n) return 0n;
+    r = Math.min(r, n - r);
+    var num = 1n, den = 1n;
+    for (var i = 0; i < r; i += 1) { num *= BigInt(n - i); den *= BigInt(i + 1); }
+    return num / den;
+  }
+  function group(x) { return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+
+  /* Ceiling and floor of an exact rational, as BigInt.
+
+     Capacity answers are counts of machines, shards and tree levels, and the
+     whole point of a sizing lesson is that 3.2 machines is four. Integer
+     division truncates toward zero, so a negative rational needs the sign. */
+  function Rfloor(a) {
+    var q = a.n / a.d;
+    if (a.n < 0n && q * a.d !== a.n) q -= 1n;
+    return q;
+  }
+  function Rceil(a) {
+    var q = a.n / a.d;
+    if (a.n > 0n && q * a.d !== a.n) q += 1n;
+    return q;
+  }
+
+  /* Birth-death queues, exact for rational arrival and service rates.
+
+     M/M/1 is derived in the lessons from the cut balance equations, so these
+     are the closed forms that result, not a separate model: rho = lam/mu,
+     pi_n = (1-rho)rho^n, L = rho/(1-rho), W = L/lam. */
+  function mm1(lam, mu) {
+    var rho = Rdiv(lam, mu);
+    if (Rcmp(rho, R(1n, 1n)) >= 0) return { rho: rho, stable: false };
+    var one = R(1n, 1n), free = Rsub(one, rho);
+    var L = Rdiv(rho, free);
+    var Lq = Rdiv(Rmul(rho, rho), free);
+    return {
+      rho: rho, stable: true, p0: free, L: L, Lq: Lq,
+      W: Rdiv(L, lam), Wq: Rdiv(Lq, lam)
+    };
+  }
+
+  /* Erlang C: the probability an arrival waits with s servers.
+     Rational throughout -- the factorials are BigInt, so a 20-server desk is
+     still an exact fraction. */
+  function erlangC(lam, mu, s) {
+    var a = Rdiv(lam, mu), rho = Rdiv(a, R(BigInt(s), 1n));
+    if (Rcmp(rho, R(1n, 1n)) >= 0) return { rho: rho, stable: false };
+    var sum = R(0n, 1n), n;
+    for (n = 0; n < s; n += 1) sum = Radd(sum, Rdiv(Rpow(a, n), R(fact(n), 1n)));
+    var last = Rdiv(Rpow(a, s), Rmul(R(fact(s), 1n), Rsub(R(1n, 1n), rho)));
+    var p0 = Rinv(Radd(sum, last));
+    var pw = Rmul(last, p0);
+    var Lq = Rdiv(Rmul(pw, rho), Rsub(R(1n, 1n), rho));
+    return {
+      rho: rho, stable: true, p0: p0, pWait: pw, Lq: Lq,
+      Wq: Rdiv(Lq, lam), L: Radd(Lq, a), W: Rdiv(Radd(Lq, a), lam)
+    };
+  }
+
+  /* M/M/1/K: finite capacity. Stable at any rho because the queue cannot grow,
+     which is the lesson -- and the arrival rate Little's law may use is the
+     EFFECTIVE one, lam(1 - pK). */
+  function mm1k(lam, mu, K) {
+    var rho = Rdiv(lam, mu), n, un = [], total = R(0n, 1n);
+    for (n = 0; n <= K; n += 1) { var t = Rpow(rho, n); un.push(t); total = Radd(total, t); }
+    var pi = un.map(function (t) { return Rdiv(t, total); });
+    var L = R(0n, 1n);
+    for (n = 0; n <= K; n += 1) L = Radd(L, Rmul(R(BigInt(n), 1n), pi[n]));
+    var pK = pi[K], lamEff = Rmul(lam, Rsub(R(1n, 1n), pK));
+    return { rho: rho, pi: pi, blocking: pK, lamEff: lamEff, L: L, W: Rdiv(L, lamEff) };
+  }
+
+  /* The discrete-time queue: Bernoulli arrivals (p per slot), geometric service
+     (q per slot), late arrival with departure first.
+
+     This exists because a slotted simulation is NOT M/M/1 at finite slot size,
+     and a lesson that checks the continuous formula against the simulation is
+     checking it against a different model. At p = 2/5, q = 1/2 the exact mean
+     here is 12/5, while rho/(1 - rho) at rho = p/q = 4/5 is 4 -- the continuous
+     formula overstates it by 5/3. The two agree only as the slot shrinks, and
+     the convergence panel is the lesson.
+
+     pi_1/pi_0 = p/(q(1-p)); pi_{n+1}/pi_n = p(1-q)/(q(1-p)) for n >= 1. */
+  function geoGeo1(p, q) {
+    var one = R(1n, 1n);
+    var ratio = Rdiv(Rmul(p, Rsub(one, q)), Rmul(q, Rsub(one, p)));
+    var first = Rdiv(p, Rmul(q, Rsub(one, p)));
+    if (Rcmp(ratio, one) >= 0) return { ratio: ratio, stable: false };
+    var tail = Rdiv(one, Rsub(one, ratio));
+    var p0 = Rinv(Radd(one, Rmul(first, tail)));
+    /* sum_{n>=1} n r^{n-1} = 1/(1-r)^2 */
+    var L = Rmul(p0, Rmul(first, Rmul(tail, tail)));
+    return { ratio: ratio, stable: true, p0: p0, L: L, rho: Rdiv(p, q) };
+  }
+
+  /* Little's Law from a trace, which is how this library proves it: the area
+     under the number-in-system curve is both the integral of N and the sum of
+     the customers' times, so L = lambda*W is an identity about averages and
+     needs no model at all.
+
+     Arrivals and departures are integer slot indices, paired by index. */
+  function littleFromTrace(arrivals, departures) {
+    var n = arrivals.length, i, horizon = 0;
+    for (i = 0; i < n; i += 1) if (departures[i] > horizon) horizon = departures[i];
+    var area = 0, totalTime = 0;
+    for (i = 0; i < n; i += 1) {
+      var w = departures[i] - arrivals[i];
+      totalTime += w;          /* sum of times in system */
+      area += w;               /* which IS the area under N(t) */
+    }
+    var T = R(BigInt(horizon), 1n);
+    return {
+      horizon: horizon,
+      L: Rdiv(R(BigInt(area), 1n), T),
+      lambda: Rdiv(R(BigInt(n), 1n), T),
+      W: Rdiv(R(BigInt(totalTime), 1n), R(BigInt(n), 1n)),
+      area: area
+    };
+  }
+
+  /* N(t) as a step function, for drawing the curve the area is under. */
+  function occupancyTrace(arrivals, departures, horizon) {
+    var out = [], t, i;
+    for (t = 0; t < horizon; t += 1) {
+      var c = 0;
+      for (i = 0; i < arrivals.length; i += 1) {
+        if (arrivals[i] <= t && departures[i] > t) c += 1;
+      }
+      out.push(c);
+    }
+    return out;
+  }
+
+  /* A seeded stream. number.py's lcgRun detects the cycle of a generator, which
+     is a different job; a lab that samples needs the values in order and needs
+     the same values every time the page is opened, or a reader cannot check
+     what they were told. */
+  function lcgStream(a, c, m, seed, count) {
+    /* BigInt, not Number. A typical multiplier times a typical state exceeds
+       2^53 on the SECOND step, and a double silently rounds it -- the stream
+       then looks reproducible, because it is reproducibly wrong. */
+    var A = BigInt(a), C = BigInt(c), M = BigInt(m);
+    var out = [], x = ((BigInt(seed) % M) + M) % M;
+    for (var i = 0; i < count; i += 1) { x = (A * x + C) % M; out.push(Number(x)); }
+    return out;
+  }
+  /* Uniform rationals in [0, 1) from that stream. */
+  function streamUniform(a, c, m, seed, count) {
+    return lcgStream(a, c, m, seed, count).map(function (x) {
+      return R(BigInt(x), BigInt(m));
+    });
+  }
+  /* Inverse-transform sampling from a pmf given as [value, rational] pairs. */
+  function sampleFromPmf(pairs, u) {
+    var cum = R(0n, 1n);
+    for (var i = 0; i < pairs.length; i += 1) {
+      cum = Radd(cum, pairs[i][1]);
+      if (Rcmp(u, cum) < 0) return pairs[i][0];
+    }
+    return pairs[pairs.length - 1][0];
+  }
+
+  /* The four places this subject cannot be exact. Each says how it rounds.
+
+     Everything else in the module returns a rational. These return Numbers, and
+     every lesson that calls one states that it is an approximation -- which is
+     the library's rule, not a courtesy. */
+
+  /* e^-x, as the reciprocal of a POSITIVE-term series.
+
+     The obvious implementation sums the alternating series for e^-x directly,
+     and it is wrong in a way that looks right at the arguments a test usually
+     picks. Terms of alternating sign near cancel, losing roughly 2x/ln(10)
+     significant digits: exact at x = 5, 0.4% out at x = 17, 173% out at x = 20,
+     and past x = 21 the SIGN is wrong -- a probability comes back negative.
+
+     Summing e^x instead has every term positive, so nothing cancels, and one
+     division at the end is exact to a rounding. */
+  function expNegApprox(x, tol) {
+    tol = tol || 1e-15;
+    if (x < 0) return 1 / expNegApprox(-x, tol);
+    if (x > 700) return 0;            /* e^700 is the edge of a double */
+    var t = 1, s = 1, k = 1;
+    while (t > tol * s && k < 1000) { t = t * x / k; s += t; k += 1; }
+    return 1 / s;
+  }
+  /* The Bloom false-positive rate. The exact form (1 - 1/m)^(kn) is available
+     as a rational; this is the (1 - e^(-kn/m))^k idealisation lessons compare
+     it against. */
+  function bloomApprox(m, n, k) {
+    return Math.pow(1 - expNegApprox(k * n / m, 1e-15), k);
+  }
+  /* Standard error of a proportion. A square root, so it rounds. */
+  function standardErrorApprox(p, n) { return Math.sqrt(p * (1 - p) / n); }
+  /* The Zipf normaliser past the point where its exact form is unreadable.
+     harmonic() stays exact and is what the lessons use; this is for the
+     lesson that asks what happens at a million keys. */
+  function harmonicApprox(n, s) {
+    if (s === 1) return Math.log(n) + 0.5772156649015329 + 1 / (2 * n);
+    var t = 0;
+    for (var k = 1; k <= n && k <= 100000; k += 1) t += 1 / Math.pow(k, s);
+    return t;
+  }
+  /* Bits per key for a target false-positive rate: log2(1/p)/ln 2.
+
+     NOT "the familiar 1.44 * log2(1/p)", and the difference is the point of
+     the lesson that uses this. 1.44 is a two-digit rounding of 1/ln 2 =
+     1.4427, so at p = 0.01 the textbook constant gives 9.567 and this gives
+     9.585. Both are printed on storage's `bloom` page, each under its own
+     name. This rounds -- it is a logarithm -- like the other Approx functions
+     around it. */
+  function bitsPerKeyApprox(target) { return Math.log2(1 / target) / Math.LN2; }
+  /* A root that rounds, by Newton from a rational start. Rsqrt returns null for
+     a non-square, which is right for exactness and useless for a geometric-mean
+     centre or a square-root scaling law. */
+  function sqrtApprox(a, tol) {
+    var x = Number(a.n) / Number(a.d);
+    if (x < 0) return NaN;
+    if (x === 0) return 0;
+    tol = tol || 1e-15;
+    var g = x, prev = 0;
+    while (Math.abs(g - prev) > tol * Math.max(1, g)) { prev = g; g = (g + x / g) / 2; }
+    return g;
+  }
+  /* Natural log, for the two max-load results this subject STATES rather than
+     proves. Everywhere else a logarithm is an exact integer search instead. */
+  function logApprox(x) { return Math.log(x); }
+
+  /* ---------------------------------------------------------------- output
+
+     Rdec goes through Number, and this course produces rationals Number cannot
+     hold: (19/20)^400 is a 512-digit numerator over a 521-digit denominator,
+     and Number() of it is 0, while
+     M/M/1/K at K = 20 has a denominator of 21 digits. So decimals here are long
+     division in BigInt, rounded half up at the last digit printed. */
+  function Rfixed(a, places) {
+    if (places === undefined) places = 3;
+    var neg = a.n < 0n, n = neg ? -a.n : a.n, d = a.d;
+    var scale = 10n ** BigInt(places);
+    var q = (2n * n * scale + d) / (2n * d);          /* round half up */
+    var whole = q / scale, frac = (q % scale).toString();
+    while (frac.length < places) frac = '0' + frac;
+    var body = places > 0 ? whole + '.' + frac : String(whole);
+    return (neg ? '-' : '') + body;
+  }
+  function Rpct(a, places) {
+    return Rfixed(Rmul(a, R(100n, 1n)), places === undefined ? 2 : places) + '%';
+  }
+  /* The exact fraction when a reader can read it, and a decimal when the exact
+     form has run to twenty digits. Both are the same number; only one of them
+     is evidence. The cut is on digits, not on magnitude, so it is the same
+     rule on every page of the course. */
+  function Rshort(a, places, digits) {
+    if (digits === undefined) digits = 9;
+    var wide = String(a.n < 0n ? -a.n : a.n).length > digits || String(a.d).length > digits;
+    return wide ? Rfixed(a, places === undefined ? 4 : places) : Rtext(a);
+  }
+  function commas(value) {
+    var s = String(value), out = '', i, c = 0;
+    for (i = s.length - 1; i >= 0; i -= 1) {
+      out = s.charAt(i) + out;
+      c += 1;
+      if (c % 3 === 0 && i > 0 && s.charAt(i - 1) !== '-') out = ' ' + out;
+    }
+    return out;
+  }
+
+  /* ------------------------------------------------- L1: rates, not latencies
+
+     mu is a RATE. A service time of S milliseconds is mu = 1000/S per second,
+     and the whole misconception of lesson 1 is reading mu off as if it were S.
+     Both directions are here so the page can print the conversion rather than
+     assert it. */
+  function muFromServiceMs(serviceMs) { return R(1000n, BigInt(serviceMs)); }
+  function serviceMsFromMu(mu) { return Rdiv(R(1000n, 1n), mu); }
+  /* Above rho = 1 the backlog grows at lambda - mu per second, for ever. This
+     is a straight line, not a queue: no steady state exists to ask L about. */
+  function growthPerSec(lam, mu) { return Rsub(lam, mu); }
+  function backlogAfter(lam, mu, secs) {
+    var g = growthPerSec(lam, mu);
+    if (Rcmp(g, R(0n, 1n)) <= 0) return R(0n, 1n);
+    return Rmul(g, R(BigInt(secs), 1n));
+  }
+
+  /* ------------------------------------- L2: Little's Law inside a window
+
+     littleFromTrace in the core takes the horizon to be the last departure, so
+     every customer has finished and the identity holds exactly. This is the
+     same counting over a window the reader can cut SHORT, which is where the
+     identity stops holding -- not because the law is false but because the
+     three quantities are then being measured over different populations.
+
+     area  : sum over t in [0, T) of N(t), the same area littleFromTrace uses
+     done  : the customers who both arrived and departed inside the window
+     The honest W is the mean sojourn of `done`; the seductive one divides the
+     area by every arrival, including those still in flight. */
+  function littleWindow(arrivals, departures, T) {
+    var i, area = 0, arrived = 0, done = 0, doneTime = 0, inflight = 0;
+    for (var t = 0; t < T; t += 1) {
+      for (i = 0; i < arrivals.length; i += 1) {
+        if (arrivals[i] <= t && departures[i] > t) area += 1;
+      }
+    }
+    for (i = 0; i < arrivals.length; i += 1) {
+      if (arrivals[i] >= T) continue;
+      arrived += 1;
+      if (departures[i] <= T) { done += 1; doneTime += departures[i] - arrivals[i]; }
+      else inflight += 1;
+    }
+    var Tr = R(BigInt(T), 1n);
+    var L = Rdiv(R(BigInt(area), 1n), Tr);
+    var lam = Rdiv(R(BigInt(arrived), 1n), Tr);
+    var W = done ? Rdiv(R(BigInt(doneTime), 1n), R(BigInt(done), 1n)) : R(0n, 1n);
+    return {
+      area: area, arrived: arrived, done: done, inflight: inflight,
+      L: L, lambda: lam, W: W, lamW: Rmul(lam, W),
+      holds: Requ(L, Rmul(lam, W))
+    };
+  }
+
+  /* -------------------------------------------------- L3: sizing with L = lam*W
+
+     One identity, three ways round. Units are carried as strings because the
+     error this lesson is about is a unit error: a pool of N connections at W
+     milliseconds each supports N/W per MILLISECOND, which is 1000N/W a second,
+     and a reader who forgets the thousand sizes the pool 1000x wrong. */
+  function littleSolve(which, a, b) {
+    if (which === 'L') return Rmul(a, b);            /* lambda * W          */
+    if (which === 'lambda') return Rdiv(a, b);       /* L / W               */
+    if (which === 'W') return Rdiv(a, b);            /* L / lambda          */
+    throw new Error('littleSolve: no unknown named ' + which);
+  }
+  /* The throughput a pool of N caps at, when each holder keeps it for W ms. */
+  function poolCapPerSec(N, waitMs) {
+    return Rdiv(Rmul(R(BigInt(N), 1n), R(1000n, 1n)), waitMs);
+  }
+  /* And the pool a target rate needs: lambda per second * W ms / 1000. */
+  function poolForRate(ratePerSec, waitMs) {
+    return Rdiv(Rmul(ratePerSec, waitMs), R(1000n, 1n));
+  }
+
+  /* --------------------------------------- L4, L7, L9: the slotted chain
+
+     One Bernoulli arrival per slot with probability p; geometric service with
+     parameter q; LATE ARRIVAL, meaning a departure is resolved before an
+     arrival within the same slot, so a job that arrives in slot t cannot leave
+     before slot t + 1. That convention is what makes the stationary chain the
+     one geoGeo1 solves, and changing it changes the number -- which is why it
+     is stated on the page and not only here.
+
+     Exactly two draws are consumed per slot whether or not the departure draw
+     is used. Consuming one when the queue is empty would make the arrival
+     sequence depend on q, and then the deterministic-service arm below would
+     not be seeing the same arrivals. */
+  var LCG_A = 1103515245, LCG_C = 12345, LCG_M = 2147483648;
+
+  /* u is a raw stream value in [0, m); the comparison is exact in BigInt
+     because a Number comparison here would be right until it silently was not. */
+  function drawBelow(u, m, prob) {
+    return BigInt(u) * prob.d < prob.n * BigInt(m);
+  }
+  function slottedRun(p, q, seed, slots) {
+    var u = lcgStream(LCG_A, LCG_C, LCG_M, seed, 2 * slots), n = 0, out = [];
+    for (var t = 0; t < slots; t += 1) {
+      if (n > 0 && drawBelow(u[2 * t], LCG_M, q)) n -= 1;   /* departure first */
+      if (drawBelow(u[2 * t + 1], LCG_M, p)) n += 1;        /* then the arrival */
+      out.push(n);
+    }
+    return out;
+  }
+  /* The same arrivals, served in exactly D slots every time: c_s^2 = 0. */
+  function slottedDetRun(p, D, seed, slots) {
+    var u = lcgStream(LCG_A, LCG_C, LCG_M, seed, 2 * slots), n = 0, rem = 0, out = [];
+    for (var t = 0; t < slots; t += 1) {
+      if (n > 0) { if (rem === 0) rem = D; rem -= 1; if (rem === 0) n -= 1; }
+      if (drawBelow(u[2 * t + 1], LCG_M, p)) n += 1;
+      out.push(n);
+    }
+    return out;
+  }
+  /* D/D/1: an arrival every A slots, service exactly S slots, S < A. Nothing
+     random in it, and nothing ever waits -- which is lesson 4's whole point. */
+  function ddRun(A, S, slots) {
+    var n = 0, rem = 0, out = [];
+    for (var t = 0; t < slots; t += 1) {
+      if (n > 0) { if (rem === 0) rem = S; rem -= 1; if (rem === 0) n -= 1; }
+      if (t % A === 0) n += 1;
+      out.push(n);
+    }
+    return out;
+  }
+  /* The mean of a run from slot `from` onward, exact. `from` is the discarded
+     warm-up, and the difference between from = 0 and from > 0 is the initial
+     transient the lesson names. */
+  function runMean(trace, from) {
+    var s = 0n, i, n = 0;
+    for (i = from; i < trace.length; i += 1) { s += BigInt(trace[i]); n += 1; }
+    if (!n) return R(0n, 1n);
+    return R(s, BigInt(n));
+  }
+  /* The running mean at `points` evenly spaced cut-offs, exact, in one pass.
+
+     Calling runMean at each cut-off would be O(points * slots); a cumulative
+     sum makes it O(slots), which is what lets the curve be drawn from the same
+     exact arithmetic as the headline number rather than from a float shadow of
+     it. Each entry is [slot, mean]. */
+  function runningMeans(trace, from, points) {
+    var out = [], cum = 0n, kept = 0, i, every = Math.max(1, Math.floor((trace.length - from) / points));
+    for (i = from; i < trace.length; i += 1) {
+      cum += BigInt(trace[i]);
+      kept += 1;
+      if (kept % every === 0 || i === trace.length - 1) out.push([i + 1, R(cum, BigInt(kept))]);
+    }
+    return out;
+  }
+
+  /* Those waiting rather than in service. L - Lq = rho is the misconception of
+     lesson 7, and this is the same subtraction done slot by slot. */
+  function queueOf(trace) {
+    return trace.map(function (n) { return n > 0 ? n - 1 : 0; });
+  }
+  function runMax(trace) {
+    var m = 0;
+    for (var i = 0; i < trace.length; i += 1) if (trace[i] > m) m = trace[i];
+    return m;
+  }
+  /* The exact number waiting in the discrete chain: L - rho, because exactly
+     rho of the time there is one in service. */
+  function geoGeo1Lq(p, q) {
+    var g = geoGeo1(p, q);
+    if (!g.stable) return null;
+    return Rsub(g.L, g.rho);
+  }
+  /* The chain's own coefficients of variation, which are NOT free parameters:
+     a Bernoulli arrival stream has geometric gaps, so c_a^2 = 1 - p, and a
+     geometric service has c_s^2 = 1 - q. Kingman evaluated at these is a fair
+     comparison; Kingman evaluated at 1 and 1 is the M/M/1 answer wearing a
+     slotted simulation's clothes. */
+  function slottedCa2(p) { return Rsub(R(1n, 1n), p); }
+  function slottedCs2(q) { return Rsub(R(1n, 1n), q); }
+
+  /* The initial transient, made visible rather than argued about.
+
+     E[N_t] starts at 0 because the run starts empty and climbs toward L, so a
+     mean taken from t = 0 is biased LOW in expectation. On one run that bias is
+     smaller than the sampling noise and the sign can come out either way, which
+     is exactly why a warm-up is discarded rather than debated: this averages
+     the occupancy at each slot over `seeds` independent runs, and the curve it
+     returns rises from zero with nothing to argue about. */
+  function transientCurve(p, q, seed0, seeds, slots) {
+    var acc = [], s, t;
+    for (t = 0; t < slots; t += 1) acc.push(0);
+    for (s = 0; s < seeds; s += 1) {
+      var run = slottedRun(p, q, seed0 + s, slots);
+      for (t = 0; t < slots; t += 1) acc[t] += run[t];
+    }
+    return acc.map(function (v) { return R(BigInt(v), BigInt(seeds)); });
+  }
+
+  /* The mean of part of an ensemble curve, exact. Early against late is the
+     bias the empty start causes, stated as two numbers rather than as a claim. */
+  function curveMean(curve, from, to) {
+    var s = R(0n, 1n), i, n = 0;
+    for (i = from; i < to && i < curve.length; i += 1) { s = Radd(s, curve[i]); n += 1; }
+    return n ? Rdiv(s, R(BigInt(n), 1n)) : R(0n, 1n);
+  }
+
+  /* --------------------------------- L7: the shrinking slot, done exactly
+
+     p = lambda*Delta and q = mu*Delta, so both must be probabilities: the
+     largest legal slot is 1/max(lambda, mu), and the panel starts there. The
+     exact mean at each step is geoGeo1's, and its distance from rho/(1 - rho)
+     is rho*p/(1 - rho) -- linear in Delta, which is why ten times smaller is
+     ten times closer and not merely closer. */
+  function largestLegalSlot(lam, mu) {
+    var bigger = Rcmp(lam, mu) >= 0 ? lam : mu;
+    if (Rzero(bigger)) return null;
+    return Rinv(bigger);
+  }
+  function slottedMean(lam, mu, delta) {
+    var p = Rmul(lam, delta), q = Rmul(mu, delta), one = R(1n, 1n);
+    if (Rcmp(p, one) > 0 || Rcmp(q, one) > 0) return null;
+    var g = geoGeo1(p, q);
+    return g.stable ? g.L : null;
+  }
+  /* The whole panel: `steps` slot sizes, each a tenth of the one before. */
+  function convergenceRows(lam, mu, steps) {
+    var base = largestLegalSlot(lam, mu), rows = [], i;
+    if (!base) return rows;
+    var cont = mm1(lam, mu);
+    for (i = 0; i < steps; i += 1) {
+      var delta = Rdiv(base, Rpow(R(10n, 1n), i));
+      var L = slottedMean(lam, mu, delta);
+      rows.push({
+        delta: delta, p: Rmul(lam, delta), q: Rmul(mu, delta), L: L,
+        gap: L && cont.stable ? Rsub(cont.L, L) : null
+      });
+    }
+    return rows;
+  }
+
+  /* ------------------------------------------------------- L8: the knee
+
+     W/S = 1/(1 - rho), a hyperbola with an asymptote at rho = 1. The inverse is
+     the more useful direction: the utilisation at which the response time has
+     reached k service times is exactly (k - 1)/k, so k = 10 is 90% and k = 100
+     is 99%, and the last tenth of a machine costs what the first nine did. */
+  function kneeFactor(rho) { return Rinv(Rsub(R(1n, 1n), rho)); }
+  function rhoForFactor(k) { return R(BigInt(k - 1), BigInt(k)); }
+
+  /* ------------------------------------------------ L9: Kingman's formula
+
+     Wq ~ (rho/(1 - rho)) * ((ca^2 + cs^2)/2) * S. The arithmetic is exact for
+     rational ca^2, cs^2 and S. The MODEL is the approximation, and the page
+     proves that rather than asserting it: at ca^2 = cs^2 = 1 this returns the
+     M/M/1 Wq exactly, and at the slotted chain's own coefficients it misses the
+     chain's exact answer -- in the same direction every time, because it is a
+     heavy-traffic limit being read at moderate load. */
+  function kingmanWq(rho, ca2, cs2, S) {
+    var one = R(1n, 1n);
+    if (Rcmp(rho, one) >= 0) return null;
+    return Rmul(Rdiv(rho, Rsub(one, rho)), Rmul(Rdiv(Radd(ca2, cs2), R(2n, 1n)), S));
+  }
+
+  /* ------------------------------- L5: geometric to exponential, both ways
+
+     P(T > t) = (1 - lambda*Delta)^(t/Delta) exactly, against e^(-lambda*t)
+     rounded. t is a whole number of seconds and Delta is 1/k of one, so the
+     exponent is the integer t*k and no rounding enters the exact side at all. */
+  function geoTail(lam, invDelta, t) {
+    var delta = R(1n, BigInt(invDelta));
+    var per = Rsub(R(1n, 1n), Rmul(lam, delta));
+    if (Rcmp(per, R(0n, 1n)) < 0) return null;
+    return Rpow(per, t * invDelta);
+  }
+  /* Memorylessness, exactly: P(T > s + t | T > s) = P(T > t), for EVERY s.
+     Not approximately, not in the limit -- it is the defining property, and the
+     geometric has it at any slot size, which is why the limit keeps it. */
+  function geoCondTail(lam, invDelta, s, t) {
+    var both = geoTail(lam, invDelta, s + t), past = geoTail(lam, invDelta, s);
+    if (!both || !past || Rzero(past)) return null;
+    return Rdiv(both, past);
+  }
+  /* e^-x, from the core, WITH ITS RANGE STATED.
+
+     expNegApprox sums the alternating series 1 - x + x^2/2! - ..., whose largest
+     term is about e^x/sqrt(2*pi*x) while the answer is e^-x, so it throws away
+     roughly 2x/ln(10) significant digits to cancellation. In double precision
+     that is all sixteen of them by about x = 19, and past x = 21 the result
+     changes sign. Measured: the relative error is 3e-9 at x = 10, 1.6e-7 at
+     x = 12, 4e-3 at x = 17 and 173% at x = 20.
+
+     So this kit does not hand it an x it cannot answer. The two modes that call
+     it bound their controls to EXP_SAFE_X and say so on the page, and the two
+     functions below refuse rather than return a number that is confidently
+     wrong -- which on a page promising checkable arithmetic is the worse
+     failure of the two. Widening the bound is a change to the core's method,
+     not to this kit. */
+  var EXP_SAFE_X = 12;
+  function expNegSafe(x) {
+    if (!(x >= 0) || x > EXP_SAFE_X) return NaN;
+    var v = expNegApprox(x, 1e-15);
+    return (v > 0 && v <= 1) ? v : NaN;
+  }
+  function expTailApprox(lam, t) { return expNegSafe(Rnum(lam) * t); }
+
+  /* ------------------------------- L6: the binomial exactly, Poisson rounded
+
+     The count in a window of n opportunities each firing with probability m/n
+     is binomial, and that is EXACT. Its limit as n grows is e^-m m^k/k!, which
+     is not, because e^-m is not rational. Both are printed, the difference is
+     printed, and the difference is what "Poisson" means. */
+  function binomRow(n, m, upto) {
+    /* P(k+1) = P(k) * ((n-k)/(k+1)) * (p/(1-p)), from P(0) = (1-p)^n.
+
+       By recurrence rather than comb(n,k)p^k(1-p)^(n-k) per term, for a reason
+       that is not tidiness: at n = 1000 and p = 1/100 each term has a
+       two-thousand-digit denominator, and summing the upper tail one closed
+       form at a time takes long enough that the page never paints. The
+       recurrence is one multiplication per step and the answers are identical. */
+    var p = R(BigInt(m), BigInt(n)), one = R(1n, 1n), notp = Rsub(one, p);
+    if (Rzero(notp)) return [one];
+    var ratio = Rdiv(p, notp), out = [], cur = Rpow(notp, n), k;
+    out.push(cur);
+    for (k = 0; k < upto && k < n; k += 1) {
+      cur = Rmul(cur, Rmul(R(BigInt(n - k), BigInt(k + 1)), ratio));
+      out.push(cur);
+    }
+    return out;
+  }
+  function binomPmf(n, m, k) {
+    if (k < 0 || k > n) return R(0n, 1n);
+    var row = binomRow(n, m, k);
+    return row[k];
+  }
+  /* P(count > C) as 1 minus the head, which is C + 1 terms rather than n - C.
+     Exact either way; only one of them finishes. */
+  function tailFromRow(row, C) {
+    var s = R(0n, 1n), k;
+    for (k = 0; k <= C && k < row.length; k += 1) s = Radd(s, row[k]);
+    return Rsub(R(1n, 1n), s);
+  }
+  function binomTail(n, m, C) {
+    if (C >= n) return R(0n, 1n);
+    return tailFromRow(binomRow(n, m, Math.max(0, C)), C);
+  }
+  /* Variance equals the mean is the Poisson signature, and the binomial says
+     what it costs to get there: n*p(1-p) = m(1 - m/n), exactly. At n = 100 and
+     m = 10 the variance is 9, not 10, and that 10% is the whole gap between a
+     window of a hundred opportunities and a window of infinitely many. */
+  function binomVar(n, m) {
+    return Rmul(R(BigInt(m), 1n), Rsub(R(1n, 1n), R(BigInt(m), BigInt(n))));
+  }
+
+  function poissonPmfApprox(m, k) {
+    var t = expNegSafe(m);
+    for (var i = 1; i <= k; i += 1) t = t * m / i;
+    return t;
+  }
+  /* The head is accumulated term by term, so the tail is one pass rather than
+     one pass per C. The same rewrite the binomial needed, for the same reason. */
+  function poissonTailApprox(m, C) {
+    var t = expNegSafe(m), head = t, k;
+    for (k = 1; k <= C; k += 1) { t = t * m / k; head += t; }
+    return 1 - head;
+  }
+  /* The smallest headroom C that keeps P(count > C) at or under a target. The
+     tail falls with C, so the first C that clears it is the answer. */
+  function headroomForApprox(m, target, limit) {
+    var t = expNegSafe(m), head = t, C;
+    if (!(t > 0)) return -1;
+    for (C = 0; C <= limit; C += 1) {
+      if (1 - head <= target) return C;
+      t = t * m / (C + 1);
+      head += t;
+    }
+    return -1;
+  }
+
+  /* ----------------------------------- L11: the K a loss target needs
+
+     mm1k gives the blocking at one K; this is the smallest K that gets it under
+     a target. Monotone in K for rho < 1, and at rho >= 1 it may never get
+     there, which the -1 says. */
+  function smallestBuffer(lam, mu, target, limit) {
+    for (var K = 1; K <= limit; K += 1) {
+      if (Rcmp(mm1k(lam, mu, K).blocking, target) <= 0) return K;
+    }
+    return -1;
+  }
+  /* The latency cap a buffer of K buys: at most K jobs ahead of you, each
+     taking S = 1/mu on average, so the wait cannot exceed about K*S however
+     hard the offered load pushes. */
+  function bufferLatencyCap(mu, K) { return Rdiv(R(BigInt(K), 1n), mu); }
+
+  /* -------------------------------------------- L12: the token bucket
+
+     Capacity b, refilling at r tokens a second. An arrival at time t tops the
+     bucket up by r*(t - last) seconds' worth, capped at b, and is admitted if a
+     whole token is there. Times are integer milliseconds and r is a rational,
+     so the token level is exact at every step and no drift accumulates.
+
+     The bound is the lesson: at most b + r*t admissions in any window of t,
+     which is why a bucket is not "r per second". */
+  function bucketRun(times, r, b) {
+    var cap = R(BigInt(b), 1n), tokens = cap, last = times.length ? times[0] : 0;
+    var out = [], admitted = 0;
+    for (var i = 0; i < times.length; i += 1) {
+      var gap = R(BigInt(times[i] - last), 1000n);          /* ms -> seconds */
+      tokens = Radd(tokens, Rmul(r, gap));
+      if (Rcmp(tokens, cap) > 0) tokens = cap;
+      last = times[i];
+      var pass_ = Rcmp(tokens, R(1n, 1n)) >= 0;
+      if (pass_) { tokens = Rsub(tokens, R(1n, 1n)); admitted += 1; }
+      out.push({ t: times[i], admit: pass_, tokens: tokens });
+    }
+    return { rows: out, admitted: admitted, rejected: times.length - admitted };
+  }
+  /* The fixed window a bucket replaces: reset a counter every `windowMs`. It
+     admits `limit` in each window, so two full windows back to back put 2*limit
+     through in one window's width -- the boundary burst. */
+  function fixedWindowRun(times, limit, windowMs) {
+    var out = [], admitted = 0, bucketIndex = -1, count = 0;
+    for (var i = 0; i < times.length; i += 1) {
+      var w = Math.floor(times[i] / windowMs);
+      if (w !== bucketIndex) { bucketIndex = w; count = 0; }
+      var pass_ = count < limit;
+      if (pass_) { count += 1; admitted += 1; }
+      out.push({ t: times[i], admit: pass_, window: w });
+    }
+    return { rows: out, admitted: admitted, rejected: times.length - admitted };
+  }
+  /* The largest number of ADMITTED arrivals in any window of `windowMs`, taken
+     over every window that starts at an admission. That is the number the
+     downstream service actually sees, and it is what the two limiters are
+     being compared on. */
+  function largestBurst(rows, windowMs) {
+    var ts = [], i, j, best = 0;
+    for (i = 0; i < rows.length; i += 1) if (rows[i].admit) ts.push(rows[i].t);
+    for (i = 0; i < ts.length; i += 1) {
+      var c = 0;
+      for (j = i; j < ts.length; j += 1) if (ts[j] - ts[i] < windowMs) c += 1;
+      if (c > best) best = c;
+    }
+    return best;
+  }
+  function parseTimes(text, limit) {
+    var raw = String(text).split(/[^0-9]+/), out = [], i;
+    for (i = 0; i < raw.length; i += 1) {
+      if (!raw[i]) continue;
+      out.push(Number(raw[i]));
+      if (out.length >= limit) break;
+    }
+    if (!out.length) return null;
+    return out.sort(function (a, b) { return a - b; });
+  }
+
+  /* --------------------------------- L13: the backlog a spike leaves behind
+
+     While lambda > mu the backlog grows at (lambda - mu) a second; the peak is
+     that rate times the spike, which is the AREA between the two curves. It
+     then drains at (mu - lambda_after), and the drain takes
+
+         peak / (mu - lambda_after)
+
+     seconds -- which is longer than the spike whenever the recovery headroom is
+     smaller than the excess was. The lag a consumer sees is backlog/mu, so the
+     worst lag arrives at the END of the spike and decays from there. */
+  function backlogPlan(mu, before, spike, spikeSecs, after) {
+    var zero = R(0n, 1n);
+    var excess = Rsub(spike, mu);
+    var peak = Rcmp(excess, zero) > 0 ? Rmul(excess, R(BigInt(spikeSecs), 1n)) : zero;
+    var headroom = Rsub(mu, after);
+    var drains = Rcmp(headroom, zero) > 0;
+    var drainSecs = drains && !Rzero(peak) ? Rdiv(peak, headroom) : null;
+    return {
+      excess: excess, peak: peak, headroom: headroom, drains: drains,
+      drainSecs: drainSecs,
+      maxLagSecs: Rdiv(peak, mu),
+      beforeStable: Rcmp(before, mu) < 0,
+      totalSecs: drainSecs ? Radd(R(BigInt(spikeSecs), 1n), drainSecs) : null
+    };
+  }
+  /* The backlog at a chosen second of the episode, for the curve: it rises on
+     [0, spike] and falls after, and never goes below zero. */
+  function backlogAt(plan, spikeSecs, secs) {
+    var zero = R(0n, 1n);
+    if (secs <= 0) return zero;
+    if (secs <= spikeSecs) {
+      var up = Rmul(plan.excess, R(BigInt(secs), 1n));
+      return Rcmp(up, zero) > 0 ? up : zero;
+    }
+    if (!plan.drains) {
+      return Radd(plan.peak, Rmul(Rsub(zero, plan.headroom), R(BigInt(secs - spikeSecs), 1n)));
+    }
+    var down = Rsub(plan.peak, Rmul(plan.headroom, R(BigInt(secs - spikeSecs), 1n)));
+    return Rcmp(down, zero) > 0 ? down : zero;
+  }
+
+  var pS = document.getElementById('slP'), qS = document.getElementById('slQ');
+  var subSel = document.getElementById('slSub'), seedS = document.getElementById('slSeed');
+  var warmS = document.getElementById('slWarm');
+  var plot = document.getElementById('slPlot'), trans = document.getElementById('slTrans');
+  var table = document.getElementById('slTable'), status = document.getElementById('slStatus');
+  var BASE = 2000;
+
+  function polyline(pts, colour, width, dash) {
+    if (!pts.length) return '';
+    return '<polyline fill="none" stroke="var(' + colour + ')" stroke-width="' + width + '"'
+      + (dash ? ' stroke-dasharray="' + dash + '"' : '')
+      + ' points="' + pts.map(function (q) { return q[0].toFixed(1) + ',' + q[1].toFixed(1); }).join(' ') + '" />';
+  }
+
+  function redraw() {
+    var pn = +pS.value, qn = +qS.value, k = +subSel.value, seed = +seedS.value, warmPct = +warmS.value;
+    if (pn >= qn) { qn = Math.min(20, pn + 1); qS.value = qn; }
+    var kb = BigInt(k);
+    var p = R(BigInt(pn), 20n * kb), q = R(BigInt(qn), 20n * kb);
+    var rho = Rdiv(p, q);
+    var slots = BASE * k, warmSlots = Math.floor(slots * warmPct / 100);
+
+    document.getElementById('slPOut').textContent = Rtext(p);
+    document.getElementById('slQOut').textContent = Rtext(q);
+    document.getElementById('slSeedOut').textContent = String(seed);
+    document.getElementById('slWarmOut').textContent = warmPct + '% (' + commas(warmSlots) + ' slots)';
+
+    var run = slottedRun(p, q, seed, slots);
+    var A = Number(rho.d) * k, S = Number(rho.n) * k;
+    var det = ddRun(A, S, slots);
+    var exact = geoGeo1(p, q);
+    var mean0 = runMean(run, 0), meanW = runMean(run, warmSlots), meanD = runMean(det, 0);
+
+    document.getElementById('slMean0').textContent = Rfixed(mean0, 4);
+    document.getElementById('slMeanW').textContent = Rfixed(meanW, 4);
+    document.getElementById('slMeanD').textContent = Rtext(meanD);
+    document.getElementById('slRatio').innerHTML = Rzero(meanD) ? '&mdash;'
+      : Rfixed(Rdiv(meanW, meanD), 3) + '&times;';
+
+    var peak = Math.max(1, runMax(run.slice(0, 240)));
+    var show = Math.min(240, slots), W0 = 500 / show, base = 92, i;
+    var s = '<text x="0" y="12" font-size="11" fill="var(--muted)">the first ' + show
+      + ' slots &mdash; <tspan fill="var(--cyan)">Bernoulli arrivals</tspan> against '
+      + '<tspan fill="var(--green)">an arrival every ' + A + ' slots, served in exactly ' + S + '</tspan></text>';
+    for (i = 0; i < show; i += 1) {
+      if (!run[i]) continue;
+      var h = (run[i] / peak) * 68;
+      s += '<rect x="' + (10 + i * W0) + '" y="' + (base - h) + '" width="' + Math.max(0.8, W0 - 0.3)
+        + '" height="' + h + '" fill="var(--cyan)" opacity="0.55" />';
+    }
+    var dpts = [];
+    for (i = 0; i < show; i += 1) dpts.push([10 + i * W0, base - (det[i] / peak) * 68]);
+    s += polyline(dpts, '--green', 1.2, '');
+    s += '<line x1="10" y1="' + base + '" x2="510" y2="' + base + '" stroke="var(--line-strong)" stroke-width="1" />'
+      + '<text x="10" y="' + (base + 12) + '" font-size="9" fill="var(--muted)">peak of ' + peak
+      + ' waiting on the random run; the clockwork run never exceeds 1</text>';
+
+    var rmA = runningMeans(run, 0, 180), rmD = runningMeans(det, 0, 180);
+    var top = Math.max(parseFloat(Rfixed(exact.stable ? exact.L : mean0, 3)), parseFloat(Rfixed(mean0, 3))) * 1.5 + 0.5;
+    function yOf(v) { return 196 - (v / top) * 62; }
+    s += '<text x="0" y="122" font-size="11" fill="var(--muted)">the running means, over all '
+      + commas(slots) + ' slots</text>';
+    s += polyline(rmA.map(function (r) { return [10 + (r[0] / slots) * 500, yOf(parseFloat(Rfixed(r[1], 4)))]; }), '--amber', 1.6, '');
+    s += polyline(rmD.map(function (r) { return [10 + (r[0] / slots) * 500, yOf(parseFloat(Rfixed(r[1], 4)))]; }), '--green', 1.4, '');
+    if (exact.stable) {
+      var ye = yOf(parseFloat(Rfixed(exact.L, 4)));
+      s += '<line x1="10" y1="' + ye + '" x2="510" y2="' + ye
+        + '" stroke="var(--purple)" stroke-width="1.2" stroke-dasharray="4 3" />'
+        + '<text x="510" y="' + (ye - 4) + '" text-anchor="end" font-size="9" fill="var(--purple)">'
+        + 'exact Geo/Geo/1 L = ' + Rtext(exact.L) + '</text>';
+    }
+    if (warmSlots > 0) {
+      var xw = 10 + (warmSlots / slots) * 500;
+      s += '<line x1="' + xw + '" y1="130" x2="' + xw + '" y2="196" stroke="var(--red)" stroke-width="1" stroke-dasharray="2 3" />'
+        + '<text x="' + (xw + 3) + '" y="138" font-size="9" fill="var(--red)">warm-up ends</text>';
+    }
+    s += '<line x1="10" y1="196" x2="510" y2="196" stroke="var(--line-strong)" stroke-width="1" />';
+    plot.innerHTML = s;
+
+    /* The initial transient, as an ensemble rather than as an argument. */
+    var seeds = 24, span = 160;
+    var curve = transientCurve(p, q, seed, seeds, span);
+    var earlyMean = curveMean(curve, 0, Math.floor(span / 8));
+    var lateMean = curveMean(curve, Math.floor(span / 2), span);
+    var ctop = parseFloat(Rfixed(exact.stable ? exact.L : R(1n, 1n), 3)) * 1.4 + 0.3;
+    var t2 = '<text x="0" y="12" font-size="11" fill="var(--muted)">E[N at slot t], averaged over '
+      + seeds + ' runs that all start empty &mdash; this is the initial transient</text>';
+    t2 += polyline(curve.map(function (v, ix) {
+      return [10 + (ix / span) * 500, 100 - (parseFloat(Rfixed(v, 4)) / ctop) * 70];
+    }), '--cyan', 1.4, '');
+    if (exact.stable) {
+      var yl = 100 - (parseFloat(Rfixed(exact.L, 4)) / ctop) * 70;
+      t2 += '<line x1="10" y1="' + yl + '" x2="510" y2="' + yl
+        + '" stroke="var(--purple)" stroke-width="1.2" stroke-dasharray="4 3" />';
+    }
+    t2 += '<line x1="10" y1="100" x2="510" y2="100" stroke="var(--line-strong)" stroke-width="1" />'
+      + '<text x="10" y="114" font-size="9" fill="var(--muted)">t = 0, empty</text>'
+      + '<text x="510" y="114" text-anchor="end" font-size="9" fill="var(--muted)">t = ' + span + '</text>'
+      + '<text x="10" y="126" font-size="10" fill="var(--muted)">E[N] over the first '
+      + Math.floor(span / 8) + ' slots is ' + Rfixed(earlyMean, 3) + ' against ' + Rfixed(lateMean, 3)
+      + ' over the last half &mdash; that is the bias, and it is downward</text>';
+    trans.innerHTML = t2;
+
+    var ca2 = slottedCa2(p), cs2 = slottedCs2(q);
+    table.innerHTML = '<thead><tr><th>row</th><th>what it is</th><th>value</th></tr></thead><tbody>'
+      + '<tr><td>p, q</td><td>arrival and service probabilities per slot</td><td>' + Rtext(p) + ', ' + Rtext(q) + '</td></tr>'
+      + '<tr><td>&rho; = p/q</td><td>the same for both runs, by construction</td><td>' + Rtext(rho) + '</td></tr>'
+      + '<tr><td>c<sub>a</sub><sup>2</sup>, c<sub>s</sub><sup>2</sup></td>'
+      + '<td>1 &minus; p and 1 &minus; q for this chain; 0 and 0 for the clockwork one</td><td>'
+      + Rtext(ca2) + ', ' + Rtext(cs2) + '</td></tr>'
+      + '<tr><td class="tone-cyan">random, from t = 0</td><td>one run, transient included</td><td>'
+      + Rfixed(mean0, 4) + '</td></tr>'
+      + '<tr><td class="tone-amber">random, after warm-up</td><td>the same run, first ' + commas(warmSlots)
+      + ' slots discarded</td><td>' + Rfixed(meanW, 4) + '</td></tr>'
+      + '<tr><td class="tone-cyan">ensemble, slots 0 to ' + Math.floor(span / 8) + '</td>'
+      + '<td>E[N] over ' + seeds + ' runs, while the transient is still running</td><td>'
+      + Rfixed(earlyMean, 4) + '</td></tr>'
+      + '<tr><td class="tone-amber">ensemble, slots ' + Math.floor(span / 2) + ' to ' + span + '</td>'
+      + '<td>the same ' + seeds + ' runs, once the transient has decayed</td><td>'
+      + Rfixed(lateMean, 4) + '</td></tr>'
+      + '<tr><td class="tone-green">clockwork D/D/1</td><td>same &rho;, nothing random</td><td>'
+      + Rtext(meanD) + '</td></tr>'
+      + '<tr><td class="tone-purple">exact Geo/Geo/1</td><td>&rho;(1 &minus; p)/(1 &minus; &rho;), '
+      + 'solved in Operations Research</td><td>'
+      + (exact.stable ? Rtext(exact.L) : 'unstable') + '</td></tr>'
+      + '<tr><td class="tone-red">&rho;/(1 &minus; &rho;)</td><td>the continuous M/M/1 formula, '
+      + 'which is a different model</td><td>' + Rtext(Rdiv(rho, Rsub(R(1n, 1n), rho))) + '</td></tr>'
+      + '</tbody>';
+
+    status.innerHTML = 'Both runs are at <strong>&rho; = ' + Rtext(rho) + '</strong>. The clockwork one '
+      + '&mdash; an arrival every ' + A + ' slots, served in exactly ' + S + ' &mdash; holds <strong>'
+      + Rtext(meanD) + '</strong>, which is &rho; itself: the server is busy that fraction of the time and '
+      + '<em>nothing ever waits</em>. The Bernoulli run, at the same utilisation, holds <strong>'
+      + Rfixed(meanW, 4) + '</strong>, about <strong>' + (Rzero(meanD) ? '—' : Rfixed(Rdiv(meanW, meanD), 2))
+      + '&times;</strong> as much, and peaks at ' + peak + '. Nothing is overloaded in either run. '
+      + 'What waits is the bunching. '
+      + (exact.stable
+          ? 'The exact answer for this chain is <span class="tone-purple">' + Rtext(exact.L)
+            + '</span> &mdash; the Geo/Geo/1 mean, derived in Operations Research. Note what it is '
+            + '<em>not</em>: &rho;/(1 &minus; &rho;) = ' + Rtext(Rdiv(rho, Rsub(R(1n, 1n), rho)))
+            + ', the M/M/1 answer, which belongs to a different model and only meets this one as the '
+            + 'slot shrinks. '
+          : '')
+      + 'One last thing, and it is what the second drawing is for: <strong>the simulation starts '
+      + 'empty</strong>. Over ' + seeds + ' runs, E[N] across the first ' + Math.floor(span / 8)
+      + ' slots is <strong>' + Rfixed(earlyMean, 3) + '</strong> and across the last half it is '
+      + '<strong>' + Rfixed(lateMean, 3) + '</strong>, so a mean taken from t = 0 is biased low. '
+      + 'That is the initial transient. On <em>one</em> run the bias is smaller than the sampling '
+      + 'noise and can land either way &mdash; here ' + Rfixed(mean0, 4) + ' from t = 0 against '
+      + Rfixed(meanW, 4) + ' after the warm-up &mdash; which is exactly why a warm-up is discarded '
+      + 'as a matter of routine rather than argued about run by run. Operations Research, '
+      + '<span class="tt">warm-up-and-the-initial-transient</span>, is where that argument lives.';
+  }
+
+  [pS, qS, seedS, warmS].forEach(function (el) { el.addEventListener('input', redraw); });
+  subSel.addEventListener('change', redraw);
+  redraw();
+  window.redrawLab = redraw;
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "queues-and-utilisation/why-queues-form-below-full-utilisation";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+  </script>
+</body>
+</html>

@@ -771,6 +771,370 @@
         "This is exactly the argument used for the cut property in “Spanning Trees and Minimum Spanning Trees” in Graphs and Trees: swapping the heavier edge for the lighter one in a minimum spanning tree does not increase the total. The technique is the same wherever greedy is correct.",
         "Undecidability is a theorem, not a state of ignorance, and its proof uses the same self-reference Logic and Proof excluded from propositions."
       ]
+    },
+    "content/system_design/__init__.py": {
+      "baseline_ast_sha256": "57000b676dd1140f2d1ee235d1bc385b9af5111f96747272653ddf9a132a0f86",
+      "expected_ast_sha256": "57000b676dd1140f2d1ee235d1bc385b9af5111f96747272653ddf9a132a0f86",
+      "clauses": [
+        "Every decision a system designer makes that has a number attached, taught as that number: capacity from rates and retention, latency from distance and round trips, waiting from utilisation and variability, availability as a product of probabilities, replication as lag and overlap, partitioning as balls into bins, storage as I/O counts, scaling as a ceiling, and measurement as the arithmetic that tells you whether any of it is true. Ten courses and 114 lessons are available.",
+        "The System Design Subject: ten courses in one order, from back-of-envelope capacity through latency and the tail, queueing, caching, availability, replication, partitioning, storage engines, scaling laws and cost, to the measurement of a running system. Every lesson closes on a number the reader computes in the lab and can check by hand, and every model states the assumption it rests on. All ten courses and 114 lessons are available.",
+        "Each course assumes the ones before it and the two prerequisite paths, and nothing else. Latency and the Tail supplies the percentile vocabulary that Queues and Utilisation explains the origin of; Caching, Availability, Replication and Partitioning are four applications of one probability toolkit, each adding a single tool; Storage, Cost and Measuring consume numbers produced by all of the others.",
+        "discrete probability and algebra are assumed",
+        "<strong>Educational course material.</strong> Every figure on this path is computed in your browser from the model the lesson states. Rates, counts, percentiles by nearest rank, availabilities, quorum overlaps, queue lengths at rational utilisations and convolved latency distributions are all exact fractions, not decimals that are nearly them. Six quantities on the path are genuinely irrational &mdash; a standard error, a square root, `e^(−x)`, a Bloom filter&rsquo;s rate, a Zipf normaliser past the point where its exact form is readable, and the Universal Scalability Law&rsquo;s peak &mdash; and every lesson that prints one says that it is rounded and how. What the labs cannot do is check an assumption: a model that assumes independence will report a confident number for a system whose failures are correlated, and naming that gap is what each lesson closes on.",
+        "Capacity Estimation comes first because every later number begins as a rate. A reader who cannot turn ten million users into requests per second, with an error bar they can defend, cannot start any of the nine courses that follow &mdash; and the habit of carrying the error bar is the course&rsquo;s real content.",
+        "Latency and the Tail precedes Queues and Utilisation because queueing is the explanation and the tail is the thing explained. Percentiles, fan-out amplification and the convolution of two stages have to exist as objects before &ldquo;why is the p99 like that&rdquo; is a question with an answer.",
+        "Caching, Availability, Replication and Partitioning are four applications of the same probability, in increasing order of what they add: conditional hit rates, then binomials and products, then order statistics, then balls into bins. Each could stand alone; in this order each one&rsquo;s new tool is the only new thing in it.",
+        "Storage Engines, Scaling Laws and Cost, and Measuring Systems come last because each consumes numbers from all of the others. A page cache is the cache of course 4, a shard count is the machine count of course 1 under two constraints, and the last course asks the question the whole path has been deferring: how would you know any of this from a system that is running?",
+        "The Algebra path through course 9, and the Discrete Mathematics path through course 8. Specifically: scientific notation, logarithmic scales, geometric series and asymptotes from Algebra; independence, conditional probability, expectation, variance, the binomial and geometric distributions, combinations, partial orders, modular arithmetic and the seeded generator from Discrete Mathematics. Each course names the slugs it uses.",
+        "No calculus and no continuous probability. Where this path needs the exponential or the Poisson distribution it builds them as limits of the geometric and the binomial you already have, and no lesson writes a density or an integral.",
+        "No programming and no operational experience. The labs run the models for you; nothing asks you to write code, configure a service or have carried a pager.",
+        "Willingness to distrust a number you just computed. The arithmetic on this path is easy, and every wrong answer in it comes from an assumption &mdash; independence, memorylessness, a steady state &mdash; that was true of the model and not of the system."
+      ]
+    },
+    "content/system_design/c10_measuring/__init__.py": {
+      "baseline_ast_sha256": "63c4b4744c22be46e2d911740135eacd5c6958a640142c2d9e2407edce52bc0e",
+      "expected_ast_sha256": "63c4b4744c22be46e2d911740135eacd5c6958a640142c2d9e2407edce52bc0e",
+      "clauses": [
+        "Every earlier course produced a number; this one asks how you would know it from a live system, and shows the four ways the measurement lies: percentiles that were averaged, histograms with wide buckets, load generators that skipped the slow requests, and scrape intervals that never saw the spike. It ends with the arithmetic of sampling, cardinality, load-test length and alerts.",
+        "Latency and the Tail and Availability and Failure; binomials, variance, the product rule",
+        "Tracing systems, dashboard design and the operational tooling around metrics.",
+        "Statistical inference beyond these direct calculations &mdash; no hypothesis tests, no confidence intervals by a normal approximation, no regression.",
+        "Anomaly detection as a technique. &ldquo;Threshold Alerts and False Alarms&rdquo; computes a false-alarm rate; it does not propose a detector."
+      ]
+    },
+    "content/system_design/c10_measuring/part_a.py": {
+      "baseline_ast_sha256": "fafdd139127c664a6af2bed8d68197c8ba5694ff5b21634e28473ed58252d9ae",
+      "expected_ast_sha256": "fafdd139127c664a6af2bed8d68197c8ba5694ff5b21634e28473ed58252d9ae",
+      "clauses": [
+        "Every number after this one is a percentile rather than a ratio, and percentiles fail in a second way that has nothing to do with noise: they are routinely combined by an operation that is not defined on them. &ldquo;Percentiles Do Not Average&rdquo; takes three hosts whose individual p99s are 12, 14 and 400 ms and shows that the average of those three numbers lands below the fleet&rsquo;s median.",
+        "Merging histograms rescues the aggregation and costs resolution: the answer stops being a value and becomes the bucket that contains it. &ldquo;Histograms and Bucket Error&rdquo; computes how wide that bucket is &mdash; on logarithmic boundaries the relative error is `ratio − 1`, which at the usual ratio of two is one hundred per cent, in every bucket, no matter how much traffic you collect.",
+        "Both aggregates so far were computed from requests that were actually served. The next two pages are about requests that were not: &ldquo;Coordinated Omission&rdquo; puts back the ones a stalled load generator never sent, which moves a p99 from 2 ms to 990 ms on one trace, and &ldquo;Scrape Intervals and What They Cannot See&rdquo; counts the spikes that happened between two reads.",
+        "The stall in that trace was at least recorded once. A metrics pipeline has a second way of not seeing an event, which is that nothing was sampled while it was happening at all: &ldquo;Scrape Intervals and What They Cannot See&rdquo; computes the probability that a spike lands between two reads, and names the longest spike that can hide entirely.",
+        "Scraping every instant is one way of not seeing an event; sampling one request in a hundred is another, and it has the more surprising arithmetic. &ldquo;Sampling and Rare Events&rdquo; computes the chance that one per cent sampling catches a ten-request problem &mdash; it is 9.56%, not one per cent &mdash; and the rate it would actually take, which is twenty-six times higher rather than ten."
+      ]
+    },
+    "content/system_design/c10_measuring/part_b.py": {
+      "baseline_ast_sha256": "0cb1c2897df42dee81816f3f13e1dd00cdcfebc350dbd69ef8d0502dca6ad375",
+      "expected_ast_sha256": "0cb1c2897df42dee81816f3f13e1dd00cdcfebc350dbd69ef8d0502dca6ad375",
+      "clauses": [
+        "Keeping everything is the alternative to sampling, and it has its own arithmetic: every distinct combination of label values is a separate series, stored for ever. &ldquo;Metric Cardinality&rdquo; multiplies five ordinary labels into 3 456 000 series and 39.81 GB a day, and then adds one more label that multiplies it by ten thousand.",
+        "Cardinality is the cost of measuring a production system continuously. The next page is about a measurement you take deliberately and stop: &ldquo;How Long to Run a Load Test&rdquo; computes how many requests a run needs before it has even met the request it is reporting on &mdash; a six-hundred-request run sees the top 0.1% only 45.14% of the time.",
+        "Everything so far has been about measuring. The last two pages are about acting on a measurement, and both are arithmetic rather than judgement. &ldquo;Burn-rate Alerts&rdquo; computes what a window of elevated errors costs against a budget of 43.2 minutes, and names why another page of this library says 43.8 for the same objective.",
+        "A burn-rate rule fires on a quantity that is genuinely being spent. A plain threshold on a noisy ratio fires on the sample, and it fires whether or not anything has changed: &ldquo;Threshold Alerts and False Alarms&rdquo; computes that a 2% threshold on 200-request windows at a true 1% error rate trips 5.175% of the time, which is 104.32 pages a week from a perfectly healthy service.",
+        "That is the whole course: a ratio with an error bar, two aggregates that lie in different ways, two biases a measurement introduces, and four sizing calculations for a sample, a metric, a test and an alert. Every one of them is the same discipline &mdash; write down what the number is a measurement of, and then compute how far it can be from the thing you wanted to know."
+      ]
+    },
+    "content/system_design/c1_capacity/__init__.py": {
+      "baseline_ast_sha256": "f580712650d791dfea826fdacb8bada871f2ebe35aa0dd22ad7274751cc87488",
+      "expected_ast_sha256": "f580712650d791dfea826fdacb8bada871f2ebe35aa0dd22ad7274751cc87488",
+      "clauses": [
+        "Ten million users, a hundred actions a day, a kilobyte each: how much machine is that? The course teaches estimation as arithmetic with error bars &mdash; every factor is a range, every product is a wider range, and an estimate that arrives as a single number is hiding its width. It ends by checking an estimate the only honest way, by a second route that shares no assumption with the first.",
+        "School algebra: exponents, ratios, log scales",
+        "Prices. What a machine or a gigabyte costs belongs to Scaling Laws and Cost; this course counts machines and gigabytes.",
+        "Latency. How long a request takes belongs to Latency and the Tail; this course counts how many of them arrive.",
+        "Why the headroom is what it is. The target utilisation is taken as given here and earned in Queues and Utilisation, where the knee explains it."
+      ]
+    },
+    "content/system_design/c1_capacity/part_a.py": {
+      "baseline_ast_sha256": "46ded4b32737d67661ecf14ac31ec980ff7a57287bf5ed52292423aaffbee30a",
+      "expected_ast_sha256": "46ded4b32737d67661ecf14ac31ec980ff7a57287bf5ed52292423aaffbee30a",
+      "clauses": [
+        "Every factor from here on is a rate, and a rate is where the first real unit trap lives. &ldquo;Rates: the Day Has 10&#8309; Seconds&rdquo; turns a population into requests per second, and takes seriously the shortcut everyone uses for the division &mdash; a day of `10⁵` seconds instead of `86 400` &mdash; by computing exactly what it costs and in which direction.",
+        "One rate is rarely the end of it. &ldquo;Read/Write Ratio&rdquo; splits a single request rate into two that size completely different things &mdash; reads size caches and bandwidth, writes size storage and replication &mdash; and it turns on an arithmetic detail that catches almost everyone: a ratio of `r:1` gives a write share of `1/(r+1)`, which for `100:1` is not one percent.",
+        "The write rate is now a number, and the first thing it sizes is the disk. &ldquo;Storage from Ingest and Retention&rdquo; accumulates it over a retention window, which turns out to be a sum rather than a product &mdash; an arithmetic series while the ingest is flat, a geometric one as soon as it grows &mdash; and then multiplies the whole thing by the number of copies you keep.",
+        "The same write rate that filled the disk also has to cross a wire, and the wire is sold in different units from the payload. &ldquo;Bandwidth: Bits, Bytes and Overhead&rdquo; takes a request rate to megabits a second, which is where a factor of eight hides, and then asks what per-request headers do to the total &mdash; a question with a surprisingly clean answer about which payload sizes are mostly header.",
+        "Two of the four things a rate sizes are done. Before the other two &mdash; machines and memory &mdash; the course needs two quantities that are not rates at all. &ldquo;Latency Numbers on a Log Scale&rdquo; is the first: the operations a system is built out of span a range so wide that only a ratio scale holds them, and the ratios between them are the part worth carrying around."
+      ]
+    },
+    "content/system_design/c1_capacity/part_b.py": {
+      "baseline_ast_sha256": "1040ed40aaec5b2ae55235ac9bb8b5d50a3a94a9b9ae21f6cf1661aec1d02b42",
+      "expected_ast_sha256": "1040ed40aaec5b2ae55235ac9bb8b5d50a3a94a9b9ae21f6cf1661aec1d02b42",
+      "clauses": [
+        "The ladder is about one operation at a time. The other quantity this course needs before it can count machines is about a whole day at a time: &ldquo;Peak to Average&rdquo; asks what a daily profile does to a rate, computes the multiplier between the busiest hour and the mean one from twenty-four buckets rather than from a rule of thumb, and names the number you must not size to.",
+        "The peak is now a number, and a number of requests per second is one input short of a fleet. &ldquo;From a Request&rsquo;s Cost to a Machine Count&rdquo; supplies the other two &mdash; what one request costs and how full you are willing to run &mdash; and turns all three into an integer, which is the first answer on this course that cannot be a range.",
+        "Machines are counted; memory is not counted the same way. &ldquo;Memory and the Working Set&rdquo; is the last of the four things a rate sizes, and it is the one where the whole dataset is the wrong denominator &mdash; a cache is sized to the fraction of the data the traffic actually touches, and the curve relating that fraction to the hit rate has a knee in it that decides the budget.",
+        "Every quantity this course produces is now in hand, and all of them share one weakness: they were computed once, by one route, from factors that were guessed. &ldquo;Triangulating an Estimate&rdquo; is the only honest check &mdash; a second route to the same number that shares no assumption with the first &mdash; and it is precise about what makes a second route a check rather than a ritual.",
+        "That is capacity: a rate, the four things it sizes, and a way of checking any of them. &ldquo;Latency and the Tail&rdquo; asks the other question about the same request &mdash; not how many arrive, but how long one takes &mdash; and it begins where this course ended, with the ratio that says a packet crossing a continent costs three hundred round trips inside a datacentre."
+      ]
+    },
+    "content/system_design/c2_latency/__init__.py": {
+      "baseline_ast_sha256": "985bfef4e1ec6299b78c25c350e6f46668e0b886e6439ae8e4b3e80a46b660b3",
+      "expected_ast_sha256": "985bfef4e1ec6299b78c25c350e6f46668e0b886e6439ae8e4b3e80a46b660b3",
+      "clauses": [
+        "A request is slow for one of four reasons &mdash; it went far, it went back and forth, it waited for the slowest of many, or it was the unlucky one in a hundred &mdash; and each has a number. The course puts a floor under latency with the speed of light, counts round trips, computes percentiles by rank, and builds the budget that a timeout and a retry have to fit inside.",
+        "Course 1; independence and random variables",
+        "Where the tail comes from. Queueing is course 3; this course measures the tail and composes it.",
+        "How the measurement could be lying. Coordinated omission, bucket error and scrape intervals are course 10.",
+        "Congestion control as a subject. One bound &mdash; Mathis &mdash; is computed in &ldquo;Packet Loss and Throughput&rdquo; because it decides cross-region throughput; the algorithms behind it are not taught."
+      ]
+    },
+    "content/system_design/c2_latency/part_a.py": {
+      "baseline_ast_sha256": "808b49f11f29fd45fd32f2978dceb319d564a96fb4cb491c429af4256a26f514",
+      "expected_ast_sha256": "808b49f11f29fd45fd32f2978dceb319d564a96fb4cb491c429af4256a26f514",
+      "clauses": [
+        "The round-trip time has been an input everywhere on this page. &ldquo;The Speed-of-Light Floor&rdquo; takes it apart: part of it is a distance divided by a speed and cannot be removed by anything, and the rest is the part worth arguing about. &ldquo;Round Trips, Not Bytes&rdquo; then shows that the count of round trips, not the size of any one of them, is usually what a slow first page load is made of.",
+        "The floor is one round trip. A first page load usually pays for several of them in sequence, and &ldquo;Round Trips, Not Bytes&rdquo; counts them: at this route&rsquo;s measured `76 ms`, four sequential handshakes cost more than three hundred milliseconds before any content moves at all. The floor computed here reappears as a fixed, non-negotiable line item in &ldquo;Latency Budgets&rdquo;.",
+        "So far every stage has been in a line. Real requests fan out: the server asks several things at once and waits for the slowest, and &ldquo;Serial Sums, Parallel Maxes&rdquo; is how those compose &mdash; serial stages add, parallel stages take the maximum, and the end-to-end time is the longest path through the graph. The handshake cost counted here returns as a fixed line in &ldquo;Latency Budgets&rdquo;.",
+        "Every stage time so far has been a single number, as if a stage always took exactly that long. It does not: it has a distribution, and the interesting part of that distribution is its tail. &ldquo;Percentiles from a Sample&rdquo; makes the tail into an object you can compute with, and &ldquo;Percentiles Do Not Add&rdquo; returns to this lesson&rsquo;s series rule to show that it survives for means and fails for percentiles.",
+        "A percentile of one call is now a computable object, which makes the rest of this course possible. &ldquo;Tail Amplification under Fan-out&rdquo; asks what happens when a request has to wait for many calls that each sit inside their own p99, and the answer &mdash; that at sixty-nine of them the p99 has become the median &mdash; is the result this course exists to establish.",
+        "The fan-out made the tail worse by composing independent calls. &ldquo;Hedged Requests&rdquo; composes two independent copies of the same call and makes the tail better by the same mechanism, squaring a tail probability instead of raising a success probability to a power. The two labs are worth reading in one sitting: they are one fact about independence, pointed in opposite directions."
+      ]
+    },
+    "content/system_design/c2_latency/part_b.py": {
+      "baseline_ast_sha256": "8731f6ac021eaa03c1b46d70b4f765b04c67ce0a678065863bc2ede6f8c4135f",
+      "expected_ast_sha256": "8731f6ac021eaa03c1b46d70b4f765b04c67ce0a678065863bc2ede6f8c4135f",
+      "clauses": [
+        "Both &ldquo;Tail Amplification under Fan-out&rdquo; and this lesson compose independent copies of a distribution. So does &ldquo;Percentiles Do Not Add&rdquo;, which asks what happens to the tail when two stages run one after the other instead of beside each other &mdash; and finds that the obvious arithmetic, adding the two stage p99s, is not the percentile of anything.",
+        "The stage floors of &ldquo;The Speed-of-Light Floor&rdquo; and &ldquo;Round Trips, Not Bytes&rdquo;, the graph of &ldquo;Serial Sums, Parallel Maxes&rdquo; and the percentile arithmetic of this lesson are now all available, and &ldquo;Latency Budgets&rdquo; puts them in one place: an objective at the top, the floors subtracted first, and what is left divided among the stages that are allowed to spend it.",
+        "The budget so far assumes every call eventually answers. It does not: a call has to be given up on at some point, and that decision has two consequences the budget has to hold. &ldquo;Timeouts and Retries in the Budget&rdquo; puts the worst case `(r + 1) × T` inside the allocation and prices the good calls the timeout throws away.",
+        "Everything in this course has been about one request&rsquo;s time. &ldquo;Packet Loss and Throughput&rdquo; closes it with the other side of the same round trip: a single connection&rsquo;s sustained rate is bounded by its round-trip time and its loss rate together, which is why a cross-region transfer can be slow on a link with capacity to spare.",
+        "That is the course. Latency had a floor set by distance, a multiplier set by the round-trip count, and a shape set by the longest path through the stage graph; the tail turned out to be a rank rather than an average, to amplify under fan-out and shrink under hedging, and to refuse to add across stages; and the budget held all of it, with a timeout and a retry count fitted inside. What none of it explained is where the tail came from in the first place. Queues and Utilisation is the answer: the tail is what waiting in line looks like, and it is a function of how busy the server is."
+      ]
+    },
+    "content/system_design/c3_queues/__init__.py": {
+      "baseline_ast_sha256": "63957d6bb5653cdbfb4cde6a1f1dc6030cbbe3e6646006f42deb84590cf8feff",
+      "expected_ast_sha256": "63957d6bb5653cdbfb4cde6a1f1dc6030cbbe3e6646006f42deb84590cf8feff",
+      "clauses": [
+        "Why a server at 80% is nearly full, in numbers. The course opens with the one law that needs no assumptions &mdash; `L = λW`, proved on a trace by counting &mdash; builds the exponential and Poisson distributions as limits of the geometric and binomial you already have, derives M/M/1 by flow balance, and ends with the four controls a designer actually has: fewer queues with more servers, less variance, a bounded buffer, and a token bucket.",
+        "Courses 1 and 2; geometric and binomial distributions",
+        "Queueing networks, and priority disciplines beyond a mention.",
+        "The Pollaczek&ndash;Khinchine derivation. Kingman's formula is stated as an approximation and the lab shows the simulation disagreeing with it.",
+        "<strong>The derivation of Erlang C.</strong> It is stated in &ldquo;Many Servers: Pooling, and Erlang C&rdquo; and used there; the state-dependent birth&ndash;death chain it comes from is Operations Research `markov-chains-decisions-and-queues/multiple-servers-and-erlang-c`.",
+        "Markov chains as a theory. M/M/1 here is a conservation argument across a cut, not a chapter on chains; Operations Research builds the chain."
+      ]
+    },
+    "content/system_design/c3_queues/part_a.py": {
+      "baseline_ast_sha256": "f9f5db7926c2107416460c91b0b86765feb4b20d8e46cae30fd6a3ba38814249",
+      "expected_ast_sha256": "f9f5db7926c2107416460c91b0b86765feb4b20d8e46cae30fd6a3ba38814249",
+      "clauses": [
+        "Everything above is one server at one moment. The next lesson leaves models behind entirely: “Little&rsquo;s Law from a Trace” proves the one relation on this course that assumes nothing at all &mdash; no distribution, no steady state, not even a queue discipline &mdash; by counting the same area twice.",
+        "The identity is most useful solved for something you do not know. “Sizing with Little&rsquo;s Law” does exactly that: fix any two of the three and the third is determined, which is how a connection pool, a thread count and a throughput ceiling turn out to be one arithmetic problem.",
+        "Everything so far has been exact and model-free. “Why Queues Form at ρ &lt; 1” asks the question the identity cannot answer &mdash; why `W` is bigger than the service time at all when the server is idle a fifth of the time &mdash; and the answer is not overload.",
+        "The random service time above was geometric: a fixed chance of finishing in each slot, whatever has happened so far. “Memoryless Waiting: from Geometric to Exponential” takes that property seriously, shrinks the slot, and arrives at the exponential distribution without writing a density.",
+        "The same shrinking-slot argument answers a different question: not how long until the next arrival, but how many arrive in a fixed window. “Poisson Arrivals and Bursts” builds that count from the binomial, and its variance turns out to equal its mean.",
+        "Memoryless gaps and Poisson counts are the two halves of the same assumption, and together they name a queue: arrivals memoryless, service memoryless, one server. “The M/M/1 Queue” solves it by balancing flow across a cut, and the library&rsquo;s closed forms for `L`, `W` and the tail come from that one argument.",
+        "One rearrangement of `W = L/λ` is the most useful sentence on this course. “The Knee: Response Time vs Utilisation” reads it as `W = S/(1 − ρ)` &mdash; a hyperbola with an asymptote at `ρ = 1` &mdash; and that curve is why every capacity plan on this path names a target utilisation instead of a maximum one."
+      ]
+    },
+    "content/system_design/c3_queues/part_b.py": {
+      "baseline_ast_sha256": "15cd104d603b7c4d1adf053b9041dda73229d268a5630617a79106f7546d2faa",
+      "expected_ast_sha256": "15cd104d603b7c4d1adf053b9041dda73229d268a5630617a79106f7546d2faa",
+      "clauses": [
+        "The constant in front of the hyperbola is the next question. “Variability: the Kingman Approximation” splits the wait into three factors &mdash; utilisation, variability and service time &mdash; and the middle one is the only one on this course that can be halved without buying anything.",
+        "Variability was the first of the four controls. “Many Servers: Pooling, and Erlang C” is the second and the least intuitive: at an identical utilisation, one queue in front of several servers waits a fraction of what the same servers wait behind separate queues.",
+        "Pooling and variability both reduce the waiting. The third control removes it instead: “Bounded Queues and Loss” puts a limit on how many may wait, which turns latency into rejection &mdash; and changes which arrival rate Little&rsquo;s Law is entitled to use.",
+        "A bounded buffer refuses work only once the queue is full. “Token Buckets and Rate Limiting” refuses it earlier and on purpose, by an explicit rule about how much may be admitted in any window &mdash; and the rule is not the one most people think they are enforcing.",
+        "Limiters and buffers both assume the overload is something to refuse. The last lesson takes the other case: the surge is legitimate, it is accepted, and “Transient Overload and Draining the Backlog” measures what it leaves behind and how long the system takes to give it back.",
+        "That closes the four controls and the course. Every number here has been a consequence of `ρ` and of how irregularly work arrives; the next course changes `λ` at the source instead. “Caching and Hit Rates” asks what a cache is worth, and the answer is that a hit rate of `h` sends `(1 − h)λ` to the backend &mdash; a utilisation problem wearing different clothes."
+      ]
+    },
+    "content/system_design/c4_caching/__init__.py": {
+      "baseline_ast_sha256": "44c854af399d2edb1e0e045dcd03703e4d94185445a84fea3438104b59cc3ab2",
+      "expected_ast_sha256": "44c854af399d2edb1e0e045dcd03703e4d94185445a84fea3438104b59cc3ab2",
+      "clauses": [
+        "A cache is a number &mdash; the miss rate &mdash; and every decision about it is arithmetic on that number: what it does to the backend, what it does to the average and to the tail, how big the cache must be given how skewed the requests are, how stale it is allowed to be, and what happens in the second after a hot key expires.",
+        "Courses 1 and 3; expectation and conditioning",
+        "Cache coherence protocols; this course&rsquo;s caches are independent copies with a TTL, not a coherent memory system.",
+        "CPU caches beyond the latency table of “Latency Numbers on a Log Scale”.",
+        "Eviction implementations &mdash; the data structures that make LRU cheap are Algorithms&rsquo; business, not this course&rsquo;s."
+      ]
+    },
+    "content/system_design/c4_caching/part_a.py": {
+      "baseline_ast_sha256": "070fd8ff3fb92bbeae5136066f83227968204e6c711d14d04bfd9c059270878e",
+      "expected_ast_sha256": "070fd8ff3fb92bbeae5136066f83227968204e6c711d14d04bfd9c059270878e",
+      "clauses": [
+        "Backend load is only half of what a cache changes. The other half is what a single request experiences, and there the hit rate stops being a multiplier and becomes a weight: “Average Latency under a Cache” computes the mean as an expectation over two outcomes, and then shows that the percentile ignores the mean entirely.",
+        "Both lessons so far took the hit rate as given. It is not given &mdash; it comes out of how skewed the requests are and how much you are willing to store. “Popularity Is Skewed: Zipf” computes the first of those exactly, and it is the reason a cache holding one per cent of a catalogue is worth building at all.",
+        "This lesson reads the share off a chosen `k`. The question a cache actually poses is the other way round: given a hit rate you want, how many keys must you hold? “Cache Size and Hit Rate” inverts the same ratio, and the answer has a shape &mdash; the first nine is cheap and the second is not.",
+        "Both of the last two lessons assumed the cache holds the most popular keys. Nothing running in production knows which those are. “Replacement Policies on a Trace” counts what four policies actually achieve on a reference string, with the offline optimum as the ceiling &mdash; and finds a trace where a bigger cache makes one of them worse.",
+        "That is the last of the three things which decide a hit rate: the skew, the size and the policy. The rest of the course is about the two things a cache does wrong even when its hit rate is excellent. The first is staleness, and “TTL and Staleness” prices it &mdash; along with what a shorter TTL costs in misses, which is the part that is usually left out."
+      ]
+    },
+    "content/system_design/c4_caching/part_b.py": {
+      "baseline_ast_sha256": "b3ea2969a591099be5bf79c44af8ebbc58c8a0c16a3a2e21bc88d34ee825d81d",
+      "expected_ast_sha256": "b3ea2969a591099be5bf79c44af8ebbc58c8a0c16a3a2e21bc88d34ee825d81d",
+      "clauses": [
+        "A TTL sets staleness against backend load on average. The moment it actually expires is not an average: a popular key going cold lets everything that arrives in the next few milliseconds through at once, and “Cache Stampedes” computes how many that is.",
+        "Everything so far has been about reads. Writes have their own arithmetic and their own trade: “Write Policies” counts what a write-back cache actually sends to the backend on a trace, and what is lost if the process dies before the next flush.",
+        "The next two lessons are about caches that are not one cache. The first is a second level behind the first, where the rate you measure is not the rate you want: “Multi-level Caches” shows why the two miss rates multiply rather than add.",
+        "The last lesson moves the cache to the edge, where the arithmetic is the same and the unit is not. A CDN is billed in bytes, and “CDN Egress and Origin Load” shows that the byte hit rate and the request hit rate are two different numbers &mdash; and that the invoice follows the one nobody puts on the dashboard.",
+        "That is the course: a cache is a miss rate, and every question about one &mdash; backend load, latency, size, policy, staleness, bursts, writes, levels and bytes &mdash; is arithmetic on that number. What it cannot tell you is what happens when a component is simply gone, which is where “Nines and Downtime” starts the next course."
+      ]
+    },
+    "content/system_design/c5_availability/__init__.py": {
+      "baseline_ast_sha256": "bed5a12bf817909c15cfe56102368b15938d4699dbcba94bb770ced142d8e626",
+      "expected_ast_sha256": "bed5a12bf817909c15cfe56102368b15938d4699dbcba94bb770ced142d8e626",
+      "clauses": [
+        "Nines are a fraction, and everything else in this course is what happens to that fraction under composition: chains multiply it down, redundancy multiplies it up but only if the failures are independent, retries multiply load exactly when the system can least afford it, and three copies of a file are safe in proportion to how fast a lost copy is replaced. Every claim is a probability you compute.",
+        "Courses 1 and 3; independence, binomials, combinations",
+        "Incident process, on-call practice and chaos engineering as a discipline.",
+        "Consensus availability, which needs the quorum arithmetic of course 6.",
+        "Failure-rate models over time. Every failure here has a constant rate; bathtub curves and wear-out are out of scope."
+      ]
+    },
+    "content/system_design/c5_availability/part_a.py": {
+      "baseline_ast_sha256": "967372fa3a214ec9f60d96cdc25a86126ad6eb629935a2337d32a485ccaeffa5",
+      "expected_ast_sha256": "967372fa3a214ec9f60d96cdc25a86126ad6eb629935a2337d32a485ccaeffa5",
+      "clauses": [
+        "This lesson takes the availability as given. Where it comes from is the next question, and it has an answer with two levers in it: a machine is available in proportion to how long it runs between failures and how fast it is repaired. &ldquo;MTBF and MTTR&rdquo; shows that those two levers are worth exactly the same amount, and that one of them is usually far cheaper to pull.",
+        "Both lessons so far concern one component. Real systems are many components arranged in two ways: those a request needs all of, and those it needs any of. Those two arrangements have different formulas and they point in opposite directions &mdash; &ldquo;Series: Availability Multiplies&rdquo; takes the first, and it is the one that surprises people, because a chain is worse than every part of it.",
+        "A chain multiplies availability down, which raises the obvious question of what multiplies it up. The answer is the same probability read through its complement: if a request needs any one of several paths, it fails only when all of them do. &ldquo;Parallel: Redundancy&rdquo; does that arithmetic, and then charges for the thing the formula quietly leaves out.",
+        "Full redundancy is one end of a spectrum. Most real systems do not need every replica and do not need only one &mdash; they need a quorum, some `k` out of `n`, and both the series and the parallel formulas turn out to be special cases of the same binomial sum. &ldquo;k-of-n&rdquo; computes it, and closes on the case where adding replicas makes a system less available rather than more.",
+        "Every formula on this course so far &mdash; the product, the parallel complement, the binomial tail &mdash; has the same premise written above it, and it has been taken on trust three times. &ldquo;Correlated Failure&rdquo; is where it is paid for: a lab cannot check an assumption, so the model reports a confident number for a system whose components share a rack, a power feed or a deploy, and the only honest thing to do is compute both figures and look at the gap.",
+        "The five lessons so far turn a system into one fraction. What an organisation does with that fraction is a separate question, and it has an arithmetic of its own that is often mistaken for policy: a target implies a quantity of failure that may be spent, an incident spends a computable share of it, and the two are counted in failed requests rather than in minutes. &ldquo;Error Budgets&rdquo; is that arithmetic.",
+        "Every lesson so far has treated the load on a system as given from outside. It is not: a failing service produces load of its own, because a client that does not get an answer asks again. &ldquo;Retries and Request Amplification&rdquo; puts a number on that extra load, and the number has an unpleasant property &mdash; it is largest exactly when the service is least able to carry it."
+      ]
+    },
+    "content/system_design/c5_availability/part_b.py": {
+      "baseline_ast_sha256": "bacbdef5054049543031ae6dbeb0fd6385f0844001f4d5da1ab89ddc55f52b54",
+      "expected_ast_sha256": "bacbdef5054049543031ae6dbeb0fd6385f0844001f4d5da1ab89ddc55f52b54",
+      "clauses": [
+        "This lesson takes the failure probability as given. In a loaded system it is not given: it rises with utilisation, and the retries that rise with it are themselves load. &ldquo;Retry Storms&rdquo; closes that loop and iterates it, and the fixed point it lands on can sit above capacity when the load without retries was comfortably inside it.",
+        "The loop is closed by two different mechanisms and they are not alternatives. Spreading the retries in time is one, and &ldquo;Backoff and Jitter&rdquo; shows that the spreading, not the delay, is what actually cuts the peak. Refusing work at the door is the other, and that is &ldquo;Load Shedding&rdquo;.",
+        "Backoff and jitter make the clients behave. The service can also defend itself, and the arithmetic for that is a comparison of two goodput curves rather than a histogram. &ldquo;Load Shedding&rdquo; computes what a system delivers when it refuses work at the door against what it delivers when it accepts everything, and the second is worse in a way that surprises people.",
+        "The course has been about requests up to here. The last two lessons are about sets of machines rather than about one request, and they ask two questions that redundancy cannot answer on its own: how likely is it that every copy of a piece of data is gone at once, and how much of a fleet does a single bad machine take with it. &ldquo;Replica Loss and Durability&rdquo; is the first, and it is the one lesson on the course whose headline figure is not exact.",
+        "Durability asks whether every copy of one item is gone. The last question of the course is the other half of the same picture: when one machine fails, how much of the fleet notices. &ldquo;Blast Radius and Shuffle Sharding&rdquo; answers it with exact combinatorics, and the result is that overlap between two tenants is common while a full collision &mdash; the only kind that takes them both down &mdash; is rare by a factor you can count.",
+        "That closes the course. Availability is a fraction; chains multiply it down and redundant paths multiply it up, but only under an independence assumption that &ldquo;Correlated Failure&rdquo; exists to break; retries multiply load at the worst possible moment; and durability and blast radius are the two questions that are about a fleet rather than a request. The next course takes the replicas this one merely counted and asks whether they agree with one another, which turns out to be a different kind of arithmetic entirely."
+      ]
+    },
+    "content/system_design/c6_replication/__init__.py": {
+      "baseline_ast_sha256": "6d2cb171e5700ecb2cc3f6255fef8c18f59697248f600633dd957b91d339a882",
+      "expected_ast_sha256": "6d2cb171e5700ecb2cc3f6255fef8c18f59697248f600633dd957b91d339a882",
+      "clauses": [
+        "Replication is bought in three currencies — write work, latency and staleness — and the course prices each. Reads scale by `N` and writes do not; a synchronous write waits for the slowest replica and a quorum for the `W`-th fastest; a follower read is stale with a probability read off the lag distribution; and “consistency” becomes a count — of concurrent pairs in a vector-clock diagram, of valid linearizations of a history, of updates a last-writer-wins merge throws away.",
+        "Latency and the Tail and Availability and Failure; combinations, partial orders, permutations",
+        "Consensus log mechanics — Raft replication, snapshots, membership change. Only the quorum arithmetic, majority availability and election timing are here.",
+        "Transactions and isolation levels; CAP and PACELC as slogans. What this course carries instead are the measurable consequences — lag, staleness, overlap and the sloppy-quorum miss.",
+        "CRDT design beyond the counter of “Conflict Resolution, Counted”."
+      ]
+    },
+    "content/system_design/c6_replication/part_a.py": {
+      "baseline_ast_sha256": "eca892e444d009edb4936e9a7a21a5d95879303102be8d9d8cc7accc4e1cda2b",
+      "expected_ast_sha256": "eca892e444d009edb4936e9a7a21a5d95879303102be8d9d8cc7accc4e1cda2b",
+      "clauses": [
+        "That prices replication in capacity. It also has a latency, and the next lesson, “Synchronous Writes Wait for the Slowest”, is where most readers get a number badly wrong for the first time on this course: asked what three replicas cost in write latency against one, almost everyone multiplies, and the write is not waiting for a sum.",
+        "Both options on this page leave something behind. The synchronous write leaves a longer p99; the asynchronous one leaves a follower that does not yet have the data — and a reader who reaches that follower gets the old value. “Replication Lag and Stale Reads” turns that into a probability you can read off a distribution, and it is the number behind every complaint that begins “I saved it and it did not save”.",
+        "Three lessons have priced replication in capacity, in latency and in staleness, and all three assumed a reader who talks to one replica. The rest of the course is about readers and writers who talk to several at once, starting with “Quorums Overlap” — where a counting argument buys a guarantee that none of the three numbers so far could.",
+        "The overlap condition constrains `R + W` and leaves you free to choose where to spend it, and that choice is a latency choice. “Quorum Latency: the W-th Fastest” computes it — and produces the one result on this course that most readers refuse to believe until they have worked the binomial tail themselves.",
+        "The last example on this page left a configuration where `R + W = N`, which is a guarantee you no longer have. “Sloppy Quorums and the Miss Probability” computes exactly what that costs — and the answer at three replicas with one read and one write is not a small number.",
+        "Every configuration so far has been a free choice of `R` and `W`. One choice is not free: a cluster that has to agree on a leader or a membership list uses a majority, and a majority's size is forced by `n`. “Majorities and Fault Tolerance” works out what that costs — and shows that the fourth node in a three-node cluster adds nothing at all.",
+        "A majority decides who the leader is, but it does not decide how the candidates agree to hold a vote at all. If every node times out at the same instant they all stand, they all split the vote, and the cluster has no leader — for ever, if the timeout is fixed. “Randomised Election Timeouts” computes the probability of a clean first round and the number of rounds it takes, and shows that a fixed timeout gives exactly zero."
+      ]
+    },
+    "content/system_design/c6_replication/part_b.py": {
+      "baseline_ast_sha256": "b4c10e146e8d671432026e4f1c037d277a206c28d31d5d24545c2f3a024e59c6",
+      "expected_ast_sha256": "b4c10e146e8d671432026e4f1c037d277a206c28d31d5d24545c2f3a024e59c6",
+      "clauses": [
+        "A leader settles who decides, and a majority settles what is committed. Neither settles the question every replicated system eventually asks: given two events on two machines, which came first? “Lamport Clocks” gives the first and cheapest answer, together with the precise sense in which that answer is only half of one.",
+        "One integer per process cannot record which processes have heard of an event, only how many steps have happened somewhere. “Vector Clocks and Concurrency” spends one integer per process instead, which is enough to answer the question Lamport stamps cannot — and turns “are these two updates in conflict” into a count.",
+        "Both clocks so far count events rather than seconds, which is what makes them exact. The temptation is always to use the machine's own wall clock instead, since it needs no messages at all. “Physical Clocks and Drift” computes how wrong that is: a drift rate and a sync interval give an uncertainty window, and any two events closer together than the window cannot be ordered by a timestamp at all.",
+        "Clocks were a way of ordering two events. The question underneath was always whether a whole history could be told as though every operation happened at one instant, and that has a definition and a decision procedure. “Linearizability by Enumeration” makes it a count — of total orders that real time allows and a register would accept — and zero of them is a violation.",
+        "Linearizability rules out disagreement by insisting there was only ever one story. Systems that accept writes in more than one place give that up on purpose, and then have to decide what to do with two updates that genuinely conflict. “Conflict Resolution, Counted” closes the course by counting what each answer throws away.",
+        "That closes the course. Replication costs read capacity you get, write capacity you do not, a latency that is an order statistic rather than a sum, and a staleness that is a tail; quorums buy overlap by counting and nothing more than overlap; and “consistent” turns out to be three different countable questions with three different answers. The next course, “Partitioning and Load Balancing”, stops asking whether the copies agree and starts asking how the data was split between them in the first place — which is balls into bins, and skewed."
+      ]
+    },
+    "content/system_design/c7_partitioning/__init__.py": {
+      "baseline_ast_sha256": "68de86399879582b052d70449f76183e8f33cbf921da981171f452cf05564d21",
+      "expected_ast_sha256": "68de86399879582b052d70449f76183e8f33cbf921da981171f452cf05564d21",
+      "clauses": [
+        "Splitting data or traffic across `N` nodes is a balls-into-bins problem, and the course measures it: how uneven a hash actually is, what fraction of keys move when `N` changes, what one hot key does to the hottest shard regardless of `N`, why sampling two bins beats one so dramatically, and what a query that must visit every shard costs.",
+        "Queues and Utilisation, Replication and Consistency; hashing, variance, combinations",
+        "Shard-router internals and the mechanics of a resharding algorithm — the cost is computed in “Rebalancing Cost”; the algorithm is not.",
+        "Geo-partitioning and data-residency constraints.",
+        "Proofs of the maximum-load asymptotics. They are stated and measured; see the notes in “Hash Partitioning and Imbalance” and “The Power of Two Choices”."
+      ]
+    },
+    "content/system_design/c7_partitioning/part_a.py": {
+      "baseline_ast_sha256": "666c1ac9a0e45a6b7fcd3fa6a8fa7033ecb50d0b7e4bfd9add99ebfb1fbaff4b",
+      "expected_ast_sha256": "666c1ac9a0e45a6b7fcd3fa6a8fa7033ecb50d0b7e4bfd9add99ebfb1fbaff4b",
+      "clauses": [
+        "Having chosen `N`, the next question is what happens when it changes, and the answer is worse than most people expect: under a plain `mod N` assignment, going from `N` to `N + 1` relocates nearly every key in the system. “Rehashing When N Changes” counts exactly how many.",
+        "Two questions follow immediately. The first is what happens to this placement when `N` changes, which is “Rehashing When N Changes” and has a sharper answer than the imbalance does. The second is whether a small change to the placement rule can make the maximum much better, and it can: “The Power of Two Choices” measures a rule that costs one extra lookup and collapses the maximum load.",
+        "A ring fixes what moves and does not fix how evenly the keys sit, because one token a node produces arcs that are nothing like equal. “Virtual Nodes” measures how unequal, and prices the fix: the relative spread falls like the square root of the number of tokens, which is a slower purchase than it looks.",
+        "Everything so far has assumed the partitioning function scatters the keys. A range partition deliberately does not, because ordered keys make scans cheap — and that choice has a cost that no number of tokens touches. “Range Partitioning and Hot Ranges” measures it.",
+        "A hot range is a busy region of the key space and can be split, hashed or bucketed. A single key that is busy can be none of those things: it lands in one place under every partitioning function, and “Hot Keys and Salting” shows that the hottest shard's load has a floor no shard count reaches under.",
+        "Two skews down, one to go. A hot range and a hot key are both about where the work lands; the third is about when it finishes, and it appears on any job that waits for all of its partitions. “Stragglers” shows that a job's time is the maximum of `N` draws, which grows with `N` even when nothing is skewed at all."
+      ]
+    },
+    "content/system_design/c7_partitioning/part_b.py": {
+      "baseline_ast_sha256": "2f83c5e612892c2b0b13229ffa3f33a7649000fba4812f2f45a956735ef37cbf",
+      "expected_ast_sha256": "2f83c5e612892c2b0b13229ffa3f33a7649000fba4812f2f45a956735ef37cbf",
+      "clauses": [
+        "The maximum over `N` draws is the shape of this half of the course. The next lesson takes the same object and changes one rule of the game: let each key look at two shards instead of one before it settles, and the maximum collapses from a logarithm to a logarithm of a logarithm. “The Power of Two Choices” measures it.",
+        "That is the last of the placement lessons. What remains is the cost of queries and operations that cannot be routed to a single shard, and the first of them is the one that makes a fleet's request rate go up rather than down: “Scatter-Gather Cost” prices a query that has to ask every shard.",
+        "The standing answer to an unroutable query is to keep a second copy of the data partitioned by the attribute the query filters on. That is a global secondary index, and it is not free either: it turns a scatter on every read into an extra write on every write. “Local vs Global Secondary Indexes” prices both and finds the ratio at which they change places.",
+        "A global index write touches two shards, and writing two shards together raises the question this course has been deferring: what does it cost to make an operation over several shards atomic? “Cross-shard Transactions” answers it in two parts — how often a transaction crosses, which is a counting problem, and what crossing costs, which is round trips and fsyncs.",
+        "One cost remains, and it is the one that turns every earlier decision into hours of wall clock: changing `N`. “Rebalancing Cost” multiplies the fraction of keys that move — the `N/(N+1)` or `1/(N+1)` of “Rehashing When N Changes” — by the dataset and divides by a throttle, and then prices the utilisation the copy holds the fleet at while it runs.",
+        "That closes the course. Every structural decision on it — the shard count, the partitioning function, the token count, the salt, the index design — is eventually paid for in the currency of this last lesson: bytes moved, hours of wall clock, and a utilisation held above normal while they move. The cheapest rebalance is the one a partitioning choice made years earlier does not require."
+      ]
+    },
+    "content/system_design/c8_storage/__init__.py": {
+      "baseline_ast_sha256": "782e02d48e491db981d849afced332dcfa76952a2b43f721d3fc94f97180b313",
+      "expected_ast_sha256": "782e02d48e491db981d849afced332dcfa76952a2b43f721d3fc94f97180b313",
+      "clauses": [
+        "Every storage engine is a bargain between reads, writes and space, and the bargain is countable: seeks against bytes, tree levels against fanout, bytes rewritten per byte ingested, bits per key for a Bloom filter, fsyncs per second. The course prices each structure so that &ldquo;use an LSM&rdquo; or &ldquo;add an index&rdquo; becomes a number a designer can defend.",
+        "Capacity Estimation and Caching and Hit Rates; trees, logarithms, independence",
+        "Isolation levels, query planning, and any particular product&rsquo;s internals. The structures here are shapes, and every figure is a ratio rather than a benchmark.",
+        "The derivation of the Bloom filter&rsquo;s false-positive rate and its optimal `k`. Both are stated in &ldquo;Bloom Filters: Bits per Key&rdquo; and derived in &ldquo;Bloom Filters&rdquo; on the Algorithms path, which owns them along with the rule that a filter supports no deletion.",
+        "Compression algorithms. The ratio is an input on this course; the break-even it feeds &mdash; whether the processor time a codec costs is worth the bytes it saves &mdash; is &ldquo;Compress or Not&rdquo; in Scaling Laws and Cost."
+      ]
+    },
+    "content/system_design/c8_storage/part_a.py": {
+      "baseline_ast_sha256": "d667f04f5f8998ee4acaafbda7870a7586aeac415b7daa52ac3e1f9a8f0ff3f3",
+      "expected_ast_sha256": "d667f04f5f8998ee4acaafbda7870a7586aeac415b7daa52ac3e1f9a8f0ff3f3",
+      "clauses": [
+        "The crossover chunk is the first of several numbers on this course that are one multiplication and settle an argument. “The Height of a B-tree” is another: the levels a tree needs are found by multiplying the fanout into an accumulator until it passes the key count, and the answer is a single digit for far more data than anyone expects.",
+        "A tree costs its height for a point lookup and a hash index costs one, which sounds settled until a query asks for a range. “Hash vs Tree for Ranges” counts both engines on the same workload, and the ordering reverses by a factor of nearly a hundred and seventy.",
+        "Both engines here were priced for readers. “The Write Cost of an Index” prices the same indexes for the writer, and the arithmetic is a division rather than an addition — which is why the answer surprises people who have only ever been shown the read side.",
+        "The `k + 1` random writes here are exactly what a log-structured engine refuses to pay at insert time. The bill it pays instead is the subject of “Write Amplification in LSM Trees”: twenty-five bytes written for every byte handed over, on ordinary settings, and all of them sequential.",
+        "The five probes a miss costs here are what a filter on every level removes almost entirely. “Bloom Filters: Bits per Key” sizes that filter — about ten bits a key at a one per cent false-positive rate, independent of how many keys there are — and turns a read amplification of `5` into `1.04`.",
+        "A filter buys one amplification back with memory, which is the shape of the bargain this whole course is named after. “The RUM Trade-off” computes the read, update and memory amplifications of three engine shapes at once and shows that no setting of anything minimises all three."
+      ]
+    },
+    "content/system_design/c8_storage/part_b.py": {
+      "baseline_ast_sha256": "a80d0efa039ad86d0673c3dd76a42a900c0a7e9b249e6ea295aa146d3a819654",
+      "expected_ast_sha256": "a80d0efa039ad86d0673c3dd76a42a900c0a7e9b249e6ea295aa146d3a819654",
+      "clauses": [
+        "Every number on this page assumed the write reached durable storage. “fsync and Group Commit” is where that assumption gets priced: a single fsync caps durable commits at `1/t_fsync` a second no matter what the rest of the engine can do, and the only way past it costs latency.",
+        "The fsync caps how quickly durable bytes land. What a query has to read back is decided somewhere else entirely — by how the values are laid out on the page. “Row vs Column Storage” counts the bytes a scan touches each way and finds the query on which the answer reverses.",
+        "Both scans here went to disk. How much of the data is on disk <em>at the moment a query asks for it</em> is a question about memory, and it is the cache arithmetic of Caching and Hit Rates wearing a different set of names. “Working Set and the Page Cache” is that callback, and it is deliberately not new material.",
+        "Every figure so far has described a system that is running. “RPO and RTO” prices the one that is not: how many bytes a backup schedule puts at risk and how many hours a restore takes — two questions in two different units, and a single sentence about having backups answers neither of them.",
+        "Every number on this course has been a count — of seeks, levels, rewrites, bits, fsyncs and hours — and none of them has had a price attached. Scaling Laws and Cost is where a count becomes money, and where the compression ratio this course took as an input finally has to earn the processor time it costs."
+      ]
+    },
+    "content/system_design/c9_scaling/__init__.py": {
+      "baseline_ast_sha256": "6bd69b1c627b9dfbef991c4d0c435a8949ad0b1472959d245bd4e0c3597f4061",
+      "expected_ast_sha256": "6bd69b1c627b9dfbef991c4d0c435a8949ad0b1472959d245bd4e0c3597f4061",
+      "clauses": [
+        "Adding a machine buys less than a machine&rsquo;s worth, and sometimes less than nothing; paying for capacity buys more than you use, by a ratio you can compute. The course fits Amdahl&rsquo;s ceiling and the Universal Scalability Law&rsquo;s peak, prices batching, reserved capacity, autoscaling lag and storage tiers, and closes with two transfer break-evens.",
+        "Capacity Estimation, Queues and Utilisation, Partitioning and Load Balancing and Storage Engines and Indexes; asymptotes and optimisation",
+        "Vendor pricing, discount structures and FinOps process. Prices are inputs.",
+        "Fitting `α` and `β` for the Universal Scalability Law. That is regression; here they are given and the peak is computed.",
+        "Capacity planning under uncertainty beyond the ranges of &ldquo;Capacity Estimation&rdquo;."
+      ]
+    },
+    "content/system_design/c9_scaling/part_a.py": {
+      "baseline_ast_sha256": "0f9c18e3ed72bcfb9702fda36e8e4e59c174945146157c8f7c5bc86e3b225689",
+      "expected_ast_sha256": "0f9c18e3ed72bcfb9702fda36e8e4e59c174945146157c8f7c5bc86e3b225689",
+      "clauses": [
+        "Amdahl&rsquo;s curve rises to a plateau, which is already a disappointment. It is also the optimistic case: it charges nothing for the machines talking to each other. &ldquo;The Universal Scalability Law&rdquo; adds that charge, and the curve stops plateauing &mdash; it peaks and comes back down, so that past a certain fleet size the next machine makes throughput <em>worse</em>. If you take one shape away from this course, take that one.",
+        "Both scaling laws so far answer &ldquo;what does another machine buy?&rdquo; in throughput. The rest of this course asks what it costs, and the first two questions are about shape rather than size: how big a batch should be, and whether capacity is better bought as many small machines or one large one. &ldquo;Vertical vs Horizontal&rdquo; uses this same contention term with `β` set to zero, so the two pages cannot disagree about what a fleet delivers.",
+        "This lesson chose a shape for one operation. The next chooses a shape for the machines themselves: the same capacity bought as many small nodes or as one large one. The two costs are easy; what makes it a real question is that coordination means `N` nodes do not deliver `N` nodes&rsquo; worth &mdash; the contention term of &ldquo;The Universal Scalability Law&rdquo;, reappearing as a line on a price comparison.",
+        "Both shapes so far were bought for a target capacity, and the target was treated as a single number. It is not: load has a shape over the day, capacity is bought for the top of that shape, and the difference between the top and the average is paid for every hour. &ldquo;Utilisation and Waste&rdquo; puts a fraction on that gap, and the fraction is larger than most people guess.",
+        "That fraction assumed every instance-hour costs the same. It does not: the same hour can be bought up front at a discount or on demand at a premium, and the profile decides which is cheaper for each layer of the fleet. &ldquo;Reserved vs On-demand&rdquo; turns the price ratio into a utilisation threshold and then reads the optimal reserved level straight off the profile you just measured.",
+        "Reservation and on-demand both assume capacity appears when it is asked for. It does not: instances take time to boot, and during that window demand is served by the fleet that already exists. &ldquo;Autoscaling Lag&rdquo; puts an area on that window, and the surprise is that without a warm reserve the requests missed during the boot are never made up."
+      ]
+    },
+    "content/system_design/c9_scaling/part_b.py": {
+      "baseline_ast_sha256": "133db94b56efa7f502421e1bfb3f87b653cf3fc6dc62b3df6df5b45326a65d50",
+      "expected_ast_sha256": "133db94b56efa7f502421e1bfb3f87b653cf3fc6dc62b3df6df5b45326a65d50",
+      "clauses": [
+        "That is the last of the three ways capacity is paid for. What remains is the cost of a single request, and the surprise in it: the term that dominates a per-request bill is usually not the one that was sized. &ldquo;Cost per Request&rdquo; decomposes it into four, and the largest of them is the bytes going out of the door.",
+        "Two of those four terms are bytes: the ones you keep and the ones you send. The rest of this course is about both, and each question turns out to be a single equality. &ldquo;Storage Tiers and the Access Break-even&rdquo; takes the bytes you keep and finds the access rate at which a cheaper, slower tier stops paying for itself.",
+        "Bytes held are one half of what a system pays for. The other half is bytes moved, and the next question about them is whether to spend processor time shrinking them first. &ldquo;Compress or Not&rdquo; makes that a single equality too, and the surprise in it is that the size of the file cancels out of the answer completely.",
+        "Shrinking the bytes is one way to make a transfer cheaper. Not transferring them is the other, and it is usually worth far more. &ldquo;Move the Data or the Compute&rdquo; compares shipping a dataset against shipping the job that reads it, and the comparison turns out not to contain the bandwidth at all.",
+        "That closes the course: what another machine buys, what a shape costs, the three ways capacity is paid for, and the break-evens about moving bytes. Every one of them was an equality located exactly rather than a rule of thumb, and the one figure that had to be rounded &mdash; the square root in the Universal Scalability Law&rsquo;s peak &mdash; was printed beside the integer it glosses. &ldquo;Measuring Systems&rdquo; asks the question all of this has been deferring: how would you know any of these numbers from a system that is actually running?"
+      ]
     }
   },
   "serialization": "ast.dump with attributes omitted and empty fields included",

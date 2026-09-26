@@ -140,9 +140,9 @@ class TestPublicCopy(unittest.TestCase):
 
     def test_rendered_inventory_has_no_ordinal_references(self):
         pages, records = copy.scan(SITE)
-        self.assertEqual(369, len(pages), 'visitor inventory must include every family')
-        self.assertEqual(25, sum(p.family == 'course' for p in pages.values()))
-        self.assertEqual(336, sum(p.family == 'lesson' for p in pages.values()))
+        self.assertEqual(494, len(pages), 'visitor inventory must include every family')
+        self.assertEqual(35, sum(p.family == 'course' for p in pages.values()))
+        self.assertEqual(450, sum(p.family == 'lesson' for p in pages.values()))
         self.assertGreater(len(records), 45000)
         focus = os.environ.get('AB_COURSE')
         if focus:
@@ -206,7 +206,7 @@ class TestPublicCopy(unittest.TestCase):
             'Arithmetic and geometric sequences have different rules.',
             'At each algorithmic stage, compare the current node with its neighbours.',
             'This Course contains 14 lessons.',
-            'There are 25 Courses in three Subjects.',
+            'There are 35 Courses in four Subjects.',
             'The expression (3 − 1) equals 2.',
             'The expression (3 - 1) = 2.',
             'Take each edge in order if it joins two components',
@@ -452,7 +452,7 @@ class TestAuthoredSemanticCopy(unittest.TestCase):
         registered = {c['slug'] for p in ui.build_paths.GENERATED_PATHS for c in p['courses']}
         registered.update(c['slug'] for c in trading)
         self.assertEqual(all_courses, registered)
-        self.assertEqual(len(all_courses), 25)
+        self.assertEqual(len(all_courses), 35)
         self.assertGreater(sum(len(p['clauses']) for p in semantic['pages'].values()), 5000)
         self.assertGreater(sum(len(p['source_records']) for p in semantic['pages'].values()), 2000)
         self.assertEqual([], authored_semantic_errors(SITE, contract))

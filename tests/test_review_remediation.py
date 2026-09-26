@@ -147,13 +147,13 @@ class TestReviewRemediation(unittest.TestCase):
 
     def test_all_generated_content_is_preserved(self):
         contract = json.loads(CONTRACT.read_text())
-        self.assertEqual(53, len(contract['modules']))
+        self.assertEqual(84, len(contract['modules']))
         errors = content_errors(ui.ROOT, contract)
         self.assertEqual([], errors, '\n'.join(errors))
 
     def test_complete_visitor_boundary_is_neutral(self):
         pages = sorted(ui.SITE.rglob('*.html'))
-        self.assertEqual(369, len(pages), 'include capstones and no-script alternatives')
+        self.assertEqual(494, len(pages), 'include capstones and no-script alternatives')
         failures = [(p.relative_to(ui.SITE).as_posix(), progression_matches(p.read_text())) for p in pages]
         self.assertEqual([], [(p, m) for p, m in failures if m], 'visitor progression/taxonomy')
 
