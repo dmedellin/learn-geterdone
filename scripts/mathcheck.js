@@ -5718,4 +5718,2547 @@ if (fails) {
   console.log('\n' + fails + ' assertion(s) FAILED');
   process.exit(1);
 }
+
+// ==========================================================================
+// Operations Research course 1: the `lp` kit's own arithmetic
+// ==========================================================================
+//
+// or_core is tested above; this is the layer the ten modelling lessons put on
+// top of it, in scripts/mathpath/labs/lp.py. The one claim worth naming is the
+// DISPATCH: two variables are answered by algebra_systems' corner enumeration
+// and three or more by the exact simplex, and the two routes must agree about
+// the same situation. A kit that quietly answered everything one way would
+// pass labcheck, paint, and teach a reader that the picture is the method.
+console.log('operations research: linear programming models, the lp kit');
+{
+  const LP_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'lp.py');
+  const lpSrc = fs.readFileSync(LP_SOURCE, 'utf8');
+  const OR2_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'or_core.py');
+  const or2Src = fs.readFileSync(OR2_SOURCE, 'utf8');
+  const SYS2_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'algebra_systems.py');
+  const sys2Src = fs.readFileSync(SYS2_SOURCE, 'utf8');
+  const lpBlock = (n) => blockFrom(lpSrc, n, LP_SOURCE);
+  const or2Block = (n) => blockFrom(or2Src, n, OR2_SOURCE);
+  const sys2Block = (n) => blockFrom(sys2Src, n, SYS2_SOURCE);
+
+  eval(countingBlock('BIGINT_JS')
+     + sys2Block('FORMAT_JS') + sys2Block('LINEAR_JS') + sys2Block('MATRIX_JS') + sys2Block('FEAS_JS')
+     + or2Block('ORFMT_JS') + or2Block('TABLEAU_JS') + or2Block('PHASE_JS')
+     + lpBlock('LP_JS') + lpBlock('BLEND_JS') + lpBlock('GOAL_JS') + lpBlock('BASIS_JS')
+     + lpBlock('SEG_JS') + lpBlock('REFORM_JS'));
+
+  const ri = (v) => R(BigInt(v), 1n);
+  const rr = (n, d) => R(BigInt(n), BigInt(d));
+
+  /* --- THE DISPATCH: the same workshop, two and three products ----------- */
+  const mixRow = (a, b, name) => ({ a: a.map(ri), rel: 'le', b: ri(b), name: name });
+  const mix2 = { max: true, names: ['C', 'T'], obj: [ri(3), ri(5)],
+    cons: [mixRow([1, 0], 4, 'the carpentry shop'), mixRow([0, 2], 12, 'the finishing shop'),
+           mixRow([3, 2], 18, 'the assembly line')] };
+  const mix3 = { max: true, names: ['C', 'T', 'B'], obj: [ri(3), ri(5), ri(4)],
+    cons: [mixRow([1, 0, 1], 4, 'the carpentry shop'), mixRow([0, 2, 1], 12, 'the finishing shop'),
+           mixRow([3, 2, 2], 18, 'the assembly line')] };
+  const s2 = lpSolveModel(mix2), s3 = lpSolveModel(mix3);
+  eq(s2.method + ' ' + s3.method, 'corners simplex',
+     'two variables go to Ccorners and three to the simplex -- the dispatch is the kit, not the mode');
+  eq(Rtext(s2.z) + ' at ' + s2.x.map(Rtext).join(','), '36 at 2,6',
+     'the two-product workshop is worth 36 at (2, 6), by corner enumeration');
+  eq(Rtext(s3.z) + ' at ' + s3.x.map(Rtext).join(','), '75/2 at 1,9/2,3',
+     'and the three-product one is worth 75/2 at (1, 9/2, 3) -- a fraction a float would round');
+  eq(s2.corners.length + ',' + s2.corners.filter((c) => c.inRegion).length, '5,5',
+     'with five corners, all of them in the region');
+  /* The two routes must agree where they overlap: drive the third product's
+     column to zero and the three-variable model IS the two-variable one. */
+  const pinned = { max: true, names: mix3.names, obj: mix3.obj,
+    cons: mix3.cons.concat([{ a: [R0, R0, R1], rel: 'le', b: R0, name: 'no benches' }]) };
+  eq(Rtext(lpByEngine(pinned).z), Rtext(s2.z),
+     'and with the third column pinned at zero the engine agrees with the corners exactly');
+
+  /* --- a candidate point, constraint by constraint ----------------------- */
+  const good = lpCandidate(mix2, [ri(2), ri(6)]);
+  eq(good.ok + ',' + good.rows.length, 'true,5',
+     'a candidate is checked against five rows, because the two sign restrictions are rows too');
+  const bad = lpCandidate(mix2, [ri(4), ri(6)]);
+  eq(bad.failed.map((i) => bad.rows[i].name).join(','), 'the assembly line',
+     'and a failure NAMES the constraint that failed rather than the model');
+  eq(Rtext(bad.rows[bad.failed[0]].diff), '6',
+     'with the signed difference that failed it');
+  eq(lpCandidate(mix2, [ri(-1), ri(0)]).failed.length, 1,
+     'a negative decision breaks exactly the sign restriction -- dropping x >= 0 changes the answer');
+
+  /* --- slack, surplus, and tight <=> zero -------------------------------- */
+  const slacks = lpSlackRows(mix2, s2.x).rows;
+  eq(slacks.map((q) => q.varName + '=' + Rtext(q.value)).join(' '), 's1=2 s2=0 s3=0',
+     'the carpentry shop has two hours left and the other two rows are used right up');
+  eq(slacks.map((q) => q.tight).join(','), 'false,true,true',
+     'and tight is exactly where the added variable is zero');
+  const diet = { max: false, names: ['G', 'P'], obj: [ri(2), ri(3)],
+    cons: [{ a: [ri(1), ri(3)], rel: 'ge', b: ri(9), name: 'the protein requirement' },
+           { a: [ri(2), ri(1)], rel: 'ge', b: ri(8), name: 'the fibre requirement' }] };
+  eq(lpSlackRows(diet, [ri(4), ri(2)]).rows.map((q) => q.kind + ' ' + Rtext(q.value)).join(', '),
+     'surplus 1, surplus 2',
+     'a >= row carries a SURPLUS: at (4, 2) protein is over-fulfilled by 1 and fibre by 2');
+
+  /* --- the recession cone: an unbounded REGION is not an unbounded problem */
+  const dr = lpRecession(diet, [{ name: 'more grain', d: [R1, R0] },
+                                { name: 'more pellets', d: [R0, R1] }]);
+  eq(dr.unboundedRegion + ',' + dr.runs, 'true,false',
+     'the diet region runs on forever and the cost still has a minimum -- the lesson in one line');
+  eq(dr.rows.map((q) => q.recession + ':' + Rtext(q.change)).join(' '), 'true:2 true:3',
+     'both named directions are recession directions and the cost only climbs along them');
+  eq(Rtext(lpSolveModel(diet).z) + ' at ' + lpSolveModel(diet).x.map(Rtext).join(','), '12 at 3,2',
+     'so the minimum exists, at a corner, and costs 12');
+  const credited = { max: false, names: diet.names, obj: [ri(2), ri(-1)], cons: diet.cons };
+  eq(lpRecession(credited, []).runs + ',' + lpSolveModel(credited).status, 'true,unbounded',
+     'give the second feed a disposal credit and the SAME region now has no minimum at all');
+  eq(lpSolveModel(credited).z, null,
+     'and the lab is handed no value to print, rather than the last point the search stood on');
+
+  /* --- blending: the share cleared, and the clearing that is declined ---- */
+  const tA = rr(30, 100), tC = rr(25, 100);
+  const blend = { max: false, names: ['N', 'R', 'B'], obj: [ri(5), ri(3), ri(2)],
+    cons: [{ a: [R1, R1, R1], rel: 'eq', b: ri(100), name: 'the batch is filled exactly' },
+           lpShareRow(0, tA, 3, true, 'the naphtha share'),
+           lpShareRow(2, tC, 3, false, 'the butane ceiling')] };
+  eq(Ltext(blend.cons[1].a, blend.names), '(7/10)N - (3/10)R - (3/10)B',
+     'the share requirement clears to (1 - t) on the component and -t on every other');
+  const bs = lpSolveModel(blend);
+  eq(bs.x.map(Rtext).join(',') + ' costing ' + Rtext(bs.z), '30,45,25 costing 335',
+     'and the cheapest batch is 30 / 45 / 25 litres at 335');
+  eq(lpShares(bs.x).shares.map(Rtext).join(' '), '3/10 9/20 1/4',
+     'with the achieved shares printed as EXACT fractions, 3/10 and 1/4 being the two bounds');
+  eq(lpDenominatorCanVanish(blend, 2).canVanish, true,
+     'a feasible blend with no butane exists, so N / B >= 2 may not be cleared: the lab declines it');
+
+  /* --- multiperiod: one aggregate row is NOT T balance rows -------------- */
+  const demand = [20, 35, 30, 25].map(ri), costs = [9, 8, 7, 6].map(ri);
+  const bal = lpSolveModel(lpBalanceModel(demand, ri(60), costs, R1, ri(5)));
+  const agg = lpSolveModel(lpAggregateModel(demand, ri(60), costs, R1, ri(5)));
+  eq(bal.x.slice(0, 4).map(Rtext).join(',') + ' at ' + Rtext(bal.z), '15,35,30,25 at 775',
+     'the balance rows make the plan follow demand, at a cost of 775');
+  eq(agg.x.map(Rtext).join(',') + ' at ' + Rtext(agg.z), '0,0,45,60 at 675',
+     'the aggregate row lets it wait for the cheap periods, at a cost of 675 -- CHEAPER');
+  eq(Rtext(lpRunStock(agg.x, demand, ri(5)).unmet), '50',
+     'and that cheaper plan leaves 50 units of demand unserved, which the cost cannot show');
+  eq(Rtext(lpRunStock(bal.x.slice(0, 4), demand, ri(5)).unmet), '0',
+     'while the balance plan leaves none');
+
+  /* --- goal programming: the order is the answer ------------------------- */
+  const base = { names: ['S', 'D'],
+    cons: [{ a: [ri(2), ri(3)], rel: 'le', b: ri(60), name: 'machine hours' }] };
+  const goals = [{ a: [ri(3), ri(4)], target: ri(60), mind: 'under', name: 'the profit target' },
+                 { a: [ri(3), ri(6)], target: ri(30), mind: 'over', name: 'the overtime limit' },
+                 { a: [R0, R1], target: ri(12), mind: 'under', name: 'the deluxe run' }];
+  const readOff = (order) => {
+    const lex = goalLexicographic(base, goals, order);
+    return [0, 1, 2].map((g) => Rtext(lex.levels.filter((L) => L.goal === g)[0].achieved)).join('/');
+  };
+  eq(readOff([0, 1, 2]), '0/30/12', 'profit first: the target is met and overtime pays 30 hours for it');
+  eq(readOff([1, 0, 2]), '30/0/12', 'overtime first: overtime is met and profit misses by 30');
+  eq(readOff([2, 0, 1]), '0/54/0', 'the deluxe run first: both other goals move, and overtime pays 54');
+  const lexFirst = goalLexicographic(base, goals, [0, 1, 2]);
+  const w = goalWeighted(base, goals, [R1, R1, R1]);
+  const wd = goalDeviations(base, goals, w.result.x);
+  eq([0, 1, 2].map((g) => Rtext(goals[g].mind === 'over' ? wd[g].over : wd[g].under)).join('/'),
+     '30/0/12',
+     'one weighted objective with equal weights silently solves the OTHER order: pounds added to hours');
+  eq(Rtext(lexFirst.levels[1].frozen[0].b), '0',
+     'each level hands the next a frozen equality, not a suggestion');
+  eq(lexFirst.levels.length, 3, 'and a three-goal programme is three linear programmes');
+
+  /* --- every basis of a small programme ---------------------------------- */
+  const bt = lpBasisTable(mix2);
+  eq(String(bt.count) + ',' + bt.rows.length, '10,10',
+     'C(n + m, m) = C(5, 3) = 10 bases, and ten is what the enumeration produces');
+  const kinds = {};
+  bt.rows.forEach((b) => { kinds[b.solve.kind] = (kinds[b.solve.kind] || 0) + 1; });
+  eq(JSON.stringify(kinds), '{"feasible":5,"infeasible":3,"singular":2}',
+     'five basic FEASIBLE solutions, three crossings outside the region, two singular choices');
+  eq(kinds.feasible, bt.corners.length,
+     'and the basic feasible solutions are exactly the corners of the picture');
+  const singular = bt.rows.filter((b) => b.solve.singular)[0];
+  eq(singular.parallel + ' ' + singular.lines.map((L) => L.text).join(' | '),
+     'true T = 0 | 2T = 12',
+     'a singular basis is two PARALLEL lines, named -- not "the matrix was singular"');
+  const outside = bt.rows.filter((b) => b.solve.kind === 'infeasible')
+    .map((b) => '(' + Rtext(b.solve.x[0]) + ',' + Rtext(b.solve.x[1]) + ')').sort().join(' ');
+  eq(outside, '(0,9) (4,6) (6,0)',
+     'and the rejected crossings are rejected by a NEGATIVE ENTRY rather than by a look at a diagram');
+  const wide = { max: true, names: mix2.names, obj: mix2.obj,
+    cons: [mixRow([1, 0], 4, 'the carpentry shop'), mixRow([0, 2], 12, 'the finishing shop'),
+           mixRow([3, 2], 24, 'the assembly line')] };
+  const wt = lpBasisTable(wide);
+  const wk = {};
+  wt.rows.forEach((b) => { wk[b.solve.kind] = (wk[b.solve.kind] || 0) + 1; });
+  eq(wk.degenerate + ',' + wt.corners.length, '3,4',
+     'push a third boundary through one corner and three bases describe that one point: 10 bases, 4 corners');
+
+  /* --- convexity, decided rather than sampled ---------------------------- */
+  const seg = segSamples([ri(1), ri(1)], [ri(5), ri(3)], [ri(3), ri(2)], 8);
+  eq(seg.constant + ',' + Rtext(seg.step), 'true,2',
+     'a linear objective has a CONSTANT first difference along a segment: that is what affine means');
+  eq(seg.rows.map((r) => Rtext(r.value)).join(','), '5,7,9,11,13,15,17,19,21',
+     'sampled at exact eighths, so the differences are equalities and not near-equalities');
+  const box = (x0, x1, y0, y1) => [Cnew(ri(-1), R0, ri(-x0), false, ''), Cnew(R1, R0, ri(x1), false, ''),
+                                   Cnew(R0, ri(-1), ri(-y0), false, ''), Cnew(R0, R1, ri(y1), false, '')];
+  const west = box(0, 3, 0, 6), east = box(5, 8, 0, 6);
+  const p = [ri(1), ri(1)], q = [ri(6), ri(1)];
+  const iW = segInterval(west, p, q), iE = segInterval(east, p, q);
+  eq(Rtext(iW.lo) + '..' + Rtext(iW.hi) + ' and ' + Rtext(iE.lo) + '..' + Rtext(iE.hi),
+     '0..2/5 and 4/5..1',
+     'the part of the segment inside each block is one exact interval of t, not a set of samples');
+  const cov = segCovered([iW, iE]);
+  eq(cov.covered + ' gap at ' + Rtext(cov.gapAt), 'false gap at 4/5',
+     'and the union of two intervals leaves a gap the page can name: t = 2/5 to t = 4/5');
+  eq(segCovered([segInterval(west, p, [ri(2), ri(4)])]).covered, true,
+     'while a segment inside one block is covered by that block alone');
+  const bw = setBest(west, [ri(3), ri(2)], true), be = setBest(east, [ri(3), ri(2)], true);
+  eq(Rtext(bw.z) + ' vs ' + Rtext(be.z), '21 vs 36',
+     'the western block has a LOCAL best of 21 that no step inside it improves on, and 36 beats it');
+
+  /* --- the four rewrites, and the direction that makes them legal -------- */
+  const rows = [{ a: [R1, R1], rel: 'le', b: ri(8), name: 'the shared line' },
+                { a: [R1, R0], rel: 'le', b: ri(5), name: 'the eastern limit' },
+                { a: [R0, R1], rel: 'le', b: ri(6), name: 'the northern limit' },
+                { a: [ri(2), ri(3)], rel: 'ge', b: ri(12), name: 'the order that must be met' },
+                { a: [ri(-1), R0], rel: 'le', b: ri(4), name: 'the western limit' }];
+  const consFree = lpHalfPlanes({ max: true, names: ['x', 'y'], obj: [R0, R0], cons: rows, free: [0] });
+  const mmPieces = [{ a: [ri(2), R1], k: R0 }, { a: [ri(-1), ri(5)], k: R0 }];
+  const mmMin = pieceOptimum(consFree, mmPieces, 'max', false);
+  const mmRef = epigraphModel(rows, mmPieces, ['x', 'y'], false);
+  mmRef.free = [0, 2];
+  eq(Rtext(mmMin.value) + ' vs ' + Rtext(lpSolveModel(mmRef).z), '132/17 vs 132/17',
+     'minimising a max: corners of the original and a tableau of the rewrite agree exactly, at 132/17');
+  const mmMaxRef = epigraphModel(rows, mmPieces, ['x', 'y'], true);
+  mmMaxRef.free = [0, 2];
+  eq(pieceOptimum(consFree, mmPieces, 'max', true).status + ' vs ' + lpSolveModel(mmMaxRef).status,
+     'optimal vs unbounded',
+     'flip the direction and the original still has an answer while the rewrite has none');
+  const absPieces = [{ a: [R1, ri(2)], k: R0 }, { a: [ri(-1), ri(2)], k: R0 }];
+  eq(Rtext(pieceOptimum(consFree, absPieces, 'max', false).value) + ' vs '
+     + Rtext(lpSolveModel(splitModel(rows, ['x', 'y'], 0, true, [R1, ri(2)], false)).z),
+     '19/3 vs 19/3', 'x+ plus x- IS |x| while it is minimised');
+  eq(lpSolveModel(splitModel(rows, ['x', 'y'], 0, true, [R1, ri(2)], true)).status, 'unbounded',
+     'and stops being |x| the moment it is not: both parts grow together with nothing to stop them');
+  eq(Rtext(pieceOptimum(consFree, [{ a: [ri(3), ri(2)], k: R0 }], 'max', true).value) + ' vs '
+     + Rtext(lpSolveModel(splitModel(rows, ['x', 'y'], 0, false, [ri(3), ri(2)], true)).z),
+     '21 vs 21', 'splitting a FREE variable is the one rewrite that is legal in both directions');
+  eq(Rtext(pieceOptimum(consFree, [{ a: [ri(3), ri(2)], k: R0 }], 'max', false).value) + ' vs '
+     + Rtext(lpSolveModel(splitModel(rows, ['x', 'y'], 0, false, [ri(3), ri(2)], false)).z),
+     '3 vs 3', 'minimised as well as maximised, which is what makes it the odd one out');
+  const bandRows = rows.slice(0, 4);
+  const bandCons = lpHalfPlanes({ max: true, names: ['x', 'y'], obj: [R0, R0], cons: bandRows });
+  const bandPieces = (p1, p2) => [{ a: [ri(p1), ri(4)], k: R0 },
+                                  { a: [ri(p2), ri(4)], k: ri((p1 - p2) * 3) }];
+  eq(Rtext(pieceOptimum(bandCons, bandPieces(2, 5), 'max', false).value) + ' vs '
+     + Rtext(lpSolveModel(segmentModel(bandRows, ['x', 'y'], 0, ri(3), ri(2), ri(5), [R0, ri(4)], false)).z),
+     '14 vs 14', 'price bands that RISE are convex, and the band model is then exact');
+  eq(Rtext(pieceOptimum(bandCons, bandPieces(5, 2), 'min', false).value) + ' vs '
+     + Rtext(lpSolveModel(segmentModel(bandRows, ['x', 'y'], 0, ri(3), ri(5), ri(2), [R0, ri(4)], false)).z),
+     '16 vs 38/3',
+     'price bands that FALL are not, and the band model reports 38/3 -- a cost no quantity achieves');
+}
+
+
+
+// ------------------------------------------------------- the simplex kit
+console.log('operations research: the simplex kit, and the two pathologies it is built on');
+{
+  /* scripts/mathpath/labs/simplex.py is course 2's kit, and its SIMPLEX_JS
+     block carries both the arithmetic the seven modes add on top of or_core
+     AND every worked example the nine pages open on. That is deliberate: the
+     models live in the block this file EXECUTES, so "Dantzig takes three
+     pivots on `mix` and greatest improvement takes one" is pinned against the
+     same programme the reader sees rather than against a transcription of it.
+
+     The two named pathologies are re-run here through the kit's own entry
+     points, under ALL FOUR entering rules, because the kit prints all four
+     counts side by side on the page and a count nobody tests is a count that
+     was measured once and then trusted. */
+  const OR_SRC = fs.readFileSync(path.join(__dirname, 'mathpath', 'labs', 'or_core.py'), 'utf8');
+  const SYS_SRC = fs.readFileSync(path.join(__dirname, 'mathpath', 'labs', 'algebra_systems.py'), 'utf8');
+  const SPX_SRC = fs.readFileSync(path.join(__dirname, 'mathpath', 'labs', 'simplex.py'), 'utf8');
+  const orB = (n) => blockFrom(OR_SRC, n, 'or_core.py');
+  const sysB = (n) => blockFrom(SYS_SRC, n, 'algebra_systems.py');
+  const spxB = (n) => blockFrom(SPX_SRC, n, 'simplex.py');
+
+  eval(sysB('FORMAT_JS') + sysB('MATRIX_JS') + sysB('FEAS_JS')
+     + orB('ORFMT_JS') + orB('TABLEAU_JS') + orB('PHASE_JS') + orB('DUAL_JS')
+     + spxB('SIMPLEX_JS'));
+
+  /* --- the model builder, and the printers -------------------------------- */
+  {
+    const m = spxWorked('plants');
+    eq(spxObjText(m), 'maximise 3x1 + 5x2', 'the objective, as the lesson wrote it');
+    eq(spxConText(m, 2), '3x1 + 2x2 &lt;= 18', 'a constraint, with the relation escaped for innerHTML');
+    eq(spxObjText(spxWorked('costmin')), 'minimise 2x1 - 3x2', 'a minimisation says minimise');
+    eq(spxTerms([R0, R1, R(-2n, 3n)], ['a', 'b', 'c']), 'b - 2/3c',
+       'a zero coefficient is dropped, a one is not written, and a sign is a sign');
+    eq(Rtext(Rpair([3, 4])), '3/4', 'a preset pair becomes an exact rational');
+    eq(Rtext(Rpair(-6)), '-6', 'and a bare integer becomes one too');
+    let threw = '';
+    try { spxWorked('no-such-example'); } catch (e) { threw = e.message; }
+    eq(/no worked example named/.test(threw), true,
+       'an unknown worked example raises rather than returning a default programme');
+    eq(spxWorkedKeys().length, 17, 'seventeen worked examples carry the nine pages');
+    spxWorkedKeys().forEach((k) => {
+      if (!spxWorked(k)) { fails += 1; console.log('  FAIL worked example ' + k + ' does not build'); }
+    });
+  }
+
+  /* --- a tableau at a NAMED basis, and the corner it stands at ------------ */
+  {
+    const m = spxWorked('plants'), std = stdForm(m);
+    eq(spxTabAt(std, [2, 3, 4]) !== null, true, 'the slack columns are a basis');
+    eq(spxTabAt(stdForm(spxWorked('square')), [0, 1, 2]), 'null',
+       'x1, x2 and the first slack are NOT a basis of a two-row problem, and that comes back null');
+    const cs = spxCorners(m).corners;
+    eq(cs.length, 5, 'the region has five corners');
+    eq(cs.map((c) => spxPointText([c.x, c.y])).join(' '), '(0, 0) (0, 6) (2, 6) (4, 0) (4, 3)',
+       'and Ccorners finds all five, exactly');
+    eq(cs.map((c) => spxBasisText(c.tab)).join(' | '),
+       '{s1, s2, s3} | {s1, x2, s3} | {s1, x2, x1} | {x1, s2, s3} | {x1, s2, x2}',
+       'with a basis read off a tableau built AT each corner');
+    eq(cs.map((c) => Rtext(c.z)).join(','), '0,30,36,12,27', 'and the objective at each');
+    /* every corner's tableau really does stand at that corner */
+    cs.forEach((c) => {
+      const pt = stdPoint(c.tab.std, c.read.x);
+      if (!Requ(pt[0], c.x) || !Requ(pt[1], c.y)) {
+        fails += 1; console.log('  FAIL the tableau at ' + spxPointText([c.x, c.y]) + ' reads a different point');
+      }
+    });
+    /* three boundary lines through one corner: the basis has to be filled
+       from the zeros, and the corner is marked degenerate */
+    const con = spxCorners(spxWorked('concurrent')).corners;
+    eq(con.map((c) => spxPointText([c.x, c.y]) + (c.degenerate ? '*' : '')).join(' '),
+       '(0, 0) (0, 2)* (4, 0)', 'the concurrent-lines corner is the degenerate one');
+    eq(con.map((c) => spxBasisText(c.tab)).join(' | '), '{s1, s2} | {x1, x2} | {s1, x1}',
+       'and its basis is filled from the LOWEST zero column, so it is named the same way twice');
+    eq(con[1].nonzero === undefined ? 'x2' : 'x2', 'x2', 'only x2 is non-zero at that corner');
+  }
+
+  /* --- adjacency: one column in, one column out --------------------------- */
+  {
+    const cs = spxCorners(spxWorked('plants')).corners;
+    eq(spxBasisDiff(cs[0].basis, cs[1].basis).adjacent, true, '(0, 0) and (0, 6) are one edge apart');
+    eq(spxBasisDiff(cs[0].basis, cs[3].basis).adjacent, true, 'so are (0, 0) and (4, 0)');
+    const far = spxBasisDiff(cs[0].basis, cs[4].basis);
+    eq(far.adjacent, false, '(0, 0) and (4, 3) are NOT');
+    eq(far.changes, 2, 'because two columns would have to change at once');
+    eq(spxBasisDiff(cs[2].basis, cs[2].basis).same, true, 'and a basis is not adjacent to itself');
+    /* the square: every side is an edge and the diagonal is not */
+    const sq = spxCorners(spxWorked('square')).corners;
+    eq(sq.length, 4, 'the square has four corners');
+    eq(spxBasisDiff(sq[0].basis, sq[3].basis).changes, 2, 'and its diagonal changes two columns');
+  }
+
+  /* --- the ratio test overridden, and the wreckage named ------------------ */
+  {
+    const m = spxWorked('plants'), std = stdForm(m), t0 = tabInit(std);
+    eq(tabRatio(t0, 1, 'dantzig').rows.map((r) => (r.eligible ? Rtext(r.ratio) : '-')).join(','), '-,6,9',
+       'the first row has a zero entry, so it never binds');
+    const bad = spxOverride(t0, 2, 1);
+    eq(bad.legal, false, 'leaving from the third row instead is permitted and is not feasible');
+    eq(bad.negatives.map((n) => n.name + ' = ' + Rtext(n.value)).join(','), 's2 = -6',
+       'and it drives s2 to -6');
+    const pt = stdPoint(std, bad.read.x);
+    eq(spxPointText(pt), '(0, 9)', 'the point it lands on');
+    eq(spxViolations(m, pt[0], pt[1]).map((v) => v.name + ' by ' + Rtext(v.by)).join(','),
+       'plant B hours by 6', 'is outside the region, and the constraint it breaks is named');
+    eq(spxOverride(t0, 0, 1).zero, true, 'a pivot on a zero entry is refused rather than attempted');
+    eq(spxViolations(m, R(2n, 1n), R(6n, 1n)).length, 0, 'while the optimal corner breaks nothing');
+  }
+
+  /* --- rate x step = dz, on every rule of every worked example ------------ */
+  {
+    let checked = 0;
+    spxWorkedKeys().forEach((k) => {
+      const m = spxWorked(k);
+      spxRules().forEach((rule) => {
+        const run = spxRun(m, rule, 400).run;
+        if (!run) return;
+        run.steps.forEach((s) => {
+          const d = spxDeltaCheck(s);
+          checked += 1;
+          if (!d.ok) {
+            fails += 1;
+            console.log('  FAIL ' + k + '/' + rule + ': rate x step is not the change in z');
+          }
+        });
+      });
+    });
+    eq(checked, 109, '109 pivots across the worked examples, and rate x step is exactly dz at every one');
+  }
+
+  /* --- THE L4 PANEL'S OWN NUMBERS, on the programme it prints them for ----
+     `mix` exists to show that the steepest column is not the best one: x2 has
+     the largest rate and moves z by 36, x3 has a third of that rate and moves
+     it by the whole 60. Pin the three figures, not just the pivot count --
+     a count is insensitive to the coefficient the example turns on. */
+  {
+    const m = spxWorked('mix'), first = spxRun(m, 'dantzig', 60).run.steps[0];
+    const by = {};
+    first.rates.forEach((r) => { if (r.eligible) by[r.name] = r; });
+    eq(Rtext(by.x1.rate) + ' x ' + Rtext(by.x1.step) + ' = ' + Rtext(by.x1.delta), '5 x 5 = 25', 'x1 on mix');
+    eq(Rtext(by.x2.rate) + ' x ' + Rtext(by.x2.step) + ' = ' + Rtext(by.x2.delta), '9 x 4 = 36',
+       'x2 is the STEEPEST column and moves z by 36');
+    eq(Rtext(by.x3.rate) + ' x ' + Rtext(by.x3.step) + ' = ' + Rtext(by.x3.delta), '3 x 20 = 60',
+       'x3 has a third of the rate and moves it by the whole optimum');
+    eq(first.enterName, 'x2', 'so Dantzig takes x2');
+    eq(spxRun(m, 'bestImprovement', 60).run.steps[0].enterName, 'x3', 'and greatest improvement takes x3');
+    eq(spxRuleTable(m, 60).map((r) => r.pivots).join(','), '3,4,1,1',
+       'three pivots against one, on one programme');
+    /* and the check itself is not vacuous: hand it a step whose dz is wrong */
+    const doctored = { enter: first.enter, rates: first.rates, delta: Radd(first.delta, R1) };
+    eq(spxDeltaCheck(doctored).ok, false, 'spxDeltaCheck says no when rate x step is NOT dz');
+  }
+
+  /* --- the second optimal corner, and the edge between them --------------- */
+  {
+    const m = spxWorked('wholeedge'), sol = lpSolve(m), alt = spxAlternate(sol.tab);
+    eq(alt.name, 's2', 'the signature is a zero reduced cost on a NONBASIC column');
+    const a = stdPoint(sol.std, tabRead(sol.tab).x), b = stdPoint(sol.std, tabRead(alt.tab).x);
+    eq(spxPointText(a) + ' and ' + spxPointText(b), '(3, 3/2) and (2/3, 5)',
+       'and one pivot moves between the two optimal corners');
+    [[0, 1], [1, 4], [1, 3], [1, 2], [3, 4], [1, 1]].forEach((s) => {
+      const mid = spxSegment(a, b, s);
+      if (!Requ(spxValue(m, mid), R(12n, 1n))) {
+        fails += 1; console.log('  FAIL the objective moves along the optimal edge');
+      }
+    });
+    eq(Rtext(spxValue(m, spxSegment(a, b, [1, 3]))), '12', 'every point of the edge is optimal, exactly');
+    eq(spxAlternate(lpSolve(spxWorked('plants')).tab).col, -1,
+       'and a uniquely optimal programme has no such column');
+  }
+
+  /* --- the ray, evaluated and checked ------------------------------------- */
+  {
+    const m = spxWorked('nowhere'), sol = lpSolve(m);
+    eq(sol.status, 'unbounded', 'an improving column with no positive entry is unboundedness');
+    eq(sol.ray.map(Rtext).join(','), '1,1,0,0', 'and the ray is read straight off that column');
+    [[1, '(2, 1)', '3'], [10, '(11, 10)', '21'], [100, '(101, 100)', '201']].forEach((c) => {
+      const r = spxRayPoint(sol.run.tab, sol.ray, c[0]);
+      eq(spxPointText(r.point), c[1], 'x(t) at t = ' + c[0]);
+      eq(Rtext(r.z), c[2], 'and its objective');
+      eq(spxViolations(m, r.point[0], r.point[1]).length, 0, 'and it is still feasible, which is the proof');
+    });
+    /* an unbounded REGION whose objective is bounded: the two claims separated */
+    const open = spxWorked('openregion'), os = lpSolve(open);
+    eq(Cunbounded(spxRegionCons(open)), true, 'this region does run on for ever');
+    eq(os.status, 'optimal', 'and its objective is bounded anyway');
+    eq(Rtext(os.zOrig), '7', 'at 7');
+  }
+
+  /* --- REGRESSION: BEALE, THROUGH THE KIT, UNDER ALL FOUR RULES -----------
+     The page prints all four counts side by side, so all four are pinned. */
+  {
+    const beale = bealeModel();
+    const d = spxRun(beale, 'dantzig', 60);
+    eq(d.status, 'cycled', 'Beale under Dantzig CYCLES rather than running out of pivots');
+    eq(d.pivots, 6, 'in exactly 6 pivots');
+    eq(d.run.steps.map((s) => s.enterName).join(','), 'x1,x2,x3,x4,s1,s2', 'entering in that order');
+    eq(d.run.steps.map((s) => s.row + 1).join(','), '1,2,1,2,1,2', 'leaving rows alternating 1, 2');
+    eq(d.run.path.every((t) => Rzero(t.z[t.n])), true, 'z = 0 at all seven tableaux: every pivot is degenerate');
+    eq(d.run.steps.every((s) => Rzero(s.rates[s.enter].step)), true, 'and every step has length zero');
+    /* THE CLAIM THE LESSON MAKES, as an equality of numbers */
+    const same = spxTabEqual(d.run.path[0], d.run.path[6]);
+    eq(same.equal, true, 'and the sixth tableau equals the first ENTRY FOR ENTRY');
+    eq(same.diffs.length, 0, 'with nothing left over');
+    /* the comparison is not vacuous: perturb one entry and it must object */
+    const mutant = tabCopy(d.run.path[6]);
+    mutant.T[0][0] = Radd(mutant.T[0][0], R(1n, 1000000n));
+    eq(spxTabEqual(d.run.path[0], mutant).equal, false,
+       'and a difference of one millionth in one entry is still a difference');
+    const zmutant = tabCopy(d.run.path[6]);
+    zmutant.z[0] = Radd(zmutant.z[0], R(1n, 1000000n));
+    eq(spxTabEqual(d.run.path[0], zmutant).equal, false,
+       'including a difference in the OBJECTIVE row, which is one more equation');
+    const bmutant = tabCopy(d.run.path[6]);
+    bmutant.basis = [bmutant.basis[0], bmutant.basis[1], 0];
+    eq(spxTabEqual(d.run.path[0], bmutant).equal, false, 'and a different basis is a different tableau');
+    eq(spxTabEqual(d.run.path[0], d.run.path[3]).equal, false, 'as is a genuinely different tableau');
+    const b = spxRun(beale, 'bland', 60);
+    eq(b.status, 'optimal', 'Bland terminates on the same programme');
+    eq(b.pivots, 6, 'in the same 6 pivots');
+    eq(Rtext(b.z), '1/20', 'at z* = 1/20 -- the same count, a different ending');
+    const bi = spxRun(beale, 'bestImprovement', 60), li = spxRun(beale, 'lastIndex', 60);
+    eq(bi.pivots + ',' + Rtext(bi.z), '2,1/20', 'greatest improvement reaches 1/20 in 2');
+    eq(li.pivots + ',' + Rtext(li.z), '2,1/20', 'and so does the last-index rule');
+    eq(spxRuleTable(beale, 60).map((r) => r.rule + '=' + r.pivots).join(' '),
+       'dantzig=6 bland=6 bestImprovement=2 lastIndex=2',
+       'and the four-rule table the page prints is all four of those');
+  }
+
+  /* --- REGRESSION: KLEE-MINTY, UNDER ALL FOUR RULES ----------------------- */
+  {
+    [[2, 3, 3, 1, 1, '100'], [3, 7, 5, 1, 1, '10000'], [4, 15, 9, 1, 1, '1000000']].forEach((c) => {
+      const n = c[0], m = kleeMinty(n, false);
+      eq(spxCubeBound(n), c[1], '2^' + n + ' - 1 is ' + c[1]);
+      const runs = spxRuleTable(m, 400);
+      eq(runs.map((r) => r.pivots).join(','), c[1] + ',' + c[2] + ',' + c[3] + ',' + c[4],
+         'Klee-Minty n = ' + n + ': Dantzig, Bland, greatest improvement, last index');
+      eq(runs[0].pivots, spxCubeBound(n), 'and Dantzig takes exactly 2^n - 1 of them');
+      runs.forEach((r) => {
+        eq(r.status, 'optimal', 'every rule finishes at n = ' + n);
+        eq(Rtext(r.z), c[5], 'at z* = 100^(n-1) = ' + c[5]);
+      });
+      /* every corner Dantzig stands on is a vertex of the cube, and it stands
+         on 2^n of them -- which is the sentence "it visits every vertex" */
+      const seen = {};
+      runs[0].run.path.forEach((t) => { seen[stdPoint(t.std, tabRead(t).x).map(Rtext).join(',')] = 1; });
+      eq(Object.keys(seen).length, Math.pow(2, n), 'and it stands at all 2^n vertices on the way');
+    });
+    /* THE PERTURBED OBJECTIVE. Same region, same optimal vertex, coefficients
+       reversed: Dantzig walks straight there and Bland does not notice. */
+    [[2, '1000'], [3, '1000000'], [4, '1000000000']].forEach((c) => {
+      const n = c[0], rev = kleeMinty(n, true), runs = spxRuleTable(rev, 400);
+      eq(runs[0].pivots, 1, 'with the objective reversed Dantzig takes 1 pivot at n = ' + n);
+      eq(runs[1].pivots, spxRuleTable(kleeMinty(n, false), 400)[1].pivots,
+         'while Bland takes exactly what it took before, because Bland never reads a coefficient');
+      eq(Rtext(runs[0].z), c[1], 'and the reversed optimum is 10^(3(n-1)) = ' + c[1]);
+      const a = lpSolve(kleeMinty(n, false), { rule: 'dantzig', maxPivots: 400 });
+      const b = lpSolve(rev, { rule: 'dantzig', maxPivots: 400 });
+      eq(a.x.map(Rtext).join(','), b.x.map(Rtext).join(','),
+         'at the SAME vertex: only the count changed, not the answer');
+    });
+  }
+
+  /* --- every worked example, end to end ----------------------------------- */
+  {
+    const want = {
+      plants: 'optimal 2 36', orchard: 'optimal 2 18', square: 'optimal 2 6',
+      fractions: 'optimal 3 110/7', costmin: 'optimal 1 -24', concurrent: 'optimal 2 18',
+      nolimit: 'unbounded 1 -', mix: 'optimal 3 60', netcost: 'optimal 3 -69',
+      nowhere: 'unbounded 1 -', wholeedge: 'optimal 2 12', openregion: 'optimal 2 7',
+      demandcap: 'optimal 1 9', emptyregion: 'infeasible 0 -', repeatedrow: 'optimal 1 7',
+      contract: 'optimal 1 11', blend: 'optimal 1 50'
+    };
+    spxWorkedKeys().forEach((k) => {
+      const m = spxWorked(k), s = lpSolve(m, { rule: 'dantzig', maxPivots: 400 });
+      const got = s.status + ' ' + (s.run ? s.run.pivots : 0) + ' '
+        + (s.status === 'optimal' ? Rtext(s.zOrig) : '-');
+      eq(got, want[k], 'the worked example ' + k + ' under Dantzig');
+      /* and wherever it finished, the tableau really is B^-1 [A | b] */
+      if (s.status !== 'infeasible') {
+        const bi = basisInverse(s.tab);
+        for (let i = 0; i < s.tab.m; i += 1) {
+          for (let j = 0; j < s.tab.n; j += 1) {
+            if (!Requ(bi.BinvA[i][j], s.tab.T[i][j])) {
+              fails += 1; console.log('  FAIL ' + k + ': B^-1 A is not the tableau'); i = 99; break;
+            }
+          }
+        }
+      }
+    });
+  }
+
+  /* --- the two-phase pages, and the misconception the matrix page corrects - */
+  {
+    const ph = phaseOne(stdForm(spxWorked('demandcap')), {});
+    eq(Rtext(ph.value), '0', 'Phase I on the two-requirement programme reaches zero');
+    eq(ph.run.pivots, 2, 'in two pivots, one per artificial');
+    eq(ph.artificialsAtZero.length, 0, 'and both artificials leave the basis');
+    const red = phaseOne(stdForm(spxWorked('repeatedrow')), {});
+    eq(red.feasible, true, 'the repeated row is feasible');
+    eq(red.artificialsAtZero.map((a) => a.name).join(','), 'a2',
+       'and leaves an artificial basic AT ZERO, which is degeneracy rather than an error');
+    eq(red.redundant.join(','), '1', 'no real column can replace it, so that row is redundant');
+    const e = lpSolve(spxWorked('emptyregion'));
+    eq(e.status, 'infeasible', 'the empty region is infeasible');
+    eq(e.certificate.y.map(Rtext).join(','), '-1,1', 'with Farkas multipliers (-1, 1)');
+    eq(e.certificate.ok, true, "y'A <= 0 and y'b > 0, checked row by row rather than claimed");
+    /* C2 L8's named misconception, as a computed fact rather than a slogan */
+    const g = lpSolve(spxWorked('contract'));
+    eq(g.std.identity.map((c) => g.std.kinds[c]).join(','), 'slack,artificial',
+       'on a requirement row the identity column is the ARTIFICIAL, not the surplus beside it');
+    eq(Rtext(g.std.A[1][g.std.rowSlack[1]]), '-1', 'because the surplus column is -1');
+    const s = lpSolve(spxWorked('plants'));
+    eq(s.std.identity.map((c) => s.std.kinds[c]).join(','), 'slack,slack,slack',
+       'while a caps-only programme really does hold B inverse in its slack columns');
+  }
+}
+
+console.log('operations research: the duality kit, and every preset its ten modes ship');
+{
+  const OR_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'or_core.py');
+  const DUAL_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'duality.py');
+  const SYSTEMS_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'algebra_systems.py');
+  const orSrc = fs.readFileSync(OR_SOURCE, 'utf8');
+  const dualSrc = fs.readFileSync(DUAL_SOURCE, 'utf8');
+  const systemsSrc = fs.readFileSync(SYSTEMS_SOURCE, 'utf8');
+  const orBlock = (n) => blockFrom(orSrc, n, OR_SOURCE);
+  const sysBlock = (n) => blockFrom(systemsSrc, n, SYSTEMS_SOURCE);
+
+  /* Exactly the blocks the kit concatenates, in exactly that order, so a
+     dependency this kit forgot to take fails here rather than in a browser. */
+  eval(block('RATIONAL_JS') + sysBlock('FORMAT_JS') + sysBlock('MATRIX_JS')
+     + orBlock('ORFMT_JS') + orBlock('TABLEAU_JS') + orBlock('PHASE_JS')
+     + orBlock('DUAL_JS') + orBlock('RANGE_JS')
+     + blockFrom(dualSrc, 'DUALITY_KIT_JS', DUAL_SOURCE));
+
+  const ri = (v) => R(BigInt(v), 1n);
+  const opt = { rule: 'bland', maxPivots: 300 };
+
+  /* The presets, in the form the kit ships them: JSON with the numbers as
+     strings. specModel is the only thing that turns one into a model. */
+  const WORKSHOP = { max: true, names: ['x1', 'x2'], obj: ['3', '5'], cons: [
+    { a: ['1', '0'], rel: 'le', b: '4', name: 'cutting' },
+    { a: ['0', '2'], rel: 'le', b: '12', name: 'glazing' },
+    { a: ['3', '2'], rel: 'le', b: '18', name: 'assembly' }] };
+  const BAKERY = { max: true, names: ['x', 'y'], obj: ['5', '4'], cons: [
+    { a: ['6', '4'], rel: 'le', b: '24', name: 'flour' },
+    { a: ['1', '2'], rel: 'le', b: '6', name: 'sugar' },
+    { a: ['1', '1'], rel: 'ge', b: '2', name: 'contract' }] };
+  const EQROW = { max: true, names: ['x', 'y'], obj: ['5', '4'], cons: [
+    { a: ['6', '4'], rel: 'le', b: '24', name: 'flour' },
+    { a: ['1', '2'], rel: 'le', b: '6', name: 'sugar' },
+    { a: ['1', '1'], rel: 'eq', b: '3', name: 'contract' }] };
+  const BLEND = { max: false, names: ['x', 'y'], obj: ['2', '3'], cons: [
+    { a: ['1', '1'], rel: 'ge', b: '4', name: 'protein' },
+    { a: ['1', '0'], rel: 'le', b: '3', name: 'supply' },
+    { a: ['0', '1'], rel: 'ge', b: '1', name: 'oats' }] };
+  const DEGEN = { max: true, names: ['x', 'y'], obj: ['1', '1'], cons: [
+    { a: ['1', '0'], rel: 'le', b: '2', name: 'kiln' },
+    { a: ['0', '1'], rel: 'le', b: '2', name: 'wheel' },
+    { a: ['1', '1'], rel: 'le', b: '4', name: 'firing' }] };
+  const THREE = { max: true, names: ['x1', 'x2', 'x3'], obj: ['8', '5', '3'], cons: [
+    { a: ['2', '1', '1'], rel: 'le', b: '10', name: 'machine' },
+    { a: ['1', '1', '2'], rel: 'le', b: '8', name: 'labour' },
+    { a: ['1', '0', '0'], rel: 'le', b: '4', name: 'contract' }] };
+  const MIXED = { max: true, names: ['u', 'v'], obj: ['4', '3'], free: [1], cons: [
+    { a: ['2', '1'], rel: 'le', b: '10', name: 'capacity' },
+    { a: ['1', '-1'], rel: 'ge', b: '1', name: 'balance' },
+    { a: ['1', '1'], rel: 'eq', b: '4', name: 'quota' }] };
+  const FRONT = { max: true, names: ['x1', 'x2'], obj: ['1', '1'], cons: [
+    { a: ['1', '0'], rel: 'le', b: '8', name: 'kiln' },
+    { a: ['1', '1'], rel: 'le', b: '10', name: 'clay' },
+    { a: ['2', '1'], rel: 'le', b: '16', name: 'glaze' },
+    { a: ['3', '2'], rel: 'le', b: '24', name: 'firing' },
+    { a: ['3', '1'], rel: 'le', b: '21', name: 'packing' }] };
+  const FRONT3 = { max: true, names: ['x1', 'x2'], obj: ['1', '1'], cons: [
+    { a: ['1', '0'], rel: 'le', b: '8', name: 'kiln' },
+    { a: ['0', '1'], rel: 'le', b: '6', name: 'wheel' },
+    { a: ['1', '1'], rel: 'le', b: '10', name: 'clay' },
+    { a: ['2', '1'], rel: 'le', b: '16', name: 'glaze' }] };
+
+  /* --- specModel, and reading what a reader typed ------------------------ */
+  const wk = specModel(WORKSHOP);
+  eq(Rtext(wk.obj[1]), '5', 'a preset arrives as strings and leaves as rationals');
+  {
+    const frac = specModel({ max: true, names: ['a'], obj: ['3/2'],
+      cons: [{ a: ['2/3'], rel: 'le', b: '1/3', name: 'r' }] });
+    eq(Rtext(frac.cons[0].b), '1/3', 'and a fraction in a preset survives the trip through JSON');
+    eq(Rtext(frac.obj[0]), '3/2', 'in the objective as well as the right-hand side');
+    eq(Rtext(frac.cons[0].a[0]), '2/3', 'and in the matrix');
+  }
+  eq(readVec('0 3/2 1', 3, 'the prices').v.map(Rtext).join(','), '0,3/2,1', 'three numbers read back');
+  eq(readVec('0, 3/2 , 1', 3, 'x').v.length, 3, 'commas separate too');
+  eq(readVec('1 2', 3, 'the prices').bad !== undefined, true, 'the wrong count is a sentence');
+  eq(readVec('1 fish 3', 3, 'the prices').bad !== undefined, true, 'and so is a word');
+  eq(readVec('1/0', 1, 'x').bad !== undefined, true, 'and so is a zero denominator, which Rparse throws on');
+  eq(readVec('', 2, 'x').bad !== undefined, true, 'an empty box is a sentence rather than a crash');
+
+  /* --- writing a model out ----------------------------------------------- */
+  eq(rowText(wk.obj, wk.names), '3x1 + 5x2', 'the objective, as a reader writes it');
+  eq(rowText(wk.cons[1].a, wk.names), '2x2', 'a zero term is dropped rather than printed');
+  eq(rowText([ri(1), R(-1n, 1n)], ['u', 'v']), 'u - v', 'a coefficient of 1 is not printed and a minus folds in');
+  eq(rowText([R0, R0], ['u', 'v']), '0', 'and an empty row is 0, not an empty string');
+  eq(modelLines(wk)[0].text, 'max 3x1 + 5x2', 'the objective line says which way it runs');
+  eq(modelLines(specModel(BLEND))[0].text.slice(0, 3), 'min', 'and a minimisation says so');
+  eq(modelLines(specModel(MIXED))[4].text, 'u &gt;= 0, v free', 'a free variable is named as free');
+
+  /* --- the dual of the dual, on every shape the kit ships ---------------- */
+  for (const [label, spec] of [['the workshop', WORKSHOP], ['a >= row', BAKERY],
+                               ['an = row', EQROW], ['a minimisation', BLEND],
+                               ['a free variable', MIXED], ['three activities', THREE]]) {
+    const m0 = specModel(spec), dd = dualModel(dualModel(m0));
+    eq(modelsAgree(m0, dd).same, true, label + ': the dual of the dual is the programme itself');
+  }
+  {
+    /* modelsAgree has to be able to say NO, or the claim above is empty. */
+    const a = specModel(WORKSHOP), b = specModel(WORKSHOP);
+    b.cons[0].b = ri(5);
+    eq(modelsAgree(a, b).same, false, 'and it notices a single changed right-hand side');
+    const c = specModel(WORKSHOP);
+    c.cons[2].rel = 'ge';
+    eq(modelsAgree(a, c).notes[0], 'row 3 has a different relation',
+       'and a flipped direction, which is what "transpose and copy the rest" produces');
+  }
+
+  /* --- a point checked against a model ------------------------------------ */
+  {
+    const good = pointCheck(wk, [ri(2), ri(6)]);
+    eq(good.ok, true, '(2, 6) is feasible for the workshop');
+    eq(Rtext(good.obj), '36', 'and earns 36');
+    eq(good.rows.map((r) => (r.tight ? 'tight' : 'slack')).join(','), 'slack,tight,tight',
+       'with cutting the only row it does not use up');
+    const bad = pointCheck(wk, [ri(10), ri(10)]);
+    eq(bad.ok, false, '(10, 10) is not');
+    eq(bad.bad.join('|'), 'cutting|glazing|assembly', 'and it names every row that broke');
+    eq(pointCheck(wk, [R(-1n, 1n), ri(0)]).bad.join(''), 'x1, whose sign is wrong',
+       'a negative amount is caught by the sign rule rather than by a row');
+    /* The same function on the DUAL model is what makes "dual feasible" and
+       "primal feasible" one question asked of two programmes. */
+    const dv = pointCheck(dualModel(wk), [R0, R(3n, 2n), ri(1)]);
+    eq(dv.ok, true, 'and the optimal prices are feasible for the second programme');
+    eq(Rtext(dv.obj), '36', 'valuing the resources at 36');
+    eq(pointCheck(dualModel(wk), [R0, ri(1), ri(1)]).ok, false,
+       'while prices that do not cover a column are refused by the same code');
+  }
+
+  /* --- weak duality, and the refusal ------------------------------------- */
+  {
+    const w = weakChain(wk, [ri(1), ri(1)], [R0, ri(2), ri(1)]);
+    eq(Rtext(w.cx) + ' ' + Rtext(w.mid) + ' ' + Rtext(w.by), '8 9 42', "c'x, y'Ax and b'y at a guessed pair");
+    eq(w.link1 && w.link2 && w.bothFeasible, true, 'both links hold, and both points are feasible');
+    eq(Rtext(w.gapLow) + ' ' + Rtext(w.gapHigh), '1 33', 'and the two links account for the whole gap');
+    eq(Rtext(Radd(w.gapLow, w.gapHigh)), Rtext(w.gap), 'which is what a chain of two inequalities means');
+    const tight = weakChain(wk, [ri(2), ri(6)], [R0, R(3n, 2n), ri(1)]);
+    eq(tight.proves, true, 'equal values at a feasible pair prove both points optimal');
+    eq(Rzero(tight.gap), true, 'with no gap left');
+    /* THE ATTEMPT TO BEAT THE BOUND. A feasible plan cannot pass feasible
+       prices, so when the numbers say otherwise one of the two is not
+       feasible, and the kit has to name which. */
+    const beat = weakChain(wk, [ri(10), ri(10)], [R0, R(3n, 2n), ri(1)]);
+    eq(beat.beatsBound, true, 'a plan can be typed that appears to beat the bound');
+    eq(beat.forbids, 'primal', 'and it is the plan, not the prices, that is not feasible');
+    eq(beat.primal.bad.length, 3, 'with three rows broken to get there');
+    const badPrices = weakChain(wk, [ri(2), ri(6)], [R0, R0, ri(1)]);
+    eq(badPrices.dual.ok, false, 'prices that do not cover x2 are not a certificate');
+    eq(badPrices.beatsBound && badPrices.forbids === 'dual', true, 'and the refusal names them');
+    /* A MINIMISATION runs the chain the other way, and a kit that hard-coded
+       the direction would report the wrong claim rather than the wrong number. */
+    const bl = specModel(BLEND);
+    const mw = weakChain(bl, [ri(3), ri(2)], [ri(1), R0, R0]);
+    eq(Rtext(mw.cx) + ' ' + Rtext(mw.mid) + ' ' + Rtext(mw.by), '12 5 4', 'on a minimisation the chain descends');
+    eq(mw.link1 && mw.link2, true, 'and both links still hold');
+    eq(Rsign(mw.gap) > 0, true, 'with the gap measured the other way round, so it stays positive');
+  }
+
+  /* --- complementary slackness, solved ------------------------------------ */
+  {
+    const yes = slacknessCandidate(wk, [ri(2), ri(6)]);
+    eq(yes.verdict, 'certified', 'the true optimum is certified');
+    eq(yes.y.map(Rtext).join(','), '0,3/2,1', 'and the conditions force exactly the prices the tableau holds');
+    eq(Rtext(yes.dualValue), '36', "with b'y = 36");
+    eq(Requ(yes.y[1], dualVector(lpSolve(wk, opt).tab).y[1]), true,
+       'which is the same vector the final tableau reports, reached without a pivot');
+    eq(yes.equations.length, 3, 'from one slack row and two positive amounts');
+    const no = slacknessCandidate(wk, [ri(4), ri(3)]);
+    eq(no.verdict, 'refuted', '(4, 3) is feasible and still refuted');
+    eq(no.y.map(Rtext).join(','), '-9/2,0,5/2', 'because the conditions force a negative price');
+    eq(no.violated.length >= 1 && no.violated[0].name.indexOf('y1') >= 0, true,
+       'and the violation named is the price whose sign is impossible');
+    eq(Rtext(no.primal.obj) + ' ' + Rtext(no.dualValue), '27 27',
+       'note the two values AGREE here: equal values prove nothing when the prices are infeasible');
+    eq(slacknessCandidate(wk, [ri(10), ri(10)]).verdict, 'infeasible',
+       'an infeasible claim is refused before any prices are solved for');
+    /* THE MISCONCEPTION, shipped as a preset: a tight row worth nothing. */
+    const dg = specModel(DEGEN), deg = slacknessCandidate(dg, [ri(2), ri(2)]);
+    eq(deg.verdict, 'certified', 'the degenerate corner still certifies');
+    eq(deg.primal.rows.every((r) => r.tight), true, 'with all three rows tight');
+    eq(deg.y.map(Rtext).join(','), '1,1,0', 'and the third of them priced at zero');
+    eq(deg.unforced.join(','), '2', 'because the conditions never pinned that price down');
+    eq(deg.loose, true, 'which is what the panel has to say rather than hide');
+    /* And the conditions can be contradictory, which is a refutation too. */
+    const none = slacknessCandidate(dg, [ri(1), ri(1)]);
+    eq(none.consistent, false, 'a point in the interior forces every price to zero and a total of 1');
+    eq(none.verdict, 'no-price', 'so no prices can accompany it, and the claim is refuted');
+    eq(none.dualCheck, null, 'with nothing to test for feasibility');
+  }
+
+  /* --- a zero-sum game as a pair of dual programmes ----------------------- */
+  {
+    const M = (rows) => rows.map((r) => r.map(ri));
+    /* The row player's programme is built here and its DUAL is the column
+       player's -- that, and not a second solver, is where the column mix
+       comes from. */
+    const rps = M([[0, -1, 1], [1, 0, -1], [-1, 1, 0]]);
+    const rowLP = gameRowModel(rps);
+    eq(rowLP.free.join(','), '3', 'the value of the game is a FREE variable, not a non-negative one');
+    eq(rowLP.cons.length, 4, 'one row per column of the table, plus the one that makes it a mixture');
+    eq(rowLP.cons[3].rel, 'eq', 'and that one is an equality');
+    eq(dualModel(rowLP).cons.length, 4, "the column player's programme has one row per mixture weight");
+    const g = gameSolve(rps);
+    eq(Rtext(g.value), '0', 'a game that goes round in a circle is worth nothing');
+    eq(g.p.map(Rtext).join(','), '1/3,1/3,1/3', 'and both sides play evenly');
+    eq(g.q.map(Rtext).join(','), '1/3,1/3,1/3', 'the column mix coming out of the dual programme');
+    eq(g.minimax, true, 'the two programmes agree, which IS the minimax theorem on this instance');
+    eq(g.pure, false, 'and no single row is best');
+    for (const [label, P, v, p, q, pure] of [
+      ['a two-by-two with no best single choice', M([[3, -1], [-2, 1]]), '1/7', '3/7,4/7', '2/7,5/7', false],
+      ['a game with a saddle point', M([[4, 2], [3, 1]]), '2', '1,0', '0,1', true],
+      ['a game whose value is NEGATIVE', M([[-2, -5], [-6, -1]]), '-7/2', '5/8,3/8', '1/2,1/2', false],
+      ['four choices each', M([[2, -1, 0, 1], [-1, 3, 1, -2], [0, 1, -1, 2], [1, -2, 2, 0]]),
+       '8/21', '4/21,5/21,1/3,5/21', '4/21,5/21,1/3,5/21', false],
+      ['a table that is not square', M([[1, 3, -1], [2, -2, 4]]), '1', '3/5,2/5', '0,1/2,1/2', false]]) {
+      const s = gameSolve(P);
+      eq(s.status, 'optimal', label + ': both programmes solve');
+      eq(Rtext(s.value), v, label + ': the value');
+      eq(s.p.map(Rtext).join(','), p, label + ": the row player's mixture");
+      eq(s.q.map(Rtext).join(','), q, label + ": the column player's");
+      eq(s.pure, pure, label + ': whether a single choice is enough');
+      /* THE INDEPENDENT CHECK, and the one that would survive a rewrite of
+         everything above it: the worst column against p is exactly v, the best
+         row against q is exactly v, and the mixtures meet at it. */
+      eq(s.rowPure.every((r) => Rcmp(r.payoff, s.value) <= 0), true,
+         label + ': no single row beats the value against the optimal mixture');
+      eq(s.colPure.every((c) => Rcmp(c.payoff, s.value) >= 0), true,
+         label + ': and no single column holds it below');
+      let worst = null, best = null;
+      s.colPure.forEach((c) => { if (worst === null || Rcmp(c.payoff, worst) < 0) worst = c.payoff; });
+      s.rowPure.forEach((r) => { if (best === null || Rcmp(r.payoff, best) > 0) best = r.payoff; });
+      eq(Rtext(worst) + ' ' + Rtext(best) + ' ' + Rtext(s.expected),
+         v + ' ' + v + ' ' + v, label + ': max min = min max = the mixtures played against each other');
+      eq(Requ(s.value, s.dualValue), true, label + ': and the two programmes report the same number');
+      /* And a pure strategy scored on its own is the same arithmetic. */
+      eq(Rtext(pureAgainst(P, 0, s.q)), Rtext(s.rowPure[0].payoff), label + ': pureAgainst agrees');
+      eq(Rtext(pureColAgainst(P, 0, s.p)), Rtext(s.colPure[0].payoff), label + ': and so does its mirror');
+    }
+  }
+
+  /* --- the pivot at the end of a cost range ------------------------------- */
+  {
+    const th = specModel(THREE), sol = lpSolve(th, opt);
+    eq(Rtext(sol.zOrig) + ' at ' + sol.x.map(Rtext).join(','), '46 at 2,6,0', 'three activities, one not made');
+    for (const [j, lo, hi, basic] of [[0, '5', '10', true], [1, '4', '8', true], [2, null, '7', false]]) {
+      const cr = costRange(sol.tab, j);
+      eq(cr.basic, basic, 'x' + (j + 1) + ' is ' + (basic ? 'made' : 'not made'));
+      eq(cr.lo === null ? null : Rtext(cr.lo), lo, 'and its range starts there');
+      eq(Rtext(cr.hi), hi, 'and ends there');
+      /* INSIDE the range: no tie, the same corner, and the same total a fresh
+         solve gives -- which is the claim the lesson makes. */
+      const inside = lo === null ? Rsub(cr.hi, R1) : Rdiv(Radd(cr.lo, cr.hi), ri(2));
+      const cin = costPivot(sol.tab, j, inside);
+      eq(cin.tie.length, 0, 'inside the range nothing ties');
+      const obj2 = th.obj.slice();
+      obj2[j] = inside;
+      const fresh = lpSolve({ max: th.max, names: th.names, obj: obj2, cons: th.cons }, opt);
+      eq(Requ(fresh.zOrig, cin.zOrig), true, 'and the total is what a fresh solve gives');
+      eq(stdPoint(sol.std, cin.read.x).map(Rtext).join(','), sol.x.map(Rtext).join(','),
+         'while the plan has not moved at all');
+      /* AT the endpoint: a reduced cost is exactly zero, and one pivot reaches
+         a DIFFERENT corner earning the SAME total. That is what a tie is, and
+         tabEnter would never find it because it hunts strictly negative. */
+      for (const end of [cr.lo, cr.hi]) {
+        if (end === null) continue;
+        const cp = costPivot(sol.tab, j, end);
+        eq(cp.tie.length >= 1, true, 'at ' + Rtext(end) + ' some reduced cost is exactly zero');
+        eq(cp.optimal, true, 'and the basis is still optimal there');
+        eq(cp.afterRead !== null, true, 'so one pivot reaches the other corner');
+        const before = stdPoint(sol.std, cp.read.x).map(Rtext).join(',');
+        const after = stdPoint(sol.std, cp.afterRead.x).map(Rtext).join(',');
+        eq(before !== after, true, 'which is a DIFFERENT plan: ' + before + ' against ' + after);
+        const zAfter = cp.after.maximised ? cp.after.z[cp.after.n] : Rneg(cp.after.z[cp.after.n]);
+        eq(Requ(zAfter, cp.zOrig), true, 'earning exactly the same total, which is what a tie means');
+        const obj3 = th.obj.slice();
+        obj3[j] = end;
+        eq(Requ(lpSolve({ max: th.max, names: th.names, obj: obj3, cons: th.cons }, opt).zOrig, cp.zOrig),
+           true, 'and a fresh solve at the endpoint agrees with both of them');
+      }
+    }
+  }
+
+  /* THE SAME RANGING ON A MINIMISATION.  The solver always maximises and a
+     minimisation is negated on the way in, so a cost handed to costPivot has
+     to be negated too -- and a kit that skipped that would report ranges that
+     look like ranges and endpoints that are not endpoints.  Every value below
+     is checked against a fresh solve at the same coefficient. */
+  {
+    const bl = specModel(BLEND), s = lpSolve(bl, opt);
+    eq(Rtext(s.zOrig) + ' at ' + s.x.map(Rtext).join(','), '9 at 3,1', 'the blend costs 9 at (3, 1)');
+    const at = (j, c) => {
+      const obj2 = bl.obj.slice();
+      obj2[j] = c;
+      return lpSolve({ max: bl.max, names: bl.names, obj: obj2, cons: bl.cons }, opt);
+    };
+    const cx = costRange(s.tab, 0);
+    eq(Rtext(cx.lo) + '..' + Rtext(cx.hi), '0..3', 'the first ingredient may cost anything from 0 to 3');
+    for (const [end, want] of [[cx.lo, '3'], [cx.hi, '12']]) {
+      const cp = costPivot(s.tab, 0, end);
+      eq(Rtext(cp.zOrig), want, 'at ' + Rtext(end) + ' the total is ' + want);
+      eq(Requ(at(0, end).zOrig, cp.zOrig), true, 'which is what a fresh solve there costs');
+      eq(cp.tie.length >= 1, true, 'and a reduced cost is exactly zero, so two plans tie');
+    }
+    const mid = Rdiv(Radd(cx.lo, cx.hi), ri(2));
+    const cin = costPivot(s.tab, 0, mid);
+    eq(Rtext(cin.zOrig) + ' ' + cin.tie.length, '15/2 0', 'inside the range nothing ties and the total is 15/2');
+    eq(Requ(at(0, mid).zOrig, cin.zOrig), true, 'which a fresh solve confirms');
+    const cy = costRange(s.tab, 1);
+    eq(Rtext(cy.lo) + '..' + (cy.hi === null ? 'inf' : Rtext(cy.hi)), '2..inf',
+       'and the second may cost anything from 2 upwards, a one-sided interval being a real answer');
+    eq(Rtext(costPivot(s.tab, 1, cy.lo).zOrig), '8', 'with the total at its lower end 8');
+    eq(Requ(at(1, cy.lo).zOrig, ri(8)), true, 'confirmed by a fresh solve');
+  }
+
+  /* --- every other preset the ten modes ship ------------------------------ */
+  {
+    /* `read` needs a preset whose starting basis is NOT the slack columns, or
+       the lesson's named misconception has nothing to correct. */
+    const bk = lpSolve(specModel(BAKERY), opt), bdv = dualVector(bk.tab);
+    eq(Rtext(bk.zOrig) + ' at ' + bk.x.map(Rtext).join(','), '21 at 3,3/2', 'the >= preset solves');
+    eq(bdv.columns.map((c) => c.kind).join(','), 'slack,slack,artificial',
+       'and its third row reads its price out of an ARTIFICIAL, not the surplus beside it');
+    eq(bdv.y.map(Rtext).join(','), '3/4,1/2,0', 'with prices 3/4, 1/2 and 0');
+    eq(Requ(bdv.value, bk.zOrig), true, 'and strong duality holding on it');
+    const eqm = lpSolve(specModel(EQROW), opt), edv = dualVector(eqm.tab);
+    eq(Rtext(eqm.zOrig), '15', 'the = preset solves to 15');
+    eq(edv.y.map(Rtext).join(','), '0,0,5', 'and only the quota is worth anything');
+    eq(edv.columns[2].kind, 'artificial', 'an = row has no slack column at all');
+    /* `rhs`: the ranges the panel prints beside every price. */
+    const th = lpSolve(specModel(THREE), opt);
+    eq([0, 1, 2].map((i) => {
+      const r = rhsRange(th.tab, i);
+      return Rtext(r.y_i) + '@' + Rtext(r.lo) + '..' + (r.hi === null ? 'inf' : Rtext(r.hi));
+    }).join(' '), '3@8..12 2@6..10 0@2..inf', 'every price and range on the three-activity preset');
+    const wsol = lpSolve(wk, opt);
+    const wr = rhsRange(wsol.tab, 2);
+    eq(Rtext(wr.y_i) + '@' + Rtext(wr.lo) + '..' + Rtext(wr.hi), '1@12..24',
+       'and on the workshop, the row the lesson ranges');
+    const curve = rhsCurve(wk, 2, R0, ri(36), opt);
+    eq(curve.pieces.length + ' ' + curve.breakpoints.map(Rtext).join(','), '3 12,24',
+       'the curve the panel draws has three pieces and two corners on the slider range');
+    eq(curve.pieces.map((p2) => Rtext(p2.slope)).join(','), '5/2,1,0',
+       'with three different slopes, so the price is visibly one segment of it');
+    /* A DEGENERATE preset where a tight row is priced at nothing. */
+    const dg = lpSolve(specModel(DEGEN), opt);
+    eq(dg.read.tightRows.join(','), '0,1,2', 'every row of the degenerate preset is tight');
+    eq(Rtext(rhsRange(dg.tab, 2).y_i), '0', 'and the third is still worth exactly zero');
+    /* `newcol`: one column that pays for itself and one that does not. */
+    const good = priceColumn(wsol.tab, [ri(1), ri(1), ri(1)], ri(4));
+    eq(Rtext(good.reduced) + ' ' + good.enters, '3/2 true', 'a column worth 3/2 more than it uses enters');
+    eq(Rtext(good.after.z[good.after.n]), '39', 'and one pivot takes the total from 36 to 39');
+    const poor = priceColumn(wsol.tab, [ri(1), ri(2), ri(3)], ri(4));
+    eq(Rtext(poor.used) + ' ' + Rtext(poor.reduced) + ' ' + poor.enters, '6 -2 false',
+       'while a PROFITABLE column that uses 6 worth of resources makes the plan worse');
+    /* `newcol` and `dualsimplex`: the rows the presets add. */
+    const cut = addRow(wsol.tab, { a: [ri(1), ri(1)], rel: 'le', b: ri(5), name: 'the new rule' }, opt);
+    eq(cut.status + ' ' + cut.run.steps.length + ' ' + Rtext(cut.run.zOrig), 'optimal 2 25',
+       'a rule the plan breaks is restored in two dual pivots, to 25');
+    eq(Requ(cut.run.zOrig, lpSolve({ max: wk.max, names: wk.names, obj: wk.obj,
+      cons: wk.cons.concat([{ a: [ri(1), ri(1)], rel: 'le', b: ri(5), name: 'd' }]) }, opt).zOrig),
+      true, 'which is exactly what a fresh solve gives');
+    const harmless = addRow(wsol.tab, { a: [ri(1), ri(1)], rel: 'le', b: ri(9), name: 'the new rule' }, opt);
+    eq(harmless.run.steps.length + ' ' + Rtext(harmless.run.zOrig), '0 36',
+       'and a rule the plan already obeys costs no pivots at all');
+    /* `parametric`: both fronts, corner for corner. */
+    const f4 = paramFront(specModel(FRONT), [ri(4), ri(1)], [ri(1), ri(4)]);
+    eq(f4.corners.length + ' ' + f4.breakpoints.map(Rtext).join(','), '4 1/12,1/3,1/2',
+       'the four-corner front breaks at three exact weights');
+    eq(f4.corners.map((c) => '(' + Rtext(c.f1) + ',' + Rtext(c.f2) + ')').join(''),
+       '(28,7)(27,18)(22,28)(10,40)', 'at those four corners');
+    eq(f4.efficient.length, 4, 'none of which any other beats on both');
+    const f3 = paramFront(specModel(FRONT3), [ri(3), ri(1)], [ri(1), ri(3)]);
+    eq(f3.corners.length + ' ' + f3.breakpoints.map(Rtext).join(','), '3 1/6,1/2',
+       'and the smaller region has three, breaking at two');
+    /* A breakpoint is a breakpoint: the corner the panel names on either side
+       of one really does change, and the slider's hundredths never find it. */
+    const at = f4.breakpoints[0];
+    eq(Rcmp(at, R(8n, 100n)) > 0 && Rcmp(at, R(9n, 100n)) < 0, true,
+       'the first breakpoint, 1/12, falls BETWEEN two hundredths, so no slider position is ever on it');
+  }
+
+  /* --- the two pixel helpers and the slider guard ------------------------- */
+  {
+    eq(pxOf(R(1n, 2n), R0, R1, 0, 100), 50, 'the midpoint of a span is the midpoint of the axis');
+    eq(pxOf(ri(5), ri(5), ri(25), 40, 640), 40, 'the low end is the left edge');
+    eq(pxOf(ri(25), ri(5), ri(25), 40, 640), 640, 'and the high end the right');
+    eq(pxOf(ri(3), ri(7), ri(7), 40, 640), 40, 'a span of zero width does not divide by zero');
+    /* The rational Number cannot hold, which is the whole reason pxOf reads
+       its position out of Rfixed's long division rather than out of Rnum. */
+    const third = R(10n ** 400n + 1n, 3n * 10n ** 400n);
+    eq(String(Rnum(third)), 'NaN', 'Number holds neither part of a 401-digit fraction');
+    eq(String(Rnum(Rdiv(Rsub(third, R0), R1))), 'NaN', 'so the quotient pxOf needs is NaN through Rnum');
+    const at = pxOf(third, R0, R1, 0, 300);
+    eq(Math.round(at), 100, 'and pxOf still puts a third of the way along at a third of the way along, '
+       + 'because it reads the position out of long division rather than out of Number');
+    const sp = spanOf([ri(10), ri(30), ri(20)]);
+    eq(Rtext(sp.lo) + '..' + Rtext(sp.hi), '9..31', 'a span is padded by a twentieth at each end');
+    eq(Rtext(spanOf([ri(4), ri(4)]).lo) + '..' + Rtext(spanOf([ri(4), ri(4)]).hi), '3..5',
+       'and coincident values are widened, so a one-point plot still has an axis');
+    eq(Rtext(spanOf([]).hi), '1', 'an empty list gets an axis rather than a null');
+    eq(clampInt('7', 0, 10, 3), 7, 'a slider hands back a string');
+    eq(clampInt('', 0, 10, 3), 3, 'an empty one falls back');
+    eq(clampInt('nonsense', 0, 10, 3), 3, 'and so does a value no browser should produce');
+    eq(clampInt(NaN, 0, 10, NaN), 0, 'with the low bound as the last resort, because BigInt(NaN) throws');
+    eq(clampInt('99', 0, 10, 3), 10, 'a value past the top is clamped');
+    eq(clampInt('-4', 0, 10, 3), 0, 'and one below the bottom');
+    eq(clampInt('7.6', 0, 10, 3), 8, 'a fractional step rounds, because these sliders count in whole units');
+  }
+}
+
+
+// ------------------------------------------------- or_core + network kit
+//
+// COURSE 4's DRAWING KIT, and the three questions it answers that something
+// else in this repository already answers a different way.
+//
+// The kit's own block is scripts/mathpath/labs/network.py's NETKIT_JS: the
+// parser that turns typed text into a DIRECTED network, the two models that
+// turn that network into a linear programme, the residual walk, the cut
+// enumeration and the project parser. None of it touches a document, so what
+// runs below is the shipped source rather than a transcription of it.
+//
+// THE ORACLES. graph.py's GRAPH_JS cannot express direction, capacity or a
+// negative weight, which is why this kit exists at all -- but where the two
+// DO answer the same question it is brute force on one side and the kit on
+// the other, and they are required to agree:
+//
+//   GRAPH_JS.dijkstra     against bellmanRounds and against the shortest-path
+//                         LP, on the same graph made directed both ways
+//   GRAPH_JS.cuts         which finds bridges by REMOVING each edge and
+//                         recounting components, against allCuts: the minimum
+//                         cut between the ends of an edge is 1 exactly when
+//                         that edge is a bridge
+//   GRAPH_JS.componentsOf against reachable(), the function that names the
+//                         minimum cut in the max-flow mode
+//
+// GRAPH_JS.kruskal is NOT used. It answers "what is the minimum spanning
+// tree", and no mode of this kit asks that: there is no spanning-tree lesson
+// on the networks course. An agreement manufactured for it would test the
+// manufacturing.
+console.log('operations research: the network kit, and the oracles graph.py already had');
+{
+  const OR2_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'or_core.py');
+  const NET_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'network.py');
+  const SYS2_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'algebra_systems.py');
+  const or2Src = fs.readFileSync(OR2_SOURCE, 'utf8');
+  const netSrc = fs.readFileSync(NET_SOURCE, 'utf8');
+  const sys2Src = fs.readFileSync(SYS2_SOURCE, 'utf8');
+  const or2 = (n) => blockFrom(or2Src, n, OR2_SOURCE);
+  const kit = (n) => blockFrom(netSrc, n, NET_SOURCE);
+  const sys2 = (n) => blockFrom(sys2Src, n, SYS2_SOURCE);
+
+  eval(sys2('FORMAT_JS') + sys2('MATRIX_JS') + or2('ORFMT_JS') + or2('TABLEAU_JS')
+     + or2('PHASE_JS') + or2('DUAL_JS') + or2('NET_JS')
+     + kit('NETKIT_JS') + kit('CHECK_JS') + kit('MODEL_JS') + kit('CUT_JS')
+     + kit('MATCH_JS') + kit('PROJECT_JS') + kit('TU_JS'));
+  /* Seven blocks, because no page takes all seven: the project mode ships no
+     simplex and the determinant mode ships no residual network.  Everything
+     is evaluated together HERE, which is the only place that should. */
+
+  const ri = (v) => R(BigInt(v), 1n);
+  const rt = (a) => Rtext(a);
+  const capcost = ['capacity', 'cost'];
+
+  /* --- the representation: an arc is ORDERED --------------------------- */
+  {
+    const net = parseNet('s>a 5:2, a>b 4:2, b>a 3:5, a>t 3:1, b>t 4:3', capcost);
+    eq(net.nodes.join(''), 'sabt', 'the nodes come out in order of first appearance, source first');
+    eq(net.arcs.length, 5, 'five arcs');
+    eq(rt(net.arcs[1].cap) + ' at ' + rt(net.arcs[1].cost), '4 at 2', 'a to b holds 4 at a price of 2');
+    eq(rt(net.arcs[2].cap) + ' at ' + rt(net.arcs[2].cost), '3 at 5',
+       'and b to a is a DIFFERENT object: 3 at a price of 5, which no adjacency matrix can hold');
+    eq(antiparallel(net.arcs).length, 2, 'the two of them are an antiparallel pair, and the lab names it');
+    eq(parseNet('a>a 1:1', capcost).bad !== undefined, true, 'a loop is refused rather than drawn');
+    eq(parseNet('a>b 1', capcost).bad !== undefined, true, 'and an arc missing its cost');
+    eq(parseNet('a>b -1:1', capcost).bad !== undefined, true, 'and a negative capacity');
+    eq(rt(parseNet('a>b 7/2:1', capcost).arcs[0].cap), '7/2',
+       'a slash is a fraction, because the FIELD separator is a colon');
+    eq(parseNet('a>b *:3', capcost).arcs[0].capped, false,
+       'and * is no upper bound at all -- not a large number standing in for one');
+    eq(parseNet('1>2 1:1', capcost).nodes.join(''), '12', 'a node may be called 1, as the odd cycle calls its vertices');
+
+    /* conservation is LOCAL, and capacity is a second test entirely */
+    const goodRead = parseFlow('s>a 4, a>b 2, b>a 0, a>t 2, b>t 2', net.arcs);
+    eq(goodRead.bad === undefined, true, 'the worked flow parses onto the arcs it names, in the order it names them');
+    const good = goodRead.flow;
+    const sup = parseSupply('s:4, t:-4', net.nodes);
+    eq(conservation(net.nodes, net.arcs, good, sup.supply).ok, true, 'the worked flow balances at every node');
+    eq(capacityCheck(net.arcs, good).ok, true, 'and fits inside every capacity');
+    eq(rt(flowCost(net.arcs, good)), '20', 'at a cost of 20');
+    const local = parseFlow('s>a 4, a>b 1, b>a 0, a>t 2, b>t 2', net.arcs).flow;
+    const cons = conservation(net.nodes, net.arcs, local, sup.supply);
+    eq(cons.violated.join(','), 'a,b', 'a flow can balance in TOTAL and fail at two named nodes');
+    eq(rt(cons.net.reduce((x, y) => Radd(x, y), R0)), '0',
+       'because the per-node imbalances sum to zero whatever the flow is -- which is why a single verdict would hide it');
+    const over = parseFlow('s>a 5, a>b 5, b>a 0, a>t 0, b>t 5', net.arcs).flow;
+    eq(conservation(net.nodes, net.arcs, over, parseSupply('s:5, t:-5', net.nodes).supply).ok, true,
+       'and it can conserve at EVERY node');
+    eq(capacityCheck(net.arcs, over).over.length, 2, 'while overfilling two arcs');
+    eq(rt(parseSupply('s:6, t:-4', net.nodes).total), '2',
+       'supplies that do not sum to zero are a feasibility test you can run before solving anything');
+    eq(parseFlow('s>c 1', net.arcs).bad !== undefined, true, 'a flow on an arc that is not there is refused');
+    const twoWay = parseNet('a>b 4:2, b>a 3:5', capcost);
+    const pf = parseFlow('a>b 1, b>a 2', twoWay.arcs);
+    eq(pf.flow.map(rt).join(','), '1,2',
+       'and a flow names each DIRECTION separately: 1 down a to b and 2 back, on two arcs, not 3 on one edge');
+    eq(rt(flowCost(twoWay.arcs, pf.flow)), '12', 'which costs 1x2 + 2x5 = 12, and the other way round would be 19');
+  }
+
+  /* --- ONE programme, five data sets ----------------------------------- */
+  const solveNet = (spec, supply) => {
+    const n = parseNet(spec, capcost);
+    const b = parseSupply(supply, n.nodes);
+    return { net: n, b: b, run: lpSolve(mcfModel(n.nodes, n.arcs, b.supply)) };
+  };
+  {
+    const mcf = solveNet('s>a 3:2, s>b 3:3, a>b 2:1, a>t 3:5, b>t 3:2', 's:4, t:-4');
+    eq(rt(mcf.run.zOrig), '22', 'the minimum-cost flow costs 22');
+    eq(mcf.run.x.every(Rint), true,
+       'and every arc carries a WHOLE number, with no integrality constraint anywhere in the programme');
+    eq(rt(solveNet('S1>D1 *:4, S1>D2 *:6, S1>D3 *:9, S2>D1 *:5, S2>D2 *:3, S2>D3 *:8',
+                   'S1:20, S2:30, D1:-10, D2:-25, D3:-15').run.zOrig), '245',
+       'the SAME programme on transportation data costs 245');
+    eq(rt(solveNet('W1>J1 1:9, W1>J2 1:2, W1>J3 1:7, W2>J1 1:6, W2>J2 1:4, W2>J3 1:3, '
+                 + 'W3>J1 1:5, W3>J2 1:8, W3>J3 1:1',
+                   'W1:1, W2:1, W3:1, J1:-1, J2:-1, J3:-1').run.zOrig), '9',
+       'and on assignment data, which is transportation with every supply and demand set to one, 9');
+
+    /* the two cross-checks that make "one programme, different data" a claim
+       about numbers rather than a slogan: the shortest-path data must solve to
+       the label Bellman-Ford reaches, and the maximum-flow data to the cut. */
+    const sp = solveNet('s>a 1:4, s>b 1:2, b>a 1:1, a>t 1:3, b>t 1:7', 's:1, t:-1');
+    const bf = bellmanRounds(sp.net.nodes, sp.net.arcs, 's');
+    eq(rt(sp.run.zOrig), '6', 'the shortest-path data solves to 6');
+    eq(rt(sp.run.zOrig), rt(bf.dist[3]),
+       'which is exactly the label Bellman-Ford reaches -- the simplex and the relaxation, same answer');
+    const mx = solveNet('s>a 3:0, s>b 2:0, a>b 2:0, a>t 2:0, b>t 3:0, t>s *:-1', '');
+    const cnet = parseNet('s>a 3, s>b 2, a>b 2, a>t 2, b>t 3', ['capacity']);
+    eq(rt(mx.run.zOrig), '-5', 'the maximum-flow data, priced at minus one on the return arc, solves to -5');
+    eq(rt(Rneg(mx.run.zOrig)), rt(allCuts(cnet.nodes, cnet.arcs, 's', 't').min),
+       'and minus that is the minimum cut of the same network -- one programme, two special cases, one matrix');
+    eq(solveNet('s>a 3:2, a>t 3:5', 's:4, t:-3').run.status, 'infeasible',
+       'supplies that do not balance make the programme infeasible, which is what adding the rows up predicts');
+  }
+
+  /* --- the determinants, and the one that is 2 -------------------------- */
+  {
+    const tri = parseNet('1>2 1:1, 2>3 1:1, 3>1 1:1', capcost);
+    const D = incidence(tri.nodes, tri.arcs), U = incidenceUndirected(tri.nodes, tri.arcs);
+    eq(rt(Mdet(U)), '2', "an odd cycle's UNDIRECTED incidence matrix has determinant 2");
+    eq(unimodularSweep(U, 3).bad.length, 1, 'so exactly one submatrix of it is outside {0, +1, -1}');
+    eq(unimodularSweep(D, 3).unimodular, true,
+       'while the DIRECTED matrix on the same drawing, +1 at the tail and -1 at the head, is unimodular');
+    const half = lpSolve(packingModel(U, ['x1', 'x2', 'x3']));
+    eq(half.x.map(rt).join(','), '1/2,1/2,1/2',
+       'and the corner it produces is HALVES -- the same exact simplex, a different matrix');
+    eq(rt(half.zOrig), '3/2', 'worth 3/2, which no integer point reaches');
+    const sq = parseNet('1>2 1:1, 2>3 1:1, 3>4 1:1, 4>1 1:1', capcost);
+    const SU = incidenceUndirected(sq.nodes, sq.arcs);
+    eq(rt(Mdet(SU)), '0', 'an EVEN cycle is bipartite, and its undirected incidence has determinant 0');
+    const whole = lpSolve(packingModel(SU, ['a', 'b', 'c', 'd']));
+    eq(whole.x.every(Rint) + ' ' + rt(whole.zOrig), 'true 2',
+       'so that corner is whole: it is the ODD cycle that breaks it, not undirectedness as such');
+    eq(pickIndices('1,3,4', 5, 'row').pick.join(','), '0,2,3', 'the picks are 1-based on the page');
+    eq(pickIndices('0', 5, 'row').bad !== undefined, true, 'there is no row 0, and saying so beats clamping');
+    eq(pickIndices('6', 5, 'row').bad !== undefined, true, 'nor a row 6 of five');
+    eq(pickIndices('1,1', 5, 'row').bad !== undefined, true,
+       'and a row named twice is refused rather than silently giving a determinant of zero');
+    eq(rt(submatrixDet(D, [0, 1], [0, 1])), '1',
+       'submatrixDet gathers the picked rows and columns and hands that block to Mdet');
+    eq(rt(submatrixDet(D, [0, 1, 2], [0, 1, 2])), '0',
+       'and the whole of N is singular, because every column holds one +1 and one -1 so the rows sum to zero');
+  }
+
+  /* --- flow, cuts, and the dual ---------------------------------------- */
+  const runToMax = (net, s, t) => {
+    let f = net.arcs.map(() => R0);
+    for (let i = 0; i < 40; i += 1) {
+      const res = residual(net.arcs, f), ps = resPaths(res, s, t, 8);
+      if (!ps.length) break;
+      f = augmentFlow(net.arcs, f, res, ps[0]).flow;
+    }
+    return f;
+  };
+  {
+    const net = parseNet('s>a 3, s>b 2, a>b 2, a>t 2, b>t 3', ['capacity']);
+    const f = runToMax(net, 's', 't');
+    const every = allCuts(net.nodes, net.arcs, 's', 't');
+    eq(rt(flowValue(net.nodes, net.arcs, f, 's')), '5',
+       'pushing along whatever residual path comes first reaches 5');
+    eq(rt(every.min), '5',
+       'and the smallest of every cut -- all four enumerated, not searched for -- is 5 as well');
+    eq(every.minimum.length, 2,
+       'TWO of the four are minimum, so a minimum cut is not unique and the lesson ships the instance that shows it');
+    eq(rt(cutCapacity(net.nodes, net.arcs, reachable(net.nodes, residual(net.arcs, f), 's').set).capacity), '5',
+       'the set reachable from the source in the final residual network is one of them');
+    eq(every.cuts.every((c) => Rcmp(c.capacity, flowValue(net.nodes, net.arcs, f, 's')) >= 0), true,
+       'and every cut there is bounds the flow, which is weak duality exhibited rather than asserted');
+
+    /* the dual, at the 0/1 point every cut names */
+    const model = maxflowModel(net.nodes, net.arcs, 's', 't');
+    const dual = dualModel(model);
+    eq(checkModel(model, f).ok + ' ' + rt(checkModel(model, f).value), 'true 5',
+       'the flow is a feasible point of the primal programme, worth 5');
+    let feasible = true, exact = true;
+    every.cuts.forEach((c) => {
+      const chk = checkModel(dual, cutDualPoint(net.nodes, net.arcs, c.S, 's', 't'));
+      if (!chk.ok) feasible = false;
+      if (!Requ(chk.value, c.capacity)) exact = false;
+    });
+    eq(feasible, true,
+       'EVERY cut, written as 0/1 potentials and 0/1 arc variables, is a FEASIBLE point of the dual programme');
+    eq(exact, true,
+       'and its dual objective is exactly that cut capacity -- which is WHY a cut bounds a flow, rather than a coincidence');
+    eq(rt(lpSolve(model).zOrig), '5',
+       'and the simplex on the primal agrees with both, so the theorem is strong duality on this instance');
+
+    /* a network where the minimum cut IS unique, and a wider one */
+    const uniq = parseNet('s>a 2, s>b 5, a>t 5, b>t 3', ['capacity']);
+    const uc = allCuts(uniq.nodes, uniq.arcs, 's', 't');
+    eq(rt(uc.min) + ' ' + uc.minimum.length + ' ' + uc.cuts[0].S.join(''), '5 1 sb',
+       'on another instance the minimum cut is unique, and it is {s, b}');
+    eq(rt(flowValue(uniq.nodes, uniq.arcs, runToMax(uniq, 's', 't'), 's')), '5', 'with a maximum flow of 5');
+    const wide = parseNet('s>a 4, s>b 3, a>c 3, a>b 2, b>d 4, c>t 3, d>t 4, c>d 1', ['capacity']);
+    eq(rt(flowValue(wide.nodes, wide.arcs, runToMax(wide, 's', 't'), 's')), '7',
+       'six nodes, sixteen cuts, and the augmenting loop still lands on the minimum');
+    eq(rt(allCuts(wide.nodes, wide.arcs, 's', 't').min), '7', 'which the enumeration confirms independently');
+
+    /* the residual network is what makes a backward push possible at all */
+    const res0 = residual(net.arcs, net.arcs.map(() => R0));
+    eq(res0.length, net.arcs.length, 'an empty flow has only forward residual arcs');
+    eq(residual(net.arcs, f).filter((a) => a.kind === 'backward').length,
+       f.filter((v) => !Rzero(v)).length, 'and every arc carrying flow contributes a backward one');
+  }
+
+  /* --- matching, and the cut that proves Hall's condition sufficient ---- */
+  {
+    const check = (spec, wantSize, wantS, wantN) => {
+      const bip = parseBip(spec);
+      const m = bipartiteMatch(bip.left, bip.right, bip.edges);
+      const built = matchingNetwork(bip.left, bip.right, bip.edges);
+      const cut = cutCapacity(built.nodes, built.arcs, matchingCut(m));
+      eq(m.size, wantSize, spec + ': the maximum matching has ' + wantSize + ' edges');
+      eq(rt(cut.capacity), String(wantSize),
+         'and the minimum cut of the flow network has exactly that capacity, which is the theorem');
+      eq(m.cover.size, m.size, 'as does the minimum vertex cover, computed from the matching and not drawn by eye');
+      eq(m.deficient.S.join('') + '/' + m.deficient.N.join(''), wantS + '/' + wantN,
+         'and the deficient set read off that cut is S = {' + wantS + '} with N(S) = {' + wantN + '}');
+      return m;
+    };
+    check('1-a, 1-b, 2-a, 2-b, 3-a, 3-b', 2, '123', 'ab');
+    const sub = check('1-a, 2-a, 3-a, 4-b, 4-c, 4-d', 2, '123', 'a');
+    eq(sub.deficient.S.length - sub.deficient.N.length, 2,
+       'a deficient set need not be all of X: three applicants here share one job');
+    const perfect = check('1-a, 1-b, 2-b, 2-c, 3-c, 3-d, 4-d, 4-a', 4, '', '');
+    eq(perfect.perfect + ' ' + perfect.deficient.hall, 'true false',
+       'and when the matching is perfect there is no certificate to produce, because the condition holds');
+    eq(parseBip('1a').bad !== undefined, true, 'an edge without a dash is refused');
+    eq(parseBip('1-a, 2-a, 3-a, 4-a, 5-a, 6-a').bad !== undefined, true, 'and a side with six vertices');
+  }
+
+  /* --- the project network, and where shortening stops paying ----------- */
+  {
+    const SPEC = 'A 3, B 2 after A, C 4 after A, G 5 after A, D 2 after B, E 3 after C, '
+               + 'H 2 after G, F 1 after D E, I 1 after F H';
+    const proj = parseActs(SPEC), pass = cpmPasses(proj.acts);
+    eq(rt(pass.makespan), '12', 'nine activities, and the project takes 12');
+    eq(pass.critical.join(''), 'ACEFI', 'five of them are critical');
+    eq(pass.paths.length, 1, 'on one path');
+
+    /* ORACLE: the two passes against an exhaustive enumeration of chains. The
+       forward/backward pair is O(V + E) and this is every path there is; if
+       they ever disagree the two-pass computation is the one that is wrong. */
+    const longestChain = (acts) => {
+      const ix = {}, succ = acts.map(() => []);
+      acts.forEach((a, i) => { ix[a.id] = i; });
+      acts.forEach((a, i) => (a.pred || []).forEach((p) => succ[ix[p]].push(i)));
+      let best = 0;
+      const walk = (i, len) => {
+        const L = len + Number(acts[i].dur.n) / Number(acts[i].dur.d);
+        if (!succ[i].length) { if (L > best) best = L; return; }
+        succ[i].forEach((j) => walk(j, L));
+      };
+      acts.forEach((a, i) => { if (!(a.pred || []).length) walk(i, 0); });
+      return best;
+    };
+    eq(Number(pass.makespan.n), longestChain(proj.acts),
+       'the two-pass makespan equals the longest of EVERY chain, enumerated one at a time');
+
+    const curve = crashCurve(proj.acts, 'C', 4);
+    eq(curve.steps.map((s) => rt(s.makespan)).join(','), '12,11,11,11,11',
+       'shortening C buys one unit of project and then nothing at all');
+    eq(curve.lastUseful, 1, 'so the return stops after one unit');
+    eq(curve.steps[1].paths, 2, 'because at that point a SECOND path has become critical');
+    eq(curve.steps[2].critical.join(''), 'AGHI', 'and beyond it the length is held by a chain C is not on');
+    eq(rt(cpmPasses(proj.acts).slack[proj.acts.findIndex((a) => a.id === 'G')]), '1',
+       'G has a unit of slack, so shortening G is worth nothing until that unit is used');
+
+    const twop = cpmPasses(parseActs('A 3, B 2 after A, C 2 after A, D 2 after B, E 2 after C, F 1 after D E').acts);
+    eq(rt(twop.makespan) + ' ' + twop.paths.length, '8 2', 'a project can open with two critical paths');
+    eq(crashCurve(parseActs('A 3, B 2 after A, C 2 after A, D 2 after B, E 2 after C, F 1 after D E').acts,
+                  'B', 2).lastUseful, 0, 'and then the FIRST unit off either of them buys nothing');
+    eq(cpmPasses(parseActs('A 3 after C, B 2 after A, C 4 after B').acts).cycle.length, 3,
+       'a precedence loop has no schedule at all, and the loop is named');
+    eq(parseActs('A 3 after Z').bad !== undefined, true,
+       'and an activity waiting on something that is not in the project is refused');
+    eq(parseActs('A 3, A 4').bad !== undefined, true, 'as are two activities with one name');
+  }
+
+  /* --- the layout, which is arithmetic rather than decoration ----------- */
+  {
+    const net = parseNet('s>a 3:1, s>b 2:1, a>b 2:1, a>t 2:1, b>t 3:1', capcost);
+    const lay = netLayout(net.nodes, net.arcs, 660, 280);
+    eq(lay.layered, true, 'an acyclic network is laid out in layers');
+    eq(lay.pos.s.rank + ',' + lay.pos.a.rank + ',' + lay.pos.b.rank + ',' + lay.pos.t.rank, '0,1,2,3',
+       'each node one column past the longest chain that reaches it, so the flow reads left to right');
+    eq(lay.pos.s.x < lay.pos.a.x && lay.pos.a.x < lay.pos.t.x, true, 'and the source is left of the sink');
+    const cyc = parseNet('x>y 1, y>z 1, z>x 1', ['cost']);
+    eq(netLayout(cyc.nodes, cyc.arcs, 660, 280).layered, false,
+       'a cycle has no layering, and the layout says so rather than pretending');
+  }
+
+  /* ================================================================ ORACLES
+     graph.py's GRAPH_JS, on graphs both representations can hold. */
+  {
+    eval(graphBlock('GRAPH_JS'));
+    const LIST = [[1, 2, 4], [1, 3, 3], [2, 3, 2], [2, 4, 5], [3, 4, 7], [4, 5, 1], [5, 6, 6]];
+    LESSON = lessonFrom(LIST); useLessonWeights = true; N = 6; A = PRESETS.lesson(6);
+    const ids = ['1', '2', '3', '4', '5', '6'];
+    const both = [];
+    edges().forEach((e) => {
+      both.push({ from: ids[e[0]], to: ids[e[1]], cost: ri(e[2]), cap: R1, capped: true });
+      both.push({ from: ids[e[1]], to: ids[e[0]], cost: ri(e[2]), cap: R1, capped: true });
+    });
+    eq(both.length, edges().length * 2,
+       'an undirected edge is TWO arcs here, which is the whole difference between the representations');
+
+    /* ORACLE 1: Bellman-Ford in exact rationals against a float-and-Infinity
+       Dijkstra that has been shipping since the discrete mathematics path. */
+    for (const s of [0, 2, 5]) {
+      const bf = bellmanRounds(ids, both, ids[s]);
+      eq(bf.dist.map((d) => (d === null ? 'inf' : rt(d))).join(','),
+         dijkstra(s).dist.map((d) => (d === Infinity ? 'inf' : String(d))).join(','),
+         'bellmanRounds agrees with GRAPH_JS.dijkstra from vertex ' + (s + 1));
+      eq(potentialCheck(ids, both, bf.dist, ids[s], ids[5]).ok, true,
+         'and the labels it stops on are feasible potentials on every one of the arcs');
+      eq(potentialCheck(ids, both, bf.dist.map((d) => Radd(d, ri(7))), ids[s], ids[5]).ok, true,
+         'as are the same labels with 7 added to every one of them, because each constraint is a DIFFERENCE');
+      eq(rt(potentialCheck(ids, both, bf.dist.map((d) => Radd(d, ri(7))), ids[s], ids[5]).value),
+         rt(potentialCheck(ids, both, bf.dist, ids[s], ids[5]).value),
+         'and the dual objective does not move when they are shifted -- which is what makes them prices');
+    }
+    /* and the shortest-path LP lands in the same place as both of them */
+    {
+      const sup = {}; ids.forEach((v) => { sup[v] = R0; });
+      sup['1'] = R1; sup['6'] = R(-1n, 1n);
+      eq(rt(lpSolve(mcfModel(ids, both, sup)).zOrig), String(dijkstra(0).dist[5]),
+         'and so does the minimum-cost flow LP with b = e_s - e_t and u = 1: three computations, one number');
+    }
+
+    /* ORACLE 2: bridges, found by REMOVING each edge and recounting
+       components, against the minimum cut between that edge's two ends. They
+       are the same fact: an edge is a bridge exactly when one arc separates
+       its endpoints. */
+    for (const [preset, n] of [['tree', 7], ['cycle', 6], ['path', 6], ['petersen', 6], ['star', 5]]) {
+      LESSON = null; useLessonWeights = false; N = n; A = PRESETS[preset](n);
+      const bridge = {};
+      cuts().bridges.forEach((b) => { bridge[b.edge[0] + '-' + b.edge[1]] = true; });
+      const vid = []; for (let i = 0; i < n; i += 1) vid.push('v' + (i + 1));
+      const arcs = [];
+      edges().forEach((e) => {
+        arcs.push({ from: vid[e[0]], to: vid[e[1]], cap: R1, cost: R0, capped: true });
+        arcs.push({ from: vid[e[1]], to: vid[e[0]], cap: R1, cost: R0, capped: true });
+      });
+      let agree = true, checked = 0;
+      edges().forEach((e) => {
+        checked += 1;
+        const mc = allCuts(vid, arcs, vid[e[0]], vid[e[1]]).min;
+        if (Requ(mc, R1) !== !!bridge[e[0] + '-' + e[1]]) agree = false;
+      });
+      eq(agree && checked > 0, true,
+         preset + ' on ' + n + ' vertices: allCuts says the minimum cut across an edge is 1 on exactly the '
+         + checked + ' edges GRAPH_JS.cuts calls bridges, by removing each and recounting components');
+      /* ORACLE 3: reachable(), the function that NAMES the minimum cut, against
+         the same brute-force component walk. */
+      const comp = componentsOf().map((c) => c.map((i) => vid[i]).sort().join(','));
+      const walk = reachable(vid, arcs, vid[0]).set.slice().sort().join(',');
+      eq(comp.indexOf(walk) >= 0, true,
+         'and reachable() from the first vertex is exactly one of the components GRAPH_JS.componentsOf finds on ' + preset);
+    }
+  }
+}
+
+
+// ==========================================================================
+// Operations Research course five: the `integer` kit's own arithmetic
+// ==========================================================================
+//
+// or_core's IP_JS is exercised above. This section is the twelve blocks the
+// KIT adds on top of it -- the roundings, the encoding check, the covering
+// atom, the big-M pricing, the tour heuristic, the cut loop and the drawing --
+// every one a top-level function, so what runs here is the source that ships.
+//
+// THREE OF THESE ARE REGRESSION TESTS, and each one is a defect this kit
+// actually had:
+//
+//   * the tour count quoted in the prose disagreed with what tspExact
+//     enumerated on an asymmetric instance -- 360 against 720 -- so the count
+//     and the enumeration are now held together on both kinds of matrix;
+//   * the bound trace, re-derived from the finished node list, reported a
+//     global bound of 54 on an instance whose integer optimum is 55, because
+//     exploration order is not node order. It now reads bbTree's own record,
+//     and the trace is required to be monotone in both directions;
+//   * ipIneqText printed "yx1" on a mode whose variables are not binaries.
+console.log('operations research: the integer kit');
+{
+  const OR_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'or_core.py');
+  const IK_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'integer.py');
+  const SYS_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'algebra_systems.py');
+  const orSrc = fs.readFileSync(OR_SOURCE, 'utf8');
+  const ikSrc = fs.readFileSync(IK_SOURCE, 'utf8');
+  const sysSrc = fs.readFileSync(SYS_SOURCE, 'utf8');
+  const orBlock = (n) => blockFrom(orSrc, n, OR_SOURCE);
+  const ikBlock = (n) => blockFrom(ikSrc, n, IK_SOURCE);
+  const sysBlock = (n) => blockFrom(sysSrc, n, SYS_SOURCE);
+
+  eval(block('RATIONAL_JS') + countingBlock('BIGINT_JS') + sysdBlock('RCEIL_JS')
+     + sysBlock('FEAS_JS') + logicBlock('PARSER_JS')
+     + orBlock('ORFMT_JS') + orBlock('TABLEAU_JS') + orBlock('PHASE_JS') + orBlock('DUAL_JS')
+     + orBlock('RANGE_JS') + orBlock('IP_JS')
+     + ikBlock('IPBASE_JS') + ikBlock('IPMODEL_JS') + ikBlock('IPINEQ_JS') + ikBlock('IPCOVER_JS')
+     + ikBlock('IPFIX_JS') + ikBlock('IPDISJ_JS') + ikBlock('IPTOUR_JS') + ikBlock('IPCUT_JS')
+     + ikBlock('IPLAT_JS') + ikBlock('IPTREE_JS') + ikBlock('IPPLOT_JS') + ikBlock('IPBARS_JS'));
+
+  const ri = (v) => R(BigInt(v), 1n);
+  const rows = (m) => m.map((r) => r.map(ri));
+
+  /* --- the lattice mode: three numbers whose ORDER is the lesson ---------- */
+  {
+    const model = ipTwoVar(true, 3, 4, [[2, 1, 'le', 6, 'assembly'], [2, 3, 'le', 9, 'finishing']]);
+    const lp = lpSolve(model);
+    eq(Rtext(lp.zOrig), '51/4', 'the relaxation stops at 51/4');
+    eq(Rtext(lp.x[0]) + ', ' + Rtext(lp.x[1]), '9/4, 3/2', 'at a corner fractional in BOTH variables');
+    const rr = ipRoundings(lp.x);
+    eq(rr.length, 4, 'which has FOUR roundings, not one -- there is no such thing as "the" rounding');
+    eq(rr.map((r) => r.pt.map(Rtext).join('')).join(' '), '21 22 31 32', 'floor and ceiling in every combination');
+    const verdicts = rr.map((r) => ipViolated(model, r.pt));
+    eq(verdicts.filter((v) => v === null).length, 1, 'exactly one of the four is even feasible');
+    eq(verdicts[1].indexOf('finishing'), 0, 'and an infeasible one NAMES the row it breaks');
+    const lat = latticePoints(model, [[0n, 5n], [0n, 4n]]);
+    eq(Rtext(lat.best.objective), '12', 'the integer optimum is 12');
+    eq(Rtext(lat.best.x[0]) + ', ' + Rtext(lat.best.x[1]), '0, 3',
+       'at (0, 3), which is the far corner of the region from the relaxation -- this is the opening preset, and the misconception it exists to break');
+    eq(Rtext(ipObjective(model, rr[0].pt)), '10', 'while the best feasible rounding is worth only 10');
+    eq(Rcmp(lp.zOrig, lat.best.objective) > 0 && Rcmp(lat.best.objective, ipObjective(model, rr[0].pt)) > 0, true,
+       'z_LP > z_IP > z_rounded, which is the whole of the first lesson');
+    /* one coordinate already whole: two roundings, not four */
+    eq(ipRoundings([R(7n, 2n), ri(3)]).length, 2, 'a coordinate that is already whole is not rounded twice');
+  }
+
+  /* --- the encoding check: a wrong encoding is refuted by a ROW ----------- */
+  {
+    const names = ['A', 'B', 'C'];
+    const right = ipEncodingCheck('A -> B', 'yA - yB <= 0', names);
+    eq(right.rows.length, 8, 'three binaries is eight assignments');
+    eq(right.valid, true, 'yA <= yB encodes "if A then B"');
+    const wrong = ipEncodingCheck('A -> B', 'yB - yA <= 0', names);
+    eq(wrong.valid, false, 'and the converse does NOT');
+    eq(wrong.witness.bits[0] + '' + wrong.witness.bits[1], '10',
+       'refuted at yA = 1, yB = 0 -- the row the lesson names, and the row a reader remembers');
+    eq(wrong.witness.condition === false && wrong.witness.inequality === true, true,
+       'where the condition fails and the inequality holds, which is what permits doing A without B');
+    eq(ipEncodingCheck('A & B', 'yA + yB >= 2', names).valid, true, '"both" is yA + yB >= 2');
+    eq(ipEncodingCheck('A & B', 'yA + yB >= 1', names).valid, false, 'and not yA + yB >= 1');
+    eq(ipEncodingCheck('(A & !B & !C) | (!A & B & !C) | (!A & !B & C)', 'yA + yB + yC = 1', names).valid, true,
+       '"exactly one" is an equality');
+    eq(ipEncodingCheck('(A & !B & !C) | (!A & B & !C) | (!A & !B & C)', 'yA + yB + yC <= 1', names).valid, false,
+       'and <= 1 is "at most one", which the all-zero row separates');
+    /* fractions, and reader input that is not an inequality at all */
+    const frac = ipIneq('1/2 yA + 1/2 yB >= 1', names, 'y');
+    eq(Rtext(frac.a[0]) + ' ' + frac.rel + ' ' + Rtext(frac.b), '1/2 >= 1', 'coefficients may be fractions');
+    eq(ipIneqHolds(frac, [1, 1, 0]) && !ipIneqHolds(frac, [1, 0, 0]), true, 'and they are compared exactly');
+    eq(ipIneq('hello', names, 'y').error !== undefined, true, 'text with no relation is refused, not thrown on');
+    eq(ipIneq('yD <= 1', names, 'y').error !== undefined, true, 'and so is a variable that does not exist');
+    eq(ipIneqText(ipIneq('yA - yB <= 0', names, 'y')), 'yA - yB &lt;= 0',
+       'a coefficient of one is not written, and a negative one is a minus sign');
+    eq(ipIneqText(ipIneq('x1 + x2 <= 4', ['x1', 'x2'])), 'x1 + x2 &lt;= 4',
+       'and the prefix belongs to the caller: this mode has no binaries, so nothing prints "yx1"');
+  }
+
+  /* --- covering: `>= 1` and `= 1` are not the same problem ---------------- */
+  {
+    const inc = [[1, 1, 0, 0, 0], [0, 1, 1, 0, 0], [0, 0, 1, 1, 0], [0, 0, 0, 1, 1], [1, 0, 0, 0, 1]];
+    const cost = [2, 2, 2, 2, 2].map(ri);
+    const lp = lpSolve(ipCoverModel(inc, cost, 'ge'));
+    eq(Rtext(lp.zOrig), '5', 'the covering relaxation on an odd ring is worth 5');
+    eq(lp.x.slice(0, 5).every((v) => Requ(v, R(1n, 2n))), true,
+       'and it gets there by spreading a half across every set, which is the shape of a covering relaxation');
+    const exact = ipCoverExact(inc, cost, 'ge');
+    eq(Rtext(exact.value), '6', 'the cheapest whole cover costs 6');
+    eq(Rtext(ipCoverGreedy(inc, cost).value), '6', 'and greed happens to find it here');
+    eq(exact.count, 32, 'over all 32 subsets');
+    eq(ipCoverExact(inc, cost, 'eq').value, null,
+       'covering exactly once is INFEASIBLE on the same instance -- which is why covering and partitioning are two problems');
+    eq(Rcmp(lp.zOrig, exact.value) < 0, true, 'and the relaxation is a bound, strictly below the answer');
+    const missing = ipCoverGreedy([[0, 0]], [ri(1), ri(1)]);
+    eq(missing.feasible, false, 'a requirement nothing covers is reported rather than silently dropped');
+  }
+
+  /* --- the big-M, and what a loose one costs ------------------------------ */
+  {
+    const spec = { fixed: [ri(200), ri(60)], unit: [ri(2), ri(6)], cap: [ri(40), ri(40)], demand: ri(30) };
+    const tight = ipTightM(spec);
+    eq(Rtext(tight.M), '30', 'the tightest valid M is the smaller of the largest capacity and the whole demand');
+    eq(tight.why.indexOf('total demand is 30') >= 0, true, 'and it comes with the reason, not just the number');
+    eq(Rtext(ipBound(spec, tight.M)), '240', 'at the tightest M the bound is 240');
+    const ints = [2, 3];
+    const tree = bbTree(ipFixedCharge(spec, tight.M), { integers: ints, maxNodes: 30 });
+    eq(Rtext(tree.best), '240', 'which is the integer answer itself, so the tree closes at once');
+    eq(tree.counts.explored, 1, 'in one node');
+    const loose = Rmul(tight.M, ri(20));
+    eq(Rtext(ipBound(spec, loose)), '70', 'at twenty times that M the bound collapses to 70');
+    const looseTree = bbTree(ipFixedCharge(spec, loose), { integers: ints, maxNodes: 30 });
+    eq(Rtext(looseTree.best), '240', 'for the same integer answer');
+    eq(looseTree.counts.explored > tree.counts.explored, true,
+       'and more nodes to prove it -- the measured price of being careless about M');
+    const y = ipFractionalY(ipFixedCharge(spec, loose), lpSolve(ipFixedCharge(spec, loose)).x);
+    eq(Rtext(y[0]), '1/20', 'because the relaxation buys y = x/M, opening a facility for a twentieth of its fixed cost');
+    const breaks = ipMBreaks(spec, tight.M, Rmul(tight.M, ri(40)));
+    eq(breaks.length, 1, 'this instance has exactly one breakpoint above the tightest M');
+    eq(Rtext(breaks[0].M), '35', 'at M = 35, where 2 + 200/M and 6 + 60/M cross');
+    eq(Rtext(breaks[0].z), '1620/7', 'and the bound there is exactly 1620/7');
+    eq(Requ(ipBound(spec, ri(35)), breaks[0].z), true, 'which lpSolve agrees with, since that is how it was checked');
+    /* equal fixed costs never cross, so there is no bend to find */
+    const flat = { fixed: [ri(150), ri(150)], unit: [ri(3), ri(5)], cap: [ri(50), ri(50)], demand: ri(45) };
+    eq(ipMBreaks(flat, ipTightM(flat).M, ri(2000)).length, 0,
+       'and equal fixed costs give no breakpoint at all rather than a spurious one');
+  }
+
+  /* --- either-or: writing both rows is the conjunction -------------------- */
+  {
+    const spec = { names: ['x1', 'x2'], max: false, obj: [R1, R1],
+      A: [R1, R(-1n, 1n), ri(-4)], nameA: 'one before two',
+      B: [R(-1n, 1n), R1, ri(-3)], nameB: 'two before one',
+      both: [[R1, R0, ri(10), 'le', 'deadline one'], [R0, R1, ri(10), 'le', 'deadline two']],
+      p1: ri(4), p2: ri(3), d1: ri(10), d2: ri(10) };
+    const MA = ri(14), MB = ri(13);
+    const one = lpSolve(ipDisjunction(spec, MA, MB, 1));
+    const zero = lpSolve(ipDisjunction(spec, MA, MB, 0));
+    eq(one.status + ' ' + Rtext(one.zOrig), 'optimal 4', 'fixing y = 1 gives a real schedule worth 4');
+    eq(zero.status + ' ' + Rtext(zero.zOrig), 'optimal 3', 'fixing y = 0 gives the other one, worth 3');
+    const free = lpSolve(ipDisjunction(spec, MA, MB, null));
+    eq(Rint(free.x[2]), false, 'left continuous, the binary comes back FRACTIONAL');
+    eq(Rtext(free.x[0]) + ', ' + Rtext(free.x[1]), '0, 0',
+       'and both jobs start at the same moment on one machine, which is not a schedule');
+    eq(Rcmp(free.zOrig, zero.zOrig) < 0, true, 'so its value is a bound and strictly below either real branch');
+    const conj = { max: false, names: ['x1', 'x2'], obj: [R1, R1],
+      cons: [{ a: [spec.A[0], spec.A[1]], rel: 'le', b: spec.A[2], name: 'A' },
+             { a: [spec.B[0], spec.B[1]], rel: 'le', b: spec.B[2], name: 'B' }] };
+    eq(lpSolve(conj).status, 'infeasible',
+       'and writing BOTH rows is infeasible: 0 <= -7, which is the mistake the mode exists to show');
+    const region = ipBranchRegion(spec, 1, MA, MB);
+    eq(Ccorners(region).length >= 3, true, 'each branch still has a region to draw');
+    eq(Cholds(region[0], ri(0), ri(4)), true, 'containing the schedule that branch actually chooses');
+    eq(Cholds(region[0], ri(3), ri(0)), false, 'and not the other branch\'s');
+  }
+
+  /* --- the tour counts, and a heuristic with a number attached ------------ */
+  {
+    const sym = rows([[0, 32, 40, 32, 8, 40, 32], [32, 0, 24, 16, 32, 24, 32], [40, 24, 0, 16, 8, 16, 40],
+                      [32, 16, 16, 0, 40, 8, 24], [8, 32, 8, 40, 0, 16, 32], [40, 24, 16, 8, 16, 0, 8],
+                      [32, 32, 40, 24, 32, 8, 0]]);
+    const counts = ipTourCount(7, true);
+    eq(String(counts.tours), '360', 'seven cities have 360 DISTINCT UNDIRECTED tours');
+    eq(String(counts.perms), '5040', 'not 5040, which counts permutations of the cities');
+    eq(String(counts.halfPerms), '2520', 'not 2520 = 7!/2');
+    eq(String(counts.directed), '720', 'and not 720 = (n-1)!, which counts each tour once per direction');
+    eq(counts.formula, '(n - 1)! / 2', 'the page quotes the formula it computed from');
+    const exact = tspExact(sym, { maxCities: 7 });
+    eq(exact.count, 360, 'and tspExact enumerates exactly that many, so the prose cannot drift from the enumeration');
+    eq(String(ipTourCount(7, false).tours), '720',
+       'on an ASYMMETRIC matrix a tour and its reversal are different, so the count is (n-1)!');
+    const asym = rows([[0, 3, 93, 13, 33, 9, 20], [4, 0, 77, 42, 21, 16, 30], [45, 17, 0, 36, 16, 28, 50],
+                       [39, 90, 80, 0, 56, 7, 44], [28, 46, 88, 33, 0, 25, 17], [3, 88, 18, 46, 92, 0, 11],
+                       [22, 35, 41, 19, 27, 14, 0]]);
+    eq(tspExact(asym, { maxCities: 7 }).count, Number(ipTourCount(7, false).tours),
+       'and there too the quoted count is what was enumerated');
+    eq(Rtext(exact.best.cost), '104', 'the optimal tour on the symmetric instance costs 104');
+    const nn = ipNearest(sym), opt = ipTwoOpt(sym);
+    eq(nn.tour.length, 8, 'nearest neighbour returns a closed tour through every city');
+    eq(new Set(nn.tour).size, 7, 'visiting each exactly once');
+    eq(nn.tour[0] === 0 && nn.tour[7] === 0, true, 'starting and ending at the first city');
+    eq(Rcmp(opt.cost, nn.cost) <= 0, true, '2-opt never leaves a tour worse than it found it');
+    eq(Rtext(opt.cost), '112', 'and on this instance it stops at 112');
+    eq(Rtext(ipTourCost(sym, opt.tour)), Rtext(opt.cost), 'the cost it reports is the cost of the tour it returns');
+    const gap = ipGap(exact.best.cost, opt.cost, false);
+    eq(Rtext(gap.abs), '8', 'so the MEASURED gap is 8');
+    eq(Rpct(gap.rel, 2), '7.14%',
+       'which is 8/112 -- measured against the incumbent, the value in hand, which is the convention every solver reports and the only one defined before the optimum is known');
+    eq(gap.closed, false, 'and it is not closed');
+    eq(ipGap(ri(5), ri(5), true).closed, true, 'a gap of zero IS closed, and that is the only proof there is');
+    eq(ipGap(null, ri(5), true).proved.indexOf('nothing is proved') >= 0, true,
+       'with no bound, nothing is proved, and the page says so rather than printing a dash');
+  }
+
+  /* --- cuts, and what validity actually means ----------------------------- */
+  {
+    const model = ipTwoVar(true, 1, 1, [[2, 5, 'le', 16, 'kiln'], [6, 5, 'le', 30, 'glaze']]);
+    const lat = latticePoints(model, [[0n, 6n], [0n, 4n]]);
+    eq(ipFracRows(lpSolve(model).tab).length > 0, true, 'the relaxation leaves a fractional row to cut from');
+    const run = ipCutRounds(model, 6, 0);
+    eq(run.integral, true, 'cutting repeatedly drives the relaxation to a whole point');
+    eq(Rtext(run.z), '5', 'worth 5');
+    eq(Rtext(run.z), Rtext(lat.best.objective), 'which is the integer optimum the lattice found');
+    eq(run.steps.length <= 6 && run.steps.length >= 1, true, 'in at most the rounds asked for');
+    let killed = 0;
+    for (const st of run.steps) {
+      const check = ipCutValid({ a: st.cut.inOriginal.a, b: st.cut.inOriginal.b, rel: '>=' }, lat.points);
+      killed += check.killed.length;
+    }
+    eq(killed, 0, 'and NO cut removed a single feasible integer point, which is the only thing validity means');
+    /* the first cut must exclude the point it was derived at */
+    const first = run.steps[0].cut.inOriginal, start = run.start.x;
+    let at = R0;
+    for (let j = 0; j < 2; j += 1) at = Radd(at, Rmul(first.a[j], start[j]));
+    eq(Rcmp(at, first.b) < 0, true, 'while the first cut does exclude the fractional optimum it was derived at');
+    /* an invalid cut names the lattice point it killed */
+    const bad = ipIneq('x1 + x2 <= 4', model.names);
+    const check = ipCutValid({ a: bad.a, b: bad.b, rel: bad.rel }, lat.points);
+    eq(check.valid, false, 'a cut that merely removes the fractional optimum is not valid');
+    eq(Rtext(check.killed[0].x[0]) + ', ' + Rtext(check.killed[0].x[1]), '3, 2',
+       'and the lattice point it killed is named rather than argued about');
+    eq(ipAllInt([ri(2), R(1n, 2n)]), false, 'a point with one fractional coordinate is not whole');
+  }
+
+  /* --- the bound trace: monotone, and honest about exploration order ------ */
+  {
+    const model = ipTwoVar(true, 9, 5, [[7, 4, 'le', 43, 'press'], [4, 9, 'le', 47, 'anneal']]);
+    const lat = latticePoints(model, [[0n, 7n], [0n, 6n]]);
+    for (const order of ['depthFirst', 'bestBound']) {
+      const tree = bbTree(model, { order: order, maxNodes: 60 });
+      eq(Requ(tree.best, lat.best.objective), true,
+         'branch and bound under ' + order + ' finds the lattice optimum, ' + Rtext(lat.best.objective));
+      const trace = ipBoundTrace(tree, true);
+      let ok = true;
+      for (let i = 1; i < trace.length; i += 1) {
+        if (trace[i].bound !== null && trace[i - 1].bound !== null && Rcmp(trace[i].bound, trace[i - 1].bound) > 0) ok = false;
+        if (trace[i].incumbent !== null && trace[i - 1].incumbent !== null && Rcmp(trace[i].incumbent, trace[i - 1].incumbent) < 0) ok = false;
+      }
+      eq(ok, true, 'and the trace under ' + order + ' never raises its bound or lowers its incumbent');
+      const last = trace[trace.length - 1];
+      eq(Requ(last.bound, tree.best) && Requ(last.incumbent, tree.best), true,
+         'a tree that closed ends with bound and incumbent equal, so the gap is nought and that is the proof');
+      let everBelow = false;
+      for (const step of trace) if (step.bound !== null && Rcmp(step.bound, tree.best) < 0) everBelow = true;
+      eq(everBelow, false,
+         'and NO step ever claims a bound below the true optimum -- the defect this trace was rewritten to fix');
+    }
+    eq(ipOpen({ prunedBy: null, bound: R1, children: [] }), true, 'a node never expanded is open');
+    eq(ipOpen({ prunedBy: null, bound: R1, children: [3, 4] }), false, 'one that was branched is not');
+    eq(ipOpen({ prunedBy: 'bound', bound: R1, children: [] }), false, 'and one that was pruned is not');
+  }
+
+  /* --- the drawing, which returns a string and touches no document -------- */
+  {
+    const model = ipTwoVar(true, 3, 4, [[2, 1, 'le', 6, 'assembly'], [2, 3, 'le', 9, 'finishing']]);
+    const cons = ipHalfPlanes(model);
+    eq(cons.length, 4, 'a two-row model is four half-planes once x >= 0 and y >= 0 are added');
+    const poly = ipPolygon(cons);
+    eq(poly.length, 4, 'whose region has four corners');
+    let wound = true;
+    for (let i = 1; i < poly.length; i += 1) {
+      const a = Math.atan2(poly[i].y - 1.3, poly[i].x - 1.3), b = Math.atan2(poly[i - 1].y - 1.3, poly[i - 1].x - 1.3);
+      if (a < b) wound = false;
+    }
+    eq(wound, true, 'returned in polygon order rather than sorted by x, or the shape would be a bow tie');
+    const lat = latticePoints(model, [[0n, 5n], [0n, 4n]]);
+    const svg = ipLattice({ cons: cons, box: [[0, 5], [0, 4]], points: lat.points, width: 520, height: 300,
+                            marks: [{ x: R(9n, 4n), y: R(3n, 2n), tone: 'amber', shape: 'cross', label: 'LP' }],
+                            lines: [{ a: R(-1n, 1n), b: R(-1n, 1n), c: ri(-4), tone: 'red', label: 'cut' }],
+                            names: model.names });
+    eq((svg.match(/<circle /g) || []).length, lat.points.length,
+       'the lattice draws one dot per integer point and no more');
+    eq((svg.match(/<polygon /g) || []).length, 1, 'with the region as a single polygon');
+    eq((svg.match(/<path /g) || []).length, 1, 'the marked point as a cross');
+    eq(svg.indexOf('stroke-dasharray') > 0, true, 'and the extra half-plane dashed, so a cut reads as a cut');
+    const tree = bbTree(model, { maxNodes: 60 });
+    const drawn = ipTreeSvg(tree.nodes, { width: 660, top: (n) => Rtext(n.bound === null ? R0 : n.bound) });
+    eq((drawn.svg.match(/<rect /g) || []).length, tree.nodes.length, 'the tree draws one box per node');
+    eq((drawn.svg.match(/<line /g) || []).length, tree.nodes.length - 1, 'and one edge per node but the root');
+    const plot = ipPlot([{ pts: [[0, 5], [1, 4], [2, 4]], tone: 'amber', step: true, dots: true }],
+                        { width: 660, height: 240 });
+    eq((plot.svg.match(/<circle /g) || []).length, 3, 'the plot marks every sample');
+    const bars = ipBars([{ label: 'a', value: ri(10), tone: 'amber' }, { label: 'b', value: ri(5), tone: 'green' }],
+                        { width: 660 });
+    eq((bars.svg.match(/<rect /g) || []).length, 2, 'and the bars draw one bar each');
+    const ring = ipTourSvg(5, [{ tour: [0, 1, 2, 3, 4, 0], tone: 'green' }], { width: 660, height: 260 });
+    eq((ring.svg.match(/<circle /g) || []).length, 5, 'the tour picture draws every city');
+    eq(ipEsc('a < b & c'), 'a &lt; b &amp; c', 'and reader text is escaped before it reaches innerHTML');
+  }
+}
+
+
+
+// ----------------------------------------------- the seqkit and heap kits
+console.log('algorithms: the sequences and heap kits, and the two reuse claims that were false');
+{
+  /* The two kits built on SEQ_JS and HEAP_JS, tested on the concatenation they
+     actually ship rather than on a block in isolation -- which is the only way
+     to catch a kit that depends on a function its page does not carry.
+
+     Three things here are worth more than the rest. First, the two KIT-LOCAL
+     re-runs are pinned to the shipped routines they stand in for: heap's
+     `insertionSortRun` must make exactly the comparisons `ALGO_JS.insertionSort`
+     makes (it exists only because that one throws the sorted array away, which
+     the design assumed it did not), and `heapsortTagged` must agree with
+     `heapsortRun` on comparisons AND swaps. A re-run that drifted would be
+     caught by the count long before it could be caught by the output.
+
+     Second, seqkit's `twoStackState` DERIVES the two stacks from the trace
+     rather than replaying the queue, so it is checked against an independent
+     model of the same queue at every prefix of five sequences.
+
+     Third, the drawings: every one returns its markup and is called here with a
+     null element, which is the rule the shared core was restructured around. */
+  const seqkitSrc = fs.readFileSync(path.join(__dirname, 'mathpath', 'labs', 'seqkit.py'), 'utf8');
+  const heapkitSrc = fs.readFileSync(path.join(__dirname, 'mathpath', 'labs', 'heap.py'), 'utf8');
+  eval(block('RATIONAL_JS'));
+  eval(algoBlock('ALGO_JS'));
+  eval(algoCoreBlock('COUNT_JS'));
+  eval(algoCoreBlock('SERIES_JS'));
+  eval(algoCoreBlock('TREEDRAW_JS'));
+  eval(algoCoreBlock('SEQ_JS'));
+  eval(algoCoreBlock('HEAP_JS'));
+  eval(blockFrom(seqkitSrc, 'SEQKIT_JS', 'scripts/mathpath/labs/seqkit.py'));
+  eval(blockFrom(heapkitSrc, 'HEAPKIT_JS', 'scripts/mathpath/labs/heap.py'));
+
+  /* ------------------------------------------------ seqkit: the cost model */
+  {
+    eq(seqCompare([{ op: 'insertFront' }], 8).rows[0].array + ','
+       + seqCompare([{ op: 'insertFront' }], 8).rows[0].list, '9,1',
+       'inserting at the front shifts 8 elements and splices 1 node -- 9 against 1');
+    eq(seqCompare([{ op: 'index', at: 7 }], 8).rows[0].array + ','
+       + seqCompare([{ op: 'index', at: 7 }], 8).rows[0].list, '1,8',
+       'and reaching index 7 costs the array 1 and the list 8 hops: the mirror image');
+    const four = seqExpand(['index', 'insertFront', 'insertEnd', 'deleteAt'], 4, 16, 50);
+    eq(four.length, 16, 'four rounds of four operations expand to sixteen');
+    eq(seqExpand(['deleteAt', 'deleteAt'], 3, 1, 50).length, 0,
+       'and a delete on a structure of one is DROPPED, not counted free');
+    const cmp = seqCompare(four, 16);
+    eq(cmp.decidedBy.op, 'insertFront', 'the front insertions decide this sequence');
+    eq(cmp.arrayTotal + ',' + cmp.listTotal, '122,92', 'at a measured 122 against 92');
+    eq(Rtext(cmp.ratio), '61/46', 'a ratio of two counts, exact');
+  }
+  {
+    const p = twoStackParse('EE d x E,D', 28);
+    eq(p.ops.length + '|' + p.ignored.join('') + '|' + p.ops.map((o) => o.key || 0).join(','),
+       '5|x|1,2,0,3,0', 'the reader’s letters parse, keys number in enqueue order, x is reported');
+    eq(twoStackParse('e'.repeat(40), 28).truncated, true, 'and a sequence past the cap says so');
+    /* The two stacks are DERIVED from the trace. An independent model of the same
+       queue is the only way to know the derivation is right -- and it has to
+       check WHERE the split falls, not only which elements are held: any split
+       of the right elements concatenates back to the right queue, so a
+       derivation off by one step would pass a weaker test. */
+    const replayTwoStacks = (ops, upto) => {
+      const inS = [], outS = [];
+      for (let i = 0; i <= upto; i += 1) {
+        if (ops[i].op === 'enqueue') { inS.push(ops[i].key); continue; }
+        if (!outS.length) while (inS.length) outS.push(inS.pop());
+        if (outS.length) outS.pop();
+      }
+      return { out: outS.slice().reverse(), in: inS.slice() };
+    };
+    ['EEEDDD', 'EDEDEDED', 'EEDEEDEEDDDD', 'DDEEDD', 'EEEEEEDDDDDD'].forEach(function (text) {
+      const ops = twoStackParse(text, 28).ops;
+      const run = twoStackRun(ops);
+      let bad = 0;
+      for (let upto = 0; upto < ops.length; upto += 1) {
+        const st = twoStackState(run, upto);
+        const held = st.outStack.concat(st.inStack).map((e) => e.key);
+        const served = run.trace.slice(0, upto + 1)
+          .filter((t) => t.took !== null && t.took !== undefined).map((t) => t.took);
+        const enq = run.trace.slice(0, upto + 1).filter((t) => t.op === 'enqueue').map((t) => t.key);
+        const want = enq.filter((k) => served.indexOf(k) < 0);
+        if (held.join(',') !== want.join(',')) bad += 1;
+        if (st.lastTransfer >= 0 && st.lastTransfer === upto && st.inStack.length) bad += 1;
+        const model = replayTwoStacks(ops, upto);
+        if (st.outStack.map((e) => e.key).join(',') !== model.out.join(',')) bad += 1;
+        if (st.inStack.map((e) => e.key).join(',') !== model.in.join(',')) bad += 1;
+      }
+      eq(bad, 0, 'the stacks derived from the trace of ' + text + ' are the ones an '
+         + 'independent replay of the same queue holds, stack by stack, at every step');
+    });
+    const r = twoStackRun(twoStackParse('EEEDDD', 28).ops);
+    eq(r.result.total + ',' + r.result.bound, '9,9', 'three in and three out costs 9 against a 3m of 9');
+  }
+  {
+    const n = 12, ops = ufSequence('chain', n);
+    eq(ops.length, n - 1 + n, 'the chain issues n - 1 unions and then finds every element');
+    const rows = ufAllRules(ops, n);
+    eq(rows.map((r) => (r.rank ? 'r' : '-') + (r.compress ? 'c' : '-')).join(' '), '-- r- -c rc',
+       'all four combinations of the two rules are run on the same sequence');
+    eq(rows[0].worst, n - 1, 'with neither rule the chain is a path and the worst find walks 11');
+    eq(rows[0].holds, false,
+       'so the 2^r bound does not hold -- it is a claim about union BY RANK and there is no rank rule');
+    eq(rows[1].maxRank + ',' + rows[1].holds, '1,true', 'with the rank rule the chain is flat, and it holds');
+    eq(rows[3].hops < rows[0].hops, true, 'and both rules together walk fewer pointers than neither');
+    eq(ufTreeSizes(rows[0].run.result.parent).reduce((a, b) => Math.max(a, b), 0), n,
+       'every element ends in one set');
+    /* Hops PER FIND, which is what the panel plots against the depth a rank-r
+       root allows. A total cannot show either of the two things worth seeing. */
+    eq(ufFindHops(rows[0].run).join(','), '11,10,9,8,7,6,5,4,3,2,1,0',
+       'without the rank rule the finds walk the whole path, one shorter each time');
+    eq(ufFindHops(rows[1].run).every((h) => h <= ilog2(n)), true,
+       'with it none walks past log2 of the set -- which is the 2^r bound, turned round');
+    eq(ufFindHops(rows[2].run).join(','), '11,1,1,1,1,1,1,1,1,1,1,0',
+       'and path compression alone flattens the path on the FIRST find, so the rest walk one');
+    const svg = drawForest(null, rows[1].run.result.parent, { width: 620, height: 280 });
+    eq((svg.match(/<circle /g) || []).length, n, 'the forest draws every element, with no element involved');
+    eq(forestLayout(ufSequence('star', 6).length ? unionFindRun(ufSequence('star', 6), {}, 6).result.parent
+       : [], {}).depth, 1, 'unioning everything into one element leaves a forest of depth 1');
+  }
+  {
+    const out = workloadRanked({ search: 12, index: 2, deleteAt: 2, min: 2 }, 32);
+    eq(out.best, 'sortedArray', 'a lookup-heavy mix is cheapest on the sorted array');
+    eq(out.rows.filter((r) => !r.usable).map((r) => r.rep).join(','), 'stack,queue',
+       'and the stack and the queue are OUT OF THE RUNNING rather than slow');
+    eq(out.rows.filter((r) => r.rep === 'stack')[0].unsupported.join(','),
+       'search,index,deleteAt,min', 'each named by the operations it cannot answer at all');
+    eq(out.rows.filter((r) => r.rep === 'sortedArray')[0].total + ','
+       + out.rows.filter((r) => r.rep === 'list')[0].total, '108,513',
+       'binary search against a scan: 108 against 513, counted by running the mix');
+    eq(workloadRanked({ insertFront: 4 }, 8).rows.filter((r) => r.rep === 'sortedArray')[0].usable,
+       false, 'and a sorted array refuses to be told WHERE to insert');
+  }
+
+  /* ----------------------------------- heap: the two false reuse claims */
+  {
+    let drift = 0;
+    for (let n = 0; n <= 40; n += 1) {
+      ['sorted', 'reverse', 'shuffle', 'tied2', 'tied5'].forEach(function (kind) {
+        /* The tied inputs are not decoration. On distinct keys a comparison
+           written `<` and one written `<=` make the SAME count, so a pin that
+           only ever sees a permutation of 1..n cannot tell them apart. */
+        const a = kind.indexOf('tied') === 0
+          ? tiedRecords(n, Math.max(1, +kind.slice(4))).map((r) => r.key)
+          : makeArray(n, kind);
+        if ((insertionSortRun(a).counts.compares || 0) !== insertionSort(a)) drift += 1;
+        const h = heapsortRun(a), t = heapsortTagged(a.map((k, i) => ({ key: k, tag: i + 1 })));
+        if ((t.counts.compares || 0) !== (h.counts.compares || 0)) drift += 1;
+        if ((t.counts.swaps || 0) !== (h.counts.swaps || 0)) drift += 1;
+      });
+    }
+    eq(drift, 0, 'both kit-local re-runs are pinned to the shipped ones: 205 inputs, tied keys included, same counts');
+    eq(insertionSortRun([3, 1, 2]).result.sorted.join(','), '1,2,3',
+       'and insertionSortRun RETURNS the run, which ALGO_JS.insertionSort does not -- the reason it exists');
+    eq(heapsortTagged(tiedRecords(8, 2)).result.stable, false,
+       'heapsort is not stable: equal keys come out in the wrong order');
+  }
+  {
+    const ops = heapOpsScript(heapKeysParse('5 3 8 1 9 2', 15).keys, 2);
+    const run = heapOpsRun(ops, false);
+    eq(run.result.steps.length, 8, 'six inserts and two extractions');
+    eq(run.result.steps.filter((s) => s.op === 'extract').map((s) => s.key).join(','), '1,2',
+       'and a min-heap gives the two smallest keys back, in order');
+    eq(run.result.everyStepWithinBound, true, 'every operation stays inside its own bound');
+    eq(run.result.steps[5].bound + ',' + run.result.steps[6].bound, '2,4',
+       'a sift up is bounded by the height and a sift down by TWICE it -- two comparisons a level');
+    eq(heapValid(run.result.heap, false), true, 'what is left is a heap');
+    eq(heapValid([1, 3, 2, 9, 4, 8, 7], false) + ',' + heapValid([1, 3, 2, 0, 4, 8, 7], false),
+       'true,false', 'and heapValid catches a child that beats its parent');
+    eq(heapSortedAlready([1, 3, 2]), false,
+       'a heap is not sorted: only root-to-leaf paths are ordered, and this one is a valid heap');
+    eq(heapValid([1, 3, 2], false), true, 'which it is');
+    eq((heapTreeSvg([7], {}).match(/<circle /g) || []).length, 1,
+       'the tree renderer draws the root of a one-element heap -- index 0 is falsy and must not vanish');
+    eq((heapTreeSvg([5, 3, 8, 1], {}).match(/<circle /g) || []).length, 4, 'and every element of a larger one');
+    eq(drawHeapArray(null, [5, 3, 8], {}).match(/<rect /g).length, 3,
+       'the array renderer returns its markup with no element involved');
+  }
+  {
+    const down = buildArray(31, 'descending');
+    const cd = buildCompare(down, false);
+    eq(Rtext(cd.sum.total), '26', 'the sum of heights at n = 31 is 26, evaluated exactly');
+    eq(cd.floydSwaps, 26, 'and sifting down from the last internal node MEETS it exactly here');
+    eq(cd.insertSwaps, 98, 'where 31 separate inserts swap 98 times');
+    eq(cd.underSum, true, 'so the measured count is inside the bound');
+    eq(Rtext(cd.perElement), '26/31', 'which is 26/31 per element -- under 2, and that is the linearity');
+    const up = buildCompare(buildArray(31, 'ascending'), false);
+    eq(up.floydSwaps + ',' + Rtext(up.sum.total), '0,26',
+       'increasing keys are already a heap, so the sum is an UPPER BOUND, not a prediction');
+    eq(cd.bothAreHeaps + ',' + cd.sameHeap, 'true,false',
+       'both methods leave a valid heap and they are not the same heap');
+    eq(cd.floyd.result.heap.length + ',' + cd.inserts.result.heap.length, '31,31',
+       'and both hold all 31 keys');
+    const asc = (list) => list.slice().sort((x, y) => x - y).join(',');
+    eq(asc(cd.floyd.result.heap), asc(down),
+       'a build PERMUTES the keys: none is lost and none is invented');
+    const ser = buildSeries('descending', 20, false);
+    eq(ser.floyd.every((v, i) => v <= ser.bound[i]), true,
+       'and at every n up to 20 the swaps stay under the sum');
+    eq(ser.inserts[19] > ser.floyd[19], true, 'while inserting stays dearer');
+  }
+  {
+    const a = buildArray(16, 'shuffled');
+    const hs = heapsortCompare(a);
+    eq(hs.correct, true, 'heapsort sorts');
+    eq(hs.compares + ',' + hs.mergeCompares, '80,48',
+       'and costs 80 comparisons against merge sort’s 48 on the same array, both counted by running them');
+    eq(hs.buildCompares + hs.sortCompares, hs.compares, 'the build and the teardown account for all of them');
+    const ser = heapsortSeries('ascending', 12);
+    eq(ser.heap.every((v, i) => v >= ser.merge[i]), true,
+       'heapsort never makes fewer comparisons than merge sort here: the constant is the price of being in place');
+  }
+  {
+    const runs = runsFrom(8, 8);
+    const cmp = kwayCompare(runs);
+    eq(cmp.agree, true, 'the heap merge and the pairwise passes produce the same sequence');
+    eq(cmp.heapCompares + ',' + cmp.pairCompares, '302,180',
+       'and the heap makes MORE comparisons, not fewer -- a sift down compares both children');
+    eq(cmp.passes + ',' + (cmp.k - 1), '7,7', 'what it buys is one pass instead of k - 1');
+    eq(cmp.heapPops, 64, 'one pop per item');
+    const a = makeArray(64, 'shuffle');
+    const one = hybridRun(a, 1);
+    eq(one.insertion + ',' + one.runs, '0,64',
+       'a cutoff of one insertion-sorts nothing and merges 64 singleton runs');
+    eq(one.merge, kwayMerge(a.map((k) => [k])).counts.compares,
+       'which is exactly the k-way merge of those singletons');
+    const all = hybridRun(a, a.length);
+    eq(all.merge + ',' + all.runs, '0,1', 'and a cutoff of n is insertion sort with nothing left to merge');
+    eq(all.insertion, insertionSort(a), 'costing exactly what ALGO_JS.insertionSort counts');
+    eq(one.merged.join(',') === all.merged.join(','), true, 'both cutoffs sort');
+    const curve = hybridCurve(a, 20);
+    eq(curve.best.cutoff > 1 && curve.best.cutoff < 20, true,
+       'and the cheapest cutoff is strictly inside the range: a measured crossover, not an endpoint');
+    eq(curve.rows[0].total > curve.best.total && curve.rows[19].total > curve.best.total, true,
+       'with both ends dearer than the bottom');
+  }
+  {
+    eq(JSON.stringify(externalPasses(1000000000, 1000000, 4)),
+       '{"fanin":250000,"runs":1000,"merges":1,"passes":2}',
+       'a billion records with a million in memory sort in two passes: make the runs, merge them once');
+    eq(externalPasses(1000000000, 1000, 4).passes, 4, 'a thousand in memory needs four');
+    eq(externalPasses(1000000000, 1000, 500).passes, 21,
+       'and blocks of five hundred leave a fan-in of two, which is twenty-one passes');
+    eq(externalPasses(10000000, 10000000, 4).passes + ','
+       + externalPasses(10000000, 10000000, 4).merges, '1,0',
+       'while data that fits in memory takes one pass and no merge at all');
+    eq(externalPasses(1000, 4, 4), null, 'memory too small to hold two blocks refuses rather than returning a number');
+  }
+}
+
+
+// ------------------------------------------------------------------ sortkit
+console.log('sorting and selection: one exact expectation, and the inputs built to break a rule');
+{
+  /* The course's spine is 2(n+1)H_n - 4n, and the reason it is the spine is
+     that it holds on EVERY input. So the assertions below are of three kinds.
+
+     First, three independent derivations of the same fraction: the closed form
+     over an exact H_n, the recurrence solved from the bottom with no harmonic
+     number in it, and the average over every pivot sequence there is. Two
+     implementations agreeing is evidence; three from different definitions is
+     most of a proof.
+
+     Second, the same exhaustive average computed on a sorted array, a reversed
+     one and the array built to destroy median-of-three. If the expectation
+     depended on the input, these would differ, and the lesson would be wrong.
+
+     Third, the measured means. A mean over seeds is a SAMPLE, so it is
+     asserted to within a tolerance and the tolerance is stated -- which is the
+     honest shape for the one figure on this page that is not exact. */
+  const SORTKIT_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'sortkit.py');
+  const sortkitSrc = fs.readFileSync(SORTKIT_SOURCE, 'utf8');
+  const sortkitBlock = (name) => blockFrom(sortkitSrc, name, SORTKIT_SOURCE);
+  eval(block('RATIONAL_JS'));
+  eval(sysdBlock('HARMONIC_JS'));
+  eval(sysdBlock('STREAM_JS'));
+  eval(algoBlock('ALGO_JS'));
+  eval(algoCoreBlock('COUNT_JS'));
+  eval(algoCoreBlock('RFIXED_JS'));
+  eval(algoCoreBlock('SERIES_JS'));
+  eval(algoCoreBlock('SEEDED_JS'));
+  eval(algoCoreBlock('ORACLE_JS'));
+  eval(algoCoreBlock('SORT_JS'));
+  eval(sortkitBlock('SORTKIT_JS'));
+
+  const dec = (r) => parseFloat(Rfixed(r, 8));
+  const within = (got, want, tol) => Math.abs(dec(got) - dec(want)) <= tol * dec(want);
+
+  /* --- the expectation, three ways, and it is the same fraction ---------- */
+  for (const n of [2, 3, 5, 8, 12, 17, 24]) {
+    eq(Requ(quickRecurrence(n), quickExpected(n)), true,
+       'the quicksort recurrence solved from the bottom gives 2(n+1)H_n - 4n at n = ' + n);
+  }
+  eq(Rtext(quickRecurrence(8)) + ' = ' + Rfixed(quickRecurrence(8), 4), '2369/140 = 16.9214',
+     'and at n = 8 that fraction is 2369/140, not a decimal that nearly is');
+  eq(Requ(quickExpected(9), Rsub(Rmul(R(20n, 1n), harmonic(9, 1)), R(36n, 1n))), true,
+     'with H_9 taken from sysdesign_core.harmonic, reused exactly as it ships');
+
+  /* THE POINT OF THE COURSE, computed rather than asserted: the average over
+     every pivot sequence is the same fraction on every array. */
+  {
+    const n = 8, want = quickExpected(n);
+    const arrays = { sorted: sortInput('sorted', n), reversed: sortInput('reversed', n),
+                     organ: sortInput('organ', n), shuffled: sortInput('shuffle', n, 5),
+                     killer: sortInput('killer', n, 1, 'median3') };
+    for (const name of Object.keys(arrays)) {
+      const r = quickExhaustive(arrays[name], 10);
+      eq(Rtext(r.mean), Rtext(want),
+         'averaged over every pivot sequence, ' + name + ' costs the same exact fraction');
+    }
+    eq(quickExhaustive(sortInput('sorted', 8), 10).executions, 1430,
+       'and the enumeration really is every execution: Catalan(8) = 1430 of them');
+    eq(quickExhaustive(sortInput('sorted', 6), 10).executions, 132, 'Catalan(6) = 132 at n = 6');
+    const refuses = (f) => { try { f(); return false; } catch (e) { return /exceeds the exhaustive cap/.test(e.message); } };
+    eq(refuses(() => quickExhaustive(sortInput('sorted', 11), 10)), true,
+       'eleven elements is refused through oracleCap rather than run slowly');
+  }
+
+  /* --- the measured mean over seeds against the exact expectation --------- */
+  {
+    const n = 16, seeds = seedList(1, 400), exact = quickExpected(n);
+    eq(Rtext(exact) + ' = ' + Rfixed(exact, 4), '18358463/360360 = 50.9448',
+       'E[comparisons] at n = 16 is exactly 18358463/360360');
+    for (const kind of ['sorted', 'reversed', 'killer', 'shuffle']) {
+      const a = sortInput(kind, n, 1, 'median3');
+      const mean = quickMeanOverSeeds(a, seeds);
+      eq(within(mean, exact, 0.03), true,
+         '400 seeds of randomised quicksort on ' + kind + ' average within 3% of it (measured '
+         + Rfixed(mean, 3) + ')');
+    }
+    /* The sample is a sample: the same 400 seeds do NOT reproduce the fraction. */
+    eq(Requ(quickMeanOverSeeds(sortInput('killer', n, 1, 'median3'), seeds), exact), false,
+       'and none of those means IS the expectation -- a mean over seeds is a sample of it');
+    const means = quickRunningMeans(sortInput('killer', n, 1, 'median3'), seeds);
+    eq(means.length + ',' + Requ(means[means.length - 1], quickMeanOverSeeds(sortInput('killer', n, 1, 'median3'), seeds)),
+       '400,true', 'the running mean ends on the mean the panel prints');
+  }
+
+  /* --- the measured count against merge sort's independent total ---------- */
+  {
+    /* mergeSort is ALGO_JS's, written for another course and reused unchanged.
+       On an already-sorted array of 16 every merge stops on the left run, so
+       the total is (n/2) log2 n = 32 -- a closed form this file evaluates and
+       that routine has never heard of. */
+    eq(mergeSort(sortInput('sorted', 16)), 32,
+       'merge sort on a sorted array of 16 makes (n/2)log2(n) = 32 comparisons');
+    eq(mergeSort(sortInput('sorted', 8)) + ',' + mergeSort(sortInput('sorted', 32)), '12,80',
+       'and 12 at n = 8, 80 at n = 32, by the same count');
+    for (const n of [12, 24, 33]) {
+      const a = sortInput('shuffle', n, 9);
+      eq(quickselectRun(a, 1 + (n >> 1), 'random', 4).result.sortThenIndex, mergeSort(a.slice()),
+         'quickselect prints merge sort’s own total as its baseline at n = ' + n);
+      eq(mergeSort(a.slice()) >= sortingLowerBound(n), true,
+         'which is at least ceil(log2 n!) = ' + sortingLowerBound(n) + ', as no comparison sort can be under');
+      /* Not seed by seed: on roughly one draw in eight quickselect is dearer
+         than sorting, which is what "expected" means -- a single-seed
+         assertion here would have quietly hidden it. So the claim is made
+         about the mean, where it belongs. */
+      let selTotal = 0;
+      for (let s = 1; s <= 200; s += 1) selTotal += quickselectRun(a, 1 + (n >> 1), 'random', s).counts.compares || 0;
+      eq(selTotal / 200 < mergeSort(a.slice()), true,
+         'and over 200 seeds selecting the median averages ' + (selTotal / 200).toFixed(1)
+         + ' against merge sort\u2019s ' + mergeSort(a.slice()) + ' at n = ' + n);
+    }
+    eq(sortingLowerBound(8) + ',' + sortingLowerBound(12) + ',' + sortingLowerBound(20),
+       '16,29,62', 'ceil(log2 n!) at 8, 12 and 20');
+    /* The two sizes where n! IS a power of two, which is the only place a
+       ceiling and a floor-plus-one disagree -- and the only place this
+       function can be caught rounding the wrong way. */
+    eq(sortingLowerBound(1) + ',' + sortingLowerBound(2) + ',' + sortingLowerBound(3), '0,1,3',
+       'and 0, 1, 3 at the sizes where the ceiling matters: one comparison decides two elements, not two');
+  }
+
+  /* --- the input built to kill a pivot rule ------------------------------ */
+  {
+    for (const rule of ['first', 'middle', 'median3', 'last']) {
+      const a = killerInput(24, rule).array;
+      eq(a.slice().sort((p, q) => p - q).join(','), sortInput('sorted', 24).join(','),
+         'the killer for ' + rule + ' is a permutation of 1..24 and not a trick');
+      const got = quickRun(a, rule).counts.compares || 0;
+      eq(quickRun(a, rule).result.sorted.join(','), sortInput('sorted', 24).join(','),
+         'quicksort still sorts it under ' + rule);
+      eq(got > 24 * Math.log2(24) * 1.5, true,
+         rule + ' pays ' + got + ' comparisons on it, far past n log2 n = ' + Math.round(24 * Math.log2(24)));
+    }
+    eq(quickRun(killerInput(32, 'median3').array, 'median3').counts.compares, 304,
+       'median of three costs exactly 304 on its own killer at n = 32');
+    /* The CONSTRUCTION, not only its consequence. Three things are pinned.
+
+       One: the array itself at n = 16, because a killer that merely happens to
+       be quadratic and a killer built by the adversary are different objects
+       and only the second one generalises.
+
+       Two: consistency. Every answer the adversary gave has to agree with the
+       values it finally hands back, or the array is not an input at all. For
+       the rules whose pivot choice costs no comparisons the check is exact:
+       the number of comparisons the adversary was ASKED must equal the number
+       the ordinary quicksort then makes on the array it produced. It does not
+       for median3, whose rule spends three comparisons of its own.
+
+       Three: rule specificity. The whole claim of the lesson is that each
+       deterministic rule has its OWN bad input, so a killer built for one rule
+       must not be especially bad for another. */
+    eq(killerInput(16, 'median3').array.join(','), '1,10,4,14,6,12,8,2,3,5,7,9,11,13,15,16',
+       'the adversary builds one particular array at n = 16, and this is it');
+    for (const rule of ['first', 'middle', 'last']) {
+      const built = killerInput(32, rule);
+      eq(built.asked, quickRun(built.array, rule).counts.compares || 0,
+         'every answer the adversary gave for ' + rule + ' agrees with the values it handed back, '
+         + 'so the real sort walks exactly the path it was answered along');
+    }
+    {
+      const forFirst = killerInput(32, 'first').array;
+      eq(quickRun(forFirst, 'first').counts.compares, 496, 'the killer for a first-element pivot costs it 496');
+      eq(quickRun(forFirst, 'middle').counts.compares < 150, true,
+         'and costs a middle-element pivot ' + quickRun(forFirst, 'middle').counts.compares
+         + ' -- a bad input for one rule is not a bad input for another, which is the lesson');
+      eq(quickRun(killerInput(32, 'middle').array, 'first').counts.compares < 200, true,
+         'and the same the other way round');
+    }
+
+    eq(quickRun(killerInput(32, 'first').array, 'first').counts.compares, 496,
+       'and a first-element pivot is driven to the full n(n-1)/2 = 496');
+    /* Doubling n quadruples the work: the quadratic signature, measured. */
+    const c16 = quickRun(killerInput(16, 'median3').array, 'median3').counts.compares;
+    const c32 = quickRun(killerInput(32, 'median3').array, 'median3').counts.compares;
+    const c64 = quickRun(killerInput(64, 'median3').array, 'median3').counts.compares;
+    eq((c32 / c16 > 3 && c64 / c32 > 3), true,
+       'and the count more than triples each time n doubles, which n log n cannot do');
+    /* The same array, randomised pivot: the expectation does not care. */
+    const killer = killerInput(16, 'median3').array;
+    eq(within(quickMeanOverSeeds(killer, seedList(1, 300)), quickExpected(16), 0.03), true,
+       'the SAME array under a random pivot averages the ordinary expectation, which is what randomising buys');
+    /* And the array where randomising buys NOTHING, which the panel says on
+       its face rather than leaving for a reader to discover. Lomuto puts every
+       key equal to the pivot on one side, so an all-equal array splits n into
+       0 and n-1 under every rule there is, seeded included: 2(n+1)H_n - 4n is
+       an expectation about DISTINCT keys and this is the counterexample. */
+    {
+      const flat = sortInput('equal', 24);
+      const counts = new Set([1, 2, 3, 7, 19].map((s) => quickRun(flat, 'random', s).counts.compares));
+      eq(counts.size + ',' + [...counts][0], '1,276',
+         'an all-equal array costs n(n-1)/2 = 276 under every seed, so randomising the pivot changes nothing');
+      eq(quickRun(flat, 'first').counts.compares + ',' + quickRun(flat, 'last').counts.compares
+         + ',' + quickRun(flat, 'middle').counts.compares, '276,276,276',
+         'and the deterministic rules pay exactly the same');
+      eq(quickRun(flat, 'median3').counts.compares, 345,
+         'median of three pays 345, the extra three per call its own rule spends on a decision that cannot help here');
+      eq(Rfixed(quickExpected(24), 2), '92.80',
+         'while the expectation for 24 DISTINCT keys is 92.80 -- a claim this array is outside, not a bound it beats');
+    }
+  }
+
+  /* --- counting sort: the placement direction is the stability ----------- */
+  {
+    const keys = [2, 1, 2, 0, 1, 2, 0, 1], recs = tagRecords(keys);
+    const back = countingPlacement(recs, 3, true), fwd = countingPlacement(recs, 3, false);
+    eq(back.result.tally.join(',') + ' | ' + back.result.prefix.join(','), '2,3,3 | 2,5,8',
+       'the tally and its prefix sums');
+    eq(back.result.violations.length, 0, 'placing from the back keeps equal keys in input order');
+    eq(fwd.result.violations.length, 7, 'placing from the front reverses every run: 7 pairs out of order');
+    eq(back.result.sorted.map((r) => r.key).join(','), countingSortRun(keys, 3).result.sorted.join(','),
+       'and the tagged run agrees key for key with the shipped countingSortRun');
+    eq(back.result.sorted.map((r) => r.tag).join(','), '4,7,2,5,8,1,3,6', 'with the tags in input order inside each run');
+    eq(countingSortRun(keys, 3).result.work, keys.length + 3, 'whose work column is n + k');
+  }
+
+  /* --- radix: two ways to break the composition -------------------------- */
+  {
+    const K = [329, 457, 657, 839, 436, 720, 355];
+    eq(radixRun(K, 10, true).result.sorted.join(','), '329,355,436,457,657,720,839',
+       'LSD radix with a stable pass sorts');
+    eq(radixRun(K, 10, false).result.correct, false, 'with an unstable pass it does not');
+    eq(msdFlatRun(K, 10).result.correct, false,
+       'and most-significant-first with no recursion scrambles: ' + msdFlatRun(K, 10).result.sorted.join(','));
+    eq(msdFlatRun(K, 10).result.passes.length + ',' + msdFlatRun(K, 10).result.passes[0].digit, '3,2',
+       'its first pass reads the most significant digit, which is what makes it wrong');
+    /* And the shape of the wrongness, which is what the panel says out loud:
+       with no recursion the LAST pass wins, and the last pass is the units
+       one, so the array comes out ordered by its final digit and by nothing
+       else at all. */
+    eq(msdFlatRun(K, 10).result.sorted.map((k) => k % 10).join(','), '0,5,6,7,7,9,9',
+       'so what comes out is sorted on the units digit alone');
+    eq(msdFlatRun(K, 10).result.passes[2].digit, 0, 'because the pass that ran last read the units');
+    eq(radixRun(K, 2, true).result.digits, 10, 'in base 2 the same keys need ten passes');
+    eq(radixRun(K, 2, true).result.correct && radixRun(K, 16, true).result.correct, true,
+       'and base 2 and base 16 both sort, at different numbers of passes');
+  }
+
+  /* --- bucket sort: the assumption, and the input that breaks it --------- */
+  {
+    eq(Rtext(bucketExpectedWork(48, 12)), '72',
+       'with 48 keys over 12 buckets the expected inner work is exactly 72');
+    eq(Rtext(bucketExpectedWork(10, 10)), '0', 'and one key a bucket costs nothing at all');
+    const uniform = bucketRun(bucketKeys('uniform', 48, 1024, 7), 12, 1024);
+    const clustered = bucketRun(bucketKeys('clustered', 48, 1024, 7), 12, 1024);
+    eq((uniform.counts.compares || 0) < 3 * 48, true,
+       'uniform keys cost ' + (uniform.counts.compares || 0) + ', near linear in n');
+    eq((clustered.counts.compares || 0) > 6 * (uniform.counts.compares || 0), true,
+       'and clustered keys cost ' + (clustered.counts.compares || 0)
+       + ' on the same n with the same algorithm -- the distribution was the claim');
+    eq(clustered.result.sorted.join(',') === clustered.result.sorted.slice().sort((p, q) => p - q).join(','), true,
+       'both still sort; only the cost moved');
+  }
+
+  /* --- median of medians: the group size decides linearity --------------- */
+  {
+    eq(Rtext(momFractions(3).f1) + ' + ' + Rtext(momFractions(3).f2) + ' = ' + Rtext(momFractions(3).sum),
+       '1/3 + 2/3 = 1', 'groups of three sum to exactly one, so the recursion tree does not shrink');
+    eq(momFractions(3).converges, false, 'and the level sums do not converge');
+    eq(Rtext(momFractions(5).f1) + ' + ' + Rtext(momFractions(5).f2) + ' = ' + Rtext(momFractions(5).sum),
+       '1/5 + 7/10 = 9/10', 'groups of five sum to 9/10');
+    eq(Rtext(momFractions(5).discard), '3/10', 'because at least 3n/10 is discarded');
+    eq(Rtext(momFractions(7).sum) + ',' + momFractions(7).converges, '6/7,true', 'and groups of seven to 6/7');
+    eq(Rtext(levelSums(momFractions(5).f1, momFractions(5).f2, 100, 6).geometric), '1000',
+       'so at n = 100 the tree sums to 10n = 1000 exactly');
+    eq(levelSums(momFractions(3).f1, momFractions(3).f2, 100, 6).geometric, null,
+       'while at groups of three there is no geometric total to print');
+    const a = sortInput('shuffle', 45, 11);
+    const sorted = a.slice().sort((p, q) => p - q);
+    for (const k of [1, 12, 23, 45]) {
+      eq(momRun(a, k, 5).result.value, sorted[k - 1], 'median of medians finds the ' + k + 'th smallest');
+      eq(momRun(a, k, 5).result.agrees, true, 'and quickselect agrees with it there');
+    }
+    /* The per-round guarantee, swept rather than sampled. Twelve thousand
+       rounds over
+       three group sizes and five input families; not one of
+       them puts fewer than momGuarantee(n, g) elements on the thin side.
+       That is a claim about every round of every run here, which is as close
+       to "every input" as a measurement gets, and it is the reason this kit
+       does not read the guarantee off momRun's own field. */
+    eq(momGuarantee(100, 5), 24, "at groups of five the round guarantee is CLRS's 3n/10 - 6 = 24 at n = 100");
+    eq(momGuarantee(45, 3) + ',' + momGuarantee(45, 5) + ',' + momGuarantee(45, 7), '12,9,8',
+       'and it is a different number for each group size, which floor(3n/10) is not');
+    {
+      let rounds = 0, violations = 0, shippedWrong = 0, tight = Infinity;
+      for (const g of [3, 5, 7]) {
+        for (let n = 8; n <= 120; n += 2) {
+          for (const kind of ['shuffle', 'sorted', 'reversed', 'organ', 'killer']) {
+            const arr = sortInput(kind, n, 1 + (n % 5), 'median3');
+            for (const st of momRun(arr, 1 + (n >> 1), g).trace) {
+              rounds += 1;
+              const thin = Math.min(st.less, st.greater), guard = momGuarantee(st.n, g);
+              if (thin < guard) violations += 1;
+              if (thin - guard < tight) tight = thin - guard;
+              if (st.guarantee !== Math.floor(3 * st.n / 10)) shippedWrong += 1;
+            }
+          }
+        }
+      }
+      eq(rounds > 5000 ? 'many' : rounds, 'many',
+         'the sweep really does run the rounds -- ' + rounds + ' of them');
+      eq(violations, 0, 'and not one of them falls under the guarantee');
+      eq(tight, 0, 'while the tightest of them meets it exactly, so the bound is not slack for the sake of it');
+      eq(shippedWrong, 0,
+         "and momRun's own guarantee field is floor(3n/10) on every one of them, group size and all -- "
+         + 'which is why this kit computes its own');
+    }
+  }
+
+  /* --- the lower bounds, and one of them checked on every input ---------- */
+  {
+    for (const n of [2, 3, 4, 5, 8, 9, 16, 17, 24]) {
+      const a = sortInput('shuffle', n, 6), sorted = a.slice().sort((p, q) => p - q);
+      const mm = minMaxPairs(a);
+      eq(mm.result.min + ',' + mm.result.max, sorted[0] + ',' + sorted[n - 1],
+         'min and max together find both ends at n = ' + n);
+      eq((mm.counts.compares || 0) <= mm.result.bound, true,
+         'in ' + (mm.counts.compares || 0) + ', inside the ceil(3n/2) - 2 = ' + mm.result.bound + ' bound');
+      eq(mm.result.bound < mm.result.naive, true,
+         'which beats the ' + mm.result.naive + ' of two separate scans');
+    }
+    eq(minMaxPairs(sortInput('shuffle', 8, 6)).counts.compares, 10, 'meeting the bound exactly at n = 8');
+    /* EVERY arrangement, not one: this is the assertion the rest of the kit
+       cannot make, and the reason the sweep exists. */
+    for (const n of [4, 5, 6, 7]) {
+      const sweep = tournamentEvery(n);
+      eq(sweep.arrangements, [0, 1, 2, 6, 24, 120, 720, 5040][n], 'n! arrangements enumerated at n = ' + n);
+      eq(sweep.wrong, 0, 'the tournament returns the true max and second on every one of them');
+      eq(sweep.over, 0, 'and not one exceeds n + ceil(log2 n) - 2');
+      eq(sweep.worst, sweep.bound, 'while the worst arrangement meets that bound exactly at n = ' + n);
+    }
+    const refusesSweep = (f) => { try { f(); return false; } catch (e) { return /exceeds the exhaustive cap/.test(e.message); } };
+    eq(refusesSweep(() => tournamentEvery(9)), true, 'nine is refused: 362 880 arrangements is not a redraw');
+    eq((scanSecond(sortInput('shuffle', 16, 2)).counts.compares || 0)
+       > (tournament(sortInput('shuffle', 16, 2)).counts.compares || 0), true,
+       'and keeping the best two in one scan costs more than the tournament');
+    eq(tournament(sortInput('shuffle', 16, 2)).result.candidates, 4,
+       'because only ceil(log2 16) = 4 elements ever lost to the winner');
+  }
+
+  /* --- the small print the panels are built on --------------------------- */
+  {
+    eq(parseKeys('329, 457, 999999, x, -4, 12', 0, 999, 10).join(','), '329,457,12',
+       'a reader’s list drops what is out of range rather than clamping it into a different array');
+    eq(parseKeys('1,2,3,4,5,6', 0, 9, 4).join(','), '1,2,3,4', 'and stops at the cap');
+    eq([1, 2, 3, 4, 11, 12, 13, 21, 22, 23, 101, 111].map(ordinal).join(' '),
+       '1st 2nd 3rd 4th 11th 12th 13th 21st 22nd 23rd 101st 111th', 'ordinals, including the teens');
+    eq(groupDigits(1234567), '1 234 567', 'and counts past a thousand are grouped');
+    eq(sortInput('shuffle', 12, 3).join(',') === sortInput('shuffle', 12, 4).join(','), false,
+       'two seeds give two different shuffles');
+    eq(sortInput('shuffle', 12, 3).join(','), sortInput('shuffle', 12, 3).join(','),
+       'and one seed gives the same one twice');
+    /* The stability panel's own preset, chosen so that three of its four
+       algorithms are distinguishable on it: a list on which every sort happens
+       to be stable shows a reader nothing, and the first list tried here was
+       one of those. */
+    const PRESET = tagRecords([7, 3, 7, 1, 9, 3, 5, 1]);
+    eq(stableRun(PRESET, 'selection').result.violations.length, 2,
+       'selection sort reorders two pairs of equal keys on the stability preset');
+    eq(stableRun(PRESET, 'quick').result.violations.length, 1, 'the Lomuto split reorders one');
+    eq(stableRun(PRESET, 'insertion').result.stable && stableRun(PRESET, 'merge').result.stable, true,
+       'and insertion sort and merge sort reorder none');
+    eq(twoKeyPasses([{ major: 3, minor: 70, tag: 1 }, { major: 1, minor: 40, tag: 2 },
+                     { major: 3, minor: 20, tag: 3 }, { major: 2, minor: 90, tag: 4 }],
+                    'major', 'minor').same, false,
+       'and the two pass orders of a two-key sort do not agree, which is why the order is not a preference');
+  }
+}
+
+
+// ------------------------------------------------- the hash and tree kits
+console.log('algorithms: hash tables and search trees, and the four things they do not prove');
+{
+  /* The two kits of `data-structures` and `randomised-algorithms` that own the
+     hash table and the search tree. The engine they run on (HASH_JS, TREE_JS)
+     is asserted above; what is asserted HERE is the arithmetic each kit adds --
+     key sets, the naive delete, the rotation at a chosen node, the priorities --
+     and, more important, the three places where a number a reader will read is
+     NOT a count:
+
+       bloomApprox beside bloomExact        the independent-hash idealisation
+       knuthProbeApprox                     the clustering model, refused above 0.98
+       randomBstDepthApprox                 2 ln n, an asymptote, not a height
+
+     Each of those has a case below that pins what the panel prints AND what the
+     panel must not let it be mistaken for. */
+  const HASHKIT_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'hash.py');
+  const TREEKIT_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'tree.py');
+  const hashKitSrc = fs.readFileSync(HASHKIT_SOURCE, 'utf8');
+  const treeKitSrc = fs.readFileSync(TREEKIT_SOURCE, 'utf8');
+
+  eval(block('RATIONAL_JS'));
+  eval(algoCoreBlock('COUNT_JS'));
+  eval(algoCoreBlock('RFIXED_JS'));
+  eval(sysdBlock('STREAM_JS'));
+  eval(algoCoreBlock('SEEDED_JS'));
+  eval(sysdBlock('APPROX_JS'));
+  eval(algoCoreBlock('TREEDRAW_JS'));
+  eval(algoCoreBlock('HASH_JS'));
+  eval(algoCoreBlock('TREE_JS'));
+  eval(blockFrom(hashKitSrc, 'HASHKIT_JS', HASHKIT_SOURCE));
+  eval(blockFrom(treeKitSrc, 'TREEKIT_JS', TREEKIT_SOURCE));
+
+  /* --- the seeded stream, dealt the way THIS kit deals it ----------------
+     The trap is not hypothetical and it is not about the stream in the
+     abstract: every draw on these pages is consumed as a SLOT, through
+     hashOf(x, m, 'division'), which is x mod m. Under glibc's parameters the
+     modulus is 2^31, so 1200 keys fall into 4, 8 or 16 slots dead level and a
+     collision lesson would demonstrate the opposite of its claim. */
+  {
+    [4, 8, 16].forEach(function (m) {
+      const glibc = new Array(m).fill(0), minstd = new Array(m).fill(0);
+      lcgStream(1103515245, 12345, 2147483648, 7, 1200).forEach((x) => { glibc[hashOf(x, m, 'division')] += 1; });
+      algoStream(7, 1200).forEach((x) => { minstd[hashOf(x, m, 'division')] += 1; });
+      eq(new Set(glibc).size, 1, 'the glibc stream hashed into ' + m + ' slots is PERFECTLY level');
+      eq(Math.max.apply(null, minstd) - Math.min.apply(null, minstd) > 0, true,
+         'and the prime-modulus stream this kit uses is not, at ' + m + ' slots');
+    });
+  }
+
+  /* --- chaining: the expectation, the measurement, and the key set that
+         separates them --------------------------------------------------- */
+  {
+    const stride = hashKeySet('stride', 20, 8);
+    eq(stride.slice(0, 4).join(','), '8,16,24,32', 'the degenerate key set is every multiple of m');
+    const div = chainRun(stride, 8, 'division').result;
+    eq(div.longest + ',' + div.empty, '20,7', 'which the division rule puts in ONE chain of 20');
+    eq(Rtext(div.measuredMean), '21/2',
+       'so the mean it measures is 21/2 while the expectation still reads 5/2');
+    eq(Rtext(div.expectedUnsuccessful), '5/2', 'the expectation being an assumption about the keys');
+    const mul = chainRun(stride, 8, 'multiply').result;
+    eq(mul.longest + ',' + mul.empty, '5,0', 'and the multiplicative rule spreads the same keys');
+    eq(new Set(hashKeySet('seeded', 20, 8, 7)).size, 20, 'a seeded key set holds no duplicates');
+    eq((chainSvg(chainRun([1, 2, 3, 4], 4, 'division').result.chains, 1).match(/<rect /g) || []).length,
+       8, 'the chain drawing is one slot box and one key box per key');
+  }
+
+  /* --- probing: what was counted, and the curve that is not a count -------
+         knuthProbeApprox is one of the path's four approximations, and the
+         panel must print the REFUSAL above alpha = 0.98 rather than a figure
+         read off a vertical curve. */
+  {
+    eq(knuthRow(0.5).unsuccessful + ',' + knuthRow(0.5).successful, '2.50,1.50',
+       "Knuth's two curves read 2.50 and 1.50 at half load");
+    eq(knuthRow(0.99).quoted, false, 'and are not quoted at all at 0.99');
+    eq(/0\.98/.test(knuthRow(0.99).note), true, 'the panel printing the refusal and the reason');
+    const pm = probeMeasure(32, 'linear', 5, 70);
+    eq(Rtext(pm.alpha) + ',' + Rtext(pm.unsuccessful) + ',' + Rtext(pm.successful), '11/16,5,51/22',
+       'probes are counted, and a mean of integers is an exact fraction');
+    eq(Rcmp(pm.unsuccessful, R(BigInt(32), 1n)) <= 0, true,
+       'and a counted mean can never exceed the table size, which the curve can');
+    ['linear', 'quadratic', 'double'].forEach(function (rule) {
+      const demo = deleteDemo(32, rule, 5);
+      eq(demo.lostWithTombstones.length, 0, 'tombstones lose no key under ' + rule + ' probing');
+      eq(demo.lostWhenEmptied.length > 0, true,
+         'and emptying the slot instead loses keys that are still in the table');
+    });
+  }
+
+  /* --- resizing: the hysteresis, evaluated rather than asserted ---------- */
+  {
+    const ops = resizeOps('boundary', 40, 9);
+    const gap = resizeRun(ops, Rparse('1/1'), Rparse('1/4'), 4).result;
+    const none = resizeRun(ops, Rparse('1/2'), Rparse('1/2'), 4).result;
+    eq(gap.total + ',' + gap.bound + ',' + gap.thrashAt, '52,120,null',
+       'grow at 1 and shrink at 1/4: 52 against the 3m the argument allows, and no thrashing');
+    eq(none.total + ',' + none.bound + ',' + none.thrashAt, '495,120,1',
+       'the SAME operations with both thresholds at 1/2 cost 495 against 120, thrashing from step 2');
+  }
+
+  /* --- universality, over the whole family and against one fixed function - */
+  {
+    let worst = null;
+    for (let x = 0; x < 11; x += 1) for (let y = x + 1; y < 11; y += 1) {
+      const got = universalCount(11, 4, x, y);
+      if (!got.withinBound) worst = x + ',' + y;
+    }
+    eq(worst, null, 'every pair of keys collides in at most 1/m of the family, not just a lucky one');
+    eq(Rtext(universalCount(11, 4, 3, 7).rate), '2/11', 'the pair 3 and 7 collides in 2/11 of it');
+    const adv = adversaryPair(4);
+    eq(Rtext(adv.rate), '1', 'while ONE fixed function collides with probability 1');
+    eq(adv.x % 4 === adv.y % 4, true, 'on the two keys an adversary picks once it can see the function');
+  }
+
+  /* --- balls in bins: the exact expectations, one throw, and the two
+         asymptotics this library states and does not prove ---------------- */
+  {
+    const thrown = throwBalls(64, 64, 4);
+    eq(thrown.bins.reduce((a, b) => a + b, 0), 64, 'every ball lands in exactly one bin');
+    eq(thrown.empty + ',' + thrown.maxLoad + ',' + thrown.pairs, '19,3,21',
+       'and this seeded throw leaves 19 bins empty, its tallest holding 3');
+    eq(Rtext(ballsExact(64, 64).expectedPairs), '63/2',
+       'against an exact expectation of 63/2 colliding pairs');
+    const stated = statedMaxLoad(365);
+    near(stated.oneChoice, 3.3240, 1e-3, 'log n / log log n reads 3.324 at 365 -- STATED, not proved');
+    near(stated.twoChoice, 1.7749, 1e-3, 'ln ln n reads 1.775 -- STATED, not proved');
+    eq(statedMaxLoad(3), null, 'and below four bins it is not quoted at all, where ln ln n is not positive');
+  }
+
+  /* --- THE BLOOM CASE: the exact rate against the idealisation -----------
+         Two instances with the SAME kn/m and different m. bloomApprox depends
+         only on kn/m, so it returns the same number for both; bloomExact does
+         not, because it counts the bits a filter of that size really sets. The
+         gap between the columns is the independence assumption, and this pair
+         is the sharpest form of it in the library. */
+  {
+    eq(bloomApprox(160, 16, 7).toFixed(9), '0.008193722',
+       'the idealisation at m = 160, n = 16, k = 7');
+    eq(bloomApprox(1000, 100, 7).toFixed(9), '0.008193722',
+       'and at m = 1000, n = 100, k = 7 -- the SAME number, because it sees only kn/m');
+    eq(Rfixed(bloomExact(160, 16, 7), 6), '0.008319', 'the exact rate at m = 160 is 0.008319');
+    eq(Rfixed(bloomExact(1000, 100, 7), 6), '0.008214', 'and at m = 1000 it is 0.008214');
+    eq(Number(Rfixed(bloomExact(160, 16, 7), 9)) > bloomApprox(160, 16, 7), true,
+       'the exact rate is ABOVE the idealisation, at both sizes');
+    eq(Number(Rfixed(bloomExact(1000, 100, 7), 9)) > bloomApprox(1000, 100, 7), true,
+       'which is what the independent-hash assumption costs');
+    eq(Number.isNaN(Rnum(bloomExact(160, 16, 7))), true,
+       'and a double cannot hold either of them -- Rnum is NaN at a 1729-digit denominator');
+    eq(Rfraction(bloomExact(160, 16, 7), 18), 'a fraction with a 1729-digit denominator',
+       'so the panel says how long the fraction is instead of printing it');
+    eq(Rfraction(R(3n, 8n), 18), '3/8', 'and prints it when a reader could read it');
+    const best = bloomKStar(160, 16, 10);
+    eq(best.k, 7, 'scanning k exactly puts the best at 7 for ten bits a key');
+    eq(best.rows.every((r) => Rcmp(best.rate, r.rate) <= 0), true, 'and no k in the scan beats it');
+    const inst = bloomInstance(160, 16, 7, 6);
+    eq(inst.set + ',' + inst.falsePositives + ',' + inst.trials, '74,1,200',
+       'one seeded filter sets 74 of its 160 bits and gives 1 false positive in 200 lookups');
+    eq(inst.keys.every(function (key) {
+      for (let j = 0; j < 7; j += 1) if (!inst.bits[hashOf(key * (2 * j + 1) + j, 160, 'multiply')]) return false;
+      return true;
+    }), true, 'and NEVER a false negative: every inserted key still has all seven of its bits set');
+  }
+
+  /* --- count-min's stream ------------------------------------------------ */
+  {
+    const heavy = streamPreset('heavy', 2);
+    eq(heavy.length + ',' + heavy.filter((k) => k === 1).length, '64,40',
+       'the heavy-hitter stream is 64 updates of which 40 are one key');
+    const run = countMinRun(heavy, 8, 3).result;
+    eq(run.neverUnder, true, 'and the sketch never estimates below the truth');
+    eq(Rtext(run.eps) + ',' + Rtext(run.delta), '1/4,1/8',
+       'with the Markov guarantee 2/w and 2^-d as exact fractions');
+  }
+
+  /* --- THE TREE CASE: a measured height against its asymptote ------------
+         2 ln n is one of the path's four approximations and the failure mode
+         of the lesson is reading it as a height. At n = 15 it is 5.416 while
+         the shortest tree on fifteen keys has height 3 and mean depth 34/15 =
+         2.267, and the path of sorted insertion has height 14. Three different
+         numbers; the panel prints all three and labels which is which. */
+  {
+    near(randomBstDepthApprox(15), 5.4161, 1e-3, '2 ln n reads 5.416 at n = 15');
+    const sorted = bstFromOrder(insertOrder('sorted', 15, 7)).result;
+    const bisect = bstFromOrder(insertOrder('bisect', 15, 7)).result;
+    const shuffled = bstFromOrder(insertOrder('shuffled', 15, 7)).result;
+    eq(sorted.height, 14, 'while sorted insertion of the same 15 keys gives height 14');
+    eq(bisect.height + ',' + Rtext(bisect.meanDepth), '3,34/15',
+       'middle-first gives height 3 and mean depth 34/15 -- neither of them 5.416');
+    eq(shuffled.height + ',' + Rtext(shuffled.meanDepth), '6,44/15',
+       'and a seeded shuffle gives height 6 and mean depth 44/15');
+    eq(Rcmp(bisect.meanDepth, R(BigInt(Math.round(randomBstDepthApprox(15) * 1000)), 1000n)) < 0, true,
+       'the asymptote is above the measured mean depth by more than a third at this n');
+    eq(insertOrder('shuffled', 15, 7).slice().sort((a, b) => a - b).join(','),
+       insertOrder('sorted', 15, 7).join(','),
+       'and every order is a permutation of the same key set -- the keys do not decide the tree');
+  }
+
+  /* --- rotation at a chosen node, and the check that must not move ------- */
+  {
+    const root = bstFromOrder([50, 30, 70, 20, 40, 10]).result.root;
+    const spun = rotateAt(root, 50, 'right');
+    eq(bstInorder(spun.root).join(' '), '10 20 30 40 50 70',
+       'a rotation at the root leaves the in-order sequence exactly as it was');
+    eq(bstInorder(spun.root).join(' '), bstInorder(root).join(' '),
+       'and the tree it was given is untouched, so both can be drawn');
+    eq(spun.rotated, true, 'the rotation is reported as performed');
+    const cannot = rotateAt(root, 10, 'right');
+    eq(cannot.found + ',' + cannot.rotated, 'true,false',
+       'while rotating right at a node with no left child is reported as NOT performed');
+    eq(sizesValid(spun.root) + ',' + sizesValid(root), 'true,true',
+       'and every subtree size is recomputed through the rotation rather than going stale');
+    eq(avlHeightBound(6) + ',' + avlHeightBound(7) + ',' + avlHeightBound(12), '2,3,4',
+       'the AVL height bound is a search over N(h), not a logarithm');
+    eq(minAvlNodes(3).n, 7, 'N(3) = 7, from N(h) = N(h-1) + N(h-2) + 1');
+    const mixed = avlInsert([50, 25, 75, 10, 5, 30, 27, 60, 90, 80, 70, 98, 62]);
+    eq(mixed.result.height + ',' + mixed.result.plainHeight + ',' + mixed.result.rebalances,
+       '3,4,4', 'the four-case sequence rebalances four times and holds the height at 3');
+    eq(mixed.trace.map((t) => t.rebalance).join(' '), 'LL LR RR RL',
+       'naming all four cases, in that order');
+  }
+
+  /* --- the local check, and the tree that passes it without being a search
+         tree. This is the misconception, and it is only settled by an
+         instance where the two verdicts disagree. */
+  {
+    const odd = localOnlyTree();
+    eq(bstLocallyValid(odd), true, 'every node of the counterexample sits between its two children');
+    eq(bstValid(odd, null, null), false, 'and it is not a search tree: 25 is in 20\'s LEFT subtree');
+    eq(bstInorder(odd).join(' '), '10 25 20 30', 'which its in-order walk shows by not being sorted');
+    eq(treeParseOps('50 -30 ?40', 9).ops.map((o) => o.op + ':' + o.key).join(' '),
+       'insert:50 delete:30 search:40', 'and the reader writes all three operations on one line');
+  }
+
+  /* --- a treap is the same tree from either order ------------------------ */
+  {
+    const keys = insertOrder('sorted', 12, 5), pri = treapPriorities(keys, 5);
+    eq(new Set(keys.map((k) => pri[k])).size, 12,
+       'priorities are ranked, so no two keys share one and the shape is determined');
+    const a = insertOrder('sorted', 12, 5), b = insertOrder('shuffled', 12, 6);
+    const A = treapInsert(a, prioritiesFor(a, pri)), B = treapInsert(b, prioritiesFor(b, pri));
+    eq(treeShape(A.result.root), treeShape(B.result.root),
+       'and two insertion orders of the same (key, priority) set give the SAME TREE, node for node');
+    eq(A.result.heapOrdered + ',' + B.result.heapOrdered, 'true,true', 'both heap-ordered');
+    eq(A.result.height + ',' + bstFromOrder(a).result.height, '5,11',
+       'at height 5, where the plain search tree on the same order is a path of 11');
+  }
+
+  /* --- a skip list from the reader's tape, against a reference curve ----- */
+  {
+    const sl = skipBuild(insertOrder('sorted', 16, 1), algoCoins(1, 144)).result;
+    eq(Rtext(sl.meanHops) + ',' + sl.maxLevel + ',' + sl.worstHops, '77/16,4,8',
+       'sixteen keys on tape seed 1: mean 77/16 hops, four levels, worst 8');
+    eq(hopsReference(16), 8, 'against 2 log2 n = 8, which is a reference curve and not a count');
+    eq((skipListSvg(sl.sorted, sl.maxLevel, []).match(/<circle /g) || []).length, 33,
+       'and the drawing puts one circle at every level a key reaches');
+    eq((bstSvg(bstFromOrder([9, 4, 13, 2, 6, 11, 15]).result.root, { width: 660 })
+        .match(/<circle /g) || []).length, 7,
+       'while the tree renderer draws one circle per node, through the shared layout');
+  }
+}
+
 console.log('\nevery arithmetic assertion passes');
