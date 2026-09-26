@@ -19,20 +19,31 @@ from . import (
     avail,
     cache,
     counting,
+    duality,
     estimate,
     graph,
+    hash,
+    heap,
     induction,
+    integer,
     latency,
     logic,
+    lp,
     measure,
+    network,
     number,
     probability,
     queue,
     replica,
     scale,
+    seqkit,
     sets,
     shard,
+    simplex,
+    sortkit,
     storage,
+    transport,
+    tree,
 )
 from .common import QUIZ_MARKUP, QUIZ_SCRIPT, Lab, cfg_literal
 
@@ -94,6 +105,26 @@ REGISTRY = {
     "storage": storage.storage_lab,
     "scale": scale.scale_lab,
     "measure": measure.measure_lab,
+
+    # The Operations Research path. Its kits share the exact simplex in
+    # or_core.py; courses 4 and 9 take two kits each, which is a stated
+    # exception to one-kit-per-course because a drawing and a tableau
+    # cannot share a mode.
+    "lp": lp.lp_lab,
+    "simplex": simplex.simplex_lab,
+    "duality": duality.duality_lab,
+    "network": network.network_lab,
+    "transport": transport.transport_lab,
+    "integer": integer.integer_lab,
+
+    # The Algorithms path, over algo_core.py. A kit concatenates only the
+    # blocks it needs: the whole core is 68 KB gzipped, above the page
+    # ceiling on its own.
+    "seqkit": seqkit.seqkit_lab,
+    "heap": heap.heap_lab,
+    "hash": hash.hash_lab,
+    "tree": tree.tree_lab,
+    "sortkit": sortkit.sortkit_lab,
 }
 
 
