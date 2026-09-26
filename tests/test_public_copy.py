@@ -54,7 +54,7 @@ class TestPublicCopy(unittest.TestCase):
         owners = {route for route, page in pages.items()
                   if page.family in ('library', 'subject')}
         self.assertEqual(sum(page.family == 'library' for page in pages.values()), 1)
-        self.assertEqual(sum(page.family == 'subject' for page in pages.values()), 3)
+        self.assertEqual(sum(page.family == 'subject' for page in pages.values()), 4)
         records = [r for r in records if r['route'] in owners]
         self.assertGreater(len(records), 100, 'shared visitor sweep cannot be empty')
         self.assertFalse([f for r in records for f in copy.findings(r)],

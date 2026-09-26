@@ -2712,8 +2712,8 @@ def _rebalance(cfg):
           : 'unstable: &rho; is at or past 1') + '</text>';
     }
     s += '<text x="0" y="184" font-size="10" fill="var(--muted)">both wait bars share one scale, 0 to '
-      + waitTop.toFixed(3) + ' ms; the wait is M/M/1&rsquo;s W = 1/(&mu; &minus; &lambda;), the course-3 '
-      + 'result read at the utilisation the copy produced</text>'
+      + waitTop.toFixed(3) + ' ms; the wait is M/M/1&rsquo;s W = 1/(&mu; &minus; &lambda;), the '
+      + 'Queues and Utilisation result read at the utilisation the copy produced</text>'
       + '<text x="0" y="200" font-size="10" fill="var(--muted)">moving ' + byteText(bytes) + ' at '
       + (+tS.value) + ' MB/s takes ' + (secs === null ? '&mdash;' : durText(secs))
       + ', and the elevated utilisation lasts exactly that long</text>'

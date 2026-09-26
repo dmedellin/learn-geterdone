@@ -27,7 +27,7 @@ COURSE = {
         "stampede size = λ·d                  one, with coalescing",
         "global miss = (1 − h₁)(1 − h₂ | miss)",
     ],
-    "assumes_short": "Courses 1 and 3; expectation and conditioning",
+    "assumes_short": "Capacity Estimation and Queues and Utilisation; expectation and conditioning",
     "assumes_long": (
         'Capacity Estimation and Queues and Utilisation. Discrete Mathematics '
         '“Expected Value”, “Conditional Probability” and “Independence”. Algebra '

@@ -42,7 +42,7 @@ COURSE = {
         "W = S/(1 − ρ)                      S = 1/μ; the hyperbola and its asymptote",
         "π_K = (1 − ρ)ρ^K/(1 − ρ^(K+1))     and the admitted rate is λ(1 − π_K)",
     ],
-    "assumes_short": "Courses 1 and 2; geometric and binomial distributions",
+    "assumes_short": "Capacity Estimation and Latency and the Tail; geometric and binomial distributions",
     "assumes_long": (
         "C1, C2. Discrete Mathematics `geometric-distribution`, `binomial-distribution`, "
         "`expected-value`, `hashing-and-pseudorandom-numbers`. Algebra "

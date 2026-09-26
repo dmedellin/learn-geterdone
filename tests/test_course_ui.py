@@ -182,7 +182,7 @@ class TestVisitorTaxonomy(unittest.TestCase):
                 scopes.append((self.SUBJECT_PATH,copy))
             found=sorted({m[0] for pattern,scope in scopes for m in pattern.finditer(scope)})
             if found:failures.append(url+": "+repr(found))
-        self.assertEqual(366,len(urls),"taxonomy sweep must cover every requested page")
+        self.assertEqual(491,len(urls),"taxonomy sweep must cover every requested page")
         self.assertEqual([],failures,"visitor taxonomy failures:\n"+"\n".join(failures[:45]))
 
 
