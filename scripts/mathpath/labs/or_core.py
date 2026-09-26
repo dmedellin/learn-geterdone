@@ -1983,8 +1983,13 @@ IP_JS = r"""
                cons: model.cons.concat([{ a: unit, rel: 'ge', b: R(hi, 1n),
                                           name: name + ' >= ' + hi }]) };
     return { down: down, up: up, floor: lo, ceil: hi, j: j, name: name, value: v,
+             /* &le;/&ge; because they are the symbols the prose means, and
+                the file already used them elsewhere. NOT because <= breaks:
+                a '<' only opens a tag when a letter follows it, so '<= 2'
+                survives innerHTML intact. Checked, after a scan of mine
+                claimed otherwise and was wrong. */
              why: name + ' came back at ' + Rtext(v) + ', which no integer plan can do; every integer plan has '
-               + name + ' <= ' + lo + ' or ' + name + ' >= ' + hi + ', and those two cases are the children' };
+               + name + ' &le; ' + lo + ' or ' + name + ' &ge; ' + hi + ', and those two cases are the children' };
   }
 
   /* The tree.  Each child is re-solved FROM ITS PARENT'S TABLEAU by dual
