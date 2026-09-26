@@ -1,0 +1,2542 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>RPO and RTO | Lesson | Storage Engines and Indexes | System Design | Learn · geterdone.io</title>
+  <meta name="description" content="Two questions, two units. The recovery point objective is bytes: the backup interval multiplied by the write rate, 1.73 TB at a daily backup and 20 MB/s of writes. The recovery time objective is hours: the dataset over the restore bandwidth plus the log replay, 12.38 h for two terabytes. Shortening the interval moves both — and cannot touch the copy, which is the floor under either promise." />
+  <link rel="canonical" href="https://learn.geterdone.io/storage-engines-and-indexes/rpo-and-rto/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="RPO and RTO | Lesson | Storage Engines and Indexes | System Design | Learn · geterdone.io" />
+  <meta property="og:description" content="Two questions, two units. The recovery point objective is bytes: the backup interval multiplied by the write rate, 1.73 TB at a daily backup and 20 MB/s of writes. The recovery time objective is hours: the dataset over the restore bandwidth plus the log replay, 12.38 h for two terabytes. Shortening the interval moves both — and cannot touch the copy, which is the floor under either promise." />
+  <meta property="og:url" content="https://learn.geterdone.io/storage-engines-and-indexes/rpo-and-rto/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="RPO and RTO | Lesson | Storage Engines and Indexes | System Design | Learn · geterdone.io" />
+  <meta name="twitter:description" content="Two questions, two units. The recovery point objective is bytes: the backup interval multiplied by the write rate, 1.73 TB at a daily backup and 20 MB/s of writes. The recovery time objective is hours: the dataset over the restore bandwidth plus the log replay, 12.38 h for two terabytes. Shortening the interval moves both — and cannot touch the copy, which is the floor under either promise." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/storage-engines-and-indexes/rpo-and-rto/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    @media (max-width: 920px) {
+      body[data-page-kind="supplemental"] [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/system-design/">System Design</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Storage Engines and Indexes</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">RPO and RTO</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The rpo and rto are two different numbers is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Storage Engines and Indexes &middot; Durability and layout</span>
+        <h1>RPO and RTO</h1>
+        <p>Two questions, two units. The recovery point objective is bytes: the backup interval multiplied by the write rate, <span class="math">1.73 TB</span> at a daily backup and <span class="math">20 MB/s</span> of writes. The recovery time objective is hours: the dataset over the restore bandwidth plus the log replay, <span class="math">12.38 h</span> for two terabytes. Shortening the interval moves both — and cannot touch the copy, which is the floor under either promise.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">RPO = backup interval × write rate                      bytes at risk
+RTO = size / restore bandwidth + log / replay rate      hours to be back
+
+24 h at 20 MB/s        RPO   1.73 TB worst,   864.00 GB expected
+2 TB at 200 MB/s       copy back                          2.78 h
+1.73 TB at 50 MB/s     replay                             9.60 h
+                       RTO                               12.38 h</div>
+        <div class="float-label" style="right:16px;bottom:16px;">Two questions, two units, and the floor no schedule can move</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>The whole lesson is that these are different numbers. Everything else is two multiplications and a division.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>RPO is bytes and RTO is hours</h3><p>The recovery <em>point</em> objective asks how much work is lost: the backup interval times the write rate, in bytes. The recovery <em>time</em> objective asks how long the system is down: the dataset over the restore bandwidth, plus replaying whatever log survived. They answer different questions, they are measured in different units, and a single statement cannot satisfy both.</p></article><article class="card concept-card"><div class="icon">2</div><h3>A failure lands inside the interval, so the expected loss is half the worst case</h3><p>The worst case is a failure one instant before the next backup, losing a whole interval of writes: <span class="math">1.73 TB</span> at a daily backup and <span class="math">20 MB/s</span>. A failure at a uniformly random moment inside the interval loses half of that on average, <span class="math">864.00 GB</span>. Quote both — the first is what you must survive and the second is what you will typically pay.</p></article><article class="card concept-card"><div class="icon">3</div><h3>The copy is the floor, and the schedule cannot move it</h3><p>Halving the backup interval halves the bytes at risk and halves the replay, but copying <span class="math">2.00 TB</span> back at <span class="math">200 MB/s</span> takes <span class="math">2.78 h</span> on every row of the table. No backup schedule in existence makes a restore faster than the time it takes to move the data, which is why an aggressive RTO target is a statement about bandwidth and dataset size rather than about backups.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>Bytes at risk, hours to be back, and the floor under both</h2></div><p>Two formulas, the difference between worst case and expected, and what a target actually constrains.</p></div>
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Recovery point and recovery time objectives</span><p>The <strong>recovery point objective</strong> (RPO) is the volume of writes lost by a failure, measured in bytes: at most <span class="math">interval × write rate</span>, and <span class="math">interval × write rate / 2</span> in expectation for a failure at a uniformly random moment.</p><p>The <strong>recovery time objective</strong> (RTO) is the elapsed time to be serving again, measured in hours: <span class="math">size / restore bandwidth + surviving log / replay rate</span>.</p></div><p>Writing them side by side is most of the work, because the two are routinely collapsed into one sentence about backups existing. They are controlled by different things: the RPO by the schedule, the RTO by bandwidth. Doubling the backup frequency improves the first proportionally and the second hardly at all.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">interval 24 h = 86 400 s      writes 20 MB/s      dataset 2.00 TB
+restore 200 MB/s              log replay 50 MB/s
+
+RPO worst       86 400 s × 20 MB/s             =  1.73 TB
+RPO expected    half the interval, on average  = 864.00 GB
+
+copy back       2.00 TB / 200 MB/s = 10 000 s  =   2.78 h
+replay          1.73 TB / 50 MB/s  = 34 560 s  =   9.60 h
+RTO             2.78 h + 9.60 h                =  12.38 h</div><p>Notice what dominates. Of the <span class="math">12.38 h</span>, the copy is <span class="math">2.78</span> and the replay is <span class="math">9.60</span> — so on this schedule most of the outage is spent reapplying a day's worth of log, and the fastest available lever is the backup interval rather than the restore path. That balance flips as the interval shortens, which is exactly why both terms have to be computed rather than one of them assumed dominant.</p><h3>What a shorter interval buys</h3><p>It buys twice: fewer bytes at risk, and less log to replay. Backing up hourly instead of daily takes the RPO from <span class="math">1.73 TB</span> to <span class="math">72.00 GB</span> and the RTO from <span class="math">12.38 h</span> to <span class="math">3.18 h</span> — a factor of twenty-four on the first and most of the way to the floor on the second. What it does not touch is the <span class="math">2.78 h</span> of copying, which sits under every row.</p><div class="example"><span class="label">Example &middot; The same table at four intervals</span><p>At <span class="math">20 MB/s</span> of writes into a <span class="math">2.00 TB</span> dataset restored at <span class="math">200 MB/s</span> with <span class="math">50 MB/s</span> of replay: one hour gives <span class="math">72.00 GB</span> at risk and an RTO of <span class="math">3.18 h</span>; six hours, <span class="math">432.00 GB</span> and <span class="math">5.18 h</span>; twelve hours, <span class="math">864.00 GB</span> and <span class="math">7.58 h</span>; twenty-four hours, <span class="math">1.73 TB</span> and <span class="math">12.38 h</span>. The RPO is linear in the interval and so is the replay, so the RTO is a straight line starting at <span class="math">2.78 h</span>.</p></div><p>Run it backwards to turn a target into a schedule. A four-hour RTO leaves <span class="math">4 h − 2.78 h = 1.22 h</span> for replay, which at <span class="math">50 MB/s</span> is about <span class="math">220 GB</span> of log, which at <span class="math">20 MB/s</span> of writes is <span class="math">3.06 h</span> of interval. So “we must be back inside four hours” is, on this hardware, a requirement to back up at least every three hours — and if the copy alone exceeded four hours the target would be unreachable at any schedule, which the arithmetic says immediately.</p><p>The misconception this page exists for is offering “we have backups” as an answer. It is not a number of bytes, so it is not an RPO; it is not a number of hours, so it is not an RTO. Both of the real answers are one multiplication away from figures an operator already has, and the unwillingness to produce them is usually a sign that nobody has timed a restore.</p><p>Which is the honest caveat. Restore bandwidth must be measured on a real restore, not assumed from a network specification; a backup that has never been restored is a forecast rather than a fact. And this model starts the clock at the moment of failure, while a real outage also contains detection and the decision to restore — neither of which is in these two formulas and both of which are in the outage.</p></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>RPO and RTO are two different numbers</h2></div><p>Bytes at risk from the schedule, hours to restore from the bandwidth</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Bytes at risk, and hours to be back</strong><span>RPO = interval &times; write rate; RTO = size / restore + the replay</span></div>
+        <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>since the last backup</span><span class="tone-red"><i class="legend-swatch"></i>lost on a restore</span><span class="tone-purple"><i class="legend-swatch"></i>copying the data back</span><span class="tone-amber"><i class="legend-swatch"></i>replaying the log</span></div>
+      </div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="rcTimeline" viewBox="0 0 660 220" role="img" aria-label="A timeline of backups and a failure, with the bytes at risk marked and the restore and replay drawn as the recovery window."></svg></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="rcTable"></table></div>
+      <div class="status-banner" id="rcStatus" style="margin-top:12px;"></div>
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>Set the schedule and the two bandwidths</h3>
+          <p>RPO is the interval times the write rate; RTO is the dataset over the restore bandwidth plus the log over the replay rate. Drag the interval from a day down to an hour and watch the RTO fall toward the copy time and stop there — that floor is the point of the lesson.</p>
+        <div>
+          <div class="range-row"><label class="small-copy" for="rcInterval">Backup interval (hours)</label><span class="range-value" id="rcIntervalOut">24</span></div>
+          <input id="rcInterval" type="range" min="1" max="48" step="1" value="24" />
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="rcWrite">Write rate (MB/s)</label><span class="range-value" id="rcWriteOut">20</span></div>
+          <input id="rcWrite" type="range" min="1" max="500" step="1" value="20" />
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="rcSize">Dataset size (GB)</label><span class="range-value" id="rcSizeOut">2000</span></div>
+          <input id="rcSize" type="range" min="100" max="20000" step="100" value="2000" />
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="rcRestore">Restore bandwidth (MB/s)</label><span class="range-value" id="rcRestoreOut">200</span></div>
+          <input id="rcRestore" type="range" min="10" max="2000" step="10" value="200" />
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="rcReplay">Log replay rate (MB/s)</label><span class="range-value" id="rcReplayOut">50</span></div>
+          <input id="rcReplay" type="range" min="5" max="500" step="5" value="50" />
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>RPO &mdash; worst case bytes</span><strong id="rcRpo">&mdash;</strong></div>
+          <div class="kpi"><span>RPO &mdash; expected bytes</span><strong id="rcRpoExp">&mdash;</strong></div>
+          <div class="kpi"><span>Copying the data back</span><strong id="rcRestoreVal">&mdash;</strong></div>
+          <div class="kpi"><span>Replaying the log</span><strong id="rcReplayVal">&mdash;</strong></div>
+          <div class="kpi"><span>RTO &mdash; hours to be back</span><strong id="rcRto">&mdash;</strong></div>
+          <div class="kpi"><span>Interval that fits a 4 h RTO</span><strong id="rcMax">&mdash;</strong></div>
+        </div>
+        <p class="small-copy" id="rcHint" style="margin:0;">Two questions, two units. RPO is bytes and is fixed by the backup schedule; RTO is hours and is fixed by bandwidth. Shortening the interval shrinks both &mdash; less to lose and less to replay &mdash; but it cannot touch the copy, which is the floor.</p>
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Turning a schedule into two promises</h2></div><p>Two multiplications, one addition, and then the same arithmetic run backwards.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Multiply the interval by the write rate</h3><p>That is the worst-case RPO in bytes: <span class="math">86 400 s × 20 MB/s = 1.73 TB</span> for a daily backup. Use the write rate, not the read rate and not the ingest of the busiest hour unless that is the hour you are protecting.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Halve it for the expected case, and keep both figures</h3><p>A failure at a uniformly random moment inside the interval loses half the worst case on average, <span class="math">864.00 GB</span> here. The worst case is what a commitment has to survive; the expected case is what the business will actually experience.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Add the copy and the replay</h3><p><span class="math">size / restore bandwidth</span> plus <span class="math">RPO / replay rate</span>. Write the two terms separately: the first is the floor and cannot be moved by the schedule, and seeing which of the two dominates tells you which lever is worth pulling.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Invert it: solve for the interval a target allows</h3><p>Subtract the copy from the target, multiply what is left by the replay rate to get a log size, and divide by the write rate. A four-hour target on this hardware allows <span class="math">3.06 h</span> between backups. If the copy alone exceeds the target, no schedule reaches it and the conversation is about bandwidth.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>Bytes at risk and hours to be back</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>A daily backup of two terabytes at 20 MB/s</h3><p>The two objectives, then the same arithmetic at four intervals, then run backwards from a target.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">interval 24 h = 86 400 s      writes 20 MB/s      dataset 2.00 TB
+restore 200 MB/s              log replay 50 MB/s
+
+RPO worst       86 400 s × 20 MB/s               =   1.73 TB
+RPO expected    half of the interval, on average = 864.00 GB
+
+copy back       2.00 TB / 200 MB/s = 10 000 s    =   2.78 h
+replay          1.73 TB / 50 MB/s  = 34 560 s    =   9.60 h
+RTO             2.78 + 9.60                      =  12.38 h
+
+interval    RPO worst     copy      replay        RTO
+     1 h     72.00 GB    2.78 h    24.0 min     3.18 h
+     6 h    432.00 GB    2.78 h     2.40 h      5.18 h
+    12 h    864.00 GB    2.78 h     4.80 h      7.58 h
+    24 h      1.73 TB    2.78 h     9.60 h     12.38 h
+
+for RTO ≤ 4 h    4 h − 2.78 h = 1.22 h of replay
+                 1.22 h × 50 MB/s ≈ 220 GB of log
+                 220 GB / 20 MB/s        →   interval ≤ 3.06 h</div><p>The copy column never moves. <span class="math">2.78 h</span> is the floor under every recovery promise this hardware can make, and only a faster restore path or a smaller dataset lowers it — no backup schedule does. That is the single most useful sentence on this page, because it converts an argument about backup frequency into an arithmetic fact about bandwidth.</p><p>Shortening the interval buys on both axes at once, which is unusual enough to be worth saying out loud: from twenty-four hours to one, the bytes at risk fall by a factor of twenty-four and the recovery time falls from <span class="math">12.38 h</span> to <span class="math">3.18 h</span>, which is within half an hour of the floor. Past that point more frequent backups buy almost nothing.</p><p>For a faded rehearsal, keep the daily schedule and double the restore bandwidth to <span class="math">400 MB/s</span>. The supplied first move is that the copy falls to <span class="math">1.39 h</span>. Compute the new RTO, then say what a four-hour target now allows as a backup interval, and why that answer moved so much further than the RTO did. Check both in the lab before opening the quiz.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Offering “we have backups” as a recovery-time claim</strong><span>Backups existing is a precondition, not an answer. The two answers are <span class="math">interval × write rate</span> in bytes and <span class="math">size/bandwidth + log/replay</span> in hours, and both are computable in a minute from numbers an operator already has. A recovery plan whose strongest statement is that backups run has not been tested, and the first restore will discover the bandwidth.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Quoting the worst case and the expected loss as if they were one number</strong><span>A daily backup at <span class="math">20 MB/s</span> puts <span class="math">1.73 TB</span> at risk and loses <span class="math">864.00 GB</span> on average, and the two figures are for different conversations: the first is what a commitment must survive, the second what will typically happen. Using the expected figure in a contract understates the exposure by two.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Leaving the log replay out of the recovery time</strong><span>The copy is <span class="math">2.78 h</span> of a <span class="math">12.38 h</span> recovery here — less than a quarter. A plan that quotes only the restore bandwidth is quoting the smaller term, and it is the term that does <em>not</em> respond to the backup schedule, so the plan also loses the one lever it had.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a recovery question gets two numbers in two units.</strong><p>You should be able to compute worst-case and expected RPO from a schedule and a write rate, compute RTO from a dataset, a restore bandwidth and a replay rate, and invert the second to say what backup interval a stated target allows.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Every number on this course has been a count — of seeks, levels, rewrites, bits, fsyncs and hours — and none of them has had a price attached. Scaling Laws and Cost is where a count becomes money, and where the compression ratio this course took as an input finally has to earn the processor time it costs.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../working-set-and-the-page-cache/" rel="prev"><span>Lesson</span><strong>Working Set and the Page Cache</strong></a>
+      <a class="lesson-link next" href="../"><span>Course</span><strong>Storage Engines and Indexes</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="storage-engines-and-indexes/rpo-and-rto" data-lesson-title="RPO and RTO" data-course-title="Storage Engines and Indexes">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Storage Engines and Indexes.</strong> I/O counts, tree heights, amplification factors, fsync rates and recovery windows on this course are exact &mdash; a height is the smallest integer <span class="math">h</span> with <span class="math">Bʰ ≥ N</span>, found by multiplication rather than by a logarithm that rounds, and the page prints what a logarithm would have said beside it. Two figures are rounded and say so on their faces: the Bloom filter&rsquo;s bits per key, which comes from the standard approximation to the false-positive rate and is <span class="math">9.585</span> rather than the <span class="math">9.57</span> a two-digit constant gives, and the page cache&rsquo;s Zipf hit rate past the size at which an exact harmonic number is still readable.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure on this path is computed in your browser from the model the lesson states, and a model&rsquo;s answer is only as true as its assumptions &mdash; independence, memorylessness and steady state are named where they are used, and each lesson says where its own fails.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "Backups run every <span class=\"math\">6<\/span> hours and the system writes <span class=\"math\">20 MB/s<\/span>. What is the worst-case RPO?", "a": ["<span class=\"math\">72.00 GB<\/span>", "<span class=\"math\">216.00 GB<\/span>", "<span class=\"math\">432.00 GB<\/span>", "<span class=\"math\">1.73 TB<\/span>"], "c": 2, "why": "<span class=\"math\">6 \u00d7 3 600 s \u00d7 20 MB/s = 432.00 GB<\/span>. <span class=\"math\">216.00 GB<\/span> is the expected loss, half the worst case, which is a different figure and worth quoting separately; <span class=\"math\">72.00 GB<\/span> is the hourly schedule and <span class=\"math\">1.73 TB<\/span> the daily one."}, {"q": "A <span class=\"math\">2.00 TB<\/span> dataset restores at <span class=\"math\">200 MB/s<\/span> with <span class=\"math\">50 MB/s<\/span> of log replay, on a daily backup. Which term dominates the <span class=\"math\">12.38 h<\/span> recovery?", "a": ["The copy, at <span class=\"math\">9.60 h<\/span>", "The replay, at <span class=\"math\">9.60 h<\/span>", "They are about equal", "Neither; most of it is detection time"], "c": 1, "why": "The copy is <span class=\"math\">2.00 TB / 200 MB/s = 2.78 h<\/span> and the replay is <span class=\"math\">1.73 TB / 50 MB/s = 9.60 h<\/span>. A day of log at a replay rate four times slower than the restore path is most of the outage, which is why the backup interval is the effective lever here. Detection time is real and is not in this model."}, {"q": "The backup interval is halved. What happens to the recovery time?", "a": ["It halves", "It falls, but by less than half, because the copy is unchanged", "It is unchanged", "It falls by the same factor as the RPO"], "c": 1, "why": "Halving the interval halves the log and therefore the replay term, and leaves the copy exactly where it is. From <span class=\"math\">12.38 h<\/span> at twenty-four hours to <span class=\"math\">7.58 h<\/span> at twelve: the RPO halved exactly and the RTO did not, because <span class=\"math\">2.78 h<\/span> of it was never a function of the schedule."}, {"q": "Someone answers a recovery question with \u201cwe have backups\u201d. What has that established?", "a": ["The RPO, but not the RTO", "The RTO, but not the RPO", "Neither \u2014 it is not a number of bytes and not a number of hours", "Both, provided the backups are recent"], "c": 2, "why": "An RPO is bytes and an RTO is hours; the sentence produces neither. Both are one multiplication away from figures the operator already has \u2014 interval, write rate, dataset size, restore bandwidth \u2014 and the absence of them usually means no restore has been timed."}];
+
+  (function () {
+
+  /* Exact rational arithmetic over BigInt.
+
+     Every number a lesson calls "the answer" lives in this type. BigInt rather
+     than Number because a few steps of elimination on a 3x3 system produces
+     numerators that leave the exact-integer range of a double, and a solution
+     that is silently wrong in the last digits is worse than no solution. */
+  function bgcd(a, b) {
+    if (a < 0n) a = -a;
+    if (b < 0n) b = -b;
+    while (b) { var t = a % b; a = b; b = t; }
+    return a;
+  }
+  function R(n, d) {
+    if (d === undefined) d = 1n;
+    n = BigInt(n); d = BigInt(d);
+    if (d === 0n) throw new Error('division by zero');
+    if (d < 0n) { n = -n; d = -d; }
+    var g = bgcd(n, d) || 1n;
+    return { n: n / g, d: d / g };
+  }
+  var R0 = R(0n), R1 = R(1n);
+  function Radd(a, b) { return R(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function Rsub(a, b) { return R(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function Rmul(a, b) { return R(a.n * b.n, a.d * b.d); }
+  function Rdiv(a, b) { return R(a.n * b.d, a.d * b.n); }
+  function Rneg(a) { return R(-a.n, a.d); }
+  function Rabs(a) { return a.n < 0n ? Rneg(a) : a; }
+  function Rinv(a) { return R(a.d, a.n); }
+  function Rzero(a) { return a.n === 0n; }
+  function Rsign(a) { return a.n === 0n ? 0 : (a.n < 0n ? -1 : 1); }
+  function Requ(a, b) { return a.n === b.n && a.d === b.d; }
+  function Rcmp(a, b) { var l = a.n * b.d, r = b.n * a.d; return l < r ? -1 : (l > r ? 1 : 0); }
+  function Rint(a) { return a.d === 1n; }
+  function Rpow(a, k) {
+    var out = R1, base = a, e = k < 0 ? -k : k;
+    while (e > 0) { if (e & 1) out = Rmul(out, base); base = Rmul(base, base); e >>= 1; }
+    return k < 0 ? Rinv(out) : out;
+  }
+  /* The reader's form: "3", "-7/4". Never "3/1", never "0/5". */
+  function Rtext(a) { return a.d === 1n ? String(a.n) : a.n + '/' + a.d; }
+  /* Parenthesised when it would otherwise glue onto a neighbouring symbol. */
+  function Rterm(a) { return (a.n < 0n || a.d !== 1n) ? '(' + Rtext(a) + ')' : Rtext(a); }
+  function Rnum(a) { return Number(a.n) / Number(a.d); }
+  /* A decimal, for the one place a lesson asks for one. Exact when it can be. */
+  function Rdec(a, places) {
+    if (places === undefined) places = 6;
+    var v = Rnum(a);
+    if (Rint(a)) return String(a.n);
+    var s = v.toFixed(places);
+    return s.indexOf('.') >= 0 ? s.replace(/0+$/, '').replace(/\.$/, '') : s;
+  }
+  function Rparse(text) {
+    var s = String(text).trim();
+    var m = /^([+-]?\d+)\s*\/\s*(\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]), BigInt(m[2]));
+    m = /^([+-]?\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]));
+    m = /^([+-]?)(\d*)\.(\d+)$/.exec(s);
+    if (m) {
+      var whole = m[2] || '0', frac = m[3];
+      var num = BigInt(whole + frac), den = 10n ** BigInt(frac.length);
+      return R(m[1] === '-' ? -num : num, den);
+    }
+    return null;
+  }
+  /* Is this rational a perfect square? Needed wherever a lesson must decide
+     between an exact answer and a radical one -- sqrt(4/9) is 2/3 and belongs
+     on the page as 2/3, while sqrt(2) must stay sqrt(2). */
+  function bisqrt(n) {
+    if (n < 0n) return null;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x * x === n ? x : null;
+  }
+  function Rsqrt(a) {
+    if (a.n < 0n) return null;
+    var p = bisqrt(a.n), q = bisqrt(a.d);
+    return (p === null || q === null) ? null : R(p, q);
+  }
+
+  /* Ceiling and floor of an exact rational, as BigInt.
+
+     Capacity answers are counts of machines, shards and tree levels, and the
+     whole point of a sizing lesson is that 3.2 machines is four. Integer
+     division truncates toward zero, so a negative rational needs the sign. */
+  function Rfloor(a) {
+    var q = a.n / a.d;
+    if (a.n < 0n && q * a.d !== a.n) q -= 1n;
+    return q;
+  }
+  function Rceil(a) {
+    var q = a.n / a.d;
+    if (a.n > 0n && q * a.d !== a.n) q += 1n;
+    return q;
+  }
+
+  /* Generalised harmonic H(n,s) = sum_{k=1..n} 1/k^s, exact for integer s.
+
+     The Zipf popularity model needs it twice: as the normaliser of the whole
+     key space and as the partial sum over the cached prefix, and a cache hit
+     rate is their ratio. Kept exact because the ratio of two large harmonics
+     loses its leading digits in floating point exactly when the tail matters,
+     which is the case a caching lesson is about. */
+  function harmonic(n, s) {
+    var total = R(0n, 1n);
+    for (var k = 1; k <= n; k += 1) {
+      var kb = BigInt(k), den = 1n;
+      for (var j = 0; j < s; j += 1) den *= kb;
+      total = Radd(total, R(1n, den));
+    }
+    return total;
+  }
+
+  /* The Zipf hit rate: the c most popular of n keys, exponent s.
+     H(c,s)/H(n,s) -- exact, and the reason a small cache of a skewed
+     workload holds most of the traffic. */
+  function zipfHit(c, n, s) {
+    if (c <= 0) return R(0n, 1n);
+    if (c >= n) return R(1n, 1n);
+    return Rdiv(harmonic(c, s), harmonic(n, s));
+  }
+
+  /* Birth-death queues, exact for rational arrival and service rates.
+
+     M/M/1 is derived in the lessons from the cut balance equations, so these
+     are the closed forms that result, not a separate model: rho = lam/mu,
+     pi_n = (1-rho)rho^n, L = rho/(1-rho), W = L/lam. */
+  function mm1(lam, mu) {
+    var rho = Rdiv(lam, mu);
+    if (Rcmp(rho, R(1n, 1n)) >= 0) return { rho: rho, stable: false };
+    var one = R(1n, 1n), free = Rsub(one, rho);
+    var L = Rdiv(rho, free);
+    var Lq = Rdiv(Rmul(rho, rho), free);
+    return {
+      rho: rho, stable: true, p0: free, L: L, Lq: Lq,
+      W: Rdiv(L, lam), Wq: Rdiv(Lq, lam)
+    };
+  }
+
+  /* Erlang C: the probability an arrival waits with s servers.
+     Rational throughout -- the factorials are BigInt, so a 20-server desk is
+     still an exact fraction. */
+  function erlangC(lam, mu, s) {
+    var a = Rdiv(lam, mu), rho = Rdiv(a, R(BigInt(s), 1n));
+    if (Rcmp(rho, R(1n, 1n)) >= 0) return { rho: rho, stable: false };
+    var sum = R(0n, 1n), n;
+    for (n = 0; n < s; n += 1) sum = Radd(sum, Rdiv(Rpow(a, n), R(fact(n), 1n)));
+    var last = Rdiv(Rpow(a, s), Rmul(R(fact(s), 1n), Rsub(R(1n, 1n), rho)));
+    var p0 = Rinv(Radd(sum, last));
+    var pw = Rmul(last, p0);
+    var Lq = Rdiv(Rmul(pw, rho), Rsub(R(1n, 1n), rho));
+    return {
+      rho: rho, stable: true, p0: p0, pWait: pw, Lq: Lq,
+      Wq: Rdiv(Lq, lam), L: Radd(Lq, a), W: Rdiv(Radd(Lq, a), lam)
+    };
+  }
+
+  /* M/M/1/K: finite capacity. Stable at any rho because the queue cannot grow,
+     which is the lesson -- and the arrival rate Little's law may use is the
+     EFFECTIVE one, lam(1 - pK). */
+  function mm1k(lam, mu, K) {
+    var rho = Rdiv(lam, mu), n, un = [], total = R(0n, 1n);
+    for (n = 0; n <= K; n += 1) { var t = Rpow(rho, n); un.push(t); total = Radd(total, t); }
+    var pi = un.map(function (t) { return Rdiv(t, total); });
+    var L = R(0n, 1n);
+    for (n = 0; n <= K; n += 1) L = Radd(L, Rmul(R(BigInt(n), 1n), pi[n]));
+    var pK = pi[K], lamEff = Rmul(lam, Rsub(R(1n, 1n), pK));
+    return { rho: rho, pi: pi, blocking: pK, lamEff: lamEff, L: L, W: Rdiv(L, lamEff) };
+  }
+
+  /* The four places this subject cannot be exact. Each says how it rounds.
+
+     Everything else in the module returns a rational. These return Numbers, and
+     every lesson that calls one states that it is an approximation -- which is
+     the library's rule, not a courtesy. */
+
+  /* e^-x, as the reciprocal of a POSITIVE-term series.
+
+     The obvious implementation sums the alternating series for e^-x directly,
+     and it is wrong in a way that looks right at the arguments a test usually
+     picks. Terms of alternating sign near cancel, losing roughly 2x/ln(10)
+     significant digits: exact at x = 5, 0.4% out at x = 17, 173% out at x = 20,
+     and past x = 21 the SIGN is wrong -- a probability comes back negative.
+
+     Summing e^x instead has every term positive, so nothing cancels, and one
+     division at the end is exact to a rounding. */
+  function expNegApprox(x, tol) {
+    tol = tol || 1e-15;
+    if (x < 0) return 1 / expNegApprox(-x, tol);
+    if (x > 700) return 0;            /* e^700 is the edge of a double */
+    var t = 1, s = 1, k = 1;
+    while (t > tol * s && k < 1000) { t = t * x / k; s += t; k += 1; }
+    return 1 / s;
+  }
+  /* The Bloom false-positive rate. The exact form (1 - 1/m)^(kn) is available
+     as a rational; this is the (1 - e^(-kn/m))^k idealisation lessons compare
+     it against. */
+  function bloomApprox(m, n, k) {
+    return Math.pow(1 - expNegApprox(k * n / m, 1e-15), k);
+  }
+  /* Standard error of a proportion. A square root, so it rounds. */
+  function standardErrorApprox(p, n) { return Math.sqrt(p * (1 - p) / n); }
+  /* The Zipf normaliser past the point where its exact form is unreadable.
+     harmonic() stays exact and is what the lessons use; this is for the
+     lesson that asks what happens at a million keys. */
+  function harmonicApprox(n, s) {
+    if (s === 1) return Math.log(n) + 0.5772156649015329 + 1 / (2 * n);
+    var t = 0;
+    for (var k = 1; k <= n && k <= 100000; k += 1) t += 1 / Math.pow(k, s);
+    return t;
+  }
+  /* Bits per key for a target false-positive rate: log2(1/p)/ln 2.
+
+     NOT "the familiar 1.44 * log2(1/p)", and the difference is the point of
+     the lesson that uses this. 1.44 is a two-digit rounding of 1/ln 2 =
+     1.4427, so at p = 0.01 the textbook constant gives 9.567 and this gives
+     9.585. Both are printed on storage's `bloom` page, each under its own
+     name. This rounds -- it is a logarithm -- like the other Approx functions
+     around it. */
+  function bitsPerKeyApprox(target) { return Math.log2(1 / target) / Math.LN2; }
+  /* A root that rounds, by Newton from a rational start. Rsqrt returns null for
+     a non-square, which is right for exactness and useless for a geometric-mean
+     centre or a square-root scaling law. */
+  function sqrtApprox(a, tol) {
+    var x = Number(a.n) / Number(a.d);
+    if (x < 0) return NaN;
+    if (x === 0) return 0;
+    tol = tol || 1e-15;
+    var g = x, prev = 0;
+    while (Math.abs(g - prev) > tol * Math.max(1, g)) { prev = g; g = (g + x / g) / 2; }
+    return g;
+  }
+  /* Natural log, for the two max-load results this subject STATES rather than
+     proves. Everywhere else a logarithm is an exact integer search instead. */
+  function logApprox(x) { return Math.log(x); }
+
+  /* ---------------------------------------------------------------- output
+
+     Rdec goes through Number(a.n)/Number(a.d), and this course produces
+     rationals a double cannot hold: a filter's exact false-positive rate at
+     m = 64, n = 8, k = 5 is a fraction with a 362-digit denominator. So the
+     decimals here are long division in BigInt, rounded half up at the last
+     digit printed, exact at every size up to that one rounding. */
+  function Rfix(a, places) {
+    if (places === undefined) places = 3;
+    var neg = a.n < 0n, n = neg ? -a.n : a.n, d = a.d;
+    var scale = 10n ** BigInt(places);
+    var q = (2n * n * scale + d) / (2n * d);          /* round half up */
+    var whole = q / scale, frac = (q % scale).toString();
+    while (frac.length < places) frac = '0' + frac;
+    var body = places > 0 ? whole + '.' + frac : String(whole);
+    return (neg ? '-' : '') + body;
+  }
+  /* A percentage of an exact ratio, exact until the last digit printed. */
+  function Rpct(a, places) {
+    return Rfix(Rmul(a, R(100n, 1n)), places === undefined ? 2 : places) + '%';
+  }
+  /* A float for PLOTTING only. Never for a figure: it goes through Rfix, so it
+     cannot be the NaN that Number(huge)/Number(huge) produces. */
+  function Rflt(a) { return parseFloat(Rfix(a, 9)); }
+  /* Digit grouping. 62500000 and 62 500 000 are the same number and only one
+     of them can be read at a glance. */
+  function grp(value) {
+    var s = String(value), sign = '';
+    if (s.charAt(0) === '-') { sign = '-'; s = s.slice(1); }
+    return sign + s.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  }
+  /* DECIMAL byte units: 1 kB = 1000 B, 1 GB = 10^9 B. Stated rather than
+     assumed, because this course's headline ratio depends on which. */
+  function byteText(a) {
+    var b = Rabs(a), i;
+    var units = [[1000000000000000n, ' PB'], [1000000000000n, ' TB'],
+                 [1000000000n, ' GB'], [1000000n, ' MB'], [1000n, ' kB']];
+    for (i = 0; i < units.length; i += 1) {
+      if (Rcmp(b, R(units[i][0], 1n)) >= 0) return Rfix(Rdiv(a, R(units[i][0], 1n)), 2) + units[i][1];
+    }
+    return grp(Rfix(a, 0)) + ' B';
+  }
+  /* A duration, in whatever unit keeps it readable. An entity, so this belongs
+     in innerHTML rather than textContent. */
+  function secText(a) {
+    var b = Rabs(a);
+    if (Rzero(b)) return '0 s';
+    if (Rcmp(b, R(1n, 1000000n)) < 0) return Rfix(Rmul(a, R(1000000000n, 1n)), 1) + ' ns';
+    if (Rcmp(b, R(1n, 1000n)) < 0) return Rfix(Rmul(a, R(1000000n, 1n)), 1) + ' &micro;s';
+    if (Rcmp(b, R(1n, 1n)) < 0) return Rfix(Rmul(a, R(1000n, 1n)), 2) + ' ms';
+    if (Rcmp(b, R(600n, 1n)) < 0) return Rfix(a, 2) + ' s';
+    if (Rcmp(b, R(7200n, 1n)) < 0) return Rfix(Rdiv(a, R(60n, 1n)), 1) + ' min';
+    if (Rcmp(b, R(172800n, 1n)) < 0) return Rfix(Rdiv(a, R(3600n, 1n)), 2) + ' h';
+    return Rfix(Rdiv(a, R(86400n, 1n)), 2) + ' days';
+  }
+
+  /* ============ L1: the pattern, not the size ==============================
+
+     time = seeks * t_seek + bytes / bandwidth.
+
+     Both terms are always there. The mistake the lesson names is dropping the
+     first one, which is the same as assuming one seek -- true for a sequential
+     read and false by five orders of magnitude for a random one. */
+  function seekCount(totalBytes, chunkBytes) { return Rceil(Rdiv(totalBytes, chunkBytes)); }
+  function ioTime(seeks, seekSec, totalBytes, bwBps) {
+    return Radd(Rmul(R(seeks, 1n), seekSec), Rdiv(totalBytes, bwBps));
+  }
+  function randomTime(totalBytes, chunkBytes, seekSec, bwBps) {
+    return ioTime(seekCount(totalBytes, chunkBytes), seekSec, totalBytes, bwBps);
+  }
+  /* One seek and then the whole file: the SAME formula at one seek, not a
+     second model. The bytes term is identical in both, which is the point --
+     everything that differs between them is the seek count. */
+  function seqTime(totalBytes, seekSec, bwBps) { return ioTime(1n, seekSec, totalBytes, bwBps); }
+  function ioRatio(totalBytes, chunkBytes, seekSec, bwBps) {
+    return Rdiv(randomTime(totalBytes, chunkBytes, seekSec, bwBps),
+                seqTime(totalBytes, seekSec, bwBps));
+  }
+  /* The chunk at which the transfer costs exactly what the seek costs:
+     chunk / bw = t_seek, so chunk = t_seek * bw. Below it the arm dominates
+     and the size of the read hardly matters; above it the bandwidth does and
+     the seek hardly matters. One multiplication, exact. */
+  function crossoverChunk(seekSec, bwBps) { return Rmul(seekSec, bwBps); }
+
+  /* ============ L2: a height is an integer search ==========================
+
+     The smallest h with B^h >= N, found by multiplying B into an accumulator
+     and counting. No logarithm, so nothing rounds, and the boundary case
+     N = B^h comes out h rather than h + 1. */
+  function btreeHeight(n, b) {
+    var N = BigInt(n), B = BigInt(b);
+    if (N <= 1n) return 1;
+    if (B < 2n) return null;                  /* a fanout of one never covers N */
+    var cap = 1n, h = 0;
+    while (cap < N) { cap *= B; h += 1; if (h > 512) return null; }
+    return h;
+  }
+  /* What the same height looks like through a logarithm, for the page that
+     shows why this kit does not use one. */
+  function btreeHeightByLog(n, b) { return Math.ceil(Math.log(n) / Math.log(b)); }
+  function btreeCapacity(b, h) { return BigInt(b) ** BigInt(h); }
+  function btreeNodes(b, level) { return BigInt(b) ** BigInt(level - 1); }
+  /* I/Os a lookup costs: one per level the page cache does not already hold.
+     Caching more levels than there are is not negative work. */
+  function lookupIos(n, b, cached) {
+    var h = btreeHeight(n, b);
+    if (h === null) return null;
+    var c = cached < 0 ? 0 : (cached > h ? h : cached);
+    return h - c;
+  }
+
+  /* ============ L3: hash against tree, counted in I/Os =====================
+
+     "Hash is faster" is a claim about point lookups presented as a claim about
+     everything. A hash index destroys the order a range needs, so a range on
+     one is a full scan; a tree pays its height on every lookup and then walks
+     leaves in order. The expected probe length Theta(1 + alpha) that makes a
+     hash lookup one I/O is Algorithms `data-structures/hashing-with-chaining`;
+     it is cited, not re-derived. */
+  function pagesFor(rows, perPage) {
+    return Rceil(Rdiv(R(BigInt(rows), 1n), R(BigInt(perPage), 1n)));
+  }
+  function hashPointIos() { return 1n; }
+  function hashRangeIos(rows, perPage) { return pagesFor(rows, perPage); }
+  function treePointIos(rows, b) { return BigInt(btreeHeight(rows, b)); }
+  /* The descent is paid once and the matching leaves are read in order, so a
+     range of `width` rows is h - 1 interior pages plus the leaf pages it
+     spans. */
+  function treeRangeIos(rows, b, width, perPage) {
+    return BigInt(btreeHeight(rows, b)) - 1n + pagesFor(width, perPage);
+  }
+  function mixIos(points, ranges, perPoint, perRange) {
+    return Radd(Rmul(R(BigInt(points), 1n), R(perPoint, 1n)),
+                Rmul(R(BigInt(ranges), 1n), R(perRange, 1n)));
+  }
+  /* The range rate at which the two engines cost the same, given the point
+     rate: r*(hashRange - treeRange) = p*(treePoint - hashPoint). Exact, and
+     null when nothing ties them. */
+  function rangeCrossover(points, hashPoint, hashRange, treePoint, treeRange) {
+    var dr = hashRange - treeRange;
+    if (dr === 0n) return null;
+    return Rdiv(Rmul(R(BigInt(points), 1n), R(treePoint - hashPoint, 1n)), R(dr, 1n));
+  }
+
+  /* ============ L4: an index is not free for writes ========================
+
+     One insert writes the table and then every index on it, each in a
+     different place: k indexes make k + 1 random writes, and a device that
+     does D of those a second does D/(k+1) inserts. */
+  function writesPerInsert(k) { return R(BigInt(k) + 1n, 1n); }
+  function insertRate(deviceWrites, k) {
+    return Rdiv(R(BigInt(deviceWrites), 1n), writesPerInsert(k));
+  }
+  /* The share of the bare rate that k indexes leave: 1/(k+1). */
+  function throughputShare(k) { return Rinv(writesPerInsert(k)); }
+  /* The smallest k whose share falls to or below a target -- "the k that
+     halves throughput" is this at 1/2, computed rather than asserted. */
+  function indexesForShare(share) {
+    if (Rzero(share)) return null;
+    var k = Rceil(Rinv(share)) - 1n;
+    return k < 0n ? 0n : k;
+  }
+  /* The largest k that still meets an insert target: D/(k+1) >= t means
+     k <= D/t - 1, and the floor of an exact rational is the answer. */
+  function maxIndexesFor(deviceWrites, target) {
+    if (target <= 0) return null;
+    var k = Rfloor(Rdiv(R(BigInt(deviceWrites), 1n), R(BigInt(target), 1n))) - 1n;
+    return k < 0n ? null : k;
+  }
+
+  /* ============ L5: append-only is not the same as cheap ===================
+
+     A levelled LSM merges each level into the next. A byte arriving at a level
+     is rewritten once for each merge it takes part in, and a level is on
+     average half full of the data it will eventually hold, so the level costs
+     about F/2 rewrites -- and L levels cost L*F/2. Read amplification before
+     filters is L: a lookup that misses has to ask every level. */
+  function lsmWriteAmp(levels, fanout) {
+    return Rdiv(R(BigInt(levels) * BigInt(fanout), 1n), R(2n, 1n));
+  }
+  function lsmReadAmp(levels) { return R(BigInt(levels), 1n); }
+  /* What that costs the disk: every byte ingested is written WA times, so the
+     bandwidth compaction needs is ingest * WA. Sizing the disk to the ingest
+     rate alone is the misconception of L7, and it starts here. */
+  function compactionBw(ingestBps, wa) { return Rmul(ingestBps, wa); }
+  function levelCapacity(memtableBytes, fanout, level) {
+    return Rmul(memtableBytes, R(BigInt(fanout) ** BigInt(level), 1n));
+  }
+  /* How many levels the data actually forces, by the same exact integer search
+     the B-tree height uses: the smallest L with memtable * F^L >= size. */
+  function levelsForSize(datasetBytes, memtableBytes, fanout) {
+    var F = BigInt(fanout);
+    if (F < 2n) return null;
+    if (Rcmp(memtableBytes, datasetBytes) >= 0) return 0;
+    var cap = memtableBytes, L = 0;
+    while (Rcmp(cap, datasetBytes) < 0) {
+      cap = Rmul(cap, R(F, 1n)); L += 1; if (L > 512) return null;
+    }
+    return L;
+  }
+
+  /* ============ L6: bits per key, and which constant it came from ==========
+
+     At the optimal number of hashes k = (m/n) ln 2 the bargain is
+     m/n = log2(1/p) / ln 2 bits per key, INDEPENDENT OF n.
+
+     This rounds -- it is a logarithm -- and so does everything below it. It is
+     also not the number a textbook quotes: 1.44 is a two-digit rounding of
+     1/ln 2 = 1.4427, and at p = 1/100 the two answers are 9.567 and 9.585.
+     Both are returned, and the page says which is which.
+
+     The derivation, the optimal k, the exact form under the independent-hash
+     idealisation and the rule that a filter supports no deletion belong to
+     Algorithms `randomised-algorithms/bloom-filters`. */
+  function bitsPerKeyTextbook(p) { return 1.44 * Math.log2(1 / p); }
+  function bloomBits(n, p) { return Math.ceil(n * bitsPerKeyApprox(p)); }
+  function bloomMemoryBytes(n, p) { return R(BigInt(bloomBits(n, p)), 8n); }
+  /* k = (m/n) ln 2 = log2(1/p) at the optimum, rounded to a whole number,
+     because you cannot run 6.64 hash functions. */
+  function bloomHashes(p) {
+    var k = Math.round(Math.log2(1 / p));
+    return k < 1 ? 1 : k;
+  }
+  /* The EXACT false-positive rate under the independent-hash idealisation,
+     (1 - (1 - 1/m)^(kn))^k, as a rational. Evaluable only while m and kn are
+     small: a production filter has m near 10^10 and there is no fraction to
+     print. Returns null past the limit rather than a rounded number wearing an
+     exact label. */
+  function bloomExactRate(m, n, k) {
+    if (m > 4096 || k * n > 512) return null;
+    var one = R(1n, 1n);
+    var empty = Rpow(Rsub(one, R(1n, BigInt(m))), k * n);
+    return Rpow(Rsub(one, empty), k);
+  }
+  /* Read amplification with a filter on every level: the level that holds the
+     key costs one, and each of the other L - 1 costs p -- the probability its
+     filter says yes when the key is not there. Exact, because p is a target
+     the reader chose and not a measurement. */
+  function readAmpWithFilter(levels, p) {
+    return Radd(R(1n, 1n), Rmul(R(BigInt(levels) - 1n, 1n), p));
+  }
+
+  /* ============ L7: three corners of one triangle ==========================
+
+     Read, update and memory amplification cannot all be minimised. Each engine
+     below minimises one and pays in the other two, and the numbers come from
+     the reader's F, L and page geometry rather than from a quotation. */
+  function rumLevelled(levels, fanout) {
+    return { read: lsmReadAmp(levels),
+             write: lsmWriteAmp(levels, fanout),
+             space: Radd(R(1n, 1n), R(1n, BigInt(fanout))) };
+  }
+  /* Tiered keeps up to F runs per level instead of merging into one, so a
+     lookup probes every run (L*F), a byte is written once per level (L), and a
+     level can hold F copies of the same key (F). */
+  function rumTiered(levels, fanout) {
+    return { read: R(BigInt(levels) * BigInt(fanout), 1n),
+             write: R(BigInt(levels), 1n),
+             space: R(BigInt(fanout), 1n) };
+  }
+  /* A B-tree reads one page per level and writes a WHOLE PAGE to change one
+     row, and its pages are not full: at fill factor f it occupies 1/f of what
+     it holds. */
+  function rumBtree(height, pageBytes, rowBytes, fill) {
+    return { read: R(BigInt(height), 1n),
+             write: Rdiv(R(BigInt(pageBytes), 1n), R(BigInt(rowBytes), 1n)),
+             space: Rinv(fill) };
+  }
+  /* Where an engine sits in the triangle: the share each of its three costs
+     takes of their total, so it lands nearest the corner it pays most in.
+     Shares, not raw amplifications, because the three are in different units
+     and only their proportions can be plotted together. */
+  function rumShares(triple) {
+    var total = Radd(Radd(triple.read, triple.write), triple.space);
+    if (Rzero(total)) return null;
+    return { read: Rdiv(triple.read, total),
+             write: Rdiv(triple.write, total),
+             space: Rdiv(triple.space, total) };
+  }
+
+  /* ============ L8: fsync caps durability =================================
+
+     write() returning means the bytes reached the page cache. Durability is
+     the fsync, and one fsync per commit caps DURABLE writes at 1/t whatever
+     the CPU and the network can do. Grouping B commits into one fsync
+     amortises it to t/B each -- paid for with the wait to fill the batch. */
+  function durableCap(tfSec) { return Rinv(tfSec); }
+  function groupedCap(tfSec, batch) { return Rdiv(R(BigInt(batch), 1n), tfSec); }
+  function perWriteCost(tfSec, batch) { return Rdiv(tfSec, R(BigInt(batch), 1n)); }
+  /* A write arrives uniformly among the B places in its batch, so it waits for
+     (B - 1)/2 further arrivals at 1/lambda each. */
+  function fillWait(batch, lam) {
+    return Rdiv(R(BigInt(batch) - 1n, 1n), Rmul(R(2n, 1n), lam));
+  }
+  /* The whole commit latency: the fill wait, then the batch queues for the one
+     thread that fsyncs. mm1 is course 3's result REUSED, not a second model --
+     batches arrive at lambda/B and are served at 1/t. At B = 1 the queue is
+     unstable whenever lambda exceeds 1/t, which is the lesson's cap arriving
+     as a queueing fact rather than as an assertion. */
+  function commitLatency(tfSec, batch, lam) {
+    var lamB = Rdiv(lam, R(BigInt(batch), 1n));
+    var q = mm1(lamB, durableCap(tfSec));
+    var fill = fillWait(batch, lam);
+    if (!q.stable) return { stable: false, rho: q.rho, fill: fill };
+    return { stable: true, rho: q.rho, fill: fill, service: q.W, total: Radd(fill, q.W) };
+  }
+  /* The batch size that minimises that latency, found by evaluating the curve
+     at every B in range. A closed form for this shape of trade-off exists --
+     it is the EOQ of Operations Research `inventory-models/the-eoq-formula-
+     without-calculus` -- and this lesson deliberately scans instead, so the
+     curve is on the page. */
+  function bestBatch(tfSec, lam, maxB) {
+    var best = null, B, c;
+    for (B = 1; B <= maxB; B += 1) {
+      c = commitLatency(tfSec, B, lam);
+      if (!c.stable) continue;
+      if (best === null || Rcmp(c.total, best.total) < 0) best = { batch: B, total: c.total };
+    }
+    return best;
+  }
+
+  /* ============ L9: bytes scanned is a layout question =====================
+
+     A row store reads whole rows even when the query names one column; a
+     column store reads only the columns named. Then both are divided by
+     whatever their layout compresses to -- and a column of like values
+     compresses better than a row of unlike ones, which is half of why the
+     comparison goes the way it does. */
+  function columnBytes(rowBytes, cols) {
+    return Rdiv(R(BigInt(rowBytes), 1n), R(BigInt(cols), 1n));
+  }
+  function rowScanBytes(rows, rowBytes, ratio) {
+    return Rdiv(R(BigInt(rows) * BigInt(rowBytes), 1n), ratio);
+  }
+  function colScanBytes(rows, rowBytes, cols, selected, ratio) {
+    return Rdiv(Rmul(R(BigInt(rows), 1n), Rmul(columnBytes(rowBytes, cols),
+                R(BigInt(selected), 1n))), ratio);
+  }
+  function scanSeconds(bytes, bwBps) { return Rdiv(bytes, bwBps); }
+  /* The number of selected columns at which the two scans cost the same:
+     sel/cols / colRatio = 1 / rowRatio, so sel = cols * colRatio / rowRatio.
+     When that exceeds the column count, no selection flips a scan -- and the
+     page says so instead of printing a column that does not exist. */
+  function colCrossover(cols, rowRatio, colRatio) {
+    return Rdiv(Rmul(R(BigInt(cols), 1n), colRatio), rowRatio);
+  }
+  /* The misconception, counted. Fetching one WHOLE row is one page in a row
+     store and one page per column in a column store: columnar is not always
+     faster, and this is the query where it loses. An unknown layout throws,
+     because a silent default here would show a reader a row-store count under
+     a column-store heading. */
+  function wholeRowIos(cols, layout) {
+    if (layout === 'row') return 1n;
+    if (layout === 'column') return BigInt(cols);
+    throw new Error('wholeRowIos: unknown layout ' + layout);
+  }
+
+  /* ============ L10: the page cache is course 4's cache ====================
+
+     Memory over dataset is the cached fraction, the Zipf exponent is the skew,
+     and the hit rate is the same ratio of harmonics. `zipfHit` is
+     sysdesign_core.py's -- the SAME function the cache kit calls -- so the two
+     courses cannot drift apart. */
+  function pageCount(bytes, pageBytes) { return Rfloor(Rdiv(bytes, pageBytes)); }
+  function wsHit(c, n, s, limit) {
+    if (c <= 0) return { rounded: false, exact: R(0n, 1n), value: 0 };
+    if (c >= n) return { rounded: false, exact: R(1n, 1n), value: 1 };
+    /* s = 0 is uniform popularity, where H(n,0) = n exactly at any n. No
+       approximation is needed and none is used -- and this is also the control
+       the lesson compares the skewed case against. */
+    if (s === 0) {
+      var u = R(BigInt(c), BigInt(n));
+      return { rounded: false, exact: u, value: Rflt(u) };
+    }
+    if (n <= limit) {
+      var r = zipfHit(c, n, s);
+      return { rounded: false, exact: r, value: Rflt(r) };
+    }
+    /* Past the limit the exact harmonic is neither computable in a redraw nor
+       readable on a page, so this rounds and SAYS it rounds. */
+    return { rounded: true, exact: null, value: harmonicApprox(c, s) / harmonicApprox(n, s) };
+  }
+  /* What is left for the disk: (1 - h) * reads. */
+  function diskIopsExact(reads, h) {
+    return Rmul(R(BigInt(reads), 1n), Rsub(R(1n, 1n), h));
+  }
+  function diskIopsApprox(reads, hValue) { return reads * (1 - hValue); }
+
+  /* ============ L11: two different numbers ================================
+
+     RPO is a number of BYTES -- everything written since the last backup, all
+     of which a restore loses. RTO is a number of HOURS -- copy the dataset
+     back, then replay the log that covers the gap. "We have backups" answers
+     neither question. */
+  function rpoBytes(intervalSec, writeBps) { return Rmul(intervalSec, writeBps); }
+  /* The worst case is a failure the instant before the next backup; the
+     expected case is half an interval, because the failure lands uniformly
+     inside it. */
+  function rpoExpectedBytes(intervalSec, writeBps) {
+    return Rdiv(rpoBytes(intervalSec, writeBps), R(2n, 1n));
+  }
+  function restoreSeconds(sizeBytes, restoreBps) { return Rdiv(sizeBytes, restoreBps); }
+  function replaySeconds(logBytes, replayBps) { return Rdiv(logBytes, replayBps); }
+  function rtoSeconds(sizeBytes, restoreBps, logBytes, replayBps) {
+    return Radd(restoreSeconds(sizeBytes, restoreBps), replaySeconds(logBytes, replayBps));
+  }
+  /* The longest backup interval that still fits an RTO target. Null when the
+     copy alone blows it -- at which point the schedule is not the problem and
+     the page says which number is. */
+  function intervalForRto(sizeBytes, restoreBps, writeBps, replayBps, targetSec) {
+    var left = Rsub(targetSec, restoreSeconds(sizeBytes, restoreBps));
+    if (Rcmp(left, R(0n, 1n)) <= 0) return null;
+    return Rdiv(Rmul(left, replayBps), writeBps);
+  }
+  var PRESET = {"interval": 24, "write": 20, "size": 2000, "restore": 200, "replay": 50};
+
+  var intervalS = document.getElementById('rcInterval');
+  var writeS = document.getElementById('rcWrite');
+  var sizeS = document.getElementById('rcSize');
+  var restoreS = document.getElementById('rcRestore');
+  var replayS = document.getElementById('rcReplay');
+  var plot = document.getElementById('rcTimeline');
+  var table = document.getElementById('rcTable');
+  var status = document.getElementById('rcStatus');
+
+  var TARGET_RTO = R(14400n, 1n);        /* four hours, the target the panel names */
+
+  function redraw() {
+    var hours = +intervalS.value, wmb = +writeS.value, gb = +sizeS.value;
+    var rmb = +restoreS.value, pmb = +replayS.value;
+    var interval = R(BigInt(hours) * 3600n, 1n);
+    var write = R(BigInt(wmb) * 1000000n, 1n);
+    var size = R(BigInt(gb) * 1000000000n, 1n);
+    var restore = R(BigInt(rmb) * 1000000n, 1n);
+    var replay = R(BigInt(pmb) * 1000000n, 1n);
+
+    document.getElementById('rcIntervalOut').textContent = hours + (hours === 1 ? ' hour' : ' hours');
+    document.getElementById('rcWriteOut').textContent = grp(wmb) + ' MB/s';
+    document.getElementById('rcSizeOut').innerHTML = byteText(size);
+    document.getElementById('rcRestoreOut').textContent = grp(rmb) + ' MB/s';
+    document.getElementById('rcReplayOut').textContent = grp(pmb) + ' MB/s';
+
+    var rpo = rpoBytes(interval, write);
+    var rpoExp = rpoExpectedBytes(interval, write);
+    var copy = restoreSeconds(size, restore);
+    var rep = replaySeconds(rpo, replay);
+    var rto = rtoSeconds(size, restore, rpo, replay);
+    var maxInterval = intervalForRto(size, restore, write, replay, TARGET_RTO);
+
+    document.getElementById('rcRpo').innerHTML = byteText(rpo);
+    document.getElementById('rcRpoExp').innerHTML = byteText(rpoExp);
+    document.getElementById('rcRestoreVal').innerHTML = secText(copy);
+    document.getElementById('rcReplayVal').innerHTML = secText(rep);
+    document.getElementById('rcRto').innerHTML = secText(rto);
+    document.getElementById('rcMax').innerHTML = maxInterval === null
+      ? '<span class="tone-red">none &mdash; the copy alone is ' + secText(copy) + '</span>'
+      : secText(maxInterval);
+
+    /* One row per candidate interval. RPO and the replay both scale with it;
+       the copy does not, which is what makes the copy the floor. */
+    var rows = '', marks = [1, 2, 4, 6, 12, 24, 48], i;
+    for (i = 0; i < marks.length; i += 1) {
+      var ivl = R(BigInt(marks[i]) * 3600n, 1n);
+      var rp = rpoBytes(ivl, write);
+      var rt = rtoSeconds(size, restore, rp, replay);
+      var here = marks[i] === hours;
+      var fits = Rcmp(rt, TARGET_RTO) <= 0;
+      rows += '<tr><td' + (here ? ' class="tone-cyan"' : '') + '>' + marks[i] + ' h'
+        + (here ? ' &larr;' : '') + '</td><td>' + byteText(rp) + '</td><td>'
+        + byteText(Rdiv(rp, R(2n, 1n))) + '</td><td>' + secText(copy) + '</td><td>'
+        + secText(replaySeconds(rp, replay)) + '</td><td><strong>' + secText(rt)
+        + '</strong></td><td class="' + (fits ? 'tone-green">inside 4 h'
+            : 'tone-red">over 4 h') + '</td></tr>';
+    }
+    table.innerHTML = '<thead><tr><th>backup interval</th><th>RPO worst case</th>'
+      + '<th>RPO expected</th><th>copy back</th><th>replay</th><th>RTO</th>'
+      + '<th>against a 4 h target</th></tr></thead><tbody>' + rows + '</tbody>';
+
+    /* ---- the drawing: the schedule, then the recovery window ---- */
+    var x0 = 30, wid = 600, y = 54;
+    var s = '<text x="' + x0 + '" y="20" font-size="11" fill="var(--muted)">'
+      + 'backups every ' + hours + (hours === 1 ? ' hour' : ' hours') + ', writing '
+      + grp(wmb) + ' MB/s between them</text>'
+      + '<line x1="' + x0 + '" y1="' + y + '" x2="' + (x0 + wid) + '" y2="' + y
+      + '" stroke="var(--line-strong)" stroke-width="1.5" />';
+    var marks2 = 4, k;
+    for (k = 0; k <= marks2; k += 1) {
+      var mx = x0 + (wid - 120) * k / marks2;
+      s += '<line x1="' + mx + '" y1="' + (y - 10) + '" x2="' + mx + '" y2="' + (y + 10)
+        + '" stroke="var(--cyan)" stroke-width="2" />'
+        + '<text x="' + mx + '" y="' + (y - 14) + '" text-anchor="middle" font-size="9" '
+        + 'fill="var(--cyan)">backup</text>';
+    }
+    var failX = x0 + wid - 70;
+    s += '<rect x="' + (x0 + (wid - 120)) + '" y="' + (y - 8) + '" width="' + (failX - x0 - wid + 120)
+      + '" height="16" fill="var(--red)" opacity="0.35" />'
+      + '<line x1="' + failX + '" y1="' + (y - 22) + '" x2="' + failX + '" y2="' + (y + 22)
+      + '" stroke="var(--red)" stroke-width="2.5" />'
+      + '<text x="' + failX + '" y="' + (y - 26) + '" text-anchor="middle" font-size="10" '
+      + 'fill="var(--red)" font-weight="700">failure</text>'
+      + '<text x="' + (x0 + wid - 118) + '" y="' + (y + 30) + '" font-size="10" fill="var(--red)">'
+      + 'everything in this gap is gone: up to ' + byteText(rpo) + '</text>';
+
+    var ry = 120, total = Math.max(Rflt(rto), 1e-9);
+    var copyW = (wid - 60) * Rflt(copy) / total, repW = (wid - 60) * Rflt(rep) / total;
+    s += '<text x="' + x0 + '" y="' + (ry - 10) + '" font-size="11" fill="var(--muted)">'
+      + 'and then the clock the other question asks about</text>'
+      + '<rect x="' + x0 + '" y="' + ry + '" width="' + Math.max(3, copyW) + '" height="26" '
+      + 'rx="3" fill="var(--purple)" opacity="0.9" />'
+      + '<rect x="' + (x0 + copyW) + '" y="' + ry + '" width="' + Math.max(3, repW)
+      + '" height="26" rx="3" fill="var(--amber)" opacity="0.9" />'
+      + '<text x="' + (x0 + 6) + '" y="' + (ry + 18) + '" font-size="10" '
+      + 'fill="var(--on-accent)" font-weight="700">'
+      + (copyW > 130 ? 'copy ' + byteText(size) + ' back: ' + secText(copy) : '') + '</text>'
+      + '<text x="' + (x0 + copyW + 6) + '" y="' + (ry + 18) + '" font-size="10" '
+      + 'fill="var(--on-accent)" font-weight="700">'
+      + (repW > 110 ? 'replay: ' + secText(rep) : '') + '</text>'
+      + '<text x="' + x0 + '" y="' + (ry + 46) + '" font-size="11" fill="var(--text)" '
+      + 'font-weight="700">RTO = ' + secText(copy) + ' + ' + secText(rep) + ' = '
+      + secText(rto) + '</text>'
+      + '<text x="' + x0 + '" y="' + (ry + 66) + '" font-size="10" fill="var(--muted)">'
+      + 'the purple block does not move when you change the backup schedule &mdash; it is '
+      + byteText(size) + ' at ' + grp(rmb) + ' MB/s, and it is the floor under every RTO '
+      + 'promise</text>'
+      + '<text x="' + x0 + '" y="' + (ry + 84) + '" font-size="10" fill="var(--amber)">'
+      + (maxInterval === null
+          ? 'no schedule reaches a four-hour RTO: the copy alone is ' + secText(copy)
+          : 'the longest interval that still fits a four-hour RTO is ' + secText(maxInterval))
+      + '</text>';
+    plot.innerHTML = s;
+
+    status.innerHTML = 'A backup every ' + hours + (hours === 1 ? ' hour' : ' hours')
+      + ' at ' + grp(wmb) + ' MB/s puts <strong>' + byteText(rpo)
+      + '</strong> at risk in the worst case and <strong>' + byteText(rpoExp)
+      + '</strong> on average, because a failure lands uniformly inside the interval. That is '
+      + 'the RPO, and it is measured in bytes. The RTO is a different number in a different '
+      + 'unit: copying ' + byteText(size) + ' back at ' + grp(rmb) + ' MB/s takes <strong>'
+      + secText(copy) + '</strong>, replaying ' + byteText(rpo) + ' of log at ' + grp(pmb)
+      + ' MB/s takes <strong>' + secText(rep) + '</strong>, and the two together are <strong>'
+      + secText(rto) + '</strong>. Halving the backup interval halves the bytes at risk and '
+      + 'halves the replay &mdash; and leaves the copy exactly where it was, which is why the '
+      + 'copy is the floor under any recovery-time promise. '
+      + (maxInterval === null
+          ? 'At this restore bandwidth a four-hour RTO is unreachable on any schedule: the copy '
+            + 'alone is ' + secText(copy) + ', so the thing to buy is bandwidth, not more '
+            + 'frequent backups.'
+          : 'To stay inside four hours the interval has to be at most <strong>'
+            + secText(maxInterval) + '</strong>.')
+      + ' "We have backups" answers neither question: it is not a number of bytes and it is not '
+      + 'a number of hours.';
+  }
+
+  [intervalS, writeS, sizeS, restoreS, replayS].forEach(function (el) {
+    el.addEventListener('input', redraw);
+  });
+  intervalS.value = PRESET.interval; writeS.value = PRESET.write; sizeS.value = PRESET.size;
+  restoreS.value = PRESET.restore; replayS.value = PRESET.replay;
+  redraw();
+  window.redrawLab = redraw;
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "storage-engines-and-indexes/rpo-and-rto";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+  </script>
+</body>
+</html>

@@ -27,9 +27,9 @@ COURSE = {
         "P(all n ≤ p99) = 0.99ⁿ               ½ at n = 69",
         "p99(A + B) < p99(A) + p99(B)",
     ],
-    "assumes_short": "Course 1; independence and random variables",
+    "assumes_short": "Capacity Estimation; independence and random variables",
     "assumes_long": (
-        "course 1, plus independence, computing probabilities, random variables, "
+        "capacity estimation, plus independence, computing probabilities, random variables, "
         "cartesian products and tuples, and graph traversal from discrete mathematics, "
         "and roots and radicals from algebra"
     ),
@@ -71,10 +71,10 @@ COURSE = {
         "arithmetic error this course reliably produces.",
     ],
     "not_covered": [
-        "Where the tail comes from. Queueing is course 3; this course measures the tail "
+        "Where the tail comes from. Queueing is Queues and Utilisation; this course measures the tail "
         "and composes it.",
         "How the measurement could be lying. Coordinated omission, bucket error and "
-        "scrape intervals are course 10.",
+        "scrape intervals are Measuring Systems.",
         'Congestion control as a subject. One bound &mdash; Mathis &mdash; is computed '
         'in &ldquo;Packet Loss and Throughput&rdquo; because it decides cross-region '
         'throughput; the algorithms behind it are not taught.',

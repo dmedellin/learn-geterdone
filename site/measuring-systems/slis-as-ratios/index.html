@@ -1,0 +1,2769 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>SLIs as Ratios | Lesson | Measuring Systems | System Design | Learn · geterdone.io</title>
+  <meta name="description" content="An indicator of service quality is a ratio: good events over valid events, counted across a window. It is measured, not observed, so it arrives with an error bar whose width is √(p(1 − p)/n) and depends on the size of the window rather than on the health of the service. A thousand requests cannot tell 99.9% from 99.8%, and most arguments about whether an objective was met are arguments about a number whose error bar contains both positions." />
+  <link rel="canonical" href="https://learn.geterdone.io/measuring-systems/slis-as-ratios/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="SLIs as Ratios | Lesson | Measuring Systems | System Design | Learn · geterdone.io" />
+  <meta property="og:description" content="An indicator of service quality is a ratio: good events over valid events, counted across a window. It is measured, not observed, so it arrives with an error bar whose width is √(p(1 − p)/n) and depends on the size of the window rather than on the health of the service. A thousand requests cannot tell 99.9% from 99.8%, and most arguments about whether an objective was met are arguments about a number whose error bar contains both positions." />
+  <meta property="og:url" content="https://learn.geterdone.io/measuring-systems/slis-as-ratios/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="SLIs as Ratios | Lesson | Measuring Systems | System Design | Learn · geterdone.io" />
+  <meta name="twitter:description" content="An indicator of service quality is a ratio: good events over valid events, counted across a window. It is measured, not observed, so it arrives with an error bar whose width is √(p(1 − p)/n) and depends on the size of the window rather than on the health of the service. A thousand requests cannot tell 99.9% from 99.8%, and most arguments about whether an objective was met are arguments about a number whose error bar contains both positions." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/measuring-systems/slis-as-ratios/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    @media (max-width: 920px) {
+      body[data-page-kind="supplemental"] [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/system-design/">System Design</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Measuring Systems</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">SLIs as Ratios</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The an sli is a ratio with an error bar is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Measuring Systems &middot; What a number means</span>
+        <h1>SLIs as Ratios</h1>
+        <p>An indicator of service quality is a ratio: good events over valid events, counted across a window. It is measured, not observed, so it arrives with an error bar whose width is <span class="math">√(p(1 − p)/n)</span> and depends on the size of the window rather than on the health of the service. A thousand requests cannot tell 99.9% from 99.8%, and most arguments about whether an objective was met are arguments about a number whose error bar contains both positions.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">SLI = good events ÷ valid events, over a stated window
+SE = √(p(1−p)/n)          n = 1 000, p = 0.9995 → SE ≈ 0.0707%
+gap to a 99.9% objective   0.05% = 0.71 SE      inside the noise
+n ≥ p(1−p)/w²              w = 0.025% → 7 996 requests
+precision goes as 1/√n     4× the requests buys 2× the precision</div>
+        <div class="float-label" style="right:16px;bottom:16px;">A ratio, and the error bar that arrives with it</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>One formula, and the two things it is usually misread about: what is in the denominator, and what a difference smaller than the error bar is evidence of.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>An SLI is a ratio, and its denominator is a decision</h3><p>Good events over valid events. Both halves are choices you make before you measure anything: a request that a client abandoned, a health check, a request rejected for a malformed body &mdash; each is either valid or not, and moving one of them across the line moves the ratio without anything happening to the service. Two teams quoting different availabilities for the same week are usually quoting different denominators, and no amount of precision resolves that.</p></article><article class="card concept-card"><div class="icon">2</div><h3>The ± is a property of the count, not of the service</h3><p>Each valid event either succeeds or does not, so the count of good ones behaves like <span class="math">n</span> independent trials at probability <span class="math">p</span>, and the measured ratio has variance <span class="math">p(1 − p)/n</span>. Its standard error is the square root, <span class="math">√(p(1 − p)/n)</span>. Nothing about the system appears in that expression except <span class="math">p</span> itself: a healthy service measured over a short window produces a noisy number, and the noise is arithmetic rather than a symptom.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Precision costs the square</h3><p>The error bar shrinks as <span class="math">1/√n</span>, so halving it costs four times the traffic and the rest of the day buys less than the morning did. At <span class="math">p = 0.999</span> one thousand requests give a standard error of about <span class="math">0.1%</span> &mdash; the entire distance between 99.9% and 99.8%, which is why a thousand requests cannot tell those two apart. Resolving a tenth of a per cent takes about four thousand, and resolving a hundredth takes a hundred times as many again.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>The ratio, its standard error, and the window that resolves a tenth of a per cent</h2></div><p>Where <span class="math">√(p(1 − p)/n)</span> comes from, what a gap of 0.71 standard errors is evidence of, and the request count a stated precision requires.</p></div>
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Service level indicator</span><p>A <strong>service level indicator</strong> is a ratio <span class="math">good ÷ valid</span> of events counted over a stated <strong>window</strong>. The <strong>objective</strong> is a target the indicator is compared against. An indicator is not complete without its window and its denominator: &ldquo;99.95%&rdquo; names neither, and the same events can produce several different correct values of it.</p></div><p>Everything on this course is a ratio of this shape or a percentile of a sample, and both are measurements. The first thing to do with a measurement is to say how wide it is, because a ratio quoted to four figures from a five-minute window is three of those figures wider than it looks.</p><div class="thm"><span class="label">Theorem &middot; The standard error of a measured ratio</span><p>Let each of <span class="math">n</span> valid events be good with probability <span class="math">p</span>, independently. The number of good events has variance <span class="math">n·p(1 − p)</span>, so the measured ratio <span class="math">good/n</span> has variance</p><p><span class="math">p(1 − p)/n</span>,  and standard error  <span class="math">SE = √(p(1 − p)/n)</span>.</p><p>The variance of a Bernoulli trial, and the rule that the variance of a mean of <span class="math">n</span> independent copies is the variance divided by <span class="math">n</span>, are proved in &ldquo;Variance and Standard Deviation&rdquo; on the Discrete Mathematics path. This page uses the result; that page establishes it.</p></div><p>Independence is the assumption and it is the one that fails. Requests that fail because one dependency is down are not independent trials, and during an incident the true error bar is wider than this one &mdash; the formula is a floor on the uncertainty, not a description of it. What it is exactly right about is the quiet week, which is when the arguments happen.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">a window of n = 1 000 requests reporting 99.95%
+
+p = 9995/10000 = 1999/2000        1 − p = 1/2000
+
+p(1 − p)     = 1999/4000000
+p(1 − p)/n   = 1999/4000000000            exact
+
+SE = √(1999/4000000000) = 0.000706929…
+                        ≈ 0.0707%          rounded, and it is a root</div><p>The variance is an exact fraction and the standard error is not, because a square root of a rational is almost never rational. The lab prints the fraction under the root exactly and labels the root itself as rounded. That is the only rounded figure on this course and its lesson says so.</p><p>Now compare the measurement to the objective. The gap is <span class="math">0.9995 − 0.9990 = 0.0005</span>, which is <span class="math">0.05%</span>. In units of the error bar that is <span class="math">0.0005 ÷ 0.000707 = 0.71</span> &mdash; less than one standard error. A window that reports 99.95% against a 99.9% objective has produced a number that a service sitting exactly on the objective would produce routinely.</p><div class="example"><span class="label">Example &middot; A window that says 99.95% and settles nothing</span><p>One thousand requests, 99.95% good, a 99.9% objective, and a meeting. The measured ratio is above the objective, so the objective was met &mdash; except that the same window run again on a service that is exactly at 99.9% would land above 99.95% about a quarter of the time by arithmetic alone. The honest report is &ldquo;99.95% ± 0.07%, which does not separate us from the objective&rdquo;. It is a shorter meeting.</p></div><h3>How many requests resolve a tenth of a per cent</h3><p>Turn the formula round. To resolve a difference of <span class="math">w</span>, ask for an error bar of <span class="math">w</span>: set <span class="math">√(p(1 − p)/n) ≤ w</span> and solve for <span class="math">n</span>. A difference worth acting on is usually wanted at two standard errors rather than one, so put half the gap in as <span class="math">w</span>.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">want   SE ≤ w,   so   p(1 − p)/n ≤ w²,   so   n ≥ p(1 − p)/w²
+
+gap of 0.05%, wanted at 2 SE:   w = 0.00025
+
+n ≥ (1999/4000000) ÷ (1/16000000)
+  = 1999 × 4
+  = 7 996 requests
+
+check by search: the smallest n with 2·√(p(1−p)/n) ≤ 0.0005  →  7 996</div><p>Two routes to one integer, which is the check: the closed form and an exact scan over <span class="math">n</span> agree on 7 996. At a hundred requests a second that is eighty seconds, which is a useful thing to know before anyone proposes a five-minute window as the unit an objective is judged in.</p><p>The <span class="math">1/√n</span> is not specific to measurement. Estimating a quantity by running a simulation many times has exactly the same error bar for exactly the same reason, which is what &ldquo;Monte Carlo Estimation and the Standard Error&rdquo; on the Operations Research path is about: four times the runs for twice the precision, whether the trials are simulated or served. No tail inequality is needed on this page &mdash; Markov and Chebyshev, which bound a deviation without knowing the distribution, are &ldquo;From Expectation to Probability&rdquo; on the Algorithms path, and here the distribution is known.</p><h3>What the error bar does not cover</h3><p>It covers sampling noise and nothing else. A denominator that silently excludes the requests that never reached the load balancer produces a ratio that is biased, not noisy, and doubling the window makes it more precisely wrong. The same is true of a window whose boundary falls in the middle of an incident, of retries counted as separate valid events, and of a client-side timeout the server never saw. Systematic error has no <span class="math">√n</span> in it, and the only defence is writing down what the denominator is.</p></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>An SLI is a ratio with an error bar</h2></div><p>What a window of n requests can and cannot tell you about a ratio</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>An SLI and its error bar</strong><span>good &divide; total over a window, plus or minus what the window can resolve</span></div>
+        <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the measurement</span><span class="tone-amber"><i class="legend-swatch"></i>&plusmn; one standard error</span><span class="tone-green"><i class="legend-swatch"></i>the objective</span></div>
+      </div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="slBar" viewBox="0 0 660 170" role="img" aria-label="The measured ratio drawn with its error bar against the objective line."></svg></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="slTable"></table></div>
+      <div class="status-banner" id="slStatus" style="margin-top:12px;"></div>
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>Set the window and what it measured</h3>
+          <p>The variance and the required <span class="math">n</span> are exact fractions of the window and the ratio you set; the standard error is the square root of that fraction and is labelled as rounded. Push the window down to a few hundred requests and watch the error bar swallow the objective line, then find the <span class="math">n</span> at which the two separate.</p>
+        <div>
+          <div class="range-row"><label class="small-copy" for="slN">Requests in the window</label><span class="range-value" id="slNOut">1000</span></div>
+          <input id="slN" type="range" min="100" max="20000" step="100" value="1000" />
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="slObs">Measured success ratio (ten-thousandths)</label><span class="range-value" id="slObsOut">9995</span></div>
+          <input id="slObs" type="range" min="9900" max="10000" step="1" value="9995" />
+        </div>
+        <div class="field">
+          <label for="slObj">The objective</label>
+          <select id="slObj"><option value="99/100">99% &mdash; two nines</option><option value="995/1000">99.5%</option><option value="999/1000" selected>99.9% &mdash; three nines</option><option value="9995/10000">99.95%</option><option value="9999/10000">99.99% &mdash; four nines</option></select>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Measured SLI</span><strong id="slP">&mdash;</strong></div>
+          <div class="kpi"><span>Variance p(1&minus;p)/n, exact</span><strong id="slVar">&mdash;</strong></div>
+          <div class="kpi"><span>Standard error (rounded)</span><strong id="slSe">&mdash;</strong></div>
+          <div class="kpi"><span>Gap to the objective</span><strong id="slGap">&mdash;</strong></div>
+          <div class="kpi"><span>Gap, in standard errors</span><strong id="slSigma">&mdash;</strong></div>
+          <div class="kpi"><span>Window needed to resolve it</span><strong id="slNeed">&mdash;</strong></div>
+        </div>
+        <p class="small-copy" id="slHint" style="margin:0;">The variance is an exact fraction and so is the window size this page solves for: p(1&minus;p)/n &le; w&sup2; needs no square root at all. Only the error bar itself is rounded, because it is a root, and it is the one rounded figure on this course.</p>
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Putting a ± on a ratio you were handed</h2></div><p>The first two steps are arithmetic and the third is the one that changes what anybody says next.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write down the denominator before the ratio</h3><p>What counts as a valid event, and over what window. If you cannot say it in a sentence, the number is not yet a measurement of anything and the error bar is the smaller of your problems.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Compute p(1 − p)/n, then take the root</h3><p>Keep the variance as a fraction and round only at the root. At <span class="math">p</span> near one the product <span class="math">p(1 − p)</span> is small and the arithmetic is easy: <span class="math">0.999 × 0.001 = 0.000999</span>, divided by the window size.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Express the gap to the objective in units of SE</h3><p>Subtract, divide by the standard error, and say the answer out loud. Below about two, the window has not separated the measurement from the objective, and that is the finding &mdash; not a smaller finding than a clear pass or fail, a different one.</p></article><article class="card concept-card"><div class="icon">4</div><h3>If the gap matters, solve for the window</h3><p><span class="math">n ≥ p(1 − p)/w²</span> with <span class="math">w</span> set to half the gap you want resolved. Then ask whether that many requests exist in the period you are allowed to wait, because often they do not and the objective has to be judged over a longer window instead.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>Ratios, windows and error bars</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>1 000 requests, 99.95% measured, a 99.9% objective</h3><p>Every figure below except the root is an exact fraction, and the root is the only rounded number on the page. The question is not whether 99.95% is bigger than 99.9% &mdash; it plainly is &mdash; but whether this window can tell the difference.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">p = 9995/10000 = 1999/2000            n = 1 000
+
+p(1 − p)      = (1999/2000)(1/2000) = 1999/4000000
+variance      = p(1 − p)/n          = 1999/4000000000
+
+SE            = √(1999/4000000000)
+              = 0.000706929…         ≈ 0.0707%   (rounded)
+
+gap           = 0.9995 − 0.9990 = 0.0005 = 0.05%
+gap ÷ SE      = 0.0005 ÷ 0.000706929 = 0.71
+
+so the window reports  99.95% ± 0.07%
+and the objective 99.90% is 0.71 SE away — inside the bar
+
+for a 2 SE separation:   w = 0.00025
+  n ≥ p(1 − p)/w² = (1999/4000000) × 16000000 = 7 996
+  exact scan over n agrees:  7 996</div><p>The last block is the one to keep. A window of 1 000 requests can distinguish 99.95% from about 99.81% and from nothing closer; to separate it from 99.9% takes eight times as many requests, and to separate 99.99% from 99.95% would take far more again.</p><p>For faded practice, take the same objective and a window of 5 000 requests reporting 99.92%. The supplied first move is <span class="math">p(1 − p) = (2498/2500)(2/2500)</span>; compute the standard error, express the gap of 0.02% in units of it, and say in one sentence what the window has established. Then set the lab to those values and check the error bar against the objective line before opening the quiz.</p><p>A last habit worth forming: when someone quotes an indicator to four significant figures, the first question is the window, not the figure. The digits past the error bar were produced by the division, not by the service.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading a ratio over requests as a ratio over users</strong><span>&ldquo;Our p99 is 200 ms, so 99% of users see under 200 ms&rdquo; is the same slip in percentile clothing, and it is wrong in the direction that matters. A user who makes ten requests meets the slow tail with probability <span class="math">1 − 0.99¹⁰ = 9.56%</span>, not 1%, and a page that fans out to twenty backend calls is worse again. The indicator counts events; a user is a bundle of them, and &ldquo;Tail Amplification under Fan-out&rdquo; on the Latency and the Tail course is the arithmetic that converts one into the other.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Quoting more digits than the window supports</strong><span>99.9473% from a five-minute window is a division carried out to six figures on a measurement good to two. The digits are real arithmetic and they are not information, and once they are in a dashboard someone will compare two of them and find a difference. Round the report to the error bar and state the bar.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Changing the denominator between the two windows being compared</strong><span>Last month excluded health checks and this month does not, so the indicator moved by more than any error bar explains and nothing happened to the service. Any comparison of two indicators is first a comparison of two denominators, and a change in definition should be recorded as an event on the graph rather than absorbed into it.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a difference smaller than the error bar reads as a finding, not as a result.</strong><p>You should be able to state the denominator and window of any indicator you quote, compute <span class="math">√(p(1 − p)/n)</span> from them, express the gap to an objective in units of it, solve <span class="math">n ≥ p(1 − p)/w²</span> for a stated resolution, and say which of your error sources the square root does not cover.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Every number after this one is a percentile rather than a ratio, and percentiles fail in a second way that has nothing to do with noise: they are routinely combined by an operation that is not defined on them. &ldquo;Percentiles Do Not Average&rdquo; takes three hosts whose individual p99s are 12, 14 and 400 ms and shows that the average of those three numbers lands below the fleet&rsquo;s median.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link next" href="../percentiles-do-not-average/" rel="next"><span>Lesson</span><strong>Percentiles Do Not Average</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="measuring-systems/slis-as-ratios" data-lesson-title="SLIs as Ratios" data-course-title="Measuring Systems">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Measuring Systems.</strong> The percentile arithmetic on this course is exact and is done on the samples you edit, so that the fleet p99 and the average of per-host p99s are two numbers you can see differ rather than a claim you have to accept. Capture probabilities, cardinalities, load-test lengths and false-alarm rates are exact fractions. The one rounded figure is the standard error of a proportion, which is a square root, and its lesson says so.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure on this path is computed in your browser from the model the lesson states, and a model&rsquo;s answer is only as true as its assumptions &mdash; independence, memorylessness and steady state are named where they are used, and each lesson says where its own fails.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "A window of 1 000 requests reports 99.95% against a 99.9% objective, with a standard error of 0.0707%. What has the window established?", "a": ["That the objective was met, since 99.95% &gt; 99.9%", "That the objective was missed, since the error bar reaches below it", "That the measurement and the objective are 0.71 standard errors apart, which this window cannot separate", "Nothing, because a standard error cannot be computed from one window"], "c": 2, "why": "The gap is <span class=\"math\">0.05% \u00f7 0.0707% = 0.71<\/span> standard errors. That is neither a pass nor a fail: it is a window too short to tell the two apart. The first two answers read a difference smaller than the noise as a verdict in opposite directions, which is how the same number ends up supporting both sides of the argument."}, {"q": "Traffic doubles, so a window of the same length now holds 2 000 requests instead of 1 000. What happens to the standard error?", "a": ["It halves", "It falls by a factor of <span class=\"math\">\u221a2<\/span>, to about 71% of what it was", "It is unchanged, because <span class=\"math\">p<\/span> is unchanged", "It doubles"], "c": 1, "why": "<span class=\"math\">SE = \u221a(p(1 \u2212 p)/n)<\/span>, so <span class=\"math\">n<\/span> appears under a root: doubling <span class=\"math\">n<\/span> divides the error bar by <span class=\"math\">\u221a2 \u2248 1.414<\/span>. Halving it would need four times the traffic. The third answer confuses the ratio, which is unchanged in expectation, with the precision of the measurement of it, which is not."}, {"q": "You want to resolve a difference of 0.1% at two standard errors, around <span class=\"math\">p = 0.999<\/span>. Roughly how many valid events does that take?", "a": ["About 1 000", "About 4 000", "About 16 000", "About 400 000"], "c": 1, "why": "<span class=\"math\">w<\/span> is half the gap, <span class=\"math\">0.0005<\/span>, so <span class=\"math\">n \u2265 p(1 \u2212 p)/w\u00b2 = 0.000999 \u00f7 0.00000025 \u2248 3 996<\/span>. About four thousand. <span class=\"math\">1 000<\/span> is the window that cannot do it; <span class=\"math\">16 000<\/span> is what resolving 0.05% would take, four times as many for half the distance; <span class=\"math\">400 000<\/span> is another factor of ten too far."}, {"q": "A team excludes from the denominator every request that timed out at the client without reaching the server. What does a longer window do to the resulting indicator?", "a": ["It narrows the error bar and leaves the exclusion intact", "It corrects the exclusion, because more data covers more cases", "It widens the error bar, because the excluded requests add variance", "Nothing, since excluded events never affected the ratio"], "c": 0, "why": "The exclusion is a systematic error and <span class=\"math\">\u221an<\/span> does not appear in it: more data makes a biased ratio more precisely biased. The error bar shrinks and the number moves no closer to the truth. This is why the denominator is written down before the measurement rather than discovered afterwards."}];
+
+  (function () {
+
+  /* Exact rational arithmetic over BigInt.
+
+     Every number a lesson calls "the answer" lives in this type. BigInt rather
+     than Number because a few steps of elimination on a 3x3 system produces
+     numerators that leave the exact-integer range of a double, and a solution
+     that is silently wrong in the last digits is worse than no solution. */
+  function bgcd(a, b) {
+    if (a < 0n) a = -a;
+    if (b < 0n) b = -b;
+    while (b) { var t = a % b; a = b; b = t; }
+    return a;
+  }
+  function R(n, d) {
+    if (d === undefined) d = 1n;
+    n = BigInt(n); d = BigInt(d);
+    if (d === 0n) throw new Error('division by zero');
+    if (d < 0n) { n = -n; d = -d; }
+    var g = bgcd(n, d) || 1n;
+    return { n: n / g, d: d / g };
+  }
+  var R0 = R(0n), R1 = R(1n);
+  function Radd(a, b) { return R(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function Rsub(a, b) { return R(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function Rmul(a, b) { return R(a.n * b.n, a.d * b.d); }
+  function Rdiv(a, b) { return R(a.n * b.d, a.d * b.n); }
+  function Rneg(a) { return R(-a.n, a.d); }
+  function Rabs(a) { return a.n < 0n ? Rneg(a) : a; }
+  function Rinv(a) { return R(a.d, a.n); }
+  function Rzero(a) { return a.n === 0n; }
+  function Rsign(a) { return a.n === 0n ? 0 : (a.n < 0n ? -1 : 1); }
+  function Requ(a, b) { return a.n === b.n && a.d === b.d; }
+  function Rcmp(a, b) { var l = a.n * b.d, r = b.n * a.d; return l < r ? -1 : (l > r ? 1 : 0); }
+  function Rint(a) { return a.d === 1n; }
+  function Rpow(a, k) {
+    var out = R1, base = a, e = k < 0 ? -k : k;
+    while (e > 0) { if (e & 1) out = Rmul(out, base); base = Rmul(base, base); e >>= 1; }
+    return k < 0 ? Rinv(out) : out;
+  }
+  /* The reader's form: "3", "-7/4". Never "3/1", never "0/5". */
+  function Rtext(a) { return a.d === 1n ? String(a.n) : a.n + '/' + a.d; }
+  /* Parenthesised when it would otherwise glue onto a neighbouring symbol. */
+  function Rterm(a) { return (a.n < 0n || a.d !== 1n) ? '(' + Rtext(a) + ')' : Rtext(a); }
+  function Rnum(a) { return Number(a.n) / Number(a.d); }
+  /* A decimal, for the one place a lesson asks for one. Exact when it can be. */
+  function Rdec(a, places) {
+    if (places === undefined) places = 6;
+    var v = Rnum(a);
+    if (Rint(a)) return String(a.n);
+    var s = v.toFixed(places);
+    return s.indexOf('.') >= 0 ? s.replace(/0+$/, '').replace(/\.$/, '') : s;
+  }
+  function Rparse(text) {
+    var s = String(text).trim();
+    var m = /^([+-]?\d+)\s*\/\s*(\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]), BigInt(m[2]));
+    m = /^([+-]?\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]));
+    m = /^([+-]?)(\d*)\.(\d+)$/.exec(s);
+    if (m) {
+      var whole = m[2] || '0', frac = m[3];
+      var num = BigInt(whole + frac), den = 10n ** BigInt(frac.length);
+      return R(m[1] === '-' ? -num : num, den);
+    }
+    return null;
+  }
+  /* Is this rational a perfect square? Needed wherever a lesson must decide
+     between an exact answer and a radical one -- sqrt(4/9) is 2/3 and belongs
+     on the page as 2/3, while sqrt(2) must stay sqrt(2). */
+  function bisqrt(n) {
+    if (n < 0n) return null;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x * x === n ? x : null;
+  }
+  function Rsqrt(a) {
+    if (a.n < 0n) return null;
+    var p = bisqrt(a.n), q = bisqrt(a.d);
+    return (p === null || q === null) ? null : R(p, q);
+  }
+
+  /* Counting is done in BigInt. 21! already exceeds what a double can hold
+     exactly, so a lab that used ordinary numbers would start printing
+     confidently wrong totals somewhere around n = 21 with nothing to mark the
+     boundary. Every count below is exact for every n the controls allow. */
+  function fact(n) { var r = 1n; for (var i = 2n; i <= BigInt(n); i += 1n) r *= i; return r; }
+  function perm(n, r) {
+    if (r > n || r < 0) return 0n;
+    var out = 1n;
+    for (var i = 0; i < r; i += 1) out *= BigInt(n - i);
+    return out;
+  }
+  function comb(n, r) {
+    if (r < 0 || r > n) return 0n;
+    r = Math.min(r, n - r);
+    var num = 1n, den = 1n;
+    for (var i = 0; i < r; i += 1) { num *= BigInt(n - i); den *= BigInt(i + 1); }
+    return num / den;
+  }
+  function group(x) { return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+
+  /* Ceiling and floor of an exact rational, as BigInt.
+
+     Capacity answers are counts of machines, shards and tree levels, and the
+     whole point of a sizing lesson is that 3.2 machines is four. Integer
+     division truncates toward zero, so a negative rational needs the sign. */
+  function Rfloor(a) {
+    var q = a.n / a.d;
+    if (a.n < 0n && q * a.d !== a.n) q -= 1n;
+    return q;
+  }
+  function Rceil(a) {
+    var q = a.n / a.d;
+    if (a.n > 0n && q * a.d !== a.n) q += 1n;
+    return q;
+  }
+
+  /* Nearest-rank percentile: the smallest value at or above q of the sample.
+
+     Nearest rank rather than an interpolating definition because it returns a
+     value that was actually observed. A p99 of 412ms that no request took is a
+     worse answer for this subject than one that a request did. */
+  function percentileRank(n, q) {
+    /* q is a rational in [0,1]; the rank is ceil(q*n), at least 1. */
+    var rank = Rceil(Rmul(q, R(BigInt(n), 1n)));
+    if (rank < 1n) rank = 1n;
+    if (rank > BigInt(n)) rank = BigInt(n);
+    return Number(rank);
+  }
+  function percentile(sorted, q) {
+    if (!sorted.length) return null;
+    return sorted[percentileRank(sorted.length, q) - 1];
+  }
+
+  /* P(X <= t) for a sample: a rational, count over total. */
+  function empiricalCdf(sorted, t) {
+    var c = 0;
+    for (var i = 0; i < sorted.length; i += 1) if (sorted[i] <= t) c += 1;
+    return R(BigInt(c), BigInt(sorted.length));
+  }
+
+  /* Availability composition. Series multiplies down, parallel multiplies up,
+     k-of-n is a binomial tail -- all exact, which matters because the
+     interesting answers are differences in the fourth decimal place. */
+  function availSeries(list) {
+    var a = R(1n, 1n);
+    for (var i = 0; i < list.length; i += 1) a = Rmul(a, list[i]);
+    return a;
+  }
+  function availParallel(list) {
+    var down = R(1n, 1n);
+    for (var i = 0; i < list.length; i += 1) down = Rmul(down, Rsub(R(1n, 1n), list[i]));
+    return Rsub(R(1n, 1n), down);
+  }
+  /* P(at least k of n independent components up), each up with probability a. */
+  function availKofN(a, k, n) {
+    var total = R(0n, 1n), q = Rsub(R(1n, 1n), a);
+    for (var j = k; j <= n; j += 1) {
+      total = Radd(total, Rmul(R(comb(n, j), 1n), Rmul(Rpow(a, j), Rpow(q, n - j))));
+    }
+    return total;
+  }
+  /* Expected attempts and success under a retry policy of r retries at failure
+     probability p: the geometric sum the retry-storm lesson iterates on. */
+  function retryAttempts(p, r) {
+    var num = Rsub(R(1n, 1n), Rpow(p, r + 1));
+    return Rdiv(num, Rsub(R(1n, 1n), p));
+  }
+  function retrySuccess(p, r) { return Rsub(R(1n, 1n), Rpow(p, r + 1)); }
+
+  /* A seeded stream. number.py's lcgRun detects the cycle of a generator, which
+     is a different job; a lab that samples needs the values in order and needs
+     the same values every time the page is opened, or a reader cannot check
+     what they were told. */
+  function lcgStream(a, c, m, seed, count) {
+    /* BigInt, not Number. A typical multiplier times a typical state exceeds
+       2^53 on the SECOND step, and a double silently rounds it -- the stream
+       then looks reproducible, because it is reproducibly wrong. */
+    var A = BigInt(a), C = BigInt(c), M = BigInt(m);
+    var out = [], x = ((BigInt(seed) % M) + M) % M;
+    for (var i = 0; i < count; i += 1) { x = (A * x + C) % M; out.push(Number(x)); }
+    return out;
+  }
+  /* Uniform rationals in [0, 1) from that stream. */
+  function streamUniform(a, c, m, seed, count) {
+    return lcgStream(a, c, m, seed, count).map(function (x) {
+      return R(BigInt(x), BigInt(m));
+    });
+  }
+  /* Inverse-transform sampling from a pmf given as [value, rational] pairs. */
+  function sampleFromPmf(pairs, u) {
+    var cum = R(0n, 1n);
+    for (var i = 0; i < pairs.length; i += 1) {
+      cum = Radd(cum, pairs[i][1]);
+      if (Rcmp(u, cum) < 0) return pairs[i][0];
+    }
+    return pairs[pairs.length - 1][0];
+  }
+
+  /* The four places this subject cannot be exact. Each says how it rounds.
+
+     Everything else in the module returns a rational. These return Numbers, and
+     every lesson that calls one states that it is an approximation -- which is
+     the library's rule, not a courtesy. */
+
+  /* e^-x, as the reciprocal of a POSITIVE-term series.
+
+     The obvious implementation sums the alternating series for e^-x directly,
+     and it is wrong in a way that looks right at the arguments a test usually
+     picks. Terms of alternating sign near cancel, losing roughly 2x/ln(10)
+     significant digits: exact at x = 5, 0.4% out at x = 17, 173% out at x = 20,
+     and past x = 21 the SIGN is wrong -- a probability comes back negative.
+
+     Summing e^x instead has every term positive, so nothing cancels, and one
+     division at the end is exact to a rounding. */
+  function expNegApprox(x, tol) {
+    tol = tol || 1e-15;
+    if (x < 0) return 1 / expNegApprox(-x, tol);
+    if (x > 700) return 0;            /* e^700 is the edge of a double */
+    var t = 1, s = 1, k = 1;
+    while (t > tol * s && k < 1000) { t = t * x / k; s += t; k += 1; }
+    return 1 / s;
+  }
+  /* The Bloom false-positive rate. The exact form (1 - 1/m)^(kn) is available
+     as a rational; this is the (1 - e^(-kn/m))^k idealisation lessons compare
+     it against. */
+  function bloomApprox(m, n, k) {
+    return Math.pow(1 - expNegApprox(k * n / m, 1e-15), k);
+  }
+  /* Standard error of a proportion. A square root, so it rounds. */
+  function standardErrorApprox(p, n) { return Math.sqrt(p * (1 - p) / n); }
+  /* The Zipf normaliser past the point where its exact form is unreadable.
+     harmonic() stays exact and is what the lessons use; this is for the
+     lesson that asks what happens at a million keys. */
+  function harmonicApprox(n, s) {
+    if (s === 1) return Math.log(n) + 0.5772156649015329 + 1 / (2 * n);
+    var t = 0;
+    for (var k = 1; k <= n && k <= 100000; k += 1) t += 1 / Math.pow(k, s);
+    return t;
+  }
+  /* Bits per key for a target false-positive rate: log2(1/p)/ln 2.
+
+     NOT "the familiar 1.44 * log2(1/p)", and the difference is the point of
+     the lesson that uses this. 1.44 is a two-digit rounding of 1/ln 2 =
+     1.4427, so at p = 0.01 the textbook constant gives 9.567 and this gives
+     9.585. Both are printed on storage's `bloom` page, each under its own
+     name. This rounds -- it is a logarithm -- like the other Approx functions
+     around it. */
+  function bitsPerKeyApprox(target) { return Math.log2(1 / target) / Math.LN2; }
+  /* A root that rounds, by Newton from a rational start. Rsqrt returns null for
+     a non-square, which is right for exactness and useless for a geometric-mean
+     centre or a square-root scaling law. */
+  function sqrtApprox(a, tol) {
+    var x = Number(a.n) / Number(a.d);
+    if (x < 0) return NaN;
+    if (x === 0) return 0;
+    tol = tol || 1e-15;
+    var g = x, prev = 0;
+    while (Math.abs(g - prev) > tol * Math.max(1, g)) { prev = g; g = (g + x / g) / 2; }
+    return g;
+  }
+  /* Natural log, for the two max-load results this subject STATES rather than
+     proves. Everywhere else a logarithm is an exact integer search instead. */
+  function logApprox(x) { return Math.log(x); }
+
+  /* ================================================================= output
+
+     Rdec goes through Number(a.n)/Number(a.d), and this course produces
+     rationals a double cannot hold: (999/1000)^2996 -- the load-test answer at
+     95% confidence -- has a numerator of nine thousand digits, Number() of it
+     is Infinity, and Infinity/Infinity is NaN. So decimals here are long
+     division in BigInt, rounded half up at the last digit printed. */
+  function Rfixed(a, places) {
+    if (places === undefined) places = 3;
+    var neg = a.n < 0n, n = neg ? -a.n : a.n, d = a.d;
+    var scale = 10n ** BigInt(places);
+    var q = (2n * n * scale + d) / (2n * d);          /* round half up */
+    var whole = q / scale, frac = (q % scale).toString();
+    while (frac.length < places) frac = '0' + frac;
+    var body = places > 0 ? whole + '.' + frac : String(whole);
+    return (neg ? '-' : '') + body;
+  }
+  /* Scaling by a hundred THROUGH THE NUMERATOR, not through Rmul.
+
+     Rmul goes via R(), which runs a gcd, and the fractions printed here have
+     numerators of thousands of digits -- one such gcd costs more than every
+     other computation on the page put together. Rfixed only long-divides, so
+     the fraction it is handed does not have to be in lowest terms, and the
+     value printed is identical. */
+  function Rpct(a, places) {
+    return Rfixed({ n: a.n * 100n, d: a.d }, places === undefined ? 2 : places) + '%';
+  }
+  /* A probability that is nearly 1 or nearly 0 needs its own width, because a
+     fixed two places prints 0.9999994 as 100.00% -- which is the claim these
+     alerting lessons deny. Widen until a non-nine appears, to a limit. */
+  function RpctAuto(a) {
+    var scaled = { n: a.n * 100n, d: a.d }, places = 2, i;
+    for (i = 2; i <= 10; i += 1) {
+      var s = Rfixed(scaled, i);
+      places = i;
+      /* Anchored at BOTH ends: the test is "did this round away to 100 or to
+         zero", not "does it happen to end in a nought". Unanchored, 50.00%
+         looks degenerate because of the nought in 50. */
+      if (!/^(100|0)\.0*$/.test(s)) break;
+    }
+    return Rfixed(scaled, places) + '%';
+  }
+  /* A double for a PIXEL COORDINATE, and never for a figure.
+
+     Rnum is Number(a.n)/Number(a.d), and the probabilities on this course have
+     denominators of hundreds or thousands of digits: Number() of one of those
+     is Infinity, Infinity/Infinity is NaN, and a chart of NaNs paints nothing
+     while throwing nothing -- the failure looks like a styling problem. So a
+     coordinate is long-divided to nine places first. Every printed figure
+     comes from Rfixed or Rpct on the exact fraction, never from here. */
+  function Rplot(a) { return parseFloat(Rfixed(a, 9)); }
+
+  /* Milliseconds, seconds, minutes and hours from an exact rational count of
+     minutes -- the budget lesson's one unit, converted once, here. */
+  function minutesText(a) {
+    if (Rcmp(a, R(1n, 1n)) < 0) return Rfixed(Rmul(a, R(60n, 1n)), 1) + ' s';
+    if (Rcmp(a, R(120n, 1n)) < 0) return Rfixed(a, 2) + ' min';
+    if (Rcmp(a, R(2880n, 1n)) < 0) return Rfixed(Rdiv(a, R(60n, 1n)), 2) + ' h';
+    return Rfixed(Rdiv(a, R(1440n, 1n)), 2) + ' days';
+  }
+
+  /* ============================================ THE FORMULA THAT REPEATS
+
+     P(at least one of k independent trials happens) = 1 - (1-p)^k.
+
+     It is the sampling lesson's capture probability at rate p over k slow
+     requests, the load-test lesson's "did n requests ever include one from the
+     top 0.1%", and the alerting lesson's "did a 0.1%-per-window false alarm
+     fire at least once in a month of windows". Three lessons, three stories,
+     one function -- so that a page can say they are the same formula and the
+     reader can check that the same code produced all three.
+
+     WHY THIS IS NOT Rsub(1, Rpow(1 - p, k)), WHICH IS WHAT IT MEANS. R()
+     normalises with a gcd on every operation, and the powers this course asks
+     for are enormous: at p = 1/1000 and k = 8640 the numerator has 26 000
+     digits, one gcd on which costs about a second, and a lab that recomputes
+     while a slider is dragged cannot pay that.
+
+     Two facts make the gcd unnecessary. Writing p = a/b in lowest terms --
+     which R() guarantees -- the value is (b^k - (b-a)^k)/b^k; and
+     gcd(b, b - a) = gcd(b, a) = 1, so a prime dividing b^k divides the
+     numerator only if it divides (b-a)^k, which it cannot. The fraction is
+     therefore ALREADY in lowest terms and needs no reduction. It is exact, not
+     an approximation, and scripts/mathcheck.js asserts that it agrees with the
+     rational-arithmetic form term for term. */
+  function atLeastOne(p, k) {
+    var a = p.n, b = p.d;
+    if (k <= 0 || a === 0n) return R(0n, 1n);
+    var bk = b ** BigInt(k);
+    return { n: bk - (b - a) ** BigInt(k), d: bk };
+  }
+  /* The same value at n = 0, step, 2*step, ... for the curve a page draws.
+
+     Carrying the power forward one factor at a time rather than recomputing it
+     at each point: the load-test lesson plots sixty points out to three
+     thousand requests, and sixty independent (999/1000)^n each with a
+     nine-thousand-digit numerator is a second and a half of arithmetic for a
+     picture. Every entry is the same exact fraction atLeastOne returns, by the
+     same argument about lowest terms. */
+  function atLeastOneCurve(p, step, points) {
+    var a = p.n, b = p.d, f = (b - a) ** BigInt(step), g = b ** BigInt(step);
+    var num = 1n, den = 1n, out = [], i;
+    for (i = 0; i <= points; i += 1) {
+      out.push({ n: den - num, d: den });
+      num *= f;
+      den *= g;
+    }
+    return out;
+  }
+  /* The smallest k for which that reaches a target, by exact integer search:
+     doubling to bracket, then bisection. No logarithm -- a logarithm would
+     round, and this answer is a count. */
+  function trialsForTarget(p, target, limit) {
+    if (Rcmp(p, R(0n, 1n)) <= 0) return 0;
+    if (Rcmp(target, R(1n, 1n)) >= 0) return 0;          /* certainty needs infinity */
+    if (Rcmp(atLeastOne(p, 1), target) >= 0) return 1;
+    var lo = 1, hi = 2;
+    while (hi <= limit && Rcmp(atLeastOne(p, hi), target) < 0) { lo = hi; hi *= 2; }
+    if (hi > limit) return 0;
+    while (lo + 1 < hi) {
+      var mid = (lo + hi) >> 1;
+      if (Rcmp(atLeastOne(p, mid), target) >= 0) hi = mid; else lo = mid;
+    }
+    return hi;
+  }
+  /* The smallest rate, in units of 1/steps, that catches at least one of k with
+     the stated confidence. A scan rather than a solve, for the same reason. */
+  function rateForTarget(k, target, steps) {
+    for (var j = 1; j <= steps; j += 1) {
+      if (Rcmp(atLeastOne(R(BigInt(j), BigInt(steps)), k), target) >= 0) return R(BigInt(j), BigInt(steps));
+    }
+    return R(1n, 1n);
+  }
+  /* The same answer by bisection instead of by scanning, for the callers whose
+     k is in the thousands: atLeastOne rises with j, so the search is exact, and
+     a scan of ten thousand rates each raising a sixty-thousand-digit power does
+     not finish while a slider moves. mathcheck.js asserts the two agree.
+
+     The SLI lesson reads this backwards and gets the rule of three: with no
+     failures in n requests, the largest failure rate that would still have let
+     the window come back clean with probability 1 - c is this same rate at
+     k = n. At n = 1000 and c = 95% it is exactly 3/1000. */
+  function rateForTargetSearch(k, target, steps) {
+    var lo = 0, hi = steps;
+    if (Rcmp(atLeastOne(R(1n, BigInt(steps)), k), target) >= 0) return R(1n, BigInt(steps));
+    while (lo + 1 < hi) {
+      var mid = (lo + hi) >> 1;
+      if (Rcmp(atLeastOne(R(BigInt(mid), BigInt(steps)), k), target) >= 0) hi = mid; else lo = mid;
+    }
+    return R(BigInt(hi), BigInt(steps));
+  }
+  /* The rule of thumb the same lesson prints beside the exact answer:
+     1 - e^(-sk). It ROUNDS -- expNegApprox sums a positive-term series and
+     divides, to about 1e-13 -- and it is also a different number, because the
+     idealisation is not the exact binomial. Both facts are on the page. */
+  function captureApprox(s, k) { return 1 - expNegApprox(Rnum(s) * k, 1e-15); }
+
+  /* ============================================ L1: an SLI and its error bar
+
+     An SLI is good/total over a window. The estimator's variance is p(1-p)/n
+     EXACTLY -- that part is a fraction and stays one -- and the standard error
+     is its square root, which is the one irrational figure on this course. */
+  function sliRatio(good, total) { return R(BigInt(good), BigInt(total)); }
+  function sliVariance(p, n) {
+    return Rdiv(Rmul(p, Rsub(R(1n, 1n), p)), R(BigInt(n), 1n));
+  }
+  /* Rounds, and every caller says so. */
+  function sliSeApprox(p, n) { return standardErrorApprox(Rnum(p), n); }
+  /* The n at which the standard error is at most w, by exact comparison:
+     p(1-p)/n <= w^2 needs no root at all, which is why this answer is exact
+     while the error bar it sizes is not. Doubling, then bisection. */
+  function sampleSizeForWidth(p, w) {
+    var v = Rmul(p, Rsub(R(1n, 1n), p)), w2 = Rmul(w, w);
+    if (Rzero(w2)) return 0;
+    if (Rzero(v)) return 1;
+    var fits = function (n) { return Rcmp(Rdiv(v, R(BigInt(n), 1n)), w2) <= 0; };
+    if (fits(1)) return 1;
+    var lo = 1, hi = 2;
+    while (!fits(hi) && hi < 1000000000) { lo = hi; hi *= 2; }
+    while (lo + 1 < hi) { var mid = Math.floor((lo + hi) / 2); if (fits(mid)) hi = mid; else lo = mid; }
+    return hi;
+  }
+  /* The same answer in closed form, ceil(p(1-p)/w^2). The page prints both and
+     they must agree: a search and a formula that disagree mean one is wrong,
+     and the reader is entitled to see which. */
+  function sampleSizeClosed(p, w) {
+    var w2 = Rmul(w, w);
+    if (Rzero(w2)) return 0n;
+    var n = Rceil(Rdiv(Rmul(p, Rsub(R(1n, 1n), p)), w2));
+    return n < 1n ? 1n : n;
+  }
+  /* How many standard errors separate an observation from an objective. The
+     misconception this lesson refutes is reading a gap of 0.7 SE as evidence. */
+  function sigmasApprox(p, objective, n) {
+    var se = sliSeApprox(p, n);
+    if (!(se > 0)) return Infinity;
+    return Math.abs(Rnum(Rsub(p, objective))) / se;
+  }
+
+  /* ================================================ L2: aggregating samples
+
+     A sample is a sorted list of integer milliseconds. It is typed either as
+     values or as value:count runs, because the lesson's preset needs one host
+     with ninety requests on it and nobody types ninety numbers.
+
+     percentile() and percentileRank() are NOT defined here. They come from
+     sysdesign_core, they are nearest rank, and they are the same two functions
+     course 2 prints its p99 with. */
+  function parseRuns(text) {
+    var parts = String(text).split(/[,;\s]+/), out = [], i, j;
+    for (i = 0; i < parts.length; i += 1) {
+      var s = parts[i].trim();
+      if (!s) continue;
+      var m = /^([0-9]+)(?::([0-9]+))?$/.exec(s);
+      if (!m) return null;
+      var v = Number(m[1]), c = m[2] === undefined ? 1 : Number(m[2]);
+      if (c < 1 || c > 4000) return null;
+      for (j = 0; j < c; j += 1) out.push(v);
+    }
+    if (!out.length) return null;
+    return out.sort(function (a, b) { return a - b; });
+  }
+  function mergeSamples(lists) {
+    var out = [], i;
+    for (i = 0; i < lists.length; i += 1) out = out.concat(lists[i]);
+    return out.sort(function (a, b) { return a - b; });
+  }
+  function sampleMean(sorted) {
+    var s = 0n;
+    for (var i = 0; i < sorted.length; i += 1) s += BigInt(sorted[i]);
+    return R(s, BigInt(sorted.length));
+  }
+  /* The mean of a list of per-host percentiles. This is the ONLY place in the
+     kit that averages percentiles, and it exists to be contradicted. */
+  function meanOfPercentiles(values) {
+    var s = 0n;
+    for (var i = 0; i < values.length; i += 1) s += BigInt(values[i]);
+    return R(s, BigInt(values.length));
+  }
+  function hostPercentiles(lists, q) {
+    var out = [];
+    for (var i = 0; i < lists.length; i += 1) out.push(percentile(lists[i], q));
+    return out;
+  }
+  /* The fleet percentile: the percentile OF THE MERGED SAMPLE. One definition,
+     applied to every request the fleet served. */
+  function fleetPercentile(lists, q) { return percentile(mergeSamples(lists), q); }
+  /* The bound that does hold: the pooled percentile can never exceed the
+     largest per-host one, because ceil(qn_1) + ... + ceil(qn_h) >= ceil(qN).
+     The mean of the per-host percentiles has no such relation to anything,
+     which is the lesson. */
+  function maxOf(values) {
+    var m = values[0];
+    for (var i = 1; i < values.length; i += 1) if (values[i] > m) m = values[i];
+    return m;
+  }
+  function minOf(values) {
+    var m = values[0];
+    for (var i = 1; i < values.length; i += 1) if (values[i] < m) m = values[i];
+    return m;
+  }
+
+  /* ============================================== L3: histograms and buckets
+
+     A histogram does not store the requests. It stores how many fell in each
+     bucket, so a percentile read off it is known only to the width of the
+     bucket that contains it. With exponential buckets at ratio r, every bucket
+     is r times as wide as its lower edge, so the answer is known to a FACTOR
+     of r -- a p99 reported as 100 ms with r = 2 is somewhere in [100, 200).
+
+     Edges are exact rationals, so r = 3/2 is a ratio of three halves and not
+     1.4999999999999998. */
+  function bucketEdges(base, ratio, count) {
+    var out = [], b = R(BigInt(base), 1n), i;
+    for (i = 0; i <= count; i += 1) out.push(Rmul(b, Rpow(ratio, i)));
+    return out;
+  }
+  /* The bucket containing a value: -1 below the first edge, edges.length - 1
+     for the open-ended overflow bucket above the last. */
+  function bucketIndex(edges, value) {
+    var v = R(BigInt(value), 1n), i;
+    if (Rcmp(v, edges[0]) < 0) return -1;
+    for (i = 0; i + 1 < edges.length; i += 1) {
+      if (Rcmp(v, edges[i + 1]) < 0) return i;
+    }
+    return edges.length - 1;
+  }
+  /* Counts per bucket, with the two open ends kept separate rather than folded
+     in: a sample that overflows the last edge is a histogram that cannot
+     report its own tail at all, and the page has to be able to say so. */
+  function bucketCounts(sorted, edges) {
+    var under = 0, over = 0, inside = [], i;
+    for (i = 0; i + 1 < edges.length; i += 1) inside.push(0);
+    for (i = 0; i < sorted.length; i += 1) {
+      var b = bucketIndex(edges, sorted[i]);
+      if (b < 0) under += 1;
+      else if (b >= inside.length) over += 1;
+      else inside[b] += 1;
+    }
+    return { under: under, inside: inside, over: over };
+  }
+  /* What the HISTOGRAM can report: the first bucket whose cumulative count
+     reaches the rank the percentile needs. The rank is percentileRank from the
+     core -- the same rank the exact percentile uses -- so the only difference
+     between the two answers is the bucketing, which is the lesson. */
+  function histogramBucket(sorted, edges, q) {
+    var rank = percentileRank(sorted.length, q);
+    var counts = bucketCounts(sorted, edges), cum = counts.under, i;
+    if (cum >= rank) return -1;
+    for (i = 0; i < counts.inside.length; i += 1) {
+      cum += counts.inside[i];
+      if (cum >= rank) return i;
+    }
+    return counts.inside.length;
+  }
+  function bucketWidth(edges, i) {
+    if (i < 0 || i + 1 >= edges.length) return null;
+    return Rsub(edges[i + 1], edges[i]);
+  }
+  /* The relative width of any bucket is r - 1, at every scale. That is the
+     whole argument for exponential bucketing: the error is a constant
+     PERCENTAGE rather than a constant number of milliseconds. */
+  function bucketRelative(ratio) { return Rsub(ratio, R(1n, 1n)); }
+
+  /* ================================================== L4: coordinated omission
+
+     A closed-loop generator sends the next request when the last one comes
+     back. During a stall it therefore sends nothing, so a stall that should
+     have hit every request scheduled inside it is measured exactly once.
+
+     The correction is to impute the requests the schedule called for: at an
+     interval I, a stall of S beginning with a request at time T means requests
+     were due at T + I, T + 2I, ... up to T + S, and each of those would have
+     waited until the stall cleared -- latencies S - I, S - 2I, ... down to the
+     last one still inside the stall. Nothing random, nothing precomputed:
+     integer arithmetic on the numbers the reader set. */
+  function naiveSample(n, serviceMs, stallMs) {
+    var out = [], i;
+    for (i = 0; i < n - 1; i += 1) out.push(serviceMs);
+    out.push(stallMs);
+    return out.sort(function (a, b) { return a - b; });
+  }
+  function imputedLatencies(intervalMs, stallMs) {
+    var out = [], j;
+    if (intervalMs <= 0) return out;
+    for (j = 1; j * intervalMs < stallMs; j += 1) out.push(stallMs - j * intervalMs);
+    return out;
+  }
+  function correctedSample(n, intervalMs, serviceMs, stallMs) {
+    return naiveSample(n, serviceMs, stallMs)
+      .concat(imputedLatencies(intervalMs, stallMs))
+      .sort(function (a, b) { return a - b; });
+  }
+  /* How much of the stall the generator never charged anyone for. */
+  function omittedCount(intervalMs, stallMs) { return imputedLatencies(intervalMs, stallMs).length; }
+
+  /* ================================================= L5: scrape intervals
+
+     A gauge is read every I seconds. A spike of duration d is seen only if a
+     read instant falls inside it, so the probability over a uniformly random
+     phase is min(1, d/I) -- exact, and the min is a comparison, not a rounding.
+
+     The longest spike that can be entirely invisible is therefore one instant
+     short of the interval: at a one-second granularity, I - 1 seconds. */
+  function catchProbability(d, I) {
+    if (I <= 0) return R(1n, 1n);
+    var p = R(BigInt(d), BigInt(I));
+    return Rcmp(p, R(1n, 1n)) >= 0 ? R(1n, 1n) : p;
+  }
+  function longestInvisible(I) { return I <= 1 ? 0 : I - 1; }
+  /* One RUN, from the seeded stream in sysdesign_core: spike start times drawn
+     over a horizon, then the scrape instants laid over them and the hits
+     counted. The probability above is what happens on average; this is what
+     happened on the run drawn, and the two differ, which is the point of
+     showing both. */
+  /* MINSTD -- a = 16807, c = 0, m = 2^31 - 1, which is PRIME -- rather than the
+     glibc constants the rest of the path uses, because these draws are consumed
+     MODULO a horizon and then compared modulo a scrape interval. Under a
+     power-of-two modulus the low bits are a cycle and not a sample: x % 4 runs
+     0, 1, 2, 3 forever, so at an interval of 4, 8 or 16 seconds the drawn run
+     would catch exactly d/I of its spikes every single time, and this page --
+     whose whole point is that one run is NOT the probability -- would be
+     demonstrating the arithmetic with the arithmetic. A prime modulus shares no
+     factor with any reducer.
+
+     The seed is mixed before it becomes a state, by the splitmix64 finaliser,
+     for the reason shard.py sets out: an LCG's k-th value is affine in its
+     seed, so the small seeds a slider offers walk a straight line instead of
+     sampling, and this mode asks the reader to reseed and compare. */
+  function measureSeedState(seed) {
+    var mask = 0xFFFFFFFFFFFFFFFFn;
+    var x = (BigInt(seed) + 1n) * 0x9E3779B97F4A7C15n & mask;
+    x = ((x ^ (x >> 30n)) * 0xBF58476D1CE4E5B9n) & mask;
+    x = ((x ^ (x >> 27n)) * 0x94D049BB133111EBn) & mask;
+    x = x ^ (x >> 31n);
+    return Number(x % 2147483646n) + 1;                /* never the fixed point 0 */
+  }
+  function measureStream(seed, count) {
+    return lcgStream(16807, 0, 2147483647, measureSeedState(seed), count);
+  }
+  function spikeStarts(count, horizon, seed) {
+    var raw = measureStream(seed, count), out = [], i;
+    for (i = 0; i < raw.length; i += 1) out.push(raw[i] % horizon);
+    return out.sort(function (a, b) { return a - b; });
+  }
+  function scrapeInstants(I, offset, horizon) {
+    var out = [], t;
+    for (t = offset; t < horizon; t += I) out.push(t);
+    return out;
+  }
+  /* A spike covering [s, s + d) is caught if any instant lands in it. */
+  function spikeCaught(start, d, I, offset) {
+    if (I <= 0) return true;
+    var first = Math.ceil((start - offset) / I) * I + offset;
+    return first < start + d;
+  }
+  function caughtCount(starts, d, I, offset) {
+    var c = 0;
+    for (var i = 0; i < starts.length; i += 1) if (spikeCaught(starts[i], d, I, offset)) c += 1;
+    return c;
+  }
+
+  /* ----------------------------------------- L5 also: a counter that resets
+
+     A rate is the difference between two reads divided by the time between
+     them. A process restart sets the counter back to zero, so the two reads
+     either side of it differ by a NEGATIVE number, and the naive rate is a
+     large negative -- or worse, where the counter has climbed again before the
+     next read, a small positive that reads as a quiet period.
+
+     The correction is the one every time-series database makes: a decrease
+     between consecutive reads is a reset, and the increase across that gap is
+     the second read itself, because the counter started again from zero. It is
+     right in sign and still low in value, because the increments between the
+     last read and the restart went with the process; the page prints how many
+     were lost, since a correction that hides its own residue is worse than the
+     error it fixes. Integers throughout. */
+  function counterSamples(perSecond, I, horizon, resetAt) {
+    var out = [], t;
+    for (t = 0; t <= horizon; t += I) {
+      var since = (resetAt > 0 && t >= resetAt) ? t - resetAt : t;
+      out.push([t, since * perSecond]);
+    }
+    return out;
+  }
+  function naiveRates(samples) {
+    var out = [], i;
+    for (i = 1; i < samples.length; i += 1) {
+      out.push(R(BigInt(samples[i][1] - samples[i - 1][1]), BigInt(samples[i][0] - samples[i - 1][0])));
+    }
+    return out;
+  }
+  function correctedRates(samples) {
+    var out = [], i;
+    for (i = 1; i < samples.length; i += 1) {
+      var d = samples[i][1] - samples[i - 1][1];
+      if (d < 0) d = samples[i][1];          /* a decrease is a restart from zero */
+      out.push(R(BigInt(d), BigInt(samples[i][0] - samples[i - 1][0])));
+    }
+    return out;
+  }
+  /* The interval in which the counter went backwards, or -1. */
+  function resetInterval(samples) {
+    for (var i = 1; i < samples.length; i += 1) if (samples[i][1] < samples[i - 1][1]) return i;
+    return -1;
+  }
+  /* The increments the correction cannot recover: those between the last read
+     before the restart and the restart itself. */
+  function lostIncrements(perSecond, I, resetAt) {
+    if (resetAt <= 0) return 0;
+    return perSecond * (resetAt - Math.floor(resetAt / I) * I);
+  }
+
+  /* ================================================ L6: sampling rare events
+
+     The capture probability is atLeastOne(s, k) above -- the same function the
+     load test and the alert use. What is local to this lesson is what sampling
+     does to a MEAN once the rate stops being uniform.
+
+     A population is value:count runs. Sampling keeps a fraction sHead of the
+     requests at or below a threshold and sTail of those above it. The expected
+     sampled multiset therefore holds rate_i * count_i of each value, and:
+
+       the naive mean divides the sampled total by the sampled count;
+       the reweighted mean divides each sampled item by its own inclusion
+       probability first -- Horvitz-Thompson -- and recovers the true mean.
+
+     Both are computed here from the same runs, exactly, so the page shows the
+     distortion and the correction rather than asserting either. */
+  function runsFromText(text) {
+    var parts = String(text).split(/[,;\s]+/), out = [], i;
+    for (i = 0; i < parts.length; i += 1) {
+      var s = parts[i].trim();
+      if (!s) continue;
+      var m = /^([0-9]+):([0-9]+)$/.exec(s);
+      if (!m) return null;
+      if (Number(m[2]) <= 0) return null;
+      out.push([Number(m[1]), Number(m[2])]);
+    }
+    return out.length ? out.sort(function (a, b) { return a[0] - b[0]; }) : null;
+  }
+  function runRate(value, threshold, sHead, sTail) {
+    return value > threshold ? sTail : sHead;
+  }
+  function trueMean(runs) {
+    var num = R(0n, 1n), den = R(0n, 1n), i;
+    for (i = 0; i < runs.length; i += 1) {
+      num = Radd(num, R(BigInt(runs[i][0]) * BigInt(runs[i][1]), 1n));
+      den = Radd(den, R(BigInt(runs[i][1]), 1n));
+    }
+    return Rzero(den) ? R(0n, 1n) : Rdiv(num, den);
+  }
+  function sampledMean(runs, threshold, sHead, sTail) {
+    var num = R(0n, 1n), den = R(0n, 1n), i;
+    for (i = 0; i < runs.length; i += 1) {
+      var rate = runRate(runs[i][0], threshold, sHead, sTail);
+      var kept = Rmul(rate, R(BigInt(runs[i][1]), 1n));
+      num = Radd(num, Rmul(kept, R(BigInt(runs[i][0]), 1n)));
+      den = Radd(den, kept);
+    }
+    return Rzero(den) ? R(0n, 1n) : Rdiv(num, den);
+  }
+  function reweightedMean(runs, threshold, sHead, sTail) {
+    var num = R(0n, 1n), den = R(0n, 1n), i;
+    for (i = 0; i < runs.length; i += 1) {
+      var rate = runRate(runs[i][0], threshold, sHead, sTail);
+      if (Rzero(rate)) continue;                 /* never sampled, never estimable */
+      var kept = Rmul(rate, R(BigInt(runs[i][1]), 1n));
+      var weight = Rdiv(kept, rate);             /* each item counted 1/rate times */
+      num = Radd(num, Rmul(weight, R(BigInt(runs[i][0]), 1n)));
+      den = Radd(den, weight);
+    }
+    return Rzero(den) ? R(0n, 1n) : Rdiv(num, den);
+  }
+  function slowCount(runs, threshold) {
+    var c = 0;
+    for (var i = 0; i < runs.length; i += 1) if (runs[i][0] > threshold) c += runs[i][1];
+    return c;
+  }
+
+  /* ==================================================== L7: metric cardinality
+
+     A label is not a field, it is a multiplier: the series count is the
+     product of the label cardinalities, and the storage is series x samples x
+     bytes. Everything here is integer, so the only interesting question is how
+     fast the product grows, which is the lesson. */
+  function seriesCount(cards) {
+    var p = 1n;
+    for (var i = 0; i < cards.length; i += 1) p *= BigInt(cards[i]);
+    return p;
+  }
+  function samplesPerDay(scrapeSeconds) {
+    return R(86400n, BigInt(scrapeSeconds));
+  }
+  function bytesPerDay(series, scrapeSeconds, bytesPerSample) {
+    return Rmul(Rmul(R(series, 1n), samplesPerDay(scrapeSeconds)), R(BigInt(bytesPerSample), 1n));
+  }
+  /* Decimal gigabytes, stated: 1 GB = 10^9 B, the unit a bill is quoted in. */
+  function gigabytes(bytes) { return Rdiv(bytes, R(1000000000n, 1n)); }
+
+  /* ================================================= L9: the error budget
+
+     99.9% of a 30-day window is exactly 43.2 minutes. A burn rate b is a
+     multiple of the rate that would consume exactly the whole budget over
+     exactly the period, so a window of w minutes at burn b spends b*w/period
+     of it, and the budget runs out after period/b.
+
+     Minutes throughout, exactly. 43.2 is 216/5. */
+  function periodMinutes(days) { return R(BigInt(days) * 1440n, 1n); }
+  function budgetMinutes(objective, days) {
+    return Rmul(Rsub(R(1n, 1n), objective), periodMinutes(days));
+  }
+  function burnFraction(b, windowMinutes, days) {
+    return Rdiv(Rmul(b, windowMinutes), periodMinutes(days));
+  }
+  function budgetSpentMinutes(b, windowMinutes, days, objective) {
+    return Rmul(burnFraction(b, windowMinutes, days), budgetMinutes(objective, days));
+  }
+  function exhaustMinutes(b, days) {
+    if (Rzero(b)) return null;                      /* a burn of zero never exhausts */
+    return Rdiv(periodMinutes(days), b);
+  }
+  /* The error RATE a burn rate corresponds to: b times the budget's own rate. */
+  function burnErrorRate(b, objective) {
+    return Rmul(b, Rsub(R(1n, 1n), objective));
+  }
+
+  /* ============================================ L10: thresholds and false alarms
+
+     A threshold on a noisy ratio fires when the window's error count reaches k,
+     and the probability of that when NOTHING HAS CHANGED is the exact binomial
+     upper tail. availKofN(p, k, n) from sysdesign_core is that tail -- it was
+     written for "at least k of n replicas up" and the arithmetic is identical,
+     which is worth saying rather than writing a second copy of it.
+
+     Pages per week is that probability times the number of windows, and the
+     probability of at least one page is atLeastOne -- the sampling formula
+     again, on windows instead of requests. */
+  function thresholdCount(rate, n) {
+    /* The smallest integer error count STRICTLY above the threshold rate. */
+    var exact = Rmul(rate, R(BigInt(n), 1n));
+    var k = Rceil(exact);
+    if (Requ(R(k, 1n), exact)) k += 1n;
+    return k < 1n ? 1n : k;
+  }
+  function falseAlarmProbability(p, k, n) { return availKofN(p, Number(k), n); }
+  function windowsPer(minutesInSpan, windowMinutes) {
+    return R(BigInt(minutesInSpan), BigInt(windowMinutes));
+  }
+  function expectedPages(q, windows) { return Rmul(q, windows); }
+  function binomialTerm(p, j, n) {
+    return Rmul(R(comb(n, j), 1n), Rmul(Rpow(p, j), Rpow(Rsub(R(1n, 1n), p), n - j)));
+  }
+  /* The whole distribution, by the ratio between neighbouring terms:
+     P(j+1)/P(j) = (n-j)/(j+1) * p/(1-p). Exact, and one pass instead of one
+     binomial coefficient per term -- which matters because the page draws the
+     distribution AND tabulates every threshold's tail, and availKofN would be
+     recomputed from scratch for each. The suffix sums of this array are those
+     tails, and scripts/mathcheck.js asserts they equal availKofN term for
+     term, so the cheap path and the shared one cannot drift apart. */
+  function binomialPmf(p, n) {
+    var one = R(1n, 1n), q = Rsub(one, p);
+    if (Rzero(q)) return null;                      /* p = 1: every trial fires */
+    var ratio = Rdiv(p, q), term = Rpow(q, n), out = [term], j;
+    for (j = 0; j < n; j += 1) {
+      term = Rmul(term, Rmul(R(BigInt(n - j), BigInt(j + 1)), ratio));
+      out.push(term);
+    }
+    return out;
+  }
+  /* P(X >= k) for every k at once, as suffix sums. Index k is the tail at k. */
+  function pmfUpperTails(pmf) {
+    var out = new Array(pmf.length), s = R(0n, 1n), j;
+    for (j = pmf.length - 1; j >= 0; j -= 1) { s = Radd(s, pmf[j]); out[j] = s; }
+    return out;
+  }
+
+  var nS = document.getElementById('slN'), obsS = document.getElementById('slObs');
+  var objSel = document.getElementById('slObj');
+  var bar = document.getElementById('slBar'), table = document.getElementById('slTable');
+  var status = document.getElementById('slStatus');
+
+  /* An SLI is good divided by total, so the only ratios a window of n can
+     produce are the n + 1 fractions with denominator n. A ratio between two of
+     them was never an observation, and saying which two it sits between is the
+     same resolution limit the error bar measures, arrived at by counting. */
+  function reachable(p, n) {
+    var good = Rmul(p, R(BigInt(n), 1n));
+    if (Rint(good)) return '';
+    var lo = sliRatio(Rfloor(good), n), hi = sliRatio(Rceil(good), n);
+    return ' <span class="tone-muted">And strictly, ' + Rpct(p, 3) + ' of ' + group(BigInt(n))
+      + ' requests is ' + Rfixed(good, 1) + ' successful requests, which no window can return. The '
+      + 'nearest ratios this window can actually produce are ' + Rfloor(good) + '/' + n + ' = '
+      + Rpct(lo, 3) + ' and ' + Rceil(good) + '/' + n + ' = ' + Rpct(hi, 3)
+      + ' &mdash; the same resolution limit, counted '
+      + 'rather than estimated.</span>';
+  }
+
+  function redraw() {
+    var n = +nS.value, obs = +obsS.value;
+    var p = R(BigInt(obs), 10000n), objective = Rparse(objSel.value);
+    document.getElementById('slNOut').textContent = group(BigInt(n)) + ' requests';
+    document.getElementById('slObsOut').textContent = Rpct(p, 2);
+
+    var variance = sliVariance(p, n);
+    var se = sliSeApprox(p, n);
+    var gap = Rsub(p, objective);
+    var sigmas = sigmasApprox(p, objective, n);
+    var half = Rdiv(Rabs(gap), R(2n, 1n));
+    var need = Rzero(gap) ? 0 : sampleSizeForWidth(p, half);
+    var closed = Rzero(gap) ? 0n : sampleSizeClosed(p, half);
+
+    document.getElementById('slP').textContent = Rpct(p, 3) + ' = ' + Rtext(p);
+    document.getElementById('slVar').textContent = Rtext(variance);
+    document.getElementById('slSe').textContent = (se * 100).toFixed(4) + '% (rounded)';
+    document.getElementById('slGap').textContent = (Rcmp(gap, R(0n, 1n)) >= 0 ? '+' : '') + Rpct(gap, 4);
+    var clean = Requ(p, R(1n, 1n));
+    document.getElementById('slSigma').innerHTML = clean ? 'none &mdash; the error bar is zero at 100%'
+      : (Rzero(gap) ? 'none &mdash; it is the objective' : sigmas.toFixed(2) + ' SE');
+    document.getElementById('slNeed').innerHTML = clean ? '&mdash;'
+      : (need ? group(BigInt(need)) + ' requests' : '&mdash;');
+
+    var rows = '', ladder = [100, 300, 1000, 3000, 10000, 30000, 100000], i;
+    if (ladder.indexOf(n) < 0) { ladder.push(n); ladder.sort(function (a, b) { return a - b; }); }
+    for (i = 0; i < ladder.length; i += 1) {
+      var m = ladder[i], v = sliVariance(p, m), s = sliSeApprox(p, m);
+      rows += '<tr><td class="' + (m === n ? 'tone-amber' : '') + '">' + group(BigInt(m)) + '</td><td>'
+        + Rtext(v) + '</td><td>' + (s * 100).toFixed(4) + '%</td><td>'
+        + (Rpct(Rsub(p, R(BigInt(Math.round(s * 1000000)), 1000000n)), 3)) + ' &ndash; '
+        + (Rpct(Radd(p, R(BigInt(Math.round(s * 1000000)), 1000000n)), 3)) + '</td></tr>';
+    }
+    table.innerHTML = '<thead><tr><th>window n</th><th>p(1&minus;p)/n, exact</th>'
+      + '<th>standard error</th><th>p &plusmn; one standard error</th></tr></thead><tbody>' + rows + '</tbody>'
+      + '<tfoot><tr><td colspan="4" class="small-copy">Column two is exact. Columns three and four are '
+      + 'its square root and so are rounded &mdash; standardErrorApprox, the only rounding on this page.'
+      + '</td></tr></tfoot>';
+
+    /* The drawing: the measured ratio, its error bar, and the objective, on an
+       axis that spans the interesting range rather than 0 to 1. */
+    var lo = Rplot(objective) - 6 * se - 0.0008, hi = Rplot(p) + 6 * se + 0.0008;
+    if (Rplot(p) < lo) lo = Rplot(p) - 6 * se - 0.0008;
+    if (Rplot(objective) > hi) hi = Rplot(objective) + 6 * se + 0.0008;
+    var span = (hi - lo) || 1;
+    function px(v) { return 24 + ((v - lo) / span) * 612; }
+    var px1 = px(Rplot(p) - se), px2 = px(Rplot(p) + se), pxm = px(Rplot(p)), pxo = px(Rplot(objective));
+    var s2 = '<line x1="24" y1="104" x2="636" y2="104" stroke="var(--line-strong)" stroke-width="1" />'
+      + '<rect x="' + Math.min(px1, px2) + '" y="60" width="' + Math.max(2, Math.abs(px2 - px1))
+      + '" height="28" rx="3" fill="var(--amber)" opacity="0.35" />'
+      + '<line x1="' + px1 + '" y1="54" x2="' + px1 + '" y2="94" stroke="var(--amber)" stroke-width="2" />'
+      + '<line x1="' + px2 + '" y1="54" x2="' + px2 + '" y2="94" stroke="var(--amber)" stroke-width="2" />'
+      + '<line x1="' + pxm + '" y1="44" x2="' + pxm + '" y2="104" stroke="var(--cyan)" stroke-width="3" />'
+      + '<text x="' + Math.min(pxm + 6, 470) + '" y="40" font-size="11" fill="var(--cyan)" font-weight="700">measured '
+      + Rpct(p, 3) + '</text>'
+      + '<line x1="' + pxo + '" y1="44" x2="' + pxo + '" y2="126" stroke="var(--green)" stroke-width="2" stroke-dasharray="5 4" />'
+      + '<text x="' + Math.min(pxo + 6, 470) + '" y="122" font-size="11" fill="var(--green)">objective '
+      + Rpct(objective, 3) + '</text>'
+      + '<text x="24" y="152" font-size="10" fill="var(--muted)">' + (lo * 100).toFixed(3) + '%</text>'
+      + '<text x="636" y="152" text-anchor="end" font-size="10" fill="var(--muted)">' + (hi * 100).toFixed(3) + '%</text>'
+      + '<text x="24" y="20" font-size="11" fill="var(--muted)">the amber band is one standard error either side of '
+      + 'the measurement, on ' + group(BigInt(n)) + ' requests</text>';
+    bar.innerHTML = s2;
+
+    var covers = sigmas <= 1;
+    var above = Rcmp(p, objective) >= 0;
+    if (clean) {
+      var bound = rateForTargetSearch(n, R(95n, 100n), 10000);
+      status.innerHTML = '<strong>' + group(BigInt(n)) + ' requests and not one failure</strong> puts the '
+        + 'estimate on the boundary, where p(1&minus;p)/n is <strong>exactly zero</strong> and the error '
+        + 'bar vanishes. That is the formula reporting that it does not apply here, not a measurement of '
+        + 'certainty. What a clean window does support is an upper bound, and it comes from the sampling '
+        + 'lesson\'s own formula read backwards: the largest failure rate that would still have let '
+        + group(BigInt(n)) + ' requests come back clean 5% of the time is <strong>' + Rtext(bound) + ' = '
+        + Rpct(bound, 4) + '</strong>. That is the exact form of the rule of three &mdash; the familiar '
+        + '3/n is ' + (3 / n).toFixed(6) + ' &mdash; and it is the honest sentence to write in the review: '
+        + 'not "we met ' + Rpct(objective, 3) + '", but "nothing failed, and the rate is under '
+        + Rpct(bound, 3) + ' with 95% confidence".';
+      return;
+    }
+    status.innerHTML = '<strong>' + Rpct(p, 3) + ' on ' + group(BigInt(n)) + ' requests</strong> carries a standard '
+      + 'error of <strong>' + (se * 100).toFixed(4) + '%</strong>. The objective is ' + Rpct(objective, 3)
+      + ', which is ' + (Rzero(gap) ? 'exactly the measurement' : sigmas.toFixed(2) + ' standard errors '
+        + (above ? 'below' : 'above') + ' it') + '. '
+      + (covers
+          ? '<span class="tone-red">That is inside the noise.</span> A window this short cannot tell these two '
+            + 'ratios apart, so ' + Rpct(p, 3) + ' here is not evidence of ' + (above ? 'meeting' : 'missing')
+            + ' ' + Rpct(objective, 3) + '. To separate them by two standard errors you need <strong>'
+            + group(BigInt(need)) + ' requests</strong> &mdash; the exact solution of p(1&minus;p)/n &le; ('
+            + Rtext(half) + ')&sup2;, which the search and the closed form ceil(p(1&minus;p)/w&sup2;) = '
+            + group(closed) + ' both give.'
+          : 'That gap is <span class="tone-green">larger than the noise</span>: at ' + group(BigInt(n))
+            + ' requests the measurement resolves it. The window at which the gap is exactly two standard '
+            + 'errors is ' + group(BigInt(need)) + ' requests.')
+      + ' The variance ' + Rtext(variance) + ' is exact; its square root is not, and '
+      + '<span class="tone-amber">every figure derived from the error bar on this page is rounded</span>.'
+      + reachable(p, n);
+  }
+
+  [nS, obsS].forEach(function (el) { el.addEventListener('input', redraw); });
+  objSel.addEventListener('change', redraw);
+  nS.value = 1000; obsS.value = 9995;
+  objSel.value = '999/1000';
+  redraw();
+  window.redrawLab = redraw;
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "measuring-systems/slis-as-ratios";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+  </script>
+</body>
+</html>

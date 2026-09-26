@@ -841,6 +841,117 @@ ALGEBRA_COURSE_LESSONS = tuple(
     for lesson in lessons
 )
 
+# The System Design path. Generated from content/system_design/ and kept in the
+# same shape as the two paths above it: one row per course, and the check ids
+# built from it so smoke and the invariant suite cannot probe different sets.
+SYSDESIGN_PATH_PAGE_PATH = "/paths/system-design/"
+SYSDESIGN_MATERIAL_MARKER = "only as true as its assumptions"
+SYSDESIGN_COURSES = (
+    ("capacity-estimation", "Capacity Estimation", (
+        "orders-of-magnitude", "rates-and-the-day-in-seconds",
+        "read-write-ratio", "storage-from-ingest-and-retention",
+        "bandwidth-bits-and-overhead", "latency-numbers-on-a-log-scale",
+        "peak-to-average", "from-request-cost-to-machine-count",
+        "memory-and-the-working-set", "triangulating-an-estimate"
+    )),
+    ("latency-and-the-tail", "Latency and the Tail", (
+        "latency-is-not-throughput", "the-speed-of-light-floor",
+        "round-trips-not-bytes", "serial-sums-parallel-maxes",
+        "percentiles-from-a-sample", "tail-amplification-under-fan-out",
+        "hedged-requests", "percentiles-do-not-add", "latency-budgets",
+        "timeouts-and-retries-in-the-budget", "packet-loss-and-throughput"
+    )),
+    ("queues-and-utilisation", "Queues and Utilisation", (
+        "arrival-rate-service-rate-utilisation", "littles-law-from-a-trace",
+        "sizing-with-littles-law", "why-queues-form-below-full-utilisation",
+        "memoryless-waiting", "poisson-arrivals-and-bursts",
+        "the-mm1-queue", "the-knee", "variability-and-kingman",
+        "many-servers-and-pooling", "bounded-queues-and-loss",
+        "token-buckets-and-rate-limiting", "transient-overload-and-backlog"
+    )),
+    ("caching-and-hit-rates", "Caching and Hit Rates", (
+        "hit-rate-and-backend-load", "average-latency-under-a-cache",
+        "popularity-is-skewed", "cache-size-and-hit-rate",
+        "replacement-policies-on-a-trace", "ttl-and-staleness",
+        "cache-stampedes", "write-policies", "multi-level-caches",
+        "cdn-egress-and-origin-load"
+    )),
+    ("availability-and-failure", "Availability and Failure", (
+        "nines-and-downtime", "mtbf-and-mttr", "chains-multiply",
+        "redundancy-and-parallel-paths", "k-of-n-and-quorums",
+        "correlated-failure", "error-budgets",
+        "retries-and-request-amplification", "retry-storms",
+        "backoff-and-jitter", "load-shedding-and-circuit-breakers",
+        "replica-loss-and-durability", "shuffle-sharding"
+    )),
+    ("replication-and-consistency", "Replication and Consistency", (
+        "reads-scale-writes-do-not",
+        "synchronous-writes-wait-for-the-slowest",
+        "replication-lag-and-stale-reads", "quorums-overlap",
+        "quorum-latency", "sloppy-quorums",
+        "majorities-and-fault-tolerance", "randomised-election-timeouts",
+        "lamport-clocks", "vector-clocks-and-concurrency",
+        "physical-clocks-and-drift", "linearizability-by-enumeration",
+        "conflict-resolution-counted"
+    )),
+    ("partitioning-and-load-balancing", "Partitioning and Load Balancing", (
+        "how-many-shards", "hash-partitioning-and-imbalance",
+        "rehashing-when-n-changes", "consistent-hashing-and-virtual-nodes",
+        "range-partitioning-and-hot-ranges", "hot-keys-and-salting",
+        "stragglers", "the-power-of-two-choices", "scatter-gather-cost",
+        "local-vs-global-secondary-indexes", "cross-shard-transactions",
+        "rebalancing-cost"
+    )),
+    ("storage-engines-and-indexes", "Storage Engines and Indexes", (
+        "sequential-vs-random-io", "the-height-of-a-b-tree",
+        "hash-vs-tree-for-ranges", "the-write-cost-of-an-index",
+        "write-amplification-in-lsm-trees", "bloom-filters",
+        "the-rum-trade-off", "fsync-and-group-commit",
+        "row-vs-column-storage", "working-set-and-the-page-cache",
+        "rpo-and-rto"
+    )),
+    ("scaling-laws-and-cost", "Scaling Laws and Cost", (
+        "amdahls-law", "the-universal-scalability-law",
+        "batching-cost-and-latency", "vertical-vs-horizontal",
+        "utilisation-and-waste", "reserved-vs-on-demand", "autoscaling-lag",
+        "cost-per-request", "storage-tiers", "compress-or-not",
+        "move-the-data-or-the-compute"
+    )),
+    ("measuring-systems", "Measuring Systems", (
+        "slis-as-ratios", "percentiles-do-not-average",
+        "histograms-and-bucket-error", "coordinated-omission",
+        "scrape-intervals", "sampling-and-rare-events",
+        "metric-cardinality", "how-long-to-run-a-load-test",
+        "burn-rate-alerts", "threshold-alerts-and-false-alarms"
+    )),
+)
+
+SYSDESIGN_PATH_PAGE_MARKERS = (
+    canonical_marker(SYSDESIGN_PATH_PAGE_PATH),
+    SYSDESIGN_COURSES[0][1],
+    SYSDESIGN_COURSES[-1][1],
+    'href="../../%s/"' % SYSDESIGN_COURSES[-1][0],
+)
+
+SYSDESIGN_COURSE_HOMES = tuple(
+    (
+        "sysdesign-course%d-home" % number,
+        "/%s/" % slug,
+        generated_page_markers("/%s/" % slug, SYSDESIGN_MATERIAL_MARKER, title),
+    )
+    for number, (slug, title, _lessons) in enumerate(SYSDESIGN_COURSES, start=1)
+)
+
+SYSDESIGN_COURSE_LESSONS = tuple(
+    (
+        "sysdesign-course%d-lesson-%s" % (number, lesson),
+        "/%s/%s/" % (slug, lesson),
+        generated_page_markers("/%s/%s/" % (slug, lesson), SYSDESIGN_MATERIAL_MARKER, title),
+    )
+    for number, (slug, title, lessons) in enumerate(SYSDESIGN_COURSES, start=1)
+    for lesson in lessons
+)
+
 PUBLISHED_ASSETS = (
     (
         "journal-schema",
@@ -931,6 +1042,7 @@ def path_page_targets(args):
         ("trading-path", PATH_PAGE_PATH, tuple(args.path_marker)),
         ("discrete-math-path", MATH_PATH_PAGE_PATH, MATH_PATH_PAGE_MARKERS),
         ("algebra-path", ALGEBRA_PATH_PAGE_PATH, ALGEBRA_PATH_PAGE_MARKERS),
+        ("sysdesign-path", SYSDESIGN_PATH_PAGE_PATH, SYSDESIGN_PATH_PAGE_MARKERS),
     ]
 
 
@@ -949,7 +1061,8 @@ def course_home_targets(args):
     """(check id, path, markers) for every course home, course 1 first."""
     targets = [("course-home", args.course_path, tuple(args.course_marker))]
     seen = {args.course_path}
-    for check_id, path, markers in COURSE_HOMES + MATH_COURSE_HOMES + ALGEBRA_COURSE_HOMES:
+    for check_id, path, markers in (COURSE_HOMES + MATH_COURSE_HOMES
+                                    + ALGEBRA_COURSE_HOMES + SYSDESIGN_COURSE_HOMES):
         if path in seen:
             continue
         seen.add(path)
@@ -982,6 +1095,7 @@ def lesson_targets(args):
         + COURSE_8_LESSONS
         + MATH_COURSE_LESSONS
         + ALGEBRA_COURSE_LESSONS
+        + SYSDESIGN_COURSE_LESSONS
         + AUTH_PAGE_TARGETS
     ):
         if path in seen:

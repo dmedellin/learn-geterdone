@@ -28,7 +28,7 @@ class TestCanvasSourceContract(unittest.TestCase):
     def test_all_published_sources_have_bound_text(self):
         run = self.run_node('scripts/canvas_sources.js', ROOT)
         result = json.loads(run.stdout)
-        self.assertEqual(result['htmlRoutes'], 369)
+        self.assertEqual(result['htmlRoutes'], 494)
         self.assertEqual(result['canvasRoutes'], 66)
         self.assertEqual(result['canvases'], 71)
         self.assertEqual(result['contractOccurrences'], 269)

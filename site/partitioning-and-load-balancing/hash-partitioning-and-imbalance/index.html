@@ -1,0 +1,2780 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hash Partitioning and Imbalance | Lesson | Partitioning and Load Balancing | System Design | Learn · geterdone.io</title>
+  <meta name="description" content="Hashing makes every shard equally likely to receive a key, which is not the same as making every shard receive the same number of keys. The mean is exactly m/N and the maximum is whatever the stream produced, and the gap between them is the quantity a capacity plan has to be built on. This lesson measures that gap on a placement you can reproduce, and reseeds, because one placement is one sample of a distribution." />
+  <link rel="canonical" href="https://learn.geterdone.io/partitioning-and-load-balancing/hash-partitioning-and-imbalance/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="Hash Partitioning and Imbalance | Lesson | Partitioning and Load Balancing | System Design | Learn · geterdone.io" />
+  <meta property="og:description" content="Hashing makes every shard equally likely to receive a key, which is not the same as making every shard receive the same number of keys. The mean is exactly m/N and the maximum is whatever the stream produced, and the gap between them is the quantity a capacity plan has to be built on. This lesson measures that gap on a placement you can reproduce, and reseeds, because one placement is one sample of a distribution." />
+  <meta property="og:url" content="https://learn.geterdone.io/partitioning-and-load-balancing/hash-partitioning-and-imbalance/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Hash Partitioning and Imbalance | Lesson | Partitioning and Load Balancing | System Design | Learn · geterdone.io" />
+  <meta name="twitter:description" content="Hashing makes every shard equally likely to receive a key, which is not the same as making every shard receive the same number of keys. The mean is exactly m/N and the maximum is whatever the stream produced, and the gap between them is the quantity a capacity plan has to be built on. This lesson measures that gap on a placement you can reproduce, and reseeds, because one placement is one sample of a distribution." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/partitioning-and-load-balancing/hash-partitioning-and-imbalance/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    @media (max-width: 920px) {
+      body[data-page-kind="supplemental"] [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/system-design/">System Design</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Partitioning and Load Balancing</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">Hash Partitioning and Imbalance</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The hash partitioning and imbalance is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Partitioning and Load Balancing &middot; Where the keys land</span>
+        <h1>Hash Partitioning and Imbalance</h1>
+        <p>Hashing makes every shard equally likely to receive a key, which is not the same as making every shard receive the same number of keys. The mean is exactly <span class="math">m/N</span> and the maximum is whatever the stream produced, and the gap between them is the quantity a capacity plan has to be built on. This lesson measures that gap on a placement you can reproduce, and reseeds, because one placement is one sample of a distribution.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">mean = m/N          exact          max = whatever landed        measured
+max/mean = max · N / m                    a ratio of two integers
+
+1 200 keys, 12 shards, seed 7:  max 122, mean 100, max/mean = 61/50 = 1.220
+excess = 122 − 100 = 22 = 2.20 √mean      the term that does not vanish
+maximum load at m = N is Θ(log n / log log n)      stated, not proved</div>
+        <div class="float-label" style="right:16px;bottom:16px;">The mean is exact; the maximum is measured</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>One hard idea, and it is a negative one: the property hashing gives you is about expectations, and a capacity plan is not built on expectations.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Hashing equalises the probability, not the counts</h3><p>A good hash makes each of the <span class="math">N</span> shards equally likely for each of the <span class="math">m</span> keys. That is a statement about one key at a time. The counts that result are a random vector whose mean is <span class="math">m/N</span> in every coordinate and whose maximum is above that mean essentially always — with 1 200 keys in 12 shards the fullest shard held 122 against a mean of 100.</p></article><article class="card concept-card"><div class="icon">2</div><h3>max/mean is an exact ratio of integers</h3><p><span class="math">max/mean = max · N / m</span>, and all three of those are counts, so the imbalance is a fraction rather than a float: <span class="math">122 × 12/1 200 = 61/50</span>. There is nothing to approximate and nothing to model. The lab counts the occupancies and divides, which is why the figure it prints is the same figure you would get by counting the placement by hand.</p></article><article class="card concept-card"><div class="icon">3</div><h3>One seed is one sample</h3><p>Across seeds 7 through 14 with the same 1 200 keys and 12 shards, the fullest shard ran from 112 to 122 and max/mean averaged 1.170. Quoting the 1.220 from a single run as “the imbalance” treats one draw as a property of the scheme. The lesson is about the distribution of the maximum, and that only becomes visible when you move the seed.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>What a hash actually gives you, and what it does not</h2></div><p>The placement, the two numbers that describe it, how the gap between them behaves as the load grows, and the one result here that this library states without proving.</p></div>
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Hash partitioning</span><p>Under <strong>hash partitioning</strong> the shard of a key <span class="math">k</span> is <span class="math">h(k) mod N</span> for a hash function <span class="math">h</span>. Keys near each other in the original key space are scattered, so range scans become expensive and the placement stops depending on what the keys mean. The <strong>occupancy</strong> of a shard is the number of keys assigned to it, and its <strong>mean</strong> over the fleet is <span class="math">m/N</span> whatever the hash does.</p></div><p>The claim under examination is the everyday one: that hashing spreads keys evenly. It spreads them <em>uniformly at random</em>, which is a different sentence. Uniform means no shard is favoured; it does not mean no shard is fuller, and the whole of this course's imbalance arithmetic lives in that distinction.</p><p>The placements here come from a seeded generator printed on the page, so “random” is reproducible: the stream is <span class="math">x → 16 807·x mod (2³¹ − 1)</span>, with the modulus prime on purpose. The generator used elsewhere on this library's paths has a modulus of <span class="math">2³¹</span>, and the low bits of such a stream are periodic — <span class="math">x mod 4</span> cycles <span class="math">0, 1, 2, 3</span> for ever. Taking that stream modulo 8 or 16 fills the shards perfectly level, which would demonstrate the opposite of this lesson's claim. The constants are on the page so you can check which generator drew your placement.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">m = 1 200 keys      N = 12 shards      seed 7
+
+mean          = 1 200/12 = 100        exact
+fullest shard = 122                   counted
+emptiest      = 82                    counted
+max/mean      = 122 × 12/1 200 = 61/50 = 1.220
+excess        = 122 − 100 = 22 = 2.20 × √100</div><h3>Why the excess is a square-root term</h3><p>Raise the load and max/mean improves: the same 12 shards with 12 000 keys came out at 1.046 and with 120 000 keys at 1.018. It is tempting to read that as the imbalance going away. It is not going away — it is being divided by a larger mean. The absolute excess over the mean went from 22 keys to 46 keys to 182 keys as the mean went from 100 to 1 000 to 10 000, which is growth like <span class="math">√mean</span> rather than a constant.</p><p>That is why the lab prints the excess in units of <span class="math">√mean</span> rather than as a percentage. Measured that way it stays a small number of order one — 2.20, 1.45, 1.82 on those three runs — instead of appearing to shrink. It is a noisy small number, and reseeding shows it moving between 1.20 and 2.20 on the default placement, which is the honest picture: a term of a fixed order of magnitude, not a constant.</p><div class="example"><span class="label">Example &middot; What this costs a capacity plan</span><p>Provision every shard for the mean and the fullest one is over its allocation by 22% on the default placement. Provision every shard for the fullest and 11 of the 12 are over-bought. The usable answer is neither: size for a maximum you have measured across several seeds — 1.170 on average and 1.220 at worst here — and treat the excess as a cost of hashing rather than as a defect to be engineered away.</p></div><h3>The result this lesson measures and does not prove</h3><p>When the number of keys equals the number of shards, the maximum occupancy is <span class="math">Θ(log n / log log n)</span>. That result is <strong>stated, not proved</strong> — not here and nowhere else in this library. Its proof needs Chernoff bounds, which the Algorithms path excludes from its own scope, so no lesson anywhere establishes it. What this lesson does is measure the maximum on placements you choose.</p><p>Two related quantities <em>are</em> computed exactly, and they are computed elsewhere. “Balls in Bins and the Birthday Bound”, on the Randomised Algorithms course of the Algorithms path, derives the expected number of colliding pairs as <span class="math">n(n − 1)/2m</span> and the expected number of empty bins as <span class="math">m(1 − 1/m)ⁿ</span>, both by linearity of expectation and both exact. Those are the expectations this lesson does not compute; the maximum is the thing it measures. The seeded generator itself is “Hashing and Pseudorandom Numbers” on the Discrete Mathematics path.</p><p>Keep the three statuses apart when you quote a figure from this course. The mean is exact. The maximum on a given placement is measured and reproducible. The growth rate of the maximum is stated. A design review that treats the third as though it had the standing of the first is the failure this paragraph exists to prevent.</p></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Hash partitioning and imbalance</h2></div><p>Measure max over mean on a seeded placement, then reseed and measure again</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Hashing does not give equal shards</strong><span>the same m keys, the same N bins, and a maximum that is not the mean</span></div>
+        <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>a shard</span><span class="tone-red"><i class="legend-swatch"></i>the fullest</span><span class="tone-muted"><i class="legend-swatch"></i>the mean</span></div>
+      </div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="sbHist" viewBox="0 0 520 230" role="img" aria-label="An occupancy histogram of m hashed keys across N shards, with the mean drawn across it and the fullest shard marked."></svg></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="sbTable"></table></div>
+      <div class="status-banner" id="sbStatus" style="margin-top:12px;"></div>
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>Place the keys, then move the seed</h3>
+          <p>Read max/mean off the first placement, then step the seed through eight values and watch the fullest shard move while the mean does not move at all. The table beside the histogram keeps every run you have drawn, so the spread in the maximum is on the screen rather than in your memory.</p>
+        <div>
+          <div class="range-row"><label class="small-copy" for="sbKeys">Keys to place</label><span class="range-value" id="sbKeysOut">1200</span></div>
+          <input id="sbKeys" type="range" min="60" max="6000" step="20" value="1200" />
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="sbShards">Shards</label><span class="range-value" id="sbShardsOut">12</span></div>
+          <input id="sbShards" type="range" min="2" max="48" step="1" value="12" />
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="sbSeed">Seed</label><span class="range-value" id="sbSeedOut">7</span></div>
+          <input id="sbSeed" type="range" min="1" max="60" step="1" value="7" />
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Mean keys a shard</span><strong id="sbMean">&mdash;</strong></div>
+          <div class="kpi"><span>The fullest shard</span><strong id="sbMax">&mdash;</strong></div>
+          <div class="kpi"><span>The emptiest</span><strong id="sbMin">&mdash;</strong></div>
+          <div class="kpi"><span>max / mean</span><strong id="sbRatio">&mdash;</strong></div>
+          <div class="kpi"><span>Excess, in root-means</span><strong id="sbRoot">&mdash;</strong></div>
+          <div class="kpi"><span>Shards with nothing</span><strong id="sbEmpty">&mdash;</strong></div>
+        </div>
+        <p class="small-copy" id="sbHint" style="margin:0;">The placement is drawn from an LCG with multiplier 16&nbsp;807, increment 0 and modulus 2&#179;&#185;&nbsp;&minus;&nbsp;1, which is prime &mdash; the generator the rest of this path uses has modulus 2&#179;&#185;, and the low bits of a power-of-two modulus are a cycle, so keys taken modulo 8 or 16 from it come out perfectly level. The seed is mixed before it becomes a state, so seed 4 is not seed 3 rescaled. The same seed draws the same placement every time this page is opened. The maximum-load results on this course &mdash; &Theta;(log n / log log n) for one choice and about ln ln n for two &mdash; are <strong>stated, not proved</strong>: their proofs need Chernoff bounds, which no subject in this library teaches. What this lab does is <strong>measure</strong> them. Algorithms <span class="tt">randomised-algorithms / balls-in-bins</span> states the one-choice result and computes the exact expected number of colliding pairs and of empty bins, which this page does not.</p>
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Measuring the imbalance rather than assuming it</h2></div><p>The order matters: compute what is exact first, so that everything measured afterwards has something to be measured against.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write down the mean before you look at anything</h3><p><span class="math">m/N</span> is exact and needs no placement. It is the number every later figure is a ratio to, and having it first stops a large maximum from looking alarming when it is ordinary.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Count the fullest shard and divide</h3><p><span class="math">max · N / m</span> is max/mean as a fraction. Keep it as a fraction: <span class="math">61/50</span> says more than <span class="math">1.22</span> when you come to compare two placements, because you can see the counts it came from.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Reseed at least half a dozen times</h3><p>One placement is one draw. Record the maximum from each and take both the average and the worst you saw. Eight seeds on the default placement give an average max/mean of 1.170 and a worst of 1.220, and those are two different numbers for two different purposes.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Size on the measured maximum, and say what you measured</h3><p>Provisioning at the mean under-provisions the fullest shard by the excess. Quote the figure with its sample: “max/mean 1.17 on average over eight seeds, 1.22 at worst” is a defensible input to a capacity plan; “about 1.2” is not.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>Means, maxima and what was measured</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>1 200 keys into 12 shards, and then into 120</h3><p>One placement measured exactly, and then the same key count spread over ten times as many shards, which is where the ratio misleads.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">m = 1 200, N = 12, seed 7
+  mean     = 1 200/12 = 100
+  fullest  = 122            emptiest = 82        empty shards = 0
+  max/mean = 122 × 12/1 200 = 1464/1200 = 61/50 = 1.220
+  excess   = 22 keys = 2.20 √mean
+
+m = 1 200, N = 120, seed 7
+  mean     = 1 200/120 = 10
+  fullest  = 18
+  max/mean = 18 × 120/1 200 = 1.800
+  excess   = 8 keys = 2.53 √mean
+
+the ratio got worse; the excess in root-means barely moved
+  2.20 √mean  →  2.53 √mean</div><p>Ten times the shards made max/mean look much worse and did not really change the underlying quantity. That is the shape of the whole result: the excess tracks <span class="math">√mean</span>, so shrinking the mean by spreading keys thinner makes the ratio deteriorate even though nothing about the hashing changed.</p><p>For a faded rehearsal, keep 12 shards and take the key count to 12 000. The supplied first move is the mean, which is 1 000. Predict whether max/mean will be closer to or further from 1 than it was at 1 200 keys, then read the fullest shard off the lab, compute max/mean and the excess in root-means, and say which of the two figures actually told you something about the hash. Reseed three times before you commit to an answer.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading “uniform” as “equal”</strong><span>A uniform hash makes every shard equally likely for every key. The counts that result are still a random vector, and its maximum is above its mean almost always. Every capacity figure on this course exists because those two sentences are not the same sentence.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Quoting an imbalance from a single placement</strong><span>One seed produced 1.220 and eight seeds averaged 1.170 with a worst of 1.220. A figure from one run is a draw, not a property, and it is equally wrong to be reassured by a lucky one. Reseed, record, and quote the sample you took.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Treating a falling max/mean as a disappearing problem</strong><span>Going from 1 200 keys to 120 000 on the same 12 shards moved max/mean from 1.220 to 1.018, while the absolute excess grew from 22 keys to 182. The ratio improved because its denominator grew. Nothing about the placement became more even.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you would not accept an imbalance figure without being told how many seeds it came from.</strong><p>You should be able to compute the mean and max/mean from a placement, describe how the excess behaves as the mean grows, and say which of the figures on this page are exact, which are measured, and which are stated without proof.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Two questions follow immediately. The first is what happens to this placement when <span class="math">N</span> changes, which is “Rehashing When N Changes” and has a sharper answer than the imbalance does. The second is whether a small change to the placement rule can make the maximum much better, and it can: “The Power of Two Choices” measures a rule that costs one extra lookup and collapses the maximum load.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../how-many-shards/" rel="prev"><span>Lesson</span><strong>How Many Shards</strong></a>
+      <a class="lesson-link next" href="../rehashing-when-n-changes/" rel="next"><span>Lesson</span><strong>Rehashing When N Changes</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="partitioning-and-load-balancing/hash-partitioning-and-imbalance" data-lesson-title="Hash Partitioning and Imbalance" data-course-title="Partitioning and Load Balancing">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Partitioning and Load Balancing.</strong> The placements on this course are produced by a seeded generator defined on the page, so a “random” assignment is a computed one that you can reproduce and step through. The fractions of keys moved, the shard counts, the hot-key shares and the cross-shard probabilities are exact. The two maximum-load results — <span class="math">Θ(log n / log log n)</span> for one choice and <span class="math">≈ ln ln n</span> for two — are stated, not proved, and what the labs do is measure them.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure on this path is computed in your browser from the model the lesson states, and a model&rsquo;s answer is only as true as its assumptions &mdash; independence, memorylessness and steady state are named where they are used, and each lesson says where its own fails.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "1 200 keys are hashed into 12 shards and the fullest shard holds 122. What is max/mean?", "a": ["<span class=\"math\">1.22<\/span>", "<span class=\"math\">0.82<\/span>", "<span class=\"math\">10.17<\/span>", "<span class=\"math\">1.00<\/span>"], "c": 0, "why": "<span class=\"math\">max \u00b7 N/m = 122 \u00d7 12/1 200 = 61/50 = 1.22<\/span>. <span class=\"math\">0.82<\/span> is the emptiest shard over the mean \u2014 the other end of the same placement. <span class=\"math\">10.17<\/span> is <span class=\"math\">122/12<\/span>, the maximum divided by the shard count, which is not a ratio to anything. <span class=\"math\">1.00<\/span> is what a reader who believes hashing balances would predict, and the placement disagrees."}, {"q": "You change the seed and redraw the same 1 200 keys into the same 12 shards. What moves?", "a": ["Both the mean and the maximum move", "Neither moves, because the generator is seeded and therefore deterministic", "The maximum moves \u2014 112 to 122 over eight seeds \u2014 and the mean does not move at all", "The mean moves and the maximum does not"], "c": 2, "why": "The mean is <span class=\"math\">1 200/12 = 100<\/span> for every seed, because it is a property of the two counts and not of the placement. The maximum is a draw: it ran from 112 to 122 across seeds 7 to 14. Determinism is about reproducing one placement, not about the placements agreeing with each other."}, {"q": "What is the status on this path of the result that the maximum occupancy is <span class=\"math\">\u0398(log n / log log n)<\/span> when there are as many keys as shards?", "a": ["Proved in this lesson, from the occupancy counts", "Proved on the Algorithms path and quoted here", "Stated, not proved anywhere in this library \u2014 its proof needs Chernoff bounds, which no subject here teaches \u2014 and measured in the labs", "Disproved by the measurements, which show a maximum of 122"], "c": 2, "why": "The Algorithms path states the same result and computes the exact collision and empty-bin expectations, but its scope excludes Chernoff bounds, which the proof of the maximum-load result needs. So the result is stated in two places and proved in none of them, and what both paths do instead is measure it. The 122 is at 1 200 keys in 12 shards, which is not the <span class=\"math\">m = N<\/span> regime the result is about."}, {"q": "Provisioning every shard at the mean, what does the default placement cost you?", "a": ["Nothing; the mean is the correct capacity by definition", "The fullest shard is over its allocation by 22%", "The fullest shard is over its allocation by 2.2%", "Eleven of the twelve shards are over their allocation"], "c": 1, "why": "The fullest holds 122 against an allocation of 100. The <span class=\"math\">2.2<\/span> in the lab's other figure is the excess in root-means, <span class=\"math\">22/\u221a100<\/span>, which is a different quantity with a different unit. Eleven shards are <em>under<\/em> their allocation, which is the same fact seen from the cheap end."}];
+
+  (function () {
+
+  /* Exact rational arithmetic over BigInt.
+
+     Every number a lesson calls "the answer" lives in this type. BigInt rather
+     than Number because a few steps of elimination on a 3x3 system produces
+     numerators that leave the exact-integer range of a double, and a solution
+     that is silently wrong in the last digits is worse than no solution. */
+  function bgcd(a, b) {
+    if (a < 0n) a = -a;
+    if (b < 0n) b = -b;
+    while (b) { var t = a % b; a = b; b = t; }
+    return a;
+  }
+  function R(n, d) {
+    if (d === undefined) d = 1n;
+    n = BigInt(n); d = BigInt(d);
+    if (d === 0n) throw new Error('division by zero');
+    if (d < 0n) { n = -n; d = -d; }
+    var g = bgcd(n, d) || 1n;
+    return { n: n / g, d: d / g };
+  }
+  var R0 = R(0n), R1 = R(1n);
+  function Radd(a, b) { return R(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function Rsub(a, b) { return R(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function Rmul(a, b) { return R(a.n * b.n, a.d * b.d); }
+  function Rdiv(a, b) { return R(a.n * b.d, a.d * b.n); }
+  function Rneg(a) { return R(-a.n, a.d); }
+  function Rabs(a) { return a.n < 0n ? Rneg(a) : a; }
+  function Rinv(a) { return R(a.d, a.n); }
+  function Rzero(a) { return a.n === 0n; }
+  function Rsign(a) { return a.n === 0n ? 0 : (a.n < 0n ? -1 : 1); }
+  function Requ(a, b) { return a.n === b.n && a.d === b.d; }
+  function Rcmp(a, b) { var l = a.n * b.d, r = b.n * a.d; return l < r ? -1 : (l > r ? 1 : 0); }
+  function Rint(a) { return a.d === 1n; }
+  function Rpow(a, k) {
+    var out = R1, base = a, e = k < 0 ? -k : k;
+    while (e > 0) { if (e & 1) out = Rmul(out, base); base = Rmul(base, base); e >>= 1; }
+    return k < 0 ? Rinv(out) : out;
+  }
+  /* The reader's form: "3", "-7/4". Never "3/1", never "0/5". */
+  function Rtext(a) { return a.d === 1n ? String(a.n) : a.n + '/' + a.d; }
+  /* Parenthesised when it would otherwise glue onto a neighbouring symbol. */
+  function Rterm(a) { return (a.n < 0n || a.d !== 1n) ? '(' + Rtext(a) + ')' : Rtext(a); }
+  function Rnum(a) { return Number(a.n) / Number(a.d); }
+  /* A decimal, for the one place a lesson asks for one. Exact when it can be. */
+  function Rdec(a, places) {
+    if (places === undefined) places = 6;
+    var v = Rnum(a);
+    if (Rint(a)) return String(a.n);
+    var s = v.toFixed(places);
+    return s.indexOf('.') >= 0 ? s.replace(/0+$/, '').replace(/\.$/, '') : s;
+  }
+  function Rparse(text) {
+    var s = String(text).trim();
+    var m = /^([+-]?\d+)\s*\/\s*(\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]), BigInt(m[2]));
+    m = /^([+-]?\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]));
+    m = /^([+-]?)(\d*)\.(\d+)$/.exec(s);
+    if (m) {
+      var whole = m[2] || '0', frac = m[3];
+      var num = BigInt(whole + frac), den = 10n ** BigInt(frac.length);
+      return R(m[1] === '-' ? -num : num, den);
+    }
+    return null;
+  }
+  /* Is this rational a perfect square? Needed wherever a lesson must decide
+     between an exact answer and a radical one -- sqrt(4/9) is 2/3 and belongs
+     on the page as 2/3, while sqrt(2) must stay sqrt(2). */
+  function bisqrt(n) {
+    if (n < 0n) return null;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x * x === n ? x : null;
+  }
+  function Rsqrt(a) {
+    if (a.n < 0n) return null;
+    var p = bisqrt(a.n), q = bisqrt(a.d);
+    return (p === null || q === null) ? null : R(p, q);
+  }
+
+  /* Counting is done in BigInt. 21! already exceeds what a double can hold
+     exactly, so a lab that used ordinary numbers would start printing
+     confidently wrong totals somewhere around n = 21 with nothing to mark the
+     boundary. Every count below is exact for every n the controls allow. */
+  function fact(n) { var r = 1n; for (var i = 2n; i <= BigInt(n); i += 1n) r *= i; return r; }
+  function perm(n, r) {
+    if (r > n || r < 0) return 0n;
+    var out = 1n;
+    for (var i = 0; i < r; i += 1) out *= BigInt(n - i);
+    return out;
+  }
+  function comb(n, r) {
+    if (r < 0 || r > n) return 0n;
+    r = Math.min(r, n - r);
+    var num = 1n, den = 1n;
+    for (var i = 0; i < r; i += 1) { num *= BigInt(n - i); den *= BigInt(i + 1); }
+    return num / den;
+  }
+  function group(x) { return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+
+  /* Ceiling and floor of an exact rational, as BigInt.
+
+     Capacity answers are counts of machines, shards and tree levels, and the
+     whole point of a sizing lesson is that 3.2 machines is four. Integer
+     division truncates toward zero, so a negative rational needs the sign. */
+  function Rfloor(a) {
+    var q = a.n / a.d;
+    if (a.n < 0n && q * a.d !== a.n) q -= 1n;
+    return q;
+  }
+  function Rceil(a) {
+    var q = a.n / a.d;
+    if (a.n > 0n && q * a.d !== a.n) q += 1n;
+    return q;
+  }
+
+  /* Nearest-rank percentile: the smallest value at or above q of the sample.
+
+     Nearest rank rather than an interpolating definition because it returns a
+     value that was actually observed. A p99 of 412ms that no request took is a
+     worse answer for this subject than one that a request did. */
+  function percentileRank(n, q) {
+    /* q is a rational in [0,1]; the rank is ceil(q*n), at least 1. */
+    var rank = Rceil(Rmul(q, R(BigInt(n), 1n)));
+    if (rank < 1n) rank = 1n;
+    if (rank > BigInt(n)) rank = BigInt(n);
+    return Number(rank);
+  }
+  function percentile(sorted, q) {
+    if (!sorted.length) return null;
+    return sorted[percentileRank(sorted.length, q) - 1];
+  }
+
+  /* P(X <= t) for a sample: a rational, count over total. */
+  function empiricalCdf(sorted, t) {
+    var c = 0;
+    for (var i = 0; i < sorted.length; i += 1) if (sorted[i] <= t) c += 1;
+    return R(BigInt(c), BigInt(sorted.length));
+  }
+
+  /* Discrete distributions as [value, probability] pairs with rational
+     probabilities. Convolution is the sum of two independent draws, which is
+     how a latency budget adds a serial chain and how periodic review covers
+     R+L periods of demand. Exact, so a 12-step convolution is still a fraction. */
+  function pmfNormalise(pairs) {
+    var total = R(0n, 1n), i;
+    for (i = 0; i < pairs.length; i += 1) total = Radd(total, pairs[i][1]);
+    if (Rzero(total)) return pairs.slice();
+    var out = [];
+    for (i = 0; i < pairs.length; i += 1) out.push([pairs[i][0], Rdiv(pairs[i][1], total)]);
+    return out;
+  }
+  function pmfConvolve(a, b) {
+    var acc = {}, i, j;
+    for (i = 0; i < a.length; i += 1) {
+      for (j = 0; j < b.length; j += 1) {
+        var v = a[i][0] + b[j][0], p = Rmul(a[i][1], b[j][1]);
+        acc[v] = acc[v] ? Radd(acc[v], p) : p;
+      }
+    }
+    var keys = Object.keys(acc).map(Number).sort(function (x, y) { return x - y; });
+    return keys.map(function (v) { return [v, acc[v]]; });
+  }
+  function pmfMean(pairs) {
+    var m = R(0n, 1n);
+    for (var i = 0; i < pairs.length; i += 1) {
+      m = Radd(m, Rmul(R(BigInt(pairs[i][0]), 1n), pairs[i][1]));
+    }
+    return m;
+  }
+  /* P(X > t): the tail a stale-read or a timeout lesson asks for. */
+  function pmfTail(pairs, t) {
+    var s = R(0n, 1n);
+    for (var i = 0; i < pairs.length; i += 1) if (pairs[i][0] > t) s = Radd(s, pairs[i][1]);
+    return s;
+  }
+  /* The pmf of the maximum of k independent copies -- the fan-out lesson's
+     whole point: P(max <= t) = F(t)^k, so the tail is what k does to it. */
+  function pmfMax(pairs, k) {
+    var sorted = pairs.slice().sort(function (x, y) { return x[0] - y[0]; });
+    var out = [], cum = R(0n, 1n), prev = R(0n, 1n);
+    for (var i = 0; i < sorted.length; i += 1) {
+      cum = Radd(cum, sorted[i][1]);
+      var here = Rpow(cum, k);
+      out.push([sorted[i][0], Rsub(here, prev)]);
+      prev = here;
+    }
+    return out;
+  }
+
+  /* Birth-death queues, exact for rational arrival and service rates.
+
+     M/M/1 is derived in the lessons from the cut balance equations, so these
+     are the closed forms that result, not a separate model: rho = lam/mu,
+     pi_n = (1-rho)rho^n, L = rho/(1-rho), W = L/lam. */
+  function mm1(lam, mu) {
+    var rho = Rdiv(lam, mu);
+    if (Rcmp(rho, R(1n, 1n)) >= 0) return { rho: rho, stable: false };
+    var one = R(1n, 1n), free = Rsub(one, rho);
+    var L = Rdiv(rho, free);
+    var Lq = Rdiv(Rmul(rho, rho), free);
+    return {
+      rho: rho, stable: true, p0: free, L: L, Lq: Lq,
+      W: Rdiv(L, lam), Wq: Rdiv(Lq, lam)
+    };
+  }
+
+  /* Erlang C: the probability an arrival waits with s servers.
+     Rational throughout -- the factorials are BigInt, so a 20-server desk is
+     still an exact fraction. */
+  function erlangC(lam, mu, s) {
+    var a = Rdiv(lam, mu), rho = Rdiv(a, R(BigInt(s), 1n));
+    if (Rcmp(rho, R(1n, 1n)) >= 0) return { rho: rho, stable: false };
+    var sum = R(0n, 1n), n;
+    for (n = 0; n < s; n += 1) sum = Radd(sum, Rdiv(Rpow(a, n), R(fact(n), 1n)));
+    var last = Rdiv(Rpow(a, s), Rmul(R(fact(s), 1n), Rsub(R(1n, 1n), rho)));
+    var p0 = Rinv(Radd(sum, last));
+    var pw = Rmul(last, p0);
+    var Lq = Rdiv(Rmul(pw, rho), Rsub(R(1n, 1n), rho));
+    return {
+      rho: rho, stable: true, p0: p0, pWait: pw, Lq: Lq,
+      Wq: Rdiv(Lq, lam), L: Radd(Lq, a), W: Rdiv(Radd(Lq, a), lam)
+    };
+  }
+
+  /* M/M/1/K: finite capacity. Stable at any rho because the queue cannot grow,
+     which is the lesson -- and the arrival rate Little's law may use is the
+     EFFECTIVE one, lam(1 - pK). */
+  function mm1k(lam, mu, K) {
+    var rho = Rdiv(lam, mu), n, un = [], total = R(0n, 1n);
+    for (n = 0; n <= K; n += 1) { var t = Rpow(rho, n); un.push(t); total = Radd(total, t); }
+    var pi = un.map(function (t) { return Rdiv(t, total); });
+    var L = R(0n, 1n);
+    for (n = 0; n <= K; n += 1) L = Radd(L, Rmul(R(BigInt(n), 1n), pi[n]));
+    var pK = pi[K], lamEff = Rmul(lam, Rsub(R(1n, 1n), pK));
+    return { rho: rho, pi: pi, blocking: pK, lamEff: lamEff, L: L, W: Rdiv(L, lamEff) };
+  }
+
+  /* A seeded stream. number.py's lcgRun detects the cycle of a generator, which
+     is a different job; a lab that samples needs the values in order and needs
+     the same values every time the page is opened, or a reader cannot check
+     what they were told. */
+  function lcgStream(a, c, m, seed, count) {
+    /* BigInt, not Number. A typical multiplier times a typical state exceeds
+       2^53 on the SECOND step, and a double silently rounds it -- the stream
+       then looks reproducible, because it is reproducibly wrong. */
+    var A = BigInt(a), C = BigInt(c), M = BigInt(m);
+    var out = [], x = ((BigInt(seed) % M) + M) % M;
+    for (var i = 0; i < count; i += 1) { x = (A * x + C) % M; out.push(Number(x)); }
+    return out;
+  }
+  /* Uniform rationals in [0, 1) from that stream. */
+  function streamUniform(a, c, m, seed, count) {
+    return lcgStream(a, c, m, seed, count).map(function (x) {
+      return R(BigInt(x), BigInt(m));
+    });
+  }
+  /* Inverse-transform sampling from a pmf given as [value, rational] pairs. */
+  function sampleFromPmf(pairs, u) {
+    var cum = R(0n, 1n);
+    for (var i = 0; i < pairs.length; i += 1) {
+      cum = Radd(cum, pairs[i][1]);
+      if (Rcmp(u, cum) < 0) return pairs[i][0];
+    }
+    return pairs[pairs.length - 1][0];
+  }
+
+  /* The four places this subject cannot be exact. Each says how it rounds.
+
+     Everything else in the module returns a rational. These return Numbers, and
+     every lesson that calls one states that it is an approximation -- which is
+     the library's rule, not a courtesy. */
+
+  /* e^-x, as the reciprocal of a POSITIVE-term series.
+
+     The obvious implementation sums the alternating series for e^-x directly,
+     and it is wrong in a way that looks right at the arguments a test usually
+     picks. Terms of alternating sign near cancel, losing roughly 2x/ln(10)
+     significant digits: exact at x = 5, 0.4% out at x = 17, 173% out at x = 20,
+     and past x = 21 the SIGN is wrong -- a probability comes back negative.
+
+     Summing e^x instead has every term positive, so nothing cancels, and one
+     division at the end is exact to a rounding. */
+  function expNegApprox(x, tol) {
+    tol = tol || 1e-15;
+    if (x < 0) return 1 / expNegApprox(-x, tol);
+    if (x > 700) return 0;            /* e^700 is the edge of a double */
+    var t = 1, s = 1, k = 1;
+    while (t > tol * s && k < 1000) { t = t * x / k; s += t; k += 1; }
+    return 1 / s;
+  }
+  /* The Bloom false-positive rate. The exact form (1 - 1/m)^(kn) is available
+     as a rational; this is the (1 - e^(-kn/m))^k idealisation lessons compare
+     it against. */
+  function bloomApprox(m, n, k) {
+    return Math.pow(1 - expNegApprox(k * n / m, 1e-15), k);
+  }
+  /* Standard error of a proportion. A square root, so it rounds. */
+  function standardErrorApprox(p, n) { return Math.sqrt(p * (1 - p) / n); }
+  /* The Zipf normaliser past the point where its exact form is unreadable.
+     harmonic() stays exact and is what the lessons use; this is for the
+     lesson that asks what happens at a million keys. */
+  function harmonicApprox(n, s) {
+    if (s === 1) return Math.log(n) + 0.5772156649015329 + 1 / (2 * n);
+    var t = 0;
+    for (var k = 1; k <= n && k <= 100000; k += 1) t += 1 / Math.pow(k, s);
+    return t;
+  }
+  /* Bits per key for a target false-positive rate: log2(1/p)/ln 2.
+
+     NOT "the familiar 1.44 * log2(1/p)", and the difference is the point of
+     the lesson that uses this. 1.44 is a two-digit rounding of 1/ln 2 =
+     1.4427, so at p = 0.01 the textbook constant gives 9.567 and this gives
+     9.585. Both are printed on storage's `bloom` page, each under its own
+     name. This rounds -- it is a logarithm -- like the other Approx functions
+     around it. */
+  function bitsPerKeyApprox(target) { return Math.log2(1 / target) / Math.LN2; }
+  /* A root that rounds, by Newton from a rational start. Rsqrt returns null for
+     a non-square, which is right for exactness and useless for a geometric-mean
+     centre or a square-root scaling law. */
+  function sqrtApprox(a, tol) {
+    var x = Number(a.n) / Number(a.d);
+    if (x < 0) return NaN;
+    if (x === 0) return 0;
+    tol = tol || 1e-15;
+    var g = x, prev = 0;
+    while (Math.abs(g - prev) > tol * Math.max(1, g)) { prev = g; g = (g + x / g) / 2; }
+    return g;
+  }
+  /* Natural log, for the two max-load results this subject STATES rather than
+     proves. Everywhere else a logarithm is an exact integer search instead. */
+  function logApprox(x) { return Math.log(x); }
+
+  /* ================================================================ output */
+
+  /* Rdec goes through Number(a.n)/Number(a.d). This kit produces rationals a
+     double cannot hold -- N^(1-k) at k = 12 and N = 64 has a 65-bit
+     denominator -- so decimals here are long division in BigInt, rounded half
+     up at the last digit printed. */
+  function Rfixed(a, places) {
+    if (places === undefined) places = 3;
+    var neg = a.n < 0n, n = neg ? -a.n : a.n, d = a.d;
+    var scale = 10n ** BigInt(places);
+    var q = (2n * n * scale + d) / (2n * d);
+    var whole = q / scale, frac = (q % scale).toString();
+    while (frac.length < places) frac = '0' + frac;
+    var body = places > 0 ? whole + '.' + frac : String(whole);
+    return (neg ? '-' : '') + body;
+  }
+  function Rpct(a, places) {
+    return Rfixed(Rmul(a, R(100n, 1n)), places === undefined ? 2 : places) + '%';
+  }
+  /* A rational count of bytes read the way a capacity plan reads it, decimal
+     throughout: 1 TB is 10^12 bytes, which is what a disk is sold as and what
+     a throttle is quoted in. Stated once here rather than assumed twice. */
+  function byteText(a) {
+    var units = [[1000000000000000n, 'PB'], [1000000000000n, 'TB'],
+                 [1000000000n, 'GB'], [1000000n, 'MB'], [1000n, 'kB']];
+    for (var i = 0; i < units.length; i += 1) {
+      if (Rcmp(Rabs(a), R(units[i][0], 1n)) >= 0) {
+        return Rfixed(Rdiv(a, R(units[i][0], 1n)), 2) + ' ' + units[i][1];
+      }
+    }
+    return Rfixed(a, 0) + ' B';
+  }
+  /* Seconds as an operator reads them. Exact: the seconds keep their fraction. */
+  function durText(secs) {
+    var neg = secs.n < 0n, a = neg ? R(-secs.n, secs.d) : secs;
+    var whole = a.n / a.d, rem = Rsub(a, R(whole, 1n));
+    var d = whole / 86400n, h = (whole % 86400n) / 3600n;
+    var m = (whole % 3600n) / 60n, s = whole % 60n;
+    var out = [];
+    if (d > 0n) out.push(d + ' d');
+    if (h > 0n) out.push(h + ' h');
+    if (m > 0n) out.push(m + ' min');
+    var tail = Radd(R(s, 1n), rem);
+    if (tail.n > 0n || !out.length) out.push(Rfixed(tail, tail.d === 1n ? 0 : 2) + ' s');
+    return (neg ? '-' : '') + out.join(' ');
+  }
+
+  /* ================================================= the seeded placement
+
+     MINSTD: a = 16807, c = 0, m = 2^31 - 1, prime. See the module docstring
+     for why this kit does not use the generator the rest of the path uses --
+     the short version is that this kit takes its values MODULO N, and the low
+     bits of a power-of-two modulus are a cycle rather than a sample.
+
+     The seed itself never becomes the state -- see shardSeedState. */
+  function shardMultiplier() { return 16807; }
+  function shardModulus() { return 2147483647; }
+  /* The seed is MIXED before it becomes a state, and this is not decoration.
+     An LCG's k-th value is an AFFINE function of its seed -- under a purely
+     multiplicative one it is literally seed x (a^k mod m) -- so for the small
+     seeds a slider offers, nothing wraps and the whole placement scales with
+     the seed. Measured, before this was here: the arc a joining node took on
+     seeds 1 through 12 came out 0.0206, 0.0309, 0.0411, 0.0514, 0.0617, ...
+     a straight line, not twelve samples of anything. Every mode on this course
+     asks the reader to reseed and compare, so correlated seeds would make the
+     comparison meaningless while looking perfectly random on any one of them.
+     The finaliser below is the splitmix64 mixer: multiply, xor-shift, multiply,
+     xor-shift, which is nonlinear over the integers and breaks the affinity. */
+  function shardSeedState(seed) {
+    var mask = 0xFFFFFFFFFFFFFFFFn;
+    var x = (BigInt(seed) + 1n) * 0x9E3779B97F4A7C15n & mask;
+    x = ((x ^ (x >> 30n)) * 0xBF58476D1CE4E5B9n) & mask;
+    x = ((x ^ (x >> 27n)) * 0x94D049BB133111EBn) & mask;
+    x = x ^ (x >> 31n);
+    return Number(x % BigInt(shardModulus() - 1)) + 1;   /* never the fixed point 0 */
+  }
+  function shardStream(seed, count) {
+    return lcgStream(shardMultiplier(), 0, shardModulus(), shardSeedState(seed), count);
+  }
+  /* Uniform rationals in (0, 1) from that stream, for inverse-transform
+     sampling. Exact fractions over the modulus, not doubles. */
+  function shardUniform(seed, count) {
+    var m = BigInt(shardModulus());
+    return shardStream(seed, count).map(function (x) { return R(BigInt(x), m); });
+  }
+
+  /* ======================================================= L1: how many
+
+     Two constraints, and the answer is the larger. Both are ceilings of exact
+     rationals, because 23.08 shards is 24 shards and the whole point of a
+     sizing lesson is that the fraction rounds the expensive way. */
+  function shardsForLoad(lamPeak, perNode, rhoTarget) {
+    if (Rzero(perNode) || Rzero(rhoTarget)) return null;
+    return Rceil(Rdiv(lamPeak, Rmul(perNode, rhoTarget)));
+  }
+  function shardsForStorage(dataBytes, rf, perNodeBytes) {
+    if (Rzero(perNodeBytes)) return null;
+    return Rceil(Rdiv(Rmul(dataBytes, rf), perNodeBytes));
+  }
+  function bindingShards(byLoad, byStorage) {
+    if (byLoad === null || byStorage === null) return null;
+    if (byLoad > byStorage) return { n: byLoad, binding: 'load', slack: byLoad - byStorage };
+    if (byStorage > byLoad) return { n: byStorage, binding: 'storage', slack: byStorage - byLoad };
+    return { n: byLoad, binding: 'both', slack: 0n };
+  }
+  /* What the chosen count actually leaves: the utilisation each node runs at
+     and the bytes each one holds. A count chosen on one constraint is checked
+     against the other here, which is the lesson's misconception. */
+  function utilisationAt(lamPeak, perNode, n) {
+    return Rdiv(lamPeak, Rmul(perNode, R(BigInt(n), 1n)));
+  }
+  function bytesPerNodeAt(dataBytes, rf, n) {
+    return Rdiv(Rmul(dataBytes, rf), R(BigInt(n), 1n));
+  }
+
+  /* ==================================================== L2: balls in bins
+
+     m keys into N bins by h % N. The occupancy is counted, never modelled:
+     the mean is m/N exactly and the maximum is whatever the stream produced. */
+  function binOccupancy(seed, m, n) {
+    var counts = new Array(n).fill(0), draws = shardStream(seed, m), i;
+    for (i = 0; i < m; i += 1) counts[draws[i] % n] += 1;
+    return counts;
+  }
+  function occMax(counts) {
+    var best = 0;
+    for (var i = 0; i < counts.length; i += 1) if (counts[i] > best) best = counts[i];
+    return best;
+  }
+  function occMin(counts) {
+    var best = counts.length ? counts[0] : 0;
+    for (var i = 0; i < counts.length; i += 1) if (counts[i] < best) best = counts[i];
+    return best;
+  }
+  function occEmpty(counts) {
+    var c = 0;
+    for (var i = 0; i < counts.length; i += 1) if (counts[i] === 0) c += 1;
+    return c;
+  }
+  function occTotal(counts) {
+    var t = 0;
+    for (var i = 0; i < counts.length; i += 1) t += counts[i];
+    return t;
+  }
+  /* max/mean as an exact fraction: max * N / m. The figure the lesson is
+     about, and it is a ratio of integers, so it prints as one. */
+  function maxOverMean(counts) {
+    var m = occTotal(counts);
+    if (!m) return null;
+    return R(BigInt(occMax(counts)) * BigInt(counts.length), BigInt(m));
+  }
+  function minOverMean(counts) {
+    var m = occTotal(counts);
+    if (!m) return null;
+    return R(BigInt(occMin(counts)) * BigInt(counts.length), BigInt(m));
+  }
+  /* The excess over the mean measured in root-means: (max - mean)/sqrt(mean).
+     The lesson's claim is that the gap grows like a square root of the mean
+     rather than staying a fixed percentage of it, and this is the number that
+     stays roughly constant while max/mean shrinks. It ROUNDS -- sqrtApprox is
+     Newton from a rational -- and the page says so. */
+  function excessInRootMeansApprox(counts) {
+    var m = occTotal(counts), n = counts.length;
+    if (!m || !n) return NaN;
+    var mean = R(BigInt(m), BigInt(n));
+    var excess = Rsub(R(BigInt(occMax(counts)), 1n), mean);
+    var root = sqrtApprox(mean, 1e-15);
+    return root === 0 ? NaN : Rnum(excess) / root;
+  }
+  /* The one-choice maximum load, STATED and not proved: for n balls in n bins
+     it is Theta(log n / log log n). Printed rounded, through logApprox, and
+     every page that prints it says the proof is not in this library. */
+  function oneChoiceStatedApprox(n) {
+    if (n < 16) return NaN;
+    return logApprox(n) / logApprox(logApprox(n));
+  }
+  function twoChoiceStatedApprox(n) {
+    if (n < 16) return NaN;
+    return logApprox(logApprox(n));
+  }
+
+  /* ====================================================== L3: rehashing
+
+     The two fractions, stated. They sum to one, which is the entire argument
+     for consistent hashing and is checked below rather than asserted. */
+  function modMoveShare(n) { return R(BigInt(n), BigInt(n) + 1n); }
+  function ringMoveShare(n) { return R(1n, BigInt(n) + 1n); }
+  function rehashShareSum(n) { return Radd(modMoveShare(n), ringMoveShare(n)); }
+
+  /* The exact count, by enumeration. Over the complete cycle of N(N+1)
+     consecutive hash values, h % N equals h % (N+1) exactly when both are the
+     same v < N -- and by the Chinese Remainder Theorem each of the N(N+1)
+     pairs of residues occurs exactly once. So exactly N keys stay and the
+     moved fraction is N/(N+1) on the nose, with no sampling in it at all. */
+  function modCycleMoved(n) {
+    var total = n * (n + 1), moved = 0, h;
+    for (h = 0; h < total; h += 1) if (h % n !== h % (n + 1)) moved += 1;
+    return { moved: moved, total: total, share: R(BigInt(moved), BigInt(total)) };
+  }
+  /* The same count over a seeded sample of m hashes, which is what a reader
+     with a real key set would measure. It lands near N/(N+1), not on it. */
+  function modSampleMoved(seed, m, n) {
+    var draws = shardStream(seed, m), moved = 0, i;
+    for (i = 0; i < m; i += 1) if (draws[i] % n !== draws[i] % (n + 1)) moved += 1;
+    return { moved: moved, total: m, share: R(BigInt(moved), BigInt(m)) };
+  }
+
+  /* The ring. Token j belongs to node floor(j/v), so the tokens of an N-node
+     ring are a PREFIX of the tokens of an (N+1)-node ring: adding a node adds
+     tokens and moves nothing else, which is the property the whole scheme is
+     for. A key at position p belongs to the first token at or after p going
+     clockwise, wrapping -- successor ownership, stated once and used
+     everywhere in this kit. */
+  function ringTokens(seed, n, v) {
+    var draws = shardStream(seed, n * v), out = [], j;
+    for (j = 0; j < n * v; j += 1) out.push({ pos: draws[j], node: Math.floor(j / v) });
+    out.sort(function (a, b) { return a.pos - b.pos; });
+    return out;
+  }
+  function ringOwner(tokens, pos) {
+    for (var i = 0; i < tokens.length; i += 1) if (tokens[i].pos >= pos) return tokens[i].node;
+    return tokens.length ? tokens[0].node : -1;   /* wrapped past the last token */
+  }
+  /* Each node's share of the ring, as an exact rational over the modulus.
+     The arc (previous token, this token] belongs to this token. */
+  function ringShares(seed, n, v) {
+    var tokens = ringTokens(seed, n, v), m = shardModulus();
+    var arcs = new Array(n).fill(0), i;
+    for (i = 0; i < tokens.length; i += 1) {
+      var prev = i === 0 ? tokens[tokens.length - 1].pos - m : tokens[i - 1].pos;
+      arcs[tokens[i].node] += tokens[i].pos - prev;
+    }
+    return arcs.map(function (a) { return R(BigInt(a), BigInt(m)); });
+  }
+  /* The arc the (N+1)-th node takes when it joins, exactly: its token's own
+     arc under the new ring. Its EXPECTATION is 1/(N+1); what a given seed
+     hands you is this. */
+  function ringNewNodeArc(seed, n, v) {
+    var shares = ringShares(seed, n + 1, v);
+    return shares[n];
+  }
+  /* And the count of keys that actually move, which is the enumeration the
+     lesson asks for rather than the expectation. */
+  function ringSampleMoved(seed, keySeed, m, n, v) {
+    var before = ringTokens(seed, n, v), after = ringTokens(seed, n + 1, v);
+    var keys = shardStream(keySeed, m), moved = 0, i;
+    for (i = 0; i < m; i += 1) {
+      if (ringOwner(before, keys[i]) !== ringOwner(after, keys[i])) moved += 1;
+    }
+    return { moved: moved, total: m, share: R(BigInt(moved), BigInt(m)) };
+  }
+
+  /* The mean arc a joining node takes over several seeds. One ring is one
+     draw of an exponential-looking quantity with a very long tail, so a single
+     arc says nothing about 1/(N+1); the average over seeds is what converges
+     to it, and the page shows both rather than pretending the first is the
+     second. */
+  function ringArcMeanApprox(seed, n, v, seeds) {
+    var acc = R(0n, 1n), i;
+    for (i = 0; i < seeds; i += 1) acc = Radd(acc, ringNewNodeArc(seed + i, n, v));
+    return Rdiv(acc, R(BigInt(seeds), 1n));
+  }
+
+  /* ================================================== L4: virtual nodes
+
+     Sum of shares is 1 by construction; the figures are how far from level
+     the shares are. maxOverMeanShares is the objective the lesson states. */
+  function shareMaxOverMean(shares) {
+    var n = shares.length, best = shares[0], i;
+    for (i = 1; i < n; i += 1) if (Rcmp(shares[i], best) > 0) best = shares[i];
+    return Rmul(best, R(BigInt(n), 1n));
+  }
+  function shareMinOverMean(shares) {
+    var n = shares.length, worst = shares[0], i;
+    for (i = 1; i < n; i += 1) if (Rcmp(shares[i], worst) < 0) worst = shares[i];
+    return Rmul(worst, R(BigInt(n), 1n));
+  }
+  function shareTotal(shares) {
+    var t = R(0n, 1n);
+    for (var i = 0; i < shares.length; i += 1) t = Radd(t, shares[i]);
+    return t;
+  }
+  /* The relative spread: root mean square of (share*N - 1) over the nodes.
+     THIS is the quantity that falls like 1/sqrt(V) -- the maximum of N draws
+     is far too noisy at one seed to show a rate, and a lesson that asked the
+     reader to read 1/sqrt(V) off a single maximum would be asking them to see
+     something that is not there. It rounds: the square root is sqrtApprox. */
+  function spreadRmsApprox(shares) {
+    var n = shares.length, acc = R(0n, 1n), i;
+    for (i = 0; i < n; i += 1) {
+      var d = Rsub(Rmul(shares[i], R(BigInt(n), 1n)), R(1n, 1n));
+      acc = Radd(acc, Rmul(d, d));
+    }
+    return sqrtApprox(Rdiv(acc, R(BigInt(n), 1n)), 1e-15);
+  }
+  /* The STATED rate: relative spread falls like 1/sqrt(V). Rounded, labelled,
+     and printed beside the measured value rather than instead of it. */
+  function spreadRateStatedApprox(v) { return 1 / sqrtApprox(R(BigInt(v), 1n), 1e-15); }
+  /* Averaging the measured spread over several seeds, because one ring is one
+     sample and the rate is a claim about the distribution. */
+  function spreadRmsOverSeedsApprox(seed, n, v, seeds) {
+    var acc = 0, i;
+    for (i = 0; i < seeds; i += 1) acc += spreadRmsApprox(ringShares(seed + i, n, v));
+    return acc / seeds;
+  }
+  function maxOverMeanOverSeedsApprox(seed, n, v, seeds) {
+    var acc = 0, i;
+    for (i = 0; i < seeds; i += 1) acc += Rnum(shareMaxOverMean(ringShares(seed + i, n, v)));
+    return acc / seeds;
+  }
+
+  /* =============================================== L5: range partitioning
+
+     Ranges keep locality and lose balance. The three patterns are the three
+     things a key can be, and the figure is the hottest range's share of the
+     writes happening NOW -- not of the writes ever, which is the trap: a
+     monotonic key is perfectly balanced over all time and completely
+     unbalanced at every instant of it. */
+  function rangeWindows(pattern, m, n, windows, seed, buckets) {
+    var grid = [], w, i, draws = shardStream(seed, m), per = Math.floor(m / windows);
+    var b = Math.max(1, Math.min(n, buckets || 1)), wide = Math.floor(n / b);
+    for (w = 0; w < windows; w += 1) {
+      var row = new Array(n).fill(0);
+      for (i = 0; i < per; i += 1) {
+        var t = w * per + i, bin;
+        if (pattern === 'monotonic') {
+          /* key = the counter itself; the ranges split the key space evenly,
+             so at time t every write lands in the one range holding t. */
+          bin = Math.min(n - 1, Math.floor(t * n / m));
+        } else if (pattern === 'hashed') {
+          /* key = h(id); the range a write lands in has nothing to do with
+             when it happened, and a time-range scan has to visit all N. */
+          bin = draws[t] % n;
+        } else if (pattern === 'prefixed') {
+          /* the remedy: a hashed bucket in FRONT of the timestamp. The key
+             space is ordered by bucket first, so each bucket owns n/b
+             contiguous ranges and marches through them monotonically. Writes
+             at any instant are spread over b ranges -- one per bucket -- and a
+             time-range scan visits b ranges rather than 1 or N. */
+          bin = (draws[t] % b) * wide + Math.min(wide - 1, Math.floor(t * wide / m));
+          if (bin > n - 1) bin = n - 1;
+        } else {
+          return null;
+        }
+        row[bin] += 1;
+      }
+      grid.push(row);
+    }
+    return grid;
+  }
+  /* The hottest range's share of one window, exactly. */
+  function hottestShare(row) {
+    var total = occTotal(row);
+    if (!total) return R(0n, 1n);
+    return R(BigInt(occMax(row)), BigInt(total));
+  }
+  /* The worst window, which is the number that sizes the shard. */
+  function worstWindowShare(grid) {
+    var worst = R(0n, 1n);
+    for (var w = 0; w < grid.length; w += 1) {
+      var s = hottestShare(grid[w]);
+      if (Rcmp(s, worst) > 0) worst = s;
+    }
+    return worst;
+  }
+  /* And the share over the WHOLE run, which is the figure that makes a
+     monotonic key look fine. */
+  function lifetimeShare(grid) {
+    var n = grid.length ? grid[0].length : 0, totals = new Array(n).fill(0), w, i;
+    for (w = 0; w < grid.length; w += 1) for (i = 0; i < n; i += 1) totals[i] += grid[w][i];
+    return hottestShare(totals);
+  }
+  /* How many ranges a scan of one window of time has to touch under each
+     pattern, which is what the locality is FOR and what a hash throws away. */
+  function scanRanges(pattern, n, buckets) {
+    if (pattern === 'monotonic') return 1;
+    if (pattern === 'prefixed') return Math.max(1, Math.min(n, buckets || 1));
+    if (pattern === 'hashed') return n;
+    return null;
+  }
+
+  /* ========================================================= L6: hot keys
+
+     The first term has no N in it, and that is the lesson. */
+  function hottestLoad(lam, f, n) {
+    var uniform = Rdiv(Rmul(Rsub(R(1n, 1n), f), lam), R(BigInt(n), 1n));
+    return Radd(Rmul(f, lam), uniform);
+  }
+  function hottestLoadSalted(lam, f, n, s) {
+    var uniform = Rdiv(Rmul(Rsub(R(1n, 1n), f), lam), R(BigInt(n), 1n));
+    return Radd(Rdiv(Rmul(f, lam), R(BigInt(s), 1n)), uniform);
+  }
+  /* What no N ever gets below: the hot key's own traffic. */
+  function hotAsymptote(lam, f) { return Rmul(f, lam); }
+  function meanLoad(lam, n) { return Rdiv(lam, R(BigInt(n), 1n)); }
+  /* Imbalance as the hottest shard over the average one. */
+  function hotImbalance(lam, f, n) { return Rdiv(hottestLoad(lam, f, n), meanLoad(lam, n)); }
+  /* Salting costs s reads for every read of the hot key: the fan-out a reader
+     of that key now pays, which is the price of the fix. */
+  function saltReadAmplification(f, s) {
+    return Radd(Rmul(f, R(BigInt(s), 1n)), Rsub(R(1n, 1n), f));
+  }
+  /* The salt that brings the hot shard down to a target multiple of the mean,
+     by exact integer search rather than by a logarithm. Returns null when no
+     salt can: even s -> infinity leaves the uniform term. */
+  function saltForTarget(lam, f, n, targetMultiple) {
+    var goal = Rmul(targetMultiple, meanLoad(lam, n));
+    for (var s = 1; s <= 4096; s += 1) {
+      if (Rcmp(hottestLoadSalted(lam, f, n, s), goal) <= 0) return s;
+    }
+    return null;
+  }
+
+  /* ======================================================= L7: stragglers
+
+     A scatter job ends when its slowest partition ends, so the job's time is
+     the maximum of N draws. pmfMax gives that distribution exactly -- P(max <=
+     t) = F(t)^N, differenced -- and the mean and the percentile are read off
+     it rather than simulated. */
+
+  /* A pmf the reader typed: "20:70, 40:20, 120:8, 400:2" is value:weight, and
+     the weights are normalised to exact rational probabilities. Returns null
+     on anything that is not a distribution, which is what stops a typo
+     printing a confident wrong tail. */
+  function parsePmf(text) {
+    var parts = String(text).split(','), out = [], i;
+    for (i = 0; i < parts.length; i += 1) {
+      var s = parts[i].trim();
+      if (!s) continue;
+      var bits = s.split(':');
+      if (bits.length !== 2) return null;
+      var v = Number(bits[0].trim()), w = Rparse(bits[1].trim());
+      if (!isFinite(v) || Math.floor(v) !== v || w === null) return null;
+      if (Rcmp(w, R(0n, 1n)) < 0) return null;
+      out.push([v, w]);
+    }
+    if (!out.length) return null;
+    var total = R(0n, 1n);
+    for (i = 0; i < out.length; i += 1) total = Radd(total, out[i][1]);
+    if (Rzero(total)) return null;
+    return pmfNormalise(out);
+  }
+  /* The nearest-rank percentile of a DISTRIBUTION: the smallest value whose
+     cumulative probability is at least q. Same convention as percentile() in
+     the core -- a value that the distribution actually puts mass on, never an
+     interpolated one -- lifted from a sample to a pmf, and the two agree
+     exactly on an equiprobable pmf, which is how mathcheck.js checks it. */
+  function pmfQuantile(pairs, q) {
+    var sorted = pairs.slice().sort(function (x, y) { return x[0] - y[0]; });
+    var cum = R(0n, 1n), i;
+    for (i = 0; i < sorted.length; i += 1) {
+      cum = Radd(cum, sorted[i][1]);
+      if (Rcmp(cum, q) >= 0) return sorted[i][0];
+    }
+    return sorted.length ? sorted[sorted.length - 1][0] : null;
+  }
+  /* The straggler tax: what the maximum costs over one partition. */
+  function stragglerTax(pairs, n) {
+    var one = pmfMean(pairs), all = pmfMean(pmfMax(pairs, n));
+    return { one: one, all: all, ratio: Rzero(one) ? null : Rdiv(all, one) };
+  }
+  /* P(at least one partition lands beyond t), which is the shape of the whole
+     lesson: a rare slow partition is not rare once there are N of them. */
+  function anySlowerThan(pairs, n, t) {
+    return Rsub(R(1n, 1n), Rpow(Rsub(R(1n, 1n), pmfTail(pairs, t)), n));
+  }
+
+  /* The smallest partition count at which a tail value becomes the job's
+     q-quantile. An exact integer search over N, not a logarithm: a 0.5%
+     partition is not the p99 of one partition and IS the p99 of three. */
+  function smallestNForQuantile(pairs, q, value, cap) {
+    for (var n = 1; n <= cap; n += 1) {
+      if (pmfQuantile(pmfMax(pairs, n), q) >= value) return n;
+    }
+    return null;
+  }
+  /* The slowest value the pmf puts any mass on, which is what a job of enough
+     partitions eventually waits for. */
+  function pmfWorst(pairs) {
+    var worst = null;
+    for (var i = 0; i < pairs.length; i += 1) {
+      if (Rzero(pairs[i][1])) continue;
+      if (worst === null || pairs[i][0] > worst) worst = pairs[i][0];
+    }
+    return worst;
+  }
+
+  /* ================================================ L8: two choices
+
+     Both placements are driven by ONE stream, so the comparison is between
+     two policies on identical randomness rather than between two runs. Ball i
+     reads draws[i*d] .. draws[i*d + d - 1]; the one-choice arm uses the first
+     of each group and ignores the rest, so the arms cannot be accused of
+     having been handed different luck. */
+  function placeChoices(seed, balls, bins, d) {
+    var draws = shardStream(seed, balls * d), counts = new Array(bins).fill(0), i, j;
+    for (i = 0; i < balls; i += 1) {
+      var best = draws[i * d] % bins;
+      for (j = 1; j < d; j += 1) {
+        var cand = draws[i * d + j] % bins;
+        if (counts[cand] < counts[best]) best = cand;
+      }
+      counts[best] += 1;
+    }
+    return counts;
+  }
+  function placeOneChoiceFrom(seed, balls, bins, d) {
+    /* the SAME draws, with the extra choices discarded rather than redrawn */
+    var draws = shardStream(seed, balls * d), counts = new Array(bins).fill(0), i;
+    for (i = 0; i < balls; i += 1) counts[draws[i * d] % bins] += 1;
+    return counts;
+  }
+  /* The maxima either way across a run of seeds, because one seed is one
+     sample of a maximum and the result is about the distribution. */
+  function maxLoadAcrossSeeds(seed, balls, bins, d, seeds) {
+    var one = [], many = [], i;
+    for (i = 0; i < seeds; i += 1) {
+      one.push(occMax(placeOneChoiceFrom(seed + i, balls, bins, d)));
+      many.push(occMax(placeChoices(seed + i, balls, bins, d)));
+    }
+    return { one: one, many: many };
+  }
+  function meanOf(list) {
+    var t = 0;
+    for (var i = 0; i < list.length; i += 1) t += list[i];
+    return list.length ? R(BigInt(t), BigInt(list.length)) : null;
+  }
+
+  /* =================================================== L9: scatter-gather
+
+     Two different quantities, and the misconception is that they are one.
+     Sharding divides the WORK of a query; it multiplies the number of
+     REQUESTS, because an unrouted query asks every shard. */
+  function shardRequestRate(queryRate, n) { return Rmul(queryRate, R(BigInt(n), 1n)); }
+  function requestAmplification(n) { return R(BigInt(n), 1n); }
+  /* A routed query asks one shard; the ratio is the value of the routing key. */
+  function routedRequestRate(queryRate) { return queryRate; }
+  /* A seeded run of Q queries, each the maximum of N shard latencies drawn by
+     inverse transform from the pmf. The sample is returned sorted so the
+     nearest-rank percentile in the core can be read straight off it, and the
+     page prints it beside the EXACT tail from pmfMax -- two routes to one
+     number, which is the only way to notice when one of them is wrong. */
+  function scatterSample(pairs, n, queries, seed) {
+    var us = shardUniform(seed, n * queries), out = [], q, i;
+    for (q = 0; q < queries; q += 1) {
+      var worst = null;
+      for (i = 0; i < n; i += 1) {
+        var v = sampleFromPmf(pairs, us[q * n + i]);
+        if (worst === null || v > worst) worst = v;
+      }
+      out.push(worst);
+    }
+    return out.sort(function (a, b) { return a - b; });
+  }
+
+  /* ======================================== L10: local and global indexes
+
+     Local: read every shard, write one. Global: read one shard, write two --
+     the base row and the index entry, which live on different shards. */
+  function localIndexCost(r, w, n) { return Radd(Rmul(r, R(BigInt(n), 1n)), w); }
+  function globalIndexCost(r, w) { return Radd(r, Rmul(R(2n, 1n), w)); }
+  /* The crossover: r*N + w = r + 2w gives r(N - 1) = w, so the ratio r/w at
+     which the two cost the same is 1/(N - 1). Below it the local index wins;
+     above it the global one does. Exact, and undefined at N = 1 because at one
+     shard there is no difference to have. */
+  function indexCrossover(n) {
+    if (n <= 1) return null;
+    return R(1n, BigInt(n) - 1n);
+  }
+  function cheaperIndex(r, w, n) {
+    var c = Rcmp(localIndexCost(r, w, n), globalIndexCost(r, w));
+    return c < 0 ? 'local' : (c > 0 ? 'global' : 'equal');
+  }
+
+  /* ================================================ L11: cross-shard work
+
+     k independently hashed keys all land on one shard with probability
+     N^(1-k): the first key picks a shard and the other k-1 have to match it.
+     Rpow takes the negative exponent, so this is one call and stays exact. */
+  function sameShardProb(k, n) {
+    if (k < 1 || n < 1) return null;
+    return Rpow(R(BigInt(n), 1n), 1 - k);
+  }
+  function crossShardProb(k, n) { return Rsub(R(1n, 1n), sameShardProb(k, n)); }
+  /* The expected number of distinct shards a k-key transaction touches:
+     N(1 - (1 - 1/N)^k), which is how many two-phase participants there are. */
+  function expectedShardsTouched(k, n) {
+    var nb = R(BigInt(n), 1n);
+    return Rmul(nb, Rsub(R(1n, 1n), Rpow(Rsub(R(1n, 1n), Rinv(nb)), k)));
+  }
+  /* Two-phase commit, itemised: a prepare round trip, a commit round trip,
+     and an fsync at each end of each phase. One shard pays none of it. */
+  function twoPhaseCost(rtt, fsync) {
+    return { rtt: Rmul(R(2n, 1n), rtt), fsync: Rmul(R(2n, 1n), fsync),
+             total: Radd(Rmul(R(2n, 1n), rtt), Rmul(R(2n, 1n), fsync)) };
+  }
+  function meanAddedLatency(k, n, rtt, fsync) {
+    return Rmul(crossShardProb(k, n), twoPhaseCost(rtt, fsync).total);
+  }
+
+  /* ===================================================== L12: rebalancing
+
+     Moving m of D bytes at a throttled B bytes a second takes m*D/B seconds,
+     and the copy is not free while it runs: it takes a share of the node's
+     transfer budget, which is capacity the node is no longer serving with. */
+  function rebalanceSeconds(fraction, dataBytes, throttleBps) {
+    if (Rzero(throttleBps)) return null;
+    return Rdiv(Rmul(fraction, dataBytes), throttleBps);
+  }
+  function movedBytes(fraction, dataBytes) { return Rmul(fraction, dataBytes); }
+  /* The share of the node's budget the copy holds, and the service rate left. */
+  function stolenShare(throttleBps, budgetBps) {
+    if (Rzero(budgetBps)) return null;
+    return Rdiv(throttleBps, budgetBps);
+  }
+  function serviceDuringMove(mu, throttleBps, budgetBps) {
+    var stolen = stolenShare(throttleBps, budgetBps);
+    if (stolen === null) return null;
+    return Rmul(mu, Rsub(R(1n, 1n), stolen));
+  }
+  /* The utilisation before and during, and the wait C3 L8 reads off each --
+     mm1 is the course-3 result, reused rather than restated. */
+  function rebalanceLoad(lamNode, mu, throttleBps, budgetBps) {
+    var muMove = serviceDuringMove(mu, throttleBps, budgetBps);
+    var before = mm1(lamNode, mu);
+    var during = muMove === null || Rzero(muMove) ? { stable: false } : mm1(lamNode, muMove);
+    return { before: before, during: during, muMove: muMove };
+  }
+
+  var kS = document.getElementById('sbKeys'), nS = document.getElementById('sbShards');
+  var sS = document.getElementById('sbSeed');
+  var hist = document.getElementById('sbHist'), table = document.getElementById('sbTable');
+  var status = document.getElementById('sbStatus');
+  var SEEDS = 8;
+
+  function redraw() {
+    var m = +kS.value, n = +nS.value, seed = +sS.value;
+    document.getElementById('sbKeysOut').textContent = group(BigInt(m));
+    document.getElementById('sbShardsOut').textContent = n;
+    document.getElementById('sbSeedOut').textContent = seed;
+
+    var counts = binOccupancy(seed, m, n);
+    var mean = R(BigInt(m), BigInt(n)), ratio = maxOverMean(counts);
+    document.getElementById('sbMean').textContent = Rfixed(mean, 2);
+    document.getElementById('sbMax').textContent = group(BigInt(occMax(counts)));
+    document.getElementById('sbMin').textContent = group(BigInt(occMin(counts)));
+    document.getElementById('sbRatio').textContent = Rfixed(ratio, 3) + ' (' + Rtext(ratio) + ')';
+    document.getElementById('sbRoot').textContent = excessInRootMeansApprox(counts).toFixed(2)
+      + ' &radic;mean';
+    document.getElementById('sbEmpty').textContent = occEmpty(counts);
+
+    /* One seed is one sample of a maximum. The lesson is about the DISTRIBUTION
+       of that maximum, so the table reseeds. */
+    var rows = '', i, worst = 0, best = null, sum = R(0n, 1n);
+    for (i = 0; i < SEEDS; i += 1) {
+      var c = binOccupancy(seed + i, m, n), r = maxOverMean(c);
+      sum = Radd(sum, r);
+      if (occMax(c) > worst) worst = occMax(c);
+      if (best === null || occMax(c) < best) best = occMax(c);
+      rows += '<tr' + (i === 0 ? ' class="tone-cyan"' : '') + '><td>' + (seed + i)
+        + (i === 0 ? ' &mdash; drawn above' : '') + '</td>'
+        + '<td>' + group(BigInt(occMax(c))) + '</td><td>' + group(BigInt(occMin(c))) + '</td>'
+        + '<td class="tt">' + Rtext(r) + '</td><td>' + Rfixed(r, 3) + '</td>'
+        + '<td>' + occEmpty(c) + '</td></tr>';
+    }
+    var meanRatio = Rdiv(sum, R(BigInt(SEEDS), 1n));
+    table.innerHTML = '<thead><tr><th>seed</th><th>fullest</th><th>emptiest</th>'
+      + '<th>max/mean, exactly</th><th>as a decimal</th><th>empty shards</th></tr></thead><tbody>'
+      + rows + '</tbody><tfoot><tr><th>mean over ' + SEEDS + ' seeds</th><th>&mdash;</th>'
+      + '<th>&mdash;</th><th class="tt">' + Rtext(meanRatio) + '</th><th>'
+      + Rfixed(meanRatio, 3) + '</th><th>&mdash;</th></tr></tfoot>';
+
+    var top = Math.max(1, occMax(counts)), bw = 504 / n, s = '', meanY = 186 - (Rnum(mean) / top) * 150;
+    for (i = 0; i < n; i += 1) {
+      var h = (counts[i] / top) * 150, hot = (counts[i] === occMax(counts));
+      s += '<rect x="' + (8 + i * bw + 1) + '" y="' + (186 - h) + '" width="' + Math.max(1, bw - 2)
+        + '" height="' + h + '" fill="var(--' + (hot ? 'red' : 'cyan') + ')" opacity="'
+        + (hot ? '0.95' : '0.72') + '" />';
+      if (n <= 24) {
+        s += '<text x="' + (8 + i * bw + bw / 2) + '" y="198" font-size="8" text-anchor="middle" '
+          + 'fill="var(--muted)">' + i + '</text>';
+      }
+    }
+    s += '<line x1="8" y1="186" x2="512" y2="186" stroke="var(--line-strong)" stroke-width="1" />'
+      + '<line x1="8" y1="' + meanY + '" x2="512" y2="' + meanY + '" stroke="var(--muted)" '
+      + 'stroke-width="1" stroke-dasharray="4 4" />'
+      + '<text x="8" y="' + (meanY - 4) + '" font-size="10" fill="var(--muted)">mean '
+      + Rfixed(mean, 2) + ' keys a shard</text>'
+      + '<text x="8" y="14" font-size="11" fill="var(--red)">fullest ' + group(BigInt(occMax(counts)))
+      + ', which is ' + Rfixed(ratio, 3) + ' times the mean</text>'
+      + '<text x="8" y="214" font-size="10" fill="var(--muted)">' + group(BigInt(m)) + ' keys, '
+      + n + ' shards, seed ' + seed + '; every bar is counted, none is modelled</text>'
+      + '<text x="8" y="226" font-size="10" fill="var(--muted)">the gap above the mean grows like a '
+      + 'square root of the mean, so it shrinks as a PERCENTAGE and grows in keys</text>';
+    hist.innerHTML = s;
+
+    var stated = oneChoiceStatedApprox(n);
+    status.innerHTML = group(BigInt(m)) + ' keys into ' + n + ' shards leaves a mean of <strong>'
+      + Rfixed(mean, 2) + '</strong> and a fullest shard of <strong>' + group(BigInt(occMax(counts)))
+      + '</strong> &mdash; max/mean = <strong>' + Rtext(ratio) + '</strong> = ' + Rfixed(ratio, 3)
+      + ', and the emptiest holds ' + group(BigInt(occMin(counts))) + '. Over seeds ' + seed
+      + '&ndash;' + (seed + SEEDS - 1) + ' the fullest ranges from ' + group(BigInt(best)) + ' to '
+      + group(BigInt(worst)) + ', so one run is one sample: the average max/mean is '
+      + Rfixed(meanRatio, 3) + '. The excess over the mean is '
+      + excessInRootMeansApprox(counts).toFixed(2) + ' root-means, which is the term that does not '
+      + 'go away &mdash; sizing every shard at the mean under-provisions the fullest one by '
+      + Rpct(Rsub(ratio, R(1n, 1n)), 1) + '.'
+      + (isFinite(stated)
+        ? ' For n keys into n bins the maximum is &Theta;(log n / log log n), which at n = ' + n
+          + ' is about ' + stated.toFixed(2) + ' &mdash; stated, not proved, and rounded.'
+        : '');
+  }
+
+  [kS, nS, sS].forEach(function (el) { el.addEventListener('input', redraw); });
+  redraw();
+  window.redrawLab = redraw;
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "partitioning-and-load-balancing/hash-partitioning-and-imbalance";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+  </script>
+</body>
+</html>

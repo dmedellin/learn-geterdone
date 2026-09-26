@@ -333,7 +333,7 @@ function inventory(root){
   if(new Set(html.canvases.map(c=>c.id)).size!==html.canvases.length||html.canvases.some(c=>!c.id))errors.push({route,assertion:'canvas identities must be nonempty and unique'});
   pages.push({route,file,sha256:crypto.createHash('sha256').update(raw).digest('hex'),canvases:html.canvases.map(({id,offset})=>({id,offset})),helpers:helper,occurrences});
  }
- if(pages.length!==369)errors.push({assertion:'canvas published route inventory differs',observed:pages.length});
+ if(pages.length!==494)errors.push({assertion:'canvas published route inventory differs',observed:pages.length});
  if(pages.filter(p=>p.canvases.length).length!==66||pages.reduce((n,p)=>n+p.canvases.length,0)!==71)errors.push({assertion:'canvas element continuity differs'});
  if(bound!==269)errors.push({assertion:'canvas semantic site continuity differs',observed:bound});
  return {htmlRoutes:pages.length,canvasRoutes:pages.filter(p=>p.canvases.length).length,canvases:pages.reduce((n,p)=>n+p.canvases.length,0),nativeProductOccurrences:native,contractOccurrences:bound,unbound,errors,pages};

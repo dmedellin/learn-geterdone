@@ -1,0 +1,2551 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Retry Storms | Lesson | Availability and Failure | System Design | Learn · geterdone.io</title>
+  <meta name="description" content="Load raises the failure rate, the failure rate raises the amplification, and the amplification raises the load. Iterating that map from an offered load of 0.95 of capacity, with three retries and a ten per cent base failure rate, walks 0.95 → 1.06 → 1.11 → 1.17 → 1.24 and settles at 1.727 — above capacity, from a starting point that was comfortably inside it. The retries are not a response to the overload; they are the overload." />
+  <link rel="canonical" href="https://learn.geterdone.io/availability-and-failure/retry-storms/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="Retry Storms | Lesson | Availability and Failure | System Design | Learn · geterdone.io" />
+  <meta property="og:description" content="Load raises the failure rate, the failure rate raises the amplification, and the amplification raises the load. Iterating that map from an offered load of 0.95 of capacity, with three retries and a ten per cent base failure rate, walks 0.95 → 1.06 → 1.11 → 1.17 → 1.24 and settles at 1.727 — above capacity, from a starting point that was comfortably inside it. The retries are not a response to the overload; they are the overload." />
+  <meta property="og:url" content="https://learn.geterdone.io/availability-and-failure/retry-storms/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Retry Storms | Lesson | Availability and Failure | System Design | Learn · geterdone.io" />
+  <meta name="twitter:description" content="Load raises the failure rate, the failure rate raises the amplification, and the amplification raises the load. Iterating that map from an offered load of 0.95 of capacity, with three retries and a ten per cent base failure rate, walks 0.95 → 1.06 → 1.11 → 1.17 → 1.24 and settles at 1.727 — above capacity, from a starting point that was comfortably inside it. The retries are not a response to the overload; they are the overload." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/availability-and-failure/retry-storms/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    @media (max-width: 920px) {
+      body[data-page-kind="supplemental"] [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/system-design/">System Design</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Availability and Failure</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">Retry Storms</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The retry storms is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Availability and Failure &middot; Budgets and retries</span>
+        <h1>Retry Storms</h1>
+        <p>Load raises the failure rate, the failure rate raises the amplification, and the amplification raises the load. Iterating that map from an offered load of <span class="math">0.95</span> of capacity, with three retries and a ten per cent base failure rate, walks <span class="math">0.95 → 1.06 → 1.11 → 1.17 → 1.24</span> and settles at <span class="math">1.727</span> &mdash; above capacity, from a starting point that was comfortably inside it. The retries are not a response to the overload; they are the overload.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">p(L) = base + (1 − base)·max(0, (L − C)/L)      failure rises with load
+L′   = λ · (1 − p(L)ʳ⁺¹)/(1 − p(L))             retries raise the load
+λ = 0.95 C, base = 0.10, r = 3   →  fixed point 1.727 C
+the failure rate there is 0.479 and the amplification 1.818</div>
+        <div class="float-label" style="right:16px;bottom:16px;">A map from load to load, and where it settles</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>Two functions from the last two lessons, composed. Neither is new; the composition is, and so is the answer it lands on.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Failure rises with load, by a model you state</h3><p>Above capacity the server cannot finish everything inside a client's patience, and the share it does finish is <span class="math">C/L</span>, so the failure probability is <span class="math">base + (1 − base)·(L − C)/L</span>. Below capacity it is just <span class="math">base</span>. That is this lesson's model, stated rather than assumed, and the lab evaluates it rather than drawing a curve someone liked the shape of.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Composing the two gives a map from load to load</h3><p><span class="math">L′ = λ · attempts(p(L))</span>. Feed a load in, get the failure rate it causes, get the amplification that failure rate produces, multiply the original offered load by it. The result is the load the service actually sees, and feeding it back in is one step of the iteration. Three steps by hand are enough to see which way it is going.</p></article><article class="card concept-card"><div class="icon">3</div><h3>The fixed point can sit above capacity when the offered load did not</h3><p>Starting at <span class="math">0.95</span> of capacity with three retries and a <span class="math">10%</span> base failure rate, the iteration passes capacity on its first step and settles at <span class="math">1.727</span>. Nothing external changed: the offered load was serviceable throughout, and the policy meant to protect requests is what is drowning the service. Switching the retries off returns the load to <span class="math">0.95</span>.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>The loop, the iteration and the fixed point</h2></div><p>How the two earlier formulas compose into a feedback loop, what iterating it looks like, and why a bracket answers a question the iteration cannot afford to.</p></div>
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; The retry-storm map</span><p>Write <span class="math">C</span> for capacity, <span class="math">λ</span> for the offered load before retries, <span class="math">base</span> for the failure probability under no overload and <span class="math">r</span> for the retry count. Define <span class="math">p(L) = base + (1 − base)·max(0, (L − C)/L)</span> and <span class="math">L′ = λ · (1 − p(L)ʳ⁺¹)/(1 − p(L))</span>. A <strong>fixed point</strong> is a load with <span class="math">L′ = L</span>; the system's steady state is such a point, if one exists below the ceiling <span class="math">λ(r + 1)</span>.</p></div><p>Capacity is the unit: every load on this page is a multiple of <span class="math">C</span>, so <span class="math">C = 1</span> and the offered load <span class="math">λ = 0.95</span> means ninety-five per cent of capacity. The base failure rate is what the service returns when it is not overloaded &mdash; a small tail of genuine errors, here ten per cent, which is high enough to make the iteration visible in five steps.</p><h3>Five steps of the map, by hand</h3><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">λ = 0.95, C = 1, base = 0.10, r = 3
+
+step  load in     p        attempts   load out    denominator digits
+ 1    0.95000   0.10000    1.11100    1.05545              5
+ 2    1.05545   0.14728    1.17217    1.11356             13
+ 3    1.11356   0.19178    1.23562    1.17384             39
+ 4    1.17384   0.23328    1.30040    1.23538            119
+ 5    1.23538   0.27148    1.36519    1.29693            358
+
+the first step alone crosses capacity: 0.95 × 1.111 = 1.05545</div><p>Work step two by hand and the loop stops being a metaphor. The load is <span class="math">1.05545</span>, so the overload share is <span class="math">(1.05545 − 1)/1.05545 = 0.05254</span>, and the failure rate is <span class="math">0.1 + 0.9 × 0.05254 = 0.14728</span>. Four attempts at that rate cost <span class="math">1 + 0.14728 + 0.02169 + 0.00319 = 1.17217</span>, and <span class="math">0.95 × 1.17217</span> is <span class="math">1.11356</span>. Every figure in the row came from the row above it.</p><p>The last column is worth a sentence of its own. The amplification carries the <span class="math">r</span>-th power of the failure rate's denominator, so each step cubes it at <span class="math">r = 3</span>: five digits, then thirteen, thirty-nine, a hundred and nineteen, three hundred and fifty-eight. By the seventh iterate the exact fraction has over three thousand digits, and the table stops and says so rather than silently rounding.</p><h3>Bracketing the fixed point instead of iterating to it</h3><p>The iteration cannot reach the answer, so the lab does not use it to. The map is increasing in <span class="math">L</span> and bounded above by <span class="math">λ(r + 1)</span>, so the function <span class="math">g(L) = L′ − L</span> is non-negative at <span class="math">λ</span> and non-positive at <span class="math">λ(r + 1)</span>, and a root is trapped between them. Bisection evaluates the map afresh at each probe, so nothing compounds and the denominators stay small.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">λ = 0.95, base = 0.10, r = 3
+
+fixed point bracketed at   1.72736  ≤  L*  ≤  1.72736
+failure rate there                   p = 0.47897
+amplification there                      1.8183
+
+with the retries switched off            0.95000
+
+check:  0.95 × 1.8183 = 1.72739 ≈ L*        ✓</div><p>The result is an enclosure rather than a rounded number: the fixed point is at least the lower bound and at most the upper one, and both ends are exact fractions. At this setting the two ends agree to five decimal places, which is why the readout prints the same figure twice.</p><div class="example"><span class="label">Example &middot; The service that could have served the load</span><p><span class="math">0.95</span> of capacity was serviceable. With three retries the system settles at <span class="math">1.727</span> of capacity and a <span class="math">47.9%</span> failure rate &mdash; and that failure rate is what sustains the amplification that produced the load. Turn the retries off in the lab and the load returns to <span class="math">0.95</span> immediately. The overload has no external cause at all, which is exactly why it does not end when the original trigger does.</p></div><h3>Where the transition is</h3><p>It is not gradual. At the same <span class="math">10%</span> base rate and three retries, an offered load of <span class="math">0.80</span> settles at <span class="math">0.8888</span> and one of <span class="math">0.90</span> settles at <span class="math">0.9999</span> &mdash; both below capacity and stable in a single step. <span class="math">0.95</span> settles at <span class="math">1.727</span>. The system is fine, fine, and then eighty per cent over capacity, and the parameter that moved was five per cent of offered load.</p><div class="example"><span class="label">Example &middot; The retry count as the control</span><p>Hold the offered load at <span class="math">0.95</span> and vary only the policy: with no retries the fixed point is <span class="math">0.95</span>, with one retry <span class="math">1.168</span>, with two <span class="math">1.439</span>, with three <span class="math">1.727</span>. Every one of those is the same traffic against the same service. The policy is not a response to the overload in any of the last three cases; it is the whole of it.</p></div></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Retry storms</h2></div><p>A feedback loop, iterated to its fixed point — which can sit above capacity</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>The retry storm</strong><span>load feeds failure feeds retries feeds load &mdash; iterate it and see where it lands</span></div>
+        <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the iterates</span><span class="tone-red"><i class="legend-swatch"></i>capacity</span><span class="tone-purple"><i class="legend-swatch"></i>the fixed point</span></div>
+      </div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="stPath" viewBox="0 0 520 196" role="img" aria-label="Successive iterates of the load, against the capacity line."></svg></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="stTable"></table></div>
+      <div class="status-banner" id="stStatus" style="margin-top:12px;"></div>
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>Set the load and the retry policy</h3>
+          <p>An offered load of 95% of capacity with three retries. Work the first three rows of the table by hand before reading the fixed point &mdash; the iterates move away from where the offered load sits, and watching that happen is the point. Then set the retries to none and watch the same load stay put.</p>
+        <div>
+          <div class="range-row"><label class="small-copy" for="stLoad">Offered load before retries (per cent of capacity)</label><span class="range-value" id="stLoadOut">95</span></div>
+          <input id="stLoad" type="range" min="50" max="150" step="1" value="95" />
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="stBase">Failure probability with no overload (per cent)</label><span class="range-value" id="stBaseOut">10</span></div>
+          <input id="stBase" type="range" min="0" max="30" step="1" value="10" />
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="stR">Retries</label><span class="range-value" id="stROut">3</span></div>
+          <input id="stR" type="range" min="0" max="4" step="1" value="3" />
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="stSteps">Iterations to show</label><span class="range-value" id="stStepsOut">5</span></div>
+          <input id="stSteps" type="range" min="3" max="7" step="1" value="5" />
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Where it starts</span><strong id="stStart">&mdash;</strong></div>
+          <div class="kpi"><span>Fixed point, bracketed</span><strong id="stFix">&mdash;</strong></div>
+          <div class="kpi"><span>Failure rate there</span><strong id="stFixP">&mdash;</strong></div>
+          <div class="kpi"><span>Amplification there</span><strong id="stAmp">&mdash;</strong></div>
+          <div class="kpi"><span>With retries switched off</span><strong id="stNoRetry">&mdash;</strong></div>
+          <div class="kpi"><span>Verdict</span><strong id="stVerdict">&mdash;</strong></div>
+        </div>
+        <p class="small-copy" id="stHint" style="margin:0;">Capacity is 1 by definition, so every load on this page is in units of capacity. The iterates are exact fractions and each step raises the failure probability to the (r + 1)th power, so the denominators grow very fast &mdash; the table stops when they outgrow the budget and says so.</p>
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Iterating the loop</h2></div><p>Three of these are arithmetic you already have. The fourth is the question the arithmetic was for.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>State the failure model and the capacity</h3><p>Write down what failure probability each load produces, and in what units capacity is measured. This lesson uses <span class="math">p(L) = base + (1 − base)(L − C)/L</span> above capacity and <span class="math">base</span> below it; a different model gives different numbers and the same shape of conclusion, but it has to be written down either way.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Apply the map by hand three times</h3><p>Failure rate from the load, amplification from the failure rate, load from the amplification times the original offered load. Three iterations are enough to see the direction, and doing them by hand is what makes the fourth believable.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Find the fixed point by bracketing, not by iterating</h3><p>The map is increasing and bounded by <span class="math">λ(r + 1)</span>, so bisect between the offered load and that ceiling. Iterating instead compounds the exact fractions until they are unusable, and rounding them is how a divergence gets reported as a convergence.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compare the fixed point with capacity, and with the offered load</h3><p>Above capacity is a storm; below it the policy is affordable. Then compare with the load that would have applied with no retries at all, because that difference is the part the system did to itself and the only part a policy change can remove.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>Loops and fixed points</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>Two retries at 90% offered load, and what one more retry does</h3><p>A service running at ninety per cent of capacity with a five per cent base failure rate. The question on the table is whether to raise the retry count from two to three to improve a customer-visible error rate.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">C = 1, λ = 0.90, base = 0.05
+
+r = 2
+step 1  L = 0.90  ≤ C  so p = 0.05
+        attempts = 1 + 0.05 + 0.0025 = 1.0525
+        L′ = 0.90 × 1.0525 = 0.94725
+step 2  L = 0.94725 ≤ C  so p = 0.05 again
+        L′ = 0.94725 → unchanged, this is the fixed point
+fixed point 0.94725,  below capacity,  stable
+
+r = 3
+step 1  attempts = 1 + 0.05 + 0.0025 + 0.000125 = 1.052625
+        L′ = 0.90 × 1.052625 = 0.9473625
+fixed point 0.9473625,  below capacity,  stable
+
+now the same two policies at λ = 0.98
+r = 2   fixed point 1.38247    above capacity
+r = 3   fixed point 1.63311    above capacity</div><p>At ninety per cent offered load the extra retry is nearly free: the fixed point moves by one part in ten thousand and stays well inside capacity, because the load never crosses <span class="math">C</span> and so the failure rate never leaves its base value. The feedback term is switched off entirely in this regime, which is why the policy looks harmless.</p><p>At ninety-eight per cent the same two policies both storm, and the one with the extra retry storms harder. The decision therefore is not about the retry count at all &mdash; it is about how close to capacity the service is allowed to run, because that is what decides whether the loop is engaged.</p><p>For a faded rehearsal, keep <span class="math">base = 0.05</span> and <span class="math">r = 2</span> and find the offered load at which the fixed point first exceeds capacity. The supplied first move is that while <span class="math">L ≤ C</span> the map has the constant amplification <span class="math">1.0525</span>, so the loop only engages once <span class="math">λ × 1.0525 > 1</span>. Solve that inequality by hand, then check the value against the lab's bracket by stepping the offered-load slider across it.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing the retries stop when the service recovers</strong><span>They are what prevents it recovering. At <span class="math">λ = 0.95</span> with three retries the fixed point is <span class="math">1.727</span> of capacity and the failure rate there is <span class="math">47.9%</span> &mdash; a failure rate the retries themselves are sustaining. Removing the original trigger changes nothing, because the offered load was never the problem; switching the retries off returns the load to <span class="math">0.95</span> at once.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Sizing capacity against the offered load rather than the fixed point</strong><span><span class="math">0.95</span> of capacity is the load a capacity plan would record. What arrives is <span class="math">1.727</span> of capacity, and the ceiling <span class="math">λ(r + 1)</span> is <span class="math">3.80</span>. A headroom figure that does not include the amplification is measuring traffic the system does not actually receive on the day it matters.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Iterating the exact map to find the fixed point</strong><span>Each step raises the failure rate to the <span class="math">(r + 1)</span>-th power, so the denominators cube: five digits, thirteen, thirty-nine, a hundred and nineteen. The seventh iterate has over three thousand, and rounding to carry on is how a diverging iteration gets reported as a converging one. Bracket the root instead &mdash; the map is increasing and bounded, so a sign change traps it.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you would ask for a system&#x27;s fixed point rather than its offered load.</strong><p>You should be able to state the failure model, apply the map by hand for three steps, bracket the fixed point between <span class="math">λ</span> and <span class="math">λ(r + 1)</span>, and say how much of the resulting load is the system's own doing rather than its users'.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The loop is closed by two different mechanisms and they are not alternatives. Spreading the retries in time is one, and &ldquo;Backoff and Jitter&rdquo; shows that the spreading, not the delay, is what actually cuts the peak. Refusing work at the door is the other, and that is &ldquo;Load Shedding&rdquo;.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../retries-and-request-amplification/" rel="prev"><span>Lesson</span><strong>Retries and Request Amplification</strong></a>
+      <a class="lesson-link next" href="../backoff-and-jitter/" rel="next"><span>Lesson</span><strong>Backoff and Jitter</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="availability-and-failure/retry-storms" data-lesson-title="Retry Storms" data-course-title="Availability and Failure">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Availability and Failure.</strong> Availabilities, binomial tails, retry amplifications and shuffle-sharding overlaps on this course are exact fractions, which is what lets a page show that four nines and three nines differ by a factor of ten rather than by a rounding. The one figure computed in floating point is the durability estimate of &ldquo;Replica Loss and Durability&rdquo;, which is a first-order rare-event approximation and says so.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure on this path is computed in your browser from the model the lesson states, and a model&rsquo;s answer is only as true as its assumptions &mdash; independence, memorylessness and steady state are named where they are used, and each lesson says where its own fails.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "Offered load is <span class=\"math\">0.95<\/span> of capacity, the base failure rate is <span class=\"math\">10%<\/span> and there are three retries. What is the load after one application of the map?", "a": ["<span class=\"math\">0.95<\/span>, unchanged, since the load is below capacity", "<span class=\"math\">1.05545<\/span>", "<span class=\"math\">3.80<\/span>, the offered load times <span class=\"math\">r + 1<\/span>", "<span class=\"math\">1.00<\/span>, because the service saturates at capacity"], "c": 1, "why": "Below capacity the failure rate is the base <span class=\"math\">0.10<\/span>, so the amplification is <span class=\"math\">1 + 0.1 + 0.01 + 0.001 = 1.111<\/span>, and <span class=\"math\">0.95 \u00d7 1.111 = 1.05545<\/span>. The retries apply at the base failure rate too &mdash; they are not switched off below capacity, which is precisely how the first step crosses it. The third choice is the ceiling as <span class=\"math\">p<\/span> approaches one."}, {"q": "In this model, what makes a retry storm self-sustaining?", "a": ["The original trigger persists, so the load stays high", "The failure rate rises with load and the amplification rises with the failure rate, so the retries supply their own cause", "Clients retry forever, with no bound on the attempt count", "Capacity falls during overload, which is a separate mechanism"], "c": 1, "why": "The loop closes on itself: load raises <span class=\"math\">p<\/span>, <span class=\"math\">p<\/span> raises the amplification, the amplification raises the load. At <span class=\"math\">\u03bb = 0.95<\/span> the offered load was always serviceable, so there is no persisting external trigger to point at. The attempt count is bounded at <span class=\"math\">r + 1<\/span> and the storm happens anyway &mdash; the ceiling <span class=\"math\">\u03bb(r + 1)<\/span> is <span class=\"math\">3.80<\/span> of capacity, and the fixed point at <span class=\"math\">1.727<\/span> sits well under it."}, {"q": "At <span class=\"math\">base = 0.10<\/span> and <span class=\"math\">r = 3<\/span>, offered loads of <span class=\"math\">0.80<\/span>, <span class=\"math\">0.90<\/span> and <span class=\"math\">0.95<\/span> settle at <span class=\"math\">0.8888<\/span>, <span class=\"math\">0.9999<\/span> and <span class=\"math\">1.727<\/span>. What does that say about the transition?", "a": ["It is linear in the offered load", "It is abrupt: a five-point rise in offered load moves the fixed point from just inside capacity to 73% over it", "It is an artefact of exact fractions and would not appear in a real system", "The system is unstable at every load, and the three figures are transients"], "c": 1, "why": "<span class=\"math\">0.90<\/span> settles at <span class=\"math\">0.9999<\/span>, one part in ten thousand under capacity, and <span class=\"math\">0.95<\/span> settles at <span class=\"math\">1.727<\/span>. The map is smooth but the margin between the amplified load and capacity is what determines whether the feedback term engages at all, so the outcome changes character over a very small range. All three figures are fixed points, not transients: the map returns them unchanged."}];
+
+  (function () {
+
+  /* Exact rational arithmetic over BigInt.
+
+     Every number a lesson calls "the answer" lives in this type. BigInt rather
+     than Number because a few steps of elimination on a 3x3 system produces
+     numerators that leave the exact-integer range of a double, and a solution
+     that is silently wrong in the last digits is worse than no solution. */
+  function bgcd(a, b) {
+    if (a < 0n) a = -a;
+    if (b < 0n) b = -b;
+    while (b) { var t = a % b; a = b; b = t; }
+    return a;
+  }
+  function R(n, d) {
+    if (d === undefined) d = 1n;
+    n = BigInt(n); d = BigInt(d);
+    if (d === 0n) throw new Error('division by zero');
+    if (d < 0n) { n = -n; d = -d; }
+    var g = bgcd(n, d) || 1n;
+    return { n: n / g, d: d / g };
+  }
+  var R0 = R(0n), R1 = R(1n);
+  function Radd(a, b) { return R(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function Rsub(a, b) { return R(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function Rmul(a, b) { return R(a.n * b.n, a.d * b.d); }
+  function Rdiv(a, b) { return R(a.n * b.d, a.d * b.n); }
+  function Rneg(a) { return R(-a.n, a.d); }
+  function Rabs(a) { return a.n < 0n ? Rneg(a) : a; }
+  function Rinv(a) { return R(a.d, a.n); }
+  function Rzero(a) { return a.n === 0n; }
+  function Rsign(a) { return a.n === 0n ? 0 : (a.n < 0n ? -1 : 1); }
+  function Requ(a, b) { return a.n === b.n && a.d === b.d; }
+  function Rcmp(a, b) { var l = a.n * b.d, r = b.n * a.d; return l < r ? -1 : (l > r ? 1 : 0); }
+  function Rint(a) { return a.d === 1n; }
+  function Rpow(a, k) {
+    var out = R1, base = a, e = k < 0 ? -k : k;
+    while (e > 0) { if (e & 1) out = Rmul(out, base); base = Rmul(base, base); e >>= 1; }
+    return k < 0 ? Rinv(out) : out;
+  }
+  /* The reader's form: "3", "-7/4". Never "3/1", never "0/5". */
+  function Rtext(a) { return a.d === 1n ? String(a.n) : a.n + '/' + a.d; }
+  /* Parenthesised when it would otherwise glue onto a neighbouring symbol. */
+  function Rterm(a) { return (a.n < 0n || a.d !== 1n) ? '(' + Rtext(a) + ')' : Rtext(a); }
+  function Rnum(a) { return Number(a.n) / Number(a.d); }
+  /* A decimal, for the one place a lesson asks for one. Exact when it can be. */
+  function Rdec(a, places) {
+    if (places === undefined) places = 6;
+    var v = Rnum(a);
+    if (Rint(a)) return String(a.n);
+    var s = v.toFixed(places);
+    return s.indexOf('.') >= 0 ? s.replace(/0+$/, '').replace(/\.$/, '') : s;
+  }
+  function Rparse(text) {
+    var s = String(text).trim();
+    var m = /^([+-]?\d+)\s*\/\s*(\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]), BigInt(m[2]));
+    m = /^([+-]?\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]));
+    m = /^([+-]?)(\d*)\.(\d+)$/.exec(s);
+    if (m) {
+      var whole = m[2] || '0', frac = m[3];
+      var num = BigInt(whole + frac), den = 10n ** BigInt(frac.length);
+      return R(m[1] === '-' ? -num : num, den);
+    }
+    return null;
+  }
+  /* Is this rational a perfect square? Needed wherever a lesson must decide
+     between an exact answer and a radical one -- sqrt(4/9) is 2/3 and belongs
+     on the page as 2/3, while sqrt(2) must stay sqrt(2). */
+  function bisqrt(n) {
+    if (n < 0n) return null;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x * x === n ? x : null;
+  }
+  function Rsqrt(a) {
+    if (a.n < 0n) return null;
+    var p = bisqrt(a.n), q = bisqrt(a.d);
+    return (p === null || q === null) ? null : R(p, q);
+  }
+
+  /* Counting is done in BigInt. 21! already exceeds what a double can hold
+     exactly, so a lab that used ordinary numbers would start printing
+     confidently wrong totals somewhere around n = 21 with nothing to mark the
+     boundary. Every count below is exact for every n the controls allow. */
+  function fact(n) { var r = 1n; for (var i = 2n; i <= BigInt(n); i += 1n) r *= i; return r; }
+  function perm(n, r) {
+    if (r > n || r < 0) return 0n;
+    var out = 1n;
+    for (var i = 0; i < r; i += 1) out *= BigInt(n - i);
+    return out;
+  }
+  function comb(n, r) {
+    if (r < 0 || r > n) return 0n;
+    r = Math.min(r, n - r);
+    var num = 1n, den = 1n;
+    for (var i = 0; i < r; i += 1) { num *= BigInt(n - i); den *= BigInt(i + 1); }
+    return num / den;
+  }
+  function group(x) { return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+
+  /* Availability composition. Series multiplies down, parallel multiplies up,
+     k-of-n is a binomial tail -- all exact, which matters because the
+     interesting answers are differences in the fourth decimal place. */
+  function availSeries(list) {
+    var a = R(1n, 1n);
+    for (var i = 0; i < list.length; i += 1) a = Rmul(a, list[i]);
+    return a;
+  }
+  function availParallel(list) {
+    var down = R(1n, 1n);
+    for (var i = 0; i < list.length; i += 1) down = Rmul(down, Rsub(R(1n, 1n), list[i]));
+    return Rsub(R(1n, 1n), down);
+  }
+  /* P(at least k of n independent components up), each up with probability a. */
+  function availKofN(a, k, n) {
+    var total = R(0n, 1n), q = Rsub(R(1n, 1n), a);
+    for (var j = k; j <= n; j += 1) {
+      total = Radd(total, Rmul(R(comb(n, j), 1n), Rmul(Rpow(a, j), Rpow(q, n - j))));
+    }
+    return total;
+  }
+  /* Expected attempts and success under a retry policy of r retries at failure
+     probability p: the geometric sum the retry-storm lesson iterates on. */
+  function retryAttempts(p, r) {
+    var num = Rsub(R(1n, 1n), Rpow(p, r + 1));
+    return Rdiv(num, Rsub(R(1n, 1n), p));
+  }
+  function retrySuccess(p, r) { return Rsub(R(1n, 1n), Rpow(p, r + 1)); }
+
+  /* A seeded stream. number.py's lcgRun detects the cycle of a generator, which
+     is a different job; a lab that samples needs the values in order and needs
+     the same values every time the page is opened, or a reader cannot check
+     what they were told. */
+  function lcgStream(a, c, m, seed, count) {
+    /* BigInt, not Number. A typical multiplier times a typical state exceeds
+       2^53 on the SECOND step, and a double silently rounds it -- the stream
+       then looks reproducible, because it is reproducibly wrong. */
+    var A = BigInt(a), C = BigInt(c), M = BigInt(m);
+    var out = [], x = ((BigInt(seed) % M) + M) % M;
+    for (var i = 0; i < count; i += 1) { x = (A * x + C) % M; out.push(Number(x)); }
+    return out;
+  }
+  /* Uniform rationals in [0, 1) from that stream. */
+  function streamUniform(a, c, m, seed, count) {
+    return lcgStream(a, c, m, seed, count).map(function (x) {
+      return R(BigInt(x), BigInt(m));
+    });
+  }
+  /* Inverse-transform sampling from a pmf given as [value, rational] pairs. */
+  function sampleFromPmf(pairs, u) {
+    var cum = R(0n, 1n);
+    for (var i = 0; i < pairs.length; i += 1) {
+      cum = Radd(cum, pairs[i][1]);
+      if (Rcmp(u, cum) < 0) return pairs[i][0];
+    }
+    return pairs[pairs.length - 1][0];
+  }
+
+  /* The four places this subject cannot be exact. Each says how it rounds.
+
+     Everything else in the module returns a rational. These return Numbers, and
+     every lesson that calls one states that it is an approximation -- which is
+     the library's rule, not a courtesy. */
+
+  /* e^-x, as the reciprocal of a POSITIVE-term series.
+
+     The obvious implementation sums the alternating series for e^-x directly,
+     and it is wrong in a way that looks right at the arguments a test usually
+     picks. Terms of alternating sign near cancel, losing roughly 2x/ln(10)
+     significant digits: exact at x = 5, 0.4% out at x = 17, 173% out at x = 20,
+     and past x = 21 the SIGN is wrong -- a probability comes back negative.
+
+     Summing e^x instead has every term positive, so nothing cancels, and one
+     division at the end is exact to a rounding. */
+  function expNegApprox(x, tol) {
+    tol = tol || 1e-15;
+    if (x < 0) return 1 / expNegApprox(-x, tol);
+    if (x > 700) return 0;            /* e^700 is the edge of a double */
+    var t = 1, s = 1, k = 1;
+    while (t > tol * s && k < 1000) { t = t * x / k; s += t; k += 1; }
+    return 1 / s;
+  }
+  /* The Bloom false-positive rate. The exact form (1 - 1/m)^(kn) is available
+     as a rational; this is the (1 - e^(-kn/m))^k idealisation lessons compare
+     it against. */
+  function bloomApprox(m, n, k) {
+    return Math.pow(1 - expNegApprox(k * n / m, 1e-15), k);
+  }
+  /* Standard error of a proportion. A square root, so it rounds. */
+  function standardErrorApprox(p, n) { return Math.sqrt(p * (1 - p) / n); }
+  /* The Zipf normaliser past the point where its exact form is unreadable.
+     harmonic() stays exact and is what the lessons use; this is for the
+     lesson that asks what happens at a million keys. */
+  function harmonicApprox(n, s) {
+    if (s === 1) return Math.log(n) + 0.5772156649015329 + 1 / (2 * n);
+    var t = 0;
+    for (var k = 1; k <= n && k <= 100000; k += 1) t += 1 / Math.pow(k, s);
+    return t;
+  }
+  /* Bits per key for a target false-positive rate: log2(1/p)/ln 2.
+
+     NOT "the familiar 1.44 * log2(1/p)", and the difference is the point of
+     the lesson that uses this. 1.44 is a two-digit rounding of 1/ln 2 =
+     1.4427, so at p = 0.01 the textbook constant gives 9.567 and this gives
+     9.585. Both are printed on storage's `bloom` page, each under its own
+     name. This rounds -- it is a logarithm -- like the other Approx functions
+     around it. */
+  function bitsPerKeyApprox(target) { return Math.log2(1 / target) / Math.LN2; }
+  /* A root that rounds, by Newton from a rational start. Rsqrt returns null for
+     a non-square, which is right for exactness and useless for a geometric-mean
+     centre or a square-root scaling law. */
+  function sqrtApprox(a, tol) {
+    var x = Number(a.n) / Number(a.d);
+    if (x < 0) return NaN;
+    if (x === 0) return 0;
+    tol = tol || 1e-15;
+    var g = x, prev = 0;
+    while (Math.abs(g - prev) > tol * Math.max(1, g)) { prev = g; g = (g + x / g) / 2; }
+    return g;
+  }
+  /* Natural log, for the two max-load results this subject STATES rather than
+     proves. Everywhere else a logarithm is an exact integer search instead. */
+  function logApprox(x) { return Math.log(x); }
+
+  /* ================================================================ output
+
+     Rdec goes through Number(a.n)/Number(a.d). This course produces rationals
+     that a double cannot hold at either end -- the storm iteration's seventh
+     iterate has a three-thousand-digit denominator, and Number() of it is
+     Infinity -- so decimals here are long division in BigInt, rounded half up
+     at the last digit printed. */
+  function Rfixed(a, places) {
+    if (places === undefined) places = 3;
+    var neg = a.n < 0n, n = neg ? -a.n : a.n, d = a.d;
+    var scale = 10n ** BigInt(places);
+    var q = (2n * n * scale + d) / (2n * d);          /* round half up */
+    var whole = q / scale, frac = (q % scale).toString();
+    while (frac.length < places) frac = '0' + frac;
+    var body = places > 0 ? whole + '.' + frac : String(whole);
+    return (neg ? '-' : '') + body;
+  }
+  /* An availability as a percentage, still exact until the last digit. Five
+     places by default, because four nines is 99.99000% and three is 99.90000%
+     and at two places those are the same string. */
+  function Rpct(a, places) {
+    return Rfixed(Rmul(a, R(100n, 1n)), places === undefined ? 5 : places) + '%';
+  }
+  /* A percentage with enough places to be worth printing. Three nines needs
+     five places and ten nines needs twelve, and a fixed width either wastes
+     the column or prints 100.000000% for a number that is emphatically not
+     one -- which on this course is the whole point being made. */
+  function RpctAuto(a) {
+    if (Requ(a, R(1n, 1n))) return '100%';
+    return Rpct(a, Math.min(14, Math.max(4, ninesOf(a) + 2)));
+  }
+  /* Scientific notation for the one mode that prints a float. */
+  function sciText(x, places) {
+    if (!isFinite(x)) return 'n/a';
+    if (x === 0) return '0';
+    var e = Math.floor(Math.log10(Math.abs(x)));
+    var m = x / Math.pow(10, e);
+    return m.toFixed(places === undefined ? 3 : places)
+      + ' &times; 10<sup>' + (e < 0 ? '&minus;' + (-e) : e) + '</sup>';
+  }
+
+  /* ========================================================= the periods
+
+     One table, used by every mode. A month is a TWELFTH OF A 365-DAY YEAR,
+     which is the convention under which 99.9% is 43.8 minutes a month; a
+     30-day month gives 43.2 and no reader could reconcile that with the
+     lesson. Stated here once rather than assumed thirteen times. */
+  function periodSeconds(name) {
+    if (name === 'hour') return R(3600n, 1n);
+    if (name === 'day') return R(86400n, 1n);
+    if (name === 'week') return R(604800n, 1n);
+    if (name === 'month') return R(2628000n, 1n);
+    if (name === 'quarter') return R(7884000n, 1n);
+    if (name === 'year') return R(31536000n, 1n);
+    return null;
+  }
+  /* Downtime in seconds over a period, and the availability that a downtime
+     budget implies. The two directions of L1, and each is the other's inverse. */
+  function downtimeSeconds(a, periodSec) {
+    return Rmul(Rsub(R(1n, 1n), a), periodSec);
+  }
+  function availFromDowntime(downSec, periodSec) {
+    return Rsub(R(1n, 1n), Rdiv(downSec, periodSec));
+  }
+  /* How many nines an availability has: the largest k with 1 - A <= 10^-k.
+     An exact search over powers of ten, so no logarithm is anywhere near the
+     number the page asserts. 99.95% has three nines, not three and a half. */
+  function ninesOf(a) {
+    var down = Rsub(R(1n, 1n), a);
+    if (down.n <= 0n) return 99;
+    var k = 0, bound = R(1n, 10n);
+    while (k < 15 && Rcmp(down, bound) <= 0) { k += 1; bound = Rdiv(bound, R(10n, 1n)); }
+    return k;
+  }
+  /* A duration read the way an incident review reads it. Exact: the seconds
+     part keeps its fraction when it has one. */
+  function durText(secs) {
+    var neg = secs.n < 0n, a = neg ? R(-secs.n, secs.d) : secs;
+    var whole = a.n / a.d, rem = Rsub(a, R(whole, 1n));
+    var d = whole / 86400n, h = (whole % 86400n) / 3600n;
+    var m = (whole % 3600n) / 60n, s = whole % 60n;
+    var out = [];
+    if (d > 0n) out.push(d + ' d');
+    if (h > 0n) out.push(h + ' h');
+    if (m > 0n) out.push(m + ' min');
+    var tail = Radd(R(s, 1n), rem);
+    if (tail.n > 0n || !out.length) out.push(Rfixed(tail, tail.d === 1n ? 0 : 2) + ' s');
+    return (neg ? '-' : '') + out.join(' ');
+  }
+  /* A percentage the reader typed, as an exact fraction of one. "99.9" is
+     999/1000 and stays 999/1000; it never becomes 0.9990000000000001. */
+  function pctToFraction(text) {
+    var r = Rparse(String(text).trim());
+    if (r === null) return null;
+    return Rdiv(r, R(100n, 1n));
+  }
+  /* A comma-separated chain of percentages, exactly. Returns null on anything
+     that is not a list of availabilities, which is what stops a typo printing
+     a confident wrong product. */
+  function parseChain(text) {
+    var parts = String(text).split(','), out = [], i;
+    for (i = 0; i < parts.length; i += 1) {
+      var s = parts[i].trim();
+      if (!s) continue;
+      var v = pctToFraction(s);
+      if (v === null) return null;
+      if (Rcmp(v, R(0n, 1n)) < 0 || Rcmp(v, R(1n, 1n)) > 0) return null;
+      out.push(v);
+    }
+    return out.length ? out : null;
+  }
+
+  /* ================================================== L2: MTBF and MTTR
+
+     A = MTBF/(MTBF + MTTR). Both arguments are rational seconds, so the
+     availability of a 1000-hour/1-hour machine is 1000/1001 and not a
+     decimal that has already lost the digit the lesson is about. */
+  function availFromMtbf(mtbf, mttr) {
+    return Rdiv(mtbf, Radd(mtbf, mttr));
+  }
+  /* The repair time a target availability allows, and the time between
+     failures it would otherwise demand. R = M(1 - A)/A;  M = RA/(1 - A). */
+  function mttrForTarget(mtbf, target) {
+    return Rdiv(Rmul(mtbf, Rsub(R(1n, 1n), target)), target);
+  }
+  function mtbfForTarget(mttr, target) {
+    return Rdiv(Rmul(mttr, target), Rsub(R(1n, 1n), target));
+  }
+  function failuresPerPeriod(mtbf, periodSec) { return Rdiv(periodSec, mtbf); }
+
+  /* ============================================= L4: charging the failover
+
+     1 - prod(1 - Ai) assumes the switch is instant. It is not: every failover
+     is downtime of its own, and the events that trigger it happen at a rate
+     the reader sets. The adjusted availability subtracts that time from the
+     ideal, which is the whole of the lesson's misconception. */
+  function failoverCharge(failoverSec, eventsPerPeriod, periodSec) {
+    return Rdiv(Rmul(failoverSec, eventsPerPeriod), periodSec);
+  }
+  function parallelWithFailover(list, failoverSec, eventsPerPeriod, periodSec) {
+    var ideal = availParallel(list);
+    var charge = failoverCharge(failoverSec, eventsPerPeriod, periodSec);
+    var adj = Rsub(ideal, charge);
+    return { ideal: ideal, charge: charge, adjusted: Rcmp(adj, R(0n, 1n)) < 0 ? R(0n, 1n) : adj };
+  }
+
+  /* ============================================ L5: the binomial, term by term
+
+     availKofN in the core sums the tail. This lists the terms it summed, so
+     the reader can see that j = n is the series product and that the whole
+     sum from j = 1 is the parallel form -- the two identities the lesson
+     needs and the kofn mode checks on screen. */
+  function kofnTerms(a, n) {
+    var q = Rsub(R(1n, 1n), a), out = [], j;
+    for (j = 0; j <= n; j += 1) {
+      out.push({
+        j: j,
+        c: comb(n, j),
+        term: Rmul(R(comb(n, j), 1n), Rmul(Rpow(a, j), Rpow(q, n - j)))
+      });
+    }
+    return out;
+  }
+  /* The terms must sum to one. A binomial that does not is a binomial with a
+     wrong coefficient in it, and this is the cheapest possible check. */
+  function kofnTotal(a, n) {
+    var terms = kofnTerms(a, n), s = R(0n, 1n), i;
+    for (i = 0; i < terms.length; i += 1) s = Radd(s, terms[i].term);
+    return s;
+  }
+
+  /* ============================================== L6: the common cause
+
+     P(both down) = c + (1 - c)p^2. At c = 0 this is independence and the pair
+     is p^2; it rises from there the moment c does, because c is added whole
+     and only the p^2 term is discounted.
+     The break-even is where the pair is no better than one machine:
+        c + (1 - c)p^2 = p  =>  c(1 - p^2) = p(1 - p)  =>  c = p/(1 + p).
+     Exact, and it is the number the lesson asks the reader to find. */
+  function pairBothDown(c, p) {
+    return Radd(c, Rmul(Rsub(R(1n, 1n), c), Rmul(p, p)));
+  }
+  function correlatedBreakEven(p) { return Rdiv(p, Radd(R(1n, 1n), p)); }
+  /* How many times better than a single machine the pair actually is. Under
+     independence this is 1/p; it collapses to 1 at the break-even. */
+  function redundancyGain(c, p) { return Rdiv(p, pairBothDown(c, p)); }
+
+  /* ================================================ L7: the error budget
+
+     The budget is a count of FAILED REQUESTS, not of minutes, which is the
+     lesson's misconception in one line: an incident that fails a tenth of
+     requests for an hour costs a tenth of what a full outage costs. */
+  function budgetRequests(slo, requests) {
+    return Rmul(Rsub(R(1n, 1n), slo), requests);
+  }
+  function incidentBurn(ratePerSec, durationSec, severity) {
+    return Rmul(Rmul(ratePerSec, durationSec), severity);
+  }
+  /* The full outage the budget pays for, in seconds -- the figure that makes
+     an SLO concrete, and the one an on-call engineer actually remembers. */
+  function budgetSeconds(slo, periodSec) {
+    return Rmul(Rsub(R(1n, 1n), slo), periodSec);
+  }
+
+  /* ================================================ L8: retries as load
+
+     retryAttempts and retrySuccess are in the core. What the lesson needs on
+     top is the load: lambda attempts for every lambda requests, which is the
+     amplification, and the share of that load which is duplicate work. */
+  function amplifiedLoad(lambda, p, r) { return Rmul(lambda, retryAttempts(p, r)); }
+  function duplicateShare(p, r) {
+    var a = retryAttempts(p, r);
+    return Rdiv(Rsub(a, R(1n, 1n)), a);
+  }
+  /* P(the attempt number i is ever made) = p^(i-1): every earlier attempt
+     must have failed. This is the column the attempt ladder draws. */
+  function attemptReach(p, i) { return Rpow(p, i); }
+
+  /* =============================================== L9: the retry storm
+
+     The map the lesson iterates. Load feeds failure feeds retries feeds load:
+
+       p(L)  = base + (1 - base) * max(0, (L - C)/L)     failure rises with load
+       L'    = lambda * retryAttempts(p(L), r)            retries raise the load
+
+     Both halves are exact, and stormNext is one application of the composed
+     map. It is a top-level function precisely so that mathcheck.js can iterate
+     it without a page: a fixed point nobody has computed twice is a claim. */
+  function stormFailure(load, cap, base) {
+    var over = Rcmp(load, cap) > 0 ? Rdiv(Rsub(load, cap), load) : R(0n, 1n);
+    return Radd(base, Rmul(Rsub(R(1n, 1n), base), over));
+  }
+  function stormNext(lambda, cap, base, r, load) {
+    var p = stormFailure(load, cap, base);
+    var amp = retryAttempts(p, r);
+    return { p: p, amp: amp, load: Rmul(lambda, amp) };
+  }
+  /* The iteration, as the table the lesson shows. It stops early when the
+     exact fractions outgrow the digit budget, and says so rather than
+     hanging: the amplification 1 + p + ... + p^r carries the rth power of p's
+     denominator, so at r = 3 each step cubes it and the seventh iterate
+     already carries three thousand digits. That growth is a fact about the
+     map, and the table prints the digit count as its own column. */
+  function stormRun(lambda, cap, base, r, steps, digitCap) {
+    var rows = [], load = lambda, i;
+    for (i = 0; i < steps; i += 1) {
+      if (String(load.d).length > digitCap) return { rows: rows, stopped: true };
+      var s = stormNext(lambda, cap, base, r, load);
+      rows.push({ step: i + 1, into: load, p: s.p, amp: s.amp, out: s.load });
+      load = s.load;
+    }
+    return { rows: rows, stopped: false };
+  }
+  /* The fixed point, BRACKETED rather than iterated to. The map is increasing
+     in L and bounded above by lambda*(r + 1), so g(L) = stormNext(L) - L is
+     non-negative at lambda and non-positive at lambda*(r+1) and a root is
+     caught between them. Bisection evaluates the map afresh at each probe, so
+     nothing compounds and the denominators stay small -- which is why this
+     reaches an answer the iteration cannot afford to reach.
+
+     The result is an exact ENCLOSURE, not a rounded number: the fixed point
+     is >= lo and <= hi, and both ends are fractions. */
+  function stormFixedPoint(lambda, cap, base, r, halvings) {
+    var lo = lambda, hi = Rmul(lambda, R(BigInt(r + 1), 1n)), i;
+    for (i = 0; i < halvings; i += 1) {
+      var mid = Rdiv(Radd(lo, hi), R(2n, 1n));
+      var g = Rsub(stormNext(lambda, cap, base, r, mid).load, mid);
+      if (Rcmp(g, R(0n, 1n)) >= 0) lo = mid; else hi = mid;
+    }
+    return { lo: lo, hi: hi };
+  }
+
+  /* ============================================== L10: backoff and jitter
+
+     Every client fails at the same instant -- that is what an outage IS -- and
+     schedules retry i at base * 2^(i-1) after that failure. Without jitter
+     every client's retry i lands at the same millisecond, so the waves arrive
+     at 1, 2, 4 and 8 seconds. With jitter of width w the delay is spread
+     uniformly over [d(1 - w/2), d(1 + w/2)).
+
+     The spread comes from lcgStream, so the histogram is the same every time
+     the page is opened and a reader can check what they were told. */
+  function backoffDelayMs(baseMs, attempt) {
+    return baseMs * Math.pow(2, attempt - 1);
+  }
+  function backoffHistogram(clients, outageSec, baseMs, jitterPct, maxAttempts, horizonSec, seed, slotMs) {
+    /* THE SLOT WIDTH IS THE WHOLE MEASUREMENT. Without jitter every client
+       retries in the SAME millisecond, so the spike is instantaneous and any
+       bucket wider than that understates it; a one-second bucket smears 600
+       simultaneous retries into a comfortable-looking 600 a second. So the
+       histogram is built at slotMs resolution, the page says what that is, and
+       the un-jittered peak it reports is a floor rather than a measurement. */
+    var A = 1103515245, C = 12345, M = 2147483648;
+    var draws = lcgStream(A, C, M, seed, clients * maxAttempts);
+    var slots = Math.ceil((horizonSec * 1000) / slotMs);
+    var plain = [], jitter = [], i, t;
+    for (t = 0; t < slots; t += 1) { plain.push(0); jitter.push(0); }
+    var outageMs = outageSec * 1000, horizonMs = horizonSec * 1000;
+    for (i = 0; i < clients; i += 1) {
+      var a;
+      for (a = 1; a <= maxAttempts; a += 1) {
+        var d = backoffDelayMs(baseMs, a);
+        /* no jitter: every client at the same millisecond */
+        if (d < horizonMs) plain[Math.floor(d / slotMs)] += 1;
+        if (d >= outageMs) break;            /* this attempt succeeds; the client stops */
+      }
+      for (a = 1; a <= maxAttempts; a += 1) {
+        var dj = backoffDelayMs(baseMs, a);
+        var u = draws[i * maxAttempts + (a - 1)] / M;
+        var spread = dj * (1 - jitterPct / 200) + dj * (jitterPct / 100) * u;
+        if (spread < horizonMs) jitter[Math.floor(spread / slotMs)] += 1;
+        if (spread >= outageMs) break;
+      }
+    }
+    return { plain: plain, jitter: jitter, slots: slots, slotMs: slotMs };
+  }
+  /* Slot counts folded back to whole seconds, for a table a reader can read. */
+  function perSecond(counts, slotMs) {
+    var per = Math.round(1000 / slotMs), out = [], i;
+    for (i = 0; i < counts.length; i += 1) {
+      var s = Math.floor(i / per);
+      while (out.length <= s) out.push(0);
+      out[s] += counts[i];
+    }
+    return out;
+  }
+  function peakOf(counts) {
+    var m = 0;
+    for (var i = 0; i < counts.length; i += 1) if (counts[i] > m) m = counts[i];
+    return m;
+  }
+  function totalOf(counts) {
+    var s = 0;
+    for (var i = 0; i < counts.length; i += 1) s += counts[i];
+    return s;
+  }
+
+  /* ================================= L11: shedding against collapse
+
+     ONE SERVICE MODEL, TWO ADMISSION POLICIES. Under capacity every admitted
+     request completes. Over it the server's capacity is spread across more
+     requests than it can finish inside a client's patience, so the share that
+     completes is C/L and the goodput is C*(C/L) -- work spent on a request
+     that is then abandoned is work not spent on the rest. That collapse model
+     is the lesson's own, it is stated on the page, and it is evaluated here
+     rather than drawn.
+
+     The shedder is not a second model: it admits min(offered, threshold) and
+     puts THAT through the same function. Which is why a threshold above
+     capacity collapses too, and the page can say so. */
+  function goodputUnshed(offered, cap) {
+    if (Rcmp(offered, cap) <= 0) return offered;
+    return Rdiv(Rmul(cap, cap), offered);
+  }
+  /* What the shedder lets through, before the service model touches it. The
+     rejected count and the utilisation are both about THIS number and not
+     about the goodput, which is why it is a function of its own. */
+  function admittedLoad(offered, threshold) {
+    return Rcmp(offered, threshold) < 0 ? offered : threshold;
+  }
+  function goodputShed(offered, cap, threshold) {
+    return goodputUnshed(admittedLoad(offered, threshold), cap);
+  }
+  function rejectedFraction(offered, threshold) {
+    if (Rcmp(offered, threshold) <= 0) return R(0n, 1n);
+    return Rdiv(Rsub(offered, threshold), offered);
+  }
+
+  /* ================================= L12: durability, and the one rounding
+
+     Losing an item needs all N copies gone inside one repair window. To first
+     order the first copy fails at rate N*f a year, and each further copy must
+     follow inside the window R:
+
+       P  ~=  N! * f^N * (R/8760)^(N-1)
+
+     WHAT IS APPROXIMATE HERE IS THE MODEL, NOT THE DIVISION. The formula
+     truncates every term in which failures overlap or a repair completes
+     mid-window; the arithmetic on rational f and R is exact and
+     durabilityLossExact returns it. The two functions are kept side by side
+     for that reason: the page prints both, and their agreement is what shows
+     the reader that the gap to the truth is in the modelling. */
+  function durabilityLossExact(n, f, windowHours) {
+    var share = Rdiv(windowHours, R(8760n, 1n));
+    return Rmul(R(fact(n), 1n), Rmul(Rpow(f, n), Rpow(share, n - 1)));
+  }
+  function durabilityLossApprox(n, f, windowHours) {
+    var share = Rnum(windowHours) / 8760;
+    return Number(fact(n)) * Math.pow(Rnum(f), n) * Math.pow(share, n - 1);
+  }
+  /* The size of the truncation, shown rather than asserted: the first-order
+     term x against the 1 - e^-x it stands in for. expNegApprox is the core's
+     series, and this is the only place the kit calls it. */
+  function truncationGap(x) {
+    return { first: x, exact: 1 - expNegApprox(x, 1e-15) };
+  }
+
+  /* ================================== L13: shuffle sharding, exactly
+
+     A tenant holds k of n nodes. A second tenant, drawn independently and
+     uniformly, overlaps it in j nodes with the hypergeometric probability
+        C(k,j) * C(n-k, k-j) / C(n,k)
+     and the two ends of that distribution are the lesson: j = 0 is
+     C(n-k,k)/C(n,k), no shared node at all, and j = k is 1/C(n,k), the
+     identical set -- which is the only one of the k+1 outcomes that is an
+     outage for both. */
+  function shuffleOverlap(n, k, j) {
+    var total = comb(n, k);
+    if (total === 0n) return R(0n, 1n);
+    return R(comb(k, j) * comb(n - k, k - j), total);
+  }
+  function shuffleDisjoint(n, k) { return shuffleOverlap(n, k, 0); }
+  function shuffleIdentical(n, k) { return shuffleOverlap(n, k, k); }
+  /* The share of tenants one bad node takes with it: a tenant uses k of the n
+     nodes, so k/n of them touch any given node -- degraded, not down. */
+  function blastFraction(n, k) { return R(BigInt(k), BigInt(n)); }
+  /* A sample assignment, seeded, so the drawing and the probabilities above
+     come from the same run and the reader can count the overlaps by eye. A
+     partial Fisher-Yates over the node list, driven by lcgStream. */
+  /* MINSTD (16807, 0, 2^31 - 1), NOT the glibc LCG the jitter panel uses, and
+     the seed scrambled before it is used.
+
+     The difference matters only because this function takes its draws MOD a
+     small number. glibc's modulus is 2^31, so the low bits of its stream have
+     tiny period -- mod 4 it is 0,1,2,3,0,1,2,3 forever -- and a partial
+     Fisher-Yates driven by it explores measurably fewer sets than shuffle
+     sharding actually reaches: averaged over forty seeds at n = 8, k = 2 and
+     fifty tenants, 19.9 distinct sets against MINSTD's 23.4. This lesson
+     prints the exact combinatorics beside a drawn sample, so a sample that is
+     15% short makes the exact figure look wrong.
+
+     2^31 - 1 is prime, so no modulus shares a factor with it. The seed goes
+     through a splitmix64 finaliser first because an LCG's k-th value is affine
+     in its seed: without it, reseeding 1, 2, 3 walks a straight line instead of
+     sampling, and every mode here asks the reader to reseed and compare.
+
+     The jitter panel above keeps glibc deliberately: it consumes draws as
+     x / M, which uses the high bits, where glibc is fine. */
+  function shuffleSeedState(seed) {
+    var mask = (1n << 64n) - 1n;
+    var x = (BigInt(seed >>> 0) + 0x9E3779B97F4A7C15n) & mask;
+    x = ((x ^ (x >> 30n)) * 0xBF58476D1CE4E5B9n) & mask;
+    x = ((x ^ (x >> 27n)) * 0x94D049BB133111EBn) & mask;
+    x = x ^ (x >> 31n);
+    return Number(x % 2147483646n) + 1;          /* never the fixed point 0 */
+  }
+  function shuffleAssign(n, k, tenants, seed) {
+    var A = 16807, C = 0, M = 2147483647;
+    var draws = lcgStream(A, C, M, shuffleSeedState(seed), tenants * k), out = [], t, i;
+    for (t = 0; t < tenants; t += 1) {
+      var pool = [], pick = [];
+      for (i = 0; i < n; i += 1) pool.push(i);
+      for (i = 0; i < k; i += 1) {
+        var j = i + (draws[t * k + i] % (n - i));
+        var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+        pick.push(pool[i]);
+      }
+      out.push(pick.sort(function (x, y) { return x - y; }));
+    }
+    return out;
+  }
+  /* How many of a drawn set of tenants share every node with the first one --
+     the count the sample assignment can be checked against. */
+  function identicalCount(sets) {
+    if (!sets.length) return 0;
+    var first = sets[0].join(','), c = 0, i;
+    for (i = 1; i < sets.length; i += 1) if (sets[i].join(',') === first) c += 1;
+    return c;
+  }
+  function disjointCount(sets) {
+    if (!sets.length) return 0;
+    var first = sets[0], c = 0, i, j;
+    for (i = 1; i < sets.length; i += 1) {
+      var shared = false;
+      for (j = 0; j < sets[i].length; j += 1) if (first.indexOf(sets[i][j]) >= 0) shared = true;
+      if (!shared) c += 1;
+    }
+    return c;
+  }
+
+  var loadS = document.getElementById('stLoad'), baseS = document.getElementById('stBase');
+  var rS = document.getElementById('stR'), stepS = document.getElementById('stSteps');
+  var plot = document.getElementById('stPath'), table = document.getElementById('stTable');
+  var status = document.getElementById('stStatus');
+  var DIGIT_CAP = 3000;
+
+  function redraw() {
+    var lp = +loadS.value, bp = +baseS.value, r = +rS.value, steps = +stepS.value;
+    document.getElementById('stLoadOut').textContent = lp + '% of capacity';
+    document.getElementById('stBaseOut').textContent = bp + '%';
+    document.getElementById('stROut').textContent = r === 0 ? 'none' : r;
+    document.getElementById('stStepsOut').textContent = steps;
+
+    var cap = R(1n, 1n), lambda = R(BigInt(lp), 100n), base = R(BigInt(bp), 100n);
+    var run = stormRun(lambda, cap, base, r, steps, DIGIT_CAP);
+    var fix = stormFixedPoint(lambda, cap, base, r, 24);
+    var mid = Rdiv(Radd(fix.lo, fix.hi), R(2n, 1n));
+    var pAt = stormFailure(mid, cap, base), ampAt = retryAttempts(pAt, r);
+    var above = Rcmp(fix.lo, cap) > 0, below = Rcmp(fix.hi, cap) <= 0;
+
+    document.getElementById('stStart').textContent = Rfixed(lambda, 4) + ' of capacity';
+    document.getElementById('stFix').textContent = Rfixed(fix.lo, 5) + ' &hellip; ' + Rfixed(fix.hi, 5);
+    document.getElementById('stFixP').textContent = Rfixed(pAt, 5);
+    document.getElementById('stAmp').textContent = Rfixed(ampAt, 4) + '&times;';
+    document.getElementById('stNoRetry').textContent = Rfixed(lambda, 4) + ' of capacity';
+    document.getElementById('stVerdict').textContent = above ? 'above capacity'
+      : (below ? 'below capacity' : 'astride capacity');
+
+    var rows = '', i;
+    for (i = 0; i < run.rows.length; i += 1) {
+      var row = run.rows[i];
+      rows += '<tr><td>' + row.step + '</td>'
+        + '<td>' + Rfixed(row.into, 5) + '</td>'
+        + '<td>' + Rfixed(row.p, 5) + '</td>'
+        + '<td>' + Rfixed(row.amp, 5) + '</td>'
+        + '<td class="' + (Rcmp(row.out, cap) > 0 ? 'tone-red' : 'tone-cyan') + '">'
+        + Rfixed(row.out, 5) + '</td>'
+        + '<td class="tone-muted">' + group(BigInt(String(row.out.d).length)) + '</td></tr>';
+    }
+    if (run.stopped) {
+      rows += '<tr class="tone-muted"><td colspan="6">the exact fractions passed '
+        + group(BigInt(DIGIT_CAP)) + ' digits and the table stops here; the bracket below does not '
+        + 'iterate, so it still answers</td></tr>';
+    }
+    table.innerHTML = '<thead><tr><th>step</th><th>load in</th><th>failure p</th>'
+      + '<th>attempts per request</th><th>load out</th><th>digits in the denominator</th>'
+      + '</tr></thead><tbody>' + rows + '</tbody>';
+
+    var top = Math.max(1.15, parseFloat(Rfixed(fix.hi, 6)) * 1.1), n = run.rows.length;
+    function yp(v) { return 150 - (parseFloat(Rfixed(v, 6)) / top) * 126; }
+    var x0 = 30, dx = n > 0 ? 470 / Math.max(1, n) : 0, s = '', pts = '' + x0 + ',' + yp(lambda);
+    for (i = 0; i < n; i += 1) pts += ' ' + (x0 + (i + 1) * dx) + ',' + yp(run.rows[i].out);
+    s += '<line x1="30" y1="150" x2="510" y2="150" stroke="var(--line-strong)" stroke-width="1" />'
+      + '<line x1="30" y1="' + yp(cap) + '" x2="510" y2="' + yp(cap)
+      + '" stroke="var(--red)" stroke-width="1.5" stroke-dasharray="5 3" />'
+      + '<text x="34" y="' + (yp(cap) - 5) + '" font-size="10" fill="var(--red)">capacity</text>'
+      + '<rect x="30" y="' + yp(fix.hi) + '" width="480" height="' + Math.max(1.5, yp(fix.lo) - yp(fix.hi))
+      + '" fill="var(--purple)" opacity="0.35" />'
+      + '<text x="508" y="' + (yp(fix.hi) - 5) + '" font-size="10" text-anchor="end" fill="var(--purple)">'
+      + 'fixed point, bracketed at ' + Rfixed(fix.lo, 4) + '&hellip;' + Rfixed(fix.hi, 4) + '</text>'
+      + '<polyline points="' + pts + '" fill="none" stroke="var(--cyan)" stroke-width="2" />'
+      + '<circle cx="' + x0 + '" cy="' + yp(lambda) + '" r="3" fill="var(--cyan)" />';
+    for (i = 0; i < n; i += 1) {
+      s += '<circle cx="' + (x0 + (i + 1) * dx) + '" cy="' + yp(run.rows[i].out) + '" r="3" fill="var(--cyan)" />';
+    }
+    s += '<text x="30" y="166" font-size="10" fill="var(--muted)">step 0 (the load you offered)</text>'
+      + '<text x="510" y="166" font-size="10" text-anchor="end" fill="var(--muted)">step ' + n + '</text>'
+      + '<text x="30" y="182" font-size="10" fill="var(--muted)">vertical axis: load in units of capacity, '
+      + '0 to ' + top.toFixed(2) + '</text>'
+      + '<text x="30" y="194" font-size="10" fill="var(--purple)">the bracket is exact: the map is '
+      + 'increasing, so a sign change between two fractions traps the fixed point between them</text>';
+    plot.innerHTML = s;
+
+    var startedFine = Rcmp(lambda, cap) <= 0;
+    status.innerHTML = 'You offered <strong>' + Rfixed(lambda, 4) + '</strong> of capacity'
+      + (startedFine ? ', which the service could serve' : ', which was already over capacity')
+      + '. With ' + r + ' retr' + (r === 1 ? 'y' : 'ies') + ' the loop settles between <strong>'
+      + Rfixed(fix.lo, 5) + '</strong> and <strong>' + Rfixed(fix.hi, 5) + '</strong> of capacity, at a '
+      + 'failure rate of ' + Rfixed(pAt, 4) + ' and ' + Rfixed(ampAt, 4) + ' attempts a request. '
+      + (above
+          ? (startedFine
+              ? '<span class="tone-red">The retries alone put the service over capacity.</span> Nothing '
+                + 'else changed: the offered load was serviceable and the policy meant to protect it is '
+                + 'what is now drowning it. Retries do not stop when the service recovers &mdash; they '
+                + 'are what prevents it recovering, and switching them off returns the load to '
+                + Rfixed(lambda, 4) + '.'
+              : 'The service was already overloaded and the retries have made it worse, multiplying the '
+                + 'excess rather than absorbing it.')
+          : (r === 0
+              ? 'With retries off the map is the identity and the fixed point is the offered load itself. '
+                + 'Turn the retries up and watch the same offered load land somewhere else.'
+              : 'The loop settles below capacity here, so the policy is affordable. Raise the offered '
+                + 'load or the retry count and find the point where it is not: the transition is not '
+                + 'gradual, because each extra attempt raises p, which raises the attempts again.'));
+  }
+
+  [loadS, baseS, rS, stepS].forEach(function (el) { el.addEventListener('input', redraw); });
+  redraw();
+  window.redrawLab = redraw;
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "availability-and-failure/retry-storms";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+  </script>
+</body>
+</html>

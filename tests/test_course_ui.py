@@ -78,7 +78,7 @@ class TestPublishedUI(unittest.TestCase):
         families += [(url, "subject") for url in PATH_PAGES]
         families += [(url, "course") for _title, url, _lessons in ALL_COURSES]
         families += [(url + lesson + "/", "lesson") for _title, url, lessons in ALL_COURSES for lesson in lessons]
-        self.assertEqual({"library": 1, "subject": 3, "course": 25, "lesson": 336, "progress": 1},
+        self.assertEqual({"library": 1, "subject": 4, "course": 35, "lesson": 450, "progress": 1},
                          {kind: sum(k == kind for _u, k in families) for _url, kind in families})
         required = {"library": ["hero", "subject-list", "course-search"],
                     "subject": ["breadcrumbs", "hero", "metadata", "overview", "course-list", "background"],
@@ -182,7 +182,7 @@ class TestVisitorTaxonomy(unittest.TestCase):
                 scopes.append((self.SUBJECT_PATH,copy))
             found=sorted({m[0] for pattern,scope in scopes for m in pattern.finditer(scope)})
             if found:failures.append(url+": "+repr(found))
-        self.assertEqual(366,len(urls),"taxonomy sweep must cover every requested page")
+        self.assertEqual(491,len(urls),"taxonomy sweep must cover every requested page")
         self.assertEqual([],failures,"visitor taxonomy failures:\n"+"\n".join(failures[:45]))
 
 
@@ -222,7 +222,7 @@ class TestGeneratedLessonUI(unittest.TestCase):
                                      "lesson breadcrumb must include its subject and unnumbered names")
                     self.assertEqual("Lesson", words(doc.find(**{"data-ui": "page-kind"})[0]))
                     checked += 1
-        self.assertEqual(17, checked, "hierarchy sweep must cover every generated course")
+        self.assertEqual(27, checked, "hierarchy sweep must cover every generated course")
 
     def test_understanding_and_terminal_navigation(self):
         subject = build_paths.GENERATED_PATHS[0]
@@ -283,7 +283,7 @@ assert(!/\bpath\b/i.test(context.emptyState('missing').textContent));
 const inventory=/var COURSES = (\[[\s\S]*?\n      \]);/.exec(source);
 assert(inventory,'course search inventory missing');
 const courses=vm.runInNewContext(inventory[1]);
-assert.equal(courses.length,25,'search must cover every published course');
+assert.equal(courses.length,35,'search must cover every published course');
 for(const c of courses) assert(!/\b(?:the|this|learning|Trading|Algebra|Discrete Mathematics) path\b|\bcourse\s+\d/i.test(context.resultItem(c,'').textContent),c.title+' has curricular search copy');
 assert.deepStrictEqual(JSON.parse(JSON.stringify(courses.map(c=>[c.path,c.title,c.href,c.lessons]))),EXPECTED_INVENTORY);
 console.log('library search: subject names, factual lesson counts, neutral empty state');
@@ -351,7 +351,7 @@ class TestGeneratedCatalogUI(unittest.TestCase):
             self.assertFalse([f for r in visitor_copy.Document(markup).records for f in visitor_copy.findings(r)],
                              "subject catalog must not identify a Course or Lesson by number")
             checked += 1
-        self.assertEqual(2, checked)
+        self.assertEqual(3, checked)
 
     def test_course_overview_has_factual_identity_and_optional_navigation(self):
         checked = 0
@@ -378,7 +378,7 @@ class TestGeneratedCatalogUI(unittest.TestCase):
                         self.assertNotIn("rel", terminal["attrs"])
                     self.assertFalse(re.search(r"\bcourse\s+\d|lessons? in (?:a )?fixed order", words(doc.find("body")[0]), re.I),
                                      "course identity and overview must not prescribe course order")
-        self.assertEqual(17, checked)
+        self.assertEqual(27, checked)
 
 
 class TestTradingNormalization(unittest.TestCase):

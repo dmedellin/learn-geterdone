@@ -21,7 +21,7 @@ COURSE = {
         "P(both down) = c + (1 − c)p²         a 0.1% common cause swamps a 10⁻⁴ pair",
         "attempts = (1 − pʳ⁺¹)/(1 − p)        amplification, worst when p is worst",
     ],
-    "assumes_short": "Courses 1 and 3; independence, binomials, combinations",
+    "assumes_short": "Capacity Estimation and Queues and Utilisation; independence, binomials, combinations",
     "assumes_long": (
         "C1, C3. Discrete Mathematics independence, binomial-distribution, "
         "combinations, conditional-probability, expected-value. Algebra "
@@ -67,7 +67,7 @@ COURSE = {
     ],
     "not_covered": [
         "Incident process, on-call practice and chaos engineering as a discipline.",
-        "Consensus availability, which needs the quorum arithmetic of course 6.",
+        "Consensus availability, which needs the quorum arithmetic of Replication and Consistency.",
         "Failure-rate models over time. Every failure here has a constant rate; bathtub "
         "curves and wear-out are out of scope.",
     ],

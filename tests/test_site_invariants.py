@@ -422,6 +422,7 @@ MATH_COURSES = (
 # rather than assumed, in
 # test_declared_url_space_is_the_index_the_path_pages_and_the_course_trees.
 ALGEBRA_PATH_PAGE = "/paths/algebra/"
+SYSDESIGN_PATH_PAGE = "/paths/system-design/"
 
 ALGEBRA_COURSE_1_HOME = "/algebra-foundations/"
 ALGEBRA_COURSE_1_LESSONS = (
@@ -537,7 +538,109 @@ ALGEBRA_COURSES = (
 ALGEBRA_PATH_COURSE_COUNT = 9
 ALGEBRA_UPCOMING_COURSES = ()
 
-ALL_COURSES = COURSES + MATH_COURSES + ALGEBRA_COURSES
+# The System Design path: ten courses, all published. Generated from
+# content/system_design/ so these cannot disagree with what is built.
+SYSDESIGN_COURSE_1_HOME = "/capacity-estimation/"
+SYSDESIGN_COURSE_1_LESSONS = (
+    "orders-of-magnitude", "rates-and-the-day-in-seconds", "read-write-ratio",
+    "storage-from-ingest-and-retention", "bandwidth-bits-and-overhead",
+    "latency-numbers-on-a-log-scale", "peak-to-average",
+    "from-request-cost-to-machine-count", "memory-and-the-working-set",
+    "triangulating-an-estimate"
+)
+SYSDESIGN_COURSE_2_HOME = "/latency-and-the-tail/"
+SYSDESIGN_COURSE_2_LESSONS = (
+    "latency-is-not-throughput", "the-speed-of-light-floor",
+    "round-trips-not-bytes", "serial-sums-parallel-maxes",
+    "percentiles-from-a-sample", "tail-amplification-under-fan-out",
+    "hedged-requests", "percentiles-do-not-add", "latency-budgets",
+    "timeouts-and-retries-in-the-budget", "packet-loss-and-throughput"
+)
+SYSDESIGN_COURSE_3_HOME = "/queues-and-utilisation/"
+SYSDESIGN_COURSE_3_LESSONS = (
+    "arrival-rate-service-rate-utilisation", "littles-law-from-a-trace",
+    "sizing-with-littles-law", "why-queues-form-below-full-utilisation",
+    "memoryless-waiting", "poisson-arrivals-and-bursts", "the-mm1-queue",
+    "the-knee", "variability-and-kingman", "many-servers-and-pooling",
+    "bounded-queues-and-loss", "token-buckets-and-rate-limiting",
+    "transient-overload-and-backlog"
+)
+SYSDESIGN_COURSE_4_HOME = "/caching-and-hit-rates/"
+SYSDESIGN_COURSE_4_LESSONS = (
+    "hit-rate-and-backend-load", "average-latency-under-a-cache",
+    "popularity-is-skewed", "cache-size-and-hit-rate",
+    "replacement-policies-on-a-trace", "ttl-and-staleness", "cache-stampedes",
+    "write-policies", "multi-level-caches", "cdn-egress-and-origin-load"
+)
+SYSDESIGN_COURSE_5_HOME = "/availability-and-failure/"
+SYSDESIGN_COURSE_5_LESSONS = (
+    "nines-and-downtime", "mtbf-and-mttr", "chains-multiply",
+    "redundancy-and-parallel-paths", "k-of-n-and-quorums",
+    "correlated-failure", "error-budgets",
+    "retries-and-request-amplification", "retry-storms", "backoff-and-jitter",
+    "load-shedding-and-circuit-breakers", "replica-loss-and-durability",
+    "shuffle-sharding"
+)
+SYSDESIGN_COURSE_6_HOME = "/replication-and-consistency/"
+SYSDESIGN_COURSE_6_LESSONS = (
+    "reads-scale-writes-do-not", "synchronous-writes-wait-for-the-slowest",
+    "replication-lag-and-stale-reads", "quorums-overlap", "quorum-latency",
+    "sloppy-quorums", "majorities-and-fault-tolerance",
+    "randomised-election-timeouts", "lamport-clocks",
+    "vector-clocks-and-concurrency", "physical-clocks-and-drift",
+    "linearizability-by-enumeration", "conflict-resolution-counted"
+)
+SYSDESIGN_COURSE_7_HOME = "/partitioning-and-load-balancing/"
+SYSDESIGN_COURSE_7_LESSONS = (
+    "how-many-shards", "hash-partitioning-and-imbalance",
+    "rehashing-when-n-changes", "consistent-hashing-and-virtual-nodes",
+    "range-partitioning-and-hot-ranges", "hot-keys-and-salting", "stragglers",
+    "the-power-of-two-choices", "scatter-gather-cost",
+    "local-vs-global-secondary-indexes", "cross-shard-transactions",
+    "rebalancing-cost"
+)
+SYSDESIGN_COURSE_8_HOME = "/storage-engines-and-indexes/"
+SYSDESIGN_COURSE_8_LESSONS = (
+    "sequential-vs-random-io", "the-height-of-a-b-tree",
+    "hash-vs-tree-for-ranges", "the-write-cost-of-an-index",
+    "write-amplification-in-lsm-trees", "bloom-filters", "the-rum-trade-off",
+    "fsync-and-group-commit", "row-vs-column-storage",
+    "working-set-and-the-page-cache", "rpo-and-rto"
+)
+SYSDESIGN_COURSE_9_HOME = "/scaling-laws-and-cost/"
+SYSDESIGN_COURSE_9_LESSONS = (
+    "amdahls-law", "the-universal-scalability-law",
+    "batching-cost-and-latency", "vertical-vs-horizontal",
+    "utilisation-and-waste", "reserved-vs-on-demand", "autoscaling-lag",
+    "cost-per-request", "storage-tiers", "compress-or-not",
+    "move-the-data-or-the-compute"
+)
+SYSDESIGN_COURSE_10_HOME = "/measuring-systems/"
+SYSDESIGN_COURSE_10_LESSONS = (
+    "slis-as-ratios", "percentiles-do-not-average",
+    "histograms-and-bucket-error", "coordinated-omission", "scrape-intervals",
+    "sampling-and-rare-events", "metric-cardinality",
+    "how-long-to-run-a-load-test", "burn-rate-alerts",
+    "threshold-alerts-and-false-alarms"
+)
+
+SYSDESIGN_COURSES = (
+    ("Capacity Estimation", SYSDESIGN_COURSE_1_HOME, SYSDESIGN_COURSE_1_LESSONS),
+    ("Latency and the Tail", SYSDESIGN_COURSE_2_HOME, SYSDESIGN_COURSE_2_LESSONS),
+    ("Queues and Utilisation", SYSDESIGN_COURSE_3_HOME, SYSDESIGN_COURSE_3_LESSONS),
+    ("Caching and Hit Rates", SYSDESIGN_COURSE_4_HOME, SYSDESIGN_COURSE_4_LESSONS),
+    ("Availability and Failure", SYSDESIGN_COURSE_5_HOME, SYSDESIGN_COURSE_5_LESSONS),
+    ("Replication and Consistency", SYSDESIGN_COURSE_6_HOME, SYSDESIGN_COURSE_6_LESSONS),
+    ("Partitioning and Load Balancing", SYSDESIGN_COURSE_7_HOME, SYSDESIGN_COURSE_7_LESSONS),
+    ("Storage Engines and Indexes", SYSDESIGN_COURSE_8_HOME, SYSDESIGN_COURSE_8_LESSONS),
+    ("Scaling Laws and Cost", SYSDESIGN_COURSE_9_HOME, SYSDESIGN_COURSE_9_LESSONS),
+    ("Measuring Systems", SYSDESIGN_COURSE_10_HOME, SYSDESIGN_COURSE_10_LESSONS),
+)
+
+SYSDESIGN_PATH_COURSE_COUNT = 10
+SYSDESIGN_UPCOMING_COURSES = ()
+
+ALL_COURSES = COURSES + MATH_COURSES + ALGEBRA_COURSES + SYSDESIGN_COURSES
 
 # The trading path is EIGHT courses long and all eight are published. This tuple
 # is EMPTY, and that is the finished state rather than an oversight: an entry
@@ -655,7 +758,8 @@ def source_of(url):
 # a mathematics path or a computer-science path without being rewritten. They
 # are published pages like any other, so every whole-tree invariant applies to
 # them -- but the per-course invariants do not, because neither is a course.
-SHARED_CHROME_PAGES = (SITE_INDEX, PATH_PAGE, MATH_PATH_PAGE, ALGEBRA_PATH_PAGE)
+SHARED_CHROME_PAGES = (SITE_INDEX, PATH_PAGE, MATH_PATH_PAGE, ALGEBRA_PATH_PAGE,
+                       SYSDESIGN_PATH_PAGE)
 
 # Every path, as one row: the subject name, its page, its courses and the
 # length it claims. Each per-path invariant below iterates THIS, so a third
@@ -666,6 +770,8 @@ PATHS = (
      MATH_UPCOMING_COURSES),
     ("Algebra", ALGEBRA_PATH_PAGE, ALGEBRA_COURSES, ALGEBRA_PATH_COURSE_COUNT,
      ALGEBRA_UPCOMING_COURSES),
+    ("System Design", SYSDESIGN_PATH_PAGE, SYSDESIGN_COURSES,
+     SYSDESIGN_PATH_COURSE_COUNT, SYSDESIGN_UPCOMING_COURSES),
 )
 
 PATH_PAGES = tuple(page for _t, page, _c, _n, _u in PATHS)
@@ -829,6 +935,11 @@ SYNTHETIC_DISCLAIMER_RE = re.compile(
 MATH_DISCLAIMER_RE = re.compile(r"(?i)a worked example is not a proof")
 ALGEBRA_DISCLAIMER_RE = re.compile(
     r"(?i)a step that gives the right answer here is not thereby a valid rule")
+# Deliberately apostrophe-free: the rendered clause writes "a model&rsquo;s
+# answer", and a regex spanning that entity would pass or fail on the escaping
+# rather than on the promise.
+SYSDESIGN_DISCLAIMER_RE = re.compile(
+    r"(?i)only as true as its assumptions")
 
 # Which sentence each path's course pages must carry. A path is a KEY here, so
 # adding one without deciding what it promises its reader fails immediately
@@ -837,6 +948,8 @@ PATH_MATERIAL_DISCLAIMER = {
     PATH_PAGE: ("the synthetic-examples disclaimer", SYNTHETIC_DISCLAIMER_RE),
     MATH_PATH_PAGE: ("the worked-example-is-not-a-proof disclaimer", MATH_DISCLAIMER_RE),
     ALGEBRA_PATH_PAGE: ("the a-step-is-not-a-rule disclaimer", ALGEBRA_DISCLAIMER_RE),
+    SYSDESIGN_PATH_PAGE: ("the only-as-true-as-its-assumptions disclaimer",
+                          SYSDESIGN_DISCLAIMER_RE),
 }
 
 # The notice a REAL-DATA page carries instead. Each phrase is asserted
@@ -1131,7 +1244,13 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             + len(ALGEBRA_COURSES)
             + sum(len(slugs) for _t, _h, slugs in ALGEBRA_COURSES)
         )
-        course_tree = 1 + trading_tree + math_tree + algebra_tree  # 1 for the index
+        sysdesign_tree = (
+            1  # the system design path page
+            + len(SYSDESIGN_COURSES)
+            + sum(len(slugs) for _t, _h, slugs in SYSDESIGN_COURSES)
+        )
+        course_tree = (1 + trading_tree + math_tree + algebra_tree
+                       + sysdesign_tree)  # 1 for the index
         self.assertEqual(
             127,
             trading_tree,
@@ -1151,9 +1270,15 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "pages, got %d" % algebra_tree,
         )
         self.assertEqual(
-            365,
+            125,
+            sysdesign_tree,
+            "the system design path is 1 + 10 + 10 + 11 + 13 + 10 + 13 + 13 + 12 + 11 "
+            "+ 11 + 10 = 125 pages, got %d" % sysdesign_tree,
+        )
+        self.assertEqual(
+            490,
             course_tree,
-            "the site index plus all three path trees is 365 pages, got %d" % course_tree,
+            "the site index plus all four path trees is 490 pages, got %d" % course_tree,
         )
         self.assertEqual(
             2,
@@ -1164,9 +1289,9 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
         # network sweeps treat them differently.
         expected = course_tree + len(REAL_DATA_PAGES) + len(AUTH_PAGES)
         self.assertEqual(
-            369,
+            494,
             expected,
-            "365 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 369, "
+            "490 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 494, "
             "got %d" % expected,
         )
         self.assertEqual(
@@ -1746,9 +1871,9 @@ class TestContent(SiteFixture):
         ]
         self.assertTrue(course_pages, "no course page found under %s" % SITE_ROOT)
         self.assertEqual(
-            361,
+            485,
             len(course_pages),
-            "twenty-five course homes and 336 lessons carry a material "
+            "thirty-five course homes and 450 lessons carry a material "
             "disclaimer; found %d pages, so a page has been added or removed "
             "without being declared" % len(course_pages),
         )
@@ -2739,7 +2864,7 @@ class TestCourseContext(SiteFixture):
                     self.assertIn(title, copy)
                     self.assertIn('<span data-ui="page-kind">Course</span>', doc.text)
                     self.assertNotRegex(copy, r"(?i)\bcourse\s+\d|\bpath\b")
-        self.assertEqual(25, checked, "every published course must be checked")
+        self.assertEqual(35, checked, "every published course must be checked")
 
     def test_course_pager_points_at_the_adjacent_course_homes(self):
         by_url = {served_path(doc.path): doc for doc in self.documents}
