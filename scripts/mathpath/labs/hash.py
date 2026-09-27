@@ -48,7 +48,7 @@ live on this kit and both are the MODEL rather than the arithmetic.
   library proves neither; the page measures probes and prints the curve beside
   them under the word "approximation". Above alpha = 0.98 the function returns
   nothing and the panel prints the refusal instead of a figure, because the
-  curve is vertical there -- 2501 probes at 0.98, 5001 at 0.99 -- and a number
+  curve is vertical there -- 1250.5 probes at 0.98, 5000.5 at 0.99 -- and a number
   read off it is not about any table.
 
   `sysdesign_core.bloomApprox` on `bloom`. It is printed BESIDE `bloomExact`,
@@ -152,8 +152,8 @@ HASHKIT_JS = r"""
         quoted: false,
         unsuccessful: 'not quoted above &alpha; = 0.98',
         successful: 'not quoted above &alpha; = 0.98',
-        note: 'Above &alpha; = 0.98 the curve is effectively vertical &mdash; 2501 probes at '
-            + '0.98, 5001 at 0.99 &mdash; so a figure read off it says nothing about a real '
+        note: 'Above &alpha; = 0.98 the curve is effectively vertical &mdash; 1250.5 probes at '
+            + '0.98, 5000.5 at 0.99 &mdash; so a figure read off it says nothing about a real '
             + 'table, and the function returns nothing rather than a number.'
       };
     }

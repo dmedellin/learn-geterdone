@@ -17,18 +17,23 @@ from . import (
     algebra_systems,
     algorithms,
     avail,
+    birthdeath,
     cache,
     counting,
     duality,
     estimate,
+    flowkit,
     graph,
+    graphkit,
     hash,
     heap,
     induction,
     integer,
+    inventory,
     latency,
     logic,
     lp,
+    markov,
     measure,
     network,
     number,
@@ -40,6 +45,7 @@ from . import (
     sets,
     shard,
     simplex,
+    simulate,
     sortkit,
     storage,
     transport,
@@ -116,6 +122,10 @@ REGISTRY = {
     "network": network.network_lab,
     "transport": transport.transport_lab,
     "integer": integer.integer_lab,
+    "simulate": simulate.simulate_lab,
+    "inventory": inventory.inventory_lab,
+    "markov": markov.markov_lab,
+    "birthdeath": birthdeath.birthdeath_lab,
 
     # The Algorithms path, over algo_core.py. A kit concatenates only the
     # blocks it needs: the whole core is 68 KB gzipped, above the page
@@ -125,6 +135,8 @@ REGISTRY = {
     "hash": hash.hash_lab,
     "tree": tree.tree_lab,
     "sortkit": sortkit.sortkit_lab,
+    "graphkit": graphkit.graphkit_lab,
+    "flowkit": flowkit.flowkit_lab,
 }
 
 

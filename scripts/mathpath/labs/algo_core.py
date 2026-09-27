@@ -1104,10 +1104,16 @@ SEQ_JS = r"""
   function unionFindRun(ops, rules, n) {
     rules = rules || {};
     var parent = [], rank = [], size = [], c = counter(), trace = [], i;
+    var worstFind = 0;
     for (i = 0; i < n; i += 1) { parent.push(i); rank.push(0); size.push(1); }
     function findWith(x) {
       var hops = 0, root = x;
       while (parent[root] !== root) { root = parent[root]; hops += 1; }
+      /* The longest walk ANY ONE find makes, counted here because a union
+         performs two of them and a caller cannot see either from the trace:
+         a union row reports ra.hops + rb.hops, a SUM of two separate walks
+         and not a walk any single find ever took. */
+      if (hops > worstFind) worstFind = hops;
       if (rules.compress) {
         var cur = x;
         while (parent[cur] !== cur) { var next = parent[cur]; parent[cur] = root; cur = next; c.writes += 1; }
@@ -1139,10 +1145,17 @@ SEQ_JS = r"""
     for (i = 0; i < n; i += 1) {
       if (parent[i] === i) { maxRank = Math.max(maxRank, rank[i]); maxSize = Math.max(maxSize, size[i]); }
     }
+    /* Two different worsts, and they are not interchangeable.
+       worstHops is the largest TRACE ROW -- for a union that is the sum of its
+       two finds, so it can exceed every individual walk.
+       worstFind is the longest walk a single find made, which is the figure a
+       "worst single find" label is claiming and the one the log2 bound is
+       about. They coincide on a find-only sequence, which is why the two were
+       confused. */
     var worst = 0;
     trace.forEach(function (t) { if (t.hops > worst) worst = t.hops; });
     return runOf({ parent: parent, rank: rank, maxRank: maxRank, maxSize: maxSize,
-                   bound: Math.pow(2, maxRank), worstHops: worst,
+                   bound: Math.pow(2, maxRank), worstHops: worst, worstFind: worstFind,
                    rankBoundHolds: maxSize >= Math.pow(2, maxRank) },
                  usedCounts(c), trace);
   }
@@ -1445,7 +1458,7 @@ HASH_JS = r"""
      approximation. It assumes a uniform hash and the idealised cluster
      distribution that analysis derives, and this library proves neither.
      Returns null above alpha = 0.98 rather than a number -- the curve is
-     effectively vertical there (2501 probes at 0.98, 5001 at 0.99) and a figure
+     effectively vertical there (1250.5 probes at 0.98, 5000.5 at 0.99) and a figure
      read off it says nothing about a real table. */
   function knuthProbeApprox(alpha) {
     var a = typeof alpha === 'number' ? alpha : Rnum(alpha);
@@ -2148,17 +2161,31 @@ SORT_JS = r"""
         return out;
       })(a);
     } else if (algo === 'quick') {
-      a = (function sort(arr) {
-        if (arr.length <= 1) return arr;
-        var p = arr[arr.length - 1], lo = [], hi = [];
-        for (i = 0; i < arr.length - 1; i += 1) {
+      /* The ACTUAL in-place Lomuto partition, not a model of it.
+         What stood here built two lists and returned
+         sort(hi).concat([p], sort(lo)).reverse(), which is correct only at the
+         top level: the recursive calls have already reversed their own output,
+         so the outer reverse undoes them. [1,2,3,4] came back [3,1,2,4] -- the
+         "after the sort you chose" row was visibly unsorted for any reader who
+         picked this arm. Nothing caught it because the only assertion on this
+         arm counted stability violations, and an unsorted array still has a
+         violation count.
+         Lomuto is written out because the instability IS the swap: moving
+         a[i] to the boundary jumps it over every equal key already past it. */
+      (function sort(arr, lo, hi) {
+        if (lo >= hi) return;
+        var pivot = arr[hi], b = lo, k, t;
+        for (k = lo; k < hi; k += 1) {
           c.compares += 1;
-          (arr[i].key <= p.key ? lo : hi).push(arr[i]);
+          if (arr[k].key <= pivot.key) {
+            if (k !== b) { t = arr[k]; arr[k] = arr[b]; arr[b] = t; c.swaps += 1; }
+            b += 1;
+          }
         }
-        /* The in-place Lomuto partition this stands for swaps equal keys past
-           each other; the split below reproduces the same output order. */
-        return sort(hi).concat([p], sort(lo)).reverse();
-      })(a);
+        if (b !== hi) { t = arr[b]; arr[b] = arr[hi]; arr[hi] = t; c.swaps += 1; }
+        sort(arr, lo, b - 1);
+        sort(arr, b + 1, hi);
+      })(a, 0, a.length - 1);
     } else {
       throw new Error('unknown sort: ' + algo);
     }
@@ -2913,21 +2940,54 @@ GRAPHKIT_JS = r"""
         }
       });
     });
-    /* Latest start: relax backwards from the finish under the same sign. */
-    var latest = dist.slice(), order = topo.result.order.slice().reverse();
-    var finish = null;
-    dist.forEach(function (d, v) { if (d !== null && (finish === null || s * d > s * dist[finish])) finish = v; });
+    /* Latest start, and the slack that comes out of it. The backward pass needs
+       three things the forward pass does not, and the first version of this
+       function had all three wrong -- which is recorded here rather than
+       quietly corrected, because each one produces a number that LOOKS like
+       slack.
+
+       It must be SEEDED at the far end and nowhere else. Starting every vertex
+       at its own earliest time makes the pass unable to move a vertex later
+       than it already is, and a vertex off the extreme path then reports no
+       slack at all.
+
+       Its extremum depends on the sign, and OPPOSITELY to the forward pass.
+       Write back(v) for the extreme distance from v on to the far end: under
+       the longest reading back(v) = max over successors of w + back(u), so
+       latest(v) = MIN over successors of latest(u) - w; under the shortest
+       reading back(v) is a min, so latest(v) is a MAX. Taking the forward
+       pass's extremum here reports slack on a vertex that lies on every
+       critical path.
+
+       And the difference has to be taken in the direction the reading makes
+       non-negative: latest - dist under the longest reading, dist - latest
+       under the shortest one, which is s * (dist - latest) in both. Slack is
+       then 0 exactly when the vertex lies on an extreme path to the far end,
+       and never negative.
+
+       `extreme` is the far end: the largest distance under either sign, because
+       the longest path is computed by negating the weights rather than by
+       reversing the comparison on this array. A vertex that cannot reach the
+       far end has no deadline of its own, so its latest and its slack are
+       null rather than a number. */
+    var extreme = null;
+    dist.forEach(function (d, v) { if (d !== null && (extreme === null || d > dist[extreme])) extreme = v; });
+    var latest = new Array(G.n).fill(null);
+    if (extreme !== null) latest[extreme] = dist[extreme];
+    var order = topo.result.order.slice().reverse();
     order.forEach(function (v) {
       idx.out[v].forEach(function (id) {
         var a = G.arcs[id], u = dgOther(G, id, v);
         if (latest[u] === null) return;
         var cand = latest[u] - a.w;
-        if (latest[v] === null || s * cand < s * latest[v]) latest[v] = cand;
+        if (latest[v] === null || s * cand > s * latest[v]) latest[v] = cand;
       });
     });
-    var slack = dist.map(function (d, v) { return d === null ? null : latest[v] - d; });
+    var slack = dist.map(function (d, v) {
+      return d === null || latest[v] === null ? null : s * (d - latest[v]);
+    });
     return runOf({ dist: dist, parent: parent, latest: latest, slack: slack,
-                   acyclic: true, extreme: finish, order: topo.result.order },
+                   acyclic: true, extreme: extreme, order: topo.result.order },
                  usedCounts(c), trace);
   }
 

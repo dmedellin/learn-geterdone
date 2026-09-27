@@ -2378,8 +2378,12 @@ IP_JS = r"""
       var kids = [];
       for (k2 = 0; k2 < shortest.length; k2 += 1) {
         var from = shortest[k2], to = node.assignment[from];
+        /* ONE-BASED, because the picture is. ipTourSvg draws city i with the
+           label i + 1, so a table row reading "ban 0->4" beside a ring whose
+           cities are 1..n names two cities that are not the ones it forbids.
+           The bans themselves stay zero-based -- this is the display string. */
         var child = make(node.bans.concat([[from, to]]), node.id,
-                         'ban ' + from + '->' + to);
+                         'ban ' + (from + 1) + '->' + (to + 1));
         kids.push(child.id);
       }
       node.children = kids;
@@ -3319,10 +3323,10 @@ SIM_JS = r"""
 
      Streams are NOT new and nothing here re-implements one: lcgStream,
      streamUniform and sampleFromPmf all ship in sysdesign_core.STREAM_JS, and
-     inverse-transform sampling is C10 L1's whole lesson.  number.py's lcgRun
-     is a CYCLE DETECTOR and is the wrong tool, but its hullDobell(a, c, m) is
-     the right one for the full-period certificate the lesson prints beside the
-     stream. */
+     inverse-transform sampling is the simulation course's own first lesson.
+     number.py's lcgRun is a CYCLE DETECTOR and is the wrong tool, but its
+     hullDobell(a, c, m) is the right one for the full-period certificate the
+     lesson prints beside the stream. */
 
   function sampleMean(xs) {
     if (!xs.length) return null;
