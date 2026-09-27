@@ -1072,11 +1072,22 @@ RANGE_JS = r"""
       var to = (rg.hi === null || Rcmp(rg.hi, hi) > 0) ? hi : rg.hi;
       var zHere = cur.z[cur.n];
       var zFrom = Radd(zHere, Rmul(rg.y_i, Rsub(from, rg.b)));
-      var zTo = Radd(zHere, Rmul(rg.y_i, Rsub(to, rg.b)));
+      /* zEnd IS z PLUS slope TIMES THE WIDTH, in whichever direction z is
+         reported. It used to be computed as its own negated expression --
+         `cur.maximised ? zTo : Rneg(zTo)` for zTo = zHere + y_i(to - b) -- and
+         on a MINIMISATION that negates the endpoint while leaving `slope`
+         alone, so the piece came back as z MINUS slope times the width. Every
+         one of the ten pieces across the three crash presets was wrong, and
+         the error is reader-visible: the time-cost curve was drawn as four
+         disconnected RISING segments where the true curve is convex and
+         decreasing, and the pieces table printed a right-hand total that
+         contradicted the next row's left-hand total.
+         Nothing caught it because `confirmed` re-solves at `from` only. */
+      var zStart = cur.maximised ? zFrom : Rneg(zFrom);
       pieces.push({ from: from, to: to, slope: rg.y_i, basis: cur.basis.slice(),
                     names: cur.basis.map(function (c) { return cur.names[c]; }),
-                    z: cur.maximised ? zFrom : Rneg(zFrom),
-                    zEnd: cur.maximised ? zTo : Rneg(zTo) });
+                    z: zStart,
+                    zEnd: Radd(zStart, Rmul(rg.y_i, Rsub(to, from))) });
       if (Rcmp(to, hi) >= 0) break;
       breaks.push(to);
       /* Move to the breakpoint exactly, then pivot out the basic variable that

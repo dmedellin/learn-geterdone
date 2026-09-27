@@ -14199,6 +14199,28 @@ console.log('operations research: the scheduling kit, and every order it is held
       eq(curve.confirmed + ' of ' + curve.checked, curve.pieces.length + ' of ' + curve.pieces.length,
          key + ': every piece of the time-cost curve was re-solved from scratch at its own left endpoint '
          + 'and agreed');
+      /* AND AT ITS RIGHT ENDPOINT, which is the half that was missing. `confirmed`
+         re-solves at `from` only, so a zEnd computed with the wrong sign passed
+         every check while the page drew four disconnected rising segments in
+         place of a convex decreasing curve. Ten pieces across three presets were
+         wrong. This compares each zEnd with a fresh solve at its own `to`. */
+      {
+        let ends = [];
+        for (const pc of curve.pieces) {
+          const fr = lpSolve(crashModel(acts, pc.to).model, LPOPT);
+          if (fr.status !== 'optimal' || !Requ(pc.zEnd, Rneg(fr.z))) {
+            ends.push(rt(pc.from) + '->' + rt(pc.to) + ': zEnd ' + rt(pc.zEnd)
+                      + ' against a fresh ' + (fr.status === 'optimal' ? rt(Rneg(fr.z)) : fr.status));
+          }
+        }
+        eq(ends.join(' | '), '',
+           key + ': and at its RIGHT endpoint too -- zEnd is what a fresh solve at that '
+           + 'deadline costs, which is the half that was not checked');
+        for (let q = 1; q < curve.pieces.length; q += 1) {
+          eq(Requ(curve.pieces[q - 1].zEnd, curve.pieces[q].z), true,
+             key + ': and each piece ends where the next one starts, piece ' + q);
+        }
+      }
       /* the slopes get steeper as the deadline tightens, and never flatten */
       let rising = 0;
       for (let q = 1; q < curve.pieces.length; q += 1) {
@@ -14813,6 +14835,16 @@ console.log('operations research: the sequential-decisions kit, and every policy
          + ' signal-to-act strategies, ' + rt(two.best));
       eq(rt(everyStrategy(pm.rows, prior, lm.rows).best), rt(two.best),
          key + ": and the kit's own strategy enumeration agrees with this file's");
+      /* THE COUNT, not only the value. Comparing best against best is what let a
+         scoping bug survive: everyStrategy shared its loop variable across
+         recursion levels, so it explored only the strategies whose earlier
+         signals map to act 0 -- 2 of 4, 3 of 9, 2 of 4 on the three presets --
+         and the optimum happened to be inside that prefix every time. The page
+         printed the count as "N ways to map what you see to what you do". */
+      eq(everyStrategy(pm.rows, prior, lm.rows).count, two.count,
+         key + ': and on HOW MANY strategies there are, not only on the best of them');
+      eq(two.count, Math.pow(pm.rows.length, lm.rows.length),
+         key + ': which is acts^signals, every map from a signal to an act');
       /* the identities EVPI and EVSI have to satisfy */
       eq(rt(f1.evpi), rt(Rsub(f1.perfect, f1.prior)), key + ': EVPI is perfect information less the prior');
       eq(rt(Radd(f1.prior, f1.evsi)), rt(f2.value),

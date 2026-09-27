@@ -62,6 +62,8 @@ against the 62 KB ceiling, so every mode here has at least 19 KB of room.
 Re-derive rather than trusting these -- they go stale as the engine grows.
 """
 
+import re
+
 from .algebra_core import RATIONAL_JS
 from .algebra_systems import FORMAT_JS, MATRIX_JS
 from .common import Lab
@@ -703,11 +705,21 @@ DPTREE_JS = r"""
      when it sees that signal. */
   function everyStrategy(payoff, prior, likelihood) {
     var A = payoff.length, S = prior.length, G = likelihood ? likelihood.length : 1;
-    var best = null, bestPick = null, count = 0, pick = [], g, a, s;
+    var best = null, bestPick = null, count = 0, pick = [];
+    /* EVERY loop variable here is local to its own call. They used to be
+       declared on the line above, shared by every level of the recursion, and
+       the inner `for (a = 0; a < A; ...)` left `a === A` behind when it
+       returned -- so the caller's own loop ended immediately and this function
+       enumerated only the strategies whose earlier signals all map to act 0.
+       Measured: 2 of 4, 3 of 9, 2 of 4 on the three shipped presets. The BEST
+       value came out right on all three by luck, because the optimum happens
+       to assign act 0 to the first signal in each, so the page's agreement
+       check passed while the count it printed -- "N ways to map what you see
+       to what you do" -- was wrong on every one. */
     var walk = function (i) {
       if (i === G) {
         count += 1;
-        var total = R0;
+        var total = R0, g, s;
         for (g = 0; g < G; g += 1) {
           for (s = 0; s < S; s += 1) {
             var pj = likelihood ? Rmul(prior[s], likelihood[g][s]) : prior[s];
@@ -717,6 +729,7 @@ DPTREE_JS = r"""
         if (best === null || Rcmp(total, best) > 0) { best = total; bestPick = pick.slice(); }
         return;
       }
+      var a;
       for (a = 0; a < A; a += 1) { pick.push(a); walk(i + 1); pick.pop(); }
     };
     walk(0);
@@ -1039,6 +1052,12 @@ def _kpis(items):
 
 
 def _hint(cid, text):
+    # The `x` math shorthand, converted here the way render.inline() converts it
+    # everywhere else. A hint is raw markup like every other panel string, so
+    # the marks do NOT convert themselves -- two hints in this kit shipped
+    # sixteen literal backtick characters to the reader before anything looked.
+    # Kept local rather than imported, because labs/ does not depend on render.
+    text = re.sub(r"`([^`]+)`", r'<span class="math">\1</span>', text)
     return '        <p class="small-copy" id="%s" style="margin:0;">%s</p>' % (cid, text)
 
 

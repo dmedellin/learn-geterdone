@@ -207,8 +207,32 @@ def domain_reason(record, rule, match):
                 what = re.sub(r'[,\s]*in\s+order.*$', '', what, flags=re.I).strip()
                 return ('Domain ordering instruction: what is taken in order is '
                         '%s, not Courses or Lessons.' % (what or 'a value on the page'))
-        if 'acceptable to g' in text and 'acceptable to f' in text and 'first stage' in match[0]:
-            return 'Function composition applies g then f; the first stage is evaluation of g, not a curriculum stage.'
+        # "first / next / final stage" is curricular framing only when the thing
+        # staged is the curriculum. A STAGE is also an ordinary noun in several
+        # subjects here -- a stage of a staged network, a stage of a function
+        # composition, a stage of a pipeline -- and the surrounding sentence
+        # says which. This replaced an exception that hard-coded one Algebra
+        # sentence by its own words ("acceptable to g"); the next sentence of
+        # the same kind duly failed, in an Operations Research kit that says
+        # "one node in the first stage" and "every path from the first stage to
+        # the last". Naming the domain object is the rule; listing sentences is
+        # a test written to ratify one edit.
+        if re.search(r'\bstages?\b', match[0], re.I):
+            after = text[match.end():match.end() + 90]
+            before = text[max(0, match.start() - 90):match.start()]
+            # `path` is deliberately NOT in this list. It is curricular in "the
+            # Algebra path" and ordinary in "every path from the first stage to
+            # the last", and FRAMING already catches the curricular sense in its
+            # own alternatives -- `learning paths?` and the named Subjects -- so
+            # including it here only misreads graph prose.
+            if re.search(r'\b(?:lessons?|courses?|curriculum|track|subject)\b',
+                         before[-60:] + match[0] + after[:60], re.I):
+                return None
+            noun = re.search(r'\b(node|network|graph|path|composition|pipeline|recursion|'
+                             r'evaluation|function|machine|period|round|phase|layer)\b',
+                             before + ' ' + after, re.I)
+            return ('A stage of %s, not a curriculum stage.'
+                    % (noun.group(0).lower() if noun else 'the object the page is about'))
     return None
 
 
