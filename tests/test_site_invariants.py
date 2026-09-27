@@ -3284,7 +3284,7 @@ class TestGeneratedPathIsCurrent(unittest.TestCase):
             raise unittest.SkipTest("cannot import the build script: %s" % exc)
 
         stale = []
-        for relative, markup in pages():
+        for relative, markup, _expect in pages():
             target = SITE_ROOT / relative
             if not target.is_file():
                 stale.append("%s (missing)" % relative)
@@ -4580,3 +4580,96 @@ class TestEveryLessonTakesFeedback(SiteFixture):
             "they render unstyled for every reader who can actually use them: %s"
             % sorted(unstyled)[:6],
         )
+
+
+class TestAPathCountsItsOwnCourses(unittest.TestCase):
+    """A Subject's tagline states how many courses and lessons it has.
+
+    Those are the first sentences a reader meets, on the library page and on
+    the Subject page, and nothing has ever checked them. They are written by
+    hand once, when the Subject is scaffolded and before a single lesson
+    exists, and they stay written that way -- the two Subjects being authored
+    today advertise "nine courses and 109 lessons" and "ten courses and 94
+    lessons" while holding a fraction of each. Wire a path one course early
+    and the claim ships.
+
+    This reads the counts out of the PATH itself and compares. It only covers
+    paths in GENERATED_PATHS, which is the moment the claim becomes public --
+    an unwired Subject is free to describe what it is going to be.
+
+    Spelled numbers count: every one of these sentences opens with a word
+    rather than a digit, and a digits-only check would have read none of them.
+    """
+
+    WORDS = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6,
+             "seven": 7, "eight": 8, "nine": 9, "ten": 10, "eleven": 11,
+             "twelve": 12, "thirteen": 13, "fourteen": 14, "fifteen": 15}
+    CLAIM = re.compile(r"\b(\d+|[A-Za-z]+)\s+(courses?|lessons?)\b")
+
+    def value(self, token):
+        return int(token) if token.isdigit() else self.WORDS.get(token.lower())
+
+    def test_the_tagline_and_description_state_the_real_counts(self):
+        sys.path.insert(0, str(REPO_ROOT / "scripts"))
+        try:
+            from build_paths import GENERATED_PATHS
+        except ImportError as exc:  # pragma: no cover
+            raise unittest.SkipTest("cannot import the build script: %s" % exc)
+
+        wrong = []
+        for path in GENERATED_PATHS:
+            real = {"course": len(path["courses"]),
+                    "lesson": sum(len(c["lessons"]) for c in path["courses"])}
+            for field in ("tagline", "description"):
+                for match in self.CLAIM.finditer(str(path.get(field, ""))):
+                    claimed = self.value(match.group(1))
+                    if claimed is None:
+                        continue
+                    kind = "course" if match.group(2).lower().startswith("course") else "lesson"
+                    if claimed != real[kind]:
+                        wrong.append("%s %s: says %r, has %d %ss"
+                                     % (path["slug"], field, match.group(0),
+                                        real[kind], kind))
+        self.assertEqual([], wrong,
+                         "a Subject advertises a count it does not have: %s" % wrong)
+
+
+class TestNoEntityReachesTextContent(unittest.TestCase):
+    """`textContent` does not decode entities, so one written there ships raw.
+
+    A KPI tile on site/caching-and-hit-rates/write-policies read
+
+        5/3 = 1.667&times;
+
+    to every reader, and 43 assignments across eight kits did the same on 19
+    published pages. The entity is CORRECT in an `innerHTML` string and in
+    markup; it is only wrong on the far side of a `textContent` assignment, and
+    those two live side by side in every kit, often on the same line. So this
+    splits the line and looks only at the textContent half.
+
+    This is the same class `scripts/mathpath/AGENTS.md` already warns about for
+    `topbar()`, which shows that naming a trap is not the same as catching it.
+    """
+
+    ENTITY = re.compile(r"&[a-zA-Z][a-zA-Z0-9]*;")
+
+    def test_no_kit_writes_an_entity_through_text_content(self):
+        labs = REPO_ROOT / "scripts" / "mathpath" / "labs"
+        self.assertTrue(labs.is_dir(), "the lab kits must be where this expects them")
+        seen, leaks = 0, []
+        for path in sorted(labs.glob("*.py")):
+            for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+                if ".textContent" not in line or "=" not in line:
+                    continue
+                seen += 1
+                start = line.index(".textContent")
+                stop = line.index("innerHTML") if "innerHTML" in line else len(line)
+                if stop <= start:
+                    stop = len(line)
+                for hit in self.ENTITY.finditer(line[start:stop]):
+                    leaks.append("%s:%d writes %s through textContent"
+                                 % (path.name, number, hit.group(0)))
+        # A scan that matched nothing would pass for the wrong reason.
+        self.assertGreater(seen, 200,
+                           "found only %d textContent assignments to scan; the kits moved" % seen)
+        self.assertEqual([], leaks, "these reach the reader as literal characters: %s" % leaks[:8])

@@ -227,7 +227,8 @@ SEQKIT_JS = r"""
     return combos.map(function (rules) {
       var run = unionFindRun(ops, rules, n);
       return { rank: rules.rank, compress: rules.compress, run: run,
-               hops: run.counts.hops || 0, worst: run.result.worstHops,
+               hops: run.counts.hops || 0, worst: run.result.worstFind,
+               worstRow: run.result.worstHops,
                maxRank: run.result.maxRank, bound: run.result.bound,
                maxSize: run.result.maxSize, holds: run.result.rankBoundHolds };
     });

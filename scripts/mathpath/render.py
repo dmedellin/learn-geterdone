@@ -97,6 +97,18 @@ def _block(kind, payload):
 
 def lesson_page(*, path, course, lesson, index, prev_lesson, next_lesson):
     """One lesson: /<course-slug>/<lesson-slug>/ ."""
+    return lesson_page_with_lab(
+        path=path, course=course, lesson=lesson, index=index,
+        prev_lesson=prev_lesson, next_lesson=next_lesson)[0]
+
+
+def lesson_page_with_lab(*, path, course, lesson, index, prev_lesson, next_lesson):
+    """(markup, the Lab it was built from).
+
+    The lab is handed back rather than rebuilt: scripts/build_paths.py needs
+    lab.expect to write the expectations manifest, and building the lab twice
+    would double the cost of a full render for a dictionary it already has.
+    """
     number = "%02d" % (index + 1)
     total = len(course["lessons"])
     url = "/%s/%s/" % (course["slug"], lesson["slug"])
@@ -312,7 +324,11 @@ def lesson_page(*, path, course, lesson, index, prev_lesson, next_lesson):
                              + progress.LESSON_JS % json.dumps(lesson_id)
                              + feedback.STORE_JS
                              + feedback.LESSON_JS))
-    return chrome.name_horizontal_scrollers("".join(parts))
+    return chrome.name_horizontal_scrollers("".join(parts)), lab
+
+
+def _first_upper(text):
+    return text[:1].upper() + text[1:]
 
 
 def course_home(*, course, index, courses, path):
@@ -407,7 +423,15 @@ def course_home(*, course, index, courses, path):
         '      <div class="syllabus">%s</div>\n'
         "    </section>\n" % (len(lessons), inline(course["syllabus_intro"]), syllabus),
         '    <section class="section" id="background" data-ui="background">'
-        '<h2>Recommended background</h2><p>%s.</p></section>\n' % esc(course["assumes_long"].capitalize().rstrip(".")),
+        # First character up, and NOTHING else touched. str.capitalize()
+        # lowercases the rest of the string, so every proper noun in this field
+        # was destroyed: "Discrete Mathematics" shipped as "discrete
+        # mathematics" and a course named by title as "queues and utilisation".
+        # The two live paths never noticed because they wrote the field entirely
+        # in lower case; the first course to name a sibling by title, which is
+        # what the no-ordinals rule asks for, hit it immediately.
+        '<h2>Recommended background</h2><p>%s.</p></section>\n'
+        % esc(_first_upper(course["assumes_long"]).rstrip(".")),
         '    <section class="section">\n'
         '      <div class="grid-2">\n'
         '        <article class="card card-pad prose"><h3>Practice suggestions</h3>%s</article>\n'
@@ -455,10 +479,18 @@ def path_page(path):
         '<a class="btn ghost" href="#background">Recommended background</a></div></div>'
         '<div class="hero-visual">%s</div></section>\n'
         % (esc(path["title"]), inline(path["tagline"]), _mathblock(path["key"])),
+        # `level_note` was declared in every PATH dict and rendered nowhere. It
+        # is the one thing a reader browsing Subjects most wants next to a
+        # level -- every value is a statement about what is assumed ("no
+        # calculus required", "assumes Discrete Mathematics in full") -- so it
+        # is its own stat rather than a parenthetical inside Level, which would
+        # have changed a block other guards pin.
         '<section class="section" data-ui="metadata"><dl class="stats">'
         '<div><dt>Courses</dt><dd>%d</dd></div><div><dt>Lessons</dt><dd>%d</dd></div>'
-        '<div><dt>Level</dt><dd>%s</dd></div></dl></section>\n'
-        % (len(courses), total_lessons, esc(path["level"])),
+        '<div><dt>Level</dt><dd>%s</dd></div>'
+        '<div><dt>Assumes</dt><dd>%s</dd></div></dl></section>\n'
+        % (len(courses), total_lessons, esc(path["level"]),
+           esc(path["level_note"])),
         '<section class="section prose" data-ui="overview"><h2>Overview</h2>%s</section>\n'
         % "".join('<p>%s</p>' % inline(p) for p in path["why_order"]),
         '<section class="section" id="courses" data-ui="course-list">'

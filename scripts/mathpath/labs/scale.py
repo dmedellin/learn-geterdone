@@ -3551,6 +3551,28 @@ def _placement(cfg):
     )
 
 
+# TWO MODES NO LESSON NAMES: headroom and growth.
+#
+# The course has eleven lessons and this kit has thirteen modes. These two
+# were built because the outcomes read as if they wanted the figures; the
+# lesson author then checked and found that no outcome, and no line of
+# outcomes_intro, mentions N-1 capacity after a failure or the month a plan
+# runs out. They are right, so no lesson's mode was reassigned to make them
+# used.
+#
+# Kept rather than removed, and the reason is measured rather than assumed.
+# The Python builders below are build-time only and ship nothing. The JS
+# these two modes add to the shared block -- rhoAfterLoss, monthsToLimit,
+# doublingMonths -- is 1,065 raw characters, a few hundred gzipped on a
+# 19 KB payload. Removing them would churn a verified kit serving a live
+# course to save about a thousandth of a page.
+#
+# If the course outcomes are ever revised, the figures are here and
+# checked: ceiling rho after losing one of N, the (N-1)/N of nameplate
+# that survives, and the month a compounding load reaches a limit by exact
+# integer search. That is a content decision about what the course teaches,
+# not a question about this file.
+
 # ============================================================= mode: headroom
 
 HEADROOM_PRESETS = [

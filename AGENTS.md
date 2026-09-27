@@ -17,8 +17,16 @@ is exactly the 369 pages it has been.
 | Subject | state |
 |---|---|
 | System Design | **complete** — 10 courses, 114 lessons, 10 lab kits, all gates passing. Ready to wire. |
-| Algorithms | `algo_core.py` written (21 blocks). 14 kits and 109 lessons to go. |
-| Operations Research | `or_core.py` written — an exact simplex, 13 blocks. 12 kits and 94 lessons to go. |
+| Algorithms | **complete** — 9 courses, 112 lessons. Ready to wire. |
+| Operations Research | **complete** — 10 courses, 92 lessons. Ready to wire. |
+
+74 lab modes are registered. The two new Subjects are **inert**: neither is in
+`GENERATED_PATHS`, so `site/` is still exactly the pages it has been, and
+wiring either one is the ~24-declaration-site process System Design went
+through. Before you wire, note that `tests/test_site_invariants.py` now checks a
+Subject's tagline against its own course and lesson counts — those sentences are
+written when a Subject is scaffolded, before a lesson exists, and both of these
+advertised the wrong number until the day they were finished.
 
 A course module still being authored exports `COURSE = None`, which
 `content/<subject>/__init__.py` filters out. That is the state most of them are
@@ -136,7 +144,31 @@ so the change appears to work and then vanishes.
     node scripts/labcheck.js --generated               # execute every lab
 
 The last two are different questions and CI runs both. `labcheck.js` proves each
-published lab runs, redraws, and survives every value of its own controls;
+published lab runs, redraws, and survives its controls being moved: it sweeps
+every option of every `<select>`, the two ends and a middle step of every
+range, and a handful of hostile strings through every text box, firing each
+control's own `change` handler the way a browser does. (Until 2026-09-26 this
+sentence said "survives every value of its own controls" and the file did no
+such thing -- it ran the page once and called `redrawLab()` once. Three kit
+authors noticed independently, each wrote a private sweep, and each threw it
+away; the sweep is now in `labcheck.js` and the claim is true. It found a
+published page that dies on a typed `1/0`. Pass `--no-sweep` for the old
+behaviour.)
+
+It also checks what a preset makes the page PRINT. `build_paths.py` writes
+`scripts/generated-expectations.json` — page → `<select>` id → option value →
+`{kpi element id: exact text}` — and `labcheck.js` selects each option,
+dispatches the change handler and compares `textContent` against it. For a kit
+listed in `build_paths.KITS_WITH_EXPECTATIONS` this is a gate: an option with no
+expectation fails the page, and so does a preset menu that declares none — which
+menus those are is decided by running the page and seeing which `<select>`
+rewrites another control, never by reading a name. It exists because a preset's own menu text is prose
+that no check can read, and a sweep of fifteen kits found 57 of those strings
+false about the lab they described. `greedy.py` is converted; the switch is how
+each remaining kit is turned on. `node scripts/labcheck.js --observe <page>`
+prints every option's tiles as the page prints them, which is how the figures
+are read.
+
 `mathcheck.js` proves the arithmetic those labs are built on is right, by
 executing the shipped JavaScript extracted from
 `scripts/mathpath/labs/algebra_core.py`. A lab that reports confidently wrong

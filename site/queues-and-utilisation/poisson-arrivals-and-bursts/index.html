@@ -1354,7 +1354,7 @@ P(count &gt; 10) is about 0.42                  two windows in five</div><p>Sizi
           <div class="kpi"><span>Variance (binomial) vs mean</span><strong id="poVar">&mdash;</strong></div>
           <div class="kpi"><span>C that meets the target</span><strong id="poNeed">&mdash;</strong></div>
         </div>
-        <p class="small-copy" id="poHint" style="margin:0;">"1000 per second" does not mean 1000 arrive each second. With a Poisson count the standard deviation is &radic;m, so a mean of 1000 is 1000 &plusmn; 32 and a window sized at exactly the mean is over capacity about half the time. Two limits are worth knowing: the chopping stops at 20m because the bars are <em>exact</em> fractions and at 100m the denominators run to two thousand digits; and the mean stops at 12 because the <em>rounded</em> column cannot go further &mdash; e<sup>&minus;m</sup> is summed by an alternating series that has lost every significant digit by m = 19. The exact column would have been happy to continue.</p>
+        <p class="small-copy" id="poHint" style="margin:0;">"1000 per second" does not mean 1000 arrive each second. With a Poisson count the standard deviation is &radic;m, so a mean of 1000 is 1000 &plusmn; 32 and a window sized at exactly the mean is over capacity about half the time. Both limits on this page come from the <em>exact</em> side rather than the rounded one: the chopping stops at 20m because the bars are exact fractions and at 100m the denominators run to two thousand digits, and the mean stops at 12 for the same reason. The rounded column would have been happy to continue &mdash; e<sup>&minus;m</sup> is the reciprocal of a positive-term series, so nothing cancels and it is accurate to the last bit of a double well past any mean this page offers.</p>
         </aside>
       </div>
     </section>
@@ -1567,7 +1567,14 @@ and at C = m = 10:  P(count &gt; 10) ≈ 0.42</div><p>Capacity 15 is 50% above t
   function Rparse(text) {
     var s = String(text).trim();
     var m = /^([+-]?\d+)\s*\/\s*(\d+)$/.exec(s);
-    if (m) return R(BigInt(m[1]), BigInt(m[2]));
+    /* A zero denominator is not a number this function can read, so it comes
+       back null like every other unreadable string. It used to reach R(), which
+       THROWS -- and a throw out of a parser is not a refusal, it is a dead
+       page: the lab's redraw stops, the panel keeps the last good figures, and
+       nothing tells the reader why. Typing 1/0 into the availability chain on
+       a published page did exactly that. Callers all handle null already;
+       every one of them was written to. */
+    if (m) return m[2] === '0' || /^0+$/.test(m[2]) ? null : R(BigInt(m[1]), BigInt(m[2]));
     m = /^([+-]?\d+)$/.exec(s);
     if (m) return R(BigInt(m[1]));
     m = /^([+-]?)(\d*)\.(\d+)$/.exec(s);
@@ -2149,21 +2156,19 @@ and at C = m = 10:  P(count &gt; 10) ≈ 0.42</div><p>Capacity 15 is 50% above t
     if (!both || !past || Rzero(past)) return null;
     return Rdiv(both, past);
   }
-  /* e^-x, from the core, WITH ITS RANGE STATED.
+  /* e^-x, from the core, WITH THE REASON FOR ITS RANGE STATED.
 
-     expNegApprox sums the alternating series 1 - x + x^2/2! - ..., whose largest
-     term is about e^x/sqrt(2*pi*x) while the answer is e^-x, so it throws away
-     roughly 2x/ln(10) significant digits to cancellation. In double precision
-     that is all sixteen of them by about x = 19, and past x = 21 the result
-     changes sign. Measured: the relative error is 3e-9 at x = 10, 1.6e-7 at
-     x = 12, 4e-3 at x = 17 and 173% at x = 20.
+     expNegApprox returns the reciprocal of the positive-term series for e^x.
+     Nothing cancels, and the relative error against Math.exp is last-bit from
+     x = 1 to x = 40 -- 1.5e-16, 3.0e-16, 5.5e-16, 6.4e-16, 4.0e-16, 5.4e-16 at
+     1, 10, 12, 17, 20 and 40. mathcheck pins those.
 
-     So this kit does not hand it an x it cannot answer. The two modes that call
-     it bound their controls to EXP_SAFE_X and say so on the page, and the two
-     functions below refuse rather than return a number that is confidently
-     wrong -- which on a page promising checkable arithmetic is the worse
-     failure of the two. Widening the bound is a change to the core's method,
-     not to this kit. */
+     EXP_SAFE_X is therefore NOT an accuracy bound, whatever the comment here
+     said for as long as it was wrong. It bounds the EXACT column, whose
+     denominator has 161 digits at lambda*t = 4, 401 at 10 and 801 at 20; past
+     that the fraction the page is arguing for stops being something a reader
+     can look at. The refusal stays, so a hand-written preset cannot step round
+     a control the page does not offer. */
   var EXP_SAFE_X = 12;
   function expNegSafe(x) {
     if (!(x >= 0) || x > EXP_SAFE_X) return NaN;
@@ -2445,8 +2450,8 @@ and at C = m = 10:  P(count &gt; 10) ≈ 0.42</div><p>Capacity 15 is 50% above t
       + '<tr><td>&radic;m, the spread</td><td colspan="2" class="tone-red">' + sigma.toFixed(4)
       + ' &mdash; a square root, so this one rounds too</td></tr>'
       + '<tr><td>method</td><td class="tone-cyan">exact fractions over BigInt</td>'
-      + '<td class="tone-red">e<sup>&minus;m</sup> by an alternating series, good to about seven '
-      + 'figures here and to none past m = 19 &mdash; which is why the mean stops at 12</td></tr>'
+      + '<td class="tone-red">e<sup>&minus;m</sup> as the reciprocal of a positive-term series, '
+      + 'so nothing cancels &mdash; last-bit accurate here, but still a rounded number</td></tr>'
       + '</tbody>';
 
     status.innerHTML = 'A window whose mean is <strong>' + m + '</strong> has variance <strong>'

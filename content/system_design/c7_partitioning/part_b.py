@@ -382,7 +382,8 @@ LESSONS = [
             ("p", "The empty-bin counts are worth a glance too. Two choices left 243 bins "
                   "empty where one choice left 377, because a key that would have piled "
                   "onto a busy bin goes to a quieter one instead. The exact expectation "
-                  "for the one-choice case, `n(1 − 1/n)ᵐ`, is computed on the Algorithms "
+                  "for the one-choice case, `m(1 − 1/m)ⁿ` with `m` bins and `n` keys, is "
+                  "computed on the Algorithms "
                   "path in “Balls in Bins and the Birthday Bound”; this lesson counts "
                   "rather than derives it."),
             ("h3", "The standing of the two results"),

@@ -1564,7 +1564,14 @@ degenerate        no solutions        ∅
   function Rparse(text) {
     var s = String(text).trim();
     var m = /^([+-]?\d+)\s*\/\s*(\d+)$/.exec(s);
-    if (m) return R(BigInt(m[1]), BigInt(m[2]));
+    /* A zero denominator is not a number this function can read, so it comes
+       back null like every other unreadable string. It used to reach R(), which
+       THROWS -- and a throw out of a parser is not a refusal, it is a dead
+       page: the lab's redraw stops, the panel keeps the last good figures, and
+       nothing tells the reader why. Typing 1/0 into the availability chain on
+       a published page did exactly that. Callers all handle null already;
+       every one of them was written to. */
+    if (m) return m[2] === '0' || /^0+$/.test(m[2]) ? null : R(BigInt(m[1]), BigInt(m[2]));
     m = /^([+-]?\d+)$/.exec(s);
     if (m) return R(BigInt(m[1]));
     m = /^([+-]?)(\d*)\.(\d+)$/.exec(s);

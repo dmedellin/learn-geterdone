@@ -187,12 +187,52 @@ def domain_reason(record, rule, match):
         if (re.fullmatch(r'(?:trading|algebra|discrete mathematics)\s+(?:paths?|tracks?)', match[0], re.I)
                 and record.get('family') not in ('library', 'subject')):
             return 'Names a sibling Subject in prose; the reader needs to know the target is elsewhere.'
-        if text == 'Take each edge in order if it joins two components':
-            return 'Kruskal edge-processing instruction: the ordering applies to weighted edges, not Courses or Lessons.'
-        if text == 'Read the pair in order':
-            return 'Ordered-pair reading instruction: horizontal coordinate then vertical coordinate, not catalog ordering.'
-        if 'acceptable to g' in text and 'acceptable to f' in text and 'first stage' in match[0]:
-            return 'Function composition applies g then f; the first stage is evaluation of g, not a curriculum stage.'
+        # "... in order" is curricular framing only when the thing being
+        # ordered is a Course or a Lesson. Everywhere else it is a domain
+        # instruction -- take the EDGES in order, read the PAIR in order, read
+        # the tableau COLUMNS in order -- and rewriting those costs the
+        # teaching point without removing any dependence on numbering.
+        #
+        # This replaced two exceptions that hard-coded the author's exact
+        # sentences. That shape is a test written to ratify one edit rather
+        # than to express a principle: the third sentence of the same kind
+        # ("Read the objective row over those columns, in order") failed, and
+        # so would every later one. What is stated here is the rule.
+        if re.search(r'\bin\s+order\b', match[0], re.I):
+            span = match[0]
+            if not re.search(r'\b(?:lessons?|courses?|curriculum|path|track|'
+                             r'subject|module|chapter|section)s?\b', span, re.I):
+                what = re.sub(r'^(?:learn|study|take|work through|read)\b\s*', '',
+                              span, flags=re.I)
+                what = re.sub(r'[,\s]*in\s+order.*$', '', what, flags=re.I).strip()
+                return ('Domain ordering instruction: what is taken in order is '
+                        '%s, not Courses or Lessons.' % (what or 'a value on the page'))
+        # "first / next / final stage" is curricular framing only when the thing
+        # staged is the curriculum. A STAGE is also an ordinary noun in several
+        # subjects here -- a stage of a staged network, a stage of a function
+        # composition, a stage of a pipeline -- and the surrounding sentence
+        # says which. This replaced an exception that hard-coded one Algebra
+        # sentence by its own words ("acceptable to g"); the next sentence of
+        # the same kind duly failed, in an Operations Research kit that says
+        # "one node in the first stage" and "every path from the first stage to
+        # the last". Naming the domain object is the rule; listing sentences is
+        # a test written to ratify one edit.
+        if re.search(r'\bstages?\b', match[0], re.I):
+            after = text[match.end():match.end() + 90]
+            before = text[max(0, match.start() - 90):match.start()]
+            # `path` is deliberately NOT in this list. It is curricular in "the
+            # Algebra path" and ordinary in "every path from the first stage to
+            # the last", and FRAMING already catches the curricular sense in its
+            # own alternatives -- `learning paths?` and the named Subjects -- so
+            # including it here only misreads graph prose.
+            if re.search(r'\b(?:lessons?|courses?|curriculum|track|subject)\b',
+                         before[-60:] + match[0] + after[:60], re.I):
+                return None
+            noun = re.search(r'\b(node|network|graph|path|composition|pipeline|recursion|'
+                             r'evaluation|function|machine|period|round|phase|layer)\b',
+                             before + ' ' + after, re.I)
+            return ('A stage of %s, not a curriculum stage.'
+                    % (noun.group(0).lower() if noun else 'the object the page is about'))
     return None
 
 

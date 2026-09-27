@@ -2386,7 +2386,7 @@ def _columnar(cfg):
     document.getElementById('clWidthOut').textContent = grp(width) + ' B';
     document.getElementById('clColsOut').textContent = cols + ' columns';
     document.getElementById('clSelOut').textContent = sel + ' of ' + cols;
-    document.getElementById('clRatioOut').textContent = ratio + '&times;';
+    document.getElementById('clRatioOut').textContent = ratio + '×';
 
     var rowBytes = rowScanBytes(rows, width, rowRatio);
     var colBytes = colScanBytes(rows, width, cols, sel, colRatio);

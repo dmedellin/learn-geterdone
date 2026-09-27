@@ -1032,8 +1032,8 @@ console.log('system design: exact capacity, queueing and availability');
   for (const x of [10, 12, 15, 17, 20, 21, 25, 40]) {
     const got = expNegApprox(x, 1e-15), want = Math.exp(-x);
     eq(got > 0, true, 'e^-' + x + ' is positive');
-    eq(Math.abs(got - want) / want < 1e-10, true,
-       'e^-' + x + ' is right to a relative 1e-10, not merely a small absolute error');
+    eq(Math.abs(got - want) / want < 1e-14, true,
+       'e^-' + x + ' is right to a relative 1e-14, not merely a small absolute error');
   }
   near(expNegApprox(-2, 1e-15), Math.exp(2), 1e-10, 'a negative argument gives e^|x|');
   near(standardErrorApprox(0.5, 100), 0.05, 1e-12, 'the standard error of a proportion');
@@ -1797,22 +1797,31 @@ console.log('system design: queues, Little\'s Law and the slotted chain');
   near(poissonTailApprox(10, 15), refPoissonTail(10, 15), 1e-8, 'the Poisson tail matches a Math.exp reference at m = 10');
   near(poissonTailApprox(12, 20), refPoissonTail(12, 20), 1e-6, 'and at m = 12, the edge of the usable range');
 
-  /* --- e^-x has a range, and the kit stops inside it ---------------------- *
-     sysdesign_core's expNegApprox sums the ALTERNATING series for e^-x, whose
-     largest term is about e^x/sqrt(2 pi x) while the answer is e^-x. It
-     therefore loses roughly 2x/ln(10) significant digits to cancellation:
-     measured, the relative error is 3e-9 at x = 10, 1.6e-7 at x = 12, 4e-3 at
-     x = 17 and 173% at x = 20, and past x = 21 the SIGN is wrong.
+  /* --- e^-x is accurate; the bound is about the EXACT column --------------- *
+     This block used to say that sysdesign_core's expNegApprox sums the
+     alternating series for e^-x and so loses 2x/ln(10) significant digits to
+     cancellation -- "3e-9 at x = 10 ... 173% at x = 20, and past x = 21 the
+     SIGN is wrong". The core was fixed to return the reciprocal of the
+     positive-term series for e^x, where nothing cancels, and this description
+     stayed behind. It stayed behind in queue.py's module docstring too, and
+     from there in three sentences on two PUBLISHED pages, which told readers
+     the controls stop where they do because the approximation gives out.
 
-     That is a defect in the core, not in this kit, and the fix belongs there --
-     1/exp(x) by a positive-term series would be correct at every x. Until then
-     the kit bounds the two modes that call it and refuses outside the bound,
-     because a wrong number under a promise of a checkable one is worse than no
-     number. These assertions pin both halves: that the method is good where the
-     lab uses it, and that the lab's own functions refuse where it is not. */
-  near(expNegSafe(10), Math.exp(-10), Math.exp(-10) * 1e-6, 'e^-10 is still good to six figures');
-  near(expNegSafe(12), Math.exp(-12), Math.exp(-12) * 1e-5, 'e^-12, the bound, to five');
-  eq(expNegSafe(20), 'NaN', 'past the bound the kit returns NaN rather than a confident 173% error');
+     They do not. They stop because the exact column is a fraction whose
+     denominator has 161 digits at lambda*t = 4, 401 at 10 and 801 at 20.
+
+     So the assertions changed shape. The accuracy is pinned tightly enough to
+     hold the word the pages now use -- last-bit -- rather than loosely enough
+     to pass either method, which is what let the old description survive its
+     own correction. And the refusal is pinned as a refusal, without a claim
+     about why. */
+  for (const x of [1, 10, 12, 17, 20, 40]) {
+    eq(Math.abs(expNegApprox(x) - Math.exp(-x)) / Math.exp(-x) < 1e-14, true,
+       'e^-' + x + ' is last-bit accurate, which is what the two pages now say');
+  }
+  near(expNegSafe(10), Math.exp(-10), Math.exp(-10) * 1e-14, 'and the kit sees that accuracy too');
+  near(expNegSafe(12), Math.exp(-12), Math.exp(-12) * 1e-14, 'at the bound as well as inside it');
+  eq(expNegSafe(20), 'NaN', 'while the kit still refuses past its bound, which is about the exact side');
   eq(expNegSafe(-1), 'NaN', 'and refuses a negative x outright');
   eq(poissonTailApprox(20, 25), 'NaN', 'so the Poisson tail refuses too');
   eq(headroomForApprox(20, 0.01, 400), -1, 'and the headroom search reports that it has no answer');
@@ -4967,6 +4976,15 @@ console.log('operations research: the exact simplex, duality, networks and the r
     eq(tspExact(d4).count, 3, 'four cities have (n-1)!/2 = 3 DISTINCT tours, not 6');
     eq(Rtext(tspExact(d4).best.cost), '97', 'the shortest is 97');
     eq(Requ(tspBranch(d4).best, tspExact(d4).best.cost), true, 'and branch and bound agrees');
+    {
+      // The branch table and the ring drawing must count cities the same way.
+      // ipTourSvg labels city i as i + 1; these labels once read "ban 0->4"
+      // beside a ring whose cities start at 1, naming the wrong pair.
+      const labelled = tspBranch(d4).nodes.map((x) => x.label).filter((x) => /^ban /.test(x));
+      const cities = labelled.join(' ').match(/\d+/g).map(Number);
+      eq(Math.min.apply(null, cities) >= 1 && Math.max.apply(null, cities) <= 4, true,
+         'branch labels name cities 1..n, the same numbering the ring picture draws');
+    }
     /* tspBranch's assignment bound is a SUBSET RECURSION in IP_JS; transport's
        hungarian is Koenig covers and reductions in TRANS_JS. Two different
        algorithms for one number, so their agreement is arithmetic and not a
@@ -5470,6 +5488,18 @@ console.log('algorithms: counts, exact expectations, and the oracles they agree 
     eq(unionFindRun([0,1,2,3,4,5,6].map((i) => ({ op: 'union', a: i, b: i + 1 }))
         .concat([{ op: 'find', a: 0 }]), { rank: true }, 8).result.rankBoundHolds, true,
        'and a rank-r root has at least 2^r descendants');
+    {
+      // worstHops is the largest TRACE ROW; a union row is the SUM of its two
+      // finds. The panel's "worst single find" column read worstHops and so
+      // could print a number no find ever walked -- 8 here against a longest
+      // walk of 4. worstFind is the figure that label is claiming.
+      const two = [0,1,2,3].map((i) => ({ op: 'union', a: i, b: i + 1 }))
+        .concat([6,7,8,9].map((i) => ({ op: 'union', a: i, b: i + 1 })))
+        .concat([{ op: 'union', a: 0, b: 6 }]);
+      const j = unionFindRun(two, {}, 11).result;
+      eq(j.worstHops + ',' + j.worstFind, '8,4',
+         'a union row sums two walks, so the worst row is not the worst single find');
+    }
     eq(avlInsert([1,2,3,4,5,6,7]).result.height + ',' + avlInsert([1,2,3,4,5,6,7]).result.plainHeight, '2,6',
        'AVL holds the height at 2 where the plain BST is a path of 6');
     eq(minAvlNodes(4).n, 12, 'and N(4) = 12 is the fewest nodes an AVL tree of height 4 can hold');
@@ -6783,7 +6813,15 @@ console.log('operations research: the network kit, and the oracles graph.py alre
     const pf = parseFlow('a>b 1, b>a 2', twoWay.arcs);
     eq(pf.flow.map(rt).join(','), '1,2',
        'and a flow names each DIRECTION separately: 1 down a to b and 2 back, on two arcs, not 3 on one edge');
-    eq(rt(flowCost(twoWay.arcs, pf.flow)), '12', 'which costs 1x2 + 2x5 = 12, and the other way round would be 19');
+    eq(rt(flowCost(twoWay.arcs, pf.flow)), '12', 'which costs 1x2 + 2x5 = 12');
+    // The contrast is what the lesson is for, so it is ASSERTED rather than
+    // glossed. The label here read "the other way round would be 19"; 19 is
+    // the cost of (2, 3), which is not a reversal of (1, 2). Swapping the two
+    // flows costs 2x2 + 1x5 = 9, and the direction with the cheaper arc
+    // carrying more is the cheaper plan -- which is the whole point of naming
+    // each direction separately.
+    eq(rt(flowCost(twoWay.arcs, parseFlow('a>b 2, b>a 1', twoWay.arcs).flow)), '9',
+       'and the other way round, 2 down and 1 back, costs 2x2 + 1x5 = 9');
   }
 
   /* --- ONE programme, five data sets ----------------------------------- */
@@ -6932,7 +6970,7 @@ console.log('operations research: the network kit, and the oracles graph.py alre
     eq(sub.deficient.S.length - sub.deficient.N.length, 2,
        'a deficient set need not be all of X: three applicants here share one job');
     const perfect = check('1-a, 1-b, 2-b, 2-c, 3-c, 3-d, 4-d, 4-a', 4, '', '');
-    eq(perfect.perfect + ' ' + perfect.deficient.hall, 'true false',
+    eq(perfect.saturatesSmallerSide + ' ' + perfect.deficient.violated, 'true false',
        'and when the matching is perfect there is no certificate to produce, because the condition holds');
     eq(parseBip('1a').bad !== undefined, true, 'an edge without a dash is refused');
     eq(parseBip('1-a, 2-a, 3-a, 4-a, 5-a, 6-a').bad !== undefined, true, 'and a side with six vertices');
@@ -7070,6 +7108,786 @@ console.log('operations research: the network kit, and the oracles graph.py alre
   }
 }
 
+
+// ==========================================================================
+// Operations Research course four: the `transport` kit's own arithmetic
+// ==========================================================================
+//
+// or_core's TRANS_JS is exercised in the or_core section far above, at the
+// ENGINE level: balance, northwest, leastCost, uvPotentials, stoneCycle and
+// hungarian are each called there, and MODI is driven to optimality by a loop
+// written inside that test. None of that touches this kit. TRANSPORT_JS is the
+// layer the three published lessons actually read -- parseGrid, tableauCost,
+// basisForest, padBasis, pickEntering, checkCycle, rectangleGuess,
+// shiftPotentials, modiRun, assignDual, coverCheck and greedyAssign -- and it
+// is where the kit's own decisions live. A kit that builds, paints, runs clean
+// under labcheck and passes every structural guard can still report the wrong
+// optimum, so none of those proves anything below.
+//
+// THE ORACLE for the transportation half is EVERY BASIC FEASIBLE SOLUTION,
+// enumerated. A basis of a transportation tableau is a spanning tree of the
+// m x n row/column bipartite graph, so `everyBasicSolution` takes every subset
+// of m + n - 1 cells, keeps the ones that really are spanning trees, solves
+// each by peeling leaves off the tree, discards the ones with a negative
+// allocation, and returns the cheapest of what is left. That is corner
+// enumeration -- the same kind of oracle the or_core section holds the simplex
+// to -- and it shares no code with the potentials, the cycle or the pivot rule,
+// which are the three things MODI could get wrong. On the kit's default preset it
+// returns 435, which is the figure the or_core section reaches by the exact
+// simplex through Phase I with equality rows: two computations, no shared
+// arithmetic, one number.
+//
+// THE ORACLE for the assignment half is exhaustive over permutations, and for
+// Koenig it is EVERY VERTEX COVER of the zero pattern, enumerated over all
+// 2^(2n) selections of rows and columns. The second one is what turns C4 L6's
+// named misconception into a measurement:
+//
+//   ON THE KIT'S DEFAULT ASSIGNMENT PRESET, THE "DRAW LINES THROUGH THE ZEROS"
+//   RECIPE IS NOT A FUNCTION OF THE MATRIX. At the second cover step of
+//   `jobs`, covering the row or column that holds the most still-uncovered
+//   zeros draws FOUR lines if ties go to rows and THREE if ties go to columns,
+//   on the same matrix, by the same rule -- and the recipe has no tie-break to
+//   appeal to. Four is n, so the rows-first reader concludes the zeros carry a
+//   complete assignment; the maximum matching is 3, so they do not. The
+//   enumeration says the minimum cover is 3 and unique. `bipartiteMatch`
+//   returns 3. This is why the cover is computed and the recipe is not
+//   implemented, and it is now measured rather than asserted.
+//
+// TWO THINGS PINNED HERE THAT THE KIT'S OWN PROSE GETS WRONG OR NEARLY DOES:
+//
+//   * transport.py's module docstring says of `rectangleGuess` that "on the
+//     worked example the guess closes; on the second iteration it does not".
+//     On the kit's default view -- preset `balanced`, north-west start, Dantzig
+//     rule -- it is the other way round: the guess is REFUSED on the first
+//     iteration, at (2,1), and closes on the second. The order below is what
+//     the function returns.
+//   * the cost of that same default run is NOT strictly decreasing. Its second
+//     pivot has theta = 0, so the trace is 520 -> 475 -> 475 -> 435, and an
+//     assertion that every iteration costs less than the last would fail on a
+//     shipped preset. Non-increasing is the claim; degenerate pivots are the
+//     reason.
+console.log('operations research: the transport kit, and every basic feasible solution it is held to');
+{
+  const OR4_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'or_core.py');
+  const TRANS_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'transport.py');
+  const SYS4_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'algebra_systems.py');
+  const or4Src = fs.readFileSync(OR4_SOURCE, 'utf8');
+  const transSrc = fs.readFileSync(TRANS_SOURCE, 'utf8');
+  const sys4Src = fs.readFileSync(SYS4_SOURCE, 'utf8');
+  const or4 = (n) => blockFrom(or4Src, n, OR4_SOURCE);
+  const tk = (n) => blockFrom(transSrc, n, TRANS_SOURCE);
+  const sys4 = (n) => blockFrom(sys4Src, n, SYS4_SOURCE);
+
+  /* Exactly what transport.py's _CORE_JS concatenates, in that order, so a
+     dependency the kit forgot to take fails here and not in a browser. */
+  eval(sys4('FORMAT_JS') + or4('ORFMT_JS') + or4('NET_JS') + or4('TRANS_JS') + tk('TRANSPORT_JS'));
+
+  const ri = (v) => R(BigInt(v), 1n);
+  const rt = (a) => Rtext(a);
+  const cn = (c) => '(' + (c.i + 1) + ',' + (c.j + 1) + ')';
+  const cells = (list) => list.map(cn).join(' ');
+  const sum = (list) => list.reduce(Radd, R0);
+
+  /* The presets, as the strings a reader types. They are transcribed, so each
+     one is required to appear verbatim in the module: a preset edited without
+     editing this section fails HERE, by name, rather than silently moving
+     every figure below. */
+  const TP = {
+    balanced: { cost: '10 2 20 11; 12 7 9 20; 4 14 16 18', supply: '15 25 10', demand: '5 15 15 15' },
+    surplus: { cost: '8 6 10; 9 12 13; 14 9 16', supply: '20 30 25', demand: '20 25 20' },
+    degenerate: { cost: '5 3 8; 4 7 6; 9 2 5', supply: '10 20 10', demand: '10 20 10' }
+  };
+  const AP = {
+    jobs: '10 19 8 15; 10 18 7 17; 13 16 9 14; 12 19 8 18',
+    sites: '90 75 75 80; 35 85 55 65; 125 95 90 105; 45 110 95 115',
+    crews: '9 11 14 11 7; 6 15 13 13 10; 12 13 6 8 8; 11 9 10 12 9; 7 12 14 10 14'
+  };
+  {
+    let drift = [];
+    for (const k of Object.keys(TP)) {
+      for (const f of Object.keys(TP[k])) if (transSrc.indexOf('"' + TP[k][f] + '"') < 0) drift.push(k + '.' + f);
+    }
+    for (const k of Object.keys(AP)) if (transSrc.indexOf('"' + AP[k] + '"') < 0) drift.push(k + '.cost');
+    eq(drift.join(','), '', 'every preset transcribed here is the string transport.py ships');
+    eq(transSrc.indexOf('greedy loses badly here') > 0, true,
+       'and the sites preset still advertises that greed loses on it, which is priced below');
+    eq(transSrc.indexOf('greedy happens to be right') > 0, true,
+       'and the crews preset that greed happens to get right');
+  }
+
+  /* ================================================================ ORACLE 1
+     Every basic feasible solution of a transportation problem: every spanning
+     tree of the row/column bipartite graph, solved by peeling leaves. Nothing
+     here knows what a potential or a stepping-stone cycle is. */
+  const everyBasicSolution = (C, S, D) => {
+    const m = S.length, n = D.length, want = m + n - 1, grid = [];
+    for (let i = 0; i < m; i += 1) for (let j = 0; j < n; j += 1) grid.push([i, j]);
+    let best = null, trees = 0, feasible = 0;
+    const pick = [];
+    const solve = () => {
+      /* a spanning tree, or nothing */
+      const parent = [];
+      for (let k = 0; k < m + n; k += 1) parent.push(k);
+      const find = (a) => { while (parent[a] !== a) { parent[a] = parent[parent[a]]; a = parent[a]; } return a; };
+      for (const c of pick) {
+        const a = find(c[0]), b = find(m + c[1]);
+        if (a === b) return;
+        parent[a] = b;
+      }
+      const roots = {};
+      for (let k = 0; k < m + n; k += 1) roots[find(k)] = true;
+      if (Object.keys(roots).length !== 1) return;
+      trees += 1;
+      /* peel: a row or column holding one remaining cell fixes that cell */
+      const s = S.slice(), d = D.slice(), left = pick.slice(), x = [];
+      while (left.length) {
+        let hit = -1, alone = 'row';
+        for (let k = 0; k < left.length && hit < 0; k += 1) {
+          let rc = 0, cc = 0;
+          for (const q of left) { if (q[0] === left[k][0]) rc += 1; if (q[1] === left[k][1]) cc += 1; }
+          if (rc === 1) { hit = k; alone = 'row'; } else if (cc === 1) { hit = k; alone = 'col'; }
+        }
+        if (hit < 0) return;
+        const c = left[hit], amt = alone === 'row' ? s[c[0]] : d[c[1]];
+        x.push({ i: c[0], j: c[1], x: amt });
+        s[c[0]] = Rsub(s[c[0]], amt); d[c[1]] = Rsub(d[c[1]], amt);
+        left.splice(hit, 1);
+      }
+      for (const v of s) if (!Rzero(v)) return;
+      for (const v of d) if (!Rzero(v)) return;
+      for (const c of x) if (Rsign(c.x) < 0) return;
+      feasible += 1;
+      let z = R0;
+      for (const c of x) z = Radd(z, Rmul(C[c.i][c.j], c.x));
+      if (best === null || Rcmp(z, best) < 0) best = z;
+    };
+    const walk = (at) => {
+      if (pick.length === want) { solve(); return; }
+      for (let k = at; k < grid.length; k += 1) { pick.push(grid[k]); walk(k + 1); pick.pop(); }
+    };
+    walk(0);
+    return { best: best, trees: trees, feasible: feasible };
+  };
+
+  /* --- reading a tableau in, which is the reader's only door -------------- */
+  {
+    const C = parseGrid(TP.balanced.cost);
+    eq(C.length + 'x' + C[0].length, '3x4', 'the default cost table parses as three rows of four');
+    eq(C.map((r) => r.map(rt).join(',')).join(' | '), '10,2,20,11 | 12,7,9,20 | 4,14,16,18',
+       'entry by entry, semicolons between rows and spaces between entries');
+    eq(parseGrid('1,2;3,4').map((r) => r.map(rt).join(',')).join('|'), '1,2|3,4', 'commas separate too');
+    eq(rt(parseRow('7/2 1/3')[0]) + ',' + rt(parseRow('7/2 1/3')[1]), '7/2,1/3',
+       'a slash is an exact fraction, because Rread is the only reader here');
+    eq(parseGrid('1 2; 3'), null, 'a ragged table is REFUSED rather than padded');
+    eq(parseRow('banana'), null, 'and text that is not a number is null, not NaN');
+    eq(parseGrid(''), null, 'as is nothing at all');
+    eq(parseRow('  4   6  ').map(rt).join(','), '4,6', 'and repeated spaces are one separator, not an empty entry');
+  }
+
+  /* --- C4 L3: balancing CONSERVES, and the dummy costs nothing ------------ */
+  {
+    for (const k of Object.keys(TP)) {
+      const C = parseGrid(TP[k].cost), S = parseRow(TP[k].supply), D = parseRow(TP[k].demand);
+      const bal = balance(S, D, C);
+      eq(rt(sum(bal.supply)), rt(sum(bal.demand)),
+         k + ': total supply equals total demand AFTER balancing, whatever it was before');
+      eq(bal.supply.length, bal.cost.length, k + ': and the cost table grew a row exactly when the supplies did');
+      eq(bal.demand.length, bal.cost[0].length, k + ': or a column exactly when the demands did');
+      /* the real cells are untouched: balancing adds, it does not reprice */
+      let moved = 0;
+      for (let i = 0; i < C.length; i += 1) for (let j = 0; j < C[0].length; j += 1)
+        if (!Requ(bal.cost[i][j], C[i][j])) moved += 1;
+      eq(moved, 0, k + ': and not one real unit cost was changed by it');
+    }
+    eq(balance(parseRow('15 25 10'), parseRow('5 15 15 15')).dummy, null,
+       'the default preset needs no dummy at all');
+    eq(rt(balance(parseRow('15 25 10'), parseRow('5 15 15 15')).totalSupply), '50', 'both sides being 50');
+    const sur = balance(parseRow(TP.surplus.supply), parseRow(TP.surplus.demand), parseGrid(TP.surplus.cost));
+    eq(sur.dummy + ' ' + rt(sur.amount), 'col 10', 'the surplus preset gains a dummy DESTINATION carrying 10');
+    eq(rt(sum(sur.supply)) + '/' + rt(sum(sur.demand)), '75/75', 'which balances 75 against 75');
+    eq(sur.cost.map((r) => rt(r[3])).join(','), '0,0,0',
+       'and every cost in the dummy column is zero, which is the whole of the lesson');
+    const shortfall = balance([ri(4), ri(6)], [ri(5), ri(5), ri(5)],
+                              [[ri(1), ri(2), ri(3)], [ri(4), ri(5), ri(6)]]);
+    eq(shortfall.dummy + ' ' + rt(shortfall.amount), 'row 5', 'unmet demand gains a dummy SOURCE instead');
+    eq(shortfall.cost[2].map(rt).join(','), '0,0,0', 'whose row is zero for the same reason');
+    eq(rt(sum(shortfall.supply)) + '/' + rt(sum(shortfall.demand)), '15/15', 'and the two sides agree again');
+  }
+
+  /* --- C4 L4: MODI reaches the SAME optimum from either start ------------- */
+  const solved = {};
+  {
+    for (const k of Object.keys(TP)) {
+      const C0 = parseGrid(TP[k].cost), S0 = parseRow(TP[k].supply), D0 = parseRow(TP[k].demand);
+      const bal = balance(S0, D0, C0);
+      const C = bal.cost, S = bal.supply, D = bal.demand, m = S.length, n = D.length;
+      const oracle = everyBasicSolution(C, S, D);
+      const nw = northwest(C, S, D), lc = leastCost(C, S, D);
+      solved[k] = { bal: bal, C: C, S: S, D: D, m: m, n: n, oracle: oracle, nw: nw, lc: lc };
+      eq(oracle.feasible > 0, true, k + ': the enumeration finds at least one basic feasible solution');
+      for (const start of [nw, lc]) {
+        for (const rule of ['dantzig', 'bland']) {
+          const run = modiRun(C, start, m, n, { rule: rule });
+          const where = k + ' from the ' + start.rule + ' start under ' + rule;
+          eq(run.capped, false, where + ': the iteration guard is never reached');
+          eq(run.optimal, true, where + ': it stops because no empty cell prices below zero');
+          eq(rt(run.cost), rt(oracle.best),
+             where + ': and it stops at the cheapest of the ' + oracle.feasible
+             + ' basic feasible solutions enumerated, ' + rt(oracle.best));
+          /* the answer is a shipping plan, not just a number */
+          let feasible = true;
+          for (let i = 0; i < m; i += 1) {
+            let t = R0;
+            for (let j = 0; j < n; j += 1) { t = Radd(t, run.x[i][j]); if (Rsign(run.x[i][j]) < 0) feasible = false; }
+            if (!Requ(t, S[i])) feasible = false;
+          }
+          for (let j = 0; j < n; j += 1) {
+            let t = R0;
+            for (let i = 0; i < m; i += 1) t = Radd(t, run.x[i][j]);
+            if (!Requ(t, D[j])) feasible = false;
+          }
+          eq(feasible, true, where + ': every row sums to its supply, every column to its demand, nothing negative');
+          eq(rt(tableauCost(C, run.x)), rt(run.cost),
+             where + ': and the cost it reports is c.x recomputed from the plan it returns');
+          /* the cost never rises; it may stand still, and on the default it does */
+          let rose = 0;
+          for (let q = 1; q < run.iterations.length; q += 1)
+            if (Rcmp(run.iterations[q].cost, run.iterations[q - 1].cost) > 0) rose += 1;
+          eq(rose, 0, where + ': and no iteration ever costs more than the one before it');
+        }
+      }
+    }
+    /* the figure the or_core section proves a different way */
+    eq(rt(solved.balanced.oracle.best), '435',
+       'the default preset costs 435 -- which is what the or_core section gets from the exact simplex through '
+       + 'Phase I with equality rows, and what the enumeration of every spanning tree gets here');
+    eq(solved.balanced.oracle.trees + ' of ' + (12 * 11 * 10 * 9 * 8 * 7) / (6 * 5 * 4 * 3 * 2), '432 of 924',
+       'out of 924 six-cell subsets, 432 are spanning trees');
+    eq(solved.balanced.oracle.feasible, 90, 'and 90 of those trees solve to a NON-NEGATIVE plan');
+    eq(rt(solved.surplus.oracle.best), '605', 'the surplus preset, dummy and all, costs 605');
+    eq(rt(solved.degenerate.oracle.best), '150', 'and the degenerate one 150');
+    /* the two starts are genuinely different, which is what makes "both land on it" a claim */
+    eq(rt(solved.balanced.nw.cost) + ' vs ' + rt(solved.balanced.lc.cost), '520 vs 475',
+       'the north-west corner rule opens at 520 and the least-cost rule at 475');
+    eq(rt(solved.surplus.nw.cost) + ' vs ' + rt(solved.surplus.lc.cost), '765 vs 665', 'on the surplus preset 765 and 665');
+    eq(rt(solved.degenerate.nw.cost) + ' vs ' + rt(solved.degenerate.lc.cost), '240 vs 150',
+       'and on the degenerate one 240 and 150, where the least-cost rule opens ON the optimum');
+    /* the rule changes the path and not the answer */
+    const counts = [];
+    for (const start of ['nw', 'lc']) for (const rule of ['dantzig', 'bland'])
+      counts.push(modiRun(solved.surplus.C, solved.surplus[start], 3, 4, { rule: rule }).iterations.length - 1);
+    eq(counts.join(','), '3,4,3,6',
+       'on the surplus preset Dantzig takes 3 pivots from either start where Bland takes 4 and 6 -- '
+       + 'the entering rule moves the path and not the optimum');
+    const uv0 = uvPotentials(solved.balanced.C, solved.balanced.nw.basis, 3, 4);
+    eq(cn(pickEntering(uv0.reduced, solved.balanced.nw.basis, 3, 4, 'dantzig')) + ' at '
+       + rt(pickEntering(uv0.reduced, solved.balanced.nw.basis, 3, 4, 'dantzig').value), '(3,1) at -9',
+       'Dantzig takes the most negative reduced cost, (3,1) at -9');
+    eq(cn(pickEntering(uv0.reduced, solved.balanced.nw.basis, 3, 4, 'bland')) + ' at '
+       + rt(pickEntering(uv0.reduced, solved.balanced.nw.basis, 3, 4, 'bland').value), '(1,4) at -4',
+       'and Bland the first negative one in row order, (1,4) at -4 -- a different cell on the same tableau');
+    eq(pickEntering(modiRun(solved.balanced.C, solved.balanced.nw, 3, 4, {}).iterations[3].uv.reduced,
+                    modiRun(solved.balanced.C, solved.balanced.nw, 3, 4, {}).iterations[3].basis, 3, 4, 'dantzig'),
+       null, 'and on an optimal tableau neither rule finds anything, which is how the loop ends');
+  }
+
+  /* --- C4 L4: the cycle is a CYCLE, on every pivot of every run ----------- */
+  {
+    let pivots = 0, bad = [];
+    for (const k of Object.keys(TP)) {
+      const S = solved[k];
+      for (const start of [S.nw, S.lc]) for (const rule of ['dantzig', 'bland']) {
+        const run = modiRun(S.C, start, S.m, S.n, { rule: rule });
+        for (const it of run.iterations) {
+          if (!it.cycle || !it.cycle.found) continue;
+          pivots += 1;
+          const cs = it.cycle.cells, where = k + '/' + start.rule + '/' + rule;
+          if (!it.check.ok) bad.push(where + ' checkCycle: ' + it.check.why);
+          if (cs.length < 4 || cs.length % 2 !== 0) bad.push(where + ' length ' + cs.length);
+          /* it CLOSES: corner to corner along a row, then a column, then back
+             to the entering cell's own column. This is the defect the lesson
+             cannot survive, so it is tested corner by corner and wraps. */
+          for (let q = 0; q < cs.length; q += 1) {
+            const next = cs[(q + 1) % cs.length];
+            if (q % 2 === 0) { if (cs[q].i !== next.i) bad.push(where + ' corner ' + q + ' does not share a row'); }
+            else if (cs[q].j !== next.j) bad.push(where + ' corner ' + q + ' does not share a column');
+          }
+          /* signs alternate from the entering cell outwards */
+          for (let q = 0; q < cs.length; q += 1)
+            if (cs[q].sign !== (q % 2 === 0 ? 1 : -1)) bad.push(where + ' corner ' + q + ' has the wrong sign');
+          /* theta is the smallest allocation on a MINUS cell, and that cell leaves */
+          let least = null;
+          for (const c of cs) if (c.sign < 0 && (least === null || Rcmp(c.x, least) < 0)) least = c.x;
+          if (!Requ(least, it.cycle.theta)) bad.push(where + ' theta is not the smallest minus allocation');
+          if (it.cycle.leaving.sign >= 0) bad.push(where + ' the leaving cell is not a minus cell');
+          if (!Requ(it.cycle.leaving.x, it.cycle.theta)) bad.push(where + ' the leaving cell does not attain theta');
+          /* every corner after the entering one is occupied: a cycle may CROSS
+             an empty cell and may only TURN at an occupied one */
+          const occupied = {};
+          for (const b of it.basis) occupied[b.i + ',' + b.j] = true;
+          for (let q = 1; q < cs.length; q += 1)
+            if (!occupied[cs[q].i + ',' + cs[q].j]) bad.push(where + ' turns at the empty cell ' + cn(cs[q]));
+          if (!it.forest.spanning) bad.push(where + ' the basis is not a spanning tree');
+        }
+      }
+    }
+    eq(pivots, 30, 'twelve runs over the three presets take 30 pivots between them');
+    eq(bad.join(' / '), '', 'and every one of their cycles closes, alternates, turns only where something is '
+       + 'allocated, and hands theta to a minus cell that attains it');
+
+    /* the default preset's first cycle is not a rectangle, which is the reason
+       stoneCycle walks the forest instead of looking for one */
+    const run = modiRun(solved.balanced.C, solved.balanced.nw, 3, 4, {});
+    eq(run.iterations.length, 4, 'the default run is three pivots and a verdict');
+    eq(run.iterations.map((it) => rt(it.cost)).join(' -> '), '520 -> 475 -> 475 -> 435',
+       'costing 520, 475, 475 and 435 -- the middle pair EQUAL, because the second pivot is degenerate');
+    eq(run.iterations[0].cycle.cells.length, 6, "the first pivot's cycle has SIX corners, not four");
+    eq(run.iterations[0].cycle.cells.map((c) => cn(c) + (c.sign > 0 ? '+' : '-')).join(' '),
+       '(3,1)+ (3,4)- (2,4)+ (2,2)- (1,2)+ (1,1)-',
+       'running (3,1) (3,4) (2,4) (2,2) (1,2) (1,1) -- a staircase, which no rectangle search finds');
+    eq(rt(run.iterations[0].cycle.theta) + ' at ' + cn(run.iterations[0].cycle.leaving), '5 at (2,2)',
+       'theta is 5 and (2,2) leaves');
+    eq(rt(run.iterations[1].cycle.theta) + ' at ' + cn(run.iterations[1].cycle.leaving), '0 at (1,1)',
+       'the second pivot moves theta = 0 round its cycle, so the basis changes and the cost does not');
+    eq(rt(run.iterations[2].cycle.theta) + ' at ' + cn(run.iterations[2].cycle.leaving), '10 at (2,4)',
+       'and the third moves 10, which is what gets the last 40 off the bill');
+    eq(run.x.map((r) => r.map(rt).join(',')).join(' | '), '0,5,0,10 | 0,10,15,0 | 5,0,0,5',
+       'the plan it lands on ships nothing at all down five of the twelve routes');
+    eq(rt(tableauCost(solved.balanced.C, run.x)), '435', 'and costs 435, priced from the plan rather than tracked');
+    eq(modiRun(solved.balanced.C, solved.balanced.lc, 3, 4, {}).iterations.length, 2,
+       'from the least-cost start the same tableau takes ONE pivot instead of three');
+
+    /* checkCycle can refuse, and each refusal names the thing that broke */
+    const basis = [{ i: 0, j: 1, x: ri(5) }, { i: 1, j: 1, x: ri(5) }, { i: 1, j: 0, x: ri(5) }];
+    const square = [{ i: 0, j: 0, sign: 1 }, { i: 0, j: 1, sign: -1 }, { i: 1, j: 1, sign: 1 }, { i: 1, j: 0, sign: -1 }];
+    eq(checkCycle(square, basis).ok, true, 'a legal four-corner cycle passes');
+    eq(checkCycle(square, [{ i: 0, j: 1, x: ri(5) }, { i: 1, j: 1, x: ri(5) }]).ok, false,
+       'the same path over a basis that does not occupy (2,1) does NOT');
+    eq(checkCycle(square, [{ i: 0, j: 1, x: ri(5) }, { i: 1, j: 1, x: ri(5) }]).why.indexOf('turns at (2,1)') >= 0, true,
+       'and the refusal names the corner it turned at, which is what the tableau rings');
+    eq(checkCycle([{ i: 0, j: 0, sign: 1 }, { i: 0, j: 1, sign: 1 }, { i: 1, j: 1, sign: 1 }, { i: 1, j: 0, sign: -1 }],
+                  basis).why.indexOf('wrong sign') >= 0, true, 'two pluses in a row is refused as a sign error');
+    eq(checkCycle([{ i: 0, j: 0, sign: 1 }, { i: 0, j: 1, sign: -1 }, { i: 0, j: 2, sign: 1 }, { i: 1, j: 2, sign: -1 }],
+                  [{ i: 0, j: 1, x: ri(1) }, { i: 0, j: 2, x: ri(1) }, { i: 1, j: 2, x: ri(1) }]).why.indexOf('row 1 has 3') >= 0,
+       true, 'three corners in one row is refused: a cycle enters and leaves each row once');
+    eq(checkCycle([{ i: 0, j: 0, sign: 1 }, { i: 0, j: 1, sign: -1 }], basis).why.indexOf('four corners') >= 0, true,
+       'two corners is not a cycle');
+    eq(checkCycle([{ i: 0, j: 0, sign: 1 }, { i: 0, j: 1, sign: -1 }, { i: 1, j: 1, sign: 1 },
+                   { i: 1, j: 0, sign: -1 }, { i: 2, j: 0, sign: 1 }],
+                  basis.concat([{ i: 2, j: 0, x: ri(1) }])).why.indexOf('even number') >= 0, true,
+       'and an odd number of corners cannot alternate at all');
+
+    /* basisForest, which is the reason any of the above is well defined */
+    eq(basisForest(solved.balanced.nw.basis, 3, 4).spanning, true,
+       'the six cells the north-west rule leaves are a spanning tree of three rows and four columns');
+    const squareBasis = [{ i: 0, j: 0 }, { i: 0, j: 1 }, { i: 1, j: 0 }, { i: 1, j: 1 }];
+    eq(basisForest(squareBasis, 2, 2).acyclic + ' ' + cn(basisForest(squareBasis, 2, 2).cycle), 'false (2,2)',
+       'a full 2x2 block of basic cells holds a cycle, and the cell that closes it is named');
+    eq(basisForest(squareBasis, 2, 2).why.indexOf('over-determined') > 0, true,
+       'which is reported as the potentials being over-determined, not as a drawing problem');
+    eq(basisForest([{ i: 0, j: 0 }, { i: 1, j: 1 }], 2, 2).components, 2,
+       'two cells on a 2x2 leave the forest in two pieces');
+    eq(basisForest([{ i: 0, j: 0 }, { i: 1, j: 1 }], 2, 2).why.indexOf('no stepping-stone cycle at all') > 0, true,
+       'and then some empty cell has no cycle, which is exactly what the epsilon cell repairs');
+  }
+
+  /* --- C4 L3's note: degeneracy, and where the epsilon cell goes ---------- */
+  {
+    const D = solved.degenerate;
+    eq(D.nw.count + ' of ' + D.nw.want, '5 of 5', 'on the ties preset the north-west rule still occupies m + n - 1 cells');
+    eq(cells(D.nw.epsilon), '(2,1) (3,2)', 'two of which carry ZERO -- the named epsilon cells, not missing ones');
+    eq(D.nw.degenerate, true, 'so the start is reported degenerate');
+    eq(basisForest(D.nw.basis, 3, 3).spanning, true, 'while still being a spanning tree, which is the point of naming them');
+    eq(D.lc.count + ' of ' + D.lc.want, '4 of 5', 'the least-cost rule on the same data leaves one cell SHORT');
+    eq(basisForest(D.lc.basis, 3, 3).components, 2, 'so its basic cells fall into two pieces');
+    eq(uvPotentials(D.C, D.lc.basis, 3, 3).connected, false,
+       'and u + v = c cannot be solved at all: three of the six potentials never get a value');
+    const pad = padBasis(D.lc.basis, 3, 3, D.C);
+    eq(pad.count + ' of ' + pad.want, '5 of 5', 'padBasis restores the count');
+    eq(cells(pad.added), '(1,1)', 'by placing a zero at (1,1)');
+    eq(rt(pad.added[0].cost), '5', 'which costs 5');
+    eq(pad.added.every((c) => Rcmp(c.cost, D.C[c.i][c.j]) === 0), true, 'and the cost it reports is the cell it chose');
+    eq(basisForest(pad.basis, 3, 3).spanning, true, 'the padded basis is a spanning tree');
+    eq(uvPotentials(D.C, pad.basis, 3, 3).connected, true, 'so the potentials are determined again');
+    eq(pad.why.indexOf('joins two pieces') > 0, true,
+       'and the reason given is that it joins two pieces, not that it was convenient');
+    eq(padBasis(D.nw.basis, 3, 3, D.C).added.length, 0, 'a start that is already the right size gains nothing');
+    eq(padBasis(D.nw.basis, 3, 3, D.C).why.indexOf('nothing was added') > 0, true, 'and says so');
+    eq(modiRun(D.C, D.lc, 3, 3, {}).pad.added.length, 1, 'modiRun pads before it starts');
+    eq(rt(modiRun(D.C, D.lc, 3, 3, {}).cost), '150', 'and reaches 150 from a basis that could not be priced');
+    eq(cells(solved.balanced.lc.epsilon), '(2,2)',
+       'the default preset ties too: the least-cost rule leaves a zero at (2,2) with the full count');
+  }
+
+  /* --- C4 L4's misconception: u1 = 0 is a NORMALISATION ------------------- */
+  {
+    const B = solved.balanced;
+    const it0 = modiRun(B.C, B.nw, 3, 4, {}).iterations[0];
+    eq(it0.uv.u.map(rt).join(',') + ' | ' + it0.uv.v.map(rt).join(','), '0,5,3 | 10,2,4,15',
+       'solved with u1 = 0 the potentials are u = (0, 5, 3) and v = (10, 2, 4, 15)');
+    const shifts = [];
+    let moved = true, held = true;
+    for (let a = 0; a < 3 + 4; a += 1) {
+      const kind = a < 3 ? 'u' : 'v', at = a < 3 ? a : a - 3;
+      const sh = shiftPotentials(it0.uv, B.C, kind, at);
+      shifts.push(rt(sh.shift));
+      if (!sh.same) held = false;
+      if (!Rzero(sh.shift)) {
+        for (let i = 0; i < 3; i += 1) if (Requ(sh.u[i], it0.uv.u[i])) moved = false;
+        for (let j = 0; j < 4; j += 1) if (Requ(sh.v[j], it0.uv.v[j])) moved = false;
+      }
+      eq(rt(kind === 'u' ? sh.u[at] : sh.v[at]), '0', 'fixing ' + kind + (at + 1) + ' really does set it to zero');
+    }
+    eq(shifts.join(','), '0,5,3,-10,-2,-4,-15',
+       'the seven normalisations shift the potentials by 0, 5, 3, -10, -2, -4 and -15');
+    eq(moved, true, 'and where the shift is not zero EVERY u and EVERY v moves, none of them staying put');
+    eq(held, true, 'while not one of the twelve reduced costs moves, which is what makes the choice a normalisation');
+    eq(rt(shiftPotentials(it0.uv, B.C, 'u', 0).shift), '0',
+       'fixing u1 shifts nothing, because that is the normalisation the potentials were solved with');
+    eq(shiftPotentials(it0.uv, B.C, 'v', 4), null, 'there is no v5 on a four-column tableau');
+    eq(shiftPotentials(it0.uv, B.C, 'u', -1), null, 'and no u0');
+    eq(shiftPotentials(uvPotentials(solved.degenerate.C, solved.degenerate.lc.basis, 3, 3),
+                       solved.degenerate.C, 'u', 0), null,
+       'and potentials that were never determined cannot be renormalised, which is reported rather than shifted');
+    /* u + v = c on the basic cells, at every iteration of the default run */
+    let off = 0;
+    for (const it of modiRun(B.C, B.nw, 3, 4, {}).iterations)
+      for (const c of it.basis) if (!Requ(Radd(it.uv.u[c.i], it.uv.v[c.j]), B.C[c.i][c.j])) off += 1;
+    eq(off, 0, 'and u_i + v_j = c_ij holds on every basic cell of every iteration');
+  }
+
+  /* --- C4 L3's misconception: pricing the dummy high --------------------- */
+  {
+    const S = solved.surplus, m = S.m, n = S.n, realRows = 3, realCols = 3;
+    let big = S.C[0][0];
+    for (let i = 0; i < realRows; i += 1) for (let j = 0; j < realCols; j += 1)
+      if (Rcmp(S.C[i][j], big) > 0) big = S.C[i][j];
+    eq(rt(big), '16', 'the dearest real route on the surplus preset costs 16');
+    const pen = Rmul(big, ri(10));
+    eq(rt(pen), '160', 'so the lab prices the dummy at ten times that, 160');
+    const Cp = S.C.map((r) => r.slice());
+    for (let i = 0; i < m; i += 1) Cp[i][n - 1] = pen;
+    for (const which of ['nw', 'lc']) {
+      const start = S[which], alt = which === 'lc' ? leastCost(Cp, S.S, S.D) : northwest(Cp, S.S, S.D);
+      const penalised = modiRun(Cp, alt, m, n, {}).x;
+      const bestZero = tableauCost(S.C, modiRun(S.C, start, m, n, {}).x, realRows, realCols);
+      const bestPen = tableauCost(S.C, penalised, realRows, realCols);
+      eq(rt(bestZero), '605', 'from the ' + start.rule + ' start the real shipping bill of the optimum is 605');
+      eq(rt(bestPen), rt(bestZero),
+         'and pricing the dummy at 160 does not move it -- every plan ships the same 10 to the dummy, '
+         + 'so a uniform price adds a CONSTANT and the argmin cannot move');
+      let toDummy = R0;
+      for (let i = 0; i < m; i += 1) toDummy = Radd(toDummy, penalised[i][n - 1]);
+      eq(rt(toDummy), '10', 'the penalised optimum still sends the whole surplus of 10 to the dummy, because it has nowhere else to go');
+      eq(rt(tableauCost(Cp, penalised)), '2205',
+         'so priced through the penalised table the plan reads 2205');
+      eq(rt(tableauCost(Cp, penalised, realRows, realCols)), '605',
+         'and it is the window over the real cells that gets the 1600 charge for goods that never move back off it');
+    }
+    const altLc = leastCost(Cp, S.S, S.D);
+    eq(rt(tableauCost(S.C, S.lc.x, realRows, realCols)) + ' -> '
+       + rt(tableauCost(S.C, altLc.x, realRows, realCols)), '665 -> 635',
+       'the least-cost START does move, from 665 to 635, because it reads the cost table');
+    const altNw = northwest(Cp, S.S, S.D);
+    eq(rt(tableauCost(S.C, S.nw.x, realRows, realCols)) + ' -> '
+       + rt(tableauCost(S.C, altNw.x, realRows, realCols)), '765 -> 765',
+       'and the north-west start does not, because it never reads one');
+    eq(rt(Rmul(pen, S.bal.amount)), '1600',
+       'the constant a price of 160 adds is 1600 -- which is exactly the 2205 against the 605 above');
+  }
+
+  /* --- C4 L6: KOENIG, and the recipe that is not a function -------------- */
+  {
+    /* every vertex cover of the zero pattern, enumerated over all 2^(2n)
+       selections of rows and columns. Nothing here knows about matchings. */
+    const minCovers = (M) => {
+      const n = M.length, zeros = [];
+      for (let i = 0; i < n; i += 1) for (let j = 0; j < n; j += 1) if (Rzero(M[i][j])) zeros.push([i, j]);
+      let size = 2 * n, found = [];
+      for (let mask = 0; mask < (1 << (2 * n)); mask += 1) {
+        let wide = 0;
+        for (let b = 0; b < 2 * n; b += 1) if (mask & (1 << b)) wide += 1;
+        if (wide > size) continue;
+        let ok = true;
+        for (const z of zeros) if (!((mask >> z[0]) & 1) && !((mask >> (n + z[1])) & 1)) { ok = false; break; }
+        if (!ok) continue;
+        if (wide < size) { size = wide; found = []; }
+        const names = [];
+        for (let b = 0; b < 2 * n; b += 1) if (mask & (1 << b)) names.push(b < n ? 'r' + (b + 1) : 'c' + (b - n + 1));
+        found.push(names.join('+'));
+      }
+      return { size: size, covers: found, zeros: zeros.length };
+    };
+    /* the textbook eye test: cover whichever row or column holds the most
+       still-uncovered zeros, and repeat. It has no tie-break, so it is run
+       both ways. */
+    const lineCover = (M, colsFirst) => {
+      const n = M.length, rows = {}, cols = {};
+      let lines = 0;
+      const live = () => {
+        const out = [];
+        for (let i = 0; i < n; i += 1) for (let j = 0; j < n; j += 1)
+          if (Rzero(M[i][j]) && !rows[i] && !cols[j]) out.push([i, j]);
+        return out;
+      };
+      while (live().length) {
+        let pickRow = -1, pickCol = -1, best = -1;
+        const tryRows = () => {
+          for (let i = 0; i < n; i += 1) {
+            if (rows[i]) continue;
+            let c = 0;
+            for (const z of live()) if (z[0] === i) c += 1;
+            if (c > best) { best = c; pickRow = i; pickCol = -1; }
+          }
+        };
+        const tryCols = () => {
+          for (let j = 0; j < n; j += 1) {
+            if (cols[j]) continue;
+            let c = 0;
+            for (const z of live()) if (z[1] === j) c += 1;
+            if (c > best) { best = c; pickCol = j; pickRow = -1; }
+          }
+        };
+        if (colsFirst) { tryCols(); tryRows(); } else { tryRows(); tryCols(); }
+        if (pickRow >= 0) rows[pickRow] = true; else cols[pickCol] = true;
+        lines += 1;
+      }
+      return lines;
+    };
+
+    const matrices = { jobs: parseGrid(AP.jobs), sites: parseGrid(AP.sites), crews: parseGrid(AP.crews),
+      tie: [[4, 2, 8], [4, 3, 7], [3, 1, 6]].map((r) => r.map(ri)),
+      flat: [[2, 2, 2, 2, 2], [2, 2, 2, 2, 2], [2, 2, 2, 2, 2], [2, 2, 2, 2, 2], [2, 2, 2, 2, 2]].map((r) => r.map(ri)),
+      zero: [[0, 0, 0], [0, 0, 0], [0, 0, 0]].map((r) => r.map(ri)),
+      bands: [[5, 5, 5, 5], [1, 2, 3, 4], [4, 3, 2, 1], [5, 5, 5, 5]].map((r) => r.map(ri)),
+      swap: [[7, 3], [3, 7]].map((r) => r.map(ri)) };
+    let steps = 0, off = [];
+    for (const k of Object.keys(matrices)) {
+      const h = hungarian(matrices[k]);
+      for (const s of h.steps) {
+        if (s.kind !== 'cover') continue;
+        steps += 1;
+        const brute = minCovers(s.M);
+        if (s.size !== s.matching.length) off.push(k + ': cover ' + s.size + ' vs matching ' + s.matching.length);
+        if (s.size !== brute.size) off.push(k + ': cover ' + s.size + ' vs enumerated minimum ' + brute.size);
+        if (s.cover.left.length + s.cover.right.length !== s.size) off.push(k + ': the cover does not have its own size');
+        const check = coverCheck(s.M, s.cover);
+        if (!check.ok) off.push(k + ': ' + check.missed.length + ' zeros escape the cover');
+      }
+    }
+    eq(steps, 14, 'eight matrices reach 14 cover steps between them');
+    eq(off.join(' / '), '', 'and at every one of them the minimum cover, the maximum matching and the smallest '
+       + 'of all 2^(2n) row-and-column selections that covers every zero are THE SAME NUMBER -- Koenig, three ways');
+
+    /* the recipe, on the kit's own default preset */
+    const jobsH = hungarian(matrices.jobs);
+    const stuck = jobsH.steps.filter((s) => s.kind === 'cover')[1];
+    eq(stuck.M.map((r) => r.map(rt).join(',')).join(' | '), '0,4,1,2 | 0,3,0,4 | 2,0,1,0 | 1,3,0,4',
+       'at the second cover step of the default assignment preset the reduced matrix holds six zeros');
+    eq(minCovers(stuck.M).size, 3, 'and the minimum cover is 3');
+    eq(minCovers(stuck.M).covers.join(' | '), 'r3+c1+c3', 'attained exactly one way: row 3, column 1 and column 3');
+    eq(stuck.matching.length + ' ' + stuck.size, '3 3', 'which is what the matching and the cover both report');
+    eq(lineCover(stuck.M, false), 4, 'covering the fullest line first, ties to ROWS, draws FOUR lines');
+    eq(lineCover(stuck.M, true), 3, 'ties to COLUMNS, three -- the same rule on the same matrix, two answers');
+    eq(lineCover(stuck.M, false) === matrices.jobs.length, true,
+       'and four is n, so the rows-first reader stops and looks for a complete assignment among the zeros');
+    eq(stuck.matching.length < matrices.jobs.length, true,
+       'while the maximum matching is 3, so there is no complete assignment of zeros to find');
+    const sitesStuck = hungarian(matrices.sites).steps.filter((s) => s.kind === 'cover')[1];
+    eq(minCovers(sitesStuck.M).size + ' ' + lineCover(sitesStuck.M, false) + ' ' + lineCover(sitesStuck.M, true),
+       '3 4 3', 'the sites preset does the same thing at the same step: minimum 3, recipe 4 or 3');
+    eq(minCovers(sitesStuck.M).covers.join(' | '), 'r1+c1+c3', 'with its own unique minimum cover');
+
+    /* coverCheck has to be able to fail, or it checks nothing */
+    const empty = coverCheck(stuck.M, { left: [], right: [], size: 0 });
+    eq(empty.ok + ' ' + empty.missed.length, 'false 6', 'covering nothing leaves all six zeros uncovered');
+    const wrongRow = coverCheck(stuck.M, { left: ['r0'], right: ['c0', 'c2'], size: 3 });
+    eq(wrongRow.ok, false,
+       'and so is a THREE-line selection that is not the minimum one: row 1 instead of row 3');
+    eq(wrongRow.missed.map(cn).join(','), '(3,2),(3,4)',
+       'which names the two zeros that escape it rather than reporting a count that happens to be right');
+  }
+
+  /* --- C4 L6: the method against every permutation ----------------------- */
+  {
+    const exhaustive = (cost) => {
+      const n = cost.length, used = [], perm = [];
+      let best = null, bestPerm = null, count = 0, ties = 0;
+      const walk = (k, z) => {
+        if (k === n) {
+          count += 1;
+          if (best === null || Rcmp(z, best) < 0) { best = z; bestPerm = perm.slice(); ties = 1; }
+          else if (Requ(z, best)) ties += 1;
+          return;
+        }
+        for (let j = 0; j < n; j += 1) {
+          if (used[j]) continue;
+          used[j] = 1; perm.push(j);
+          walk(k + 1, Radd(z, cost[k][j]));
+          perm.pop(); used[j] = 0;
+        }
+      };
+      walk(0, R0);
+      return { best: best, perm: bestPerm, count: count, ties: ties };
+    };
+    const want = { jobs: '49', sites: '275', crews: '38' };
+    const perms = { jobs: 24, sites: 24, crews: 120 };
+    for (const k of Object.keys(AP)) {
+      const cost = parseGrid(AP[k]), n = cost.length;
+      const h = hungarian(cost), ex = exhaustive(cost);
+      eq(ex.count, perms[k], k + ': there are ' + perms[k] + ' complete assignments of ' + n + ' workers');
+      eq(h.complete, true, k + ': and the Hungarian method finds a whole one');
+      eq(rt(h.value), rt(ex.best), k + ': worth exactly the cheapest of all ' + perms[k]);
+      eq(rt(h.value), want[k], k + ': which is ' + want[k]);
+      eq(new Set(h.assignment).size + ' ' + h.assignment.filter((j) => j < 0).length, n + ' 0',
+         k + ': its assignment is a permutation, with nobody left out');
+      let priced = R0;
+      for (let i = 0; i < n; i += 1) priced = Radd(priced, cost[i][h.assignment[i]]);
+      eq(rt(priced), rt(h.value), k + ': and the value it reports is that permutation priced from the cost table');
+    }
+    /* the VALUE is what is optimal, and on one preset the permutation is not unique */
+    const sites = parseGrid(AP.sites);
+    const hs = hungarian(sites), exs = exhaustive(sites);
+    eq(exs.ties, 2, 'the sites preset has TWO optimal assignments');
+    eq(hs.assignment.map((j) => j + 1).join(',') + ' vs ' + exs.perm.map((j) => j + 1).join(','),
+       '4,3,2,1 vs 2,4,3,1',
+       'and the two computations return different ones, so the claim is about the 275 and not about the permutation');
+    eq(Requ(hs.value, exs.best), true, 'which they agree on');
+    /* THE ARGUMENT FOR THE REDUCTIONS, over all 120 permutations rather than
+       stated: taking a constant off a whole row or column moves EVERY complete
+       assignment's cost by the same amount, so it cannot change which one is
+       cheapest. The set of differences has to be a single number. */
+    const crews = parseGrid(AP.crews);
+    const hc = hungarian(crews);
+    const reduced = hc.steps[1].M;
+    let negatives = 0;
+    for (let i = 0; i < 5; i += 1) for (let j = 0; j < 5; j += 1) if (Rsign(reduced[i][j]) < 0) negatives += 1;
+    eq(negatives, 0, 'after both reductions no entry is negative, so the zeros really are the cheapest cells left');
+    const taken = Radd(hc.steps[0].amounts.reduce(Radd, R0), hc.steps[1].amounts.reduce(Radd, R0));
+    eq(rt(hc.steps[0].amounts.reduce(Radd, R0)) + ' + ' + rt(hc.steps[1].amounts.reduce(Radd, R0)), '35 + 2',
+       'the five row minima add to 35 and the five column minima to 2');
+    const spread = {};
+    const seat = [];
+    const both = (k, orig, red) => {
+      if (k === 5) { spread[rt(Rsub(orig, red))] = true; return; }
+      for (let j = 0; j < 5; j += 1) {
+        if (seat[j]) continue;
+        seat[j] = 1;
+        both(k + 1, Radd(orig, crews[k][j]), Radd(red, reduced[k][j]));
+        seat[j] = 0;
+      }
+    };
+    both(0, R0, R0);
+    eq(Object.keys(spread).join(','), '37',
+       'and all 120 assignments are cheaper in the reduced matrix by the SAME 37 -- one difference, not a range, '
+       + 'which is why the reductions cannot change the answer');
+    eq(rt(taken), '37', 'which is exactly the total taken off');
+    eq(rt(exhaustive(reduced).best) + ' + ' + rt(taken), '1 + 37',
+       'the cheapest assignment in the reduced matrix costs 1, because the zeros there do not yet carry a whole one');
+    eq(rt(Radd(exhaustive(reduced).best, taken)), rt(exhaustive(crews).best),
+       'and 1 plus 37 is the answer in the original matrix, 38');
+  }
+
+  /* --- C4 L6's quantity: the dual, added up ------------------------------- */
+  {
+    const want = { jobs: '49', sites: '275', crews: '38' };
+    const traces = { jobs: '32,46,46,47,47,49,49', sites: '245,250,250,270,270,275,275', crews: '35,37,37,38,38' };
+    for (const k of Object.keys(AP)) {
+      const cost = parseGrid(AP[k]), n = cost.length;
+      const h = hungarian(cost), dual = assignDual(cost, h.reduced);
+      eq(dual.consistent, true, k + ': u_i + v_j + M_ij = c_ij in every cell, which is what makes the recovery a recovery');
+      eq(dual.feasible, true, k + ': and u_i + v_j <= c_ij everywhere, so the pair is dual FEASIBLE');
+      eq(rt(dual.total), want[k], k + ': the row and column constants add to ' + want[k]);
+      eq(rt(dual.total), rt(h.value), k + ': which is the cost of the assignment -- strong duality, on this instance');
+      /* the dual objective climbs to the primal one and never dips */
+      const trace = h.steps.map((s) => rt(assignDual(cost, s.M).total));
+      eq(trace.join(','), traces[k], k + ': step by step the dual total goes ' + traces[k]);
+      let dipped = 0;
+      for (let q = 1; q < trace.length; q += 1)
+        if (Rcmp(assignDual(cost, h.steps[q].M).total, assignDual(cost, h.steps[q - 1].M).total) < 0) dipped += 1;
+      eq(dipped, 0, k + ': never dipping, which is why the method stops when the two numbers meet');
+      let feasibleThroughout = true;
+      for (const s of h.steps) if (!assignDual(cost, s.M).feasible || !assignDual(cost, s.M).consistent) feasibleThroughout = false;
+      eq(feasibleThroughout, true, k + ': and the pair is feasible at every step, not only the last');
+    }
+    /* the recovery's own normalisation does not touch the total, because the
+       matrix is square -- which is the claim assignDual's comment makes */
+    const cost = parseGrid(AP.jobs), h = hungarian(cost), d = assignDual(cost, h.reduced);
+    eq(d.u.map(rt).join(',') + ' | ' + d.v.map(rt).join(','), '10,10,9,11 | 0,7,-3,5',
+       'the recovery fixes v1 = 0 and reads the rest off the final matrix');
+    const t = ri(7);
+    const u2 = d.u.map((x) => Radd(x, t)), v2 = d.v.map((x) => Rsub(x, t));
+    let consistent = true;
+    for (let i = 0; i < 4; i += 1) for (let j = 0; j < 4; j += 1)
+      if (!Requ(Radd(Radd(u2[i], v2[j]), h.reduced[i][j]), cost[i][j])) consistent = false;
+    eq(consistent, true, 'adding 7 to every u and taking it off every v is just as valid a recovery');
+    eq(rt(sum(u2.concat(v2))), rt(d.total), 'and adds to the same 49, because a square matrix adds 4t and subtracts 4t');
+  }
+
+  /* --- C4 L6's lab: greed, with a number attached ------------------------- */
+  {
+    const gaps = { jobs: '1', sites: '40', crews: '0' };
+    const values = { jobs: '50', sites: '315', crews: '38' };
+    for (const k of Object.keys(AP)) {
+      const cost = parseGrid(AP[k]), n = cost.length;
+      const h = hungarian(cost), g = greedyAssign(cost);
+      eq(g.complete, true, k + ': cheapest-cell-first does finish on a square matrix');
+      eq(new Set(g.assignment).size, n, k + ': with a permutation');
+      eq(rt(g.value), values[k], k + ': costing ' + values[k]);
+      eq(rt(Rsub(g.value, h.value)), gaps[k], k + ': which is ' + gaps[k] + ' more than the optimum');
+      eq(Rcmp(g.value, h.value) >= 0, true, k + ': greed is never below it, and that is the only thing it guarantees');
+      let cheapest = cost[0][0];
+      for (let i = 0; i < n; i += 1) for (let j = 0; j < n; j += 1) if (Rcmp(cost[i][j], cheapest) < 0) cheapest = cost[i][j];
+      eq(rt(g.order[0].cost), rt(cheapest), k + ': and its first pick really is the cheapest cell in the table');
+      let priced = R0;
+      for (const o of g.order) priced = Radd(priced, o.cost);
+      eq(rt(priced), rt(g.value), k + ': the value it reports is the picks it made, added up');
+    }
+    eq(cn(greedyAssign(parseGrid(AP.sites)).order[0]) + ' at ' + rt(greedyAssign(parseGrid(AP.sites)).order[0].cost),
+       '(2,1) at 35', 'on the sites preset greed opens at (2,1) for 35');
+    eq(rt(greedyAssign(parseGrid(AP.sites)).value) + ' against ' + rt(hungarian(parseGrid(AP.sites)).value),
+       '315 against 275', 'and ends 40 over -- which is what "greedy loses badly here" is worth in money');
+    eq(Rzero(Rsub(greedyAssign(parseGrid(AP.crews)).value, hungarian(parseGrid(AP.crews)).value)), true,
+       'on the crews preset it happens to be right, and a lucky answer with no certificate is still not a method');
+  }
+
+  /* --- the rectangle a reader guesses, and where it breaks ---------------- */
+  {
+    const B = solved.balanced;
+    const run = modiRun(B.C, B.nw, 3, 4, {});
+    eq(run.iterations.map((it) => (it.rect === null ? '-' : (it.rect.ok ? 'closes'
+        : 'refused ' + (it.rect.corner === null ? 'with no rectangle at all' : 'at ' + cn(it.rect.corner))))).join(' | '),
+       'refused at (2,1) | closes | refused with no rectangle at all | -',
+       'on the default view the guess is REFUSED FIRST and closes second -- transport.py\'s docstring has '
+       + 'these two the other way round');
+    /* where it names a corner, that corner really is empty */
+    const occupied = {};
+    for (const c of run.iterations[0].basis) occupied[c.i + ',' + c.j] = true;
+    eq(occupied[run.iterations[0].rect.corner.i + ',' + run.iterations[0].rect.corner.j] === undefined, true,
+       'and (2,1) carries no allocation, which is why the rectangle would turn on nothing');
+    eq(run.iterations[0].rect.cells.length, 4, 'the refused guess is still drawn, as four corners');
+    eq(run.iterations[0].cycle.cells.length, 6,
+       'against the six the walk actually needs -- so the guess is the wrong SHAPE, not a differently drawn cycle');
+    eq(run.iterations[0].rect.why.indexOf('is EMPTY') > 0, true, 'and the refusal says which corner was empty');
+    eq(run.iterations[1].rect.why.indexOf('the guess') > 0 && run.iterations[1].rect.ok, true,
+       'while on the second pivot the guess and the computed cycle agree, and the page says so');
+    eq(modiRun(B.C, B.lc, 3, 4, {}).iterations[0].rect.ok, true,
+       'from the least-cost start the one pivot it needs is a plain rectangle');
+    const S = solved.surplus;
+    eq(modiRun(S.C, S.nw, S.m, S.n, {}).iterations.slice(0, 3).every((it) => it.rect.ok), true,
+       'and on the surplus preset all three of the north-west pivots are rectangles -- the guess is not always wrong, '
+       + 'which is exactly why it has to be checked');
+  }
+
+  /* --- tableauCost, the window that prices the real cells only ----------- */
+  {
+    const C = [[ri(1), ri(10)], [ri(100), ri(1000)]], x = [[ri(1), ri(2)], [ri(3), ri(4)]];
+    eq(rt(tableauCost(C, x)), '4321', 'with no window it prices the whole tableau');
+    eq(rt(tableauCost(C, x, 1, null)), '21', 'a row window drops the dummy row');
+    eq(rt(tableauCost(C, x, null, 1)), '301', 'a column window the dummy column');
+    eq(rt(tableauCost(C, x, 1, 1)), '1', 'and both at once leaves one cell');
+  }
+}
 
 // ==========================================================================
 // Operations Research course five: the `integer` kit's own arithmetic
@@ -7989,9 +8807,24 @@ console.log('sorting and selection: one exact expectation, and the inputs built 
     const PRESET = tagRecords([7, 3, 7, 1, 9, 3, 5, 1]);
     eq(stableRun(PRESET, 'selection').result.violations.length, 2,
        'selection sort reorders two pairs of equal keys on the stability preset');
-    eq(stableRun(PRESET, 'quick').result.violations.length, 1, 'the Lomuto split reorders one');
+    eq(stableRun(PRESET, 'quick').result.violations.length, 2, 'and the Lomuto partition reorders two');
     eq(stableRun(PRESET, 'insertion').result.stable && stableRun(PRESET, 'merge').result.stable, true,
        'and insertion sort and merge sort reorder none');
+    {
+      // THE ASSERTION THAT WAS MISSING: a sort must sort. Only the violation
+      // counts above were pinned, and an unsorted array has a violation count
+      // too -- so the 'quick' arm returned [3,1,2,4] for [1,2,3,4] and every
+      // check passed. The reader saw an "after" row that was not in order.
+      const inputs = [[1,2,3,4], [4,3,2,1], [7,3,7,1,9,3,5,1], [2,2,1], [5], []];
+      let wrong = 0;
+      for (const algo of ['selection', 'insertion', 'merge', 'quick']) {
+        for (const keys of inputs) {
+          const out = stableRun(tagRecords(keys), algo).result.output.map((r) => r.key);
+          if (!out.every((v, i) => i === 0 || out[i - 1] <= v)) { wrong += 1; }
+        }
+      }
+      eq(wrong, 0, 'every stability arm returns its keys in order, on every input');
+    }
     eq(twoKeyPasses([{ major: 3, minor: 70, tag: 1 }, { major: 1, minor: 40, tag: 2 },
                      { major: 3, minor: 20, tag: 3 }, { major: 2, minor: 90, tag: 4 }],
                     'major', 'minor').same, false,
@@ -8259,6 +9092,10531 @@ console.log('algorithms: hash tables and search trees, and the four things they 
         .match(/<circle /g) || []).length, 7,
        'while the tree renderer draws one circle per node, through the shared layout');
   }
+}
+
+// ------------------------------------------------- or_core + simulate kit
+// SIM_JS's own functions are exercised in the or_core section above. This is
+// the KIT on top of it, in scripts/mathpath/labs/simulate.py: the stream, the
+// sampler, the slotted run, the event calendar, the exact transient, the four
+// variance-reduction measurements and the drawings. Every one is a top-level
+// function, so what runs here is the source that ships.
+//
+// FOUR OF THESE ARE REGRESSION TESTS, and each one is a defect this kit had or
+// would have had:
+//
+//   * THE GENERATOR. A power-of-two modulus has low bits that are a cycle and
+//     not a sample, and this kit reduces. Under the glibc constants a thousand
+//     two hundred draws land in four bins 300/300/300/300 -- perfectly level,
+//     asserted below -- and a mode whose claim is that one run is not the
+//     expectation would have been refuting itself. The same defect reached three
+//     other kits before it was caught, so the spread of MINSTD's low bits is
+//     pinned here rather than described in a comment.
+//   * THE SEED. An LCG's k-th value is affine in its seed, so seeds 1 through 8
+//     give eight points on a straight line: the unmixed first draws below step
+//     by exactly 16807 every time. Six of this kit's nine modes ask a reader to
+//     reseed and compare, so the splitmix64 finaliser is load bearing and the
+//     absence of a constant difference is asserted.
+//   * THE CALENDAR'S CONTENTS. Recomputing who is in the system from the clock
+//     alone disagrees with desRun's own count at any instant carrying two
+//     events -- a departure is taken before an arrival at the same time, so the
+//     table said three in system and listed two. The count and the contents are
+//     now one walk of one event list, and their agreement is asserted at every
+//     event.
+//   * THE DRAWN TRANSIENT. E[N_t] at four hundred slots is a fraction with an
+//     eight-hundred-digit denominator; Number(n)/Number(d) of it is
+//     Infinity/Infinity, which is NaN, and a NaN y coordinate draws a curve with
+//     holes and reports nothing. The float is now a BigInt long division, and it
+//     is asserted finite and asserted to agree with the exact value.
+console.log('operations research: the simulation kit, its generator and its four measurements');
+{
+  const SIM_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'simulate.py');
+  const OR_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'or_core.py');
+  const simSrc = fs.readFileSync(SIM_SOURCE, 'utf8');
+  const orSrc = fs.readFileSync(OR_SOURCE, 'utf8');
+  const simBlock = (n) => blockFrom(simSrc, n, SIM_SOURCE);
+  const orBlock = (n) => blockFrom(orSrc, n, OR_SOURCE);
+
+  eval(block('RATIONAL_JS') + block('SURD_JS') + orBlock('ORFMT_JS') + orBlock('SIM_JS')
+     + sysdBlock('STREAM_JS') + sysdBlock('PMF_JS') + sysdBlock('TRACE_JS') + sysdBlock('SLOTTED_JS')
+     + numberBlock('NT_JS')
+     + simBlock('SIMBASE_JS') + simBlock('SIMSURD_JS') + simBlock('SIMDRAW_JS') + simBlock('SIMSTAIR_JS')
+     + simBlock('SIMQ_JS') + simBlock('SIMCHAIN_JS') + simBlock('SIMBINOM_JS'));
+
+  const ri = (v) => R(BigInt(v), 1n);
+  const rf = (n, d) => R(BigInt(n), BigInt(d));
+  const PMF = [[ri(0), rf(1, 16)], [ri(1), rf(4, 16)], [ri(2), rf(6, 16)],
+               [ri(3), rf(4, 16)], [ri(4), rf(1, 16)]];
+
+  /* --- the stream: MINSTD, and the two things that go wrong without it ----- */
+  {
+    eq(simMultiplier() + '/' + simModulus(), '16807/2147483647',
+       'the kit draws from MINSTD -- prime modulus -- and not from the glibc constants');
+    /* The low bits are a SAMPLE, and the test has to be TWO-SIDED. "Not
+       perfectly level" alone is not enough: a purely multiplicative generator
+       with a power-of-two modulus collapses the other way, putting all 1200
+       draws in one bin of four, and a one-sided check passes it. So every bin
+       must be occupied to within a factor of two of its expectation AND the
+       bins must not all be exactly equal. MINSTD's worst deviation over 1200
+       draws is about a third at sixteen bins, which is sampling noise; both
+       failure modes miss these bounds by a mile. */
+    const s = simStream(1, 1200);
+    for (const bins of [4, 8, 16]) {
+      const c = new Array(bins).fill(0), want = 1200 / bins;
+      s.forEach((x) => { c[x % bins] += 1; });
+      eq(c.every((v) => v > want / 2 && v < want * 2), true,
+         'MINSTD mod ' + bins + ' fills every bin within a factor of two of ' + want
+         + ': ' + Math.min.apply(null, c) + ' to ' + Math.max.apply(null, c));
+      eq(c.every((v) => v === want), false,
+         'and is not EXACTLY level across ' + bins + ' bins, which a cycle would be');
+    }
+    /* Both counter-examples, asserted rather than asserted about. */
+    {
+      const lvl = lcgStream(1103515245, 12345, 2147483648, 1, 1200), lc = [0, 0, 0, 0];
+      lvl.forEach((x) => { lc[x % 4] += 1; });
+      eq(lc.join(','), '300,300,300,300',
+         'the glibc mixed stream mod 4 is EXACTLY level -- a cycle, not a sample');
+      const col = lcgStream(1103515245, 0, 2147483648, 1, 1200), cc = [0, 0, 0, 0];
+      col.forEach((x) => { cc[x % 4] += 1; });
+      eq(cc.join(','), '0,1200,0,0',
+         'and dropping its increment collapses every draw into ONE bin -- the other way the same modulus fails');
+    }
+    /* And the seed is mixed, because an LCG is affine in its seed. */
+    const raw = [1, 2, 3, 4, 5, 6, 7, 8].map((k) => lcgStream(16807, 0, 2147483647, k, 1)[0]);
+    const rd = [];
+    for (let i = 1; i < raw.length; i += 1) rd.push(raw[i] - raw[i - 1]);
+    eq(rd.every((v) => v === rd[0]) && rd[0] === 16807, true,
+       'an UNMIXED seed walks a straight line: seeds 1..8 step by exactly 16807');
+    const mixed = [1, 2, 3, 4, 5, 6, 7, 8].map((k) => simStream(k, 1)[0]);
+    const md = [];
+    for (let i = 1; i < mixed.length; i += 1) md.push(mixed[i] - mixed[i - 1]);
+    eq(md.every((v) => v === md[0]), false,
+       'and the splitmix64 finaliser breaks that affinity, so reseeding samples instead of sliding');
+    eq(simSeedState(0) > 0 && simSeedState(0) < simModulus(), true,
+       'the mixed state is in range and never the fixed point 0');
+    eq(simUniform(1, 500).every((u) => Rcmp(u, rf(1, 2)) !== 0), true,
+       'an odd modulus never produces U = 1/2, so no comparison in this kit has a tie to settle');
+  }
+
+  /* --- the sampler, on the worked instance the lesson prints --------------- */
+  {
+    eq(lcgStream(25173, 13849, 65536, 1, 4).join(', '), '39022, 61087, 20196, 45005',
+       'the stated generator from seed 1');
+    const us = streamUniform(25173, 13849, 65536, 1, 200);
+    eq(Rtext(us[0]), '19511/32768', 'whose first U is a fraction, not a decimal');
+    eq(simCumulative(PMF).map((r) => Rtext(r.hi)).join(' '), '1/16 5/16 11/16 15/16 1',
+       'the cumulative table, which IS the sampler');
+    const draws = us.map((u) => sampleFromPmf(PMF, u));
+    const freq = simFrequencies(PMF, draws);
+    eq(freq.map((r) => r.count).join(', '), '10, 42, 86, 49, 13', 'the counts over 200 draws');
+    eq(freq.map((r) => Rtext(r.expected)).join(', '), '25/2, 50, 75, 50, 25/2', 'against the expected counts');
+    eq(freq.map((r) => Rtext(r.empirical)).join(' '), '1/20 21/100 43/100 49/200 13/200',
+       'each empirical frequency an exact fraction of 200');
+    eq(Rtext(sampleMean(draws)), '413/200', 'and the sample mean, exactly');
+    eq(Rtext(simPmfMean(PMF)) + ', ' + Rtext(simPmfVar(PMF)), '2, 1',
+       'the table has mean exactly 2 and variance exactly 1, which is why the halving below is exact');
+    eq(hullDobell(25173n, 13849n, 65536n).join(','), 'true,true,true', 'Hull-Dobell holds for it');
+    eq(lcgRun(25173n, 13849n, 65536n, 1n, 65537n).period, 65536, 'so the period is the full modulus');
+    eq(hullDobell(2n, 4n, 16n).join(','), 'false,false,false',
+       'the kit also offers a generator that fails all three conditions');
+    eq(lcgRun(2n, 4n, 16n, 1n, 20n).period, 1, 'and its stream collapses to a single value');
+    eq(hullDobell(16807n, 0n, 2147483647n)[0], false,
+       'MINSTD itself fails the gcd(c, m) condition, because the theorem is about a MIXED generator');
+    /* simDraws is the same rule in whole numbers, and it is held to it. */
+    for (const seed of [1, 7, 19]) {
+      eq(simDraws(PMF, seed, 400).map(Rtext).join(''),
+         simUniform(seed, 400).map((u) => sampleFromPmf(PMF, u)).map(Rtext).join(''),
+         'simDraws agrees with sampleFromPmf draw for draw, seed ' + seed);
+    }
+    const wide = simBinomPmf(10, rf(4, 5));
+    eq(simDraws(wide, 3, 300).map(Rtext).join(','),
+       simUniform(3, 300).map((u) => sampleFromPmf(wide, u)).map(Rtext).join(','),
+       'and on a table whose denominators are past a double, where the comparison runs in BigInt');
+  }
+
+  /* --- the standard error, and the halving that is exact ------------------- */
+  {
+    const se = [100, 400, 1600].map((n) => simStandardError(simPmfVar(PMF), n));
+    eq(se.map((s) => Rtext(s.q) + '|' + s.k).join(' '), '1/10|1 1/20|1 1/40|1',
+       'sigma/root n at 100, 400 and 1600 is rational here: 1/10, 1/20, 1/40');
+    eq(Rtext(Rsurd(Rdiv(rf(1, 100), rf(1, 400))).q), '2',
+       'the RATIO of two standard errors squares to 4, so it is exactly 2 whatever sigma is');
+    const d = simDraws(PMF, 1, 1600);
+    const s2 = sampleVar(d.slice(0, 100));
+    eq(Rtext(s2), '113/99', 'the sample variance at 100 draws off the kit stream');
+    eq(surdtext(simStandardError(s2, 100)), '(1/330)sqrt(1243)', 'whose standard error is a surd');
+    eq(surdDec(simStandardError(s2, 100), 5), '0.10684', 'printed rounded beside it, and labelled');
+    eq(Rtext(sampleMean(d.slice(0, 400))), '413/200', 'and a 400-draw mean is a fraction');
+  }
+
+  /* --- Chebyshev: squares compared, and the width it costs ----------------- */
+  {
+    const mu = simPmfMean(PMF), varMean = Rdiv(simPmfVar(PMF), ri(100)), means = [];
+    for (let j = 0; j < 40; j += 1) means.push(sampleMean(simDraws(PMF, 1 + 1000 * (j + 1), 100)));
+    const c5 = chebyshevCover(means, mu, ri(5), varMean);
+    const c2 = chebyshevCover(means, mu, ri(2), varMean);
+    const c1 = chebyshevCover(means, mu, ri(1), varMean);
+    eq(Rtext(c5.bound) + ' = ' + Rpct(c5.bound, 0), '24/25 = 96%', 'k = 5 guarantees 24/25, which is 96%');
+    eq(Rtext(c2.bound), '3/4', 'and the folklore k = 2 guarantees 3/4 and nothing more');
+    eq(Rtext(c1.bound), '0', 'while k = 1 guarantees nothing at all, which the page prints rather than hides');
+    eq(Rtext(R(5n, 2n)), '5/2', 'so the width ratio against the folklore is exactly 5/2 -- 2.5 times as WIDE');
+    eq(Rtext(Rmul(R(5n, 2n), R(5n, 2n))), '25/4', 'and matching that width with runs costs 25/4 times as many');
+    eq(Rtext(c5.threshold), '1/4', 'the threshold is k^2 sigma^2/n exactly: no root is taken anywhere');
+    eq(Rtext(c5.coverage) + ' ' + Rtext(c2.coverage) + ' ' + Rtext(c1.coverage), '1 1 5/8',
+       'the coverage seen at k = 5, 2 and 1 -- a count, as an exact fraction');
+    eq(c5.holds && c2.holds, true, 'both guarantees held, by a margin, which is what a worst case does');
+    eq(c5.outside <= c2.outside && c2.outside <= c1.outside, true,
+       'and a wider band can never exclude more replications');
+  }
+
+  /* --- the exact transient, and the three averages the lesson quotes ------- */
+  {
+    const p = rf(2, 5), q = rf(1, 2), tr = simTransient(p, q, 400, 48);
+    eq([0, 1, 2, 3, 4].map((t) => Rtext(simTransientExact(tr, t))).join(', '),
+       '0, 2/5, 3/5, 37/50, 17/20',
+       'E[N_t] from an empty start -- which pins the slot convention, not just the arithmetic');
+    eq(Rtext(geoGeo1(p, q).L), '12/5',
+       'against the stationary mean, from the SAME geoGeo1 the System Design course prints');
+    eq(Rfixed(simExpectedAverage(tr, 0, 100), 4), '1.8624', 'the expected time-average over slots 0 to 99');
+    eq(Rfixed(simExpectedAverage(tr, 0, 400), 4), '2.2443', 'over 0 to 399, after quadrupling the run');
+    eq(Rfixed(simExpectedAverage(tr, 100, 400), 4), '2.3717',
+       'and over 100 to 399, after deleting a quarter of it -- which recovers far more than the quadrupling did');
+    eq(Rcmp(simExpectedAverage(tr, 100, 400), simExpectedAverage(tr, 0, 400)) > 0, true,
+       'so the bias from an empty start is downward, as theory and not as a story about noise');
+    /* The page SAYS "the bias is downward" on whichever configuration is
+       chosen, so it has to be downward on all three of them. */
+    for (const [pn, pd, qn, qd] of [[2, 5, 1, 2], [2, 5, 3, 5], [1, 2, 3, 5]]) {
+      const tk = simTransient(rf(pn, pd), rf(qn, qd), 400, 48);
+      eq(Rcmp(simExpectedAverage(tk, 100, 400), simExpectedAverage(tk, 0, 400)) > 0, true,
+         'and on every configuration the kit offers, including p = ' + pn + '/' + pd + ', q = ' + qn + '/' + qd);
+      eq(Rcmp(simExpectedAverage(tk, 100, 400), geoGeo1(rf(pn, pd), rf(qn, qd)).L) < 0, true,
+         'while still sitting below the stationary mean, which is what "climbing toward it" means');
+    }
+    eq(String(tr.nums[399]).length > 700, true,
+       'the exact numerator at slot 399 is ' + String(tr.nums[399]).length + ' digits');
+    eq(Number.isFinite(tr.values[399]), true,
+       'and the value the curve is DRAWN from is finite -- Number(n)/Number(d) of that fraction is NaN');
+    eq(tr.values[399].toFixed(4), Rfixed(simTransientRaw(tr, 399), 4),
+       'and agrees with the exact value to every digit it is drawn at');
+    eq(Rcmp(simTransientCapMass(tr, 399), rf(1, 1000000)) < 0, true,
+       'the probability mass sitting on the truncation is under one in a million, and is printed');
+    eq(Rtext(geoGeo1(p, rf(3, 5)).L), '6/5', 'the faster server exactly, for the comparison lesson');
+    eq(Rtext(Rsub(geoGeo1(p, q).L, geoGeo1(p, rf(3, 5)).L)), '6/5',
+       'so the true difference the two schemes compete to recover is 6/5');
+  }
+
+  /* --- the run, the calendar, and Little's Law as an identity -------------- */
+  {
+    const p = rf(2, 5), q = rf(1, 2), run = simSlotRun(p, q, 2000, 1);
+    eq(run.arrivals.length === run.services.length, true, 'one service time per arrival');
+    eq(run.arrivals.every((t, i) => i === 0 || t > run.arrivals[i - 1]), true,
+       'arrivals are in order, at most one a slot');
+    eq(run.departs.every((d, i) => d === Math.max(run.arrivals[i], i ? run.departs[i - 1] : 0) + run.services[i]),
+       true, 'first in first out on a single server, never idle while anyone waits');
+    eq(Requ(run.L, R(BigInt(run.area), BigInt(run.T))), true,
+       'the time average is the area under the occupancy curve over the horizon');
+    const little = littleFromTrace(run.arrivals, run.departs);
+    eq(Requ(little.L, Rmul(little.lambda, little.W)), true,
+       'L = lambda W holds on the trace as an identity about averages, with no model at all');
+    eq(Rcmp(Rabs(Rsub(run.L, rf(12, 5))), ri(1)) < 0, true,
+       'and the run lands within 1 of the exact 12/5: ' + Rfixed(run.L, 4));
+    /* The head of a run is the head of the whole run, which is what makes the
+       calendar affordable: desRun's per-event snapshots are quadratic. */
+    const head = simRunHead(run, 12);
+    eq(head.departs.join(','), run.departs.slice(0, 12).join(','),
+       'the truncated head of a run is exactly the head of the whole run');
+    const first = simCalendar(head, 24), again = simCalendar(head, 24);
+    const render = (c) => c.events.map((e) => Rtext(e.t) + e.kind.charAt(0) + e.who + ':' + e.inSystem
+      + '[' + (e.serving === null ? '-' : e.serving) + '|' + e.waiting.join(' ') + ']'
+      + '(' + e.pending.length + '+' + e.pendingMore + ')').join(' ');
+    eq(render(first), render(again),
+       'rendering event i is a pure function of i, so a second window.redrawLab() reproduces the first');
+    eq(first.events.every((e) => e.inSystem === (e.serving === null ? 0 : 1) + e.waiting.length), true,
+       'in system EQUALS in service plus waiting at every event -- the count and the contents are one walk');
+    /* And the contents are the RIGHT ones, not merely the right number of them.
+       The server is first in first out and never idle while anyone is present,
+       so the one in service is the earliest still-present customer: it is not
+       also in the queue, everyone queued arrived after it, and the starts array
+       -- which the walk never consults -- agrees about all of it. */
+    eq(first.events.every((e) => e.serving === null || e.waiting.indexOf(e.serving) < 0), true,
+       'the customer in service is not also listed as waiting');
+    eq(first.events.every((e) => e.waiting.every((w) => w > e.serving)), true,
+       'everyone waiting arrived after the one holding the server, because the queue is first in first out');
+    eq(first.events.every((e) => {
+      const clock = Number(e.t.n) / Number(e.t.d);
+      if (e.serving !== null
+          && !(head.starts[e.serving] <= clock && head.departs[e.serving] > clock)) return false;
+      return e.waiting.every((w) => head.starts[w] > clock && head.arrivals[w] <= clock);
+    }), true,
+       'and the starts the walk never reads agree: the one in service has begun and none of the queue has');
+    eq(first.events.every((e, i) => i === 0 || Rcmp(e.t, first.events[i - 1].t) >= 0), true,
+       'and the clock never goes backwards');
+    eq(first.events[0].kind, 'arrival', 'a run that starts empty starts with an arrival');
+    eq(new Set(first.events.map((e) => e.pending.length + '/' + e.waiting.length)).size > 2, true,
+       'the table takes ' + new Set(first.events.map((e) => e.pending.length + '/' + e.waiting.length)).size
+       + ' distinct shapes over 24 events, which is what makes this lab the hard one');
+    const occ = occupancyTrace(run.arrivals, run.departs, 40);
+    eq(occ.length, 40, 'the occupancy the figure is drawn from is asked for by the slot, not by the run');
+  }
+
+  /* --- antithetic variates: the best case and the worst one ---------------- */
+  {
+    const g = (kind, u) => (kind === 'monotone'
+      ? (Rcmp(u, rf(1, 2)) >= 0 ? R1 : R0)
+      : Rabs(Rsub(u, rf(1, 2))));
+    for (const kind of ['monotone', 'nonmonotone']) {
+      const us = simUniform(8, 64), A = [], B = [], pairMeans = [];
+      for (let i = 0; i < 64; i += 1) {
+        const u = us[i];
+        A.push(g(kind, u)); B.push(g(kind, Rsub(R1, u)));
+        pairMeans.push(Rdiv(Radd(A[i], B[i]), ri(2)));
+      }
+      const vPair = sampleVar(pairMeans), vOne = sampleVar(A), vIndep = Rdiv(vOne, ri(2));
+      eq(Rtext(rhoSquared(A, B)), '1', kind + ': the two draws of a pair are perfectly correlated');
+      if (kind === 'monotone') {
+        eq(pairMeans.every((m) => Requ(m, rf(1, 2))), true, 'every pair mean is exactly 1/2');
+        eq(Rtext(vPair), '0', 'so the variance of the pair mean is exactly 0, against ' + Rtext(vIndep)
+           + ' for an independent pair');
+        eq(Requ(sampleCov(A, B), Rneg(vOne)), true,
+           'because the covariance is exactly minus the variance of one draw -- rho is exactly -1');
+      } else {
+        eq(A.every((x, i) => Requ(x, B[i])), true, 'g(1 - U) is g(U) identically');
+        eq(Requ(vPair, vOne), true, 'so the pair mean has exactly the variance of a single draw');
+        eq(Rtext(Rdiv(vPair, vIndep)), '2',
+           'which is exactly TWICE an independent pair: two draws consumed, one draw of precision');
+        eq(Rsign(sampleCov(A, B)), 1, 'the covariance is positive, and rho is exactly +1');
+      }
+    }
+  }
+
+  /* --- control variates: the vertex, and the known mean it needs ----------- */
+  {
+    const p = rf(2, 5), q = rf(1, 2), X = [], C = [], F = [];
+    for (let j = 0; j < 24; j += 1) {
+      const s = 1 + 977 * j, run = simSlotRun(p, q, 200, s);
+      X.push(run.L); C.push(ri(run.count));
+      const raw = simStream(s + 400000, 200);
+      let c = 0;
+      for (let i = 0; i < 200; i += 1) if (2 * raw[i] < simModulus()) c += 1;
+      F.push(ri(c));
+    }
+    const ctl = controlB(X, C), foreign = controlB(X, F);
+    eq(Requ(ctl.varAt, Rmul(ctl.varRaw, Rsub(R1, ctl.rho2))), true,
+       'the variance at b* is exactly Var X times 1 - rho^2, and both factors are rational');
+    eq(Rsurd(ctl.rho2).k !== 1n, true,
+       'rho itself is irrational here, which is why only rho^2 is ever printed');
+    eq(Rsign(ctl.rho2) >= 0 && Rcmp(ctl.rho2, R1) <= 0, true, 'and rho^2 lies in [0, 1]');
+    for (const d of [rf(1, 7), rf(-1, 3), ri(1), ri(-2), rf(1, 1000)]) {
+      eq(Rcmp(controlVarAt(ctl.quadratic, Radd(ctl.bStar, d)), ctl.varAt) >= 0, true,
+         'b* minimises the quadratic, at offset ' + Rtext(d));
+    }
+    eq(Rtext(Rmul(ri(200), p)), '80',
+       'the arrivals control has mean exactly 80 -- KNOWN, which is the condition the method stands on');
+    eq(Rcmp(ctl.rho2, foreign.rho2) > 0, true,
+       'and it is better correlated (' + Rfixed(ctl.rho2, 4) + ') than a control from another stream ('
+       + Rfixed(foreign.rho2, 4) + ')');
+    eq(Rcmp(Rsub(R1, foreign.rho2), rf(9, 10)) > 0, true,
+       'so a known mean ALONE buys almost nothing: that control leaves the factor above 9/10');
+  }
+
+  /* --- importance sampling: four orders of magnitude, and one refusal ------ */
+  {
+    const P = simBinomPmf(10, rf(1, 2)), at = ri(10);
+    const hit = (x) => Rcmp(x, at) === 0;
+    eq(Rtext(P[10][1]), '1/1024', 'ten fair coins all heads is exactly 1/1024');
+    const good = importanceRun(P, simBinomPmf(10, rf(4, 5)), hit);
+    const bad = importanceRun(P, simBinomPmf(10, rf(1, 5)), hit);
+    const crude = importanceRun(P, P, hit);
+    eq(Rtext(good.estimate) + ' ' + Rtext(bad.estimate), '1/1024 1/1024',
+       'and every q that covers the support is unbiased for it -- the estimate is not where the difference is');
+    eq(Rtext(good.varCrude), '1023/1048576', 'direct sampling has per-draw variance p(1 - p)');
+    eq(Rtext(simBinomPmf(10, rf(4, 5))[10][1]), '1048576/9765625',
+       'under a coin weighted to 4/5 the event has probability (4/5)^10');
+    eq(Rtext(good.rows[10].w), '9765625/1073741824', 'and the weight on it is small');
+    eq(Rtext(good.varIS), '8717049/1099511627776', 'so the per-draw variance is 8717049 over 2^40');
+    eq(Rtext(good.ratio) + ' = ' + Rfixed(good.ratio, 2), '32505856/264153 = 123.06',
+       'the variance is DIVIDED by 32505856/264153');
+    eq(Rtext(bad.rows[10].w), '9765625/1024', 'under a coin weighted to 1/5 the one weight that matters explodes');
+    eq(Rtext(bad.varIS), '1220703/131072', 'and the per-draw variance becomes 1220703/131072');
+    eq(Rtext(Rinv(bad.ratio)) + ' = ' + Rfixed(Rinv(bad.ratio), 2), '295928/31 = 9546.06',
+       'so the variance is MULTIPLIED by 295928/31 -- four orders of magnitude, same estimator');
+    eq(Rtext(crude.ratio), '1', 'sampling from p itself is the identity');
+    eq(crude.rows.every((r) => Requ(r.w, R1)), true, 'with every weight exactly 1');
+    const holed = simHoledPmf(simBinomPmf(10, rf(4, 5)), at);
+    let total = R0;
+    holed.forEach((r) => { total = Radd(total, r[1]); });
+    eq(Rtext(holed[10][1]) + ' ' + Rtext(total), '0 1',
+       'the holed q is a proper distribution that simply never produces the event');
+    const refused = importanceRun(P, holed, hit);
+    eq(refused.refused && refused.estimate === null, true, 'and it is REFUSED rather than answered');
+    eq(/likelihood ratio is undefined/.test(refused.why), true, 'with the reason given');
+    const goodRun = simImportanceRun(P, simBinomPmf(10, rf(4, 5)), at, 2, 2000);
+    const badRun = simImportanceRun(P, simBinomPmf(10, rf(1, 5)), at, 2, 2000);
+    eq(goodRun.hits > 100, true, 'a good q hits the event ' + goodRun.hits + ' times in 2000 draws');
+    eq(Rcmp(Rabs(Rsub(goodRun.estimate, rf(1, 1024))), rf(1, 2048)) < 0, true,
+       'and its running estimate is within half the answer of the answer');
+    eq(badRun.hits + ' ' + Rtext(badRun.estimate), '0 0',
+       'a bad q hits it not once, so its estimate is exactly zero -- not near the answer, AT zero');
+  }
+
+  /* --- the drawings: strings, no document, no NaN -------------------------- */
+  {
+    const stair = simStaircase(simCumulative(PMF), simUniform(1, 12), { width: 660, height: 240 });
+    eq((stair.svg.match(/<rect /g) || []).length, 5, 'the staircase draws one band per outcome');
+    eq((stair.svg.match(/<circle /g) || []).length, 12, 'and one mark per draw shown');
+    const plot = simPlot({ width: 660, height: 230,
+      series: [{ pts: [[0, 1], [1, 2], [2, 3]], tone: 'cyan', dots: true }],
+      bands: [{ pts: [[0, 0, 2], [2, 1, 3]], tone: 'amber' }],
+      rules: [{ y: 2, tone: 'green', label: 'exact' }],
+      spans: [{ x0: 0, x1: 1, tone: 'amber', label: 'discarded' }],
+      marks: [{ x: 1, y: 2, tone: 'purple', label: 'b*' }],
+      drops: [{ x: 1, label: 'clock' }] });
+    eq((plot.svg.match(/<polygon /g) || []).length, 1, 'the ribbon is a single polygon');
+    eq((plot.svg.match(/<path /g) || []).length, 1, 'the series is a single path');
+    eq((plot.svg.match(/<circle /g) || []).length, 4, 'and every sample and the vertex are marked');
+    eq(/NaN|Infinity|undefined/.test(plot.svg), false, 'no coordinate on it is NaN');
+    eq(simPlot({ series: [] }).svg.indexOf('nothing to draw') > 0, true,
+       'and an empty figure says so rather than throwing');
+    eq((simBars([{ label: 'a', value: ri(10), tone: 'amber' },
+                 { label: 'b', value: ri(5), tone: 'green' }], { width: 660 })
+        .svg.match(/<rect /g) || []).length, 2, 'the bars draw one bar each');
+    eq(simEsc('a < b & c'), 'a &lt; b &amp; c', 'reader text is escaped before it reaches innerHTML');
+    eq(simNum(rf(1, 3)), '1/3', 'a short fraction prints exactly');
+    eq(simNum(R(12345678901234567890n, 99999999999999999n)),
+       '123.45679 (exact, shown to 5 places)',
+       'a fraction too wide to read prints a decimal that says it is EXACT and merely shown short');
+    eq(/rounded/.test(simNum(R(12345678901234567890n, 99999999999999999n))), false,
+       'and never says "rounded", which on this course is reserved for the three genuinely irrational figures');
+    eq(simSurd(Rsurd(rf(1, 100))), '1/10', 'a rational root prints as a fraction');
+    eq(simSurd(Rsurd(rf(1, 50)), 4), '(1/10)sqrt(2) = 0.1414 (rounded)',
+       'and an irrational one as a surd with its rounded decimal beside it');
+    eq(simReadInt('abc', 1, 10), null, 'reader input that is not a number is refused, not parsed');
+    eq(simReadInt('70', 1, 10), null, 'nor is one out of range');
+    eq(simReadInt('7', 1, 10), 7n, 'while a good one comes back as a BigInt');
+  }
+}
+
+
+
+// ----------------------------------------------------------------- graphkit
+console.log('graph algorithms: the kit that checks itself against three other answers');
+{
+  /* This section is about AGREEMENT, because that is what the kit's pages show.
+     Three kinds of it, and each is the reason a page can print a verdict:
+
+       against graph.py      `cuts()`, `kruskal()` and `dijkstra()` were written
+                             for another Subject, are undirected, and know
+                             nothing about this representation. `dgToMatrix`
+                             plus `lessonFrom` hand them a graph built here.
+       against an enumeration  every spanning tree, every topological order,
+                             every subset -- so a statement about all of them is
+                             read off a list at a cap this file also tests.
+       against a second algorithm here  Floyd against Bellman-Ford, the one-pass
+                             DAG relaxation against both, and Kosaraju against
+                             mutual reachability computed from the definition.
+
+     The preset graphs asserted on are the ones the pages open with, so a change
+     that breaks a lesson's opening figure fails here rather than in a browser. */
+  const GRAPHKIT_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'graphkit.py');
+  const graphkitSrc = fs.readFileSync(GRAPHKIT_SOURCE, 'utf8');
+  const gkBlock = (name) => blockFrom(graphkitSrc, name, GRAPHKIT_SOURCE);
+  eval(algoBlock('ALGO_JS'));
+  eval(algoCoreBlock('COUNT_JS'));
+  eval(algoCoreBlock('DIGRAPH_JS'));
+  eval(algoCoreBlock('ORACLE_JS'));
+  eval(algoCoreBlock('GRAPHKIT_JS'));
+  eval(gkBlock('GKIT_JS'));
+  eval(graphBlock('GRAPH_JS'));
+
+  const parse = (text, directed) => gkParse(text, directed);
+  const good = (text, directed) => {
+    const p = parse(text, directed);
+    if (p.bad) { fails += 1; console.log('  FAIL parsing ' + text + ': ' + p.bad); }
+    return p.G;
+  };
+  /* Hand a graph built here to graph.py, the way the three checked modes do. */
+  const handOver = (G) => {
+    N = G.n; A = dgToMatrix(G);
+    LESSON = lessonFrom(gkLessonList(G)); useLessonWeights = true;
+  };
+
+  /* --- what a reader types, and what is refused ------------------------- */
+  {
+    eq(good('1>2 4, 2>3 3', true).arcs.map((a) => a.u + '-' + a.v + ':' + a.w).join(' '),
+       '0-1:4 1-2:3', 'a clause is tail, head, weight, and the labels are 1-based on the page');
+    eq(good('1-2, 2-3', false).arcs.every((a) => a.w === 1), true,
+       'a weight left out is 1');
+    eq(good('1>2 -7', true).arcs[0].w, -7, 'and a weight may be negative, which graph.py cannot express');
+    eq(parse('1>1 3', true).bad !== undefined, true, 'a loop is refused');
+    eq(parse('0>2', true).bad !== undefined, true, 'so is a label below 1');
+    eq(parse('1>99', true).bad !== undefined, true, 'and one past the cap');
+    eq(parse('', true).bad !== undefined, true, 'an empty graph is refused rather than drawn empty');
+    eq(parse('1-2-3', true).bad !== undefined, true, 'and so is a clause that is not one arc');
+    eq(gkParseSet('1, 3', 4).set.join(','), '0,2', 'a vertex set is 1-based too');
+    eq(gkParseSet('1, 9', 4).bad !== undefined, true, 'and a vertex the graph does not have is refused');
+    eq(gkParallelPairs(good('1>2, 2>1, 2>3', true)).length, 1,
+       'two arcs between one pair are found, because a matrix cannot hold them');
+    eq(gkOracleReady(good('1>2, 2>1', true)).ok, false, 'so the matrix oracle is not asked about that graph');
+    eq(gkOracleReady(good('1>2, 2>3', true)).ok, true, 'and is asked about one it can hold');
+  }
+
+  /* --- dfstimes: the parenthesis theorem, on every ordered pair ---------- */
+  {
+    const G = good('1>2, 1>4, 2>5, 4>2, 5>4, 3>5, 3>6, 6>3', true);
+    const t = dfsTimes(G, gkRootsFrom(0, 6)).result;
+    const k = edgeKindCounts(classifyEdges(G, t));
+    eq([k.tree, k.back, k.forward, k.cross].join(','), '4,2,1,1',
+       'the opening graph of the timestamp page has all four edge classes on it');
+    const paren = parenthesisCheck(t);
+    eq(paren.overlapping, 0, 'no two intervals overlap without nesting, which is the theorem');
+    eq(paren.violations.length, 0, 'and nesting and descent agree on every one of the 30 ordered pairs');
+    eq(paren.nested + paren.disjoint + paren.overlapping, paren.pairs,
+       'every pair of intervals is nested, disjoint or overlapping, and there are C(6, 2) = '
+       + paren.pairs + ' of them');
+    /* The misconception, computed: read the same arcs undirected and the two
+       directed classes go to zero. Swept over graph.py's own presets so it is a
+       claim about graphs rather than about one drawing. */
+    for (const [preset, n] of [['cycle', 6], ['tree', 7], ['path', 6], ['petersen', 6],
+                               ['complete', 5], ['star', 6], ['bipartite', 6]]) {
+      LESSON = null; useLessonWeights = false; N = n; A = PRESETS[preset](n);
+      const H = dgFromMatrix(A, n, weight, false);
+      const u = gkUndirectedKinds(H, gkRootsFrom(0, n));
+      eq(u.counts.forward + ',' + u.counts.cross, '0,0',
+         'read undirected, ' + preset + ' has no forward and no cross edge');
+      eq(u.counts.tree + u.counts.back, H.arcs.length, 'and every edge is tree or back');
+      eq(u.counts.tree, n - dgComponents(H).length,
+         'with exactly V minus the number of pieces tree edges');
+    }
+  }
+
+  /* --- topo: two orders, and a COUNT for "is it unique" ------------------ */
+  {
+    const diamond = good('1>2, 1>3, 2>4, 3>4', true);
+    eq(topoAllOrders(diamond, 8).result.count, 2, 'a diamond has exactly two topological orders');
+    eq(topoAllOrders(good('1>2, 2>3, 3>4, 4>5', true), 8).result.count, 1,
+       'a chain has one, which is what uniqueness looks like as a number');
+    const free = dgNew(5, true);
+    eq(topoAllOrders(free, 8).result.count, 120, 'five vertices and no arcs have 5! = 120');
+    eq(topoAllOrders(good('1>3, 2>3, 3>4, 3>5, 4>6, 5>6', true), 8).result.count, 4,
+       'and the page’s opening graph has four');
+    for (const spec of ['1>2, 1>3, 2>4, 3>4', '1>3, 2>3, 3>4, 3>5, 4>6, 5>6', '1>2, 2>3, 3>4, 4>5']) {
+      const G = good(spec, true);
+      eq(gkValidOrder(G, topoDfs(G).result.order), true,
+         'reverse finishing order is a valid order of ' + spec);
+      eq(gkValidOrder(G, topoKahn(G).result.order), true, 'and so is Kahn’s');
+      topoAllOrders(G, 8).result.orders.forEach((o) => {
+        eq(gkValidOrder(G, o), true, 'and every enumerated order of ' + spec + ' is valid too');
+      });
+    }
+    const cyc = good('1>2, 2>3, 3>1, 3>4', true);
+    eq(topoDfs(cyc).result.order, null, 'on a cycle no order exists');
+    eq(topoAllOrders(cyc, 8).result.count, 0, 'and the enumeration finds none, which is the same fact twice');
+    eq(gkValidOrder(cyc, [0, 1, 2, 3]), false, 'a plausible-looking order on it is rejected arc by arc');
+    const refuses = (f) => { try { f(); return false; } catch (e) { return /exceeds the exhaustive cap/.test(e.message); } };
+    eq(refuses(() => topoAllOrders(dgNew(9, true), 8)), true,
+       'nine vertices is refused through oracleCap rather than run slowly');
+  }
+
+  /* --- lowlink, kruskal and relax against graph.py, on the pages' own graphs */
+  {
+    const SPECS = ['1-2, 2-3, 3-1, 3-4, 4-5, 5-6, 6-4',
+                   '1-2, 1-3, 2-3, 1-4',
+                   '1-2, 2-3, 3-4, 4-5, 5-1',
+                   '1-2, 2-3, 3-4, 4-5'];
+    for (const spec of SPECS) {
+      const G = good(spec, false);
+      handOver(G);
+      const mine = lowLink(G), theirs = cuts();
+      const pairOf = (a, b) => Math.min(a, b) + '-' + Math.max(a, b);
+      eq(mine.result.bridges.map((b) => pairOf(b.u, b.v)).sort().join(' '),
+         theirs.bridges.map((b) => pairOf(b.edge[0], b.edge[1])).sort().join(' '),
+         'lowLink and delete-and-recount find the same bridges of ' + spec);
+      eq(mine.result.cutVertices.join(','), theirs.cutVertices.join(','),
+         'and the same cut vertices');
+      /* The DFS tree the page draws beside the low-links is dfsTimes'; if the
+         two walks differed the parent column would describe another tree. */
+      const tree = dfsTimes(G).result;
+      for (let v = 0; v < G.n; v += 1) {
+        if (tree.parent[v] === -1) continue;
+        eq(mine.result.d[tree.parent[v]] < mine.result.d[v], true,
+           'the tree the page prints is the walk the low-links came from, on ' + spec);
+      }
+    }
+    /* The parallel pair: a second edge between the same two vertices stops that
+       pair being a bridge, and the matrix oracle cannot be asked at all. */
+    const par = good('1-2, 1-2, 2-3', false);
+    eq(lowLink(par).result.bridges.map((b) => (b.u + 1) + '-' + (b.v + 1)).join(' '), '2-3',
+       'with two edges between 1 and 2 the only bridge is 2-3: exclusion is BY ARC, not by endpoint');
+    eq(gkOracleReady(par).ok, false, 'and the matrix brute force cannot be handed that graph');
+    eq(lowLink(good('1-2, 2-3', false)).result.bridges.length, 2,
+       'while one edge between 1 and 2 leaves both edges bridges');
+
+    for (const spec of ['1-2 4, 1-3 3, 2-3 2, 2-4 5, 3-4 7, 4-5 1, 5-6 6, 5-7 8, 6-7 2',
+                        '1-2 1, 2-3 2, 3-4 3, 4-5 4, 5-6 5, 1-6 9',
+                        '1-2 1, 1-3 2, 1-4 3, 1-5 4, 2-3 5, 2-4 6, 2-5 7, 3-4 8, 3-5 9, 4-5 1']) {
+      const G = good(spec, false);
+      handOver(G);
+      eq(kruskalRun(G).result.weight, kruskal().total,
+         'kruskalRun agrees with graph.py’s own Kruskal on ' + spec);
+      eq(primRun(G, 0).result.weight, kruskal().total,
+         'and growing one tree from a heap reaches the same weight');
+      eq(primRun(G, 0).result.bound, G.arcs.length * ilog2(Math.max(2, G.n)),
+         'the E log V column is ilog2 from the shipped block, not a second logarithm');
+      eq(gkHeapBound(G), primRun(G, 0).result.bound, 'and the kit computes the same reference');
+      for (const source of [0, 1, G.n - 1]) {
+        handOver(G);
+        const theirs = dijkstra(source);
+        for (const sched of ['heap', 'scan', 'insertion']) {
+          const run = relaxRun(G, source, sched);
+          eq(gkSameDistances(run.result.dist, theirs.dist), true,
+             'the ' + sched + ' schedule reaches graph.py’s distances from ' + (source + 1));
+          const inv = relaxInvariant(G, source, run);
+          eq(inv.holds, true, 'and d[v] is never below the true distance at any step of it');
+          eq(inv.exact, true, 'and every label ends exact');
+        }
+        eq(relaxRun(G, source, 'heap').counts.relaxations
+           === relaxRun(G, source, 'insertion').counts.relaxations, false,
+           'while the three schedules do different amounts of work for that one answer');
+      }
+    }
+  }
+
+  /* --- scc: Kosaraju against mutual reachability, straight from the definition */
+  {
+    for (const spec of ['1>2, 2>3, 3>1, 3>4, 4>5, 5>6, 6>4, 5>7',
+                        '1>2, 2>3, 3>4, 4>1',
+                        '1>2, 2>3, 1>3, 3>4',
+                        '1>2, 2>1, 2>3, 3>4, 4>3']) {
+      const G = good(spec, true);
+      const mine = kosaraju(G).result, brute = sccBrute(G);
+      eq(samePartition(mine.components, brute.components), true,
+         'Kosaraju and mutual reachability agree on the components of ' + spec);
+      eq(mine.condensationAcyclic, true, 'and the condensation of ' + spec + ' is acyclic');
+      /* The misconception, computed: decreasing finish order names a SOURCE of
+         the condensation, which is why the second pass is on the transpose. */
+      const home = mine.componentOf[mine.order[0]];
+      eq(dgIndeg(mine.condensation, home), 0,
+         'the latest finishing vertex lies in a component nothing points into, on ' + spec);
+    }
+    eq(kosaraju(good('1>2, 2>1, 2>3, 3>4, 4>3', true)).result.components
+       .map((c) => '{' + c.map((v) => v + 1).join(' ') + '}').join(' '), '{1 2} {3 4}',
+       'and the source component is found before the sink one');
+  }
+
+  /* --- the cut property, against EVERY spanning tree and EVERY cut -------- */
+  {
+    const G = good('1-2 4, 1-3 3, 2-3 2, 2-4 5, 3-4 7, 4-5 1, 5-6 6', false);
+    let checked = 0;
+    forEachSubset(G.n, (mask) => {
+      if (mask === 0 || mask === (1 << G.n) - 1) return;
+      const S = maskMembers(mask, G.n);
+      const v = cutVerdict(G, S, 7);
+      if (!v.lightest) return;
+      checked += 1;
+      eq(v.inSome, true, 'the lightest edge across {' + S.map((x) => x + 1).join(',')
+         + '} is in some minimum spanning tree');
+      if (v.ties === 1) {
+        eq(v.inEvery, true, 'and being STRICTLY lightest across it, in every one');
+      }
+    });
+    eq(checked, 62, 'checked on all 2^6 - 2 proper cuts of the page’s opening graph');
+    const v0 = cutVerdict(G, [0, 1, 2], 7);
+    eq(v0.trees + ',' + v0.msts + ',' + v0.minWeight, '8,1,17',
+       'eight spanning trees, one of them minimum, at weight 17');
+    eq(v0.unique, true, 'so with distinct weights the minimum tree is unique');
+    eq(kruskalRun(G).result.weight, v0.minWeight,
+       'and the enumeration agrees with the sorted, union-find method');
+    /* The cycle property is the same table read the other way: an arc in no
+       minimum tree is the heaviest on a cycle. */
+    const cyc = good('1-2 1, 2-3 2, 3-4 3, 4-1 9, 2-4 4', false);
+    const vc = cutVerdict(cyc, [0], 7);
+    eq(vc.perArc.map((c, id) => c === 0 ? id : -1).filter((x) => x >= 0).join(','), '3,4',
+       'the two arcs each heaviest on a cycle are in NO minimum spanning tree');
+    eq(vc.mstList.length + ',' + vc.minWeight, '1,6', 'and the one minimum tree weighs 6');
+    /* The other misconception: each vertex's own lightest edge. */
+    const per = good('1-2 1, 2-3 5, 3-4 1, 4-5 6, 5-6 1', false);
+    const lp = lightestPerVertex(per);
+    eq(lp.arcs.length + ',' + lp.spans + ',' + lp.pieces, '3,false,3',
+       'the lightest edge at each vertex gives three edges on six vertices: not a spanning tree');
+    const vp = cutVerdict(per, [0], 7);
+    lp.arcs.forEach((id) => {
+      eq(vp.perArc[id] > 0, true, 'though every one of them IS in a minimum spanning tree');
+    });
+  }
+
+  /* --- rounds, one pass, and the matrix, each against the others ---------- */
+  {
+    const neg = good('1>2 6, 1>3 7, 2>3 8, 2>4 5, 2>5 -4, 3>4 -3, 3>5 9, 4>2 -2, 5>1 2, 5>4 7', true);
+    const bf = bellmanFordRounds(neg, 0).result;
+    eq(bf.dist.join(','), '0,2,7,4,-2', 'the page’s negative-weight graph has these distances');
+    eq(bf.negativeCycle, null, 'and no negative cycle, which is what makes them exist');
+    for (let v = 0; v < neg.n; v += 1) {
+      const arcs = gkArcsOnPath(bf.parent, 0, v);
+      eq(bf.finalAt[v] <= arcs, true,
+         'label ' + (v + 1) + ' became final no later than the ' + arcs + ' arcs on its own path');
+    }
+    /* The bound is an upper bound and the ARC ORDER decides how tight it is --
+       the two chain examples on the page differ by nothing else. */
+    const worst = good('5>6 1, 4>5 1, 3>4 1, 2>3 1, 1>2 1', true);
+    const best = good('1>2 1, 2>3 1, 3>4 1, 4>5 1, 5>6 1', true);
+    eq(bellmanFordRounds(worst, 0).result.finalAt.join(','), '0,1,2,3,4,5',
+       'typed backwards, one label becomes final per round');
+    eq(bellmanFordRounds(best, 0).result.finalAt.join(','), '0,1,1,1,1,1',
+       'typed forwards, every label becomes final in the first round');
+    eq(bellmanFordRounds(worst, 0).result.dist.join(','),
+       bellmanFordRounds(best, 0).result.dist.join(','), 'and both reach the same distances');
+    const cyc = good('1>2 1, 2>3 -3, 3>4 1, 4>2 1', true);
+    eq(bellmanFordRounds(cyc, 0).result.negativeCycle.map((v) => v + 1).join(' '), '2 3 4 2',
+       'a negative cycle comes back as the cycle itself');
+    /* Floyd against the rounds method, every pair, and the diagonal as the
+       negative-cycle detector it is. */
+    for (const spec of ['1>2 6, 2>4 9, 3>2 2, 4>3 8',
+                        '1>2 6, 1>3 7, 2>3 8, 2>4 5, 2>5 -4, 3>4 -3, 3>5 9, 4>2 -2, 5>1 2, 5>4 7',
+                        '1>2 1, 2>3 1, 3>4 1, 4>5 1']) {
+      const G = good(spec, true);
+      const F = floydSteps(dgWeightMatrix(G)).result;
+      eq(F.negativeCycleAt.length, 0, 'no negative diagonal on ' + spec);
+      for (let i = 0; i < G.n; i += 1) {
+        eq(F.dist[i].join(','), bellmanFordRounds(G, i).result.dist.join(','),
+           'the matrix row from ' + (i + 1) + ' is the rounds method’s answer, on ' + spec);
+      }
+    }
+    eq(floydSteps(dgWeightMatrix(good('1>2 6, 2>4 9, 3>2 2, 4>3 8', true))).result.dist[0][2], 23,
+       'and 1 to 3 is 23 through TWO interior vertices, which the k loop must be outermost to find');
+    eq(floydSteps(dgWeightMatrix(good('1>2 1, 2>3 -3, 3>4 1, 4>2 1', true)))
+       .result.negativeCycleAt.length > 0, true,
+       'a negative cycle shows on the diagonal with no separate check');
+    const path = floydSteps(dgWeightMatrix(good('1>2 6, 2>4 9, 3>2 2, 4>3 8', true))).result;
+    eq(gkPathText(floydPath(path.next, 0, 2)), '1 → 2 → 4 → 3',
+       'and next[] rebuilds that path one hop at a time');
+  }
+
+  /* --- one pass in topological order, and where the settled set goes wrong */
+  {
+    const dag = good('1>2 3, 1>3 2, 2>4 4, 3>4 1, 4>5 2, 3>5 7, 5>6 1', true);
+    eq(dagRelax(dag, 0, 1).result.dist.join(','), '0,3,2,3,5,6', 'one pass gives shortest paths');
+    eq(dagRelax(dag, 0, -1).result.dist.join(','), '0,3,2,7,9,10', 'and the sign flipped, longest');
+    eq(dagRelax(dag, 0, 1).counts.relaxations, dag.arcs.length,
+       'in exactly one relaxation per arc, because nothing is relaxed twice');
+    eq(dagRelax(dag, 0, -1).result.slack.join(','), '0,0,0,0,0,0',
+       'on the longest reading every vertex here is on a critical path, so nothing has slack');
+    eq(dagRelax(dag, 0, -1).result.latest.join(','), '0,3,2,7,9,10',
+       'the latest each may sit is its earliest, because the backward pass is SEEDED at the far '
+       + 'end and takes the minimum over successors -- doing either the other way reports slack '
+       + 'on a vertex that is on every critical path');
+    eq(dagRelax(dag, 0, 1).result.slack.join(','), '0,4,0,0,0,0',
+       'while on the shortest reading vertex 2 is 4 longer than necessary, and slack is never '
+       + 'negative under either reading');
+    eq(dagRelax(dag, 0, 1).result.extreme + ',' + dagRelax(dag, 0, -1).result.extreme, '5,5',
+       'and the far end is the largest distance under either sign, because the longest path is '
+       + 'the negated weights and not a reversed comparison');
+    /* THE COMPARISON THE PAGE PRINTS. On a DAG with a negative arc the settled
+       set is wrong and the one pass is right, and the gap is a vertex whose
+       outgoing arcs were relaxed from a label that later improved. */
+    const trap = good('1>2 2, 1>3 3, 3>2 -2, 2>4 1', true);
+    eq(dagRelax(trap, 0, 1).result.dist.join(','), '0,1,3,2',
+       'one pass in topological order is right on the negative arc');
+    eq(bellmanFordRounds(trap, 0).result.dist.join(','), '0,1,3,2', 'the rounds method agrees');
+    eq(relaxRun(trap, 0, 'heap').result.dist.join(','), '0,1,3,3',
+       'and nearest-unsettled-first is WRONG at the far end: 2 was settled, its arc to 4 was '
+       + 'relaxed from the label it had then, and nothing went back');
+    /* Negating a graph with a cycle is the thing the trick cannot survive. */
+    const cyc = good('1>2 3, 2>3 2, 3>1 1, 3>4 5', true);
+    eq(topoDfs(cyc).result.acyclic, false, 'a graph with a cycle has no topological order');
+    eq(dagRelax(cyc, 0, 1).result.dist, null, 'so the one pass refuses rather than returning numbers');
+    eq(gkNegate(cyc).arcs.map((a) => a.w).join(','), '-3,-2,-1,-5', 'negating flips every weight');
+    eq(bellmanFordRounds(gkNegate(cyc), 0).result.negativeCycle !== null, true,
+       'and the negated cycle is a NEGATIVE cycle, so no longest walk exists to be found');
+  }
+}
+
+// ----------------------------------------------------------------- flowkit
+console.log('flow: the algorithm that certifies its own answer, checked against every cut');
+{
+  /* THE SPINE, asserted on every network the four pages open with: the value
+     the augmenting-path algorithm reaches, the capacity of the cut it reads off
+     its own final residual network, and the smallest capacity among EVERY set
+     holding the source and not the sink. Three numbers by three routes, and the
+     theorem is that they are one number.
+
+     The rest of this section is the four misconceptions, each computed rather
+     than described: a forward-only search that stops below the maximum, a full
+     arc that is in no cut, a matching nothing can be added to that is not
+     maximum, and a vertex capacity that needs no new algorithm. */
+  const FLOWKIT_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'flowkit.py');
+  const flowkitSrc = fs.readFileSync(FLOWKIT_SOURCE, 'utf8');
+  const fkBlock = (name) => blockFrom(flowkitSrc, name, FLOWKIT_SOURCE);
+  eval(algoCoreBlock('COUNT_JS'));
+  eval(algoCoreBlock('DIGRAPH_JS'));
+  eval(algoCoreBlock('ORACLE_JS'));
+  eval(algoCoreBlock('FLOW_JS'));
+  eval(fkBlock('FKIT_JS'));
+
+  const net = (text) => {
+    const p = fkParse(text);
+    if (p.bad) { fails += 1; console.log('  FAIL parsing ' + text + ': ' + p.bad); }
+    return p.G;
+  };
+
+  /* --- what a reader types ----------------------------------------------- */
+  {
+    eq(net('1>2 16, 2>3 4').arcs.map((a) => a.u + '-' + a.v + ':' + a.cap).join(' '),
+       '0-1:16 1-2:4', 'a clause is tail, head, capacity, and the capacity lands on cap');
+    eq(net('1>2').arcs[0].cap, 1, 'a capacity left out is 1');
+    eq(fkParse('1>2 -3').bad !== undefined, true, 'a negative capacity is refused');
+    eq(fkParse('1>1 3').bad !== undefined, true, 'and so is a loop');
+    eq(fkParse('1-2 3').bad !== undefined, true,
+       'and so is an undirected clause: every arc in a flow network points one way');
+    eq(fkParsePairs('2-1, 1-2', 2, 2).pairs.map((p) => p.join('')).join(' '), '10 01',
+       'a bipartite pair is left then right, 1-based');
+    eq(fkParsePairs('3-1', 2, 2).bad !== undefined, true, 'a pair off the left side is refused');
+    eq(net('1>2 3, 1>2 4, 2>3 5').arcs.length, 3,
+       'two arcs between the same pair are TWO arcs, which is what the flow array is indexed by');
+  }
+
+  /* --- the spine: three routes to one number ------------------------------ */
+  {
+    const CASES = [
+      ['1>2 16, 1>3 13, 2>3 10, 3>2 4, 2>4 12, 3>5 14, 4>3 9, 5>4 7, 4>6 20, 5>6 4', 0, 5, 23],
+      ['1>2 1, 1>3 1, 2>3 1, 2>4 1, 3>4 1', 0, 3, 2],
+      ['1>2 100, 1>3 100, 2>3 1, 2>4 100, 3>4 100', 0, 3, 200],
+      ['1>2 3, 1>2 4, 2>3 5', 0, 2, 5],
+      ['1>2 1, 2>3 1, 3>4 5, 1>4 1', 0, 3, 2],
+      ['1>2 1, 2>3 1, 3>4 1', 0, 3, 1],
+      ['1>2 5, 2>3 5, 3>2 9, 3>4 5, 2>4 1', 0, 3, 5],
+    ];
+    for (const [spec, s, t, want] of CASES) {
+      const G = net(spec);
+      const run = maxflow(G, s, t);
+      const cut = minCutFrom(G, run.result.flow, s);
+      const brute = minCutBrute(G, s, t, 10);
+      eq(run.result.value, want, 'the maximum flow of ' + spec + ' is ' + want);
+      eq(cut.capacity, run.result.value,
+         'and the cut read off its own residual network has exactly that capacity');
+      eq(brute.result.capacity, run.result.value,
+         'and so does the smallest of all ' + brute.result.count + ' cuts, found without a flow');
+      eq(cutIsMinimum(brute, cut.S), true, 'the cut the algorithm returned is one of the smallest');
+      eq(cut.allSaturated, true, 'every arc leaving the cut is full, or the search would have crossed it');
+      eq(fkCheckFlow(G, run.result.flow, s, t).ok, true,
+         'and what came back is a flow: conserved inside, and inside every capacity');
+      eq(run.result.conserved, true, 'which maxflow also reports for itself');
+    }
+    /* Capacity leaving, and capacity coming back, are different sums. */
+    const back = net('1>2 5, 2>3 5, 3>2 9, 3>4 5, 2>4 1');
+    const inS = [true, true, true, false];
+    eq(cutCapacity(back, inS) + ',' + cutBack(back, inS), '6,0',
+       'the cut {1,2,3} leaves 5 and 1 and takes nothing back');
+    const inS2 = [true, true, false, false];
+    eq(cutCapacity(back, inS2) + ',' + cutBack(back, inS2), '6,9',
+       'while {1,2} has 9 coming back into it, and that 9 counts for NOTHING in its capacity');
+  }
+
+  /* --- the backward arc, and what happens without it ---------------------- */
+  {
+    const trap = net('1>2 1, 1>3 1, 2>3 1, 2>4 1, 3>4 1');
+    const dfsNo = fkAugmentations(trap, 0, 3, { rule: 'dfs', reverse: false });
+    const dfsYes = fkAugmentations(trap, 0, 3, { rule: 'dfs', reverse: true });
+    const bfsNo = fkAugmentations(trap, 0, 3, { rule: 'bfs', reverse: false });
+    eq(dfsNo.value, 1, 'first path found, no backward arcs: the search stops at 1');
+    eq(dfsYes.value, 2, 'the same rule WITH backward arcs reaches 2, which is the maximum');
+    eq(bfsNo.value, 2,
+       'and the shortest-path rule never takes the middle arc, so it does not need one here -- '
+       + 'which is why the failure is exhibited with a rule and not with a hand-picked path');
+    eq(dfsNo.steps[0].path.length, 3, 'the first path it took has three arcs, through the middle');
+    eq(dfsNo.steps[dfsNo.steps.length - 1].reachable.join(','), '0,2',
+       'and afterwards the search reaches only 1 and 3, though no arc out of the source is full');
+    eq(trap.arcs[0].cap - dfsNo.flow[0], 0, 'arc 1 to 2 is full');
+    eq(trap.arcs[1].cap - dfsNo.flow[1], 1, 'while arc 1 to 3 still has spare capacity');
+    const usedBack = dfsYes.steps.some((st) => st.path
+      && st.path.some((rid) => !st.residual.meta[rid].forward));
+    eq(usedBack, true, 'the augmentation that finished it used a backward arc');
+    eq(fkCheckFlow(trap, dfsNo.flow, 0, 3).ok, true,
+       'the stuck flow is still a legal flow -- it is maximal and not maximum, which is the point');
+    /* The path RULE costs augmentations, on a network where the choice shows. */
+    const zig = net('1>2 100, 1>3 100, 2>3 1, 2>4 100, 3>4 100');
+    const byBfs = fkAugmentations(zig, 0, 3, { rule: 'bfs', reverse: true });
+    const byDfs = fkAugmentations(zig, 0, 3, { rule: 'dfs', reverse: true });
+    eq(byBfs.value + ',' + byDfs.value, '200,200', 'both rules reach the maximum');
+    eq(byBfs.augmentations < byDfs.augmentations, true,
+       'and the shortest-path rule gets there in fewer augmentations: ' + byBfs.augmentations
+       + ' against ' + byDfs.augmentations);
+    eq(maxflow(zig, 0, 3).result.augmentations, byBfs.augmentations,
+       'which is the rule maxflow itself uses');
+  }
+
+  /* --- full is not the same as being in a cut ----------------------------- */
+  {
+    const G = net('1>2 1, 2>3 1, 3>4 5, 1>4 1');
+    const run = maxflow(G, 0, 3), f = run.result.flow;
+    const cut = minCutFrom(G, f, 0);
+    const sat = saturatedArcs(G, f);
+    const inCut = {};
+    cut.arcs.forEach((e) => { inCut[e.id] = true; });
+    const loose = sat.filter((id) => !inCut[id]);
+    eq(sat.length + ',' + cut.arcs.length, '3,2', 'three arcs are full and two of them are the cut');
+    eq(loose.map((id) => (G.arcs[id].u + 1) + '->' + (G.arcs[id].v + 1)).join(','), '2->3',
+       'the third full arc is 2 to 3, which is in no cut at all');
+    eq(reachesWithout(G, loose, 0, 3).reaches, true,
+       'and deleting it leaves the sink reachable, so being full does not make an arc a cut');
+    eq(reachesWithout(G, cut.arcs.map((e) => e.id), 0, 3).reaches, false,
+       'while deleting the cut does separate them, which is what a cut IS');
+    /* Several minimum cuts: the algorithm returns one and the enumeration finds
+       them all, so "the minimum cut" is a set and not the set. */
+    const chain = net('1>2 1, 2>3 1, 3>4 1');
+    const b = minCutBrute(chain, 0, 3, 10);
+    eq(b.result.minimal.length, 3, 'a chain of three unit arcs has three different minimum cuts');
+    eq(cutIsMinimum(b, minCutFrom(chain, maxflow(chain, 0, 3).result.flow, 0).S), true,
+       'and the one the algorithm returns is among them');
+  }
+
+  /* --- matching, four answers, one number --------------------------------- */
+  {
+    const CASES = [
+      [2, 2, [[1, 1], [0, 1], [1, 0]], 2],
+      [3, 3, [[0, 0], [0, 1], [1, 1], [1, 2], [2, 0], [2, 2]], 3],
+      [3, 2, [[0, 0], [1, 0], [2, 0], [2, 1]], 2],
+      [4, 4, [[0, 0], [1, 0], [2, 0], [3, 0], [3, 3]], 2],
+    ];
+    for (const [left, right, pairs, want] of CASES) {
+      const n = matchingNetwork(left, right, pairs);
+      const run = maxflow(n.graph, n.s, n.t), f = run.result.flow;
+      const m = matchingFrom(n, f), cover = konigCover(n, f);
+      const brute = matchingBrute(pairs, 16);
+      eq(run.result.value, want, 'the maximum matching on ' + left + ' and ' + right
+         + ' with ' + pairs.length + ' pairs is ' + want);
+      eq(m.length, run.result.value, 'the saturated middle layer IS the matching');
+      eq(cover.size, run.result.value,
+         'and the cut read as a vertex cover has the same size, which is the theorem');
+      eq(brute.result.value, run.result.value,
+         'as does the largest subset of the pairs with no shared end, found without a network');
+      eq(f.every((x) => x === Math.round(x) && x >= 0), true,
+         'every flow value is a whole number, because every capacity is 1');
+      /* Every matched pair is covered, which is what makes the cover a cover. */
+      const inCover = { left: {}, right: {} };
+      cover.cover.forEach((c) => { inCover[c.side][c.v] = true; });
+      pairs.forEach((p) => {
+        eq(!!(inCover.left[p[0]] || inCover.right[p[1]]), true,
+           'the pair L' + (p[0] + 1) + '-R' + (p[1] + 1) + ' is covered by one of its ends');
+      });
+      if (want < left) {
+        const hall = hallDeficient(n, f, pairs);
+        eq(hall.deficient, true,
+           'and where the matching misses a left vertex the cut exhibits a deficient set');
+        eq(hall.neighbours.length < hall.S.length, true,
+           'with |N(S)| = ' + hall.neighbours.length + ' below |S| = ' + hall.S.length);
+      }
+    }
+    /* MAXIMAL is not MAXIMUM, and the order the pairs are taken in decides it. */
+    const pairs = [[1, 1], [0, 1], [1, 0]];
+    eq(greedyMatching(pairs).length, 1,
+       'taking the pairs in that order gives one pair and blocks both others');
+    eq(matchingBrute(pairs, 16).result.value, 2, 'while the maximum is two');
+    eq(greedyMatching([[0, 1], [1, 0], [1, 1]]).length, 2,
+       'and the same three pairs in another order give two: maximal is a property of the ORDER');
+    const refuses = (f2) => { try { f2(); return false; } catch (e) { return /exceeds the exhaustive cap/.test(e.message); } };
+    const many = [];
+    for (let i = 0; i < 17; i += 1) many.push([i % 4, (i * 3) % 4]);
+    eq(refuses(() => matchingBrute(many, 16)), true,
+       'seventeen pairs is refused through oracleCap rather than run slowly');
+  }
+
+  /* --- the gadgets: the graph changes, the algorithm does not ------------- */
+  {
+    const G = net('1>2 5, 1>3 4, 2>4 3, 3>4 6, 2>3 2');
+    const plain = maxflow(G, 0, 3).result.value;
+    eq(plain, 9, 'the untransformed network carries 9');
+    /* Split, with nothing capped: the answer MUST come back unchanged, and that
+       is the check the gadget carries. */
+    const open = gadgetBuild('split', { graph: G, s: 0, t: 3, vertexCap: fkVertexCaps(G, []) });
+    eq(open.graph.n + ',' + open.graph.arcs.length, '8,9',
+       'splitting 4 vertices gives 8 of them, and 5 arcs plus one joining arc per vertex is 9');
+    eq(maxflow(open.graph, open.s, open.t).result.value, plain,
+       'and with no vertex capped it gives exactly the original answer');
+    /* Split, with one capped: the answer can only fall, and it does. */
+    const caps = [];
+    caps[1] = 2;
+    const tight = gadgetBuild('split', { graph: G, s: 0, t: 3, vertexCap: fkVertexCaps(G, caps) });
+    const tightValue = maxflow(tight.graph, tight.s, tight.t).result.value;
+    eq(tightValue, 6, 'capping what may pass through vertex 2 at 2 brings it to 6');
+    eq(tightValue <= plain, true, 'a capacity can only ever lower the answer');
+    eq(minCutBrute(tight.graph, tight.s, tight.t, 12).result.capacity, tightValue,
+       'and the certificate survives the transformation, because the result is an ordinary network');
+    /* Unit capacities: Menger, as two numbers. */
+    const u = gadgetBuild('unit', { graph: net('1>2 9, 1>3 9, 2>4 9, 3>4 9, 2>3 9, 1>4 9'), s: 0, t: 3 });
+    const uRun = maxflow(u.graph, u.s, u.t);
+    eq(u.graph.arcs.every((a) => a.cap === 1), true, 'every capacity is 1');
+    eq(uRun.result.value, 3, 'so the value counts routes sharing no arc, and there are 3');
+    eq(unitPaths(u.graph, uRun.result.flow, u.s, u.t).length, uRun.result.value,
+       'walking the routes out of the flow finds exactly that many');
+    eq(minCutBrute(u.graph, u.s, u.t, 12).result.capacity, uRun.result.value,
+       'and the fewest arcs that separate the two ends is the same number');
+    /* A super-source over the sources the graph itself names. */
+    const many = net('1>3 4, 2>3 3, 3>4 5, 3>5 4');
+    const idx = dgIndex(many);
+    const sources = [], sinks = [];
+    for (let v = 0; v < many.n; v += 1) {
+      if (!idx.inn[v].length) sources.push(v);
+      if (!idx.out[v].length) sinks.push(v);
+    }
+    eq(sources.join(',') + ' / ' + sinks.join(','), '0,1 / 3,4',
+       'the sources and sinks are read off the graph rather than typed');
+    const big = fkTotalCap(many) + 1, wide = [];
+    for (let v = 0; v < many.n; v += 1) wide.push(big);
+    const sup = gadgetBuild('supersource', { graph: many, sources: sources, sinks: sinks,
+                                             sourceCap: wide, sinkCap: wide });
+    const supRun = maxflow(sup.graph, sup.s, sup.t);
+    eq(sup.graph.n, many.n + 2, 'two nodes are added and nothing else');
+    eq(supRun.result.value, 7, 'and the most all the starts can send together is 7');
+    let outOfSources = 0;
+    many.arcs.forEach((a, id) => { if (sources.indexOf(a.u) !== -1) outOfSources += supRun.result.flow[id]; });
+    eq(outOfSources, supRun.result.value, 'which is exactly what leaves the original sources');
+    eq(minCutBrute(sup.graph, sup.s, sup.t, 12).result.capacity, supRun.result.value,
+       'and the certificate holds on the transformed network too');
+    eq(fkTotalCap(many) + 1 > minCutBrute(sup.graph, sup.s, sup.t, 12).result.capacity, true,
+       'the joining arcs carry the whole network’s capacity, so none of them is ever binding');
+    let unknown = false;
+    try { gadgetBuild('nosuchgadget', {}); } catch (e) { unknown = /unknown gadget/.test(e.message); }
+    eq(unknown, true, 'and a gadget that does not exist raises rather than returning a network');
+  }
+}
+
+
+// ------------------------------------------------------------------- greedy
+//
+// WHY THIS SECTION LOOKS THE WAY IT DOES. The greedy kit's whole method is that
+// "greedy is optimal here" is COMPUTED, and it computes it with ORACLE_JS's
+// bruteOptimal. A test that checked that kit with bruteOptimal would be
+// checking a routine against itself, so every oracle below is written out in
+// this file and reaches the same answer by a different road:
+//
+//   maxCompatible      every subset, with feasibility decided by OCCUPANCY --
+//                      a slot array over the time range, incremented per unit
+//                      of time -- instead of by comparing finish times.
+//   roomsNeeded        the most intervals alive at ANY integer instant, swept.
+//                      depthOf samples only the START instants, which is
+//                      correct and is an argument; this makes no assumption.
+//   kraftMinimum       the cheapest prefix code, over every DEPTH VECTOR that
+//                      satisfies Kraft's inequality, in BigInt. No tree is
+//                      built at all -- it is the coding-theory characterisation
+//                      of a prefix code -- and because the vector is indexed BY
+//                      SYMBOL it covers every assignment of the weights without
+//                      any rearrangement argument.
+//   lpVertices         the fractional knapsack's optimum by enumerating the
+//                      VERTICES of its polytope: every subset taken whole plus
+//                      at most one item cut to fit. Exact rationals, and not a
+//                      density sort anywhere.
+//   knapDp             the 0/1 optimum from a weight-indexed table -- course
+//                      5's algorithm, used here against course 4's search.
+//   exchangeByHand     the exchange property from the definition, with its own
+//                      membership test.
+//   greedyEverywhere   greedy against the true maximum over EVERY weighting in
+//                      {1,2,3}^n. beatingWeights stops at the first failure;
+//                      this counts them all, which is what makes "optimal for
+//                      every weighting iff a matroid" a checkable statement.
+//   stableByDefinition the blocking-pair test rewritten from the definition,
+//                      applied to all n! matchings.
+//   offlineForward     the offline caching optimum by a FORWARD sweep over the
+//                      set of reachable cache states, against everyEviction's
+//                      backward memo.
+//
+// TWO THINGS FOUND BY WRITING IT, both recorded because they are facts about
+// routines this section does not own:
+//
+//   * `greedyIntervals`'s fewestConflicts arm sorts ONCE, by each interval's
+//     conflict count in the FULL instance, and then sweeps. The rule as usually
+//     stated recomputes the counts as intervals are removed. Both are wrong on
+//     some instance and the kit names the one it runs; the assertions below pin
+//     the shipped behaviour so it cannot change silently.
+//   * `heldKarp` and `tspBrute` return a tour as an OPEN list of n cities
+//     starting at 0, with the leg home counted in the length and absent from
+//     the list. dpkit's tourLength closes it, and the dpkit section below
+//     asserts that convention directly.
+console.log('greedy: every rule beside an optimum this file computes for itself');
+{
+  const GREEDY_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'greedy.py');
+  const greedySrc = fs.readFileSync(GREEDY_SOURCE, 'utf8');
+  const gk = (name) => blockFrom(greedySrc, name, GREEDY_SOURCE);
+
+  /* Three helpers this section uses and the kit does not ship: a refusal
+     probe, a factorial, and an enumeration of permutations. They are `const`
+     inside this block, so nothing outside it can see them and no other
+     section's name can collide with them. */
+  const refusesGreedy = (fn) => { try { fn(); return false; } catch (err) { return true; } };
+  const factorialOf = (n) => { let t = 1; for (let i = 2; i <= n; i += 1) t *= i; return t; };
+  const permsOf = (list, fn) => {
+    const n = list.length, cur = [], used = new Array(n).fill(false);
+    const step = () => {
+      if (cur.length === n) { fn(cur); return; }
+      for (let i = 0; i < n; i += 1) {
+        if (used[i]) continue;
+        used[i] = true; cur.push(list[i]);
+        step();
+        cur.pop(); used[i] = false;
+      }
+    };
+    step();
+  };
+
+  /* Exactly what greedy.py's _CORE_JS concatenates, in that order, so a
+     dependency the kit forgot to take fails here and not in a browser. */
+  eval(block('RATIONAL_JS') + algoCoreBlock('COUNT_JS') + algoCoreBlock('RFIXED_JS')
+       + algoCoreBlock('ORACLE_JS') + algoCoreBlock('TREEDRAW_JS') + sysdBlock('REPLAY_JS')
+       + algoCoreBlock('GREEDY_JS') + gk('GKIT_JS'));
+  eq(greedySrc.indexOf('_CORE_JS = (RATIONAL_JS + COUNT_JS + RFIXED_JS + ORACLE_JS + TREEDRAW_JS') >= 0,
+     true, 'and the kit still concatenates those blocks in that order');
+  eq(greedySrc.indexOf('+ REPLAY_JS + GREEDY_JS + GKIT_JS)') >= 0, true,
+     'ending with the replay block, the core greedy block and its own');
+
+  /* ------------------------------------------------------------------------
+     THE PRESETS, transcribed. A preset edited without editing this section
+     fails HERE, by name, rather than silently moving every figure below. */
+  const IV = {
+    eleven: '1-4, 3-5, 0-6, 5-7, 3-9, 5-9, 6-10, 8-11, 8-12, 2-14, 12-16',
+    shortestfails: '0-5, 4-6, 5-10',
+    startfails: '0-10, 1-2, 3-4, 5-6, 7-8',
+    conflictfails: '0-2, 2-4, 4-6, 6-8, 1-3, 3-5, 5-7'
+  };
+  const PT = {
+    lectures: '0-3, 1-4, 2-5, 4-7, 5-8, 6-9, 8-11, 9-12, 10-13, 12-15',
+    staircase: '0-4, 2-6, 4-8, 6-10, 8-12',
+    pileup: '0-9, 1-9, 2-9, 3-9, 4-9',
+    disjoint: '0-2, 2-4, 4-6, 6-8, 8-10'
+  };
+  const HF = {
+    clrs: 'a:45, b:13, c:12, d:16, e:9, f:5',
+    skewed: 'a:60, b:20, c:10, d:5, e:5',
+    uniform: 'a:10, b:10, c:10, d:10',
+    fibonacci: 'a:1, b:1, c:2, d:3, e:5'
+  };
+  const KS = {
+    classic: ['10/60, 20/100, 30/120', 50],
+    densitytrap: ['1/2, 10/10, 10/10', 20],
+    halfway: ['1/2, 50/100', 50],
+    even: ['12/24, 7/13, 11/23, 8/15, 9/16, 5/9', 26]
+  };
+  const CA = {
+    mixed: ['1 2 3 1 4 1 2 5 1 2 3 4 5', 3],
+    belady: ['1 2 3 4 1 2 5 1 2 3 4 5', 3],
+    loop: ['1 2 3 4 1 2 3 4 1 2 3 4', 3],
+    hot: ['1 2 1 3 1 4 1 5 1 6 1 7', 2]
+  };
+  {
+    const drift = [];
+    for (const k of Object.keys(IV)) if (greedySrc.indexOf('"' + IV[k] + '"') < 0) drift.push('intervals.' + k);
+    for (const k of Object.keys(PT)) if (greedySrc.indexOf('"' + PT[k] + '"') < 0) drift.push('partition.' + k);
+    for (const k of Object.keys(HF)) if (greedySrc.indexOf('"' + HF[k] + '"') < 0) drift.push('huffman.' + k);
+    for (const k of Object.keys(KS)) if (greedySrc.indexOf('"' + KS[k][0] + '"') < 0) drift.push('knapsack.' + k);
+    for (const k of Object.keys(CA)) if (greedySrc.indexOf('"' + CA[k][0] + '"') < 0) drift.push('caching.' + k);
+    eq(drift.join(','), '', 'every preset transcribed here is the string greedy.py ships');
+    eq(greedySrc.indexOf('"matchings"') > 0, true, 'and the matroid mode still ships the family that is not one');
+  }
+
+  /* =================================================================== ORACLE 1
+     Every subset, with feasibility decided by occupancy over unit time slots.
+     Nothing here compares a finish time with a start time. */
+  const maxCompatible = (items) => {
+    const lo = Math.min.apply(null, items.map((x) => x.s));
+    const hi = Math.max.apply(null, items.map((x) => x.f));
+    let best = 0, bestMask = 0, feasible = 0;
+    for (let mask = 0; mask < (1 << items.length); mask += 1) {
+      const slots = new Array(hi - lo).fill(0);
+      let ok = true, size = 0;
+      for (let i = 0; i < items.length && ok; i += 1) {
+        if (!(mask & (1 << i))) continue;
+        size += 1;
+        for (let t = items[i].s; t < items[i].f; t += 1) {
+          slots[t - lo] += 1;
+          if (slots[t - lo] > 1) { ok = false; break; }
+        }
+      }
+      if (!ok) continue;
+      feasible += 1;
+      if (size > best) { best = size; bestMask = mask; }
+    }
+    return { size: best, mask: bestMask, feasible: feasible };
+  };
+  /* The most intervals alive at ANY integer instant. depthOf samples only the
+     starts, which is right and is an argument; this assumes nothing. */
+  const roomsNeeded = (items) => {
+    const lo = Math.min.apply(null, items.map((x) => x.s));
+    const hi = Math.max.apply(null, items.map((x) => x.f));
+    let best = 0, at = null;
+    for (let t = lo; t < hi; t += 1) {
+      let live = 0;
+      items.forEach((x) => { if (x.s <= t && t < x.f) live += 1; });
+      if (live > best) { best = live; at = t; }
+    }
+    return { depth: best, at: at };
+  };
+
+  /* --- what a reader types ------------------------------------------------ */
+  {
+    eq(gyParseIntervals('1-4, 3-5').items.map((x) => x.label + x.s + '-' + x.f).join(' '),
+       'A1-4 B3-5', 'an interval is start-finish, and the label is its position in the list');
+    eq(gyParseIntervals('3-3').bad !== null, true, 'an interval that does not finish after it starts is refused');
+    eq(gyParseIntervals('5-2').bad !== null, true, 'and so is one that finishes before it starts');
+    eq(gyParseIntervals('banana').bad !== null, true, 'and text that is not two numbers');
+    eq(gyParseIntervals('').bad !== null, true, 'and nothing at all');
+    eq(gyParseIntervals('0-1, 1-2, 2-3', 2).bad !== null, true, 'and more intervals than the cap allows');
+    eq(gyParseIntervals(' 1 - 4 ,  3-5 ').items.length, 2, 'while spaces anywhere are ignored');
+    eq(gyParseFreqs('a:45, b:13').freqs.map((f) => f.symbol + f.weight).join(' '), 'a45 b13',
+       'a symbol is name:weight');
+    eq(gyParseFreqs('a:0').bad !== null, true, 'a weight of zero is refused');
+    eq(gyParseFreqs('a:1, a:2').bad !== null, true, 'and so is a repeated symbol');
+    eq(gyParseFreqs('a:1').bad !== null, true, 'and a one-symbol alphabet, which has no code');
+    eq(gyParseItems('10/60, 20/100').items.map((i) => i.w + ':' + i.v).join(' '), '10:60 20:100',
+       'an item is weight/value');
+    eq(gyParseItems('0/5').bad !== null, true, 'an item of weight zero is refused: it has no density');
+    eq(gyParsePrefs('2 1 3; 1 3 2; 3 2 1').rows.map((r) => r.join('')).join(' '), '102 021 210',
+       'a preference row is 1-based on the page and 0-based inside');
+    eq(gyParsePrefs('2 1; 1 2 3').bad !== null, true, 'a row that is not a ranking of everyone is refused');
+    eq(gyParsePrefs('1 1; 2 2').bad !== null, true, 'and so is a row with a repeat');
+    eq(gyParseTrace('1 2 3').trace.join(''), '123', 'a trace is page numbers');
+    eq(gyParseTrace('0').bad !== null, true, 'page 0 is refused, because it would be a falsy cache entry');
+    eq(gyParseTrace('1 2 3', 2).bad !== null, true, 'and a trace past the cap');
+  }
+
+  /* --- C4 L1: the four rules, each against a subset enumeration ----------- */
+  {
+    /* The figures each preset produces, pinned. These are the numbers the
+       lesson prose will quote, so a change to any of them is a change to the
+       lesson and has to be made deliberately. */
+    const EXPECT = {
+      eleven: { opt: 4, earliestFinish: 4, earliestStart: 3, shortest: 4, fewestConflicts: 1 },
+      shortestfails: { opt: 2, earliestFinish: 2, earliestStart: 2, shortest: 1, fewestConflicts: 2 },
+      startfails: { opt: 4, earliestFinish: 4, earliestStart: 1, shortest: 4, fewestConflicts: 4 },
+      conflictfails: { opt: 4, earliestFinish: 4, earliestStart: 4, shortest: 4, fewestConflicts: 2 }
+    };
+    for (const k of Object.keys(IV)) {
+      const parsed = gyParseIntervals(IV[k], 11);
+      eq(parsed.bad, null, k + ': the preset parses');
+      const items = parsed.items;
+      const report = ruleReport(items);
+      const truth = maxCompatible(items);
+      eq(report.optimum, truth.size,
+         k + ': the kit\'s optimum of ' + report.optimum + ' is the best of the '
+         + truth.feasible + ' subsets an occupancy test accepts');
+      eq(report.optimum, EXPECT[k].opt, k + ': and it is ' + EXPECT[k].opt + ', as the lesson says');
+      eq(report.subsets, Math.pow(2, items.length), k + ': the enumeration looked at all 2^n subsets');
+      eq(intervalsDisjoint(report.best), true, k + ': the optimum it names really is feasible');
+      for (const row of report.rows) {
+        eq(row.feasible, true, k + '/' + row.rule + ': the selection is pairwise disjoint');
+        eq(row.size, EXPECT[k][row.rule], k + '/' + row.rule + ': selects ' + EXPECT[k][row.rule]);
+        eq(row.optimal, row.size === truth.size, k + '/' + row.rule + ': and the verdict matches');
+        eq(row.size <= truth.size, true, k + '/' + row.rule + ': no rule beats the optimum');
+        /* the selection is a genuine sub-list of the input, not invented */
+        eq(row.chosen.every((x) => items.indexOf(x) !== -1), true,
+           k + '/' + row.rule + ': every interval it returned is one that was typed');
+        eq(new Set(row.chosen.map((x) => x.label)).size, row.chosen.length,
+           k + '/' + row.rule + ': and none of them twice');
+      }
+      /* earliest finish is optimal on EVERY instance, which is the theorem */
+      eq(report.rows[0].rule + ':' + report.rows[0].optimal, 'earliestFinish:true',
+         k + ': earliest finish time reaches the optimum, as it must');
+    }
+    /* Stays ahead, step by step, from the core's own greedyTrace. */
+    {
+      const items = gyParseIntervals(IV.eleven, 11).items;
+      const tr = greedyTrace(items, 'earliestFinish');
+      eq(tr.result.matchesOptimum, true, 'greedyTrace agrees that earliest finish is optimal here');
+      eq(tr.result.fellBehindAt, null, 'and it never falls behind at any step');
+      eq(tr.result.rows.map((r) => r.g).join(','), '4,7,11,16',
+         'its finish times are 4, 7, 11 and 16');
+      const bad = greedyTrace(gyParseIntervals(IV.shortestfails).items, 'shortest');
+      eq(bad.result.matchesOptimum, false, 'and the shortest rule does not match on its own trap');
+    }
+  }
+
+  /* --- C4 L2: the exchange argument, performed ---------------------------- */
+  {
+    /* Under the earliest-finish rule every swap keeps the set feasible and the
+       same size, and the optimum ends up BEING greedy's answer. That is the
+       proof, executed on four instances. */
+    for (const k of Object.keys(IV)) {
+      const items = gyParseIntervals(IV[k], 11).items;
+      const chain = exchangeChain(items, 'earliestFinish');
+      eq(chain.survived, true, k + ': the exchange argument survives every swap under earliest finish');
+      eq(chain.steps.every((s) => s.feasible), true, k + ': no swap ever makes the set overlap');
+      eq(chain.steps.every((s) => s.kept), true, k + ': and no swap ever loses an interval');
+      eq(chain.size, chain.optimum, k + ': the set is still optimal at the end');
+      eq(intervalsDisjoint(chain.end), true, k + ': and still feasible, checked once more at the end');
+      eq(chain.matched, chain.greedy.length,
+         k + ': and every one of greedy\'s ' + chain.greedy.length + ' choices is now in it');
+      /* the transformed set really is a subset of the input */
+      eq(chain.end.every((x) => items.indexOf(x) !== -1), true, k + ': out of the typed intervals');
+    }
+    /* And it breaks where the rule is wrong, at a NAMED step. */
+    {
+      const chain = exchangeChain(gyParseIntervals(IV.shortestfails).items, 'shortest');
+      eq(chain.survived, false, 'the shortest-first rule cannot be proved by exchange on its trap');
+      eq(chain.steps.length, 1, 'the chain gets one step in');
+      eq(chain.steps[0].into.label + ' for ' + chain.steps[0].out.label, 'B for A',
+         'swapping B in for A is the step the proof would have to take');
+      eq(chain.steps[0].feasible + '/' + chain.steps[0].kept, 'false/true',
+         'and the set it produces is the same size and OVERLAPS -- B runs from 4 to 6 and C '
+         + 'from 5 to 10 -- so it is the feasibility half of the argument that fails here, '
+         + 'not the size half');
+      eq(gyNames(chain.steps[0].set), 'B C', 'the set after that one swap being B and C');
+      eq(intervalsDisjoint(chain.steps[0].set), false, 'which a feasibility check agrees is not one');
+      const fc = exchangeChain(gyParseIntervals(IV.conflictfails).items, 'fewestConflicts');
+      eq(fc.survived, false, 'and the fewest-conflicts rule fails it on its own trap too');
+    }
+  }
+
+  /* --- C4 L3: rooms against the depth, and the certificate ---------------- */
+  {
+    const EXPECT = { lectures: [3, 2], staircase: [2, 2], pileup: [5, 4], disjoint: [1, 0] };
+    for (const k of Object.keys(PT)) {
+      const items = gyParseIntervals(PT[k], 12).items;
+      const truth = roomsNeeded(items);
+      for (const order of ['start', 'finish']) {
+        const run = partitionRooms(items, order);
+        const valid = roomsValid(run.result.rooms, items);
+        eq(valid.disjoint, true, k + '/' + order + ': no room holds two overlapping intervals');
+        eq(valid.covers, true, k + '/' + order + ': and every interval is placed exactly once');
+        eq(valid.placed, items.length, k + '/' + order + ': ' + items.length + ' of them');
+        eq(run.result.depth, truth.depth,
+           k + '/' + order + ': depthOf agrees with a sweep of every integer instant');
+        eq(run.result.used >= truth.depth, true,
+           k + '/' + order + ': and no schedule can use fewer rooms than the depth');
+      }
+      /* greedy BY START TIME meets the bound; that is the theorem. */
+      const byStart = partitionRooms(items, 'start');
+      eq(byStart.result.used, truth.depth,
+         k + ': greedy by start time uses exactly ' + truth.depth + ' rooms');
+      eq(byStart.result.optimal, true, k + ': and reports itself optimal');
+      eq(byStart.result.used + ',' + byStart.result.at, EXPECT[k].join(','),
+         k + ': ' + EXPECT[k][0] + ' rooms, certified at t = ' + EXPECT[k][1]);
+      /* the certificate: the intervals live at that instant pairwise overlap */
+      const live = liveAt(items, byStart.result.at);
+      eq(live.length, truth.depth, k + ': and that many intervals are live there');
+      eq(mutuallyOverlapping(live), true, k + ': which pairwise overlap, so the bound is real');
+    }
+    /* The order MATTERS, and the kit offers both, so the difference is pinned. */
+    {
+      const items = gyParseIntervals(PT.lectures, 12).items;
+      eq(partitionRooms(items, 'finish').result.used >= partitionRooms(items, 'start').result.used,
+         true, 'ordering by finish time never does better than ordering by start time');
+    }
+    /* roomsValid is not vacuous: hand it a broken assignment and it says so. */
+    {
+      const items = gyParseIntervals('0-4, 2-6', 12).items;
+      eq(roomsValid([[items[0], items[1]]], items).disjoint, false,
+         'two overlapping intervals in one room is caught');
+      eq(roomsValid([[items[0]]], items).covers, false, 'and an interval left out of every room');
+    }
+  }
+
+  /* =================================================================== ORACLE 2
+     The cheapest prefix code, by Kraft's inequality over every depth vector.
+     No tree is built: a prefix code with lengths d_1..d_n exists exactly when
+     the sum of 2^-d_i is at most 1, which is Kraft and McMillan's theorem, and
+     because the vector is indexed BY SYMBOL this covers every assignment of
+     the weights to codewords without any rearrangement argument. */
+  const kraftMinimum = (weights) => {
+    const n = weights.length, top = n - 1, D = BigInt(top), cap = 2n ** D;
+    const d = new Array(n).fill(1);
+    let best = null, vectors = 0, feasible = 0;
+    const walk = (i) => {
+      if (i === n) {
+        vectors += 1;
+        let kraft = 0n;
+        for (let k = 0; k < n; k += 1) kraft += 2n ** (D - BigInt(d[k]));
+        if (kraft > cap) return;
+        feasible += 1;
+        let cost = 0n;
+        for (let k = 0; k < n; k += 1) cost += BigInt(weights[k]) * BigInt(d[k]);
+        if (best === null || cost < best) best = cost;
+        return;
+      }
+      for (let v = 1; v <= top; v += 1) { d[i] = v; walk(i + 1); }
+    };
+    walk(0);
+    return { bits: best, vectors: vectors, feasible: feasible };
+  };
+
+  /* --- C4 L4: Huffman, exactly, and against Kraft ------------------------- */
+  {
+    const EXPECT = {
+      clrs: { expected: '56/25', fixed: '3', bits: '224', total: '100' },
+      skewed: { expected: '17/10', fixed: '3', bits: '170', total: '100' },
+      uniform: { expected: '2', fixed: '2', bits: '80', total: '40' },
+      fibonacci: { expected: '25/12', fixed: '3', bits: '25', total: '12' }
+    };
+    for (const k of Object.keys(HF)) {
+      const parsed = gyParseFreqs(HF[k]);
+      eq(parsed.bad, null, k + ': the alphabet parses');
+      const freqs = parsed.freqs;
+      const run = huffmanBuild(freqs), codes = run.result.codes;
+      const cost = codeCost(codes, freqs);
+      eq(Object.keys(codes).length, freqs.length, k + ': every symbol got a codeword');
+      eq(codesPrefixFree(codes), true, k + ': and no codeword is a prefix of another');
+      eq(Rtext(cost.expected), EXPECT[k].expected,
+         k + ': the expected length is exactly ' + EXPECT[k].expected + ' bits per symbol');
+      eq(String(cost.bits), EXPECT[k].bits, k + ': from ' + EXPECT[k].bits + ' bits in all');
+      eq(String(cost.total), EXPECT[k].total, k + ': over a total weight of ' + EXPECT[k].total);
+      eq(Rtext(cost.fixed), EXPECT[k].fixed, k + ': against a fixed-length code of ' + EXPECT[k].fixed);
+      eq(Rtext(Radd(cost.expected, cost.saving)), Rtext(cost.fixed),
+         k + ': and the saving is the difference of those two, exactly');
+      /* Kraft holds WITH EQUALITY for a Huffman code -- it wastes nothing. */
+      {
+        const n = freqs.length, D = BigInt(n - 1);
+        let kraft = 0n;
+        freqs.forEach((f) => { kraft += 2n ** (D - BigInt(codes[f.symbol].length)); });
+        eq(String(kraft), String(2n ** D), k + ': Kraft\'s sum is exactly 1, so nothing is wasted');
+      }
+      /* the round trip, on a message using every symbol twice */
+      {
+        const syms = freqs.map((f) => f.symbol).concat(freqs.map((f) => f.symbol));
+        const bits = encodeSyms(codes, syms);
+        eq(decodeBits(codes, bits).join(''), syms.join(''),
+           k + ': a message encodes and decodes back to itself');
+        let want = 0;
+        syms.forEach((s) => { want += codes[s].length; });
+        eq(bits.length, want, k + ': in exactly the number of bits the codeword lengths predict');
+        /* A PROPER PREFIX of a codeword is never itself a codeword, because the
+           code is prefix-free -- so appending one leaves the decoder holding
+           bits it cannot spend, and it must refuse rather than guess. */
+        const longest = Object.keys(codes).map((sy) => codes[sy])
+                              .reduce((a, b) => (b.length > a.length ? b : a));
+        const stub = longest.slice(0, -1);
+        eq(stub.length > 0, true, k + ': its longest codeword is more than one bit');
+        eq(codesPrefixFree(codes) && Object.keys(codes).every((sy) => codes[sy] !== stub), true,
+           k + ': and a proper prefix of it is not itself a codeword');
+        eq(decodeBits(codes, bits + stub), null,
+           k + ': so a truncated codeword on the end is refused, not guessed at');
+      }
+      /* THE OPTIMALITY CLAIM, two ways -- the kit's tree enumeration and this
+         file's Kraft enumeration, which share no line of reasoning. */
+      const kit = huffmanBruteBits(freqs.map((f) => f.weight));
+      const kraft = kraftMinimum(freqs.map((f) => f.weight));
+      eq(String(kit.bits), String(cost.bits), k + ': Huffman attains the best of every tree shape');
+      eq(String(kraft.bits), String(cost.bits),
+         k + ': and the best depth vector Kraft allows, over ' + kraft.feasible + ' of '
+         + kraft.vectors + ' vectors');
+      eq(String(kit.assignments), String(kit.shapes * factorialOf(freqs.length)),
+         k + ': the tree enumeration tried every shape against every assignment');
+    }
+    /* Every check above is only worth having if it can fail, so each is run
+       once on something it has to reject. Without these, weakening
+       codesPrefixFree to notice only DUPLICATE codewords passes the whole
+       section: a Huffman code has no duplicates either. */
+    {
+      eq(codesPrefixFree({ a: '0', b: '01' }), false,
+         'a codeword that is a prefix of another is caught -- the only thing that test is for');
+      eq(codesPrefixFree({ a: '0', b: '10', c: '11' }), true, 'while a real prefix code passes');
+      eq(decodeBits({ a: '0', b: '10', c: '11' }, '0101'), null,
+         'and a bit left over at the end of a decode is a refusal, not a guess');
+      eq(decodeBits({ a: '0', b: '10', c: '11' }, '01011').join(''), 'abc',
+         'while a whole number of codewords decodes');
+      eq(encodeSyms({ a: '0' }, ['a', 'z']), null, 'a symbol with no codeword cannot be encoded');
+    }
+
+    /* Catalan: the number of full binary trees on n leaves is Catalan(n-1). */
+    {
+      const catalan = [1, 1, 2, 5, 14, 42];
+      for (let n = 1; n <= 6; n += 1) {
+        eq(allFullBinaryTrees(n, 6).length, catalan[n - 1],
+           'there are ' + catalan[n - 1] + ' full binary trees on ' + n + ' leaves');
+      }
+      eq(refusesGreedy(() => allFullBinaryTrees(7, 6)), true, 'and seven leaves is refused');
+      eq(refusesGreedy(() => huffmanBruteBits([1, 1, 1, 1, 1, 1, 1])), true,
+         'as is an exhaustive optimality check on seven symbols');
+    }
+    /* shapeCost places the heaviest weight on the shallowest leaf. That is the
+       rearrangement inequality and it is a CLAIM, so it is checked against the
+       minimum over every assignment of the same weights to the same shape. */
+    {
+      const w = [5, 2, 1, 1];
+      for (const shape of allFullBinaryTrees(4, 6)) {
+        const depths = [];
+        (function walk(nd, dd) {
+          if (nd.leaf) { depths.push(dd); return; }
+          walk(nd.l, dd + 1); walk(nd.r, dd + 1);
+        })(shape, 0);
+        let best = null;
+        permsOf(w, (p) => {
+          let t = 0n;
+          for (let i = 0; i < depths.length; i += 1) t += BigInt(depths[i]) * BigInt(p[i]);
+          if (best === null || t < best) best = t;
+        });
+        eq(String(shapeCost(shape, w)), String(best),
+           'shapeCost matches the best assignment of ' + w.join(',') + ' to depths ' + depths.join(','));
+      }
+    }
+  }
+
+  /* =================================================================== ORACLE 3
+     The fractional knapsack by VERTEX ENUMERATION. Its optimum is attained at a
+     basic solution -- a set of whole items plus at most one cut to fill the
+     capacity -- so enumerating those is an optimum with no density sort in it.
+     And the 0/1 optimum by a weight-indexed table, which is a different
+     algorithm from a subset search. */
+  const lpVertices = (items, W) => {
+    let best = R(0n, 1n);
+    for (let mask = 0; mask < (1 << items.length); mask += 1) {
+      let w = 0, v = 0;
+      for (let i = 0; i < items.length; i += 1) {
+        if (mask & (1 << i)) { w += items[i].w; v += items[i].v; }
+      }
+      if (w > W) continue;
+      if (Rcmp(R(BigInt(v), 1n), best) > 0) best = R(BigInt(v), 1n);
+      for (let j = 0; j < items.length; j += 1) {
+        if (mask & (1 << j)) continue;
+        const room = Math.min(W - w, items[j].w);
+        const here = Radd(R(BigInt(v), 1n),
+                          Rmul(R(BigInt(room), BigInt(items[j].w)), R(BigInt(items[j].v), 1n)));
+        if (Rcmp(here, best) > 0) best = here;
+      }
+    }
+    return best;
+  };
+  const knapDp = (items, W) => {
+    const row = new Array(W + 1).fill(0);
+    for (const it of items) {
+      for (let w = W; w >= it.w; w -= 1) {
+        if (row[w - it.w] + it.v > row[w]) row[w] = row[w - it.w] + it.v;
+      }
+    }
+    return row[W];
+  };
+
+  /* --- C4 L5: fractional exactly, 0/1 not at all -------------------------- */
+  {
+    const EXPECT = {
+      classic: { frac: '240', opt: 220, density: 160, value: 220, light: 160, half: 160 },
+      densitytrap: { frac: '21', opt: 20, density: 12, value: 20, light: 12, half: 12 },
+      halfway: { frac: '100', opt: 100, density: 2, value: 100, light: 2, half: 100 },
+      even: { frac: '421/8', opt: 51, density: 47, value: 47, light: 37, half: 47 }
+    };
+    for (const k of Object.keys(KS)) {
+      const parsed = gyParseItems(KS[k][0]);
+      eq(parsed.bad, null, k + ': the items parse');
+      const items = parsed.items, W = KS[k][1];
+      const frac = fractionalKnapsack(items, W);
+      const brute = knapsackBrute(items, W);
+      eq(Rtext(frac.result.value), EXPECT[k].frac, k + ': the fractional optimum is ' + EXPECT[k].frac);
+      eq(Rtext(lpVertices(items, W)), Rtext(frac.result.value),
+         k + ': and vertex enumeration in exact rationals reaches the same fraction');
+      eq(brute.result.value, EXPECT[k].opt, k + ': the 0/1 optimum is ' + EXPECT[k].opt);
+      eq(knapDp(items, W), brute.result.value,
+         k + ': a weight-indexed table agrees with the subset search');
+      eq(Rcmp(frac.result.value, R(BigInt(brute.result.value), 1n)) >= 0, true,
+         k + ': and cutting items can never do worse than not cutting them');
+      /* the fractional solution really is one: it fills the sack and no more */
+      {
+        let w = R(0n, 1n), v = R(0n, 1n);
+        frac.result.picks.forEach((p) => {
+          eq(Rcmp(p.take, R(0n, 1n)) >= 0 && Rcmp(p.take, R(1n, 1n)) <= 0, true,
+             k + ': every fraction taken is between 0 and 1');
+          w = Radd(w, Rmul(p.take, R(BigInt(items[p.i].w), 1n)));
+          v = Radd(v, Rmul(p.take, R(BigInt(items[p.i].v), 1n)));
+        });
+        eq(Rcmp(w, R(BigInt(W), 1n)) <= 0, true, k + ': the fractions weigh no more than the capacity');
+        eq(Rtext(v), Rtext(frac.result.value), k + ': and are worth what the run reported');
+      }
+      /* the three 0/1 rules */
+      for (const rule of ['density', 'value', 'light']) {
+        const g = greedyKnapsack01(items, W, rule);
+        const check = packValue(items, g.result.picks);
+        eq(g.result.value, EXPECT[k][rule], k + '/' + rule + ': gets ' + EXPECT[k][rule]);
+        eq(check.v, g.result.value, k + '/' + rule + ': and its picks really are worth that');
+        eq(check.w <= W, true, k + '/' + rule + ': and really do fit');
+        eq(check.w, g.result.weight, k + '/' + rule + ': the reported weight is the picks re-weighed');
+        eq(g.result.value <= brute.result.value, true, k + '/' + rule + ': and never beat the optimum');
+        eq(new Set(g.result.picks).size, g.result.picks.length,
+           k + '/' + rule + ': no item is taken twice');
+      }
+      /* THE GUARANTEE: the better of density greedy and the best single item
+         is at least half the optimum. Computed, then compared with one half. */
+      const half = halfGuarantee(items, W);
+      eq(half.value, EXPECT[k].half, k + ': the guaranteed arm returns ' + EXPECT[k].half);
+      eq(half.value, Math.max(half.greedy, half.single), k + ': which is the better of its two halves');
+      eq(Rcmp(gyRatio(half.value, brute.result.value), R(1n, 2n)) >= 0, true,
+         k + ': and that is at least half the optimum, as the bound promises');
+    }
+    /* THE BOUND, SWEPT. One instance satisfying a bound is not the bound, so
+       every instance of four items with small weights and values is tried. */
+    {
+      let worstRatio = null, worstAt = null, tried = 0, greedyWorst = null;
+      for (let a = 1; a <= 4; a += 1) for (let b = 1; b <= 4; b += 1)
+        for (let c = 1; c <= 4; c += 1) for (let d = 1; d <= 4; d += 1) {
+          const items = [{ w: a, v: b }, { w: c, v: d }, { w: a + c, v: b + 1 }];
+          for (const W of [3, 5, 7]) {
+            tried += 1;
+            const opt = knapDp(items, W);
+            if (!opt) continue;
+            const g = halfGuarantee(items, W);
+            const ratio = R(BigInt(g.value), BigInt(opt));
+            if (worstRatio === null || Rcmp(ratio, worstRatio) < 0) { worstRatio = ratio; worstAt = items; }
+            const plain = greedyKnapsack01(items, W, 'density').result.value;
+            const pr = R(BigInt(plain), BigInt(opt));
+            if (greedyWorst === null || Rcmp(pr, greedyWorst) < 0) greedyWorst = pr;
+          }
+        }
+      eq(tried, 768, 'the sweep tried 768 instances');
+      eq(Rcmp(worstRatio, R(1n, 2n)) >= 0, true,
+         'and the guaranteed arm never fell below one half on any of them, worst ' + Rtext(worstRatio));
+      eq(Rcmp(greedyWorst, R(1n, 2n)) < 0, true,
+         'while density greedy alone did fall below it, at ' + Rtext(greedyWorst)
+         + ' -- which is why the guarantee needs its second arm');
+    }
+  }
+
+  /* =================================================================== ORACLE 4
+     The exchange property from the definition, with its own membership test;
+     and greedy against the true maximum over EVERY weighting in {1,2,3}^n.
+     beatingWeights stops at the first counterexample, which is the right thing
+     for a panel and the wrong thing for a check. */
+  const exchangeByHand = (family) => {
+    const has = (s) => family.some((t) => t.length === s.length
+                                       && t.every((x, i) => x === s[i]));
+    let failures = 0, tested = 0;
+    for (const A of family) for (const B of family) {
+      if (A.length >= B.length) continue;
+      tested += 1;
+      const can = B.some((x) => A.indexOf(x) === -1
+                             && has(A.concat([x]).sort((p, q) => p - q)));
+      if (!can) failures += 1;
+    }
+    return { tested: tested, failures: failures };
+  };
+  const greedyEverywhere = (family, n) => {
+    const key = {};
+    family.forEach((s) => { key[s.join(',')] = true; });
+    let bad = 0, total = 0;
+    const w = new Array(n).fill(1);
+    const walk = (i) => {
+      if (i === n) {
+        total += 1;
+        const order = [];
+        for (let k = 0; k < n; k += 1) order.push(k);
+        order.sort((a, b) => w[b] - w[a] || a - b);
+        let cur = [];
+        for (const x of order) {
+          const next = cur.concat([x]).sort((p, q) => p - q);
+          if (key[next.join(',')]) cur = next;
+        }
+        const got = cur.reduce((t, x) => t + w[x], 0);
+        let best = 0;
+        family.forEach((s) => { const v = s.reduce((t, x) => t + w[x], 0); if (v > best) best = v; });
+        if (got !== best) bad += 1;
+        return;
+      }
+      for (let v = 1; v <= 3; v += 1) { w[i] = v; walk(i + 1); }
+    };
+    walk(0);
+    return { bad: bad, total: total };
+  };
+
+  /* --- C4 L6: matroids, and the theorem in both directions ---------------- */
+  {
+    const FAMILIES = [
+      { id: 'uniform', ground: [0, 1, 2, 3, 4], oracle: uniformOracle(2),
+        weights: [9, 7, 5, 3, 1], family: 16, rank: 2, pairs: 65, matroid: true, greedy: 16 },
+      { id: 'graphic', ground: [0, 1, 2, 3, 4],
+        oracle: forestOracle([[0, 1], [1, 2], [2, 0], [2, 3], [0, 3]], 4),
+        weights: [8, 6, 5, 4, 2], family: 24, rank: 3, pairs: 193, matroid: true, greedy: 18 },
+      { id: 'partition', ground: [0, 1, 2, 3, 4],
+        oracle: partitionOracle([0, 0, 1, 1, 2], [1, 1, 1]),
+        weights: [7, 6, 5, 4, 3], family: 18, rank: 3, pairs: 109, matroid: true, greedy: 15 },
+      { id: 'matchings', ground: [0, 1, 2], oracle: matchingOracle([[0, 1], [1, 2], [2, 3]]),
+        weights: [2, 3, 2], family: 5, rank: 2, pairs: 7, matroid: false, greedy: 3 }
+    ];
+    for (const F of FAMILIES) {
+      const en = independenceEnumerate(F.ground, F.oracle);
+      const family = en.result.family;
+      eq(family.length, F.family, F.id + ': the oracle accepts ' + F.family + ' of the subsets');
+      eq(en.counts.nodes, Math.pow(2, F.ground.length), F.id + ': out of all 2^n it was asked about');
+      eq(en.result.rank, F.rank, F.id + ': the rank is ' + F.rank);
+      eq(en.result.bases.every((b) => b.length === F.rank), true, F.id + ': and every basis has that size');
+      /* every listed set passes the oracle, and every set NOT listed fails it */
+      {
+        let wrong = 0;
+        forEachSubset(F.ground.length, (mask) => {
+          const m = maskMembers(mask, F.ground.length);
+          const listed = family.some((s) => s.join(',') === m.join(','));
+          if (listed !== !!F.oracle(m)) wrong += 1;
+        });
+        eq(wrong, 0, F.id + ': the family listed is exactly the sets the oracle accepts');
+      }
+      eq(downwardClosed(family).ok, true, F.id + ': and it is downward closed, so greedy can run on it');
+      const ex = exchangeTest(family), byHand = exchangeByHand(family);
+      eq(ex.tested, byHand.tested, F.id + ': both exchange tests look at the same ' + ex.tested + ' pairs');
+      eq(ex.tested, F.pairs, F.id + ': which is ' + F.pairs);
+      eq(ex.failures.length, byHand.failures, F.id + ': and find the same number of failures');
+      eq(ex.isMatroid, F.matroid, F.id + ': so it ' + (F.matroid ? 'is' : 'is not') + ' a matroid');
+      /* THE THEOREM, BOTH WAYS, over every weighting in {1,2,3}^n. */
+      const sweep = greedyEverywhere(family, F.ground.length);
+      eq(sweep.total, Math.pow(3, F.ground.length), F.id + ': the sweep tried 3^n weightings');
+      eq(sweep.bad === 0, F.matroid,
+         F.id + ': greedy is optimal on every weighting exactly when the exchange property holds ('
+         + sweep.bad + ' failures)');
+      const run = matroidGreedy(family, F.weights, F.ground);
+      eq(run.result.value, F.greedy, F.id + ': on the preset weights greedy gets ' + F.greedy);
+      eq(run.result.matches, F.matroid, F.id + ': and matches the best member iff it is a matroid');
+      eq(isIndependent(F.oracle, run.result.chosen), true,
+         F.id + ': and what it chose is independent, checked against the ORACLE not the list');
+      eq(run.result.chosen.reduce((t, x) => t + F.weights[x], 0), run.result.value,
+         F.id + ': and is worth what it reported, re-added');
+      /* the counterexample search agrees with the sweep */
+      const beat = beatingWeights(family, F.ground);
+      eq(beat.total, Math.pow(3, F.ground.length), F.id + ': beatingWeights walks the same space');
+      eq(beat.weights === null, F.matroid, F.id + ': and finds a bad weighting iff it is not a matroid');
+      if (!F.matroid) {
+        eq(beat.greedy < beat.optimum, true,
+           F.id + ': the weighting it returns really does beat greedy, ' + beat.greedy
+           + ' against ' + beat.optimum);
+        eq(beat.weights.join(' '), '1 2 2', 'and it is the first in the fixed walk order');
+        eq(beat.tried, 13, 'found after 13 of the 27');
+      }
+    }
+    /* The graphic matroid's rank is |V| minus the number of components, which
+       is a fact about the graph and not about the family. */
+    {
+      const edges = [[0, 1], [1, 2], [2, 0], [2, 3], [0, 3]];
+      const seen = new Array(4).fill(false);
+      let comps = 0;
+      for (let v = 0; v < 4; v += 1) {
+        if (seen[v]) continue;
+        comps += 1;
+        const stack = [v];
+        while (stack.length) {
+          const u = stack.pop();
+          if (seen[u]) continue;
+          seen[u] = true;
+          edges.forEach((e) => {
+            if (e[0] === u && !seen[e[1]]) stack.push(e[1]);
+            if (e[1] === u && !seen[e[0]]) stack.push(e[0]);
+          });
+        }
+      }
+      eq(independenceEnumerate([0, 1, 2, 3, 4], forestOracle(edges, 4)).result.rank, 4 - comps,
+         'the graphic matroid\'s rank is |V| minus the components, found by a separate search');
+      /* and its bases are the spanning trees, counted independently */
+      let trees = 0;
+      forEachSubset(5, (mask) => {
+        const m = maskMembers(mask, 5);
+        if (m.length !== 3) return;
+        const p = [0, 1, 2, 3];
+        const find = (a) => { while (p[a] !== a) a = p[a]; return a; };
+        let ok = true;
+        m.forEach((k) => {
+          const a = find(edges[k][0]), b = find(edges[k][1]);
+          if (a === b) ok = false; else p[a] = b;
+        });
+        if (ok) trees += 1;
+      });
+      eq(independenceEnumerate([0, 1, 2, 3, 4], forestOracle(edges, 4)).result.bases.length, trees,
+         'and it has as many bases as the graph has spanning trees, counted separately: ' + trees);
+    }
+    eq(refusesGreedy(() => independenceEnumerate([0,1,2,3,4,5,6,7,8,9,10], () => true)), true,
+       'and eleven ground elements are refused');
+  }
+
+  /* =================================================================== ORACLE 5
+     Stability written straight from the definition, and applied to every
+     matching, so the kit's blockingPairs is checked rather than reused. */
+  const stableByDefinition = (match, prefsA, prefsB) => {
+    const n = match.length, partnerOfB = new Array(n).fill(-1);
+    match.forEach((b, a) => { partnerOfB[b] = a; });
+    for (let a = 0; a < n; a += 1) {
+      for (let b = 0; b < n; b += 1) {
+        if (match[a] === b) continue;
+        const aWants = prefsA[a].indexOf(b) < prefsA[a].indexOf(match[a]);
+        const bWants = prefsB[b].indexOf(a) < prefsB[b].indexOf(partnerOfB[b]);
+        if (aWants && bWants) return false;
+      }
+    }
+    return true;
+  };
+
+  /* --- C4 L7: Gale-Shapley, and every stable matching --------------------- */
+  {
+    const SM = {
+      classic: ['1 2 3 4; 2 1 3 4; 3 4 1 2; 4 3 1 2', '4 3 2 1; 3 4 1 2; 2 1 4 3; 1 2 3 4',
+                { props: 4, stable: 6, rankA: '1', rankB: '4', match: '1234' }],
+      unique: ['1 2 3; 1 2 3; 1 2 3', '1 2 3; 1 2 3; 1 2 3',
+               { props: 6, stable: 1, rankA: '2', rankB: '2', match: '123' }],
+      twosided: ['1 2 3; 2 3 1; 3 1 2', '2 3 1; 3 1 2; 1 2 3',
+                 { props: 3, stable: 3, rankA: '1', rankB: '3', match: '123' }],
+      rejections: ['2 1 4 3; 2 3 1 4; 1 2 3 4; 4 1 3 2', '3 4 1 2; 1 2 3 4; 2 1 4 3; 4 3 2 1',
+                   { props: 5, stable: 1, rankA: '5/4', rankB: '1', match: '2314' }]
+    };
+    for (const k of Object.keys(SM)) {
+      const A = gyParsePrefs(SM[k][0]).rows, B = gyParsePrefs(SM[k][1]).rows;
+      const want = SM[k][2], n = A.length;
+      eq(greedySrc.indexOf('"' + SM[k][0] + '"') >= 0, true, k + ': the preset is the one shipped');
+      const run = galeShapley(A, B);
+      eq(run.result.proposals, want.props, k + ': ' + want.props + ' proposals were made');
+      eq(run.result.matchA.map((b) => b + 1).join(''), want.match, k + ': and the matching is ' + want.match);
+      eq(new Set(run.result.matchA).size, n, k + ': everyone is matched to a different partner');
+      eq(run.result.matchA.every((b) => b >= 0 && b < n), true, k + ': and to a real one');
+      eq(blockingPairs(run.result.matchA, A, B).stable, true, k + ': the matching has no blocking pair');
+      eq(stableByDefinition(run.result.matchA, A, B), true,
+         k + ': confirmed by a stability test written from the definition');
+      eq(Rtext(run.result.meanProposerRank), want.rankA, k + ': the proposers average ' + want.rankA);
+      eq(Rtext(run.result.meanReceiverRank), want.rankB, k + ': the receivers ' + want.rankB);
+      eq(Rtext(meanRank(run.result.matchA, A)), Rtext(run.result.meanProposerRank),
+         k + ': and meanRank re-derives the proposers\' figure from the matching alone');
+      eq(run.result.proposals <= n * n, true, k + ': the proposal count is inside n squared');
+
+      const every = everyStableMatching(A, B);
+      eq(every.matchings, factorialOf(n), k + ': all ' + factorialOf(n) + ' matchings were tried');
+      eq(every.stable.length, want.stable, k + ': ' + want.stable + ' of them are stable');
+      /* the two stability tests agree on every matching, not just on this one */
+      {
+        let disagree = 0, stableHere = 0;
+        permsOf([...Array(n).keys()], (p) => {
+          const kit = blockingPairs(p, A, B).stable, hand = stableByDefinition(p, A, B);
+          if (kit !== hand) disagree += 1;
+          if (hand) stableHere += 1;
+        });
+        eq(disagree, 0, k + ': the kit\'s blocking-pair test and this file\'s agree on all of them');
+        eq(stableHere, want.stable, k + ': and both count ' + want.stable);
+      }
+      eq(every.stable.some((m) => m.join(',') === run.result.matchA.join(',')), true,
+         k + ': Gale-Shapley\'s matching is one of them');
+      /* PROPOSER-OPTIMAL and RECEIVER-PESSIMAL, the theorem, over the whole set */
+      const po = proposerOptimal(run.result.matchA, A, every);
+      eq(po.optimal, true, k + ': every proposer got the best partner they have in ANY stable matching');
+      {
+        let worseForA = 0, betterForB = 0;
+        every.stable.forEach((m) => {
+          if (Rcmp(meanRank(m, A), run.result.meanProposerRank) < 0) worseForA += 1;
+          const inv = invertMatch(m, n);
+          if (Rcmp(meanRank(inv, B), run.result.meanReceiverRank) > 0) betterForB += 1;
+        });
+        eq(worseForA, 0, k + ': no stable matching ranks better for the proposers');
+        eq(betterForB, 0, k + ': and none ranks worse for the receivers -- proposer-optimal is '
+           + 'receiver-pessimal, which is the half nobody expects');
+      }
+      /* run it the other way and the roles swap */
+      const other = galeShapley(B, A);
+      const otherA = invertMatch(other.result.matchA, n);
+      eq(stableByDefinition(otherA, A, B), true, k + ': the receivers proposing is also stable');
+      eq(Rcmp(meanRank(otherA, A), run.result.meanProposerRank) >= 0, true,
+         k + ': and the proposers do no better under it');
+      eq(invertMatch(invertMatch(run.result.matchA, n), n).join(','), run.result.matchA.join(','),
+         k + ': inverting a matching twice returns it');
+    }
+    eq(refusesGreedy(() => everyStableMatching(
+         [[0,1,2,3,4,5,6],[0,1,2,3,4,5,6],[0,1,2,3,4,5,6],[0,1,2,3,4,5,6],
+          [0,1,2,3,4,5,6],[0,1,2,3,4,5,6],[0,1,2,3,4,5,6]],
+         [[0,1,2,3,4,5,6],[0,1,2,3,4,5,6],[0,1,2,3,4,5,6],[0,1,2,3,4,5,6],
+          [0,1,2,3,4,5,6],[0,1,2,3,4,5,6],[0,1,2,3,4,5,6]])), true,
+       'seven on each side is 5040 matchings and is refused');
+  }
+
+  /* =================================================================== ORACLE 6
+     The offline caching optimum by a FORWARD sweep over the set of reachable
+     cache states. everyEviction searches backward with a memo keyed on
+     (position, cache); this walks forward keeping the best hit count per cache
+     state. Same model -- demand paging, every miss loads -- different search. */
+  const offlineForward = (trace, k) => {
+    let states = new Map([['', 0]]);
+    for (const page of trace) {
+      const next = new Map();
+      const put = (key, v) => { if (!next.has(key) || next.get(key) < v) next.set(key, v); };
+      for (const [key, hits] of states) {
+        const cache = key === '' ? [] : key.split(',').map(Number);
+        if (cache.indexOf(page) !== -1) { put(key, hits + 1); continue; }
+        if (cache.length < k) {
+          put(cache.concat([page]).sort((a, b) => a - b).join(','), hits);
+          continue;
+        }
+        for (let j = 0; j < cache.length; j += 1) {
+          const c2 = cache.slice();
+          c2.splice(j, 1);
+          c2.push(page);
+          put(c2.sort((a, b) => a - b).join(','), hits);
+        }
+      }
+      states = next;
+    }
+    let best = 0;
+    for (const v of states.values()) if (v > best) best = v;
+    return best;
+  };
+
+  /* --- C4 L8: caching, and the bound no online policy can reach ----------- */
+  {
+    const EXPECT = {
+      mixed: { fifo: 4, lru: 4, opt: 6, sweep: '0 1 4 3 8 8' },
+      belady: { fifo: 3, lru: 2, opt: 5, sweep: '0 0 3 2 7 7' },
+      loop: { fifo: 0, lru: 0, opt: 6, sweep: '0 0 0 8 8 8' },
+      hot: { fifo: 3, lru: 5, opt: 5, sweep: '0 3 4 4 4 5' }
+    };
+    for (const key of Object.keys(CA)) {
+      const trace = gyParseTrace(CA[key][0]).trace, k = CA[key][1];
+      const fifo = replayPolicy(trace, k, 'fifo'), lru = replayPolicy(trace, k, 'lru');
+      const opt = replayPolicy(trace, k, 'opt');
+      eq(fifo.hits, EXPECT[key].fifo, key + ': FIFO gets ' + EXPECT[key].fifo + ' hits');
+      eq(lru.hits, EXPECT[key].lru, key + ': LRU gets ' + EXPECT[key].lru);
+      eq(opt.hits, EXPECT[key].opt, key + ': farthest-in-future gets ' + EXPECT[key].opt);
+      for (const r of [fifo, lru, opt]) {
+        eq(r.hits + r.misses, trace.length, key + ': hits and misses account for every reference');
+        eq(Rtext(r.rate), Rtext(R(BigInt(r.hits), BigInt(trace.length))),
+           key + ': and the rate is exactly that fraction');
+      }
+      /* THE BOUND, two searches */
+      const back = everyEviction(trace, k);
+      eq(back.hits, offlineForward(trace, k),
+         key + ': the backward memo and a forward sweep over cache states agree on ' + back.hits);
+      eq(back.hits, opt.hits,
+         key + ': and farthest-in-future attains it, which is the claim the lesson rests on');
+      eq(Math.max(fifo.hits, lru.hits) <= back.hits, true,
+         key + ': no online policy here beats the offline optimum');
+      /* Belady, swept */
+      const sweep = beladySweep(trace, 6, 'fifo');
+      eq(sweep.rows.map((r) => r.hits).join(' '), EXPECT[key].sweep,
+         key + ': FIFO from one slot to six gets ' + EXPECT[key].sweep);
+      eq(sweep.anomalies.length > 0,
+         EXPECT[key].sweep.split(' ').some((v, i, a) => i > 0 && Number(v) < Number(a[i - 1])),
+         key + ': and the anomaly list matches whether that sequence ever falls');
+      /* LRU never has the anomaly -- it is a stack algorithm, and that is a
+         statement about every cache size, checked here on this trace. */
+      const lruSweep = beladySweep(trace, 6, 'lru');
+      eq(lruSweep.anomalies.length, 0, key + ': LRU never loses hits as the cache grows');
+      /* the marks the drawing uses agree with the counted hits */
+      const marks = replayMarks(trace, k, 'lru');
+      eq(marks.filter(Boolean).length, lru.hits, key + ': the hit marks on the chart count the hits');
+      eq(marks.length, trace.length, key + ': one mark per reference');
+    }
+    eq(replayMarks([1, 1], 1, 'lru').join(','), 'false,true',
+       'the second reference to the same page is a hit and the first is not');
+    eq(refusesGreedy(() => everyEviction(new Array(19).fill(1), 2)), true,
+       'a trace past the exhaustive cap is refused');
+    /* Belady's anomaly is real and this is where it is: 3 slots beat 4. */
+    {
+      const t = gyParseTrace(CA.belady[0]).trace;
+      eq(replayPolicy(t, 3, 'fifo').hits + ' > ' + replayPolicy(t, 4, 'fifo').hits, '3 > 2',
+         'on the anomaly trace FIFO gets more hits with three slots than with four');
+      eq(beladySweep(t, 6, 'fifo').anomalies.map((a) => a.from + '->' + a.to + ':' + a.lost).join(' '),
+         '3->4:1', 'and the sweep names exactly that step');
+    }
+  }
+}
+
+// -------------------------------------------------------------------- dpkit
+//
+// WHAT A DP SECTION HAS TO GUARD AGAINST. A filled table is the easiest thing
+// on this path to get confidently wrong: a recurrence that reads one cell too
+// early still finishes, and the number it finishes with looks exactly like an
+// answer. `dpFill` is a general table filler, so the only way to test it is to
+// fill real tables with it and check the answers against routines that have no
+// table in them. Every oracle below is written out in this file:
+//
+//   bfsMinCoins      the fewest coins as a SHORTEST PATH: a breadth-first
+//                    search over amounts, where each coin is an edge of length
+//                    one. No recursion, no memo, no table.
+//   valueIndexed     the 0/1 knapsack optimum from the DUAL table -- least
+//                    weight to reach each value -- which indexes the other
+//                    axis and therefore shares no cell with the kit's.
+//   editByBfs        edit distance as a shortest path in the edit graph,
+//                    expanded breadth-first by cost layer.
+//   chainTopDown     the matrix chain by memoised recursion, and the number of
+//                    bracketings against Catalan(n-1) computed from BIGINT_JS's
+//                    binomial coefficient.
+//   lisLongestPath   the LIS as the longest path in the DAG i -> j whenever
+//                    i < j and a[i] < a[j], relaxed in index order.
+//   multiplicityScan the combinations of coins by enumerating MULTIPLICITY
+//                    VECTORS -- how many of each coin -- rather than by
+//                    recursing on the remaining amount; and the ordered
+//                    sequences by listing the sequences themselves.
+//   misByEdges       the weighted independent set over every subset, with the
+//                    independence test reading the EDGE LIST rather than the
+//                    adjacency map misBrute walks.
+//   grundy           the Sprague-Grundy value of each position, by mex. A
+//                    position loses exactly when its Grundy value is zero, and
+//                    that is a different computation from the W/L recursion.
+//   tourEnumerate    every ordering of the cities, with the cycle closed and
+//                    re-measured here.
+//
+// AND THE THING THAT IS NOT AN ANSWER BUT A MECHANISM: dpFill's `deps`. It is
+// the list of cells a recurrence READ while a cell was being computed, and the
+// modes paint it, so it is checked directly -- against the set of cells the
+// knapsack recurrence must read, and by asking whether any cell in a given
+// fill order read a cell that had not been filled yet.
+console.log('dynamic programming: nine tables, and the routines with no table that check them');
+{
+  const DPKIT_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'dpkit.py');
+  const dpkitSrc = fs.readFileSync(DPKIT_SOURCE, 'utf8');
+  const dk = (name) => blockFrom(dpkitSrc, name, DPKIT_SOURCE);
+
+  const refusesDp = (fn) => { try { fn(); return false; } catch (err) { return true; } };
+  const permsDp = (list, fn) => {
+    const n = list.length, cur = [], used = new Array(n).fill(false);
+    const step = () => {
+      if (cur.length === n) { fn(cur); return; }
+      for (let i = 0; i < n; i += 1) {
+        if (used[i]) continue;
+        used[i] = true; cur.push(list[i]);
+        step();
+        cur.pop(); used[i] = false;
+      }
+    };
+    step();
+  };
+
+  /* Exactly what dpkit.py's _CORE_JS concatenates, in that order. */
+  eval(block('RATIONAL_JS') + algoCoreBlock('COUNT_JS') + algoCoreBlock('RFIXED_JS')
+       + countingBlock('BIGINT_JS') + algoCoreBlock('ORACLE_JS') + algoCoreBlock('TREEDRAW_JS')
+       + algoCoreBlock('SERIES_JS') + algoCoreBlock('DP_JS') + dk('DPKIT_JS'));
+  eq(dpkitSrc.indexOf('_CORE_JS = (RATIONAL_JS + COUNT_JS + RFIXED_JS + BIGINT_JS + ORACLE_JS') >= 0,
+     true, 'the kit still concatenates those blocks in that order');
+  eq(dpkitSrc.indexOf('+ TREEDRAW_JS + SERIES_JS + DP_JS + DPKIT_JS)') >= 0, true,
+     'ending with the tree renderer, the series plotter, the core DP block and its own');
+
+  /* --- the presets, transcribed ------------------------------------------ */
+  const MM = { canonical: ['1 2 5', 18], awkward: ['1 3 4', 6],
+               sparse: ['4 7', 17], wide: ['1 2 5 10 20', 20] };
+  const KN = { small: ['1/1, 3/4, 4/5, 5/7', 7], ties: ['2/3, 2/3, 3/4', 4],
+               wasteful: ['4/5, 4/5, 4/5', 9], unbounded: ['2/3, 3/5, 5/9', 11] };
+  const ED = { kitten: ['kitten', 'sitting'], sunday: ['sunday', 'saturday'],
+               prefix: ['dog', 'dogma'], disjoint: ['abc', 'xyz'] };
+  const CH = { clrs: '30 35 15 5 10 20 25', thin: '10 100 5 50',
+               square: '10 10 10 10 10', long: '5 10 3 12 5 50 6 4' };
+  const LS = { classic: '10 9 2 5 3 7 101 18 4 8', sorted: '1 2 3 4 5 6 7 8',
+               reversed: '9 8 7 6 5 4 3 2', ties: '3 1 4 1 5 9 2 6 5 3' };
+  const CO = { small: ['1 2 5', 5], big: ['1 2 5', 100],
+               sparse: ['3 7', 20], uk: ['1 2 5 10 20 50', 40] };
+  const TR = { star: ['1-2, 1-3, 1-4, 1-5', '3 4 2 1 5'],
+               path: ['1-2, 2-3, 3-4, 4-5, 5-6', '5 1 5 1 5 1'],
+               binary: ['1-2, 1-3, 2-4, 2-5, 3-6, 3-7', '10 2 2 4 4 4 4'],
+               caterpillar: ['1-2, 2-3, 3-4, 2-5, 3-6, 4-7', '1 6 6 6 1 1 1'] };
+  const GM = { subtract123: ['1 2 3', 16], subtract12: ['1 2', 14],
+               subtract134: ['1 3 4', 18], subtract25: ['2 5', 18] };
+  const TS = { four: '0 2 9 10; 1 0 6 4; 15 7 0 8; 6 3 12 0',
+               five: '0 3 4 2 7; 3 0 4 6 3; 4 4 0 5 8; 2 6 5 0 6; 7 3 8 6 0',
+               six: '0 4 7 3 9 5; 4 0 6 8 2 7; 7 6 0 5 8 3; 3 8 5 0 6 4; 9 2 8 6 0 5; 5 7 3 4 5 0',
+               trap: '0 1 1 50; 1 0 1 1; 1 1 0 1; 50 1 1 0' };
+  {
+    const drift = [];
+    const scan = (label, table, pick) => {
+      for (const k of Object.keys(table)) {
+        const text = pick(table[k]);
+        if (dpkitSrc.indexOf('"' + text + '"') < 0) drift.push(label + '.' + k);
+      }
+    };
+    scan('memo', MM, (v) => v[0]);
+    scan('knapsack', KN, (v) => v[0]);
+    scan('edit', ED, (v) => v[0]);
+    scan('edit2', ED, (v) => v[1]);
+    scan('chain', CH, (v) => v);
+    scan('lis', LS, (v) => v);
+    scan('coins', CO, (v) => v[0]);
+    scan('tree', TR, (v) => v[0]);
+    scan('game', GM, (v) => v[0]);
+    scan('tsp', TS, (v) => v);
+    eq(drift.join(','), '', 'every preset transcribed here is the string dpkit.py ships');
+  }
+
+  /* --- what a reader types ------------------------------------------------ */
+  {
+    eq(dpParseNums('1 2, 3').values.join(','), '1,2,3', 'numbers may be separated by spaces or commas');
+    eq(dpParseNums('1.5').bad !== null, true, 'a decimal is refused rather than truncated');
+    eq(dpParseNums('7', 4, 1, 5).bad !== null, true, 'and a number outside the stated range');
+    eq(dpParseItems('3/4').items[0].label, 'A', 'items are labelled from A');
+    eq(dpParseItems('0/4').bad !== null, true, 'an item of weight zero is refused');
+    eq(dpParseWord('KITTEN').word, 'KITTEN', 'a word is letters');
+    eq(dpParseWord('kit ten').word, 'kitten', 'spaces are dropped');
+    eq(dpParseWord('kit-ten').bad !== null, true, 'and anything that is not a letter is refused');
+    eq(dpParseTree('1-2, 1-3').n, 3, 'a tree on three vertices');
+    eq(dpParseTree('1-2, 2-3, 3-1').bad !== null, true, 'a cycle is not a tree and is refused');
+    eq(dpParseTree('1-2, 3-4').bad !== null, true, 'and neither is a forest of two pieces');
+    eq(dpParseTree('1-1').bad !== null, true, 'and a self-loop is refused outright');
+    eq(dpParseMatrix('0 1; 1 0').bad !== null, true, 'a matrix needs at least three cities');
+    eq(dpParseMatrix('0 1 2; 1 0 3').bad !== null, true, 'and as many rows as columns');
+    eq(dpParseMatrix('0 1 2; 1 0 3; 2 3 0').D.length, 3, 'three cities read as three rows');
+  }
+
+  /* =================================================================== ORACLE 1
+     The fewest coins as a SHORTEST PATH. Amounts are vertices, each coin is an
+     edge of length one, and a breadth-first search settles every amount in
+     order of distance. No recursion and no table of choices. */
+  const bfsMinCoins = (coins, amount) => {
+    const dist = new Array(amount + 1).fill(-1);
+    dist[0] = 0;
+    let frontier = [0];
+    while (frontier.length) {
+      const next = [];
+      for (const at of frontier) {
+        for (const c of coins) {
+          const to = at + c;
+          if (to > amount || dist[to] !== -1) continue;
+          dist[to] = dist[at] + 1;
+          next.push(to);
+        }
+      }
+      frontier = next;
+    }
+    return dist[amount] === -1 ? null : dist[amount];
+  };
+
+  /* --- C5 L1: one recurrence, three ways ---------------------------------- */
+  {
+    const EXPECT = {
+      canonical: { best: 5, naive: 22089, memo: 50, distinct: 18, cells: 76, picks: '5+5+5+2+1' },
+      awkward: { best: 2, naive: 24, memo: 14, distinct: 6, cells: 28, picks: '3+3' },
+      sparse: { best: null, naive: 12, memo: 11, distinct: 9, cells: 54, picks: '' },
+      wide: { best: 1, naive: 66282, memo: 68, distinct: 20, cells: 126, picks: '20' }
+    };
+    for (const k of Object.keys(MM)) {
+      const coins = dpParseNums(MM[k][0]).values.slice().sort((a, b) => a - b);
+      const amount = MM[k][1];
+      const filled = minCoinTable(coins, amount);
+      const raw = filled.result.table[coins.length][amount];
+      const best = dpUnreachable(raw) ? null : raw;
+      const memo = memoMinCoins(coins, amount);
+      const naive = naiveMinCoins(coins, amount);
+      eq(String(best), String(EXPECT[k].best), k + ': the table says ' + EXPECT[k].best);
+      eq(String(memo.result.coins), String(best), k + ': and the memoised recursion agrees');
+      eq(String(naive.result.coins), String(best), k + ': and so does the one with no memo');
+      eq(String(bfsMinCoins(coins, amount)), String(best),
+         k + ': and so does a breadth-first search over amounts, which has no recursion in it');
+      eq(naive.counts.calls, EXPECT[k].naive, k + ': the plain recursion made ' + EXPECT[k].naive + ' calls');
+      eq(memo.counts.calls, EXPECT[k].memo, k + ': the memoised one ' + EXPECT[k].memo);
+      eq(memo.result.distinct, EXPECT[k].distinct,
+         k + ': over ' + EXPECT[k].distinct + ' distinct subproblems');
+      eq(filled.counts.cells, EXPECT[k].cells, k + ': and the table filled ' + EXPECT[k].cells + ' cells');
+      eq(filled.counts.cells, (coins.length + 1) * (amount + 1), k + ': which is every cell of it');
+      eq(memo.counts.calls <= naive.counts.calls, true, k + ': a memo never costs more calls');
+      /* the reconstruction: the coins really add to the amount, and there are
+         as many of them as the table said */
+      const picks = best === null ? [] : minCoinPicks(filled, coins, amount);
+      eq(picks.join('+'), EXPECT[k].picks, k + ': the coins it names are ' + (EXPECT[k].picks || 'none'));
+      if (best !== null) {
+        eq(picks.reduce((t, x) => t + x, 0), amount, k + ': and they add to the amount, re-added here');
+        eq(picks.length, best, k + ': and there are exactly as many as the table claims');
+        eq(picks.every((c) => coins.indexOf(c) !== -1), true, k + ': and every one is a real coin');
+      }
+      /* the table agrees with the shortest path at EVERY amount, not just one */
+      {
+        let wrong = 0;
+        for (let a = 0; a <= amount; a += 1) {
+          const v = filled.result.table[coins.length][a];
+          const want = bfsMinCoins(coins, a);
+          if (String(dpUnreachable(v) ? null : v) !== String(want)) wrong += 1;
+        }
+        eq(wrong, 0, k + ': and the whole last row matches the breadth-first distances');
+      }
+    }
+    eq(refusesDp(() => naiveMinCoins([1], 27)), true, 'the unmemoised recursion refuses past its cap');
+    eq(memoMinCoins([1], 27).result.coins, 27, 'while the memoised one answers it happily');
+  }
+
+  /* =================================================================== ORACLE 2
+     The 0/1 knapsack from the DUAL table: the least weight needed to reach each
+     value. It indexes the other axis, so it shares not one cell with the kit's
+     table, and it answers the same question. */
+  const valueIndexed = (items, W) => {
+    const total = items.reduce((t, it) => t + it.v, 0);
+    const need = new Array(total + 1).fill(Infinity);
+    need[0] = 0;
+    for (const it of items) {
+      for (let v = total; v >= it.v; v -= 1) {
+        if (need[v - it.v] + it.w < need[v]) need[v] = need[v - it.v] + it.w;
+      }
+    }
+    let best = 0;
+    for (let v = 0; v <= total; v += 1) if (need[v] <= W) best = v;
+    return best;
+  };
+
+  /* --- C5 L2: the grid, the dependencies, the reconstruction -------------- */
+  {
+    const EXPECT = {
+      small: { value: 9, picks: 'BC', weight: 7, cells: 40, back: 9, fwd: 9 },
+      ties: { value: 6, picks: 'AB', weight: 4, cells: 20, back: 6, fwd: 6 },
+      wasteful: { value: 10, picks: 'AB', weight: 8, cells: 40, back: 10, fwd: 10 },
+      unbounded: { value: 17, picks: 'ABC', weight: 10, cells: 48, back: 17, fwd: 19 }
+    };
+    for (const k of Object.keys(KN)) {
+      const items = dpParseItems(KN[k][0]).items, W = KN[k][1];
+      const filled = knapTable(items, W);
+      const value = filled.result.table[items.length][W];
+      eq(value, EXPECT[k].value, k + ': the table says ' + EXPECT[k].value);
+      eq(knapsackBrute(items, W).result.value, value, k + ': and every subset agrees');
+      eq(valueIndexed(items, W), value, k + ': and so does the value-indexed dual table');
+      eq(filled.counts.cells, EXPECT[k].cells, k + ': ' + EXPECT[k].cells + ' cells filled');
+      /* THE RECONSTRUCTION, re-weighed */
+      const rec = reconstructPicks(filled, items, W);
+      const check = packCheck(items, rec.picks, W, value);
+      eq(rec.picks.map((i) => items[i].label).join(''), EXPECT[k].picks,
+         k + ': it takes ' + EXPECT[k].picks);
+      eq(check.weight, EXPECT[k].weight, k + ': weighing ' + EXPECT[k].weight);
+      eq(check.fits, true, k + ': which fits the capacity');
+      eq(check.matches, true, k + ': and is worth exactly what the table said');
+      eq(check.ok, true, k + ': so the reconstruction is the answer and not merely plausible');
+      eq(new Set(rec.picks).size, rec.picks.length, k + ': and takes no item twice');
+      eq(rec.path[0].join(','), items.length + ',' + W, k + ': the walk starts at the last cell');
+      eq(rec.path[rec.path.length - 1][0], 0, k + ': and ends in the row with no items left');
+      /* ONE ROW: the direction that makes it unbounded */
+      const back = oneRow(items, W, 'backward'), fwd = oneRow(items, W, 'forward');
+      eq(back.result.value, EXPECT[k].back, k + ': one row filled backward gives ' + EXPECT[k].back);
+      eq(fwd.result.value, EXPECT[k].fwd, k + ': filled forward, ' + EXPECT[k].fwd);
+      eq(back.result.value, value, k + ': and backward is the same 0/1 answer as the grid');
+      eq(fwd.result.value >= back.result.value, true,
+         k + ': while forward can only do better, because it may reuse an item');
+      /* and forward really is the UNBOUNDED optimum, checked by a recursion */
+      {
+        const memo = {};
+        const unbounded = (left) => {
+          if (left <= 0) return 0;
+          if (memo[left] !== undefined) return memo[left];
+          let best = 0;
+          for (const it of items) {
+            if (it.w > left) continue;
+            const v = it.v + unbounded(left - it.w);
+            if (v > best) best = v;
+          }
+          memo[left] = best;
+          return best;
+        };
+        eq(fwd.result.value, unbounded(W),
+           k + ': and it is the unbounded optimum, by a recursion that has no row in it');
+      }
+      /* DEPS: the cells the recurrence actually read, checked against the
+         cells it MUST read. This is the mechanism four modes paint. */
+      {
+        let wrong = 0;
+        for (let i = 1; i <= items.length; i += 1) {
+          for (let j = 0; j <= W; j += 1) {
+            const want = items[i - 1].w > j ? [[i - 1, j]] : [[i - 1, j], [i - 1, j - items[i - 1].w]];
+            const got = filled.result.deps[i][j];
+            if (got.map((c) => c.join(',')).join(' ') !== want.map((c) => c.join(',')).join(' ')) wrong += 1;
+          }
+        }
+        eq(wrong, 0, k + ': every cell recorded exactly the cells the recurrence reads');
+        eq(filled.result.deps[0].every((d) => d.length === 0), true,
+           k + ': and the base row read nothing at all');
+      }
+      /* the fill order never reads a cell that is not yet written */
+      {
+        const at = {};
+        dpOrder({ rows: items.length + 1, cols: W + 1, order: 'rowmajor' })
+          .forEach((rc, n) => { at[rc[0] + ',' + rc[1]] = n; });
+        let early = 0;
+        dpOrder({ rows: items.length + 1, cols: W + 1, order: 'rowmajor' }).forEach((rc, n) => {
+          filled.result.deps[rc[0]][rc[1]].forEach((d) => {
+            const key = d[0] + ',' + d[1];
+            if (at[key] !== undefined && at[key] > n) early += 1;
+          });
+        });
+        eq(early, 0, k + ': and row-major order is the right order for THIS recurrence');
+      }
+    }
+  }
+
+  /* =================================================================== ORACLE 3
+     Edit distance as a SHORTEST PATH in the edit graph, expanded breadth-first
+     by cost. The recurrence is nowhere in it: this walks states outward from
+     (0,0) one unit of cost at a time. */
+  const editByBfs = (a, b) => {
+    const seen = new Set(['0,0']);
+    let layer = [[0, 0]], cost = 0;
+    while (layer.length) {
+      /* free moves first: matching characters cost nothing */
+      const closed = [];
+      const stack = layer.slice();
+      while (stack.length) {
+        const [i, j] = stack.pop();
+        closed.push([i, j]);
+        if (i < a.length && j < b.length && a.charAt(i) === b.charAt(j)) {
+          const key = (i + 1) + ',' + (j + 1);
+          if (!seen.has(key)) { seen.add(key); stack.push([i + 1, j + 1]); }
+        }
+      }
+      for (const [i, j] of closed) if (i === a.length && j === b.length) return cost;
+      const next = [];
+      for (const [i, j] of closed) {
+        const moves = [];
+        if (i < a.length) moves.push([i + 1, j]);
+        if (j < b.length) moves.push([i, j + 1]);
+        if (i < a.length && j < b.length) moves.push([i + 1, j + 1]);
+        for (const m of moves) {
+          const key = m.join(',');
+          if (seen.has(key)) continue;
+          seen.add(key);
+          next.push(m);
+        }
+      }
+      layer = next;
+      cost += 1;
+    }
+    return null;
+  };
+
+  /* --- C5 L3: the table, the script, and the script performed ------------- */
+  {
+    const EXPECT = {
+      kitten: { dist: 3, cells: 56, calls: 29737 },
+      sunday: { dist: 3, cells: 63, calls: 60121 },
+      prefix: { dist: 2, cells: 24, calls: 346 },
+      disjoint: { dist: 3, cells: 16, calls: 94 }
+    };
+    for (const k of Object.keys(ED)) {
+      const a = dpParseWord(ED[k][0]).word, b = dpParseWord(ED[k][1]).word;
+      const filled = editTable(a, b);
+      const dist = filled.result.table[a.length][b.length];
+      eq(dist, EXPECT[k].dist, k + ': the distance is ' + EXPECT[k].dist);
+      eq(editNaive(a, b).result.distance, dist, k + ': and a memo-free recursion agrees');
+      eq(editNaive(a, b).counts.calls, EXPECT[k].calls, k + ': in ' + EXPECT[k].calls + ' calls');
+      eq(editByBfs(a, b), dist, k + ': and so does a breadth-first walk of the edit graph');
+      eq(filled.counts.cells, EXPECT[k].cells, k + ': the table filled ' + EXPECT[k].cells + ' cells');
+      eq(filled.counts.cells, (a.length + 1) * (b.length + 1), k + ': which is all of them');
+      /* THE SCRIPT, PERFORMED */
+      const script = editScript(filled, a, b);
+      eq(editCost(script), dist, k + ': the script has exactly as many real operations');
+      eq(applyScript(a, script), b, k + ': and performing it on the first word gives the second');
+      eq(script.filter((o) => o.op === 'keep').length + script.filter((o) => o.op === 'delete').length
+         + script.filter((o) => o.op === 'substitute').length, a.length,
+         k + ': and it accounts for every character of the first word exactly once');
+      eq(script.filter((o) => o.op === 'keep').length + script.filter((o) => o.op === 'insert').length
+         + script.filter((o) => o.op === 'substitute').length, b.length,
+         k + ': and produces every character of the second');
+      /* applyScript is not vacuous: corrupt one operation and it refuses */
+      {
+        const broken = script.map((o) => Object.assign({}, o));
+        const at = broken.findIndex((o) => o.op === 'keep' || o.op === 'delete');
+        if (at >= 0) {
+          broken[at] = Object.assign({}, broken[at], { ch: 'Z' });
+          eq(applyScript(a, broken), null,
+             k + ': and an operation naming a character that is not there is refused');
+        }
+        const truncated = script.slice(0, script.length - 1);
+        eq(applyScript(a, truncated) === b, false,
+           k + ': and a script one operation short does not produce the second word');
+      }
+      /* the boundary rows are the lengths, which is the whole base case */
+      for (let i = 0; i <= a.length; i += 1) {
+        eq(filled.result.table[i][0], i, k + ': turning ' + i + ' characters into nothing costs ' + i);
+      }
+      for (let j = 0; j <= b.length; j += 1) {
+        eq(filled.result.table[0][j], j, k + ': and nothing into ' + j + ' costs ' + j);
+      }
+      /* the metric properties, which a wrong table breaks first */
+      eq(editTable(a, a).result.table[a.length][a.length], 0, k + ': a word is zero from itself');
+      eq(editTable(b, a).result.table[b.length][a.length], dist, k + ': and the distance is symmetric');
+      eq(dist <= Math.max(a.length, b.length), true, k + ': and never more than the longer word');
+      eq(dist >= Math.abs(a.length - b.length), true, k + ': nor less than the length difference');
+    }
+    eq(refusesDp(() => editNaive('abcdefghi', 'jklmnopqr')), true,
+       'nine letters is past the memo-free cap and is refused');
+  }
+
+  /* =================================================================== ORACLE 4
+     The matrix chain by MEMOISED TOP-DOWN recursion -- no dpFill, no fill
+     order, no table of its own -- and the number of bracketings against
+     Catalan(n-1) from BIGINT_JS's binomial coefficient. */
+  const chainTopDown = (dims) => {
+    const n = dims.length - 1, memo = {};
+    const go = (i, j) => {
+      if (i === j) return 0;
+      const key = i + ',' + j;
+      if (memo[key] !== undefined) return memo[key];
+      let best = null;
+      for (let k = i; k < j; k += 1) {
+        const v = go(i, k) + go(k + 1, j) + dims[i] * dims[k + 1] * dims[j + 1];
+        if (best === null || v < best) best = v;
+      }
+      memo[key] = best;
+      return best;
+    };
+    return go(0, n - 1);
+  };
+  const catalan = (m) => (m <= 0 ? 1n : comb(2 * m, m) / BigInt(m + 1));
+
+  /* --- C5 L4: the fill order, and every bracketing ------------------------ */
+  {
+    const EXPECT = {
+      clrs: { best: 15125, worst: 58000, count: 42, bad: 9000, paren: '((A1(A2A3))((A4A5)A6))', early: 35 },
+      thin: { best: 7500, worst: 75000, count: 2, bad: 7500, paren: '((A1A2)A3)', early: 4 },
+      square: { best: 3000, worst: 3000, count: 5, bad: 1000, paren: '(A1(A2(A3A4)))', early: 10 },
+      long: { best: 2052, worst: 14060, count: 132, bad: 200, paren: '((A1A2)(((A3A4)(A5A6))A7))', early: 56 }
+    };
+    for (const k of Object.keys(CH)) {
+      const dims = dpParseNums(CH[k]).values, n = dims.length - 1;
+      const good = chainTable(dims, 'bylength'), bad = chainTable(dims, 'rowmajor');
+      const every = everyParenthesisation(dims);
+      eq(good.result.table[0][n - 1], EXPECT[k].best, k + ': filling by length gives ' + EXPECT[k].best);
+      eq(every.cost, EXPECT[k].best, k + ': which is the cheapest of every bracketing');
+      eq(every.worstCost, EXPECT[k].worst, k + ': the dearest costing ' + EXPECT[k].worst);
+      eq(every.count, EXPECT[k].count, k + ': over ' + EXPECT[k].count + ' of them');
+      eq(String(every.count), String(catalan(n - 1)),
+         k + ': which is Catalan(' + (n - 1) + '), from a binomial coefficient in BigInt');
+      eq(chainTopDown(dims), EXPECT[k].best, k + ': and a memoised recursion reaches it with no table');
+      /* THE WRONG ORDER, and the reads that make it wrong */
+      eq(bad.result.table[0][n - 1], EXPECT[k].bad, k + ': filling row by row gives ' + EXPECT[k].bad);
+      const early = (filledRun, order) => {
+        const at = {};
+        dpOrder({ rows: n, cols: n, order: order }).forEach((rc, i) => { at[rc[0] + ',' + rc[1]] = i; });
+        let count = 0;
+        dpOrder({ rows: n, cols: n, order: order }).forEach((rc, i) => {
+          filledRun.result.deps[rc[0]][rc[1]].forEach((d) => {
+            const key = d[0] + ',' + d[1];
+            if (at[key] !== undefined && at[key] > i) count += 1;
+          });
+        });
+        return count;
+      };
+      eq(early(good, 'bylength'), 0, k + ': by length, no cell is read before it is written');
+      eq(early(bad, 'rowmajor'), EXPECT[k].early,
+         k + ': row by row, ' + EXPECT[k].early + ' reads land on an unwritten cell');
+      eq(EXPECT[k].bad <= EXPECT[k].best, true,
+         k + ': and reading a null as zero makes the wrong answer look CHEAPER, which is how '
+         + 'nobody notices');
+      /* THE RECONSTRUCTION, re-costed from the dimensions */
+      const tree = chainSplitTree(good, 0, n - 1);
+      eq(parenText(tree), EXPECT[k].paren, k + ': the bracketing is ' + EXPECT[k].paren);
+      eq(parenCost(tree, dims).cost, EXPECT[k].best, k + ': and re-costing it gives the same number');
+      eq(parenCost(tree, dims).lo + '-' + parenCost(tree, dims).hi, '0-' + (n - 1),
+         k + ': over the whole chain');
+      eq((parenText(tree).match(/A/g) || []).length, n, k + ': naming every matrix exactly once');
+      /* the base cells, where the fill starts */
+      for (let i = 0; i < n; i += 1) eq(good.result.table[i][i], 0, k + ': one matrix costs nothing');
+    }
+    eq(refusesDp(() => everyParenthesisation([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])), true,
+       'nine matrices is past the enumeration cap');
+  }
+
+  /* =================================================================== ORACLE 5
+     The LIS as the LONGEST PATH in the DAG that has an arc i -> j whenever
+     i < j and a[i] < a[j]. Relaxed in index order, which is a topological
+     order of that DAG, and it is a graph algorithm rather than a table. */
+  const lisLongestPath = (a) => {
+    const best = new Array(a.length).fill(1);
+    for (let j = 0; j < a.length; j += 1) {
+      for (let i = 0; i < j; i += 1) {
+        if (a[i] < a[j] && best[i] + 1 > best[j]) best[j] = best[i] + 1;
+      }
+    }
+    return a.length ? Math.max.apply(null, best) : 0;
+  };
+
+  /* --- C5 L5: the table, the tails array, every subsequence --------------- */
+  {
+    const EXPECT = {
+      classic: { len: 4, answer: '2 5 7 101', tails: '2 3 4 8', same: false },
+      sorted: { len: 8, answer: '1 2 3 4 5 6 7 8', tails: '1 2 3 4 5 6 7 8', same: true },
+      reversed: { len: 1, answer: '9', tails: '2', same: false },
+      ties: { len: 4, answer: '3 4 5 9', tails: '1 2 3 6', same: false }
+    };
+    for (const k of Object.keys(LS)) {
+      const a = dpParseNums(LS[k]).values;
+      const table = lisTable(a), tails = lisTails(a), brute = lisBrute(a);
+      eq(table.result.length, EXPECT[k].len, k + ': the longest increasing run has length ' + EXPECT[k].len);
+      eq(tails.result.length, table.result.length, k + ': the tails array finds the same length');
+      eq(brute.result.length, table.result.length, k + ': and so does every subsequence');
+      eq(lisLongestPath(a), table.result.length, k + ': and so does a longest path in the DAG');
+      eq(brute.counts.nodes, Math.pow(2, a.length), k + ': the enumeration looked at all 2^n of them');
+      /* THE ANSWER, and the two properties it must have */
+      eq(table.result.subsequence.join(' '), EXPECT[k].answer, k + ': the run is ' + EXPECT[k].answer);
+      eq(table.result.subsequence.length, table.result.length, k + ': as long as the table says');
+      eq(isIncreasingRun(table.result.subsequence), true, k + ': it is strictly increasing');
+      eq(isSubsequenceOf(table.result.subsequence, a), true, k + ': and it is a subsequence of the input');
+      /* the same two checks on the core's own reconstruction */
+      eq(isIncreasingRun(tails.result.subsequence) && isSubsequenceOf(tails.result.subsequence, a),
+         true, k + ': lisTails\' reconstruction passes both checks too');
+      eq(tails.result.subsequence.length, tails.result.length,
+         k + ': and is as long as its tails array claims');
+      /* AND THE MISCONCEPTION: the tails array is not the answer */
+      eq(tails.result.tails.join(' '), EXPECT[k].tails, k + ': while the tails array ends as ' + EXPECT[k].tails);
+      eq(tails.result.tails.join(',') === table.result.subsequence.join(','), EXPECT[k].same,
+         k + ': and it ' + (EXPECT[k].same ? 'happens to equal' : 'is not') + ' the answer');
+      eq(tails.result.tails.length, table.result.length, k + ': though it always has the right LENGTH');
+      /* the checks are not vacuous */
+      eq(isIncreasingRun([1, 1]), false, 'equal values are not strictly increasing');
+      eq(isSubsequenceOf([3, 1], [1, 2, 3]), false, 'and out-of-order values are not a subsequence');
+      eq(isSubsequenceOf(a.slice().sort((p, q) => p - q), a), a.length <= 1 || isSubsequenceOf(a.slice().sort((p, q) => p - q), a),
+         k + ': (a sorted copy is increasing, which is why being a subsequence is checked separately)');
+    }
+    /* STRICTLY increasing, which is the comparison a relational operator slips
+       on. None of the four presets happens to separate < from <=, so the case
+       is made here explicitly rather than hoped for: with a repeated value the
+       length changes AND the run stops being increasing. */
+    {
+      eq(lisTable([1, 3, 3, 5]).result.length, 3,
+         'with a repeated value the longest STRICTLY increasing run is 3, not 4');
+      eq(lisTable([1, 3, 3, 5]).result.subsequence.join(' '), '1 3 5', 'and it is 1 3 5');
+      eq(isIncreasingRun(lisTable([1, 3, 3, 5]).result.subsequence), true,
+         'which is strictly increasing, checked rather than assumed');
+      eq(lisTails([1, 3, 3, 5]).result.length, 3, 'the tails array agrees');
+      eq(lisBrute([1, 3, 3, 5]).result.length, 3, 'so does every subsequence');
+      eq(lisLongestPath([1, 3, 3, 5]), 3, 'and so does the longest path in the DAG');
+      eq(lisTable([2, 2, 2]).result.length, 1, 'and three equal values give a run of one');
+      eq(lisTable([2, 2, 2]).result.subsequence.join(' '), '2', 'which is a single value');
+    }
+    eq(refusesDp(() => lisBrute(new Array(17).fill(1))), true, 'seventeen values is past the cap');
+  }
+
+  /* =================================================================== ORACLE 6
+     The combinations by MULTIPLICITY VECTOR -- how many of each coin, nested --
+     rather than by recursing on what is left; and the ordered sequences by
+     listing the sequences themselves, at amounts where that is possible. */
+  const multiplicityScan = (coins, amount) => {
+    let count = 0n;
+    const walk = (i, left) => {
+      if (i === coins.length - 1) {
+        if (left % coins[i] === 0) count += 1n;
+        return;
+      }
+      for (let n = 0; n * coins[i] <= left; n += 1) walk(i + 1, left - n * coins[i]);
+    };
+    walk(0, amount);
+    return count;
+  };
+  const listSequences = (coins, amount, cap) => {
+    if (amount > (cap === undefined ? 12 : cap)) return null;
+    const out = [];
+    const walk = (left, acc) => {
+      if (left === 0) { out.push(acc.slice()); return; }
+      for (const c of coins) {
+        if (c > left) continue;
+        acc.push(c);
+        walk(left - c, acc);
+        acc.pop();
+      }
+    };
+    walk(amount, []);
+    return out;
+  };
+
+  /* --- C5 L6: the loop order that decides the question -------------------- */
+  {
+    const EXPECT = {
+      small: { comb: '4', perm: '9', listed: 4 },
+      big: { comb: '541', perm: '91197869007632925819218', listed: null },
+      sparse: { comb: '1', perm: '6', listed: 1 },
+      uk: { comb: '236', perm: '1255678045', listed: 236 }
+    };
+    for (const k of Object.keys(CO)) {
+      const coins = dpParseNums(CO[k][0]).values.slice().sort((a, b) => a - b);
+      const amount = CO[k][1];
+      const comb = countWays(coins, amount, 'combinations');
+      const perm = countWays(coins, amount, 'permutations');
+      eq(String(comb.result.count), EXPECT[k].comb, k + ': ' + EXPECT[k].comb + ' combinations');
+      eq(String(perm.result.count), EXPECT[k].perm, k + ': ' + EXPECT[k].perm + ' ordered sequences');
+      eq(typeof comb.result.count, 'bigint', k + ': and the count is a BigInt, not a double');
+      eq(typeof perm.result.count, 'bigint', k + ': both of them');
+      eq(String(multiplicityScan(coins, amount)), EXPECT[k].comb,
+         k + ': a scan over multiplicity vectors finds the same combination count');
+      eq(perm.result.count >= comb.result.count, true,
+         k + ': and there are never fewer sequences than combinations');
+      /* the memo-free recursions, where they are affordable */
+      eq(String(countBrute(coins, amount, 'combinations')), EXPECT[k].comb,
+         k + ': and so does a recursion with no table');
+      if (amount <= 26) {
+        eq(String(countBrute(coins, amount, 'permutations')), EXPECT[k].perm,
+           k + ': and the sequence count too');
+      } else {
+        eq(refusesDp(() => countBrute(coins, amount, 'permutations')), true,
+           k + ': while counting the sequences one by one is refused, which is the point');
+      }
+      /* the objects themselves, where they fit */
+      let listed = null;
+      try { listed = listCombinations(coins, amount); } catch (err) { listed = null; }
+      eq(listed === null ? null : listed.length, EXPECT[k].listed,
+         k + ': ' + (EXPECT[k].listed === null ? 'too many to list' : EXPECT[k].listed + ' listed'));
+      if (listed) {
+        eq(String(listed.length), EXPECT[k].comb, k + ': and the list is as long as the count');
+        eq(listed.every((m) => m.reduce((t, x) => t + x, 0) === amount), true,
+           k + ': every listed combination adds to the amount');
+        eq(listed.every((m) => m.every((c) => coins.indexOf(c) !== -1)), true,
+           k + ': out of the coins given');
+        eq(new Set(listed.map((m) => m.slice().sort((p, q) => p - q).join(','))).size, listed.length,
+           k + ': and no two of them are the same multiset');
+      }
+      const seqs = listSequences(coins, amount);
+      if (seqs) {
+        eq(String(seqs.length), EXPECT[k].perm, k + ': and the sequences listed one by one agree too');
+        eq(new Set(seqs.map((s) => s.join(','))).size, seqs.length, k + ': all of them distinct AS SEQUENCES');
+        eq(new Set(seqs.map((s) => s.slice().sort((p, q) => p - q).join(','))).size,
+           Number(comb.result.count),
+           k + ': and collapsing them to multisets leaves exactly the combination count');
+      }
+      /* the table's whole row, not just its last cell */
+      {
+        let wrong = 0;
+        for (let v = 0; v <= Math.min(amount, 26); v += 1) {
+          if (comb.result.table[v] !== countBrute(coins, v, 'combinations')) wrong += 1;
+        }
+        eq(wrong, 0, k + ': and every amount up to 26 agrees with the recursion, not just the last');
+      }
+    }
+    /* the two orders really are different, which is the lesson */
+    eq(String(countWays([1, 2], 4, 'combinations').result.count) + '/'
+       + String(countWays([1, 2], 4, 'permutations').result.count), '3/5',
+       'three combinations make 4 from {1,2} and five ordered sequences do');
+    eq(String(countWays([1], 7, 'combinations').result.count), '1', 'one coin type, one way');
+    eq(String(countWays([2], 7, 'combinations').result.count), '0', 'and no way to make an odd amount');
+    eq(String(countWays([1, 2, 5], 0, 'combinations').result.count), '1',
+       'and exactly one way to make nothing: take no coins');
+  }
+
+  /* =================================================================== ORACLE 7
+     The weighted independent set over every subset, with the independence test
+     reading the EDGE LIST rather than the adjacency map misBrute walks. */
+  const misByEdges = (edges, w) => {
+    let best = 0, bestSet = [];
+    forEachSubset(w.length, (mask) => {
+      const inSet = [];
+      for (let i = 0; i < w.length; i += 1) inSet.push(!!(mask & (1 << i)));
+      for (const e of edges) if (inSet[e[0]] && inSet[e[1]]) return;
+      let v = 0;
+      const m = [];
+      for (let i = 0; i < w.length; i += 1) if (inSet[i]) { v += w[i]; m.push(i); }
+      if (v > best) { best = v; bestSet = m; }
+    });
+    return { value: best, members: bestSet };
+  };
+
+  /* --- C5 L7: one postorder pass against every subset --------------------- */
+  {
+    const EXPECT = {
+      star: { value: 12, chosen: '2,3,4,5' },
+      path: { value: 15, chosen: '1,3,5' },
+      binary: { value: 26, chosen: '1,4,5,6,7' },
+      caterpillar: { value: 13, chosen: '2,4,6' }
+    };
+    for (const k of Object.keys(TR)) {
+      const parsed = dpParseTree(TR[k][0]);
+      eq(parsed.bad, null, k + ': the edge list is a tree');
+      const w = dpParseNums(TR[k][1]).values;
+      const run = treeDp(parsed.tree, w);
+      eq(run.result.value, EXPECT[k].value, k + ': the pass gives ' + EXPECT[k].value);
+      eq(misBrute(parsed.tree, w).result.value, run.result.value, k + ': every subset agrees');
+      eq(misByEdges(parsed.edges, w).value, run.result.value,
+         k + ': and so does an enumeration testing independence against the edge list');
+      eq(run.counts.calls, parsed.n, k + ': every vertex was visited exactly once');
+      eq(run.result.order.length, parsed.n, k + ': and appears once in the postorder');
+      eq(new Set(run.result.order).size, parsed.n, k + ': with no repeats');
+      /* THE SET IT CHOSE */
+      eq(run.result.chosen.map((v) => v + 1).join(','), EXPECT[k].chosen,
+         k + ': it chooses ' + EXPECT[k].chosen);
+      eq(isIndependentSet(parsed.edges, run.result.chosen), true,
+         k + ': and no two of those share an edge');
+      eq(setWeight(w, run.result.chosen), run.result.value, k + ': and they are worth what it said');
+      /* the two numbers per vertex are consistent with each other */
+      {
+        let wrong = 0;
+        for (let v = 0; v < parsed.n; v += 1) {
+          if (run.result.withV[v] === undefined || run.result.without[v] === undefined) wrong += 1;
+          if (run.result.without[v] < 0) wrong += 1;
+        }
+        eq(wrong, 0, k + ': every vertex carries both of its two numbers');
+        eq(Math.max(run.result.withV[0], run.result.without[0]), run.result.value,
+           k + ': and the root\'s better number is the answer');
+      }
+      /* the rooted drawing walks every vertex once, which is what makes the
+         picture a picture of this tree and not of some of it */
+      {
+        let seen = 0;
+        (function walk(nd) { seen += 1; nd.kids.forEach(walk); })(rootedNodes(parsed.tree, 0));
+        eq(seen, parsed.n, k + ': and the rooted form drawn on the page holds every vertex once');
+      }
+    }
+    /* isIndependentSet is not vacuous */
+    eq(isIndependentSet([[0, 1]], [0, 1]), false, 'two ends of an edge are not independent');
+    eq(isIndependentSet([[0, 1]], [0]), true, 'one end of one is');
+    eq(refusesDp(() => misBrute({ 0: [] }, new Array(17).fill(1))), true,
+       'seventeen vertices is past misBrute\'s cap');
+  }
+
+  /* =================================================================== ORACLE 8
+     Sprague and Grundy: the Grundy value of a position is the mex -- the least
+     non-negative integer missing -- of its options' Grundy values, and a
+     position is losing exactly when that value is zero. A different quantity,
+     computed differently, from which the W/L label falls out. */
+  const grundy = (moveSet, upto) => {
+    const g = [];
+    for (let p = 0; p <= upto; p += 1) {
+      const seen = new Set();
+      for (const m of moveSet) if (m <= p) seen.add(g[p - m]);
+      let mex = 0;
+      while (seen.has(mex)) mex += 1;
+      g.push(mex);
+    }
+    return g;
+  };
+
+  /* --- C5 L8: won and lost, and the period -------------------------------- */
+  {
+    const EXPECT = {
+      subtract123: { losing: '0,4,8,12,16', period: 4 },
+      subtract12: { losing: '0,3,6,9,12', period: 3 },
+      subtract134: { losing: '0,2,7,9,14,16', period: 7 },
+      subtract25: { losing: '0,1,4,7,8,11,14,15,18', period: 7 }
+    };
+    for (const k of Object.keys(GM)) {
+      const moveSet = dpParseNums(GM[k][0]).values.slice().sort((a, b) => a - b);
+      const upto = GM[k][1];
+      const positions = [];
+      for (let i = 0; i <= upto; i += 1) positions.push(i);
+      const run = gameLabels((p) => moveSet.map((m) => p - m).filter((q) => q >= 0), positions);
+      eq(run.result.losing.join(','), EXPECT[k].losing, k + ': the losing positions are ' + EXPECT[k].losing);
+      eq(run.result.period, EXPECT[k].period, k + ': and the labels repeat every ' + EXPECT[k].period);
+      eq(run.counts.calls, positions.length, k + ': one evaluation per position');
+      eq(run.result.label[0], 'L', k + ': and position zero loses, because there is no move from it');
+      /* against a memo-free minimax, and against Grundy */
+      {
+        const g = grundy(moveSet, upto);
+        let byRecursion = 0, byGrundy = 0;
+        positions.forEach((p) => {
+          if (gameBrute(moveSet, p) !== run.result.label[p]) byRecursion += 1;
+          if ((g[p] === 0 ? 'L' : 'W') !== run.result.label[p]) byGrundy += 1;
+        });
+        eq(byRecursion, 0, k + ': a memo-free recursion gives the same label at every position');
+        eq(byGrundy, 0, k + ': and so does "the Grundy value is zero", which is a different quantity');
+        eq(g.slice(0, moveSet.length + 1).join(','),
+           grundy(moveSet, moveSet.length).join(','), k + ': the Grundy values are stable');
+      }
+      /* the period is REAL: the labels honestly repeat with it */
+      {
+        let broken = 0;
+        for (let p = 0; p + EXPECT[k].period < positions.length; p += 1) {
+          if (run.result.label[p] !== run.result.label[p + EXPECT[k].period]) broken += 1;
+        }
+        eq(broken, 0, k + ': and every position agrees with the one ' + EXPECT[k].period + ' later');
+      }
+      /* and a losing position really has no move to a losing one */
+      {
+        let wrong = 0;
+        positions.forEach((p) => {
+          const opts = moveSet.filter((m) => m <= p).map((m) => p - m);
+          const anyLosing = opts.some((q) => run.result.label[q] === 'L');
+          if ((run.result.label[p] === 'W') !== anyLosing) wrong += 1;
+        });
+        eq(wrong, 0, k + ': and the definition holds at every position, checked directly');
+      }
+    }
+    eq(refusesDp(() => gameBrute([1], 25)), true, 'the memo-free game recursion refuses past its cap');
+  }
+
+  /* =================================================================== ORACLE 9
+     Every ordering of the cities, with the cycle closed and re-measured in this
+     file. And the two work figures against BigInt formulas computed here. */
+  const tourEnumerate = (D) => {
+    const n = D.length, rest = [];
+    for (let i = 1; i < n; i += 1) rest.push(i);
+    let best = null, bestTour = null, tried = 0;
+    permsDp(rest, (p) => {
+      tried += 1;
+      const tour = [0].concat(p);
+      let t = 0;
+      for (let i = 0; i + 1 < tour.length; i += 1) t += D[tour[i]][tour[i + 1]];
+      t += D[tour[tour.length - 1]][0];
+      if (best === null || t < best) { best = t; bestTour = tour.slice(); }
+    });
+    return { length: best, tour: bestTour, tried: tried };
+  };
+
+  /* --- C5 L9: subsets against orderings ----------------------------------- */
+  {
+    const EXPECT = {
+      four: { len: 21, tour: '1-3-4-2', hk: '256', bf: '6', rows: 7 },
+      five: { len: 19, tour: '1-4-5-2-3', hk: '800', bf: '24', rows: 15 },
+      six: { len: 22, tour: '1-4-3-6-5-2', hk: '2304', bf: '120', rows: 31 },
+      trap: { len: 4, tour: '1-3-4-2', hk: '256', bf: '6', rows: 7 }
+    };
+    for (const k of Object.keys(TS)) {
+      const D = dpParseMatrix(TS[k], 7).D, n = D.length;
+      const hk = heldKarp(D);
+      eq(hk.result.length, EXPECT[k].len, k + ': the shortest tour is ' + EXPECT[k].len);
+      eq(tspBrute(D).result.length, hk.result.length, k + ': and every ordering agrees');
+      const brute = tourEnumerate(D);
+      eq(brute.length, hk.result.length, k + ': and so does an enumeration written in this file');
+      eq(brute.tried, Number(fact(n - 1)), k + ': which tried all (n-1)! of them');
+      /* THE TOUR ITSELF -- and the convention it comes back in */
+      eq(hk.result.tour.map((c) => c + 1).join('-'), EXPECT[k].tour, k + ': the tour is ' + EXPECT[k].tour);
+      eq(hk.result.tour.length, n,
+         k + ': and it is n cities, OPEN -- the leg home is in the length and not in the list');
+      eq(tourValid(hk.result.tour, n), true, k + ': it visits every city once and starts at the first');
+      eq(tourLength(D, hk.result.tour), hk.result.length,
+         k + ': and closing it and re-adding the legs gives the length back');
+      eq(tspBrute(D).result.tour.length, n, k + ': tspBrute uses the same open convention');
+      eq(tourLength(D, tspBrute(D).result.tour), hk.result.length, k + ': and measures the same');
+      /* the work figures, as exact integers */
+      eq(String(hk.result.heldKarpWork), EXPECT[k].hk, k + ': n^2 2^n is ' + EXPECT[k].hk);
+      eq(String(hk.result.bruteWork), EXPECT[k].bf, k + ': and (n-1)! is ' + EXPECT[k].bf);
+      eq(String(hk.result.heldKarpWork), String(BigInt(n) * BigInt(n) * (2n ** BigInt(n))),
+         k + ': recomputed from n here');
+      eq(String(hk.result.bruteWork), String(fact(n - 1)), k + ': and so is the factorial');
+      eq(hk.result.heldKarpWork > hk.result.bruteWork, true,
+         k + ': and at this size the table costs MORE than the enumeration, which the page says');
+      eq(hk.result.table.length, EXPECT[k].rows,
+         k + ': the table has ' + EXPECT[k].rows + ' rows, one per non-empty subset');
+      eq(hk.result.table.length, Math.pow(2, n - 1) - 1, k + ': which is 2^(n-1) - 1');
+      eq(hk.result.table.every((r) => r.row.length === n - 1), true,
+         k + ': and one column per possible end city');
+    }
+    /* tourValid is not vacuous */
+    eq(tourValid([1, 0, 2], 3), false, 'a tour that does not start at the first city is refused');
+    eq(tourValid([0, 1, 1], 3), false, 'and one that visits a city twice');
+    eq(tourValid([0, 1], 3), false, 'and one that leaves a city out');
+    eq(tourLength([[0, 5], [7, 0]], [0, 1]), 12, 'and the length closes the cycle: 5 out, 7 back');
+    /* the crossover is real and it is not near: n^2 2^n passes (n-1)! at n = 13 */
+    {
+      let cross = null;
+      for (let n = 4; n <= 20 && cross === null; n += 1) {
+        if (BigInt(n) * BigInt(n) * (2n ** BigInt(n)) < fact(n - 1)) cross = n;
+      }
+      eq(cross, 10, 'the table only becomes the cheaper of the two at ten cities');
+    }
+    eq(refusesDp(() => tspBrute([[0]], undefined, 0)), true, 'and the enumeration refuses past its cap');
+  }
+}
+
+
+// ==========================================================================
+// Operations Research course eight: the `inventory` kit's own arithmetic
+// ==========================================================================
+//
+// or_core's INV_JS is exercised in the or_core section far above, at the
+// ENGINE level: eoq, eoqCostAt, eoqDiscriminant, eoqRatio, epqCost,
+// newsvendor, reorderPoint, baseStock, discountCandidates and surdValueCmp are
+// each called there. None of that touches this kit. INVKIT_JS is the layer the
+// seven published lessons read -- the flatness band, the rational brackets, the
+// all-units curve, the widened newsvendor window, the fill rate and the three
+// renderers -- and it is where the kit's own decisions live.
+//
+// THE ORACLE IS AN EXHAUSTIVE SCAN OF THE COST FUNCTION, IN PLAIN FLOATING
+// POINT. `floatScanEOQ` below converts K, D and h to doubles and evaluates
+// K*D/Q + h*Q/2 on a fine grid with its own arithmetic: no rational, no surd,
+// no call into either module. It shares nothing at all with the discriminant
+// route, which is the point -- the discriminant route never evaluates the cost
+// function, it factorises a quadratic, so a sign error in `eoq` could not
+// possibly be caught by anything that also went through `eoq`. Measured below:
+// the surd and the scan agree to the resolution of the grid, 5e-7 relative, on
+// every preset and on an instance whose EOQ is (1/3)sqrt(546).
+//
+// THE FLATNESS CLAIM IS MEASURED, NOT REPEATED. The path's key line says "the
+// cost curve is flat either side of it". `eoqBand` turns that into a second
+// discriminant -- (t + 1/t)/2 <= 1 + e is t^2 - 2(1+e)t + 1 <= 0 -- and the
+// scan below re-derives the same interval by pricing every quantity on a
+// 10^-4 grid and keeping the ones under the target. On the default instance
+// the discriminant gives [173.6451, 230.3549] and the scan [173.6452,
+// 230.3548]: ordering 13.2% too little or 15.2% too much costs one per cent,
+// and neither number depends on K, D or h.
+//
+// TWO DEFECTS IN or_core ARE PINNED HERE RATHER THAN FIXED, because that file
+// is shared by twelve kits and this kit is not its owner. Both are in
+// `epqCost`'s `bStar` field, both are silent, and the assertions below record
+// the wrong values so that fixing them is a visible change rather than a
+// surprise:
+//
+//   * `bStar` multiplies `Qstar.q`, the RATIONAL FACTOR of the surd Q*, not Q*
+//     itself. At K = 50, D = 600, h = 5, P infinite, pi = 5 it returns 20 where
+//     f*Q*h/(h+pi) is 40*sqrt(15)/2 = 77.4597 -- short by a factor of sqrt(15).
+//   * its pi = 0 branch tests `backlog === R1` by OBJECT IDENTITY and then adds
+//     h to h rather than pi to h, so it returns f*Q*/2 for a model in which no
+//     backorder is penalised at all.
+//
+// The kit computes the optimal backorder level itself, with `epqBestB`, at a
+// rational Q where the answer is rational; the assertions below hold that
+// function to a quadratic-minimum check instead.
+console.log('operations research: the inventory kit, and an exhaustive scan of the cost it minimises');
+{
+  const OR8_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'or_core.py');
+  const INV_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'inventory.py');
+  const SYS8_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'algebra_systems.py');
+  const AC8_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'algebra_core.py');
+  const SD8_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'sysdesign_core.py');
+  const or8Src = fs.readFileSync(OR8_SOURCE, 'utf8');
+  const invSrc = fs.readFileSync(INV_SOURCE, 'utf8');
+  const sys8Src = fs.readFileSync(SYS8_SOURCE, 'utf8');
+  const ac8Src = fs.readFileSync(AC8_SOURCE, 'utf8');
+  const sd8Src = fs.readFileSync(SD8_SOURCE, 'utf8');
+  const or8 = (n) => blockFrom(or8Src, n, OR8_SOURCE);
+  const ik = (n) => blockFrom(invSrc, n, INV_SOURCE);
+
+  /* Exactly what inventory.py's _CORE_JS concatenates, in that order, so a
+     dependency the kit forgot to take fails here and not in a browser. */
+  eval(blockFrom(ac8Src, 'RATIONAL_JS', AC8_SOURCE) + blockFrom(ac8Src, 'SURD_JS', AC8_SOURCE)
+     + blockFrom(sys8Src, 'FORMAT_JS', SYS8_SOURCE) + blockFrom(sd8Src, 'PMF_JS', SD8_SOURCE)
+     + or8('ORFMT_JS') + or8('INV_JS') + ik('INVKIT_JS'));
+
+  const ri = (v) => R(BigInt(v), 1n);
+  const rf = (a, b) => R(BigInt(a), BigInt(b));
+  const rt = (a) => Rtext(a);
+  const dec = (a) => parseFloat(Rfixed(a, 12));
+
+  /* The presets, transcribed. A preset edited without editing this section
+     fails HERE, by name, rather than silently moving every figure below. */
+  const IP = {
+    workshop: ['100', '1200', '6'],
+    bench: ['50', '600', '5'],
+    bulk: ['400', '9000', '3']
+  };
+  {
+    let drift = [];
+    for (const k of Object.keys(IP)) {
+      const want = '"K": "' + IP[k][0] + '", "D": "' + IP[k][1] + '", "h": "' + IP[k][2] + '"';
+      if (invSrc.indexOf(want) < 0) drift.push(k);
+    }
+    eq(drift.join(','), '', 'every EOQ preset transcribed here is the triple inventory.py ships');
+    eq(invSrc.indexOf('"breaks": "0 10 2; 500 9 9/5; 1000 8 8/5"') > 0, true,
+       'and the three-band discount preset');
+    eq(invSrc.indexOf('"pmf": "0 1/10; 1 2/10; 2 3/10; 3 3/10; 4 1/10"') > 0, true,
+       'and the newsvendor demand distribution');
+    eq(invSrc.indexOf('"pmf": "0 1/4; 1 1/2; 2 1/4", "L": 2, "r": 2') > 0, true,
+       'and the per-period demand the reorder and review modes convolve');
+  }
+
+  /* ================================================================ ORACLE 1
+     The cost function, evaluated in DOUBLES on a fine grid, by arithmetic that
+     never enters either module. The discriminant route never evaluates this
+     function at all -- it factorises a quadratic -- so the two share nothing. */
+  const floatScanEOQ = (K, D, h, lo, hi, steps) => {
+    const k = Number(K.n) / Number(K.d), d = Number(D.n) / Number(D.d);
+    const hh = Number(h.n) / Number(h.d);
+    let best = Infinity, bq = 0;
+    for (let i = 0; i <= steps; i += 1) {
+      const q = lo + (hi - lo) * i / steps;
+      if (q <= 0) continue;
+      const c = k * d / q + hh * q / 2;
+      if (c < best) { best = c; bq = q; }
+    }
+    return { Q: bq, cost: best };
+  };
+
+  /* --- C8 L1: the EOQ is where the scan says it is ----------------------- */
+  {
+    const cases = [[100, 1200, 6, '200'], [50, 600, 5, '20sqrt(30)'],
+                   [400, 9000, 3, '400sqrt(15)'], [7, 13, 3, '(1/3)sqrt(546)']];
+    for (const [K, D, h, text] of cases) {
+      const e = eoq(ri(K), ri(D), ri(h));
+      eq(surdtext(e.Qsurd), text, 'EOQ(' + K + ',' + D + ',' + h + ') is ' + text + ', kept as a surd');
+      const star = parseFloat(surdDec(e.Qsurd, 8));
+      const sc = floatScanEOQ(ri(K), ri(D), ri(h), star * 0.4, star * 1.8, 200000);
+      const rel = Math.abs(sc.Q - star) / star;
+      eq(rel < 1e-5, true, 'and a 200 000-point floating-point scan of K*D/Q + h*Q/2 puts the minimum '
+         + 'at the same place, to ' + rel.toExponential(1) + ' relative on ' + K + '/' + D + '/' + h);
+      const cstar = parseFloat(surdDec(e.costSurd, 8));
+      eq(Math.abs(sc.cost - cstar) / cstar < 1e-9, true,
+         'and the scan’s cheapest cost is C* = sqrt(2KDh) to nine places on ' + K + '/' + D + '/' + h);
+      /* the surd really is sqrt(2KD/h): squaring it must give the argument back */
+      eq(rt(Rmul(Rmul(e.Qsurd.q, e.Qsurd.q), R(e.Qsurd.k, 1n))),
+         rt(Rdiv(Rmul(ri(2), Rmul(ri(K), ri(D))), ri(h))),
+         'and squaring the surd returns 2KD/h exactly, which is what makes it the answer and not a label');
+    }
+    /* the two halves of the cost are equal AT the EOQ, and that is why */
+    const sp = eoqSplit(ri(200), ri(100), ri(1200), ri(6));
+    eq(sp.crossing, true, 'at Q = 200 the ordering cost and the holding cost are exactly equal');
+    eq(rt(sp.order) + '/' + rt(sp.hold) + '/' + rt(sp.total), '600/600/1200', 'at 600 each, totalling 1200');
+    eq(eoqSplit(R0, ri(100), ri(1200), ri(6)), null, 'and Q = 0 is refused rather than divided by');
+    eq(eoqCurve(ri(100), ri(1200), ri(6), ri(1), ri(401), 40).length, 41,
+       'the curve returns one point per grid step, endpoints included');
+    eq(rt(eoqCurve(ri(100), ri(1200), ri(6), ri(1), ri(401), 40)[10].Q), '101',
+       'and the grid is exact rationals, not floats rounded to look like them');
+  }
+
+  /* --- C8 L2: THE DISCRIMINANT ROUTE, which is what the path promises ----- */
+  {
+    const K = ri(100), D = ri(1200), h = ri(6);
+    /* above the minimum: an interval of quantities is cheap enough */
+    const wide = eoqDiscriminant(K, D, h, ri(1300));
+    eq(Rsign(wide.disc) > 0, true, 'at a budget above C* the discriminant is positive');
+    eq(wide.roots.roots.map(rt).join(','), '400/3,300', 'and the interval of affordable Q runs 400/3 to 300');
+    for (const q of [134, 200, 299]) {
+      eq(Rcmp(eoqCostAt(ri(q), K, D, h), ri(1300)) <= 0, true,
+         'Q = ' + q + ' is inside that interval and really does cost at most 1300');
+    }
+    for (const q of [133, 301]) {
+      eq(Rcmp(eoqCostAt(ri(q), K, D, h), ri(1300)) > 0, true,
+         'Q = ' + q + ' is outside it and really does cost more');
+    }
+    /* at the minimum: the roots MERGE, and the merged root is the EOQ */
+    const merged = eoqDiscriminant(K, D, h, ri(1200));
+    eq(Rzero(merged.disc) && merged.roots.kind === 'double', true,
+       'at T = C* the discriminant is exactly zero and the two roots have merged');
+    eq(rt(merged.roots.roots[0]), '200',
+       'and the single surviving quantity IS the EOQ -- derived from a collision, with nothing differentiated');
+    eq(eoqDiscriminant(K, D, h, ri(1199)).feasible, false,
+       'one unit below C* the discriminant is negative: no quantity is that cheap');
+    /* and the merge point is sqrt(2hKD) whatever the data, checked on the irrational instance */
+    const e2 = eoq(ri(50), ri(600), ri(5));
+    eq(surdtext(e2.costSurd), '100sqrt(30)', 'on the irrational instance C* is 100 sqrt 30');
+    eq(surdDec(e2.costSurd, 4), '547.7226', 'printed as 547.7226 only where the page says it is rounded');
+    eq(surdDec(e2.Qsurd, 4), '109.5445', 'and the EOQ as 109.5445');
+    /* surdDec rounds CORRECTLY: bracket the true value and check the printed digits */
+    for (const [q, k, places] of [[e2.Qsurd.q, e2.Qsurd.k, 4], [e2.costSurd.q, e2.costSurd.k, 6]]) {
+      const printed = parseFloat(surdDec({ q: q, k: k }, places));
+      const truth = (Number(q.n) / Number(q.d)) * Math.sqrt(Number(k));
+      eq(Math.abs(printed - truth) <= 0.5 * Math.pow(10, -places) * 1.0000001, true,
+         'surdDec at ' + places + ' places is within half a unit in the last place of the true value');
+    }
+  }
+
+  /* --- C8 L2: THE FLATNESS BAND, by a second discriminant and by a scan --- */
+  {
+    /* the ratio is free of K, D and h: check that on three different instances */
+    const ratios = [];
+    for (const [K, D, h] of [[100, 1200, 6], [50, 600, 5], [7, 13, 3]]) {
+      const star = eoq(ri(K), ri(D), ri(h));
+      /* C(t Q*)/C* for a RATIONAL t, computed from the cost function, is the
+         same rational on every instance -- the claim eoqRatio encodes */
+      ratios.push(rt(eoqRatio(rf(6, 5))));
+      eq(rt(eoqRatio(rf(6, 5))), '61/60', 'a 20% over-order costs 1/60 more on ' + K + '/' + D + '/' + h);
+      eq(star.Qsurd.k >= 1n, true, 'and the EOQ is a surd there');
+    }
+    eq(new Set(ratios).size, 1, 'the robustness ratio is literally the same fraction on all three');
+    eq(rt(eoqRatio(ri(2))) + ',' + rt(eoqRatio(rf(1, 2))), '5/4,5/4',
+       'twice the EOQ and half of it cost the same 25% more, which is why the curve is not symmetric in Q');
+    eq(eoqRatio(R0), null, 'and t = 0 is refused rather than inverted');
+
+    const band = eoqBand(rf(1, 100));
+    eq(rt(band.disc), '201/2500', 'the band quadratic t^2 - 2(1+e)t + 1 has discriminant 4e(2+e)');
+    eq(rt(band.p) + ' +- ' + rt(band.s.q) + 'sqrt' + band.s.k, '101/100 +- 1/100sqrt201',
+       'so the ends are 101/100 +- sqrt(201)/100 -- IRRATIONAL, and carried as surds rather than dropped');
+    eq(band.exact, false, 'which the band reports rather than rounding silently');
+    /* the ends really do cost 1 + e times the minimum: check with eoqRatio on a
+       rational t inside and outside */
+    eq(Rcmp(eoqRatio(rf(8683, 10000)), rf(101, 100)) <= 0, true, 't = 0.8683 is inside the 1% band');
+    eq(Rcmp(eoqRatio(rf(8682, 10000)), rf(101, 100)) > 0, true,
+       'and t = 0.8682 is outside it -- the end is 1.01 - sqrt(201)/100 = 0.86822553..., and the two '
+       + 'sides of it are one ten-thousandth apart, which is the sharpest check a rational t can make');
+    eq(Rcmp(eoqRatio(rf(11517, 10000)), rf(101, 100)) <= 0, true, 't = 1.1517 is inside');
+    eq(Rcmp(eoqRatio(rf(11519, 10000)), rf(101, 100)) > 0, true, 'and t = 1.1519 is outside');
+
+    /* and the same interval, in order quantities, found by pricing 10 million
+       quantities on a 10^-4 grid with the float cost function */
+    const bq = eoqBandQ(ri(100), ri(1200), ri(6), rf(1, 100));
+    eq(bq.loValue + ' to ' + bq.hiValue, '173.6451 to 230.3549',
+       'in quantities the 1% band on the default instance is 173.6451 to 230.3549');
+    eq(bq.belowPct + '% below, ' + bq.abovePct + '% above', '13.2% below, 15.2% above',
+       'that is 13.2% below the EOQ and 15.2% above it, and K, D and h appear in neither');
+    {
+      const target = parseFloat(surdDec(eoq(ri(100), ri(1200), ri(6)).costSurd, 9)) * 1.01;
+      let lo = null, hi = null;
+      for (let q = 100; q <= 300; q += 0.0001) {
+        const c = 100 * 1200 / q + 6 * q / 2;
+        if (c <= target) { if (lo === null) lo = q; hi = q; }
+      }
+      eq(Math.abs(lo - parseFloat(bq.loValue)) < 2e-4, true,
+         'and an exhaustive scan on a 10^-4 grid finds the same lower end, ' + lo.toFixed(4));
+      eq(Math.abs(hi - parseFloat(bq.hiValue)) < 2e-4, true,
+         'and the same upper end, ' + hi.toFixed(4) + ' -- the discriminant and the scan agree');
+    }
+    /* the rational brackets are BRACKETS: narrow, and containing the value */
+    {
+      const q30 = eoq(ri(50), ri(600), ri(5)).Qsurd;
+      const b = bndOf(surdValue(R0, q30), 16);
+      /* the bracket is checked by SQUARING rather than by comparing decimals:
+         lo^2 <= q^2 k <= hi^2 is exact, and a decimal comparison at this width
+         is below the resolution of a double. */
+      const sq = Rmul(Rmul(q30.q, q30.q), R(q30.k, 1n));
+      eq(Rcmp(Rmul(b[0], b[0]), sq) <= 0 && Rcmp(sq, Rmul(b[1], b[1])) <= 0, true,
+         'bndOf really brackets 20 sqrt 30, proved by squaring both ends rather than by a decimal');
+      eq(dec(bndWidth(b)) < 1e-12, true, 'and the bracket is under 1e-12 wide, so four printed places are safe');
+      eq(Rcmp(bndWidth(b), R0) > 0, true, 'and it is a genuine interval rather than a collapsed point');
+    }
+    /* a wider band is wider; a zero tolerance is the EOQ alone */
+    eq(Rcmp(eoqBand(rf(5, 100)).hi.s.q, eoqBand(rf(1, 100)).hi.s.q) > 0, true,
+       'a 5% tolerance gives a wider band than a 1% one');
+    eq(eoqBand(R0).exact + '/' + rt(eoqBand(R0).disc), 'true/0',
+       'and a tolerance of zero collapses the band to the single point t = 1');
+  }
+
+  /* --- C8 L1: the whole-number answer, and the exact comparison ----------- */
+  {
+    const K = ri(100), D = ri(1200), h = ri(6);
+    const scan = eoqWholeScan(K, D, h, 1, 600);
+    eq(scan.Q + ' at ' + rt(scan.cost), '200 at 1200', 'the cheapest whole quantity on the default instance');
+    eq(scan.scanned, 600, 'and it priced all six hundred of them');
+    /* the same scan on the irrational instance: the answer is a whole number
+       near 109.5445, and it is 110 rather than 109 -- which is a fact, not an
+       assumption about rounding */
+    const s2 = eoqWholeScan(ri(50), ri(600), ri(5), 1, 400);
+    eq(s2.Q, 110, 'on the irrational instance the cheapest whole quantity is 110');
+    eq(Rcmp(eoqCostAt(ri(109), ri(50), ri(600), ri(5)),
+            eoqCostAt(ri(110), ri(50), ri(600), ri(5))) > 0, true,
+       'and 109 really is dearer than 110, which is why rounding the surd down would be wrong');
+    /* eoqAbove compares a rational cost with an irrational minimum, exactly */
+    eq(eoqAbove(ri(200), K, D, h).cmp, 0, 'at the rational EOQ the cost is EXACTLY the minimum');
+    eq(eoqAbove(ri(201), K, D, h).cmp, 1, 'one unit away it is strictly more');
+    eq(eoqAbove(ri(199), K, D, h).cmp, 1, 'and one unit the other way, also strictly more');
+    eq(eoqAbove(ri(110), ri(50), ri(600), ri(5)).cmp, 1,
+       'and on the irrational instance the best WHOLE quantity still costs strictly more than the minimum '
+       + '-- compared by squaring, with no decimal anywhere in it');
+    let below = 0;
+    for (let q = 1; q <= 400; q += 1) if (eoqAbove(ri(q), ri(50), ri(600), ri(5)).cmp < 0) below += 1;
+    eq(below, 0, 'and not one of four hundred quantities comes out BELOW the minimum, which would be impossible');
+  }
+
+  /* --- C8 L4: all-units discounts, against a scan of every quantity ------- */
+  {
+    const bands = [{ from: ri(0), price: ri(10), h: ri(2) },
+                   { from: ri(500), price: ri(9), h: rf(9, 5) },
+                   { from: ri(1000), price: ri(8), h: rf(8, 5) }];
+    const K = ri(40), D = ri(1200), h = ri(2);
+    eq(bandOf(bands, ri(0)) + ',' + bandOf(bands, ri(499)) + ',' + bandOf(bands, ri(500)) + ','
+       + bandOf(bands, ri(1000)) + ',' + bandOf(bands, ri(99999)), '0,0,1,2,2',
+       'bandOf is a step function and the break belongs to the band it opens');
+    eq(bandOf(bands, ri(-1)), -1, 'and a quantity below the first band is in no band at all');
+    /* the curve JUMPS at a break: the cost just below is strictly more than at it */
+    for (const at of [500, 1000]) {
+      const below = allUnitsCostAt(bands, K, D, h, ri(at - 1));
+      const here = allUnitsCostAt(bands, K, D, h, ri(at));
+      eq(Rcmp(here.total, below.total) < 0, true,
+         'the total cost DROPS across the break at ' + at + ', which is why the curve cannot be one line');
+      eq(rt(Rsub(below.buy, here.buy)), rt(Rmul(D, Rsub(below.price, here.price))),
+         'and the drop in the purchase bill is D times the price difference at ' + at);
+    }
+    const res = discountCandidates(bands, K, D, h);
+    eq(res.candidates.map((c) => c.at).join(' | '), 'the EOQ | the band edge | the band edge',
+       'one candidate per band: its own EOQ when that falls inside, the band edge when it does not');
+    eq(res.best, 2, 'and the cheapest plan buys into the deepest discount');
+    /* THE ORACLE: price every whole quantity from 1 to 2000 under the all-units
+       rule, with no notion of a candidate in it */
+    const sc = discountScan(bands, K, D, h, 1, 2000);
+    eq(sc.Q, 1000, 'an exhaustive scan of two thousand whole quantities agrees: 1000 is the cheapest');
+    eq(sc.scanned, 2000, 'and it really did price two thousand of them');
+    eq(rt(sc.cost), rt(res.candidates[2].cost.r), 'at the same total cost the candidate rule reports');
+    /* the candidate in each band is the cheapest quantity IN that band -- which
+       is the claim the rule rests on, checked band by band */
+    for (let b = 0; b < bands.length; b += 1) {
+      const lo = Number(bands[b].from.n) || 1;
+      const hi = b + 1 < bands.length ? Number(bands[b + 1].from.n) - 1 : 2000;
+      let best = null, bq = 0;
+      for (let q = Math.max(1, lo); q <= hi; q += 1) {
+        const c = allUnitsCostAt(bands, K, D, h, ri(q));
+        if (best === null || Rcmp(c.total, best) < 0) { best = c.total; bq = q; }
+      }
+      const cand = res.candidates[b];
+      const candQ = cand.Q !== null ? Number(cand.Q.n) : Math.round(parseFloat(surdDec(cand.Qsurd, 6)));
+      eq(Math.abs(bq - candQ) <= 1, true,
+         'band ' + (b + 1) + ': the scan’s cheapest quantity ' + bq + ' is the candidate ' + candQ
+         + ', to the nearest whole unit');
+    }
+    /* the second preset, where taking the discount is the WRONG move */
+    const two = [{ from: ri(0), price: ri(10), h: ri(2) },
+                 { from: ri(900), price: rf(39, 4), h: rf(39, 20) }];
+    const r2 = discountCandidates(two, K, D, h);
+    const s2 = discountScan(two, K, D, h, 1, 2000);
+    eq(r2.best, 0, 'on the two-band preset the cheaper price is NOT worth the order size');
+    eq(s2.Q < 900, true, 'and the scan agrees, landing at ' + s2.Q + ', below the break');
+    /* and the comparison that decided it never rounded */
+    eq(surdValueCmp(r2.candidates[0].cost, r2.candidates[1].cost) < 0, true,
+       'the winner was chosen by surdValueCmp, which settles a surd against a rational by squaring');
+    eq(surdValueCmp(surdValue(ri(12000), Rsurd(ri(2))), surdValue(ri(12000), Rsurd(ri(2)))), 0,
+       'and identical surd-valued costs compare equal rather than accidentally unequal');
+  }
+
+  /* --- C8 L5: the production quantity and the backorder level ------------- */
+  {
+    const K = ri(100), D = ri(1200), h = ri(6);
+    /* one formula, four readings: each is epqCost with different switches */
+    const plain = epqCost(K, D, h, null, null, R0);
+    eq(rt(plain.factor) + '/' + rt(plain.backlogFactor), '1/1',
+       'with P infinite and no backorders both correction factors are 1');
+    eq(rt(plain.Qsurd.q) + '/' + rt(eoq(K, D, h).Qsurd.q), '200/200',
+       'so the EPQ IS the EOQ, computed by the same function with the switches off');
+    const prod = epqCost(K, D, h, ri(2400), null, R0);
+    eq(rt(prod.factor), '1/2', 'producing at twice demand halves the effective holding rate');
+    eq(rt(prod.Qsurd.q), rt(eoq(K, D, Rdiv(h, ri(2))).Qsurd.q),
+       'and the run size is the EOQ with h scaled by that factor');
+    eq(epqCost(K, ri(2400), h, ri(2400), null, R0).feasible, false,
+       'a machine that cannot outpace demand has no cycle, and the function says so rather than dividing');
+    eq(epqCost(K, ri(3000), h, ri(2400), null, R0).feasible, false, 'nor can one slower than demand');
+
+    /* epqBestB: the vertex of a quadratic in b, checked by pricing b either side */
+    const best = epqBestB(ri(400), K, D, h, ri(2400), ri(6));
+    eq(rt(best.b), '100', 'at Q = 400 the best backorder level is f Q h/(h+pi) = 100');
+    eq(rt(epqCostAt(ri(400), best.b, K, D, h, ri(2400), ri(6))), '600', 'costing 600 per unit time');
+    let worse = 0;
+    for (const d of [-40, -13, -1, 1, 7, 55]) {
+      const c = epqCostAt(ri(400), Radd(best.b, ri(d)), K, D, h, ri(2400), ri(6));
+      if (Rcmp(c, ri(600)) <= 0) worse += 1;
+    }
+    eq(worse, 0, 'and every backorder level either side of it costs strictly more -- six of them, tested');
+    eq(epqBestB(ri(400), K, D, h, ri(2400), R0).feasible, false,
+       'with no penalty the model has no finite optimum, and epqBestB refuses rather than inventing one');
+    eq(epqBestB(R0, K, D, h, ri(2400), ri(6)), null, 'and Q = 0 is refused');
+    eq(epqBestB(ri(400), K, ri(3000), h, ri(2400), ri(6)), null,
+       'as is a production rate below demand, where the factor is not positive');
+    /* the profile's minimum is the surd epqCost returns */
+    {
+      const prof = epqProfile(K, D, h, ri(2400), ri(6), ri(40), ri(900), 860);
+      let bi = 0;
+      for (let i = 1; i < prof.length; i += 1) if (Rcmp(prof[i].cost, prof[bi].cost) < 0) bi = i;
+      const at = parseFloat(Rfixed(prof[bi].Q, 6));
+      eq(Math.abs(at - parseFloat(surdDec(prof.length ? epqCost(K, D, h, ri(2400), null, ri(6)).Qsurd
+                                          : R0, 6))) <= 1.5, true,
+         'the cheapest point of the 861-point profile is the run size epqCost returns, to the grid step');
+      eq(prof.length, 861, 'and the profile really did price 861 run sizes');
+    }
+    /* THE TWO or_core DEFECTS, pinned. Changing either is a visible change. */
+    {
+      const surdCase = epqCost(ri(50), ri(600), ri(5), null, null, ri(5));
+      eq(surdtext(surdCase.Qsurd), '40sqrt(15)', 'or_core: on this instance Q* is 40 sqrt 15');
+      eq(rt(surdCase.bStar), '20',
+         'DEFECT PINNED: or_core.epqCost.bStar returns 20 here, because it multiplies Qstar.q -- the '
+         + 'RATIONAL FACTOR -- instead of the surd; the formula f Q* h/(h+pi) gives 20 sqrt 15 = 77.4597');
+      eq(surdDec({ q: Rmul(surdCase.bStar, R0), k: 1n }, 1), '0.0', 'and the surd it should have been is');
+      eq(surdDec({ q: ri(20), k: 15n }, 4), '77.4597',
+         '77.4597 -- a factor of sqrt(15) apart, which no test in this file asserted before this one');
+      const zeroPi = epqCost(ri(100), ri(1200), ri(6), ri(2400), R0, R0);
+      eq(rt(zeroPi.bStar), '50',
+         'DEFECT PINNED: with pi = 0 the bStar branch compares backlog === R1 by object identity and then '
+         + 'adds h to h, returning f Q*/2 = 50 for a model in which backorders are free');
+      eq(invSrc.indexOf('ignores it, deliberately') > 0, true,
+         'and inventory.py records that it does not read that field, with the reason');
+    }
+  }
+
+  /* --- C8 L6: the newsvendor, over a window wider than the demand --------- */
+  {
+    const pmf = [[0, rf(1, 10)], [1, rf(2, 10)], [2, rf(3, 10)], [3, rf(3, 10)], [4, rf(1, 10)]];
+    const cu = ri(7), co = ri(3);
+    const nv = newsvendor(pmf, cu, co);
+    eq(rt(nv.ratio) + ' at Q = ' + nv.Q, '7/10 at Q = 3', 'the critical ratio, and where the CDF reaches it');
+    /* THE ORACLE: the expected cost at every whole Q in a wide window, summed
+       straight from the distribution with no cumulative and no ratio in it */
+    const brute = (Q) => {
+      let c = R0;
+      for (const [d, p] of pmf) {
+        const over = d < Q ? BigInt(Q - d) : 0n, under = d > Q ? BigInt(d - Q) : 0n;
+        c = Radd(c, Rmul(p, Radd(Rmul(co, R(over, 1n)), Rmul(cu, R(under, 1n)))));
+      }
+      return c;
+    };
+    let bq = -2, bc = null;
+    for (let q = -2; q <= 8; q += 1) { const c = brute(q); if (bc === null || Rcmp(c, bc) < 0) { bc = c; bq = q; } }
+    eq(bq, 3, 'and an independent cost, summed at every Q from -2 to 8, is cheapest at exactly 3');
+    eq(rt(bc), rt(nv.cost), 'at the same cost the critical-ratio row reports');
+    /* nvWiden must agree with that oracle at EVERY point, not only at the best */
+    const wide = nvWiden(pmf, cu, co, -2, 8);
+    let mism = 0;
+    for (const row of wide.rows) if (!Requ(row.cost, brute(row.Q))) mism += 1;
+    eq(mism, 0, 'nvWiden agrees with it at all eleven quantities, including the four outside the support');
+    eq(wide.Q, 3, 'and picks the same minimum');
+    eq(wide.rows.length, 11, 'over the whole eleven-point window');
+    eq(rt(nvCostAt(pmf, cu, co, 9).over) + '/' + rt(nvCostAt(pmf, cu, co, 9).under), '69/10/0',
+       'ordering nine leaves 6.9 units over on average -- the mean demand is 21/10 -- and never runs short');
+    /* the other two presets, where the ratio moves the answer */
+    const bakery = [[8, rf(1, 8)], [9, rf(1, 4)], [10, rf(1, 4)], [11, rf(1, 4)], [12, rf(1, 8)]];
+    const nb = newsvendor(bakery, ri(2), ri(5));
+    eq(rt(nb.ratio) + ' at Q = ' + nb.Q, '2/7 at Q = 9', 'when overage dominates the order shrinks to 9');
+    eq(nb.agrees, true, 'and that Q is the cheapest on the whole tabulated curve');
+    const spares = [[0, rf(1, 2)], [1, rf(1, 4)], [2, rf(1, 8)], [3, rf(1, 16)], [4, rf(1, 16)]];
+    const ns = newsvendor(spares, ri(20), ri(1));
+    eq(rt(ns.ratio) + ' at Q = ' + ns.Q, '20/21 at Q = 4',
+       'and a stockout costing twenty times the leftover pushes the order out to the top of the support');
+    eq(nvWiden(spares, ri(20), ri(1), 0, 7).Q, 4, 'which the wide scan confirms, over a window twice as long');
+  }
+
+  /* --- C8 L7/L8: lead-time demand, and two service levels ----------------- */
+  {
+    const per = [[0, rf(1, 4)], [1, rf(1, 2)], [2, rf(1, 4)]];
+    /* THE ORACLE for the convolution: enumerate every L-tuple of demands and
+       add up the probability of each total. Nothing here calls pmfConvolve. */
+    const tuples = (L) => {
+      const acc = {};
+      const rec = (left, total, p) => {
+        if (left === 0) { acc[total] = acc[total] ? Radd(acc[total], p) : p; return; }
+        for (const [v, q] of per) rec(left - 1, total + v, Rmul(p, q));
+      };
+      rec(L, 0, R1);
+      return Object.keys(acc).map(Number).sort((a, b) => a - b).map((v) => [v, acc[v]]);
+    };
+    for (const L of [1, 2, 3, 4]) {
+      const want = tuples(L), got = reorderPoint(per, L, 0).lead;
+      eq(got.length, want.length, 'the ' + L + '-fold lead-time distribution has the right support');
+      let bad = 0;
+      for (let i = 0; i < want.length; i += 1) {
+        if (got[i][0] !== want[i][0] || !Requ(got[i][1], want[i][1])) bad += 1;
+      }
+      eq(bad, 0, 'and every one of its ' + want.length + ' probabilities matches the enumeration of all '
+         + Math.pow(3, L) + ' demand sequences');
+    }
+    const rp = reorderPoint(per, 2, 2);
+    eq(rt(rp.meanDemand) + '/' + rt(rp.shortage) + '/' + rt(rp.cycleService), '2/3/8/11/16',
+       'at r = 2 over two periods: mean 2, expected shortage 3/8, cycle service 11/16');
+    /* the expected shortage, recomputed from the oracle's own distribution */
+    {
+      let s = R0;
+      for (const [x, p] of tuples(2)) if (x > 2) s = Radd(s, Rmul(p, R(BigInt(x - 2), 1n)));
+      eq(rt(s), rt(rp.shortage), 'and the shortage summed from the enumerated distribution is the same 3/8');
+    }
+    /* cycle service and fill rate are DIFFERENT numbers, which is the lesson */
+    const fr = fillRate(per, 2, 2, ri(100));
+    eq(rt(fr.cycle) + ' vs ' + rt(fr.fill), '11/16 vs 797/800',
+       'cycle service 11/16 = 68.75%, fill rate 797/800 = 99.625% -- the same policy, two service levels');
+    eq(Rcmp(fr.fill, fr.cycle) > 0, true, 'and on any sensible order quantity the fill rate is the larger');
+    eq(rt(fillRate(per, 2, 2, ri(1)).fill), '5/8',
+       'shrink the order quantity to 1 and the fill rate falls BELOW the cycle service, which is what '
+       + 'shows the two are not the same quantity rescaled');
+    eq(fillRate(per, 2, 2, R0), null, 'and a zero order quantity is refused rather than divided by');
+    eq(smallestReorder(per, 2, rf(19, 20), 8), 4, 'the smallest reorder point reaching 95% cycle service is 4');
+    eq(Rcmp(reorderPoint(per, 2, 3).cycleService, rf(19, 20)) < 0, true, 'and 3 really does fall short');
+    eq(smallestReorder(per, 2, R1, 8), 4, 'and 100% service is reachable here because the demand is bounded');
+    eq(smallestReorder(per, 2, ri(2), 8), -1, 'while an impossible target returns -1 rather than the top of the range');
+    eq(serviceRows(per, 2, 0, 4).length, 5, 'serviceRows returns one row per reorder point in range');
+    /* cycle service is monotone in r, which is what makes "the smallest" meaningful */
+    {
+      let drops = 0;
+      const rows = serviceRows(per, 3, 0, 6);
+      for (let i = 1; i < rows.length; i += 1) {
+        if (Rcmp(rows[i].cycleService, rows[i - 1].cycleService) < 0) drops += 1;
+      }
+      eq(drops, 0, 'and it never falls as the reorder point rises');
+    }
+    /* periodic review covers R + L, and that is not L */
+    const bs = baseStock(per, 2, 1, rf(9, 10));
+    eq(bs.periods + ' S=' + bs.S, '3 S=5', 'periodic review over R + L = 3 periods needs S = 5 for 90%');
+    eq(rt(bs.mean), '3', 'the mean over those three periods is 3');
+    {
+      const want = tuples(3);
+      let bad = 0;
+      for (let i = 0; i < want.length; i += 1) {
+        if (bs.demand[i][0] !== want[i][0] || !Requ(bs.demand[i][1], want[i][1])) bad += 1;
+      }
+      eq(bad, 0, 'and its distribution is the enumeration of all 27 three-period demand sequences');
+    }
+    eq(baseStock(per, 1, 0, rf(9, 10)).S, 2,
+       'covering the lead time alone -- one period here -- would give S = 2 instead');
+    {
+      /* what that mistake actually delivers, over the real three periods */
+      let cdf = R0;
+      for (const [x, p] of tuples(3)) if (x <= 2) cdf = Radd(cdf, p);
+      eq(rt(cdf), '11/32', 'which over R + L periods is 11/32 service against a target of 9/10');
+    }
+  }
+
+  /* --- the renderers, which return strings and are therefore assertable --- */
+  {
+    const pts = eoqCurve(ri(100), ri(1200), ri(6), ri(1), ri(401), 20)
+      .map((p) => [parseFloat(Rfixed(p.Q, 4)), parseFloat(Rfixed(p.total, 4))]);
+    const svg = plotSvg([{ tone: 'green', pts: pts }], { w: 660, h: 240 },
+      { marks: [{ kind: 'p', at: 200, y: 1200, label: 'Q*' }, { kind: 'v', at: 150, label: 'yours' }],
+        bandFrom: 173.6, bandTo: 230.4, xlo: '1', xhi: '401' });
+    eq((svg.match(/<path /g) || []).length, 1, 'plotSvg draws one path per series');
+    eq((svg.match(/ L /g) || []).length, 20, 'with one line segment per grid step after the first');
+    eq((svg.match(/<circle /g) || []).length, 1, 'a point mark is a circle');
+    eq((svg.match(/stroke-dasharray="4 3"/g) || []).length, 1, 'a vertical mark is a dashed line');
+    eq((svg.match(/<rect /g) || []).length, 1, 'and the band is one shaded rectangle');
+    eq(svg.indexOf('NaN') < 0 && svg.indexOf('undefined') < 0, true,
+       'and nothing in it is NaN or undefined, which is how a silently broken plot looks');
+    eq(plotSvg([], { w: 660, h: 240 }, {}).indexOf('nothing to draw') > 0, true,
+       'an empty series says so rather than emitting an empty path');
+    const bars = barsSvg([[0, rf(1, 10)], [1, rf(2, 10)], [2, rf(3, 10)], [3, rf(3, 10)], [4, rf(1, 10)]],
+      { w: 660, h: 170 }, { markAt: 3, markLabel: 'Q = 3', shortAbove: 3 });
+    eq((bars.match(/<rect /g) || []).length, 5, 'barsSvg draws one bar per outcome');
+    eq((bars.match(/var\(--amber\)/g) || []).length >= 2, true, 'the marked bar and its line are amber');
+    eq((bars.match(/var\(--red\)/g) || []).length, 1, 'and exactly one outcome above Q = 3 is shaded red');
+    eq(barsSvg([], { w: 660, h: 170 }, {}).indexOf('no distribution') > 0, true,
+       'and an empty distribution says so');
+    const saw = sawPoints(ri(200), ri(1200), 4);
+    eq(saw.length, 8, 'the sawtooth has two corners a cycle');
+    eq(saw[0].join(',') + ' ' + saw[1].join(','), '0,200 1,0', 'rising instantly to Q and falling to zero');
+    eq(sawPoints(R0, ri(1200), 4).length, 0, 'and a zero batch draws nothing rather than dividing by it');
+    const ep = epqPoints(ri(400), ri(100), ri(1200), ri(2400), 3);
+    eq(ep.length, 9, 'the production sawtooth has three corners a cycle');
+    eq(ep[0][1] + ' ' + ep[1][1], '-100 100',
+       'starting at minus the backorder level and peaking at fQ - b');
+    eq(epqPoints(ri(400), R0, ri(1200), null, 2)[1][0], 0,
+       'with P infinite the rise is instantaneous, so the peak is at the start of the cycle');
+    eq(epqPoints(ri(400), R0, ri(3000), ri(2400), 2).length, 0,
+       'and a machine slower than demand draws nothing');
+  }
+
+  /* --- every mode that prints a surd says it is rounded ------------------- */
+  {
+    const modes = ['_eoq', '_discriminant', '_discount', '_epq', '_newsvendor', '_reorder', '_review'];
+    let missing = [], present = [];
+    for (const m of modes) {
+      const at = invSrc.indexOf('def ' + m + '(cfg):');
+      eq(at > 0, true, 'inventory.py defines mode function ' + m);
+      const next = modes.map((o) => invSrc.indexOf('def ' + o + '(cfg):'))
+        .filter((p) => p > at).sort((a, b) => a - b)[0];
+      const body = invSrc.slice(at, next === undefined ? invSrc.length : next);
+      const printsSurd = /surdDec\(/.test(body);
+      const saysSo = /roundedNote\(/.test(body);
+      if (printsSurd && !saysSo) missing.push(m);
+      if (printsSurd && saysSo) present.push(m);
+    }
+    eq(missing.join(','), '',
+       'every mode that calls surdDec also calls roundedNote -- the path’s footer promises that each '
+       + 'lesson printing an irrational says it is rounded and how, and this is that promise as a source scan');
+    eq(present.join(','), '_eoq,_discriminant,_discount,_epq',
+       'and the four that do print one are exactly eoq, discriminant, discount and epq');
+    eq(/rounded to ' \+ places \+ ' decimal places/.test(invSrc), true,
+       'roundedNote names the number of places');
+    eq(invSrc.indexOf('three guard digits') > 0, true, 'and the method that produced them');
+    eq(invSrc.indexOf('inventory_lab: unknown mode') > 0, true,
+       'and an unknown mode raises rather than falling back to a default');
+    eq((invSrc.match(/^_MODES = \{$/m) || []).length, 1, 'the kit registers its modes in one place');
+    for (const m of ['eoq', 'discriminant', 'discount', 'epq', 'newsvendor', 'reorder', 'review']) {
+      eq(invSrc.indexOf('    "' + m + '": _' + m + ',') > 0, true, 'mode ' + m + ' is registered');
+    }
+  }
+
+  /* --- the reader's own door: what a typo does ---------------------------- */
+  {
+    eq(invPositive('7/2') === null, false, 'a fraction is read exactly');
+    eq(rt(invPositive('7/2')), '7/2', 'as 7/2, not as 3.5');
+    eq(invPositive('0'), null, 'zero is refused where the model needs a positive number');
+    eq(invPositive('-3'), null, 'so is a negative one');
+    eq(invPositive('banana'), null, 'and text that is not a number is null rather than NaN');
+    eq(invPositive('1/0'), null, 'a zero denominator is caught rather than thrown');
+    eq(rt(invNonNegative('0')), '0', 'while zero IS allowed where the model permits it');
+    eq(invNonNegative('-1'), null, 'and a negative one still is not');
+    eq(pxOf(rf(1, 3)), 0.333333, 'a rational becomes a coordinate by BigInt long division');
+    eq(pxOf(R(10n ** 30n, 3n * 10n ** 29n)), 3.333333,
+       'including one whose numerator and denominator both overflow a double');
+  }
+}
+
+// ==========================================================================
+// Operations Research course nine, first kit: `markov`, and three oracles
+// ==========================================================================
+//
+// or_core's CHAIN_JS is exercised in the or_core section far above, at the
+// ENGINE level: chainPow, chainClasses, chainPeriod, steadyState, absorbing,
+// policyEvaluate, policyIterate and birthDeath are each called there. MARKOV_JS
+// is the layer the five published lessons read -- the transition-matrix guard,
+// the distribution walk, the on-page verification of piP = pi, the
+// floating-point iteration the exact solve is set against, the exact power
+// cycle detector, and the two renderers.
+//
+// THE FIRST ORACLE IS THE MARKOV CHAIN TREE THEOREM, and it is the reason this
+// section can say anything at all about whether `steadyState` is right.
+// `steadyState` drops a balance equation and runs Gauss-Jordan; any oracle that
+// also solved a linear system would be testing elimination against elimination.
+// `treePi` below is combinatorial instead: pi_j is proportional to the sum, over
+// every spanning in-tree of the support digraph rooted at j, of the product of
+// its arc probabilities. It enumerates every function from the non-root states
+// to the states, keeps the acyclic ones, multiplies and adds. No elimination,
+// no matrix, no subtraction of a row from another row. On the three-brand
+// preset both routes give (7/17, 11/34, 9/34); on the 3-cycle both give
+// (1/3, 1/3, 1/3).
+//
+// THE SECOND ORACLE IS A LONG POWER ITERATION IN FLOATING POINT, and the
+// DISAGREEMENT is the measurement rather than the agreement. That is the whole
+// content of the path's key line, "piP = pi -- a steady state is a linear
+// system, not a limit":
+//
+//   * on the aperiodic irreducible presets the iteration reaches about fifteen
+//     decimal places and then STOPS IMPROVING. Four hundred steps are no better
+//     than sixty; the numbers below record both, so "it has run out of double,
+//     not out of steps" is a measurement and not a turn of phrase.
+//   * on the 3-cycle preset the exact solve returns a unique pi and the powers
+//     never converge to anything: `powerCycles` finds P^3 EXACTLY equal to the
+//     identity, and the iteration's error sits at 2/3 for ever. The linear
+//     system has an answer where no limit exists at all, which is the sharpest
+//     form of the claim and it is one shipped preset.
+//
+// THE THIRD ORACLE IS SUMMATION WHERE or_core INVERTS. N = (I - Q)^-1 is
+// checked against sum_k Q^k accumulated directly, the expected time to
+// absorption against the closed form i(n - i) for the symmetric walk, the
+// absorption probabilities against a direct walk of the distribution forward
+// four hundred steps, and policy iteration against every policy evaluated by
+// summing its discounted reward series rather than by solving for it.
+console.log('operations research: the markov kit, the chain tree theorem, and an iteration that cannot win');
+{
+  const OR9_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'or_core.py');
+  const MK_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'markov.py');
+  const SYS9_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'algebra_systems.py');
+  const AC9_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'algebra_core.py');
+  const or9Src = fs.readFileSync(OR9_SOURCE, 'utf8');
+  const mkSrc = fs.readFileSync(MK_SOURCE, 'utf8');
+  const sys9Src = fs.readFileSync(SYS9_SOURCE, 'utf8');
+  const ac9Src = fs.readFileSync(AC9_SOURCE, 'utf8');
+  const or9 = (n) => blockFrom(or9Src, n, OR9_SOURCE);
+  const mk = (n) => blockFrom(mkSrc, n, MK_SOURCE);
+
+  /* Exactly what markov.py's _CORE_JS concatenates, in that order. */
+  eval(blockFrom(ac9Src, 'RATIONAL_JS', AC9_SOURCE) + blockFrom(sys9Src, 'FORMAT_JS', SYS9_SOURCE)
+     + blockFrom(sys9Src, 'MATRIX_JS', SYS9_SOURCE) + or9('ORFMT_JS') + or9('CHAIN_JS') + mk('MARKOV_JS'));
+
+  const ri = (v) => R(BigInt(v), 1n);
+  const rf = (a, b) => R(BigInt(a), BigInt(b));
+  const rt = (a) => Rtext(a);
+  const vec = (v) => v.map(rt).join(',');
+
+  /* The presets, transcribed. */
+  const MP = {
+    weather: '1/2 1/2; 1/4 3/4',
+    market: '7/10 2/10 1/10; 3/10 5/10 2/10; 1/10 3/10 6/10',
+    cycle: '0 1 0; 0 0 1; 1 0 0',
+    leaky: '1/2 1/4 1/4; 0 3/4 1/4; 0 1/2 1/2',
+    split: '1/2 1/2 0 0; 1/2 1/2 0 0; 0 0 1/3 2/3; 0 0 1/4 3/4'
+  };
+  {
+    let drift = [];
+    for (const k of Object.keys(MP)) if (mkSrc.indexOf('"P": "' + MP[k] + '"') < 0) drift.push(k);
+    eq(drift.join(','), '', 'every chain preset transcribed here is the matrix markov.py ships');
+    eq(mkSrc.indexOf('"P": "1 0 0 0 0; 1/2 0 1/2 0 0; 0 1/2 0 1/2 0; 0 0 1/2 0 1/2; 0 0 0 0 1"') > 0, true,
+       'and the gambler’s ruin chain the absorbing mode opens on');
+    eq(mkSrc.indexOf('"P0": "1/2 1/2; 1/4 3/4"') > 0 && mkSrc.indexOf('"P1": "3/4 1/4; 1/2 1/2"') > 0, true,
+       'and the two action matrices of the machine MDP');
+  }
+  const M = (key) => Mparse(MP[key], 'preset').M;
+
+  /* ================================================================ ORACLE 1
+     THE MARKOV CHAIN TREE THEOREM. pi_j is proportional to the total weight of
+     the spanning in-trees rooted at j: every non-root state picks a parent, the
+     choice is kept only if following parents from every state reaches the root,
+     and the weight is the product of the arc probabilities. Combinatorial, with
+     no elimination anywhere in it. */
+  const treePi = (P) => {
+    const n = P.length, weights = [];
+    for (let root = 0; root < n; root += 1) {
+      const others = [];
+      for (let i = 0; i < n; i += 1) if (i !== root) others.push(i);
+      let total = R0;
+      const parent = new Array(n).fill(-1);
+      const rec = (idx) => {
+        if (idx === others.length) {
+          let w = R1;
+          for (const u of others) { w = Rmul(w, P[u][parent[u]]); if (Rzero(w)) return; }
+          for (const u of others) {
+            let cur = u, steps = 0;
+            while (cur !== root && steps <= n) { cur = parent[cur]; steps += 1; }
+            if (cur !== root) return;                 /* the choice closed a cycle */
+          }
+          total = Radd(total, w);
+          return;
+        }
+        const u = others[idx];
+        for (let v = 0; v < n; v += 1) { if (v === u) continue; parent[u] = v; rec(idx + 1); }
+        parent[u] = -1;
+      };
+      rec(0);
+      weights.push(total);
+    }
+    let s = R0;
+    for (const t of weights) s = Radd(s, t);
+    return Rzero(s) ? null : weights.map((t) => Rdiv(t, s));
+  };
+
+  /* --- C9 L1: a matrix is refused unless it really is one ----------------- */
+  {
+    eq(chainValid(M('weather')).ok, true, 'the two-state preset is a transition matrix');
+    eq(chainValid(M('market')).why, 'every row sums to exactly 1, so this is a transition matrix',
+       'and says so rather than staying silent');
+    eq(chainValid([[rf(1, 2), rf(1, 3)], [rf(1, 2), rf(1, 2)]]).ok, false, 'a row summing to 5/6 is refused');
+    eq(chainValid([[rf(1, 2), rf(1, 3)], [rf(1, 2), rf(1, 2)]]).why.indexOf('row 1 sums to 5/6'), 0,
+       'and the row is NAMED -- "the matrix is wrong" is not a usable message');
+    eq(chainValid([[rf(-1, 2), rf(3, 2)], [R0, R1]]).why.indexOf('cannot be negative') > 0, true,
+       'a negative probability is refused before the row sums are even looked at -- that row sums to 1');
+    eq(chainValid([[rf(-1, 2), rf(3, 2)], [R0, R1]]).why.indexOf('(1,1)') > 0, true,
+       'and the offending entry is named by position');
+    eq(chainValid([[rf(-1, 2), rf(3, 2)], [R0, R1]]).ok, false,
+       'which is the case a row-sum test alone would pass, because -1/2 + 3/2 is exactly 1');
+    eq(chainValid([[R1, R0]]).ok, false, 'a matrix that is not square is refused');
+    eq(chainValid([[R1, R0]]).why.indexOf('square') > 0, true, 'and told it is not square');
+    eq(chainValid([]).ok, false, 'as is nothing at all');
+    /* the refusal is not cosmetic: it is the only thing between a reader and a
+       page of confident numbers about a matrix that is not a chain */
+    eq(chainValid([[ri(2), Rneg(R1)], [R0, R1]]).ok, false,
+       'and a row that sums to 1 with an entry above 1 is refused too, which the row-sum test alone misses');
+  }
+
+  /* --- C9 L1: the distribution walk, exactly ------------------------------ */
+  {
+    const P = M('weather');
+    eq(readDist('1 0', 2).map(rt).join(','), '1,0', 'a starting distribution is read exactly');
+    eq(readDist('1/3 2/3', 2).map(rt).join(','), '1/3,2/3', 'fractions included');
+    eq(readDist('1/2 1/3', 2), null, 'one that does not sum to 1 is REFUSED rather than rescaled');
+    eq(readDist('2 -1', 2), null, 'a negative entry is refused even though the entries sum to 1');
+    eq(readDist('1 0 0', 2), null, 'and one of the wrong length');
+    const w = distWalk([R1, R0], P, 6);
+    eq(w.length, 7, 'the walk keeps the start and every step');
+    eq(vec(w[1]), '1/2,1/2', 'one step from state 1');
+    eq(vec(w[6]), '683/2048,1365/2048', 'and six steps, exactly, with the denominator 2^11');
+    /* v P^n by the walk and by chainPow must be the same vector */
+    const Pn = chainPow(P, 6);
+    eq(rt(Pn[0][0]) + ',' + rt(Pn[0][1]), '683/2048,1365/2048',
+       'which is the first row of P^6 -- two routes to the same fractions');
+    eq(vec(pushDist([rf(1, 3), rf(2, 3)], P)), '1/3,2/3',
+       'and pushing the steady state forward leaves it exactly where it was');
+    /* the walk conserves probability at every step, which a wrong index would break */
+    let bad = 0;
+    for (const row of distWalk([R1, R0, R0, R0, R0], M('split').concat(), 5)) {
+      let s = R0;
+      for (const v of row) s = Radd(s, v);
+      if (!Requ(s, R1)) bad += 1;
+    }
+    eq(bad, 0, 'and every row of a five-step walk still sums to exactly 1');
+  }
+
+  /* --- C9 L2: classes, recurrence and period ------------------------------ */
+  {
+    const leaky = chainClasses(M('leaky'));
+    eq(leaky.classes.length, 2, 'the leaky preset has two communicating classes');
+    eq(leaky.classes.map((c) => (c.recurrent ? 'R' : 'T')).join(''), 'TR',
+       'the first transient, the second recurrent');
+    eq(leaky.irreducible, false, 'so it is not irreducible');
+    eq(leaky.classes[0].leaves.length > 0, true, 'and the arc that leaves the transient class is named');
+    const split = chainClasses(M('split'));
+    eq(split.classes.length + ' ' + split.classes.map((c) => (c.recurrent ? 'R' : 'T')).join(''), '2 RR',
+       'the split preset has TWO recurrent classes, which is what makes its steady state non-unique');
+    const cyc = chainClasses(M('cycle'));
+    eq(cyc.irreducible, true, 'the 3-cycle is irreducible');
+    eq(chainPeriod(M('cycle'), [0, 1, 2]).period, 3, 'and has period 3');
+    eq(chainPeriod(M('market'), [0, 1, 2]).aperiodic, true, 'while the three-brand chain is aperiodic');
+    eq(chainPeriod(M('weather'), [0, 1]).period, 1, 'as is any chain with a self-loop');
+    /* the period really is a gcd of CYCLE LENGTHS: check by enumerating the
+       lengths of the returns to state 0 that the matrix actually permits */
+    {
+      const P = M('cycle'), lens = [];
+      for (let n = 1; n <= 9; n += 1) if (!Rzero(chainPow(P, n)[0][0])) lens.push(n);
+      eq(lens.join(','), '3,6,9', 'on the 3-cycle P^n[0][0] is nonzero only at multiples of 3');
+      let g = 0;
+      for (const l of lens) { let a = g, b = l; while (b) { const t = a % b; a = b; b = t; } g = a; }
+      eq(g, chainPeriod(P, [0, 1, 2]).period, 'and the gcd of those lengths is the period the kit reports');
+    }
+    {
+      const P = M('market'), lens = [];
+      for (let n = 1; n <= 6; n += 1) if (!Rzero(chainPow(P, n)[0][0])) lens.push(n);
+      eq(lens.join(','), '1,2,3,4,5,6', 'on the three-brand chain every return length occurs');
+      eq(chainPeriod(P, [0, 1, 2]).period, 1, 'so the gcd, and the period, is 1');
+    }
+  }
+
+  /* --- C9 L3: THE FLAGSHIP. pi is solved for, and it is checked ----------- */
+  {
+    for (const key of ['weather', 'market', 'cycle']) {
+      const P = M(key), ss = steadyState(P);
+      eq(ss.unique, true, key + ': the balance system has a unique solution');
+      /* ORACLE 1: the chain tree theorem, sharing no arithmetic with the solve */
+      const tree = treePi(P);
+      eq(vec(tree), vec(ss.pi),
+         key + ': and it is EXACTLY what the Markov chain tree theorem gives by enumerating spanning '
+         + 'in-trees -- a combinatorial sum against a Gauss-Jordan elimination, with no shared code');
+      /* the check the page performs */
+      const chk = steadyCheck(P, ss.pi);
+      eq(chk.ok, true, key + ': piP recomputed from the solution equals pi entry for entry, exactly');
+      eq(rt(chk.residual), '0', key + ': the largest residual is the integer zero, not a small number');
+      eq(rt(chk.sum), '1', key + ': and the entries sum to exactly 1');
+      /* the checker must REJECT a wrong pi, or it is a rubber stamp: this is
+         the arm that would otherwise be satisfied by comparing pi with itself */
+      {
+        const wrong = ss.pi.slice();
+        wrong[0] = Radd(wrong[0], rf(1, 10n ** 9n));
+        wrong[1] = Rsub(wrong[1], rf(1, 10n ** 9n));
+        const bad = steadyCheck(P, wrong);
+        eq(bad.ok, false, key + ': and a pi out by a billionth -- still summing to exactly 1 -- is REJECTED');
+        eq(Rzero(bad.residual), false, key + ': with a nonzero residual to show for it');
+      }
+      /* dropping any equation gives the same answer, which is the claim that
+         makes "drop one of them" legitimate */
+      const answers = new Set();
+      for (let d = 0; d < P.length; d += 1) answers.add(vec(steadyState(P, d).pi));
+      eq(answers.size, 1, key + ': and dropping any one of the ' + P.length
+         + ' balance equations gives the same pi -- which is why dropping one is allowed');
+      eq(ss.system.length, P.length, key + ': the system SHOWN has n rows, so one really was replaced');
+    }
+    eq(vec(steadyState(M('market')).pi), '7/17,11/34,9/34', 'the three-brand steady state');
+    /* the reducible chain with ONE recurrent class: the solution is still
+       unique, and it puts zero on the transient state -- which is the claim
+       mode `classify` prints on that preset, so it is checked rather than said */
+    {
+      const ss = steadyState(M('leaky'));
+      eq(ss.unique, true, 'the leaky preset is reducible but has only one recurrent class, so pi is unique');
+      eq(vec(ss.pi), '0,2/3,1/3', 'and it puts EXACTLY zero on the transient state');
+      eq(steadyCheck(M('leaky'), ss.pi).ok, true, 'while still satisfying piP = pi exactly');
+      eq(vec(treePi(M('leaky'))), vec(ss.pi),
+         'and the chain tree theorem agrees, which on a reducible chain is worth checking separately: '
+         + 'every spanning in-tree rooted at the transient state has weight zero');
+      eq(chainClasses(M('leaky')).classes.filter((c) => c.recurrent).length, 1,
+         'one recurrent class is what makes that uniqueness hold, and classify counts it');
+    }
+    eq(vec(steadyState(M('cycle')).pi), '1/3,1/3,1/3', 'and the 3-cycle’s, which is uniform');
+    /* the reducible chain: no unique answer, and the kit says so */
+    {
+      const ss = steadyState(M('split'));
+      eq(ss.unique, false, 'the split preset has NO unique steady state');
+      eq(ss.rank + ' of ' + M('split').length, '3 of 4', 'its reduced system has rank 3 against 4 unknowns');
+      eq(steadyCheck(M('split'), ss.pi).ok, false, 'and the checker refuses to certify a null answer');
+      eq(steadyCheck(M('split'), ss.pi).why.indexOf('no unique solution') > 0, true, 'saying why');
+      /* and it is not unique because two different distributions are both
+         stationary -- constructed here, and both verified */
+      const a = [rf(1, 2), rf(1, 2), R0, R0], b = [R0, R0, rf(3, 11), rf(8, 11)];
+      eq(vec(pushDist(a, M('split'))), vec(a), 'the first closed group’s own steady state is stationary');
+      eq(vec(pushDist(b, M('split'))), vec(b), 'so is the second’s');
+      const mix = a.map((v, i) => Radd(Rmul(v, rf(1, 3)), Rmul(b[i], rf(2, 3))));
+      eq(vec(pushDist(mix, M('split'))), vec(mix),
+         'and so is a third of one plus two thirds of the other -- which is what "not unique" means, '
+         + 'demonstrated rather than inferred from a rank');
+    }
+  }
+
+  /* ================================================================ ORACLE 2
+     The iteration, and the disagreement as the measurement. */
+  {
+    /* an aperiodic irreducible chain: the iteration gets about fifteen places
+       and then stops getting any more, whatever you do to the step count */
+    const P = M('market'), pi = steadyState(P).pi;
+    const Pf = floatMatrix(P);
+    const start = [1, 0, 0];
+    const at60 = floatGap(pi, floatWalk(Pf, start, 60).v);
+    const at400 = floatGap(pi, floatWalk(Pf, start, 400).v);
+    eq(at60.places >= 14, true, 'sixty steps of the iteration agree with the solve to at least 14 places');
+    eq(at400.places >= 14, true, 'four hundred steps agree to at least 14 places');
+    eq(at400.places <= 17, true,
+       'and NOT to more than 17: six hundred extra multiplications bought nothing, because the iteration '
+       + 'ran out of double rather than out of steps');
+    eq(at60.gap > 0, true, 'the sixty-step gap is a real positive number, ' + at60.gap.toExponential(2));
+    /* the EXACT gap, which the float column cannot produce */
+    const ex = exactGap(P, pi, 12);
+    eq(Rsign(ex.gap) > 0, true, 'P^12 is still exactly ' + Rshort(ex.gap, 6, 8) + ' away from pi');
+    eq(Rcmp(exactGap(P, pi, 24).gap, ex.gap) < 0, true, 'and P^24 is exactly closer, as a fraction');
+    eq(Rcmp(exactGap(P, pi, 40).gap, rf(1, 1000000000)) < 0, true, 'P^40 within a billionth, exactly');
+    /* THE 3-CYCLE, where there is no limit at all */
+    const C = M('cycle'), cpi = steadyState(C).pi;
+    const cyc = powerCycles(C, 12);
+    eq(cyc.repeats + ' period ' + cyc.period, 'true period 3',
+       'on the 3-cycle the powers of P repeat with period 3 -- checked by EXACT matrix equality');
+    eq(cyc.first + '/' + cyc.again, '0/3', 'P^3 is exactly P^0, the identity');
+    eq(cyc.why.indexOf('does not converge at all') > 0, true,
+       'and the kit says it does not converge at all, rather than that it converges slowly');
+    const cg = floatGap(cpi, floatWalk(floatMatrix(C), [1, 0, 0], 400).v);
+    eq(cg.gap > 0.6, true, 'four hundred steps later the iteration is still 2/3 away from the answer');
+    eq(floatGap(cpi, floatWalk(floatMatrix(C), [1, 0, 0], 4000).v).gap > 0.6, true,
+       'and four thousand steps later, still 2/3 away -- while the exact solve had it at step zero');
+    eq(steadyCheck(C, cpi).ok, true,
+       'the solution the system gave is nevertheless stationary: piP = pi exactly, on a chain whose '
+       + 'powers have no limit. That is the whole of "a steady state is a linear system, not a limit"');
+    eq(powerCycles(M('market'), 12).repeats, false,
+       'and on an aperiodic chain no power repeats an earlier one exactly, which is the contrast');
+    /* toFloat must go through long division, not Number(n)/Number(d) */
+    {
+      /* (19/20)^400 is 512 digits over 521. Number() makes Infinity of both, so
+         the naive conversion returns NaN, and a page built on it would show a
+         blank bar rather than a wrong one -- which is worse, because nothing
+         says so. toFloat goes through BigInt long division instead. */
+      const tiny = Rpow(rf(19, 20), 400);
+      eq(String(tiny.n).length + '/' + String(tiny.d).length, '512/521', '(19/20)^400 is 512 digits over 521');
+      eq(Number.isNaN(Number(tiny.n) / Number(tiny.d)), true,
+         'and Number(n)/Number(d) on it is NaN, because both halves overflow to Infinity');
+      eq(toFloat(tiny) > 1.2e-9 && toFloat(tiny) < 1.3e-9, true,
+         'while toFloat returns ' + toFloat(tiny).toExponential(3) + ', by BigInt long division');
+    }
+    eq(floatGap([rf(1, 2), rf(1, 2)], [0.5, 0.5]).gap, 0, 'an exact hit reports a gap of zero');
+    eq(String(floatGap([rf(1, 2), rf(1, 2)], [0.5, 0.5]).places), 'Infinity',
+       'and infinitely many places agreed, which is a statement about the double and not about the chain');
+  }
+
+  /* ================================================================ ORACLE 3
+     Absorption, checked by summation and by a closed form. */
+  {
+    const ruin = Mparse('1 0 0 0 0; 1/2 0 1/2 0 0; 0 1/2 0 1/2 0; 0 0 1/2 0 1/2; 0 0 0 0 1', 'ruin').M;
+    eq(chainValid(ruin).ok, true, 'the gambler’s ruin chain is a transition matrix');
+    const abs = absorbing(ruin, [0, 4], 40);
+    eq(abs.t.map(rt).join(','), '3,4,3', 'the expected steps to absorption from 1, 2 and 3');
+    /* the closed form for the symmetric walk on 0..n is i(n - i) */
+    eq([1, 2, 3].map((i) => i * (4 - i)).join(','), '3,4,3',
+       'which is i(n - i) with n = 4 -- a closed form, agreeing with the matrix inverse');
+    eq(abs.B.map((r) => rt(r[1])).join(','), '1/4,1/2,3/4',
+       'and the probability of finishing rich from 1, 2 and 3');
+    eq([1, 2, 3].map((i) => rt(rf(i, 4))).join(','), '1/4,1/2,3/4', 'which is i/n, as the closed form says');
+    /* N = sum_k Q^k, accumulated directly rather than inverted */
+    {
+      let acc = Mid(abs.Q.length), pw = Mid(abs.Q.length);
+      for (let k = 1; k <= 400; k += 1) { pw = Mmul(pw, abs.Q); acc = Madd(acc, pw); }
+      let worst = R0;
+      for (let i = 0; i < acc.length; i += 1) {
+        for (let j = 0; j < acc.length; j += 1) {
+          const d = Rabs(Rsub(abs.N[i][j], acc[i][j]));
+          if (Rcmp(d, worst) > 0) worst = d;
+        }
+      }
+      eq(Rcmp(worst, rf(1, 10n ** 50n)) < 0, true,
+         'and (I - Q)^-1 agrees with I + Q + ... + Q^400 summed directly to within 10^-50, exactly '
+         + '-- an inverse against a series, sharing no code');
+      eq(Rsign(worst) > 0, true,
+         'but not to zero, because the series is infinite and four hundred terms are four hundred terms');
+    }
+    /* absorption probabilities by walking a distribution forward */
+    {
+      let v = [R0, R1, R0, R0, R0];
+      for (let k = 0; k < 400; k += 1) v = pushDist(v, ruin);
+      eq(Rcmp(Rabs(Rsub(v[4], abs.B[0][1])), rf(1, 10n ** 50n)) < 0, true,
+         'and walking the distribution forward four hundred steps lands the same 1/4 on the rich end, '
+         + 'to within 10^-50 -- exactly, because the walk is over rationals too');
+    }
+    /* the biased walk, where the closed form is the other standard one */
+    {
+      const drunk = Mparse('1 0 0 0 0; 1/3 0 2/3 0 0; 0 1/3 0 2/3 0; 0 0 1/3 0 2/3; 0 0 0 0 1', 'd').M;
+      const a = absorbing(drunk, [0, 4], 6);
+      /* P(reach n before 0) from i is (1 - (q/p)^i)/(1 - (q/p)^n) with q/p = 1/2 */
+      const r = rf(1, 2);
+      for (let i = 1; i <= 3; i += 1) {
+        const want = Rdiv(Rsub(R1, Rpow(r, i)), Rsub(R1, Rpow(r, 4)));
+        eq(rt(a.B[i - 1][1]), rt(want),
+           'the biased walk from ' + i + ' finishes rich with probability ' + rt(want)
+           + ', which is the gambler’s-ruin closed form (1 - (q/p)^i)/(1 - (q/p)^n)');
+      }
+    }
+    /* the partials really are partial sums, and they are SHORT of N */
+    {
+      const a = absorbing(ruin, [0, 4], 6);
+      eq(a.partials.length, 7, 'seven partial sums are kept for k = 0 to 6');
+      eq(Requ(a.partials[6][0][0], Radd(a.partials[5][0][0], chainPow(a.Q, 6)[0][0])), true,
+         'and each is the last plus the next power of Q');
+      let short = 0;
+      for (let i = 0; i < a.N.length; i += 1) {
+        for (let j = 0; j < a.N.length; j += 1) if (Rcmp(a.partials[6][i][j], a.N[i][j]) > 0) short += 1;
+      }
+      eq(short, 0, 'and no entry of a partial sum ever EXCEEDS N, which it could not');
+    }
+    /* a chain that never stops is reported, not divided by */
+    {
+      const stuck = Mparse('1 0 0; 0 1/2 1/2; 0 1/2 1/2', 'stuck').M;
+      eq(absorbing(stuck, [0], 4).singular, true,
+         'a transient state that cannot reach an absorbing one makes I - Q singular, and it says so');
+      eq(absorbing(stuck, [0], 4).N, null, 'returning null rather than a plausible matrix');
+    }
+  }
+
+  /* --- C9 L5: policy iteration against every policy, summed --------------- */
+  {
+    const acts = [Mparse('1/2 1/2; 1/4 3/4', 'a0').M, Mparse('3/4 1/4; 1/2 1/2', 'a1').M];
+    const rew = [[ri(1), ri(3)], [ri(2), ri(1)]];
+    const gamma = rf(9, 10);
+    const run = policyIterate(acts, rew, gamma, { valueSteps: 30 });
+    /* ORACLE: every policy, valued by SUMMING its discounted reward series
+       rather than by solving for it. sum_k gamma^k (P_pi^k r_pi)[i]. */
+    const sumValue = (policy, terms) => {
+      const n = policy.length;
+      const Ppi = [], rpi = [];
+      for (let i = 0; i < n; i += 1) { Ppi.push(acts[policy[i]][i].slice()); rpi.push(rew[policy[i]][i]); }
+      let v = rpi.slice(), acc = rpi.slice(), pw = Ppi.map((r) => r.slice());
+      for (let k = 1; k <= terms; k += 1) {
+        const step = [];
+        for (let i = 0; i < n; i += 1) {
+          let s = R0;
+          for (let j = 0; j < n; j += 1) s = Radd(s, Rmul(pw[i][j], rpi[j]));
+          step.push(Rmul(Rpow(gamma, k), s));
+        }
+        for (let i = 0; i < n; i += 1) acc[i] = Radd(acc[i], step[i]);
+        pw = Mmul(pw, Ppi);
+      }
+      return acc;
+    };
+    let best = null, bestPolicy = null;
+    for (const a of [0, 1]) {
+      for (const b of [0, 1]) {
+        const v = sumValue([a, b], 300);
+        if (best === null || Rcmp(v[0], best[0]) > 0) { best = v; bestPolicy = [a, b]; }
+      }
+    }
+    eq(run.policy.join(','), bestPolicy.join(','),
+       'policy iteration finds the policy that the summed discounted series ranks first, out of all four');
+    eq(run.policy.join(','), '1,0', 'which on this MDP is action 2 in the good state and action 1 in the worn one');
+    eq(vec(run.v), '265/11,285/11', 'with exact value 265/11 and 285/11');
+    for (let i = 0; i < 2; i += 1) {
+      eq(Rcmp(Rabs(Rsub(run.v[i], best[i])), rf(1, 10n ** 12n)) < 0, true,
+         'and three hundred terms of the series reach that value to within 10^-12 in state ' + (i + 1));
+      eq(Requ(run.v[i], best[i]), false,
+         'but never exactly, which is the difference between a solve and a sum');
+    }
+    eq(run.iterations <= 4, true, 'it took ' + run.iterations + ' rounds, not the four the policy count allows');
+    /* the improvement step really improves: no round's value is below the last */
+    let dropped = 0;
+    for (let k = 1; k < run.rounds.length; k += 1) {
+      for (let i = 0; i < 2; i += 1) {
+        if (Rcmp(run.rounds[k].v[i], run.rounds[k - 1].v[i]) < 0) dropped += 1;
+      }
+    }
+    eq(dropped, 0, 'and no state’s value fell from one round to the next, which is the termination argument');
+    /* value iteration approaches from BELOW and its denominators grow */
+    const vi = run.valueIteration;
+    eq(vi.iterations.length, 31, 'thirty-one value-iteration vectors are kept');
+    eq(vec(vi.iterations[0]), '0,0', 'starting at zero');
+    let above = 0;
+    for (const it of vi.iterations) for (let i = 0; i < 2; i += 1) if (Rcmp(it[i], run.v[i]) > 0) above += 1;
+    eq(above, 0, 'and not one of the sixty-two entries ever exceeds the exact value: it climbs from below');
+    eq(String(vi.iterations[30][0].d).length > String(vi.iterations[3][0].d).length, true,
+       'while the denominators grow one power of the discount’s denominator per step');
+    eq(vi.gap.every((g) => Rsign(g) <= 0), true, 'so every gap is negative or zero, never positive');
+    /* the three-state preset too, against the same oracle */
+    {
+      const P0 = Mparse('3/5 2/5 0; 0 1/2 1/2; 0 0 1', 'p0').M;
+      const P1 = Mparse('1 0 0; 4/5 1/5 0; 3/5 2/5 0', 'p1').M;
+      eq(chainValid(P0).ok && chainValid(P1).ok, true, 'both action matrices of the stock MDP are chains');
+      const r = [[ri(4), ri(1), ri(-3)], [ri(1), R0, ri(-1)]];
+      const it = policyIterate([P0, P1], r, rf(9, 10), {});
+      const ev = policyEvaluate([P0, P1], r, it.policy, rf(9, 10));
+      eq(vec(ev.v), vec(it.v), 'the reported value is what evaluating the reported policy gives');
+      let better = 0;
+      for (const a of [0, 1]) for (const b of [0, 1]) for (const c of [0, 1]) {
+        const v = policyEvaluate([P0, P1], r, [a, b, c], rf(9, 10)).v;
+        if (v[0] !== null && Rcmp(v[0], it.v[0]) > 0) better += 1;
+      }
+      eq(better, 0, 'and none of the eight policies values the first state above it');
+    }
+  }
+
+  /* --- the renderers, which return strings and are therefore assertable --- */
+  {
+    const svg = chainSvg(M('market'), { w: 660, h: 300, names: ['A', 'B', 'C'] });
+    eq((svg.match(/<circle /g) || []).length, 6,
+       'chainSvg draws one node per state and one loop per self-transition -- three of each here');
+    eq((svg.match(/ Q /g) || []).length, 6, 'and one bowed arc per off-diagonal transition');
+    eq((svg.match(/<marker /g) || []).length, 1, 'with a single arrowhead marker defined once');
+    eq(svg.indexOf('>A<') > 0 && svg.indexOf('>C<') > 0, true, 'the state names reach the drawing');
+    eq(svg.indexOf('NaN') < 0 && svg.indexOf('undefined') < 0, true, 'and nothing in it is NaN or undefined');
+    const withLoops = chainSvg(M('weather'), { w: 660, h: 300 });
+    eq((withLoops.match(/<circle /g) || []).length, 4, 'a self-loop is drawn as a circle beside its node');
+    const sparse = chainSvg(M('cycle'), { w: 660, h: 300 });
+    eq((sparse.match(/ Q /g) || []).length, 3,
+       'and a zero entry gets no arc at all -- three arcs out of nine possible, because the digraph is '
+       + 'the SUPPORT and not the matrix');
+    eq((sparse.match(/<circle /g) || []).length, 3, 'with no self-loops, because the diagonal is zero');
+    const toned = chainSvg(M('leaky'), { w: 660, h: 300,
+      nodeTone: (s) => (s === 0 ? 'red' : 'green'), arcTone: (a, b) => (a === 0 && b !== 0 ? 'amber' : 'muted') });
+    eq((toned.match(/var\(--green\)/g) || []).length >= 2, true, 'the recurrent states are tinted');
+    eq((toned.match(/var\(--amber\)/g) || []).length >= 2, true, 'and the arcs that leave a class are too');
+    const bars = distSvg(distWalk([R1, R0], M('weather'), 5), { w: 660, h: 190, target: [rf(1, 3), rf(2, 3)] });
+    eq((bars.match(/<rect /g) || []).length, 12, 'distSvg draws one bar per state per step');
+    eq((bars.match(/stroke-dasharray="3 3"/g) || []).length, 2, 'and one dashed target line per state');
+    eq(distSvg([], {}).indexOf('nothing yet') > 0, true, 'an empty walk says so rather than drawing nothing');
+  }
+
+  /* --- the kit's own contract --------------------------------------------- */
+  {
+    eq(mkSrc.indexOf('markov_lab: unknown mode') > 0, true,
+       'an unknown mode raises rather than falling back to a default');
+    for (const m of ['chain', 'classify', 'steady', 'absorb', 'mdp']) {
+      eq(mkSrc.indexOf('    "' + m + '": _' + m + ',') > 0, true, 'mode ' + m + ' is registered');
+    }
+    /* the path's footer names three results it states without proof, and the
+       convergence of P^n is this kit's. Both modes that lean on it say so. */
+    eq(convergenceNote().indexOf('stated on this path and not') > 0, true,
+       'convergenceNote says the convergence of P^n is stated and not proved');
+    eq(convergenceNote().indexOf('classify') > 0, true,
+       'and points at the mode that checks the hypotheses it needs');
+    for (const m of ['_chain', '_steady']) {
+      const at = mkSrc.indexOf('def ' + m + '(cfg):');
+      const body = mkSrc.slice(at, at + 20000);
+      eq(/convergenceNote\(\)/.test(body), true,
+         'mode ' + m + ' prints that disclaimer, because it is the one the footer promises');
+    }
+    eq(mkSrc.indexOf('the only floating-point arithmetic in the kit') > 0, true,
+       'and the float column is named as the only inexact arithmetic in the module');
+  }
+}
+
+// ==========================================================================
+// Operations Research course nine, second kit: `birthdeath`, and four oracles
+// ==========================================================================
+//
+// or_core's CHAIN_JS provides `birthDeath`, and the or_core section far above
+// calls it on M/M/1 and M/M/s. BDKIT_JS is the layer the five published lessons
+// read: the rate builders, the FULL balance system solved by elimination, the
+// truncation tail, the readings of pi that Erlang C and utilisation are, the
+// binomial arrival process, the Poisson limit, and the two renderers.
+//
+// THE FIRST ORACLE IS A TRUNCATED CHAIN SOLVED AS A LINEAR SYSTEM, written
+// here and sharing nothing with the kit. `balanceOracle` builds the global
+// balance equations -- pi_n(lam_n + mu_n) = pi_{n-1}lam_{n-1} + pi_{n+1}mu_{n+1}
+// -- and solves them with `gaussExact`, a Gauss-Jordan elimination written in
+// this file, not `Mrref`. So there are three routes to the same pi on every
+// instance below:
+//
+//     the cut equations          a product of ratios, or_core.birthDeath
+//     the kit's own system       globalBalance, through Mrref
+//     this file's system         balanceOracle, through gaussExact
+//
+// They agree by `Requ`, which is equality of fractions, not a tolerance. The
+// reason to have all three is that "you may cut the chain" is exactly the step
+// a reader of this course is asked to take on trust, and a cut argument that
+// were merely a good approximation would show up here as a disagreement in the
+// last digit of a fraction rather than not at all.
+//
+// THE SECOND ORACLE IS THE OTHER SUBJECT. mm1, mm1k and erlangC live in
+// sysdesign_core and are what content/system_design/c3_queues is built on. This
+// kit CALLS them rather than re-deriving them, and the assertions below hold
+// the cut equations to them on the same models -- so the two Subjects cannot
+// publish different numbers for M/M/1.
+//
+// THE THIRD ORACLE IS queue.py's OWN BINOMIAL. `binomRowR` takes a rational p
+// where `binomRow` takes m over n; they use the same recurrence for the same
+// reason (at n = 1000 a closed form per term has a two-thousand-digit
+// denominator and the page never paints), and below they are required to agree
+// entry for entry on three different (n, m). A drift between the two Subjects'
+// arrival processes fails here.
+//
+// THE FOURTH ORACLE IS Math.exp. `poissonRowApprox` goes through
+// sysdesign_core's `expNegApprox`; the assertions below recompute the same
+// probabilities from Math.exp and a hand-written factorial and require
+// agreement to 1e-15 relative. THIS IS THE ONE PLACE IN THE KIT THAT ROUNDS:
+// e^(-lambda) is one of the path's four irrational quantities, the footer says
+// so, and `poissonNote` is the sentence the page prints beside it. The exact
+// binomial column is held to no such tolerance.
+console.log('operations research: the birth-death kit, three routes to one pi, and the limit that rounds');
+{
+  const ORB_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'or_core.py');
+  const BD_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'birthdeath.py');
+  const SYSB_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'algebra_systems.py');
+  const ACB_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'algebra_core.py');
+  const SDB_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'sysdesign_core.py');
+  const COB_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'counting.py');
+  const QUB_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'queue.py');
+  const orbSrc = fs.readFileSync(ORB_SOURCE, 'utf8');
+  const bdSrc = fs.readFileSync(BD_SOURCE, 'utf8');
+  const sysbSrc = fs.readFileSync(SYSB_SOURCE, 'utf8');
+  const acbSrc = fs.readFileSync(ACB_SOURCE, 'utf8');
+  const sdbSrc = fs.readFileSync(SDB_SOURCE, 'utf8');
+  const cobSrc = fs.readFileSync(COB_SOURCE, 'utf8');
+  const qubSrc = fs.readFileSync(QUB_SOURCE, 'utf8');
+  const orb = (n) => blockFrom(orbSrc, n, ORB_SOURCE);
+  const bk = (n) => blockFrom(bdSrc, n, BD_SOURCE);
+
+  /* Exactly what birthdeath.py's _CORE_JS concatenates, in that order. */
+  eval(blockFrom(acbSrc, 'RATIONAL_JS', ACB_SOURCE) + blockFrom(sysbSrc, 'FORMAT_JS', SYSB_SOURCE)
+     + blockFrom(sysbSrc, 'MATRIX_JS', SYSB_SOURCE) + blockFrom(cobSrc, 'BIGINT_JS', COB_SOURCE)
+     + orb('ORFMT_JS') + blockFrom(sdbSrc, 'QUEUE_JS', SDB_SOURCE)
+     + blockFrom(sdbSrc, 'APPROX_JS', SDB_SOURCE) + orb('CHAIN_JS') + bk('BDKIT_JS'));
+
+  const ri = (v) => R(BigInt(v), 1n);
+  const rf = (a, b) => R(BigInt(a), BigInt(b));
+  const rt = (a) => Rtext(a);
+  const vec = (v) => v.map(rt).join(',');
+
+  /* The presets, transcribed. */
+  {
+    let drift = [];
+    const want = [['"lam": "3 2 1", "mu": "2 2 2"', 'machines'],
+                  ['"lam": "4 4 4 4 4", "mu": "3 6 6 6 6"', 'twoservers'],
+                  ['"lam": "4", "mu": "5", "N": 40', 'the eighty-per-cent M/M/1'],
+                  ['"lam": "19", "mu": "20", "N": 60', 'the ninety-five-per-cent one'],
+                  ['"lam": "2", "mu": "1", "s": 3, "N": 40', 'the three-server desk'],
+                  ['"lam": "6", "mu": "5", "K": 5', 'the overloaded buffer'],
+                  ['"lam": "3", "n": 40', 'the Poisson preset']];
+    for (const [text, name] of want) if (bdSrc.indexOf(text) < 0) drift.push(name);
+    eq(drift.join(','), '', 'every preset transcribed here is the one birthdeath.py ships');
+  }
+
+  /* ================================================================ ORACLE 1
+     A Gauss-Jordan elimination written in THIS file, and the global balance
+     system built here, so the comparison with the kit is two implementations
+     rather than one called twice. */
+  const gaussExact = (A) => {
+    const m = A.length, M = A.map((r) => r.slice());
+    for (let c = 0; c < m; c += 1) {
+      let p = -1;
+      for (let r = c; r < m; r += 1) if (!Rzero(M[r][c])) { p = r; break; }
+      if (p < 0) return null;
+      const t = M[c]; M[c] = M[p]; M[p] = t;
+      const inv = Rinv(M[c][c]);
+      for (let j = c; j <= m; j += 1) M[c][j] = Rmul(M[c][j], inv);
+      for (let r = 0; r < m; r += 1) {
+        if (r === c || Rzero(M[r][c])) continue;
+        const f = M[r][c];
+        for (let j = c; j <= m; j += 1) M[r][j] = Rsub(M[r][j], Rmul(f, M[c][j]));
+      }
+    }
+    return M.map((r) => r[m]);
+  };
+  const balanceOracle = (lam, mu) => {
+    const N = lam.length, S = N + 1, rows = [];
+    for (let n = 0; n < S - 1; n += 1) {
+      const row = new Array(S).fill(R0);
+      let out = R0;
+      if (n < N) out = Radd(out, lam[n]);
+      if (n > 0) out = Radd(out, mu[n - 1]);
+      row[n] = Rneg(out);
+      if (n > 0) row[n - 1] = Radd(row[n - 1], lam[n - 1]);
+      if (n < N) row[n + 1] = Radd(row[n + 1], mu[n]);
+      row.push(R0);
+      rows.push(row);
+    }
+    rows.push(new Array(S).fill(R1).concat([R1]));
+    return gaussExact(rows);
+  };
+
+  /* --- C9 L6: the cut equation, and three routes to the same pi ----------- */
+  {
+    const chains = {
+      'the machines preset': [readRates('3 2 1'), readRates('2 2 2')],
+      'constant rates': [readRates('3 3 3 3 3 3'), readRates('5 5 5 5 5 5')],
+      'two servers': [readRates('4 4 4 4 4'), readRates('3 6 6 6 6')],
+      'an overloaded chain': [readRates('5 5 5 5'), readRates('3 3 3 3')],
+      'awkward fractions': [readRates('7/3 5/2 1/6 9/4'), readRates('11/5 3/7 8/3 2')]
+    };
+    for (const name of Object.keys(chains)) {
+      const [lam, mu] = chains[name];
+      const bd = birthDeath(lam, mu);
+      const kit = globalBalance(lam, mu);
+      const oracle = balanceOracle(lam, mu);
+      eq(kit.unique, true, name + ': the balance system has a unique solution');
+      eq(vec(bd.pi), vec(kit.pi),
+         name + ': the cut equations and the kit’s own balance system give the same pi, exactly');
+      eq(vec(bd.pi), vec(oracle),
+         name + ': and so does a balance system built and eliminated in this file, sharing no code with '
+         + 'either -- three routes, one set of fractions');
+      eq(routesAgree(bd.pi, kit.pi).ok, true, name + ': and the kit’s own comparison says so too');
+      /* pi is a distribution */
+      let s = R0;
+      for (const v of bd.pi) s = Radd(s, v);
+      eq(rt(s), '1', name + ': the entries sum to exactly 1');
+      let neg = 0;
+      for (const v of bd.pi) if (Rsign(v) < 0) neg += 1;
+      eq(neg, 0, name + ': and not one of them is negative');
+      /* THE CUT ITSELF: rate up across every cut equals rate down */
+      let broken = 0;
+      for (let n = 0; n < lam.length; n += 1) {
+        if (!Requ(Rmul(bd.pi[n], lam[n]), Rmul(bd.pi[n + 1], mu[n]))) broken += 1;
+      }
+      eq(broken, 0, name + ': and pi_n lam_n = pi_{n+1} mu_{n+1} holds exactly at every one of the '
+         + lam.length + ' cuts, which is the equation the whole course rests on');
+      /* Little's Law, from the same pi */
+      let L = R0, lamEff = R0;
+      for (let n = 0; n < bd.pi.length; n += 1) {
+        L = Radd(L, Rmul(R(BigInt(n), 1n), bd.pi[n]));
+        if (n < lam.length) lamEff = Radd(lamEff, Rmul(bd.pi[n], lam[n]));
+      }
+      eq(rt(L), rt(bd.L), name + ': L recomputed as sum n pi_n is what birthDeath reports');
+      eq(rt(lamEff), rt(bd.lambdaEffective), name + ': and the admitted rate as sum pi_n lam_n');
+      eq(rt(Rmul(bd.lambdaEffective, bd.W)), rt(bd.L),
+         name + ': and L = lambda_eff W exactly -- Little’s Law, closed on the instance');
+    }
+    eq(vec(birthDeath(readRates('3 2 1'), readRates('2 2 2')).pi), '4/19,6/19,6/19,3/19',
+       'the machines preset’s distribution');
+    eq(rt(birthDeath(readRates('3 2 1'), readRates('2 2 2')).L) + '/'
+       + rt(birthDeath(readRates('3 2 1'), readRates('2 2 2')).W), '27/19/9/10',
+       'with L = 27/19 and W = 9/10');
+    /* dropping a different equation gives the same answer */
+    {
+      const lam = readRates('3 2 1'), mu = readRates('2 2 2'), answers = new Set();
+      for (let d = 0; d < 4; d += 1) answers.add(vec(globalBalance(lam, mu, d).pi));
+      eq(answers.size, 1, 'and dropping any one of the four balance equations gives the same pi');
+    }
+    /* routesAgree must FAIL when it should */
+    {
+      const bd = birthDeath(readRates('3 2 1'), readRates('2 2 2'));
+      const wrong = bd.pi.slice();
+      wrong[1] = Radd(wrong[1], rf(1, 1000000));
+      eq(routesAgree(bd.pi, wrong).ok, false, 'routesAgree rejects a distribution out by a millionth');
+      eq(routesAgree(bd.pi, wrong).at, 1, 'and names the state it disagrees at');
+      eq(routesAgree(bd.pi, [null, null, null, null]).ok, false, 'and refuses a null solution');
+      eq(routesAgree(bd.pi, bd.pi.slice(0, 3)).ok, false, 'and one of the wrong length');
+    }
+    /* the reader's door */
+    eq(readRates('3 2 1').map(rt).join(','), '3,2,1', 'rates are read exactly');
+    eq(readRates('7/3 5/2').map(rt).join(','), '7/3,5/2', 'fractions included');
+    eq(readRates('3 -1'), null, 'a negative rate is refused');
+    eq(readRates('3 banana'), null, 'and text that is not a number');
+    eq(readRates('   '), null, 'and an empty box');
+  }
+
+  /* --- C9 L7: M/M/1, against the closed form the other Subject owns ------- */
+  {
+    for (const [l, m, N] of [[4, 5, 40], [1, 2, 30], [19, 20, 60], [2, 3, 50]]) {
+      const lam = ri(l), mu = ri(m), rho = Rdiv(lam, mu);
+      const rates = ratesConstant(lam, mu, N);
+      eq(rates.lam.length + '/' + rates.mu.length, N + '/' + N, 'the constant chain has N rates each way');
+      const bd = birthDeath(rates.lam, rates.mu);
+      const closed = mm1(lam, mu);
+      /* the geometric shape is a CONSEQUENCE of the cuts, not an assumption */
+      let bad = 0;
+      for (let n = 0; n <= N; n += 1) if (!Requ(bd.pi[n], Rmul(bd.pi[0], Rpow(rho, n)))) bad += 1;
+      eq(bad, 0, 'lam=' + l + ',mu=' + m + ': every pi_n is exactly pi_0 rho^n, derived from the cuts');
+      /* the truncated chain approaches the closed form, and the gap is bounded
+         by the tail the truncation moved. The bound is derived rather than
+         guessed: the discarded mass is rho^(N+1), it is redistributed over
+         states 0..N, and no state is further than N + 1 from where it was,
+         with a further 1/(1-rho) for the mean the tail itself carried. */
+      const tail = truncationTail(rho, N);
+      /* THE TAIL IS PINNED, not merely used. Every other assertion about it is
+         an inequality, and an inequality is satisfied by a tail that is too
+         LARGE -- so a mutation reporting rho^N instead of rho^(N+1) would make
+         every bound below looser and pass. This is the arm that fails on it:
+         1 - sum_{n<=N} (1-rho)rho^n, added up in this file, one term at a time. */
+      {
+        let head = R0;
+        for (let q = 0; q <= N; q += 1) head = Radd(head, Rmul(Rsub(R1, rho), Rpow(rho, q)));
+        eq(rt(tail.tail), rt(Rsub(R1, head)),
+           'lam=' + l + ',mu=' + m + ': the truncation tail is EXACTLY 1 minus the first ' + (N + 1)
+           + ' terms of the geometric distribution, summed here term by term -- which pins the exponent '
+           + 'at N + 1 rather than leaving it to an inequality that a larger tail would also satisfy');
+        eq(rt(tail.tail), rt(Rpow(rho, N + 1)), 'lam=' + l + ',mu=' + m + ': and that is rho^(N+1)');
+      }
+      const bound = Rdiv(Rmul(tail.tail, Radd(R(BigInt(N + 1), 1n), Rinv(Rsub(R1, rho)))),
+                         Rsub(R1, tail.tail));
+      eq(Rcmp(Rabs(Rsub(closed.L, bd.L)), bound) < 0, true,
+         'lam=' + l + ',mu=' + m + ': the truncated L is within rho^(N+1)(N + 1 + 1/(1-rho))/(1-rho^(N+1)) '
+         + 'of rho/(1-rho) -- the gap is ' + Rfixed(Rsub(closed.L, bd.L), 8) + ' against a bound of '
+         + Rfixed(bound, 8));
+      eq(Rsign(Rsub(closed.L, bd.L)) > 0, true,
+         'and the truncated L is SHORT of the closed form, never over it, because the truncation removes '
+         + 'the longest queues');
+      eq(Rcmp(Rabs(Rsub(closed.p0, bd.pi[0])), tail.tail) < 0, true, 'and pi_0 by less than the tail itself');
+      /* a longer chain is strictly closer, which is what "approaches" means */
+      const ext = ratesConstant(lam, mu, N + 30);
+      const bigger = birthDeath(ext.lam, ext.mu);
+      eq(Rcmp(Rabs(Rsub(closed.L, bigger.L)), Rabs(Rsub(closed.L, bd.L))) < 0, true,
+         'lam=' + l + ',mu=' + m + ': and thirty more states bring L strictly closer to the closed form');
+      /* the mass the longer chain puts above the old top is EXACTLY the
+         truncated geometric tail -- an equality of fractions, not a tolerance */
+      {
+        let above = R0;
+        for (let q = N + 1; q < bigger.pi.length; q += 1) above = Radd(above, bigger.pi[q]);
+        const want = Rdiv(Rsub(Rpow(rho, N + 1), Rpow(rho, N + 31)), Rsub(R1, Rpow(rho, N + 31)));
+        eq(rt(above), rt(want),
+           'lam=' + l + ',mu=' + m + ': and the mass the longer chain puts above state ' + N
+           + ' is exactly (rho^(N+1) - rho^(N+31))/(1 - rho^(N+31))');
+      }
+      /* P(N > k) on the chain against rho^(k+1) on the untruncated one */
+      for (const k of [0, 3, 7]) {
+        const t = queueTail(bd.pi, k);
+        eq(Rcmp(Rabs(Rsub(t, Rpow(rho, k + 1))), tail.tail) < 0, true,
+           'P(N > ' + k + ') is rho^' + (k + 1) + ' to within the truncation on lam=' + l + ',mu=' + m);
+      }
+    }
+    /* the ninety-five-per-cent case is where a decimal would have failed */
+    {
+      const bd = birthDeath(ratesConstant(ri(19), ri(20), 60).lam, ratesConstant(ri(19), ri(20), 60).mu);
+      eq(String(bd.pi[0].d).length >= 78, true,
+         'at rho = 19/20 over sixty states pi_0 has a ' + String(bd.pi[0].d).length
+         + '-digit denominator, which is why this chain is not computed in doubles');
+      eq(Rcmp(truncationTail(rf(19, 20), 60).tail, rf(4, 100)) > 0, true,
+         'and more than four per cent of the probability still sits above state 60, so the truncation is '
+         + 'not negligible and the page says so instead of rounding it away');
+      eq(truncationTail(rf(19, 20), 60).why.indexOf('redistributes') > 0, true, 'in those words');
+    }
+    /* an unstable chain has no untruncated distribution, and it says so */
+    {
+      const t = truncationTail(rf(5, 4), 20);
+      eq(t.tail, null, 'at rho > 1 there is no tail to report, because there is no distribution');
+      eq(t.why.indexOf('not an approximation of anything') > 0, true, 'and the kit says exactly that');
+      eq(mm1(ri(5), ri(4)).stable, false, 'and the closed form refuses too');
+      const bd = birthDeath(ratesConstant(ri(5), ri(4), 20).lam, ratesConstant(ri(5), ri(4), 20).mu);
+      let s = R0;
+      for (const v of bd.pi) s = Radd(s, v);
+      eq(rt(s), '1', 'while the FINITE chain still has a perfectly good distribution summing to 1');
+      eq(bd.stable, false, 'and reports that the untruncated one would not');
+    }
+  }
+
+  /* --- C9 L8: M/M/s, and Erlang C as a reading of the same pi ------------- */
+  {
+    for (const [l, m, s, N] of [[2, 1, 3, 60], [3, 2, 2, 60], [4, 1, 5, 70]]) {
+      const lam = ri(l), mu = ri(m);
+      const rates = ratesServers(lam, mu, s, N);
+      eq(rt(rates.mu[0]) + ',' + rt(rates.mu[s - 1]) + ',' + rt(rates.mu[s]),
+         rt(mu) + ',' + rt(Rmul(ri(s), mu)) + ',' + rt(Rmul(ri(s), mu)),
+         's=' + s + ': the service rate rises to s mu and then stops -- one line, and that is all of M/M/s');
+      const bd = birthDeath(rates.lam, rates.mu, { servers: s });
+      const erl = erlangC(lam, mu, s);
+      const wait = waitProbability(bd.pi, s);
+      eq(erl.stable, true, 's=' + s + ': the closed form accepts this load');
+      eq(Rcmp(Rabs(Rsub(wait, erl.pWait)), rf(1, 1000000)) < 0, true,
+         's=' + s + ': P(N >= s) summed from the cut-equation pi is Erlang C to within a millionth -- '
+         + 'a reading of the distribution, not a second formula');
+      eq(Rcmp(Rabs(Rsub(bd.Lq, erl.Lq)), rf(1, 10000)) < 0, true,
+         's=' + s + ': and Lq with it, to ' + Rfixed(Rabs(Rsub(bd.Lq, erl.Lq)), 9)
+         + ' -- a looser agreement than P(wait) because Lq weights the long queues the truncation cut off, '
+         + 'which is the truncation showing up exactly where it should');
+      /* and against this file's own balance system, exactly */
+      const oracle = balanceOracle(rates.lam, rates.mu);
+      eq(vec(bd.pi), vec(oracle), 's=' + s + ': with the whole distribution matching an independent solve');
+      /* the busy-server count is the offered load, which is the pooling argument */
+      const busy = serversBusy(bd.pi, s);
+      eq(Rcmp(Rabs(Rsub(busy, Rdiv(lam, mu))), rf(1, 100000)) < 0, true,
+         's=' + s + ': and the mean number of busy servers is the offered load lambda/mu = '
+         + rt(Rdiv(lam, mu)) + ', whatever s is -- adding a server does not reduce the work');
+    }
+    /* adding a server at fixed load collapses the waiting: measured */
+    {
+      const lam = ri(2), mu = ri(1), waits = [];
+      for (let s = 3; s <= 6; s += 1) {
+        const r = ratesServers(lam, mu, s, 60);
+        waits.push(waitProbability(birthDeath(r.lam, r.mu, { servers: s }).pi, s));
+      }
+      let falls = 0;
+      for (let i = 1; i < waits.length; i += 1) if (Rcmp(waits[i], waits[i - 1]) < 0) falls += 1;
+      eq(falls, waits.length - 1, 'P(wait) falls at every extra server from three to six');
+      eq(Rfixed(waits[0], 9), Rfixed(erlangC(lam, mu, 3).pWait, 9),
+         'from 0.444444444 at three servers, which is Erlang C\u2019s 4/9 to nine places');
+      eq(rt(erlangC(lam, mu, 3).pWait), '4/9', 'and the closed form makes that exactly 4/9');
+      eq(Rcmp(waits[3], rf(1, 20)) < 0, true, 'to under a twentieth at six, at the same offered load of 2');
+    }
+    /* AND THE CLAIM HAS A HYPOTHESIS. "The mean number of busy servers is the
+       offered load" holds only while the queue settles, and the servers slider
+       reaches loads where it does not. At lambda = 2, mu = 1 and ONE server the
+       busy count is 1, not 2, and the page must not say otherwise -- it branches
+       on rho, and this is the measurement that keeps the branch honest. */
+    {
+      const r1 = ratesServers(ri(2), ri(1), 1, 40);
+      const b1 = birthDeath(r1.lam, r1.mu, { servers: 1 });
+      eq(Rfixed(serversBusy(b1.pi, 1), 5), '1.00000',
+         'at lambda = 2, mu = 1 and one server the mean busy count is 1, NOT the offered load 2');
+      eq(Rcmp(Rdiv(ri(2), R1), R1) >= 0, true, 'because rho = 2 and the queue does not settle');
+      const r2 = ratesServers(ri(2), ri(1), 2, 40);
+      eq(Rcmp(serversBusy(birthDeath(r2.lam, r2.mu, { servers: 2 }).pi, 2), ri(2)) < 0, true,
+         'and at rho = 1 exactly it is still short of it');
+      const r3 = ratesServers(ri(2), ri(1), 3, 40);
+      eq(Rfixed(serversBusy(birthDeath(r3.lam, r3.mu, { servers: 3 }).pi, 3), 5), '2.00000',
+         'while at three servers, where rho = 2/3, it is the offered load to five places');
+      eq(bdSrc.indexOf('It is NOT the offered load') > 0, true,
+         'and the page says which of those two situations it is in rather than asserting the stable one');
+    }
+    /* one server is M/M/1 again, which is the consistency check that matters */
+    {
+      const r1 = ratesServers(ri(4), ri(5), 1, 40), c1 = ratesConstant(ri(4), ri(5), 40);
+      eq(vec(birthDeath(r1.lam, r1.mu).pi), vec(birthDeath(c1.lam, c1.mu).pi),
+         'and M/M/s with s = 1 is exactly M/M/1, entry for entry');
+    }
+  }
+
+  /* --- C9 L9: a finite chain, and the rate Little's Law needs ------------- */
+  {
+    for (const [l, m, K] of [[6, 5, 5], [3, 2, 2], [4, 5, 12]]) {
+      const lam = ri(l), mu = ri(m);
+      const rates = ratesConstant(lam, mu, K);
+      const bd = birthDeath(rates.lam, rates.mu);
+      const closed = mm1k(lam, mu, K);
+      eq(bd.pi.length, K + 1, 'K=' + K + ': the chain has K + 1 states');
+      eq(vec(bd.pi), vec(closed.pi),
+         'K=' + K + ': and its pi is EXACTLY sysdesign_core.mm1k’s -- the other Subject’s closed '
+         + 'form and this one’s cut equations, fraction for fraction');
+      eq(rt(bd.L), rt(closed.L), 'K=' + K + ': with the same L');
+      eq(rt(bd.pi[K]), rt(closed.blocking), 'and the same blocking probability');
+      eq(rt(bd.lambdaEffective), rt(closed.lamEff),
+         'and the same admitted rate lambda(1 - pi_K), which is the number Little’s Law needs');
+      eq(rt(bd.W), rt(closed.W), 'so the same W');
+      /* the naive division is smaller, by exactly the factor 1 - pi_K */
+      const naive = Rdiv(bd.L, lam);
+      eq(Rcmp(naive, bd.W) < 0, true, 'K=' + K + ': dividing by lambda instead gives a SMALLER W');
+      eq(rt(Rmul(bd.W, Rsub(R1, bd.pi[K]))), rt(naive),
+         'and it is smaller by exactly the factor 1 - pi_K, which is what makes it the standard error');
+      /* against this file's own solve */
+      eq(vec(bd.pi), vec(balanceOracle(rates.lam, rates.mu)), 'K=' + K + ': and an independent solve agrees');
+    }
+    eq(Rpct(birthDeath(ratesConstant(ri(6), ri(5), 5).lam,
+                       ratesConstant(ri(6), ri(5), 5).mu).pi[5], 4), '25.0588%',
+       'the overloaded buffer of five blocks just over a quarter of its arrivals');
+    /* blocking falls as K rises, which is what makes "size the buffer" a question */
+    {
+      let rose = 0, last = null;
+      for (let K = 1; K <= 12; K += 1) {
+        const b = birthDeath(ratesConstant(ri(4), ri(5), K).lam, ratesConstant(ri(4), ri(5), K).mu);
+        const p = b.pi[K];
+        if (last !== null && Rcmp(p, last) >= 0) rose += 1;
+        last = p;
+      }
+      eq(rose, 0, 'and blocking falls strictly at every extra place in the buffer, from K = 1 to 12');
+    }
+    /* BALKING: the case no closed form covers, and the cut equation does */
+    {
+      const lam = ri(6), mu = ri(5), K = 5;
+      const b = ratesBalking(lam, mu, K);
+      eq(b.lam.map(rt).join(','), '6,3,2,3/2,6/5', 'balking makes lam_n = lambda/(n+1)');
+      eq(b.mu.map(rt).join(','), '5,5,5,5,5', 'while the service rate is untouched');
+      const bd = birthDeath(b.lam, b.mu);
+      eq(vec(bd.pi), vec(balanceOracle(b.lam, b.mu)),
+         'and the cut equations still give exactly what the balance system does, with no closed form in '
+         + 'sight -- which is the reason this course builds queues from the cut and not from a table');
+      const hard = birthDeath(ratesConstant(lam, mu, K).lam, ratesConstant(lam, mu, K).mu);
+      eq(Rcmp(bd.pi[K], hard.pi[K]) < 0, true,
+         'and a balking queue blocks less than a hard wall at the same capacity, because the arrivals '
+         + 'thinned out before they got there');
+      let s = R0;
+      for (const v of bd.pi) s = Radd(s, v);
+      eq(rt(s), '1', 'while still being a distribution');
+    }
+  }
+
+  /* --- C9 L10: the arrival process, and where the exactness stops --------- */
+  {
+    /* ORACLE 3: queue.py's own binomial, on the same inputs */
+    eval(blockFrom(qubSrc, 'QUEUE_KIT_JS', QUB_SOURCE));
+    for (const [n, m] of [[40, 3], [100, 10], [20, 8], [365, 1]]) {
+      const mine = binomRowR(n, rf(m, n), 9), theirs = binomRow(n, m, 9);
+      eq(mine.length, theirs.length, 'n=' + n + ',m=' + m + ': the two binomials are the same length');
+      let bad = 0;
+      for (let k = 0; k < mine.length; k += 1) if (!Requ(mine[k], theirs[k])) bad += 1;
+      eq(bad, 0, 'n=' + n + ',m=' + m + ': and agree entry for entry with queue.py’s binomRow, so the '
+         + 'two Subjects cannot publish different arrival processes');
+    }
+    /* and against the closed form C(n,k) p^k (1-p)^(n-k), which the recurrence
+       replaced for speed and must not have replaced for accuracy */
+    for (const [n, m] of [[40, 3], [20, 8]]) {
+      const p = rf(m, n), row = binomRowR(n, p, 6);
+      let bad = 0;
+      for (let k = 0; k <= 6; k += 1) {
+        const want = Rmul(R(comb(n, k), 1n), Rmul(Rpow(p, k), Rpow(Rsub(R1, p), n - k)));
+        if (!Requ(row[k], want)) bad += 1;
+      }
+      eq(bad, 0, 'n=' + n + ': and the recurrence agrees with C(n,k)p^k(1-p)^(n-k) term by term');
+    }
+    /* the row is a head of a distribution: every entry in [0,1], and the whole
+       row sums to 1 when it is complete */
+    {
+      const full = binomRowR(12, rf(1, 4), 12);
+      let s = R0;
+      for (const v of full) s = Radd(s, v);
+      eq(rt(s), '1', 'a complete binomial row sums to exactly 1');
+      eq(full.length, 13, 'with one entry per outcome');
+      let out = 0;
+      for (const v of full) if (Rsign(v) < 0 || Rcmp(v, R1) > 0) out += 1;
+      eq(out, 0, 'and every entry is a probability');
+      eq(binomRowR(10, rf(3, 2), 4), null, 'a p above 1 is refused rather than producing negative terms');
+      eq(binomRowR(10, rf(-1, 2), 4), null, 'and a negative one');
+      eq(binomRowR(5, R1, 3).map(rt).join(','), '0,0,0,0,1',
+         'and p = 1 puts everything on n, rather than dividing by 1 - p');
+    }
+    /* ORACLE 4: Math.exp, against the shared approximation */
+    {
+      const factorial = (k) => { let f = 1; for (let i = 2; i <= k; i += 1) f *= i; return f; };
+      for (const [l, up] of [[3, 10], [0.5, 8], [8, 12], [17, 12]]) {
+        const row = poissonRowApprox(R(BigInt(Math.round(l * 2)), 2n), up);
+        let worst = 0;
+        for (let k = 0; k <= up; k += 1) {
+          const want = Math.exp(-l) * Math.pow(l, k) / factorial(k);
+          worst = Math.max(worst, Math.abs(row[k] - want) / Math.max(want, 1e-300));
+        }
+        eq(worst < 1e-12, true, 'lambda=' + l + ': poissonRowApprox agrees with Math.exp to '
+           + worst.toExponential(1) + ' relative -- it rounds, and this is by how much');
+      }
+      /* expNegApprox is the shared one, and it is the reciprocal of a
+         POSITIVE-term series, so it does not lose digits to cancellation */
+      for (const x of [1, 5, 12, 20, 40]) {
+        const rel = Math.abs(expNegApprox(x) - Math.exp(-x)) / Math.exp(-x);
+        eq(rel < 1e-14, true, 'e^-' + x + ' from the shared approximation is within '
+           + rel.toExponential(1) + ' of Math.exp, which is the rounding of a double');
+      }
+    }
+    /* the gap between the exact binomial and its limit, which is the lesson */
+    {
+      const g = poissonGap(40, ri(3), 8);
+      eq(rt(g.p), '3/40', 'p = lambda/n');
+      eq(g.rows.length, 9, 'nine counts tabulated');
+      eq(String(g.rows[0].exact.d).length, 65,
+         'P(0) = (37/40)^40 has a 65-digit denominator and is carried as a fraction');
+      eq(g.at, 3, 'the two columns differ most at k = 3');
+      eq(g.worst > 8e-3 && g.worst < 9e-3, true,
+         'by ' + g.worst.toExponential(3) + ' -- which at n = 40 is not a rounding error, it is the model');
+      /* and the gap SHRINKS with n, which is the whole meaning of "limit" */
+      const gaps = [];
+      for (const n of [10, 40, 200, 1000]) gaps.push(poissonGap(n, ri(3), 8).worst);
+      let rose = 0;
+      for (let i = 1; i < gaps.length; i += 1) if (gaps[i] >= gaps[i - 1]) rose += 1;
+      eq(rose, 0, 'and the largest difference falls at every increase of n: '
+         + gaps.map((x) => x.toExponential(1)).join(', '));
+      eq(gaps[3] < 1e-3, true, 'reaching under a thousandth at n = 1000');
+      eq(poissonGap(2, ri(3), 4).bad !== undefined, true,
+         'while lambda = 3 over n = 2 is refused, because lambda/n is not a probability');
+      /* the variance gap, exactly: n p (1-p) = lambda(1 - lambda/n) */
+      for (const [n, l] of [[40, 3], [1000, 3], [20, 8]]) {
+        const lam = ri(l), v = Rmul(lam, Rsub(R1, Rdiv(lam, R(BigInt(n), 1n))));
+        eq(rt(Rsub(lam, v)), rt(Rdiv(Rmul(lam, lam), R(BigInt(n), 1n))),
+           'n=' + n + ',lambda=' + l + ': the binomial variance is short of the mean by exactly '
+           + 'lambda^2/n, which is what "variance equals the mean" costs');
+      }
+    }
+    /* the sentence the footer requires */
+    eq(poissonNote().indexOf('not exact and cannot be') > 0, true,
+       'poissonNote says the Poisson column is not exact and cannot be');
+    eq(poissonNote().indexOf('irrational') > 0, true, 'names e^(-lambda) as irrational');
+    eq(poissonNote().indexOf('expNegApprox') > 0, true, 'names the function that produced it');
+    eq(poissonNote().indexOf('positive-term series') > 0, true, 'and the method that function uses');
+    {
+      const at = bdSrc.indexOf('def _poisson(cfg):');
+      eq(at > 0, true, 'birthdeath.py defines the poisson mode');
+      eq(/poissonNote\(\)/.test(bdSrc.slice(at)), true,
+         'and that mode prints the note -- the path’s footer promises every lesson printing an '
+         + 'irrational says it is rounded and how, and e^(-lambda) is one of its four');
+      /* and no OTHER mode of this kit prints a float as though it were exact */
+      const modes = ['_cut', '_mm1', '_mms', '_finite', '_poisson'];
+      let leaks = [];
+      for (const mname of modes) {
+        const a = bdSrc.indexOf('def ' + mname + '(cfg):');
+        const next = modes.map((o) => bdSrc.indexOf('def ' + o + '(cfg):'))
+          .filter((q) => q > a).sort((x, y) => x - y)[0];
+        const body = bdSrc.slice(a, next === undefined ? bdSrc.length : next);
+        if (/poissonRowApprox|expNegApprox|poissonGap/.test(body) && !/poissonNote\(\)/.test(body)) {
+          leaks.push(mname);
+        }
+      }
+      eq(leaks.join(','), '', 'and no other mode touches the approximation at all');
+    }
+  }
+
+  /* --- the renderers, which return strings and are therefore assertable --- */
+  {
+    const lam = readRates('3 2 1'), mu = readRates('2 2 2');
+    const bd = birthDeath(lam, mu);
+    const svg = bdSvg(lam, mu, bd.pi, { w: 660, h: 220, cutAt: 1, max: 9 });
+    eq((svg.match(/<circle /g) || []).length, 8, 'bdSvg draws two circles per state -- a mass and a rim');
+    eq((svg.match(/<path d="M /g) || []).length, 8,
+       'six arcs, three each way, plus the two arrowhead marker paths');
+    eq((svg.match(/<marker /g) || []).length, 2, 'with one arrowhead for each direction');
+    eq((svg.match(/stroke-dasharray="5 4"/g) || []).length, 1, 'and the chosen cut drawn once');
+    eq(svg.indexOf('the cut') > 0, true, 'and labelled');
+    eq(svg.indexOf('NaN') < 0 && svg.indexOf('undefined') < 0, true, 'with nothing NaN or undefined in it');
+    const wide = ratesConstant(ri(4), ri(5), 40);
+    const big = bdSvg(wide.lam, wide.mu, birthDeath(wide.lam, wide.mu).pi, { w: 660, h: 220, max: 9 });
+    eq(big.indexOf('32 more') > 0, true,
+       'a chain longer than the drawing says how many states are off the end rather than silently '
+       + 'dropping them');
+    const bars = piSvg(bd.pi, { w: 660, h: 170, max: 24 });
+    eq((bars.match(/<rect /g) || []).length, 4, 'piSvg draws one bar per state');
+    const marked = piSvg(bd.pi, { w: 660, h: 170, max: 24, markFrom: 2 });
+    eq((marked.match(/var\(--amber\)/g) || []).length, 2, 'and tints the states from markFrom onward');
+    eq(piSvg([], {}).indexOf('nothing to draw') > 0, true, 'an empty distribution says so');
+    const capped = piSvg(birthDeath(wide.lam, wide.mu).pi, { w: 660, h: 170, max: 12 });
+    eq((capped.match(/<rect /g) || []).length, 12, 'and a long chain is capped at the requested width');
+  }
+
+  /* --- the kit's own contract --------------------------------------------- */
+  {
+    eq(bdSrc.indexOf('birthdeath_lab: unknown mode') > 0, true,
+       'an unknown mode raises rather than falling back to a default');
+    for (const m of ['cut', 'mm1', 'mms', 'finite', 'poisson']) {
+      eq(bdSrc.indexOf('    "' + m + '": _' + m + ',') > 0, true, 'mode ' + m + ' is registered');
+    }
+    eq(bdSrc.indexOf('from .sysdesign_core import APPROX_JS, QUEUE_JS') > 0, true,
+       'and the closed forms and the approximation are IMPORTED from the System Design core rather than '
+       + 'rewritten, which is what makes the cross-Subject agreement above structural');
+  }
+}
+
+// ==========================================================================
+// Operations Research course six: the `schedule` kit's own arithmetic
+// ==========================================================================
+//
+// or_core's SCHED_JS is exercised in the or_core section far above, at the
+// ENGINE level: seqObjectives, adjacentSwap, mooreHodgson, johnsonRule,
+// bestSequence, parallelAssign, jobShopAll and crashModel are each called
+// there. None of that touches this kit. SCHEDDRAW_JS, SCHEDKIT_JS,
+// SCHEDSHOP_JS and SCHEDCRASH_JS are the layer the nine lessons read --
+// parseJobs, parseSeq, ruleOrder, orderAudit, recheckObjectives, crossCheck,
+// attainsOptimum, exchangeChain, bestFlowshop, flowshopBars, flowshopVerify,
+// loadCheck, machineBars, parseOps, shopTimes, shopFeasible, parseActivities,
+// crashPlan, crashVerify and crashCurve -- and that is where this kit's own
+// decisions live. A kit that builds, paints and runs clean under labcheck can
+// still report the wrong optimum, so none of those proves anything below.
+//
+// THE ORACLE IS EVERY PERMUTATION, ENUMERATED HERE. `everyOrder` below walks
+// all n! orders and scores each one with a completion-time clock written in
+// this file. It calls nothing in or_core and nothing in the kit: not
+// `bestSequence`, which is the engine's enumerator, and not `seqObjectives`,
+// which is the engine's clock. So "SPT minimises sum C" is checked by three
+// mutually independent routes -- the kit's forward sweep, the kit's
+// position-weighted second route, and this enumeration -- and the rule's own
+// order is checked against the best of all of them.
+//
+// AND THE CONTRAST IS THE POINT. A rule that attains the optimum on every
+// objective would teach that scheduling is easy. Five instances are pinned
+// below where a plausible rival rule does NOT attain it, by a measured amount:
+//
+//   * heaviest weight first loses to Smith's ratio on sum wC, 111 against 108
+//     on the kit's own `mixed` data and 113 against 97 on `ratio`;
+//   * shortest processing time, which IS optimal for sum C, loses on sum wC,
+//     114 against 108 -- the same order, a different question;
+//   * EDD, which IS optimal for maximum lateness, loses on TOTAL tardiness,
+//     17 against the 16 that only enumeration finds, and 19 against 15 on the
+//     `tight` data;
+//   * earliest due date leaves 4 jobs late where Moore-Hodgson leaves 2;
+//   * LPT on three machines finishes at 13 where the best deal finishes at 12.
+//
+// EACH MODE'S OWN BUNDLE IS EXECUTED, not just the union of the blocks. The
+// kit selects blocks per mode and the rule is that a block belongs in a mode's
+// list when that mode calls into it; a dependency the table forgot would throw
+// on a reader's first redraw. So the three concatenations are transcribed
+// here, checked against the source verbatim, built with `new Function` -- a
+// fresh scope, so nothing leaks in from this file -- and then a probe that
+// calls into every block they claim is run inside each one.
+console.log('operations research: the scheduling kit, and every order it is held to');
+{
+  const OR6_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'or_core.py');
+  const SCHED_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'schedule.py');
+  const SYS6_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'algebra_systems.py');
+  const CORE6_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'algebra_core.py');
+  const or6Src = fs.readFileSync(OR6_SOURCE, 'utf8');
+  const schedSrc = fs.readFileSync(SCHED_SOURCE, 'utf8');
+  const sys6Src = fs.readFileSync(SYS6_SOURCE, 'utf8');
+  const core6Src = fs.readFileSync(CORE6_SOURCE, 'utf8');
+  const or6 = (n) => blockFrom(or6Src, n, OR6_SOURCE);
+  const sk = (n) => blockFrom(schedSrc, n, SCHED_SOURCE);
+  const sys6 = (n) => blockFrom(sys6Src, n, SYS6_SOURCE);
+  const core6 = (n) => blockFrom(core6Src, n, CORE6_SOURCE);
+
+  const BLOCK = {
+    RATIONAL_JS: core6('RATIONAL_JS'), FORMAT_JS: sys6('FORMAT_JS'),
+    ORFMT_JS: or6('ORFMT_JS'), TABLEAU_JS: or6('TABLEAU_JS'), PHASE_JS: or6('PHASE_JS'),
+    DUAL_JS: or6('DUAL_JS'), RANGE_JS: or6('RANGE_JS'), NET_JS: or6('NET_JS'),
+    SCHED_JS: or6('SCHED_JS'), SCHEDDRAW_JS: sk('SCHEDDRAW_JS'), SCHEDKIT_JS: sk('SCHEDKIT_JS'),
+    SCHEDSHOP_JS: sk('SCHEDSHOP_JS'), SCHEDCRASH_JS: sk('SCHEDCRASH_JS')
+  };
+  /* The union, for everything below. The per-mode bundles are built and run
+     separately, further down, because the union hides a missing dependency. */
+  eval(BLOCK.RATIONAL_JS + BLOCK.FORMAT_JS + BLOCK.ORFMT_JS + BLOCK.TABLEAU_JS + BLOCK.PHASE_JS
+     + BLOCK.DUAL_JS + BLOCK.RANGE_JS + BLOCK.NET_JS + BLOCK.SCHED_JS
+     + BLOCK.SCHEDDRAW_JS + BLOCK.SCHEDKIT_JS + BLOCK.SCHEDSHOP_JS + BLOCK.SCHEDCRASH_JS);
+
+  const ri = (v) => R(BigInt(v), 1n);
+  const rt = (a) => Rtext(a);
+  const ids = (seq, jobs) => seq.map((k) => jobs[k].id).join(' ');
+  const LPOPT = { rule: 'bland', maxPivots: 400 };
+
+  /* --- the presets, transcribed, so an edit to one fails HERE by name ----- */
+  const JOBS = {
+    mixed: 'A 6:1:8, B 4:2:4, C 5:4:12, D 3:3:6, E 7:1:20',
+    weights: 'A 2:1:9, B 8:5:10, C 3:1:4, D 6:4:14',
+    tight: 'A 5:2:5, B 4:1:6, C 6:3:7, D 2:2:9'
+  };
+  const SPTJOBS = { worst: 'A 9, B 2, C 6, D 3, E 5', near: 'A 2, B 3, C 7, D 5, E 6',
+                    ties: 'A 4, B 4, C 1, D 7' };
+  const WJOBS = { ratio: 'A 3:1, B 8:4, C 2:3, D 6:2', shortest: 'A 1:1, B 4:8, C 3:2, D 5:5',
+                  equal: 'A 5:2, B 3:2, C 8:2, D 2:2' };
+  const DJOBS = { loses: 'A 6:8, B 4:4, C 5:12, D 3:6, E 7:20', onelate: 'A 3:4, B 2:3, C 8:9, D 4:30',
+                  slack: 'A 2:6, B 7:10, C 3:7, D 5:12' };
+  const LJOBS = { throws: 'A 6:8, B 4:4, C 5:12, D 3:6, E 7:20',
+                  onebad: 'A 12:14, B 2:5, C 3:7, D 2:9, E 4:13', allfit: 'A 2:3, B 3:7, C 1:9, D 4:14' };
+  const FJOBS = { johnson: 'A 5:2, B 1:6, C 9:7, D 3:8, E 10:4', starved: 'A 8:1, B 7:2, C 6:9, D 2:5',
+                  balanced: 'A 4:4, B 3:3, C 6:6, D 2:2' };
+  const PJOBS = { ratio: 'A 7, B 6, C 5, D 4, E 4, F 4, G 4', onebig: 'A 11, B 3, C 3, D 2, E 2',
+                  even: 'A 4, B 4, C 4, D 4, E 4, F 4' };
+  const SHOPS = { two: 'J1 M1 3, J1 M2 2, J2 M2 4, J2 M1 1',
+                  three: 'J1 M1 2, J1 M2 3, J2 M2 2, J2 M1 4, J3 M1 3',
+                  chain: 'J1 M1 4, J1 M2 2, J2 M1 3, J2 M2 5, J3 M1 2' };
+  const ACTS = { diamond: 'A 6:4:100:140, B 4:2:80:120 | A, C 5:3:60:90 | A, D 3:2:50:80 | B C',
+                 series: 'A 5:3:40:70, B 6:3:50:110 | A, C 4:2:30:70 | B',
+                 cheapfirst: 'A 4:2:40:48, B 7:4:60:120 | A, C 2:1:20:24, D 5:3:40:70 | C' };
+  {
+    const drift = [];
+    for (const table of [JOBS, SPTJOBS, WJOBS, DJOBS, LJOBS, FJOBS, PJOBS, SHOPS, ACTS]) {
+      for (const k of Object.keys(table)) {
+        if (schedSrc.indexOf('"' + table[k] + '"') < 0) drift.push(k + ': ' + table[k]);
+      }
+    }
+    eq(drift.join(' / '), '', 'every preset transcribed here is the string schedule.py ships');
+  }
+
+  /* ================================================================ ORACLE
+     Every permutation of the jobs, scored by a clock written in this file.
+     Nothing here calls seqObjectives, recheckObjectives or bestSequence. */
+  const clockOf = (seq, jobs) => {
+    let t = R0;
+    return seq.map((k) => { t = Radd(t, jobs[k].p); return t; });
+  };
+  const SCORE = {
+    sumC: (s, j) => clockOf(s, j).reduce(Radd, R0),
+    sumWC: (s, j) => { const C = clockOf(s, j); let v = R0;
+      s.forEach((q, k) => { v = Radd(v, Rmul(j[q].w, C[k])); }); return v; },
+    Lmax: (s, j) => { const C = clockOf(s, j); let m = null;
+      s.forEach((q, k) => { const L = Rsub(C[k], j[q].d); if (m === null || Rcmp(L, m) > 0) m = L; });
+      return m === null ? R0 : m; },
+    Tmax: (s, j) => { const C = clockOf(s, j); let m = R0;
+      s.forEach((q, k) => { const L = Rsub(C[k], j[q].d); if (Rsign(L) > 0 && Rcmp(L, m) > 0) m = L; });
+      return m; },
+    sumT: (s, j) => { const C = clockOf(s, j); let v = R0;
+      s.forEach((q, k) => { const L = Rsub(C[k], j[q].d); if (Rsign(L) > 0) v = Radd(v, L); }); return v; },
+    sumU: (s, j) => { const C = clockOf(s, j); let v = 0;
+      s.forEach((q, k) => { if (Rcmp(C[k], j[q].d) > 0) v += 1; }); return ri(v); },
+    makespan: (s, j) => clockOf(s, j)[s.length - 1] || R0
+  };
+  const everyOrder = (jobs, score) => {
+    const n = jobs.length, used = [], acc = [];
+    let best = null, bestSeq = null, ties = 0, count = 0;
+    const go = () => {
+      if (acc.length === n) {
+        count += 1;
+        const v = score(acc.slice());
+        if (best === null || Rcmp(v, best) < 0) { best = v; bestSeq = acc.slice(); ties = 1; }
+        else if (Requ(v, best)) ties += 1;
+        return;
+      }
+      for (let k = 0; k < n; k += 1) {
+        if (used[k]) continue;
+        used[k] = 1; acc.push(k); go(); acc.pop(); used[k] = 0;
+      }
+    };
+    go();
+    return { best: best, seq: bestSeq, ties: ties, count: count };
+  };
+
+  /* --- reading jobs and sequences in, which is the reader's only door ----- */
+  {
+    const p = parseJobs(JOBS.mixed, ['p', 'w', 'd'], ['x', 'y', 'z']);
+    eq(p.jobs.length, 5, 'the default job list parses as five jobs');
+    eq(p.jobs.map((j) => j.id + ':' + rt(j.p) + ':' + rt(j.w) + ':' + rt(j.d)).join(' '),
+       'A:6:1:8 B:4:2:4 C:5:4:12 D:3:3:6 E:7:1:20', 'field by field, colon separated');
+    eq(rt(parseJobs('A 7/2:1:3', ['p', 'w', 'd'], ['x', 'y', 'z']).jobs[0].p), '7/2',
+       'a slash is an exact fraction, because the field separator is a colon');
+    eq(parseJobs('', ['p'], ['the time']).bad, 'there are no jobs here yet', 'nothing at all is refused');
+    eq(/two jobs called A/.test(parseJobs('A 3, A 4', ['p'], ['the time']).bad), true,
+       'and two jobs with one name, because a sequence could not name either');
+    eq(/is not a number/.test(parseJobs('A banana', ['p'], ['the time']).bad), true, 'as is a non-number');
+    eq(/not a job/.test(parseJobs('3', ['p'], ['the time']).bad), true, 'and a clause with no name');
+    eq(/2 numbers/.test(parseJobs('A 3:4', ['p'], ['the time']).bad), true,
+       'a job given more fields than the mode asked for is refused rather than truncated');
+    eq(/not a job this course can order/.test(parseJobs('A 0', ['p'], ['the time']).bad), true,
+       'a job that takes no time is refused');
+    eq(/positive weight/.test(parseJobs('A 3:0', ['p', 'w'], ['t', 'w']).bad), true,
+       "and a zero weight, because Smith's ratio divides by it");
+    eq(/at most 8/.test(parseJobs('A 1, B 1, C 1, D 1, E 1, F 1, G 1, H 1, I 1', ['p'], ['t']).bad), true,
+       'nine jobs is past what the drawing labels');
+    const jobs = parseJobs(JOBS.mixed, ['p', 'w', 'd'], ['x', 'y', 'z']).jobs;
+    eq(parseSeq('A B C D E', jobs).seq.join(''), '01234', 'a sequence reads as indices, in order');
+    eq(/runs twice/.test(parseSeq('A A B C D E', jobs).bad), true, 'a job twice is refused');
+    eq(/leaves out C and E/.test(parseSeq('A B D', jobs).bad), true,
+       'and a short sequence names the jobs it left out rather than saying "invalid"');
+    eq(/no job called Z/.test(parseSeq('A B C D Z', jobs).bad), true, 'as does a name that is not there');
+  }
+
+  /* --- THE SORTED-ARRAY TRAP, made explicit ------------------------------
+     A rule's order can be checked by counting adjacent pairs that are out of
+     order, and that count is ZERO for an array that is not a permutation of
+     the jobs at all -- which is how an unsorted, wrong, or truncated arm
+     survives a violation counter. `orderAudit` answers the two questions
+     separately and this asserts both, including on lists that would pass a
+     counter. */
+  {
+    const jobs = parseJobs(JOBS.mixed, ['p', 'w', 'd'], ['x', 'y', 'z']).jobs;
+    for (const rule of ['SPT', 'LPT', 'WSPT', 'WEIGHT', 'EDD', 'SLACK', 'FCFS']) {
+      const seq = ruleOrder(jobs, rule), audit = orderAudit(seq, jobs, rule);
+      eq(audit.permutation, true, rule + ': the order it returns is a permutation of the jobs');
+      eq(audit.ordered, true, rule + ': and each key really is no larger than the next');
+      eq(seq.slice().sort((a, b) => a - b).join(''), '01234', rule + ': every job exactly once');
+    }
+    /* zero inversions and still not an answer */
+    const doubled = orderAudit([0, 0, 1, 2, 3], jobs, 'SPT');
+    eq(doubled.ordered, false, 'a list with a job repeated is not reported as ordered');
+    eq(doubled.permutation, false, 'and it is caught as a NON-PERMUTATION, which a violation count is not');
+    eq(/appears twice/.test(doubled.why) && / E not at all/.test(doubled.why), true,
+       'the refusal names the job that is doubled and the one that is missing');
+    const short = orderAudit([1, 3], jobs, 'SPT');
+    eq(short.permutation + '/' + short.ordered, 'false/false', 'a short list fails both halves');
+    eq(/holds 2 entries where there are 5 jobs/.test(short.why), true, 'and says how short');
+    eq(orderAudit([0, 1, 2, 3, 9], jobs, 'SPT').permutation, false, 'an index off the end is refused');
+    /* and an order that IS a permutation but is not the rule's */
+    const wrong = orderAudit([0, 1, 2, 3, 4], jobs, 'SPT');
+    eq(wrong.permutation, true, 'the typed order is a permutation');
+    eq(wrong.ordered, false, 'and it is not SPT');
+    eq(wrong.fault.before + ' before ' + wrong.fault.after, 'A before B',
+       'with the first offending pair named');
+  }
+
+  /* --- TWO ROUTES TO EVERY OBJECTIVE, AND A THIRD IN THIS FILE ------------ */
+  {
+    let checked = 0, off = [];
+    for (const key of Object.keys(JOBS)) {
+      const jobs = parseJobs(JOBS[key], ['p', 'w', 'd'], ['x', 'y', 'z']).jobs;
+      for (const rule of ['SPT', 'LPT', 'WSPT', 'WEIGHT', 'EDD', 'SLACK', 'FCFS']) {
+        const seq = ruleOrder(jobs, rule), cross = crossCheck(seq, jobs);
+        checked += 1;
+        if (!cross.agree) off.push(key + '/' + rule + ': ' + cross.disagree.join(','));
+        for (const obj of ['sumC', 'sumWC', 'Lmax', 'Tmax', 'sumT', 'makespan']) {
+          if (!Requ(SCORE[obj](seq, jobs), cross.forward[obj])) off.push(key + '/' + rule + '/' + obj);
+        }
+        if (Number(SCORE.sumU(seq, jobs).n) !== cross.forward.sumU) off.push(key + '/' + rule + '/sumU');
+      }
+    }
+    eq(checked, 21, 'twenty-one rule orders over the three job lists');
+    eq(off.join(' / '), '', 'and all three routes to every objective agree on every one of them');
+    /* the second route really is a different computation: it must reach the
+       same answer on a sequence the first route never sees in order */
+    const jobs = parseJobs(JOBS.mixed, ['p', 'w', 'd'], ['x', 'y', 'z']).jobs;
+    const rev = [4, 3, 2, 1, 0], cross = crossCheck(rev, jobs);
+    eq(rt(cross.forward.sumC) + '/' + rt(cross.second.sumC), '76/76',
+       'reversed, the forward clock and the position-weighted sum of  (n - k) p  both give 76');
+    eq(rt(cross.second.sumWC), rt(SCORE.sumWC(rev, jobs)), 'and the suffix-weight sum matches the oracle');
+    eq(Rzero(cross.second.zero), true, 'the backward scan returns the clock to exactly zero');
+    eq(cross.disagree.length, 0, 'so there is nothing to disagree about');
+  }
+
+  /* --- THE RULES, AGAINST EVERY ORDER ------------------------------------ */
+  const seen = {};
+  {
+    for (const key of Object.keys(JOBS)) {
+      const jobs = parseJobs(JOBS[key], ['p', 'w', 'd'], ['x', 'y', 'z']).jobs;
+      const best = {};
+      for (const obj of Object.keys(SCORE)) best[obj] = everyOrder(jobs, (s) => SCORE[obj](s, jobs));
+      seen[key] = { jobs: jobs, best: best };
+      eq(best.sumC.count, jobs.length === 5 ? 120 : 24,
+         key + ': every one of the ' + best.sumC.count + ' orders was scored');
+      /* the theorems */
+      eq(Requ(SCORE.sumC(ruleOrder(jobs, 'SPT'), jobs), best.sumC.best), true,
+         key + ': SPT attains the enumerated minimum of sum C');
+      eq(Requ(SCORE.sumWC(ruleOrder(jobs, 'WSPT'), jobs), best.sumWC.best), true,
+         key + ": Smith's ratio attains the enumerated minimum of sum wC");
+      eq(Requ(SCORE.Lmax(ruleOrder(jobs, 'EDD'), jobs), best.Lmax.best), true,
+         key + ': EDD attains the enumerated minimum of L max');
+      eq(Requ(SCORE.Tmax(ruleOrder(jobs, 'EDD'), jobs), best.Tmax.best), true,
+         key + ': and of T max');
+      eq(Requ(SCORE.sumU(mooreHodgson(jobs).seq, jobs), best.sumU.best), true,
+         key + ': Moore-Hodgson attains the enumerated minimum number of late jobs');
+      /* the makespan does not move at all, which is why it is not a rule */
+      let spread = 0;
+      for (const o of [ruleOrder(jobs, 'SPT'), ruleOrder(jobs, 'LPT'), ruleOrder(jobs, 'EDD')]) {
+        if (!Requ(SCORE.makespan(o, jobs), best.makespan.best)) spread += 1;
+      }
+      eq(spread + '/' + best.makespan.ties, '0/' + best.makespan.count,
+         key + ': and every single order has the same makespan, which is why no rule optimises it');
+      /* the kit's own checker agrees with the oracle, objective by objective */
+      let kit = [];
+      for (const obj of ['sumC', 'sumWC', 'Lmax', 'Tmax', 'sumT', 'sumU']) {
+        for (const rule of ['SPT', 'WSPT', 'EDD', 'WEIGHT', 'FCFS']) {
+          const seq = ruleOrder(jobs, rule), chk = attainsOptimum(jobs, seq, obj);
+          if (!chk.checked) { kit.push(key + '/' + obj + '/' + rule + ': unchecked'); continue; }
+          if (!Requ(chk.optimum, best[obj].best)) kit.push(key + '/' + obj + '/' + rule + ': optimum');
+          if (chk.attains !== Requ(SCORE[obj](seq, jobs), best[obj].best)) {
+            kit.push(key + '/' + obj + '/' + rule + ': verdict');
+          }
+          if (chk.count !== best[obj].count) kit.push(key + '/' + obj + '/' + rule + ': count');
+        }
+      }
+      eq(kit.join(' / '), '', key + ": the kit's attainsOptimum agrees with the enumeration on all thirty");
+    }
+  }
+
+  /* --- AND THE FIVE CONTRASTS, WHICH ARE THE TEACHING POINT --------------- */
+  {
+    const mixed = seen.mixed.jobs, best = seen.mixed.best;
+    eq(rt(SCORE.sumWC(ruleOrder(mixed, 'WSPT'), mixed)) + ' vs ' + rt(SCORE.sumWC(ruleOrder(mixed, 'WEIGHT'), mixed)),
+       '108 vs 111', "Smith's ratio costs 108 on sum wC where heaviest-weight-first costs 111");
+    eq(rt(best.sumWC.best), '108', 'and 108 is the best any order can do');
+    eq(Requ(SCORE.sumWC(ruleOrder(mixed, 'WEIGHT'), mixed), best.sumWC.best), false,
+       'so the rival rule does NOT attain it -- a rule that sounds right and is not');
+    eq(rt(SCORE.sumWC(ruleOrder(mixed, 'SPT'), mixed)), '114',
+       'shortest-first, which IS optimal for sum C, costs 114 on the weighted version');
+    eq(ids(ruleOrder(mixed, 'SPT'), mixed) + ' / ' + ids(ruleOrder(mixed, 'WSPT'), mixed),
+       'D B C A E / D C B A E', 'the two orders differ by one adjacent pair, and that pair costs 6');
+    eq(rt(SCORE.sumT(ruleOrder(mixed, 'EDD'), mixed)) + ' vs ' + rt(best.sumT.best), '17 vs 16',
+       'EDD, which IS optimal for L max, leaves 17 of total tardiness where 16 is possible');
+    eq(ids(best.sumT.seq, mixed), 'B D C A E',
+       'and the order that attains 16 is found by enumeration and by no rule on this course');
+    const tightJobs = seen.tight.jobs;
+    eq(rt(SCORE.sumT(ruleOrder(tightJobs, 'EDD'), tightJobs)) + ' vs ' + rt(seen.tight.best.sumT.best),
+       '19 vs 15', 'on the tight data EDD is 4 worse on sum T, so the first instance was not a fluke');
+    eq(Requ(SCORE.Lmax(ruleOrder(tightJobs, 'EDD'), tightJobs), seen.tight.best.Lmax.best), true,
+       'while still being exactly optimal on L max — the same order, two verdicts');
+  }
+
+  /* --- THE ADJACENT EXCHANGE, RUN ---------------------------------------- */
+  {
+    const chains = [];
+    for (const [table, keys, obj, rule] of [[JOBS, ['p', 'w', 'd'], 'sumC', 'SPT'],
+                                            [JOBS, ['p', 'w', 'd'], 'sumWC', 'WSPT']]) {
+      for (const key of Object.keys(table)) {
+        const jobs = parseJobs(table[key], keys, ['x', 'y', 'z']).jobs;
+        const from = ruleOrder(jobs, 'LPT'), chain = exchangeChain(jobs, from, obj);
+        chains.push(key + '/' + obj + ':' + chain.steps.length);
+        eq(ids(chain.seq, jobs), ids(ruleOrder(jobs, rule), jobs),
+           key + '/' + obj + ': taking every improving adjacent swap from the WORST order lands on '
+           + rule + "'s own order, without the walk ever being told what the rule is");
+        eq(chain.stalled, false, key + '/' + obj + ': and it stops rather than running out of steps');
+        let bad = [];
+        for (const st of chain.steps) {
+          if (!st.checked) bad.push('step ' + st.a + st.b + ' does not decompose');
+          if (Rsign(st.delta) >= 0) bad.push('step ' + st.a + st.b + ' did not improve');
+          const want = obj === 'sumC' ? st.deltaSumC : st.deltaSumWC;
+          if (!Requ(st.delta, want)) bad.push('step ' + st.a + st.b + ' moved by something else');
+        }
+        eq(bad.join(' / '), '', key + '/' + obj
+           + ': and every step moved the objective by exactly the one subtraction, checked against a '
+           + 'full recomputation of both schedules');
+      }
+    }
+    eq(chains.join(' '), 'mixed/sumC:10 weights/sumC:6 tight/sumC:6 mixed/sumWC:9 weights/sumWC:2 tight/sumWC:3',
+       'and the walks take 10, 6, 6, 9, 2 and 3 swaps -- a measured number, not a bound');
+    /* the decomposition itself, on the pair Smith's rule is about */
+    const jobs = parseJobs(JOBS.mixed, ['p', 'w', 'd'], ['x', 'y', 'z']).jobs;
+    const sw = adjacentSwap(ruleOrder(jobs, 'SPT'), 1, jobs);
+    eq(jobs[ruleOrder(jobs, 'SPT')[1]].id + ' and ' + jobs[ruleOrder(jobs, 'SPT')[2]].id, 'B and C',
+       'in SPT order the second and third jobs are B and C');
+    eq(rt(sw.deltaSumC) + ' / ' + rt(sw.deltaSumWC), '1 / -6',
+       'swapping them costs 1 on sum C and SAVES 6 on sum wC — the same swap, two signs');
+    eq(rt(sw.ratios.a) + ' vs ' + rt(sw.ratios.b), '2 vs 5/4',
+       'because B has ratio 2 and C has 5/4, and the swap is worth it exactly when the first is larger');
+    eq(sw.checkC && sw.checkWC, true, 'and both decompositions survive a full recomputation');
+  }
+
+  /* --- Moore-Hodgson: the job it throws out is not the job that was late -- */
+  {
+    for (const key of Object.keys(LJOBS)) {
+      const jobs = fillJobs(parseJobs(LJOBS[key], ['p', 'd'], ['t', 'd']).jobs);
+      const mh = mooreHodgson(jobs), best = everyOrder(jobs, (s) => SCORE.sumU(s, jobs));
+      eq(Requ(ri(mh.sumU), best.best), true,
+         key + ': Moore-Hodgson leaves the enumerated minimum of ' + rt(best.best) + ' jobs late');
+      eq(mh.kept.length + mh.discarded.length, jobs.length, key + ': every job is kept or discarded, once');
+      /* the kept set really does finish on time, in due-date order */
+      let t = R0, late = 0;
+      for (const k of mh.kept) { t = Radd(t, jobs[k].p); if (Rcmp(t, jobs[k].d) > 0) late += 1; }
+      eq(late, 0, key + ': and not one of the kept jobs is late, which is what "kept" has to mean');
+      eq(mh.discarded.length, mh.sumU, key + ': so the late count is exactly the discarded count');
+    }
+    const jobs = fillJobs(parseJobs(LJOBS.throws, ['p', 'd'], ['t', 'd']).jobs);
+    const mh = mooreHodgson(jobs);
+    eq(ids(mh.seq, jobs), 'D C E B A', 'on the default data the order is D C E B A');
+    eq(mh.discarded.map((k) => jobs[k].id).join(''), 'BA', 'with B and A thrown out');
+    eq(mh.steps[1].id + ' arrived, ' + mh.steps[1].removedId + ' left', 'D arrived, B left',
+       'and at step 2 the job that went LATE was D while the job thrown out was B — the longest '
+       + 'accepted so far, which had been comfortably on time');
+    eq(rt(jobs[mh.steps[1].removed].p) + ' vs ' + rt(jobs[mh.steps[1].job].p), '4 vs 3',
+       'throwing out B frees 4 hours where throwing out D would have freed 3, for the same one late job');
+    eq(SCORE.sumU(ruleOrder(jobs, 'EDD'), jobs).n + 'n', '4n',
+       'due-date order alone leaves 4 late: the order is how the jobs are OFFERED, not the algorithm');
+    eq(mooreHodgson(fillJobs(parseJobs(LJOBS.allfit, ['p', 'd'], ['t', 'd']).jobs)).discarded.length, 0,
+       'and on a list where everything fits, nothing is discarded at all');
+  }
+
+  /* --- the two-machine flow shop ----------------------------------------- */
+  {
+    /* the oracle: every order, scored by a two-machine clock written here */
+    const flowOracle = (jobs) => {
+      const n = jobs.length, used = [], acc = [];
+      let best = null, bestSeq = null, ties = 0, count = 0;
+      const go = () => {
+        if (acc.length === n) {
+          count += 1;
+          let t1 = R0, t2 = R0;
+          for (const k of acc) {
+            t1 = Radd(t1, jobs[k].p1);
+            t2 = Radd(Rcmp(t1, t2) > 0 ? t1 : t2, jobs[k].p2);
+          }
+          if (best === null || Rcmp(t2, best) < 0) { best = t2; bestSeq = acc.slice(); ties = 1; }
+          else if (Requ(t2, best)) ties += 1;
+          return;
+        }
+        for (let k = 0; k < n; k += 1) {
+          if (used[k]) continue;
+          used[k] = 1; acc.push(k); go(); acc.pop(); used[k] = 0;
+        }
+      };
+      go();
+      return { best: best, seq: bestSeq, ties: ties, count: count };
+    };
+    for (const key of Object.keys(FJOBS)) {
+      const jobs = parseJobs(FJOBS[key], ['p1', 'p2'], ['one', 'two']).jobs;
+      const oracle = flowOracle(jobs), kit = bestFlowshop(jobs), jr = johnsonRule(jobs);
+      eq(kit.truncated, false, key + ': the flow-shop enumeration runs');
+      eq(rt(kit.value) + '/' + kit.count + '/' + kit.ties,
+         rt(oracle.best) + '/' + oracle.count + '/' + oracle.ties,
+         key + ": the kit's enumeration and this file's agree on the value, the count and the ties");
+      eq(Requ(jr.makespan.value, oracle.best), true,
+         key + ": Johnson's rule attains the minimum makespan of " + rt(oracle.best));
+      /* the picture is read back before the number is believed */
+      const bars = flowshopBars(jr.seq, jobs), vf = flowshopVerify(bars, jobs, jr.seq);
+      eq(vf.ok, true, key + ': machine 1 runs without gaps, machine 2 never overlaps itself, '
+         + 'and no job reaches machine 2 before it leaves machine 1');
+      eq(rt(vf.makespan), rt(jr.makespan.value),
+         key + ': and the makespan read off the last bar is the makespan the recursion reported');
+      let work = R0;
+      for (const k of jr.seq) work = Radd(work, jobs[k].p2);
+      eq(rt(Radd(work, vf.idle)), rt(vf.makespan),
+         key + ': the makespan is machine 2 work plus machine 2 idle, exactly — which is what the rule '
+         + 'is actually minimising');
+      eq(rt(vf.work), rt(work), key + ': and that work is the same whatever the order');
+    }
+    const jobs = parseJobs(FJOBS.johnson, ['p1', 'p2'], ['one', 'two']).jobs;
+    const jr = johnsonRule(jobs);
+    eq(ids(jr.seq, jobs), 'B D C E A', "Johnson's order on the default data is B D C E A");
+    eq(jr.front.map((k) => jobs[k].id).join('') + ' then ' + jr.back.map((k) => jobs[k].id).join(''),
+       'BD then CEA', 'B and D are quicker on machine 1 and go first; the rest go last');
+    eq(rt(flowshopVerify(flowshopBars(jr.seq, jobs), jobs, jr.seq).idle) + ' vs '
+       + rt(flowshopVerify(flowshopBars([0, 1, 2, 3, 4], jobs), jobs, [0, 1, 2, 3, 4]).idle), '3 vs 7',
+       'and machine 2 idles 3 under the rule against 7 in the order typed — the whole of the 4 it saves');
+    /* a schedule that is NOT a schedule is caught */
+    const broken = flowshopBars(jr.seq, jobs);
+    broken.two[2].start = Rsub(broken.two[2].start, ri(1));
+    eq(flowshopVerify(broken, jobs, jr.seq).ok, false, 'a second-machine bar pulled one hour earlier is refused');
+  }
+
+  /* --- machines in parallel ---------------------------------------------- */
+  {
+    for (const key of Object.keys(PJOBS)) {
+      const jobs = fillJobs(parseJobs(PJOBS[key], ['p'], ['the time']).jobs);
+      for (const rule of ['LPT', 'SPT']) {
+        const par = parallelAssign(jobs, 3, rule);
+        const lc = loadCheck(par.assign, jobs, 3), lo = loadCheck(par.optimumAssign, jobs, 3);
+        eq(lc.ok && lo.ok, true, key + '/' + rule + ': both assignments put every job on a machine');
+        eq(rt(lc.makespan), rt(par.makespan),
+           key + '/' + rule + ': the makespan the rule reported is the makespan of the deal it made, '
+           + 'added up again from the assignment');
+        eq(rt(lo.makespan), rt(par.optimum),
+           key + '/' + rule + ': and the optimum it reported is the makespan of the assignment said to attain it');
+        eq(Rcmp(par.makespan, par.bounds.best) >= 0, true,
+           key + '/' + rule + ': no schedule beats the better of the two lower bounds');
+        eq(Rcmp(par.optimum, par.bounds.best) >= 0, true, key + '/' + rule + ': including the optimum');
+        eq(Rcmp(par.ratio, R(4n, 3n)) <= 0 || rule === 'SPT', true,
+           key + '/' + rule + ': and LPT is inside the 4/3 it is proved to');
+        /* the loads really do add up to the work */
+        let total = R0, sum = R0;
+        for (const j of jobs) total = Radd(total, j.p);
+        for (const l of lc.loads) sum = Radd(sum, l);
+        eq(rt(sum), rt(total), key + '/' + rule + ': and the three loads add to the whole of the work');
+      }
+    }
+    const jobs = fillJobs(parseJobs(PJOBS.ratio, ['p'], ['the time']).jobs);
+    const par = parallelAssign(jobs, 3, 'LPT');
+    eq(rt(par.makespan) + ' vs ' + rt(par.optimum), '13 vs 12',
+       'LPT finishes at 13 on the default data where the best of the 2187 deals finishes at 12');
+    eq(par.count, 2187, 'and all 2187 of them were tried');
+    eq(rt(par.bounds.average) + ' and ' + rt(par.bounds.longest), '34/3 and 7',
+       'the two lower bounds are 34/3 and 7, and neither implies the other');
+    eq(rt(par.bounds.best), '34/3', 'the average is the binding one here');
+    eq(Rcmp(par.optimum, par.bounds.best) > 0, true,
+       'and the optimum is strictly above it, so a reader who stopped at the bound would believe in a '
+       + 'schedule that does not exist');
+    const big = parallelAssign(fillJobs(parseJobs(PJOBS.onebig, ['p'], ['t']).jobs), 3, 'LPT');
+    eq(rt(big.bounds.best) + ' = ' + rt(big.optimum), '11 = 11',
+       'on the one-big-job data the LONGEST-job bound binds instead, and it is tight');
+    eq(loadCheck([0, 1, 9], parseJobs('A 1, B 1, C 1', ['p'], ['t']).jobs, 3).ok, false,
+       'and an assignment naming a machine that does not exist is refused rather than scored');
+  }
+
+  /* --- the job shop ------------------------------------------------------ */
+  {
+    /* THE ORACLE: every linear extension of the jobs' own orders, list-scheduled
+       as early as possible. Every semi-active schedule is generated by some
+       such permutation, and an optimal schedule is semi-active, so the minimum
+       over these is the optimum -- reached without ever orienting a pair. */
+    const listOracle = (ops) => {
+      const n = ops.length, byJob = {};
+      ops.forEach((o, k) => { (byJob[o.job] = byJob[o.job] || []).push(k); });
+      const used = [], acc = [];
+      let best = null, count = 0;
+      const legal = (k) => {
+        const chain = byJob[ops[k].job], at = chain.indexOf(k);
+        return at === 0 || used[chain[at - 1]];
+      };
+      const go = () => {
+        if (acc.length === n) {
+          count += 1;
+          const mfree = {}, jfree = {}, end = {};
+          let span = R0;
+          for (const k of acc) {
+            const m = ops[k].machine, j = ops[k].job;
+            const start = Rcmp(mfree[m] || R0, jfree[j] || R0) > 0 ? mfree[m] : (jfree[j] || R0);
+            const fin = Radd(start || R0, ops[k].dur);
+            mfree[m] = fin; jfree[j] = fin; end[k] = fin;
+            if (Rcmp(fin, span) > 0) span = fin;
+          }
+          if (best === null || Rcmp(span, best) < 0) best = span;
+          return;
+        }
+        for (let k = 0; k < n; k += 1) {
+          if (used[k] || !legal(k)) continue;
+          used[k] = 1; acc.push(k); go(); acc.pop(); used[k] = 0;
+        }
+      };
+      go();
+      return { best: best, count: count };
+    };
+    for (const key of Object.keys(SHOPS)) {
+      const ops = parseOps(SHOPS[key]).ops, all = jobShopAll(ops);
+      eq(all.truncated, false, key + ': the orientation enumeration runs');
+      const oracle = listOracle(ops);
+      eq(rt(all.best.makespan), rt(oracle.best),
+         key + ': orienting every disjunctive pair and list-scheduling every legal permutation reach '
+         + 'the same makespan, ' + rt(oracle.best) + ', by different routes');
+      let bad = [], cyclic = 0;
+      for (const o of all.orientations) {
+        const times = shopTimes(ops, all.pairs, o.mask);
+        if (o.cyclic) {
+          cyclic += 1;
+          if (!times.cycle) bad.push('mask ' + o.mask + ' deadlocks but has start times');
+          continue;
+        }
+        if (times.cycle) { bad.push('mask ' + o.mask + ' has start times but is reported cyclic'); continue; }
+        if (!Requ(times.makespan, o.makespan)) bad.push('mask ' + o.mask + ' start times disagree');
+        const feas = shopFeasible(ops, times.start);
+        if (!feas.ok) bad.push('mask ' + o.mask + ': ' + feas.faults.join(', '));
+        if (!Requ(feas.makespan, o.makespan)) bad.push('mask ' + o.mask + ' last bar disagrees');
+      }
+      eq(bad.join(' / '), '', key + ': and every one of the ' + all.total
+         + ' orientations draws a schedule that holds together — no machine running two things at once, '
+         + 'no job starting a step before the one before it finished');
+      eq(cyclic, all.cyclic, key + ': the deadlock count is the number of orientations with a cycle');
+    }
+    const ops = parseOps(SHOPS.two).ops, all = jobShopAll(ops);
+    eq(all.pairs.length + ' pairs, ' + all.total + ' orientations', '2 pairs, 4 orientations',
+       'the default shop has two pairs on shared machines and four orientations');
+    eq(rt(all.best.makespan) + ', ' + all.cyclic + ' deadlocked', '6, 1 deadlocked',
+       'the best finishes at 6 and one of the four cannot be run at all');
+    eq(parseOps('J1 M1 3, J1 M1 0').bad !== undefined, true, 'an operation taking no time is refused');
+    eq(/not an operation/.test(parseOps('J1 M1').bad), true, 'and one with no duration');
+    /* a schedule with an overlap is caught, which is what makes shopFeasible a check */
+    const times = shopTimes(ops, all.pairs, all.best.mask);
+    const nudged = times.start.slice();
+    nudged[3] = Rsub(nudged[3], ri(1));
+    eq(shopFeasible(ops, nudged).ok, false, 'moving one operation an hour earlier breaks the schedule');
+  }
+
+  /* --- crashing: the programme, and the two things that check it ---------- */
+  {
+    /* THE ORACLE. Every path through the project, enumerated here. Any plan
+       that meets a deadline d must shorten EVERY path to d or less, and the
+       cheapest way to shorten one path in isolation -- buy its cheapest rates
+       first, up to each activity's own crash room -- is a lower bound on the
+       whole bill. On a project that IS one path the bound is the answer, so
+       the `series` preset is checked against it exactly. */
+    const pathsOf = (acts) => {
+      const succ = {}, ix = {};
+      acts.forEach((a, i) => { ix[a.id] = i; succ[a.id] = []; });
+      acts.forEach((a) => { (a.pred || []).forEach((p) => succ[p].push(a.id)); });
+      const out = [];
+      const walk = (id, acc) => {
+        acc.push(id);
+        if (!succ[id].length) out.push(acc.slice());
+        else succ[id].forEach((s) => walk(s, acc));
+        acc.pop();
+      };
+      acts.forEach((a) => { if (!(a.pred || []).length) walk(a.id, []); });
+      return { paths: out, ix: ix };
+    };
+    const pathBound = (acts, deadline) => {
+      const { paths, ix } = pathsOf(acts);
+      let bound = R0;
+      for (const p of paths) {
+        let len = R0;
+        for (const id of p) len = Radd(len, acts[ix[id]].normal);
+        let need = Rsub(len, deadline);
+        if (Rsign(need) <= 0) continue;
+        const rates = p.map((id) => {
+          const a = acts[ix[id]], room = Rsub(a.normal, a.crash);
+          return { room: room, rate: Rzero(room) ? null : Rdiv(Rsub(a.crashCost, a.normalCost), room) };
+        }).filter((q) => q.rate !== null).sort((x, y) => Rcmp(x.rate, y.rate));
+        let cost = R0, left = need;
+        for (const q of rates) {
+          if (Rsign(left) <= 0) break;
+          const take = Rcmp(q.room, left) < 0 ? q.room : left;
+          cost = Radd(cost, Rmul(take, q.rate));
+          left = Rsub(left, take);
+        }
+        if (Rsign(left) > 0) return null;          /* this deadline is unreachable */
+        if (Rcmp(cost, bound) > 0) bound = cost;
+      }
+      return bound;
+    };
+    for (const key of Object.keys(ACTS)) {
+      const parsed = parseActivities(ACTS[key]);
+      eq(parsed.bad, undefined, key + ': the activity list parses');
+      const acts = parsed.acts;
+      const normal = cpmPasses(acts.map((a) => ({ id: a.id, dur: a.normal, pred: a.pred })));
+      const floor = cpmPasses(acts.map((a) => ({ id: a.id, dur: a.crash, pred: a.pred })));
+      const curve = crashCurve(acts, floor.makespan, normal.makespan, LPOPT);
+      eq(curve.confirmed + ' of ' + curve.checked, curve.pieces.length + ' of ' + curve.pieces.length,
+         key + ': every piece of the time-cost curve was re-solved from scratch at its own left endpoint '
+         + 'and agreed');
+      /* AND AT ITS RIGHT ENDPOINT, which is the half that was missing. `confirmed`
+         re-solves at `from` only, so a zEnd computed with the wrong sign passed
+         every check while the page drew four disconnected rising segments in
+         place of a convex decreasing curve. Ten pieces across three presets were
+         wrong. This compares each zEnd with a fresh solve at its own `to`. */
+      {
+        let ends = [];
+        for (const pc of curve.pieces) {
+          const fr = lpSolve(crashModel(acts, pc.to).model, LPOPT);
+          if (fr.status !== 'optimal' || !Requ(pc.zEnd, Rneg(fr.z))) {
+            ends.push(rt(pc.from) + '->' + rt(pc.to) + ': zEnd ' + rt(pc.zEnd)
+                      + ' against a fresh ' + (fr.status === 'optimal' ? rt(Rneg(fr.z)) : fr.status));
+          }
+        }
+        eq(ends.join(' | '), '',
+           key + ': and at its RIGHT endpoint too -- zEnd is what a fresh solve at that '
+           + 'deadline costs, which is the half that was not checked');
+        for (let q = 1; q < curve.pieces.length; q += 1) {
+          eq(Requ(curve.pieces[q - 1].zEnd, curve.pieces[q].z), true,
+             key + ': and each piece ends where the next one starts, piece ' + q);
+        }
+      }
+      /* the slopes get steeper as the deadline tightens, and never flatten */
+      let rising = 0;
+      for (let q = 1; q < curve.pieces.length; q += 1) {
+        if (Rcmp(curve.pieces[q].slope, curve.pieces[q - 1].slope) < 0) rising += 1;
+      }
+      eq(rising, 0, key + ': and each day costs at least as much as the last one did as the deadline '
+         + 'tightens, which is what makes the curve convex');
+      /* every integer deadline: the LP, then CPM, then the bound */
+      let faults = [];
+      for (let d = Number(floor.makespan.n); d <= Number(normal.makespan.n); d += 1) {
+        const want = ri(d), cm = crashModel(acts, want), sol = lpSolve(cm.model, LPOPT);
+        if (sol.status !== 'optimal') { faults.push('d=' + d + ' is ' + sol.status); continue; }
+        const plan = crashPlan(cm, sol), check = crashVerify(cm, plan, want);
+        if (!check.ok) faults.push('d=' + d + ' does not survive CPM: ' + rt(check.makespan));
+        if (!Requ(sol.zOrig, plan.crashBill)) faults.push('d=' + d + ' bill is not the objective');
+        if (!Requ(plan.total, Radd(cm.normalCost, plan.crashBill))) faults.push('d=' + d + ' total');
+        const bound = pathBound(acts, want);
+        if (bound === null) { faults.push('d=' + d + ' unreachable by the bound'); continue; }
+        if (Rcmp(plan.crashBill, bound) < 0) faults.push('d=' + d + ' is BELOW the path bound');
+      }
+      eq(faults.join(' / '), '', key
+         + ': at every integer deadline the programme is optimal, a forward and a backward pass over '
+         + 'the durations it bought finish on time, the bill is the objective, and it is never below '
+         + 'what the cheapest way of shortening one path alone would cost');
+    }
+    /* on a project that is one chain the bound IS the answer */
+    const chain = parseActivities(ACTS.series).acts;
+    let tight = [];
+    for (let d = 8; d <= 15; d += 1) {
+      const cm = crashModel(chain, ri(d)), sol = lpSolve(cm.model, LPOPT);
+      const plan = crashPlan(cm, sol), bound = pathBound(chain, ri(d));
+      if (!Requ(plan.crashBill, bound)) tight.push('d=' + d + ': ' + rt(plan.crashBill) + ' vs ' + rt(bound));
+    }
+    eq(tight.join(' / '), '', 'on the single-chain project the programme matches, exactly, the greedy '
+       + 'that buys the cheapest rate first — which is provably optimal there and shares no line with '
+       + 'the simplex');
+    /* the named figures */
+    const acts = parseActivities(ACTS.diamond).acts;
+    const normal = cpmPasses(acts.map((a) => ({ id: a.id, dur: a.normal, pred: a.pred })));
+    eq(rt(normal.makespan) + ' days, critical ' + normal.critical.join(''), '14 days, critical ACD',
+       'the default project takes 14 days at normal durations, with A, C and D critical and B holding '
+       + 'a day of slack');
+    const curve = crashCurve(acts, ri(9), ri(14), LPOPT);
+    eq(curve.pieces.map((q) => rt(Rneg(q.slope))).join(','), '35,30,20,15',
+       'and the exact time-cost curve is four pieces costing 35, 30, 20 and 15 a day');
+    eq(curve.pieces.map((q) => rt(q.from)).join(','), '9,10,11,13',
+       'bending at 10, 11 and 13 — exact breakpoints from rhsCurve on the deadline row, not a scan');
+    eq(rt(crashCurve(acts, ri(9), ri(14), LPOPT).normalCost), '290',
+       'the normal cost of 290 is paid whatever the deadline, so it shifts the curve and does not bend it');
+    const cm = crashModel(acts, ri(11)), sol = lpSolve(cm.model, LPOPT), plan = crashPlan(cm, sol);
+    eq(rt(plan.crashBill) + ' / ' + rt(plan.total), '55 / 345', 'finishing by day 11 costs 55 in crashing');
+    eq(plan.y.map(rt).join(','), '2,0,1,0', 'bought by crashing A by 2 and C by 1');
+    eq(rt(crashVerify(cm, plan, ri(11)).makespan), '11',
+       'and a forward and backward pass over those durations — nothing to do with the simplex — '
+       + 'finishes the project on day 11');
+    eq(crashVerify(cm, plan, ri(11)).critical.join(''), 'ABCD',
+       'with all four activities critical, which is why the next day is dearer than the last');
+    /* the parser refuses what the model cannot mean */
+    eq(/LONGER than its normal/.test(parseActivities('A 4:6:10:20').bad), true,
+       'an activity that "crashes" to a longer duration is refused');
+    eq(/cheaper than not crashing/.test(parseActivities('A 6:4:100:80').bad), true,
+       'so is one that is cheaper crashed, because that makes the normal plan the wrong baseline');
+    eq(/no activity by that name/.test(parseActivities('A 6:4:10:20 | Z').bad), true,
+       'and a predecessor that does not exist');
+    eq(/in a circle/.test(parseActivities('A 2:1:1:2 | B, B 2:1:1:2 | A').bad), true,
+       'and two activities waiting for each other');
+  }
+
+  /* --- EVERY MODE'S OWN BUNDLE, BUILT AND RUN ---------------------------- */
+  {
+    const ONE = ['RATIONAL_JS', 'FORMAT_JS', 'ORFMT_JS', 'SCHED_JS', 'SCHEDDRAW_JS', 'SCHEDKIT_JS'];
+    const SHOP = ['RATIONAL_JS', 'FORMAT_JS', 'ORFMT_JS', 'NET_JS', 'SCHED_JS', 'SCHEDDRAW_JS',
+                  'SCHEDSHOP_JS'];
+    const CRASH = ['RATIONAL_JS', 'FORMAT_JS', 'ORFMT_JS', 'TABLEAU_JS', 'PHASE_JS', 'DUAL_JS',
+                   'RANGE_JS', 'NET_JS', 'SCHED_JS', 'SCHEDDRAW_JS', 'SCHEDCRASH_JS'];
+    eq(schedSrc.indexOf('_ONE = ' + ONE.join(' + ')) > 0, true,
+       'the one-machine bundle transcribed here is the one schedule.py builds');
+    eq(schedSrc.indexOf('_SHOP = ' + SHOP.join(' + ')) > 0, true, 'and the job-shop bundle');
+    eq(schedSrc.indexOf('_CRASH = (' + CRASH.slice(0, 6).join(' + ')) > 0
+       && schedSrc.indexOf('+ ' + CRASH.slice(6).join(' + ') + ')') > 0, true,
+       'and the crashing bundle, which the source wraps over two lines');
+    eq(/MATRIX_JS/.test(schedSrc.split('_CRASH = ')[1].split('_MODE_JS')[0]), false,
+       'and the crashing bundle takes NO matrix block, which is the 3.2 KB this page does not ship');
+    const bundle = (names) => names.map((n) => BLOCK[n]).join('');
+    const probe = (names, expr) => {
+      try { return String(new Function(bundle(names) + '\nreturn (' + expr + ');')()); }
+      catch (err) { return 'THREW: ' + err.message; }
+    };
+    /* each probe calls into every block its bundle claims, in a FRESH scope --
+       so a dependency the table forgot throws here instead of in a browser */
+    eq(probe(ONE, "(function () {"
+       + "var j = fillJobs(parseJobs('A 6:1:8, B 4:2:4, C 5:4:12', ['p','w','d'], ['a','b','c']).jobs);"
+       + "var o = ruleOrder(j, 'WSPT'), c = crossCheck(o, j), a = orderAudit(o, j, 'WSPT');"
+       + "var g = schedGantt([{name:'m', bars: seqBars(o, j, c.forward)}],"
+       + "                   {ticks: schedTicks(c.forward.makespan), marks: dueMarks(j, o)});"
+       + "var par = parallelAssign(j, 2, 'LPT');"
+       + "return [Rtext(c.forward.sumWC), a.permutation && a.ordered, c.agree,"
+       + "        Rtext(attainsOptimum(j, o, 'sumWC').optimum), exchangeChain(j, [2,1,0], 'sumC').steps.length,"
+       + "        Rtext(mooreHodgson(j).objectives.sumU !== undefined ? R1 : R0),"
+       + "        Rtext(bestFlowshop([{id:'a',p1:R1,p2:R1},{id:'b',p1:R(2n,1n),p2:R1}]).value),"
+       + "        Rtext(loadCheck(par.assign, j, 2).makespan), g.indexOf('<rect') >= 0,"
+       + "        machineBars(par.assign, j, 2, [0,1,2]).length].join('|');"
+       + "})()"),
+       '53|true|true|53|1|1|4|9|true|2',
+       'the one-machine bundle answers with nothing else loaded: the objective, the audit, the cross '
+       + 'check, the enumerated optimum, the exchange walk, Moore-Hodgson, the flow shop, the load '
+       + 'check, the Gantt and the machine tracks');
+    eq(probe(SHOP, "(function () {"
+       + "var ops = parseOps('J1 M1 3, J1 M2 2, J2 M2 4, J2 M1 1').ops, all = jobShopAll(ops);"
+       + "var t = shopTimes(ops, all.pairs, all.best.mask), f = shopFeasible(ops, t.start);"
+       + "var g = schedGantt([{name:'M1', bars:[{label:'x', start:R0, end:t.makespan}]}],"
+       + "                   {ticks: schedTicks(t.makespan)});"
+       + "return [all.total, Rtext(all.best.makespan), all.cyclic, Rtext(t.makespan), f.ok,"
+       + "        g.indexOf('<rect') >= 0].join('|');"
+       + "})()"),
+       '4|6|1|6|true|true',
+       'the job-shop bundle orients, scores, times, verifies and draws with no simplex loaded at all');
+    eq(probe(CRASH, "(function () {"
+       + "var acts = parseActivities('A 6:4:100:140, B 4:2:80:120 | A, C 5:3:60:90 | A, D 3:2:50:80 | B C').acts;"
+       + "var cm = crashModel(acts, R(11n,1n)), sol = lpSolve(cm.model, {rule:'bland', maxPivots:400});"
+       + "var plan = crashPlan(cm, sol), v = crashVerify(cm, plan, R(11n,1n));"
+       + "var cc = crashCurve(acts, R(9n,1n), R(14n,1n), {rule:'bland', maxPivots:400});"
+       + "var g = schedGantt([{name:'p', bars:[{label:'A', start:R0, end:R(6n,1n)}]}],"
+       + "                   {ticks: schedTicks(R(14n,1n))});"
+       + "return [Rtext(plan.crashBill), Rtext(v.makespan), v.ok, cc.pieces.length,"
+       + "        cc.confirmed, crashPlot(cc.pieces, {add: cm.normalCost}).indexOf('<line') >= 0,"
+       + "        g.indexOf('<rect') >= 0].join('|');"
+       + "})()"),
+       '55|11|true|4|4|true|true',
+       'and the crashing bundle solves, reads the plan back, runs CPM over it, walks the exact curve '
+       + 'and draws both pictures — without algebra_systems.MATRIX_JS, which it never calls');
+  }
+}
+
+// ==========================================================================
+// Operations Research course seven: the `dpseq` kit's own arithmetic
+// ==========================================================================
+//
+// or_core's DPSEQ_JS is exercised in the or_core section far above, at the
+// ENGINE level: backwardStages, stochasticDp, wagnerWhitin, lotsizeHeuristics,
+// stopThresholds, secretaryExact, foldBack and discountedValue are each called
+// there. None of that touches this kit. DPKIT_JS, DPPLOT_JS, DPPOL_JS,
+// DPTREE_JS and DPSTOP_JS are the layer the nine lessons read -- parseStages,
+// parseDpArcs, everyPath, pathCost, parseReturns, allocNetwork,
+// everyAllocation, planCost, everyOrderPattern, parseRow, parseMatrixRows,
+// parsePmf, parseStochastic, evaluateForward, everyPolicy, priorTree,
+// signalTree, everyStrategy, annotate, ruleValue, everyStoppingRule,
+// thresholdSets, invE and secretaryBrute -- and that is where this kit's own
+// decisions live.
+//
+// EVERY ORACLE IN THIS SECTION IS WRITTEN IN THIS FILE. The kit carries its
+// own enumerations and shows them to the reader beside the recursion, which is
+// the pedagogy; but a kit checking itself is not a check, so every one of them
+// is done again here by a route that shares no line with either the kit or
+// or_core:
+//
+//   * every path through a staged network, walked forward with its own cost
+//     accumulator -- against `backwardStages`, and against the kit's
+//     `everyPath`;
+//   * every split of the units across the activities, priced straight from the
+//     return table with no network in sight;
+//   * every order pattern, priced from the demand;
+//   * EVERY DETERMINISTIC POLICY, EVALUATED BY EXPANDING THE TRAJECTORIES.
+//     The kit pushes a distribution forward; this file sums over all |S|^T
+//     state sequences, weighting each by its probability. Three routes to one
+//     number -- the backward table, the distribution push, and the trajectory
+//     sum -- and the policy the table reconstructs is evaluated by the third
+//     of them, which is the claim a value table does not make on its own.
+//   * every signal-to-act strategy, priced from the joint distribution;
+//   * every accept-set in every period, evaluated by walking all |S|^T outcome
+//     sequences rather than by any recursion;
+//   * the secretary rule played out on all n! orderings.
+//
+// WHAT THIS SECTION REFUTES, and why it is worth the enumeration: "the optimal
+// policy is unique" is false, and one changed arc cost on the kit's own data
+// takes it from one optimal route to three. "Silver-Meal finds the answer" is
+// false, and so is "least-unit-cost does": on `both` they miss by 24 and by
+// 30, in different directions, with different numbers of orders. "The best
+// stopping rule is a threshold rule" is TRUE on all three presets and it is
+// measured here rather than assumed -- every one of the 512 accept-sets is
+// evaluated and the winner is tested for the shape.
+console.log('operations research: the sequential-decisions kit, and every policy it is held to');
+{
+  const OR7_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'or_core.py');
+  const DP_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'dpseq.py');
+  const SYS7_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'algebra_systems.py');
+  const CORE7_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'algebra_core.py');
+  const SYSD7_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'sysdesign_core.py');
+  const or7Src = fs.readFileSync(OR7_SOURCE, 'utf8');
+  const dpSrc = fs.readFileSync(DP_SOURCE, 'utf8');
+  const sys7Src = fs.readFileSync(SYS7_SOURCE, 'utf8');
+  const core7Src = fs.readFileSync(CORE7_SOURCE, 'utf8');
+  const sysd7Src = fs.readFileSync(SYSD7_SOURCE, 'utf8');
+  const dk = (n) => blockFrom(dpSrc, n, DP_SOURCE);
+
+  const BLOCK = {
+    RATIONAL_JS: blockFrom(core7Src, 'RATIONAL_JS', CORE7_SOURCE),
+    FORMAT_JS: blockFrom(sys7Src, 'FORMAT_JS', SYS7_SOURCE),
+    MATRIX_JS: blockFrom(sys7Src, 'MATRIX_JS', SYS7_SOURCE),
+    HARMONIC_JS: blockFrom(sysd7Src, 'HARMONIC_JS', SYSD7_SOURCE),
+    ORFMT_JS: blockFrom(or7Src, 'ORFMT_JS', OR7_SOURCE),
+    DPSEQ_JS: blockFrom(or7Src, 'DPSEQ_JS', OR7_SOURCE),
+    DPKIT_JS: dk('DPKIT_JS'), DPPLOT_JS: dk('DPPLOT_JS'), DPPOL_JS: dk('DPPOL_JS'),
+    DPTREE_JS: dk('DPTREE_JS'), DPSTOP_JS: dk('DPSTOP_JS')
+  };
+  eval(BLOCK.RATIONAL_JS + BLOCK.FORMAT_JS + BLOCK.MATRIX_JS + BLOCK.HARMONIC_JS + BLOCK.ORFMT_JS
+     + BLOCK.DPSEQ_JS + BLOCK.DPKIT_JS + BLOCK.DPPLOT_JS + BLOCK.DPPOL_JS + BLOCK.DPTREE_JS
+     + BLOCK.DPSTOP_JS);
+
+  const ri = (v) => R(BigInt(v), 1n);
+  const rf = (n, d) => R(BigInt(n), BigInt(d));
+  const rt = (a) => Rtext(a);
+
+  /* --- the presets, transcribed ------------------------------------------ */
+  const ST = {
+    tie: ['A; B C; D E; F', 'A>B 2, A>C 4, B>D 7, B>E 4, C>D 3, C>E 2, D>F 1, E>F 4'],
+    several: ['A; B C; D E; F', 'A>B 0, A>C 4, B>D 7, B>E 4, C>D 3, C>E 2, D>F 1, E>F 4'],
+    skip: ['A; B C; D E; F', 'A>B 2, A>C 4, A>E 3, B>D 7, B>E 4, C>D 3, C>E 2, D>F 1, E>F 4']
+  };
+  const AL = { diminishing: ['P 0 5 9 12 14; Q 0 4 8 11 13; R 0 6 9 11 12', 4],
+               lumpy: ['P 0 2 4 15 16; Q 0 6 8 9 10; R 0 3 7 8 9', 4],
+               twoway: ['P 0 7 11 14 15; Q 0 5 10 13 16', 4] };
+  const LS = { classic: ['10 62 12 130 154 129', 54, 2], flat: ['40 40 40 40 40 40', 90, 1],
+               spike: ['8 6 200 7 9 5', 60, 3] };
+  const HE = { split: ['10 62 12 130 154 129', 54, 2], both: ['17 25 73 113 89', 116, 1],
+               agree: ['30 30 30 30 30 30', 80, 1] };
+  const SD = {
+    twoact: ['calm rough', 'hold act', '1/2 1/2; 1/4 3/4', '3/4 1/4; 1/2 1/2', '1 3; 2 1', 3],
+    absorb: ['owned sold', 'keep sell', '4/5 1/5; 0 1', '0 1; 0 1', '3 0; 7 0', 3],
+    flip: ['small large', 'grow harvest', '1/4 3/4; 0 1', '1 0; 3/4 1/4', '0 1; 3 9', 4]
+  };
+  const TR = {
+    build: ['build wait', 'good poor', '100 -20; 0 0', '3/10 7/10', '4/5 1/4; 1/5 3/4'],
+    three: ['small medium large', 'weak mid strong', '20 20 20; 0 40 45; -30 20 80',
+            '1/4 1/2 1/4', '7/10 1/5 1/10; 3/10 4/5 9/10'],
+    useless: ['go stop', 'up down', '60 -40; 0 0', '1/2 1/2', '1/2 1/2; 1/2 1/2']
+  };
+  const SP = { three: ['10:1/3, 20:1/3, 30:1/3', 3, 1], skew: ['8:3/5, 14:3/10, 40:1/10', 4, 1],
+               costly: ['10:1/2, 30:1/2', 4, 5] };
+  const DC = { two: ['1/2 1/2; 1/4 3/4', '1 3', '1/2'], patient: ['1/2 1/2; 1/4 3/4', '1 3', '9/10'],
+               three: ['1/2 1/4 1/4; 0 2/3 1/3; 1/5 1/5 3/5', '2 0 5', '3/4'] };
+  {
+    const drift = [];
+    const seen = (v) => { if (typeof v === 'string' && dpSrc.indexOf('"' + v + '"') < 0) drift.push(v); };
+    for (const t of [ST, AL, LS, HE, SD, TR, SP, DC]) {
+      for (const k of Object.keys(t)) t[k].forEach(seen);
+    }
+    eq(drift.join(' / '), '', 'every preset transcribed here is the string dpseq.py ships');
+  }
+
+  /* ================================================================ ORACLE 1
+     Every path from the first stage to the last, walked forward here. */
+  const everyRoute = (stages, arcs) => {
+    const last = {}, out = [];
+    stages[stages.length - 1].forEach((v) => { last[v] = true; });
+    const walk = (at, acc, cost) => {
+      if (last[at]) { out.push({ path: acc.slice(), cost: cost }); return; }
+      arcs.forEach((a) => {
+        if (a.from !== at) return;
+        acc.push(a.to); walk(a.to, acc, Radd(cost, a.cost)); acc.pop();
+      });
+    };
+    stages[0].forEach((v) => walk(v, [v], R0));
+    let best = null, ties = 0;
+    out.forEach((p) => {
+      if (best === null || Rcmp(p.cost, best) < 0) { best = p.cost; ties = 1; }
+      else if (Requ(p.cost, best)) ties += 1;
+    });
+    return { paths: out, best: best, ties: ties, count: out.length };
+  };
+
+  /* --- L1: the recursion, and every path it stands for -------------------- */
+  {
+    for (const key of Object.keys(ST)) {
+      const sp = parseStages(ST[key][0]);
+      eq(sp.bad, undefined, key + ': the stages parse');
+      const ap = parseDpArcs(ST[key][1], sp.stageOf);
+      eq(ap.bad, undefined, key + ': and the arcs');
+      const back = backwardStages(sp.stages, ap.arcs);
+      const mine = everyRoute(sp.stages, ap.arcs);
+      const theirs = everyPath(sp.stages, ap.arcs);
+      eq(rt(back.value) + '/' + rt(mine.best) + '/' + rt(theirs.best),
+         rt(mine.best) + '/' + rt(mine.best) + '/' + rt(mine.best),
+         key + ': the backward recursion, this file\'s forward walk and the kit\'s own agree on '
+         + rt(mine.best));
+      eq(theirs.count, mine.count, key + ': and on how many paths there are, ' + mine.count);
+      eq(back.policy.length, mine.ties,
+         key + ': the recursion reconstructs exactly as many optimal routes as the enumeration finds, '
+         + mine.ties);
+      /* every route it reconstructs is a real path and really costs that */
+      let bad = [];
+      for (const route of back.policy) {
+        const priced = pathCost(route, ap.arcs);
+        if (!priced.ok) bad.push(route.join('') + ': ' + priced.why);
+        else if (!Requ(priced.cost, back.value)) bad.push(route.join('') + ' costs ' + rt(priced.cost));
+      }
+      eq(bad.join(' / '), '', key + ': and each of them, priced again arc by arc, costs what it claims');
+      /* the value of every node is the best of its continuations, checked here */
+      let off = 0;
+      for (const col of sp.stages) {
+        for (const v of col) {
+          let want = null;
+          ap.arcs.forEach((a) => {
+            if (a.from !== v || back.f[a.to] === undefined || back.f[a.to] === null) return;
+            const cand = Radd(a.cost, back.f[a.to]);
+            if (want === null || Rcmp(cand, want) < 0) want = cand;
+          });
+          if (want === null) { if (!Rzero(back.f[v])) off += 1; }
+          else if (!Requ(back.f[v], want)) off += 1;
+        }
+      }
+      eq(off, 0, key + ': and every value in the table really is the best of that node\'s continuations');
+    }
+    const sp = parseStages(ST.tie[0]), ap = parseDpArcs(ST.tie[1], sp.stageOf);
+    const back = backwardStages(sp.stages, ap.arcs);
+    eq(rt(back.value) + ', ' + back.policy.map((p) => p.join('')).join('|'), '8, ACDF',
+       'the default network costs 8 by the single route A C D F');
+    eq(back.ties.length + ' tie at ' + back.ties.map((t) => t.node).join(''), '1 tie at B',
+       'and B has a tie -- two continuations worth exactly the same -- which is kept rather than resolved');
+    eq(back.policy.length, 1, 'that tie is NOT on the optimal route, so the answer is still unique');
+    const sev = backwardStages(parseStages(ST.several[0]).stages,
+                               parseDpArcs(ST.several[1], parseStages(ST.several[0]).stageOf).arcs);
+    eq(rt(sev.value) + ', ' + sev.policy.length + ' routes', '8, 3 routes',
+       'one changed arc cost puts the tie ON the route and there are suddenly three optimal answers -- '
+       + 'which is what refutes "the optimal policy is unique"');
+    eq(sev.policy.map((p) => p.join('')).sort().join(' '), 'ABDF ABEF ACDF', 'and here they are');
+    const skip = parseStages(ST.skip[0]);
+    const sk = backwardStages(skip.stages, parseDpArcs(ST.skip[1], skip.stageOf).arcs);
+    eq(rt(sk.value) + ' by ' + sk.policy.map((p) => p.join('')).join(''), '7 by AEF',
+       'and an arc that skips a stage is handled without the recursion being told about it');
+    /* the parsers */
+    eq(/runs backwards or sideways/.test(parseDpArcs('D>B 1', sp.stageOf).bad), true,
+       'an arc pointing back a stage is refused, and the refusal names both stages');
+    eq(/runs backwards or sideways/.test(parseDpArcs('B>C 1', sp.stageOf).bad), true,
+       'so is one inside a stage');
+    eq(/two stages at once/.test(parseStages('A B; A C').bad), true, 'a node in two stages is refused');
+    eq(/at least two stages/.test(parseStages('A B C').bad), true, 'and a single stage is not a network');
+    eq(/no node called Z/.test(parseDpArcs('Z>B 1', sp.stageOf).bad), true, 'as is an arc from nowhere');
+    eq(/not an arc/.test(parseDpArcs('A B 1', sp.stageOf).bad), true, 'and a clause with no arrow');
+  }
+
+  /* --- L2: allocation, against every split -------------------------------- */
+  {
+    const everySplit = (acts, units) => {
+      const k = acts.length, pick = [];
+      let best = null, at = [], count = 0;
+      const walk = (i, left) => {
+        if (i === k) {
+          count += 1;
+          let total = R0;
+          for (let q = 0; q < k; q += 1) total = Radd(total, acts[q].ret[pick[q]]);
+          if (best === null || Rcmp(total, best) > 0) { best = total; at = [pick.slice()]; }
+          else if (Requ(total, best)) at.push(pick.slice());
+          return;
+        }
+        for (let x = 0; x <= left && x < acts[i].ret.length; x += 1) {
+          pick.push(x); walk(i + 1, left - x); pick.pop();
+        }
+      };
+      walk(0, units);
+      return { best: best, at: at, count: count };
+    };
+    for (const key of Object.keys(AL)) {
+      const pr = parseReturns(AL[key][0]);
+      eq(pr.bad, undefined, key + ': the return table parses');
+      const units = AL[key][1], net = allocNetwork(pr.acts, units);
+      const back = backwardStages(net.stages, net.arcs, { maximise: true });
+      const mine = everySplit(pr.acts, units), theirs = everyAllocation(pr.acts, units);
+      eq(rt(back.f[net.start]), rt(mine.best),
+         key + ': the network built from the table and solved backwards returns ' + rt(mine.best)
+         + ', which is what pricing every split directly from the table gives');
+      eq(rt(theirs.best) + '/' + theirs.count, rt(mine.best) + '/' + mine.count,
+         key + ": and the kit's own enumeration agrees on the value and on the " + mine.count + ' splits');
+      eq(theirs.at.length, mine.at.length, key + ': including on how many splits attain it');
+      /* the saving is real: fewer states than splits */
+      eq(Object.keys(back.f).length < mine.count || pr.acts.length === 2, true,
+         key + ': and the recursion writes fewer values than there are splits, which is the whole point');
+    }
+    const pr = parseReturns(AL.diminishing[0]), net = allocNetwork(pr.acts, 4);
+    const back = backwardStages(net.stages, net.arcs, { maximise: true });
+    eq(rt(back.f[net.start]) + ' over ' + everyAllocation(pr.acts, 4).count + ' splits, '
+       + Object.keys(back.f).length + ' states', '19 over 35 splits, 20 states',
+       'four units across three activities: 19, found by writing 20 state values rather than 35 splits');
+    eq(everyAllocation(pr.acts, 4).at.length, 2, 'and two different splits attain it, so the answer is a set');
+    eq(/first column is not zero/.test(parseReturns('P 1 5 9').bad), true,
+       'a table whose zero-units column is not zero is refused: it is measuring something else');
+    eq(/priced at the same levels/.test(parseReturns('P 0 5 9; Q 0 4').bad), true,
+       'and two activities priced at different numbers of levels');
+  }
+
+  /* --- L3 and L4: lot sizing, and the two heuristics ---------------------- */
+  {
+    const everyPattern = (demand, K, h) => {
+      const T = demand.length;
+      let best = null, at = null, count = 0;
+      for (let mask = 0; mask < (1 << (T - 1)); mask += 1) {
+        const orders = [0];
+        for (let k = 1; k < T; k += 1) if (mask & (1 << (k - 1))) orders.push(k);
+        let cost = R0;
+        for (let a = 0; a < orders.length; a += 1) {
+          const from = orders[a], to = a + 1 < orders.length ? orders[a + 1] : T;
+          cost = Radd(cost, K);
+          for (let t = from; t < to; t += 1) cost = Radd(cost, Rmul(h, Rmul(ri(t - from), demand[t])));
+        }
+        count += 1;
+        if (best === null || Rcmp(cost, best) < 0) { best = cost; at = orders.slice(); }
+      }
+      return { best: best, orders: at, count: count };
+    };
+    for (const key of Object.keys(LS)) {
+      const demand = parseRow(LS[key][0]), K = ri(LS[key][1]), h = ri(LS[key][2]);
+      const ww = wagnerWhitin(demand, K, h);
+      const mine = everyPattern(demand, K, h), theirs = everyOrderPattern(demand, K, h);
+      eq(rt(ww.cost) + '/' + rt(theirs.best), rt(mine.best) + '/' + rt(mine.best),
+         key + ': the recursion and both enumerations reach ' + rt(mine.best));
+      eq(theirs.count, mine.count, key + ': over the same ' + mine.count + ' order patterns');
+      const priced = planCost(ww.plan, demand, K, h);
+      eq(priced.ok && Requ(priced.cost, ww.cost), true,
+         key + ': and the plan it returns, priced again from the demand, costs the same');
+      eq(ww.plan.map((p) => p.period).join(','), mine.orders.map((q) => q + 1).join(','),
+         key + ': and it orders in the same periods the enumeration chose');
+      /* every period is covered exactly once, which is what makes it a plan */
+      let cover = demand.map(() => 0);
+      ww.plan.forEach((p) => { for (let t = p.covers[0]; t <= p.covers[1]; t += 1) cover[t - 1] += 1; });
+      eq(cover.join(''), demand.map(() => '1').join(''), key + ': every period covered exactly once');
+    }
+    eq(rt(wagnerWhitin(parseRow(LS.classic[0]), ri(54), ri(2)).cost), '294',
+       'the default demand costs 294 over six periods');
+    eq(/covered twice/.test(planCost([{ period: 1, quantity: ri(3), covers: [1, 2] },
+                                      { period: 2, quantity: ri(2), covers: [2, 2] }],
+                                     [ri(1), ri(2)], ri(5), ri(1)).why), true,
+       'and planCost refuses a plan that covers a period twice rather than pricing it');
+    eq(/never covered/.test(planCost([{ period: 1, quantity: ri(1), covers: [1, 1] }],
+                                     [ri(1), ri(2)], ri(5), ri(1)).why), true,
+       'or leaves one uncovered');
+    eq(/is not the demand it covers/.test(planCost([{ period: 1, quantity: ri(9), covers: [1, 2] }],
+                                                   [ri(1), ri(2)], ri(5), ri(1)).why.replace('where the demand it covers is', 'is not the demand it covers')), true,
+       'or orders a quantity that is not what it covers');
+    /* the heuristics */
+    for (const key of Object.keys(HE)) {
+      const demand = parseRow(HE[key][0]), K = ri(HE[key][1]), h = ri(HE[key][2]);
+      const hr = lotsizeHeuristics(demand, K, h), mine = everyPattern(demand, K, h);
+      eq(rt(hr.exact.cost), rt(mine.best), key + ': the exact answer is the best of every pattern');
+      for (const [name, plan] of [['Silver-Meal', hr.silverMeal], ['least unit cost', hr.leastUnitCost]]) {
+        const priced = planCost(plan.plan, demand, K, h);
+        eq(priced.ok && Requ(priced.cost, plan.cost), true,
+           key + '/' + name + ': its plan costs what it says it costs, priced again from the demand');
+        eq(Rcmp(plan.cost, mine.best) >= 0, true,
+           key + '/' + name + ': and it is never below the exact answer');
+        eq(Requ(plan.gap, Rsub(plan.cost, mine.best)), true, key + '/' + name + ': the gap is the difference');
+      }
+    }
+    const bothD = parseRow(HE.both[0]), bothK = ri(HE.both[1]), bothH = ri(HE.both[2]);
+    const both = lotsizeHeuristics(bothD, bothK, bothH);
+    eq(rt(both.exact.cost) + ': SM +' + rt(both.silverMeal.gap) + ', LUC +' + rt(both.leastUnitCost.gap),
+       '462: SM +24, LUC +30',
+       'on the `both` data the exact plan costs 462 and BOTH heuristics miss -- by 24 and by 30');
+    eq(both.silverMeal.plan.map((p) => p.period).join(',') + ' vs '
+       + both.leastUnitCost.plan.map((p) => p.period).join(',') + ' vs '
+       + both.exact.plan.map((p) => p.period).join(','), '1,3,5 vs 1,4 vs 1,3,4',
+       'and they miss differently: three orders, two orders, and an exact plan that is neither');
+    eq(Rpct(both.silverMeal.excess, 2) + ' / ' + Rpct(both.leastUnitCost.excess, 2), '5.19% / 6.49%',
+       'which is 5.19% and 6.49% over -- small, and the point is that neither rule can tell you which');
+    const split = lotsizeHeuristics(parseRow(HE.split[0]), ri(54), ri(2));
+    eq(rt(split.silverMeal.gap) + ' / ' + rt(split.leastUnitCost.gap), '0 / 306',
+       'on the first preset Silver-Meal happens to find the optimum and least-unit-cost is 306 worse, '
+       + 'which is why "a heuristic worked here" is not evidence');
+  }
+
+  /* ================================================================ ORACLE 2
+     Every deterministic policy, evaluated by expanding the TRAJECTORIES: for
+     each start state, sum over all |S|^T state sequences the probability of
+     that sequence times the rewards collected along it. The kit pushes a
+     distribution forward; this expands the tree. Neither is the recursion. */
+  {
+    const trajectoryValue = (P, r, T, policy, start) => {
+      let total = R0;
+      const walk = (t, state, prob) => {
+        if (t === T) return;
+        const a = policy[t][state];
+        total = Radd(total, Rmul(prob, r[a][state]));
+        for (let j = 0; j < P[a][state].length; j += 1) {
+          if (Rzero(P[a][state][j])) continue;
+          walk(t + 1, j, Rmul(prob, P[a][state][j]));
+        }
+      };
+      walk(0, start, R1);
+      return total;
+    };
+    const everyPolicyHere = (P, r, T, n, A) => {
+      const slots = n * T, digits = [];
+      for (let k = 0; k < slots; k += 1) digits.push(0);
+      const best = [], bestPol = [];
+      for (let i = 0; i < n; i += 1) { best.push(null); bestPol.push(null); }
+      let count = 0;
+      for (;;) {
+        const policy = [];
+        for (let t = 0; t < T; t += 1) {
+          const row = [];
+          for (let i = 0; i < n; i += 1) row.push(digits[t * n + i]);
+          policy.push(row);
+        }
+        count += 1;
+        for (let i = 0; i < n; i += 1) {
+          const v = trajectoryValue(P, r, T, policy, i);
+          if (best[i] === null || Rcmp(v, best[i]) > 0) {
+            best[i] = v; bestPol[i] = policy.map((q) => q.slice());
+          }
+        }
+        let p = slots - 1;
+        while (p >= 0 && digits[p] === A - 1) { digits[p] = 0; p -= 1; }
+        if (p < 0) break;
+        digits[p] += 1;
+      }
+      return { best: best, policies: bestPol, count: count };
+    };
+    for (const key of Object.keys(SD)) {
+      const [stxt, atxt, p0, p1, rtxt, T] = SD[key];
+      const states = stxt.split(' '), acts = atxt.split(' ');
+      const m0 = parseStochastic(p0, 2), m1 = parseStochastic(p1, 2);
+      eq(m0.bad, undefined, key + ': the first action\'s transition table parses and its rows add to 1');
+      eq(m1.bad, undefined, key + ': and the second\'s');
+      const rm = parseMatrixRows(rtxt, 2, 2);
+      eq(rm.bad, undefined, key + ': and the reward table');
+      const P = [m0.rows, m1.rows], r = rm.rows;
+      const dp = stochasticDp(states, acts, P, r, T);
+      const mine = everyPolicyHere(P, r, T, 2, 2);
+      const theirs = everyPolicy(states, acts, P, r, T, {});
+      eq(dp.V[0].map(rt).join(','), mine.best.map(rt).join(','),
+         key + ': the backward table and the trajectory expansion over all ' + mine.count
+         + ' policies agree, ' + mine.best.map(rt).join(' and '));
+      eq(theirs.best.map(rt).join(',') + '/' + theirs.count, mine.best.map(rt).join(',') + '/' + mine.count,
+         key + ": and the kit's own forward distribution push agrees with both");
+      /* THE RECONSTRUCTED POLICY ACHIEVES THE CLAIMED VALUE */
+      const policy = [];
+      for (let t = 0; t < T; t += 1) policy.push(dp.policy[t].slice());
+      let off = [];
+      for (let i = 0; i < 2; i += 1) {
+        const mineV = trajectoryValue(P, r, T, policy, i);
+        const theirsV = evaluateForward(states, P, r, T, policy, i).value;
+        if (!Requ(mineV, dp.V[0][i])) off.push(states[i] + ' trajectory ' + rt(mineV));
+        if (!Requ(theirsV, dp.V[0][i])) off.push(states[i] + ' push ' + rt(theirsV));
+      }
+      eq(off.join(' / '), '', key
+         + ': and the policy the table reconstructs, played out both ways, really is worth what the '
+         + 'table says -- which a value column does not prove on its own');
+    }
+    const [stxt, atxt, p0, p1, rtxt, T] = SD.twoact;
+    const dp = stochasticDp(stxt.split(' '), atxt.split(' '),
+                            [parseStochastic(p0, 2).rows, parseStochastic(p1, 2).rows],
+                            parseMatrixRows(rtxt, 2, 2).rows, T);
+    eq(dp.V[0].map(rt).join(','), '53/8,67/8', 'the default instance is worth 53/8 and 67/8 exactly');
+    eq(dp.policy[0].map((a) => atxt.split(' ')[a]).join(','), 'act,hold',
+       'and the first-stage policy is act in calm, hold in rough');
+    const flip = SD.flip;
+    const fdp = stochasticDp(flip[0].split(' '), flip[1].split(' '),
+                             [parseStochastic(flip[2], 2).rows, parseStochastic(flip[3], 2).rows],
+                             parseMatrixRows(flip[4], 2, 2).rows, flip[5]);
+    eq(fdp.policy.map((p) => p.map((a) => flip[1].split(' ')[a][0]).join('')).join('|'), 'gh|gh|gh|hh',
+       'and on the `flip` data the best action in `small` CHANGES with the horizon: grow with three or '
+       + 'more periods left, harvest with one -- so a finite-horizon policy is a function of time too');
+    eq(fdp.V[0].map(rt).join(','), '33/2,45/2', 'worth 33/2 and 45/2');
+    eq(/adds to 3\/2 rather than 1/.test(parseStochastic('1/2 1; 1/4 3/4', 2).bad), true,
+       'a transition row that does not add to 1 is refused rather than normalised');
+    eq(/negative probability/.test(parseStochastic('3/2 -1/2; 1/4 3/4', 2).bad), true, 'as is a negative one');
+    eq(/2 rows for 3 states/.test(parseStochastic('1 0; 0 1', 3).bad), true, 'and a table of the wrong shape');
+  }
+
+  /* --- L6: the tree, against every strategy ------------------------------- */
+  {
+    const everyStrategyHere = (payoff, prior, lik) => {
+      const A = payoff.length, S = prior.length, G = lik ? lik.length : 1;
+      const pick = [];
+      let best = null, at = null, count = 0;
+      const walk = (i) => {
+        if (i === G) {
+          count += 1;
+          let total = R0;
+          for (let g = 0; g < G; g += 1) {
+            for (let s = 0; s < S; s += 1) {
+              const pj = lik ? Rmul(prior[s], lik[g][s]) : prior[s];
+              total = Radd(total, Rmul(pj, payoff[pick[g]][s]));
+            }
+          }
+          if (best === null || Rcmp(total, best) > 0) { best = total; at = pick.slice(); }
+          return;
+        }
+        for (let a = 0; a < A; a += 1) { pick.push(a); walk(i + 1); pick.pop(); }
+      };
+      walk(0);
+      return { best: best, at: at, count: count };
+    };
+    for (const key of Object.keys(TR)) {
+      const [atxt, stxt, ptxt, prtxt, ltxt] = TR[key];
+      const acts = atxt.split(' '), states = stxt.split(' ');
+      const pm = parseMatrixRows(ptxt, acts.length, states.length);
+      eq(pm.bad, undefined, key + ': the payoff table parses');
+      const prior = parseRow(prtxt), lm = parseMatrixRows(ltxt, null, states.length);
+      eq(lm.bad, undefined, key + ': and the likelihood');
+      const signals = lm.rows.map((_x, i) => 'G' + (i + 1));
+      const t1 = priorTree(pm.rows, prior, acts, states);
+      t1.likelihood = lm.rows;
+      const f1 = annotate(foldBack(t1));
+      const t2 = signalTree(pm.rows, prior, lm.rows, acts, states, signals);
+      const f2 = annotate(foldBack(t2));
+      const one = everyStrategyHere(pm.rows, prior, null);
+      const two = everyStrategyHere(pm.rows, prior, lm.rows);
+      eq(rt(f1.value), rt(one.best),
+         key + ': the prior tree folds to the best act under the prior, ' + rt(one.best));
+      eq(rt(f2.value), rt(two.best),
+         key + ': and the signal tree folds to the best of all ' + two.count
+         + ' signal-to-act strategies, ' + rt(two.best));
+      eq(rt(everyStrategy(pm.rows, prior, lm.rows).best), rt(two.best),
+         key + ": and the kit's own strategy enumeration agrees with this file's");
+      /* THE COUNT, not only the value. Comparing best against best is what let a
+         scoping bug survive: everyStrategy shared its loop variable across
+         recursion levels, so it explored only the strategies whose earlier
+         signals map to act 0 -- 2 of 4, 3 of 9, 2 of 4 on the three presets --
+         and the optimum happened to be inside that prefix every time. The page
+         printed the count as "N ways to map what you see to what you do". */
+      eq(everyStrategy(pm.rows, prior, lm.rows).count, two.count,
+         key + ': and on HOW MANY strategies there are, not only on the best of them');
+      eq(two.count, Math.pow(pm.rows.length, lm.rows.length),
+         key + ': which is acts^signals, every map from a signal to an act');
+      /* the identities EVPI and EVSI have to satisfy */
+      eq(rt(f1.evpi), rt(Rsub(f1.perfect, f1.prior)), key + ': EVPI is perfect information less the prior');
+      eq(rt(Radd(f1.prior, f1.evsi)), rt(f2.value),
+         key + ': and the prior value plus EVSI is exactly what the signal tree folds to');
+      eq(Rcmp(f1.evsi, f1.evpi) <= 0, true, key + ': EVSI never exceeds EVPI');
+      eq(Rsign(f1.evsi) >= 0, true, key + ': and it is never negative -- information cannot hurt');
+      eq(Rcmp(f1.perfect, f1.prior) >= 0, true, key + ': knowing the state is never worse than not');
+      /* the drawing exists and marks the branch the fold chose */
+      eq(dpTree(f2, { width: 660, height: 300 }).indexOf('<circle') >= 0, true,
+         key + ': and the tree draws');
+    }
+    const [atxt, stxt, ptxt, prtxt, ltxt] = TR.build;
+    const pm = parseMatrixRows(ptxt, 2, 2).rows, prior = parseRow(prtxt);
+    const lm = parseMatrixRows(ltxt, null, 2).rows;
+    const t1 = priorTree(pm, prior, atxt.split(' '), stxt.split(' '));
+    t1.likelihood = lm;
+    const f1 = foldBack(t1);
+    eq(rt(f1.value) + ' by ' + f1.root.choiceLabel, '16 by build', 'the default tree folds to 16, by building');
+    eq(rt(f1.perfect) + ', EVPI ' + rt(f1.evpi), '30, EVPI 14',
+       'perfect information would be worth 30, so EVPI is 14');
+    eq(rt(f1.evsi), '9/2', 'and the survey is worth 9/2 -- less than perfect information, as it must be');
+    const useless = priorTree(parseMatrixRows(TR.useless[2], 2, 2).rows, parseRow(TR.useless[3]),
+                              TR.useless[0].split(' '), TR.useless[1].split(' '));
+    useless.likelihood = parseMatrixRows(TR.useless[4], null, 2).rows;
+    const fu = foldBack(useless);
+    eq(rt(fu.evpi) + ', EVSI ' + rt(fu.evsi), '20, EVSI 0',
+       'a signal with the same probabilities in every state is worth exactly NOTHING, while perfect '
+       + 'information on the same problem is worth 20 -- being informative-looking is not the same '
+       + 'as discriminating');
+    const bare = priorTree(pm, prior, atxt.split(' '), stxt.split(' '));
+    eq(foldBack(bare).evsi, null,
+       'and a tree with no likelihood reports EVSI as absent rather than inventing one from the branches');
+    eq(/3 rows where 2 were expected/.test(parseMatrixRows('1 2; 3 4; 5 6', 2, 2).bad), true,
+       'a table of the wrong height is refused');
+    eq(/3 entries where 2 were expected/.test(parseMatrixRows('1 2 3; 4 5 6', 2, 2).bad), true,
+       'and of the wrong width');
+  }
+
+  /* --- L7: stopping, against every accept-set ----------------------------- */
+  {
+    /* Walk all |S|^T outcome sequences and play the rule out on each. No
+       recursion anywhere in it -- which is the point, because the shape of the
+       answer is what is being tested. */
+    const playOut = (pmf, sets, c) => {
+      const T = sets.length, S = pmf.length;
+      let total = R0;
+      const walk = (t, prob, paid) => {
+        if (t === T) { total = Radd(total, Rmul(prob, paid)); return; }
+        for (let k = 0; k < S; k += 1) {
+          const p = Rmul(prob, pmf[k][1]), spent = Rsub(paid, c);
+          if (sets[T - 1 - t][k]) total = Radd(total, Rmul(p, Radd(spent, pmf[k][0])));
+          else walk(t + 1, p, spent);
+        }
+      };
+      walk(0, R1, R0);
+      return total;
+    };
+    const everyRuleHere = (pmf, T, c) => {
+      const S = pmf.length, slots = S * T, bits = [];
+      for (let k = 0; k < slots; k += 1) bits.push(0);
+      let best = null, at = null, count = 0;
+      for (;;) {
+        const sets = [];
+        for (let t = 0; t < T; t += 1) {
+          const row = [];
+          for (let k = 0; k < S; k += 1) row.push(!!bits[t * S + k]);
+          sets.push(row);
+        }
+        const v = playOut(pmf, sets, c);
+        count += 1;
+        if (best === null || Rcmp(v, best) > 0) { best = v; at = sets.map((q) => q.slice()); }
+        let p = slots - 1;
+        while (p >= 0 && bits[p] === 1) { bits[p] = 0; p -= 1; }
+        if (p < 0) break;
+        bits[p] = 1;
+      }
+      return { best: best, sets: at, count: count };
+    };
+    for (const key of Object.keys(SP)) {
+      const pp = parsePmf(SP[key][0]);
+      eq(pp.bad, undefined, key + ': the offer distribution parses and adds to 1');
+      const pmf = pp.pmf, T = SP[key][1], c = ri(SP[key][2]);
+      const st = stopThresholds(pmf, T, c);
+      const sets = thresholdSets(pmf, st.rows);
+      const viaSets = ruleValue(pmf, sets, c);
+      const mine = everyRuleHere(pmf, T, c), theirs = everyStoppingRule(pmf, T, c);
+      eq(rt(st.value) + '/' + rt(viaSets), rt(mine.best) + '/' + rt(mine.best),
+         key + ': the threshold recursion is worth ' + rt(mine.best)
+         + ', and so are the accept-sets it describes, evaluated as a rule');
+      eq(rt(theirs.best) + '/' + theirs.count, rt(mine.best) + '/' + mine.count,
+         key + ': and the best of all ' + mine.count
+         + ' accept-sets, found by this file by walking every outcome sequence and by the kit by a '
+         + 'backward sweep, is the same number');
+      eq(theirs.threshold, true, key
+         + ': and the winner IS a threshold rule -- accepting an offer implies accepting every larger '
+         + 'one, in every period -- which the recursion assumed and this measured');
+      /* the threshold falls as the deadline nears, which is the reading */
+      let monotone = true;
+      for (let q = 1; q < st.rows.length; q += 1) {
+        if (Rcmp(st.rows[q].threshold, st.rows[q - 1].threshold) > 0) monotone = false;
+      }
+      eq(monotone, true, key + ': and the threshold never rises as the deadline approaches');
+      eq(rt(st.rows[st.rows.length - 1].threshold), '0',
+         key + ': with one period left it is zero, because there is nothing to carry on to');
+    }
+    const pmf = parsePmf(SP.three[0]).pmf;
+    const st = stopThresholds(pmf, 3, ri(1));
+    eq(rt(st.value) + ' over ' + everyStoppingRule(pmf, 3, ri(1)).count + ' rules', '71/3 over 512 rules',
+       'the default search is worth 71/3, checked against all 512 accept-sets');
+    eq(st.rows.map((q) => rt(q.threshold)).join(','), '22,19,0',
+       'and the thresholds are 22, 19 and 0 as the deadline closes');
+    eq(/add to 5\/6 rather than 1/.test(parsePmf('10:1/2, 20:1/3').bad), true,
+       'a distribution that does not add to 1 is refused rather than renormalised');
+    eq(/is negative/.test(parsePmf('10:3/2, 20:-1/2').bad), true, 'as is a negative probability');
+  }
+
+  /* --- L8: the secretary problem, counted --------------------------------- */
+  {
+    const secretaryHere = (n) => {
+      const counts = [];
+      for (let r = 0; r <= n; r += 1) counts.push(0);
+      const perm = [], used = [];
+      let total = 0;
+      const walk = () => {
+        if (perm.length === n) {
+          total += 1;
+          for (let r = 1; r <= n; r += 1) {
+            let seen = 0, took = -1;
+            for (let k = 0; k < r - 1; k += 1) if (perm[k] > seen) seen = perm[k];
+            for (let k = r - 1; k < n; k += 1) if (perm[k] > seen) { took = perm[k]; break; }
+            if (took === n) counts[r] += 1;
+          }
+          return;
+        }
+        for (let v = 1; v <= n; v += 1) {
+          if (used[v]) continue;
+          used[v] = 1; perm.push(v); walk(); perm.pop(); used[v] = 0;
+        }
+      };
+      walk();
+      return { counts: counts, total: total };
+    };
+    for (const n of [3, 4, 5, 6, 7]) {
+      const ex = secretaryExact(n), mine = secretaryHere(n), kit = secretaryBrute(n, 7);
+      let off = [];
+      for (let r = 1; r <= n; r += 1) {
+        const counted = R(BigInt(mine.counts[r]), BigInt(mine.total));
+        if (!Requ(ex.probs[r - 1].p, counted)) off.push('r=' + r);
+        if (!Requ(kit.probs[r - 1].p, counted)) off.push('kit r=' + r);
+      }
+      eq(off.join(','), '', 'n = ' + n + ': the harmonic-sum formula agrees with the rule played out on '
+         + 'all ' + mine.total + ' orderings, entry for entry, and so does the kit\'s own count');
+    }
+    eq(secretaryExact(4).probs.map((q) => rt(q.p)).join(','), '1/4,11/24,5/12,1/4',
+       'at n = 4 the table is 1/4, 11/24, 5/12, 1/4');
+    eq(secretaryExact(4).best + ' so reject 1', '2 so reject 1', 'so look at one and take the next best');
+    eq(secretaryExact(7).best + ', ' + rt(secretaryExact(7).bestP), '3, 29/70', 'and at n = 7, reject two');
+    eq(secretaryBrute(8, 7).truncated, true, 'eight is past what this page walks, and it says so');
+    /* 1/e, the only rounded number on that page, and it is labelled */
+    eq(Rfixed(invE(), 12), '0.367879441171', '1/e as an exact alternating partial sum, to twelve places');
+    eq(Rfixed(Rsub(invE(), invE(30)), 18), '0.000000000000000000',
+       'and twenty terms already agree with thirty to eighteen places, so every digit this kit prints '
+       + 'of it is stable — the next term of the series is 1/21!, which is below the last of them');
+    eq(Rfixed(Rmul(ri(100), invE()), 4) + ' against ' + secretaryExact(100).best, '36.7879 against 38',
+       'at n = 100 the n/e a textbook quotes is 36.7879 and the exact best r is 38 -- the limit is not '
+       + 'the answer, and only one of them is a fraction');
+    eq(Rfixed(secretaryExact(100).bestP, 6), '0.371043', 'succeeding 37.1043% of the time');
+    eq(Rshort(secretaryExact(100).bestP, 6, 20), '0.371043',
+       'and Rshort prints that as a decimal, because the exact form runs to forty digits');
+  }
+
+  /* --- L9: value iteration and the fixed point ---------------------------- */
+  {
+    for (const key of Object.keys(DC)) {
+      const P = parseMatrixRows(DC[key][0], null, null).rows;
+      const r = parseRow(DC[key][1]), gamma = Rread(DC[key][2]), n = P.length;
+      const dv = discountedValue(P, r, gamma, 12);
+      eq(dv.singular, false, key + ': I - gP is not singular');
+      /* THE CHECK: the fixed point put back into the equation it solves */
+      let residual = [];
+      for (let i = 0; i < n; i += 1) {
+        let s = r[i];
+        for (let j = 0; j < n; j += 1) s = Radd(s, Rmul(gamma, Rmul(P[i][j], dv.v[j])));
+        residual.push(rt(Rsub(s, dv.v[i])));
+      }
+      eq(residual.join(','), residual.map(() => '0').join(','),
+         key + ': r + gPv - v is exactly zero in every row, which is a check a decimal could not make');
+      /* the iteration approaches it and never arrives */
+      let closing = true;
+      for (let k = 1; k <= 12; k += 1) {
+        const before = Rabs(Rsub(dv.iterations[k - 1][0], dv.v[0]));
+        const after = Rabs(Rsub(dv.iterations[k][0], dv.v[0]));
+        if (Rcmp(after, before) >= 0) closing = false;
+        if (Rzero(after)) closing = false;
+      }
+      eq(closing, true, key + ': every iteration is strictly closer to the fixed point and none of them '
+         + 'reaches it');
+      eq(String(dv.iterations[12][0].d).length > String(dv.iterations[1][0].d).length, true,
+         key + ': and the denominators grow on the way, one power of the discount per step');
+      /* the truncated power series is a third route to the same place */
+      let series = [];
+      for (let i = 0; i < n; i += 1) series.push(R0);
+      let term = r.slice(), gp = R1;
+      for (let k = 0; k < 120; k += 1) {
+        for (let i = 0; i < n; i += 1) series[i] = Radd(series[i], Rmul(gp, term[i]));
+        const next = [];
+        for (let i = 0; i < n; i += 1) {
+          let s = R0;
+          for (let j = 0; j < n; j += 1) s = Radd(s, Rmul(P[i][j], term[j]));
+          next.push(s);
+        }
+        term = next; gp = Rmul(gp, gamma);
+      }
+      eq(Rcmp(Rabs(Rsub(series[0], dv.v[0])), rf(1, 1000)) < 0, true,
+         key + ': and 120 terms of  sum g^k P^k r  land within a thousandth of the same fixed point — '
+         + 'a third route, and the one that says what the fixed point MEANS');
+    }
+    const two = DC.two;
+    const dv = discountedValue(parseMatrixRows(two[0], null, null).rows, parseRow(two[1]), Rread(two[2]), 20);
+    eq(dv.v.map(rt).join(','), '22/7,38/7', 'the default chain has fixed point 22/7 and 38/7');
+    eq(Rcmp(Rabs(dv.gap[0]), rf(1, 100000)) < 0, true, 'which twenty iterations reach to five places');
+    eq(String(dv.iterations[20][0].d).length + ' digits from ' + String(dv.iterations[0][0].d).length,
+       '17 digits from 1', 'and the denominator has grown from one digit to seventeen getting there');
+  }
+
+  /* --- EVERY MODE'S OWN BUNDLE, BUILT AND RUN ---------------------------- */
+  {
+    const BASE = ['RATIONAL_JS', 'FORMAT_JS', 'ORFMT_JS', 'DPSEQ_JS', 'DPKIT_JS'];
+    const MODES = {
+      stages: BASE, allocation: BASE,
+      lotsize: BASE.concat(['DPPLOT_JS']), heuristics: BASE.concat(['DPPLOT_JS']),
+      stochastic: BASE.concat(['DPPLOT_JS', 'DPPOL_JS']),
+      tree: BASE.concat(['DPTREE_JS']),
+      stopping: BASE.concat(['DPPLOT_JS', 'DPSTOP_JS']),
+      secretary: ['RATIONAL_JS', 'FORMAT_JS', 'ORFMT_JS', 'HARMONIC_JS', 'DPSEQ_JS', 'DPKIT_JS',
+                  'DPPLOT_JS', 'DPSTOP_JS'],
+      discount: ['RATIONAL_JS', 'FORMAT_JS', 'MATRIX_JS', 'ORFMT_JS', 'DPSEQ_JS', 'DPKIT_JS', 'DPPLOT_JS']
+    };
+    eq(dpSrc.indexOf('_BASE = ' + BASE.join(' + ')) > 0, true,
+       'the base bundle transcribed here is the one dpseq.py builds');
+    for (const mode of ['lotsize', 'heuristics', 'stochastic', 'tree', 'stopping']) {
+      const extra = MODES[mode].slice(BASE.length).map((b) => ' + ' + b).join('');
+      eq(dpSrc.indexOf('"' + mode + '": _BASE' + extra) > 0, true,
+         'and ' + mode + ' takes _BASE' + extra);
+    }
+    eq(dpSrc.indexOf('"secretary": (' + MODES.secretary.slice(0, 6).join(' + ')) > 0, true,
+       'secretary takes the harmonic block, which no other mode does');
+    eq(dpSrc.indexOf('"discount": (' + MODES.discount.join(' + ') + ')') > 0, true,
+       'and discount takes the matrix block, which no other mode does');
+    eq(/MATRIX_JS/.test(dpSrc.split('_MODE_JS = {')[1].split('}')[0].split('"discount"')[0]), false,
+       'and no mode before it does');
+    const bundle = (names) => names.map((n) => BLOCK[n]).join('');
+    const probe = (names, expr) => {
+      try { return String(new Function(bundle(names) + '\nreturn (' + expr + ');')()); }
+      catch (err) { return 'THREW: ' + err.message; }
+    };
+    eq(probe(MODES.stages, "(function () {"
+       + "var sp = parseStages('A; B C; F'), ap = parseDpArcs('A>B 1, A>C 2, B>F 3, C>F 1', sp.stageOf);"
+       + "var b = backwardStages(sp.stages, ap.arcs), f = everyPath(sp.stages, ap.arcs);"
+       + "var pr = parseReturns('P 0 3 5; Q 0 2 6'), nw = allocNetwork(pr.acts, 2);"
+       + "var ab = backwardStages(nw.stages, nw.arcs, {maximise: true});"
+       + "return [Rtext(b.value), Rtext(f.best), Rtext(pathCost(b.policy[0], ap.arcs).cost),"
+       + "        Rtext(ab.f[nw.start]), Rtext(everyAllocation(pr.acts, 2).best),"
+       + "        dpNet(sp.stages, ap.arcs, {}).indexOf('<circle') >= 0,"
+       + "        Rtext(everyOrderPattern([R1, R1], R1, R1).best),"
+       + "        planCost([{period:1, quantity:R(2n,1n), covers:[1,2]}], [R1,R1], R1, R1).ok].join('|');"
+       + "})()"),
+       '3|3|3|6|6|true|2|true',
+       'the base bundle solves a staged network, prices a reconstructed path, builds and solves an '
+       + 'allocation network, draws, and prices a lot-sizing plan — with no plot, no tree and no '
+       + 'policy enumeration loaded');
+    eq(probe(MODES.stochastic, "(function () {"
+       + "var P = [parseStochastic('1/2 1/2; 1/4 3/4', 2).rows, parseStochastic('1 0; 0 1', 2).rows];"
+       + "var r = parseMatrixRows('1 3; 2 1', 2, 2).rows;"
+       + "var dp = stochasticDp(['a','b'], ['x','y'], P, r, 2), ep = everyPolicy(['a','b'],['x','y'],P,r,2,{});"
+       + "var pol = [dp.policy[0].slice(), dp.policy[1].slice()];"
+       + "return [dp.V[0].map(Rtext).join(','), ep.best.map(Rtext).join(','), ep.count,"
+       + "        Rtext(evaluateForward(['a','b'], P, r, 2, pol, 0).value),"
+       + "        dpPlot([{points: [[R0, R1], [R1, R0]]}], {}).indexOf('<path') >= 0].join('|');"
+       + "})()"),
+       '4,23/4|4,23/4|16|4|true',
+       'the stochastic bundle fills the table, enumerates every policy, pushes one forward and plots');
+    eq(probe(MODES.tree, "(function () {"
+       + "var pay = [[R(100n,1n), R(-20n,1n)], [R0, R0]], prior = [R(3n,10n), R(7n,10n)];"
+       + "var lik = [[R(4n,5n), R(1n,4n)], [R(1n,5n), R(3n,4n)]];"
+       + "var t = priorTree(pay, prior, ['b','w'], ['g','p']); t.likelihood = lik;"
+       + "var f = annotate(foldBack(t));"
+       + "return [Rtext(f.value), Rtext(f.evpi), Rtext(f.evsi), Rtext(everyStrategy(pay, prior, lik).best),"
+       + "        dpTree(f, {}).indexOf('<rect') >= 0].join('|');"
+       + "})()"),
+       '16|14|9/2|41/2|true',
+       'the tree bundle builds, folds, prices EVPI and EVSI, enumerates and draws — with no plot block');
+    eq(probe(MODES.stopping, "(function () {"
+       + "var pmf = parsePmf('10:1/2, 30:1/2').pmf;"
+       + "var st = stopThresholds(pmf, 2, R1), sets = thresholdSets(pmf, st.rows);"
+       + "var br = everyStoppingRule(pmf, 2, R1);"
+       + "return [Rtext(st.value), Rtext(ruleValue(pmf, sets, R1)), Rtext(br.best), br.count,"
+       + "        br.threshold, dpBars([{label:'a', value:R1}], {}).indexOf('<rect') >= 0].join('|');"
+       + "})()"),
+       '47/2|47/2|47/2|16|true|true',
+       'the stopping bundle finds the thresholds, turns them into accept-sets, prices those, beats them '
+       + 'against every rule there is, and draws');
+    eq(probe(MODES.secretary, "(function () {"
+       + "var ex = secretaryExact(5), br = secretaryBrute(5, 7);"
+       + "return [ex.best, Rtext(ex.bestP), Rtext(br.probs[ex.best-1].p), Rfixed(invE(), 6),"
+       + "        dpPlot([{points: [[R0, R1]]}], {}).length > 0].join('|');"
+       + "})()"),
+       '3|13/30|13/30|0.367879|true',
+       'the secretary bundle needs the harmonic sum and gets it, and its count agrees inside the bundle too');
+    eq(probe(MODES.discount, "(function () {"
+       + "var P = [[R(1n,2n), R(1n,2n)], [R(1n,4n), R(3n,4n)]];"
+       + "var dv = discountedValue(P, [R1, R(3n,1n)], R(1n,2n), 6);"
+       + "return [dv.v.map(Rtext).join(','), dv.singular, dv.ops.length > 0,"
+       + "        dpPlot([{points: dv.iterations.map(function (v, k) { return [R(BigInt(k),1n), v[0]]; })}],"
+       + "               {}).indexOf('<path') >= 0].join('|');"
+       + "})()"),
+       '22/7,38/7|false|true|true',
+       'and the discount bundle reaches the exact fixed point through Mrref, which is the only reason '
+       + 'it carries the matrix block');
+  }
+}
+
+// ----------------------------------------------------------------- strings
+console.log('strings: every match position checked against a scan over every offset');
+{
+  /* THE ORACLE, and it is deliberately not the kit's own. `skBrute` in
+     strings.py compares slices; this file finds the same positions with the
+     engine's own substring search, which shares no code with it. Six routines
+     on these pages report match positions and every one of them is checked
+     against this, on every preset and on random texts -- because the way a
+     matcher fails is by returning a SHORTER list, and a shorter list of match
+     positions is not visibly wrong.
+
+     The same rule holds for the other four oracles here. The failure function
+     is checked against the longest border derived from the smallest PERIOD,
+     which is a different characterisation rather than a second implementation
+     of the same one; the automaton's table is rebuilt from that border array
+     by the recurrence delta(i, c) = delta(border(i), c); the suffix array is
+     rebuilt by sorting with a character-by-character comparator; and every
+     rolling hash is recomputed from scratch. */
+  const STRINGS_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'strings.py');
+  const stringsSrc = fs.readFileSync(STRINGS_SOURCE, 'utf8');
+  const skBlock = (name) => blockFrom(stringsSrc, name, STRINGS_SOURCE);
+  eval(algoCoreBlock('COUNT_JS'));
+  eval(algoCoreBlock('STRINGS_JS'));
+  eval(algoCoreBlock('TREEDRAW_JS'));
+  eval(skBlock('SKIT_JS'));
+
+  /* Every offset at which the pattern occurs, found by the engine's search. */
+  const bruteHits = (t, p) => {
+    const out = [];
+    let at = t.indexOf(p);
+    while (at >= 0) { out.push(at); at = t.indexOf(p, at + 1); }
+    return out;
+  };
+  /* The longest proper border of every prefix, from the smallest PERIOD:
+     p[0..i-1] has period d when p[j] === p[j+d] wherever both exist, and its
+     longest border is i minus its smallest period. A different fact about the
+     same string, not a second copy of the same loop. */
+  const borderByPeriod = (p) => {
+    const out = [0];
+    for (let i = 1; i <= p.length; i += 1) {
+      let q = i;
+      for (let d = 1; d < i; d += 1) {
+        let ok = true;
+        for (let j = 0; j + d < i; j += 1) if (p[j] !== p[j + d]) { ok = false; break; }
+        if (ok) { q = d; break; }
+      }
+      out.push(i - q);
+    }
+    return out;
+  };
+  /* The automaton's table from that border array, by the recurrence rather
+     than by asking what the longest suffix of p[0..i-1]+c is. */
+  const dfaByBorder = (p, alphabet) => {
+    const b = borderByPeriod(p), table = [];
+    for (let i = 0; i <= p.length; i += 1) {
+      const row = {};
+      for (const ch of alphabet) {
+        let s = i, k = 0;
+        for (;;) {
+          if (s < p.length && p[s] === ch) { k = s + 1; break; }
+          if (s === 0) { k = 0; break; }
+          s = b[s];
+        }
+        row[ch] = k;
+      }
+      table.push(row);
+    }
+    return table;
+  };
+  /* The suffix array by a character-by-character comparator, and the LCP array
+     by growing a shared prefix until the two suffixes differ. */
+  const suffixByCompare = (s) => {
+    const idx = [];
+    for (let i = 0; i < s.length; i += 1) idx.push(i);
+    idx.sort((a, b) => {
+      let k = 0;
+      while (a + k < s.length && b + k < s.length) {
+        if (s[a + k] !== s[b + k]) return s[a + k] < s[b + k] ? -1 : 1;
+        k += 1;
+      }
+      return (s.length - a) - (s.length - b);
+    });
+    const lcp = [0];
+    for (let i = 1; i < idx.length; i += 1) {
+      let k = 0;
+      while (s.slice(idx[i - 1], idx[i - 1] + k + 1) === s.slice(idx[i], idx[i] + k + 1)
+             && idx[i] + k < s.length) k += 1;
+      lcp.push(k);
+    }
+    return { sa: idx, lcp: lcp };
+  };
+  const hashFromScratch = (s, b, mod) => {
+    const B = BigInt(b), M = BigInt(mod);
+    let h = 0n;
+    for (let i = 0; i < s.length; i += 1) h = (h * B + BigInt(s.charCodeAt(i))) % M;
+    return h;
+  };
+  /* Everything the kit reports about one text and pattern, checked at once.
+     This is called on every preset of every mode and on a few thousand random
+     pairs, because a matcher that is right on the presets and wrong on the
+     text a reader types is the failure this whole section is for. */
+  const checkAll = (t, p, where) => {
+    const truth = bruteHits(t, p);
+    eq(skBrute(t, p).join(','), truth.join(','), 'the kit’s own scan finds the matches of ' + where);
+    eq(naiveRun(t, p).result.hits.join(','), truth.join(','), 'naive matching finds them on ' + where);
+    eq(kmpRun(t, p).result.hits.join(','), truth.join(','), 'KMP finds them on ' + where);
+    eq(horspoolRun(t, p).result.hits.join(','), truth.join(','),
+       'Horspool finds them on ' + where + ' -- the check that matters, because it skips');
+    eq(rollingHash(t, p, 256, 101).result.hits.join(','), truth.join(','),
+       'Rabin-Karp finds them on ' + where + ' after verifying every equal hash');
+    const alpha = skAlphabet(t + p);
+    if (alpha.length <= 16 && p.length <= 14) {
+      const table = dfaTable(p, alpha);
+      eq(dfaRun(t, table.table, p.length).result.hits.join(','), truth.join(','),
+         'and the automaton finds them on ' + where + ' in exactly n steps');
+    }
+    const fail = failureFn(p).result.fail;
+    const mine = [];
+    for (let k = 1; k <= p.length; k += 1) mine.push(fail[k] > 0 ? fail[k] : 0);
+    eq(mine.join(','), borderByPeriod(p).slice(1).join(','),
+       'and the failure function of ' + where + ' is the longest border at every prefix');
+    eq(mine.join(','), skBorderBrute(p).slice(1).join(','),
+       'which is also what the kit’s own by-definition search finds');
+  };
+
+  /* --- the parser, and what it refuses ---------------------------------- */
+  {
+    eq(skParse('abcabc', 'abc').t, 'abcabc', 'a text and a pattern come back as typed');
+    eq(skParse('abcabc', '').bad !== undefined, true, 'an empty pattern is refused, because every offset matches it');
+    eq(skParse('', 'a').bad !== undefined, true, 'so is an empty text');
+    eq(skParse('ab', 'abc').bad !== undefined, true, 'and a pattern longer than the text: there is no alignment to try');
+    eq(skParse('abc', 'a', 2).bad !== undefined, true, 'the text cap refuses rather than truncating');
+    eq(skParse('abcabc', 'ABC').t, 'abcabc', 'nothing is lower-cased: a matcher is case-sensitive');
+    eq(bruteHits('abcabc', 'ABC').length, 0, 'and the oracle agrees that the upper-case pattern is absent');
+    eq(skEsc('<b>&"'), '&lt;b&gt;&amp;&quot;', 'reader text is escaped before it reaches innerHTML');
+    eq(skAlphabet('banana').join(''), 'abn', 'the alphabet is the distinct characters, sorted');
+    eq(skNaiveBound(24, 5), 100, 'the naive bound is m(n - m + 1)');
+    eq(skRepeat('ab', 3), 'ababab', 'and repeating a text is the growth table’s only lever');
+  }
+
+  /* --- naive: the count, the bound, and the two texts -------------------- */
+  {
+    const t = 'the rain in spain stays mainly in the plain', p = 'ain';
+    const run = naiveRun(t, p);
+    eq(run.result.alignments, t.length - p.length + 1, 'every offset is one alignment');
+    eq(run.counts.compares, 50, 'the prose preset costs 50 comparisons');
+    eq(run.trace.reduce((a, s) => a + s.compares, 0), run.counts.compares,
+       'and the per-alignment trace sums to the total, which is what the bar chart draws');
+    eq(skNaiveBound(t.length, p.length), 123, 'against a bound of 123, so the bound is 2.46 times the truth');
+    eq(kmpRun(t, p).counts.compares, 44, 'KMP takes 44 on it');
+    eq(horspoolRun(t, p).counts.compares, 25, 'and Horspool 25');
+    /* The preset whose whole point is that naive wins. */
+    const absent = naiveRun(t, 'zebra').counts.compares;
+    eq(absent, 39, 'a pattern that is absent costs naive one comparison per alignment');
+    eq(kmpRun(t, 'zebra').counts.compares, 43, 'and KMP 43, which is more');
+    eq(absent < kmpRun(t, 'zebra').counts.compares, true,
+       'so the page’s claim that naive beats KMP on a rare pattern is a measurement, not a story');
+    /* The preset that reaches the bound, and the family that is quadratic. */
+    const adv = naiveRun('aaaaaaaaaaaaaaaaaaaaaaaa', 'aaaab');
+    eq(adv.counts.compares, 100, 'the adversarial preset costs 100');
+    eq(adv.counts.compares, skNaiveBound(24, 5), 'which IS the bound, exactly');
+    const family = [];
+    for (let q = 2; q <= 10; q += 1) {
+      const wp = naiveWorstPair(q + 1, 2 * q);
+      const c = naiveRun(wp.text, wp.pattern).counts.compares;
+      eq(c, skNaiveBound(wp.text.length, wp.pattern.length),
+         'every row of the worst-case family sits on the bound, at m = ' + wp.pattern.length);
+      eq(kmpRun(wp.text, wp.pattern).counts.compares, 3 * q,
+         'while KMP on the same row costs 3m, which is linear');
+      family.push(c);
+    }
+    eq(family.join(','), '6,12,20,30,42,56,72,90,110',
+       'and the family’s counts are m(m + 1): quadratic in n, because m grows WITH n');
+    /* Growing n alone cannot produce a quadratic, which is the claim the page
+       had to be corrected to stop making. */
+    const lin = [];
+    for (let k = 1; k <= 4; k += 1) lin.push(naiveRun(skRepeat(t, k), p).counts.compares);
+    eq(lin.join(','), '50,102,154,206',
+       'repeating the text with m fixed grows the count LINEARLY, by a constant per copy');
+    eq(Rtext(expectedPerAlignment(2)), '2', 'over two letters the expected comparisons per alignment is 2');
+    eq(Rtext(expectedPerAlignment(26)), '26/25', 'over 26 it is 26/25');
+    eq(Rtext(expectedPerAlignment(4)), '4/3', 'and it is sigma/(sigma - 1), exactly, never a decimal');
+  }
+
+  /* --- kmp: the failure function, and the amortised claim as a count ----- */
+  {
+    eq(failureFn('ababaca').result.fail.join(','), '-1,0,0,1,2,3,0,1',
+       'the standard example’s failure function');
+    eq(failureFn('ababaca').result.borders.join(','), '7,1',
+       'and its fallback chain from the whole pattern');
+    eq(failureFn('aaaaa').result.fail.join(','), '-1,0,1,2,3,4', 'a run of one letter borders itself');
+    eq(failureFn('abcdefg').result.fail.join(','), '-1,0,0,0,0,0,0,0',
+       'and a pattern with no repeated character has no border anywhere');
+    for (const p of ['ababaca', 'aaaaa', 'abcabcabd', 'aabaaab', 'abcdefg', 'aabaabaaa', 'abaababa']) {
+      const f = failureFn(p).result;
+      const mine = [];
+      for (let k = 1; k <= p.length; k += 1) mine.push(f.fail[k] > 0 ? f.fail[k] : 0);
+      eq(mine.join(','), borderByPeriod(p).slice(1).join(','),
+         'the linear construction agrees with the smallest-period definition on ' + p);
+      eq(f.inner <= f.bound, true, 'and its inner loop stayed under 2m on ' + p);
+      eq(f.bound, 2 * p.length, 'which is the bound the page draws');
+      /* The chain must strictly decrease and end at the empty border. */
+      for (let i = 1; i < f.borders.length; i += 1) {
+        eq(f.borders[i] < f.borders[i - 1], true, 'the fallback chain of ' + p + ' strictly decreases');
+      }
+    }
+    eq(failureFn('aabaaab').result.inner, 2, 'the preset chosen because its inner loop DOES iterate');
+    eq(failureFn('aaaaa').result.inner, 0, 'and the one where it never does');
+    const t = 'abababacaba ababacaab ababaca';
+    eq(kmpRun(t, 'ababaca').counts.compares, 34, 'KMP on the opening text of that page');
+    eq(kmpRun(t, 'ababaca').counts.compares <= 2 * t.length, true, 'under 2n, which is the proved bound');
+    eq(naiveRun(t, 'ababaca').counts.compares, 61, 'against naive’s 61 on the same text');
+    eq(kmpRun(t, 'ababaca').result.bound, 2 * t.length, 'and the bound the page prints is 2n');
+  }
+
+  /* --- horspool: skipping, and the text where it is five times worse ----- */
+  {
+    const t = 'the rain in spain stays mainly in the plain and never in the hills';
+    const run = horspoolRun(t, 'mainly');
+    eq(run.trace.length, 14, 'Horspool examined 14 alignments of the prose preset');
+    eq(t.length - 'mainly'.length + 1, 61, 'out of 61 there are');
+    eq(run.counts.compares, 19, 'for 19 comparisons');
+    eq(run.result.skipped, 52, 'having skipped 52 alignments outright');
+    eq(run.result.skipped, run.trace.reduce((a, s) => a + s.shift - 1, 0),
+       'and skipped is the sum of (shift - 1), which is what the average-shift KPI divides');
+    /* THE BAR CHART'S OWN ARITHMETIC. An alignment costs matchedFromRight + 1
+       when it fails and exactly m when it matches -- there is no mismatching
+       comparison to add. The chart plotted matchedFromRight + 1 for every
+       alignment, so a matching one drew a bar of m + 1 ABOVE the dashed line
+       whose label says m is the most one alignment can cost, and the heights
+       summed past the comparison total printed beside them. Asserted on every
+       preset of the mode, because one text with no match cannot see it. */
+    for (const pat of ['mainly', 'GATTACA', 'baaaa', 'ababb']) {
+      for (const txt of [t, 'a'.repeat(30), 'GATTACAGATTACA', 'abababababababab']) {
+        const r = horspoolRun(txt, pat), m = pat.length;
+        const bars = r.trace.map((st) => (st.matchedFromRight === m ? m : st.matchedFromRight + 1));
+        eq(bars.reduce((a, b) => a + b, 0), r.counts.compares,
+           'the Horspool bars sum to the comparisons the panel prints, on ' + pat + '/' + txt.slice(0, 8));
+        eq(bars.every((h) => h <= m), true,
+           'and no bar rises above the line labelled m = ' + m);
+      }
+    }
+    /* The shift table is the last occurrence in the first m - 1 characters. */
+    for (const p of ['mainly', 'GATTACA', 'baaaa', 'cccz', 'ababb']) {
+      const table = horspoolRun('x'.repeat(40), p).result.table;
+      for (const ch of skAlphabet(p)) {
+        let last = -1;
+        for (let i = 0; i < p.length - 1; i += 1) if (p[i] === ch) last = i;
+        if (last < 0) {
+          eq(table[ch], undefined, ch + ' does not appear in the first m - 1 of ' + p + ', so it has no entry');
+        } else {
+          eq(table[ch], p.length - 1 - last, 'the shift for ' + ch + ' in ' + p + ' is m - 1 - its last index');
+        }
+      }
+    }
+    /* The case the page exists to show: skipping made it worse. */
+    const stuck = horspoolRun('a'.repeat(30), 'baaaa');
+    eq(stuck.result.skipped, 0, 'on a run of a’s against baaaa nothing is skipped at all');
+    eq(stuck.counts.compares, 130, 'and it costs 130 comparisons');
+    eq(naiveRun('a'.repeat(30), 'baaaa').counts.compares, 26, 'where naive costs 26');
+    eq(stuck.counts.compares, 5 * 26,
+       'exactly m times naive’s count -- a full window at every alignment, from the wrong end');
+  }
+
+  /* --- rabin: the collisions, counted rather than described -------------- */
+  {
+    const cases = [
+      ['the rain in spain stays mainly in the plain', 'ain', 256, 41, 4, 3],
+      ['GATTACAGATTACCAGATTACAGGATTACAGATTAC', 'GATTACA', 4, 13, 3, 3],
+      ['101100101101001011010010110100101101', '10110', 2, 11, 5, 4],
+      ['abracadabra abracadabra abracadabra', 'abra', 256, 13, 6, 4],
+      ['the rain in spain stays mainly in the plain', 'ain', 256, 1000003, 4, 0],
+    ];
+    for (const [t, p, b, mod, hits, spurious] of cases) {
+      const run = rollingHash(t, p, b, mod), res = run.result;
+      eq(res.hits.join(','), bruteHits(t, p).join(','),
+         'at base ' + b + ' modulus ' + mod + ' the verified hits are the real matches');
+      eq(res.hits.length, hits, 'and there are ' + hits + ' of them');
+      eq(res.spurious, spurious, 'with ' + spurious + ' window(s) whose hash matched and whose text did not');
+      eq(res.verifications, res.hits.length + res.spurious,
+         'every equal hash was verified, and a verification is a match or a collision and nothing else');
+      eq(run.counts.compares, res.verifications * p.length,
+         'each verification costs m character comparisons, including the ones that fail');
+      /* The rolling update is the only value derived from a previous value. */
+      let drift = 0;
+      run.trace.forEach((w) => {
+        if (hashFromScratch(t.slice(w.at, w.at + p.length), b, mod) !== w.hash) drift += 1;
+      });
+      eq(drift, 0, 'and every window’s rolled hash equals the same hash computed from scratch');
+      eq(res.target, hashFromScratch(p, b, mod), 'as does the pattern’s own');
+      /* A collision is a real collision: same hash, different characters. */
+      run.trace.forEach((w) => {
+        if (!w.equal) return;
+        eq(w.hash, res.target, 'an equal-hash window really does hash to the target');
+        eq(t.slice(w.at, w.at + p.length) === p, w.match,
+           'and whether it is a match is decided by the characters, never by the hash');
+      });
+    }
+    const sw = skModulusSweep('the rain in spain stays mainly in the plain', 'ain', 256, 2, 200);
+    eq(sw.tested, 46, 'there are 46 primes under 200');
+    eq(sw.collided, 18, 'and 18 of them collide on that text: not a rare event, a counted one');
+    eq(sw.lastBad, 137, 'the largest that does is 137');
+    eq(sw.clean, 11, 'while 11, far smaller, does not -- so collisions do not stop at a threshold');
+    eq(sw.rows.every((r) => r.verifications === r.hits + r.spurious), true,
+       'and every row of the sweep balances: verifications are matches plus collisions');
+    eq(skIsPrime(1), false, 'one is not prime');
+    eq(skIsPrime(2) && skIsPrime(101) && !skIsPrime(91), true, 'and the sieve the sweep uses is right');
+  }
+
+  /* --- trie: the space question, and one pass against k passes ----------- */
+  {
+    const words = ['he', 'she', 'his', 'hers'];
+    const trie = trieBuild(words, 26);
+    eq(trie.count, 10, 'the four classic words need ten nodes');
+    eq(trie.slots, 260, 'and 260 array cells if every node held a dense row of 26');
+    eq(words.reduce((a, w) => a + w.length, 0), 12, 'they have 12 characters between them');
+    eq(trie.count, 12 + 1 - 3,
+       'so three of those positions were shared and the trie stored each of them once');
+    for (const [list, prefix] of [[['he', 'she', 'his', 'hers'], 'h'],
+                                  [['interest', 'interesting', 'interior', 'internal', 'intern'], 'inte'],
+                                  [['alpha', 'bravo', 'charlie', 'delta'], 'b'],
+                                  [['a', 'ab', 'abc', 'abcd'], 'ab'],
+                                  [['he', 'she', 'his', 'hers'], 'zz']]) {
+      const tr = trieBuild(list, 26);
+      eq(triePrefix(tr, prefix).sort().join(','),
+         list.filter((w) => w.startsWith(prefix)).sort().join(','),
+         'walking the trie for ' + prefix + ' finds what filtering the list finds');
+      eq(skPrefixBrute(list, prefix).join(','), list.filter((w) => w.startsWith(prefix)).sort().join(','),
+         'and the kit’s own filter agrees with the engine’s startsWith');
+      /* One pass against one pass per word, on the page's own text. */
+      const text = 'ushers hers his she he interning alphabravo abcdabcab';
+      const built = trieBuild(list, 26);
+      ahoLinks(built);
+      const idToWord = {};
+      (function walk(n, acc) {
+        if (n.end) idToWord[n.id] = acc;
+        trieKids(n).forEach((k) => walk(k, acc + k.ch));
+      })(built.root, '');
+      const byWord = {};
+      ahoRun(text, built).result.hits.forEach((h) => {
+        const w = idToWord[h.node];
+        eq(w === undefined, false, 'every Aho-Corasick output node names a word');
+        (byWord[w] = byWord[w] || []).push(h.at - w.length + 1);
+      });
+      list.forEach((w) => {
+        eq((byWord[w] || []).sort((a, b) => a - b).join(','), bruteHits(text, w).join(','),
+           'one Aho-Corasick pass reports every occurrence of ' + w + ' that a scan for it alone finds');
+      });
+    }
+    eq(trieBuild(['alpha', 'bravo', 'charlie', 'delta'], 26).count, 23,
+       'four words sharing no prefix need one node per character plus the root, and save nothing');
+    eq(drawTree(null, trie.root, trieKids, (n) => (n.ch === '' ? '.' : n.ch))
+       .match(/<circle /g).length, 10, 'and the renderer draws every node of it');
+  }
+
+  /* --- suffix: the order, and the two things it then answers ------------- */
+  {
+    for (const s of ['banana', 'mississippi', 'abracadabra', 'abcdefgh', 'aaaaaaaa',
+                     'abababab', 'the rain in spain']) {
+      const run = suffixArray(s), k = kasai(s, run.result.sa);
+      const truth = suffixByCompare(s);
+      eq(run.result.sa.join(','), truth.sa.join(','),
+         'prefix doubling reaches the same order as a character-by-character sort of ' + s);
+      eq(k.result.lcp.join(','), truth.lcp.join(','),
+         'and Kasai’s one pass gives the same LCP array as comparing each adjacent pair');
+      eq(skSuffixBrute(s).sa.join(','), truth.sa.join(','),
+         'the kit’s own by-definition sort agrees too, on ' + s);
+      eq(skSuffixBrute(s).lcp.join(','), truth.lcp.join(','), 'including its LCP array');
+      /* The distinct-substring identity, which is the mode's headline. */
+      const n = BigInt(s.length);
+      const total = (n * (n + 1n)) / 2n;
+      const lcpSum = k.result.lcp.reduce((a, v) => a + BigInt(v), 0n);
+      eq(k.result.distinctSubstrings, total - lcpSum,
+         'distinct substrings of ' + s + ' is n(n+1)/2 minus the sum of the LCP array');
+      /* The longest repeat is the largest LCP entry and really does repeat. */
+      eq(k.result.longestRepeat, Math.max(0, ...k.result.lcp),
+         'and the longest repeated substring is the largest LCP entry, on ' + s);
+      if (k.result.longestRepeat > 0) {
+        const L = k.result.longestRepeat;
+        const rep = s.slice(k.result.repeatAt, k.result.repeatAt + L);
+        eq(bruteHits(s, rep).length >= 2, true, 'which occurs at least twice in ' + s);
+        /* And nothing longer does, checked over every substring of length L + 1. */
+        let longer = 0;
+        for (let i = 0; i + L + 1 <= s.length; i += 1) {
+          if (bruteHits(s, s.slice(i, i + L + 1)).length >= 2) longer += 1;
+        }
+        eq(longer, 0, 'and no substring of ' + s + ' one character longer repeats at all');
+      }
+    }
+    eq(suffixArray('banana').result.sa.join(','), '5,3,1,0,4,2', 'banana, in order');
+    eq(suffixArray('banana').result.rounds.length, 2, 'in two doubling rounds');
+    eq(kasai('banana', suffixArray('banana').result.sa).result.lcp.join(','), '0,1,3,0,0,2',
+       'with these overlaps');
+    eq(String(kasai('banana', suffixArray('banana').result.sa).result.distinctSubstrings), '15',
+       'and 15 distinct substrings out of 21 counted with repeats');
+    eq(String(kasai('aaaaaaaa', suffixArray('aaaaaaaa').result.sa).result.distinctSubstrings), '8',
+       'a run of eight a’s has exactly 8 distinct substrings, the extreme the preset is for');
+    eq(String(kasai('abcdefgh', suffixArray('abcdefgh').result.sa).result.distinctSubstrings), '36',
+       'and eight distinct letters have all 36, which is the other extreme');
+  }
+
+  /* --- automaton: the table, and a run of exactly n steps ---------------- */
+  {
+    for (const [p, t] of [['ababc', 'abababcababcabababc'], ['aaab', 'aaaaabaaabaaaab'],
+                          ['10110', '101100101101001011010010110100101101'],
+                          ['abcd', 'abcabcdabdabcd'], ['the', 'the theory of the theatre is the thing']]) {
+      const alpha = skAlphabet(t + p);
+      const built = dfaTable(p, alpha);
+      eq(built.states, p.length + 1, 'one state per number of characters matched, on ' + p);
+      eq(built.cells, (p.length + 1) * alpha.length, 'and (m + 1) * sigma cells');
+      eq(built.counts.writes, built.cells, 'every one of which was written once');
+      const mine = dfaByBorder(p, alpha);
+      for (let i = 0; i <= p.length; i += 1) {
+        for (const ch of alpha) {
+          eq(built.table[i][ch], mine[i][ch],
+             'the transition from state ' + i + ' on ' + ch + ' agrees with the border recurrence, on ' + p);
+        }
+      }
+      const run = dfaRun(t, built.table, p.length);
+      eq(run.result.hits.join(','), bruteHits(t, p).join(','), 'the run finds every occurrence of ' + p);
+      eq(run.counts.reads, t.length, 'in exactly n steps, with no comparison and no back-up');
+      eq(run.result.steps, t.length, 'which is what the page prints');
+      /* The state is the number of pattern characters matched, always. */
+      run.trace.forEach((s) => {
+        const k = s.state;
+        eq(t.slice(s.at - k + 1, s.at + 1), p.slice(0, k),
+           'the state after every character of ' + t + ' is the matched prefix length');
+      });
+    }
+    eq(dfaTable('ababc', ['a', 'b', 'c']).table[4]['a'], 3,
+       'after abab an a goes to state 3, not to 0: the border is in the table');
+    eq(dfaTable('abcd', ['a', 'b', 'c', 'd']).table[3]['a'], 1,
+       'while a pattern with no border restarts from 1 at best');
+  }
+
+  /* --- and on text nobody chose ------------------------------------------ */
+  {
+    /* The presets are chosen; these are not. A deterministic stream, so a
+       failure here is reproducible rather than a flake. */
+    let seed = 20260926;
+    const rnd = (n) => { seed = (seed * 16807) % 2147483647; return seed % n; };
+    let cases = 0;
+    for (const alphabet of ['ab', 'abc', 'abcdefgh']) {
+      for (let it = 0; it < 240; it += 1) {
+        const n = 4 + rnd(30), m = 1 + rnd(5);
+        let t = '', p = '';
+        for (let i = 0; i < n; i += 1) t += alphabet[rnd(alphabet.length)];
+        for (let i = 0; i < m; i += 1) p += alphabet[rnd(alphabet.length)];
+        if (p.length > t.length) continue;
+        cases += 1;
+        checkAll(t, p, 'a random text over ' + alphabet.length + ' letters');
+        /* The two bounds, on every one of them. */
+        eq(naiveRun(t, p).counts.compares <= skNaiveBound(n, m), true,
+           'naive stayed under m(n - m + 1) on a random text');
+        eq(kmpRun(t, p).counts.compares <= 2 * n, true, 'and KMP under 2n');
+        eq(failureFn(p).result.inner <= 2 * m, true, 'and the failure function under 2m');
+      }
+    }
+    eq(cases, 712, 'and there were 712 of them, over three alphabets');
+    /* Every preset of every mode, through the same gate. */
+    for (const [t, p] of [
+      ['the rain in spain stays mainly in the plain', 'ain'],
+      ['the rain in spain stays mainly in the plain', 'zebra'],
+      ['aaaaaaaaaaaaaaaaaaaaaaaa', 'aaaab'],
+      ['GATTACAGATTACCAGATTACAGGATTACAGATTAC', 'GATTACA'],
+      ['101100101101001011010010110100101101', '10110'],
+      ['abababababababababababab', 'abababb'],
+      ['abababacaba ababacaab ababaca', 'ababaca'],
+      ['aaaaaaaaaaaaaaaaaaaa', 'aaaaa'],
+      ['abcabcabcabcabdabcabcabd', 'abcabcabd'],
+      ['aabaaabaaabaabaaab', 'aabaaab'],
+      ['abcdefgabcdefh abcdefg', 'abcdefg'],
+      ['the rain in spain stays mainly in the plain and never in the hills', 'mainly'],
+      ['GATTACAGATTACCAGATTACAGGATTACAGATTACAGGATTA', 'GATTACA'],
+      ['aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'baaaa'],
+      ['abcabcabcabcabcabcabcabcabcabcabcabcabcz', 'cccz'],
+      ['abababababababababababababababab', 'ababb'],
+      ['abracadabra abracadabra abracadabra', 'abra'],
+      ['abababcababcabababc', 'ababc'],
+      ['aaaaabaaabaaaab', 'aaab'],
+      ['abcabcdabdabcd', 'abcd'],
+      ['the theory of the theatre is the thing', 'the'],
+    ]) {
+      checkAll(t, p, 'the preset ' + p + ' in ' + t.slice(0, 18));
+    }
+  }
+
+  /* --- the kit's own contract -------------------------------------------- */
+  {
+    eq(stringsSrc.indexOf('strings_lab: unknown mode') > 0, true,
+       'an unknown mode raises rather than falling back to a default');
+    for (const m of ['naive', 'kmp', 'horspool', 'rabin', 'trie', 'suffix', 'automaton']) {
+      eq(stringsSrc.indexOf('    "' + m + '": _' + m + ',') > 0, true, 'mode ' + m + ' is registered');
+    }
+    eq(stringsSrc.indexOf('from .algo_core import COUNT_JS, STRINGS_JS, TREEDRAW_JS') > 0, true,
+       'and the algorithms are IMPORTED from algo_core rather than rewritten here, which is what '
+       + 'makes every check above a check on the code that ships');
+    const headings = stringsSrc.match(/^ +(title|subtitle|panel_title)="[^"]*"/gm) || [];
+    eq(headings.length >= 14, true, 'every mode names a title and a subtitle: ' + headings.length + ' found');
+    eq(headings.filter((h) => /&[a-z]+;|&#\d+;|<[a-z/]/.test(h)).length, 0,
+       'and none of them carries an HTML entity or a tag, which render.py escapes and would '
+       + 'therefore ship to the reader as literal text');
+  }
+}
+
+// ---------------------------------------------------------------- geometry
+console.log('geometry: exact predicates, and the hull checked against the definition');
+{
+  /* THE ORACLES, and none of them is the kit's own. geometry.py ships
+     `geoVertexBrute`, which decides whether a point is a hull vertex by
+     rotating a separating line about it; this file decides the same thing by
+     asking whether the point lies in any TRIANGLE, SEGMENT or duplicate among
+     the others, which is a different reading of "p is not in the hull of the
+     rest" and shares no code with it. Likewise `geoDet3` is the kit's second
+     route to the determinant and `detByRational` below is a third, in
+     algebra_core's rationals rather than in BigInt; `geoSegOracle` solves for
+     the two parameters in BigInt and `segByRational` solves the same system in
+     rationals; ray parity sweeps horizontally, `geoWinding` counts turns, and
+     `insideByVerticalRay` casts the ray the other way.
+
+     Three routes to a sign, three to a hull, three to an intersection and
+     three to an inside/outside verdict. Where any two of them disagree this
+     section fails, and it does not decide which one was right.
+
+     The preset point sets asserted on are the ones the pages open with, so a
+     change that breaks a lesson's opening figure fails here rather than in a
+     browser. */
+  const GEOMETRY_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'geometry.py');
+  const geometrySrc = fs.readFileSync(GEOMETRY_SOURCE, 'utf8');
+  const gBlock = (name) => blockFrom(geometrySrc, name, GEOMETRY_SOURCE);
+  eval(algoBlock('ALGO_JS'));
+  eval(algoCoreBlock('COUNT_JS'));
+  eval(algoCoreBlock('TREEDRAW_JS'));
+  eval(algoCoreBlock('GEOM_JS'));
+  eval(gBlock('GEOKIT_JS'));
+
+  const pts = (spec) => {
+    const p = geoParse(spec, 64);
+    if (p.bad) { fails += 1; console.log('  FAIL parsing ' + spec + ': ' + p.bad); return []; }
+    return p.points;
+  };
+  const keys = (list) => list.map((p) => p[0] + '|' + p[1]).sort().join(' ');
+
+  /* The determinant a third time, over algebra_core's rationals. */
+  const detByRational = (a, b, c) => {
+    const Q = (v) => R(BigInt(v));
+    const t1 = Rmul(Rsub(Q(b[0]), Q(a[0])), Rsub(Q(c[1]), Q(a[1])));
+    const t2 = Rmul(Rsub(Q(b[1]), Q(a[1])), Rsub(Q(c[0]), Q(a[0])));
+    return Rsub(t1, t2);
+  };
+  /* p is a hull VERTEX unless it coincides with another point, lies on a
+     segment between two others, or lies inside or on a triangle of three
+     others. O(n^4) and it never rotates anything. */
+  const inTriangle = (a, b, c, q) => {
+    const s1 = orientSign(a, b, q), s2 = orientSign(b, c, q), s3 = orientSign(c, a, q);
+    const neg = (s1 < 0) || (s2 < 0) || (s3 < 0);
+    const pos = (s1 > 0) || (s2 > 0) || (s3 > 0);
+    return !(neg && pos);
+  };
+  const vertexByCovering = (points) => {
+    const out = [];
+    for (let i = 0; i < points.length; i += 1) {
+      const q = points[i];
+      const rest = points.filter((_, j) => j !== i);
+      let covered = rest.some((r) => r[0] === q[0] && r[1] === q[1]);
+      for (let a = 0; a < rest.length && !covered; a += 1) {
+        for (let b = a + 1; b < rest.length && !covered; b += 1) {
+          if (onSegment(rest[a], rest[b], q)) covered = true;
+          for (let c = b + 1; c < rest.length && !covered; c += 1) {
+            if (orientSign(rest[a], rest[b], rest[c]) === 0) continue;
+            if (inTriangle(rest[a], rest[b], rest[c], q)) covered = true;
+          }
+        }
+      }
+      if (!covered) out.push(q);
+    }
+    return out;
+  };
+  /* The two parameters again, this time as rationals with gcd reduction. */
+  const segByRational = (p1, p2, q1, q2) => {
+    const Q = (v) => R(BigInt(v));
+    const cross = (ax, ay, bx, by) => Rsub(Rmul(ax, by), Rmul(ay, bx));
+    const rx = Rsub(Q(p2[0]), Q(p1[0])), ry = Rsub(Q(p2[1]), Q(p1[1]));
+    const sx = Rsub(Q(q2[0]), Q(q1[0])), sy = Rsub(Q(q2[1]), Q(q1[1]));
+    const wx = Rsub(Q(q1[0]), Q(p1[0])), wy = Rsub(Q(q1[1]), Q(p1[1]));
+    const den = cross(rx, ry, sx, sy);
+    const zero = R(0n), one = R(1n);
+    if (Rcmp(den, zero) !== 0) {
+      const t = Rdiv(cross(wx, wy, sx, sy), den);
+      const u = Rdiv(cross(wx, wy, rx, ry), den);
+      return Rcmp(t, zero) >= 0 && Rcmp(t, one) <= 0
+          && Rcmp(u, zero) >= 0 && Rcmp(u, one) <= 0;
+    }
+    /* Parallel: only a collinear overlap can meet, and that is a 1-d question. */
+    if (Rcmp(cross(wx, wy, rx, ry), zero) !== 0) return false;
+    const rr = Radd(Rmul(rx, rx), Rmul(ry, ry));
+    if (Rcmp(rr, zero) === 0) return onSegment(q1, q2, p1);
+    const t0 = Radd(Rmul(wx, rx), Rmul(wy, ry));
+    const t1 = Radd(t0, Radd(Rmul(sx, rx), Rmul(sy, ry)));
+    const lo = Rcmp(t0, t1) <= 0 ? t0 : t1, hi = Rcmp(t0, t1) <= 0 ? t1 : t0;
+    return Rcmp(hi, zero) >= 0 && Rcmp(lo, rr) <= 0;
+  };
+  /* Inside, by a ray cast UPWARDS rather than to the right. */
+  const insideByVerticalRay = (poly, q) => {
+    let crossings = 0, on = false;
+    for (let i = 0; i < poly.length; i += 1) {
+      const a = poly[i], b = poly[(i + 1) % poly.length];
+      if (onSegment(a, b, q)) on = true;
+      if ((a[0] > q[0]) !== (b[0] > q[0])) {
+        const side = orientSign(a, b, q) * (b[0] > a[0] ? -1 : 1);
+        if (side > 0) crossings += 1;
+      }
+    }
+    return { inside: !on && crossings % 2 === 1, onBoundary: on, crossings: crossings };
+  };
+  const areaByFan = (poly) => {
+    let s = 0n;
+    for (let i = 1; i + 1 < poly.length; i += 1) s += orient2(poly[0], poly[i], poly[i + 1]);
+    return s;
+  };
+  const closestByPairs = (points) => {
+    let best = null;
+    for (let i = 0; i < points.length; i += 1) {
+      for (let j = i + 1; j < points.length; j += 1) {
+        const d = dist2(points[i], points[j]);
+        if (best === null || d < best) best = d;
+      }
+    }
+    return best;
+  };
+  const crossingsByPairs = (segs) => {
+    const out = [];
+    for (let i = 0; i < segs.length; i += 1) {
+      for (let j = i + 1; j < segs.length; j += 1) {
+        if (segByRational(segs[i][0], segs[i][1], segs[j][0], segs[j][1])) out.push(i + '-' + j);
+      }
+    }
+    return out.sort().join(' ');
+  };
+  const countNodes = (t) => (t ? 1 + countNodes(t.l) + countNodes(t.r) : 0);
+
+  /* --- what a reader types, and what is refused ------------------------- */
+  {
+    eq(geoParse('0, 0; 4, 0; 2, 3', 8).points.length, 3, 'three clauses are three points');
+    eq(geoParse('(0, 0); (4, 0)', 8).points.map(geoPointText).join(' '), '(0, 0) (4, 0)',
+       'brackets are stripped inside a clause');
+    eq(geoParse('(0, 0) (4, 0)', 8).bad !== undefined, true,
+       'but a space is not a clause separator: two points on one clause is four numbers, and '
+       + 'the parser says so rather than guessing which pairing was meant');
+    eq(geoParse('0 0\n4 0', 8).points.map(geoPointText).join(' '), '(0, 0) (4, 0)',
+       'and a newline separates clauses too');
+    eq(geoParse('0.5, 1', 8).bad !== undefined, true,
+       'a coordinate that is not a whole number is REFUSED, not rounded: every predicate here '
+       + 'is an integer determinant and a rounded input is a different question');
+    eq(geoParse('1, 2, 3', 8).bad !== undefined, true, 'a clause of three numbers is not a point');
+    eq(geoParse('', 8).bad !== undefined, true, 'and an empty box is refused rather than drawn empty');
+    eq(geoParse('9007199254740993, 0', 8).bad !== undefined, true,
+       'a coordinate past 2^53 is refused, because the NUMBER is already wrong before any '
+       + 'determinant is taken');
+    eq(geoParse('0,0; 1,1; 2,2', 2).bad !== undefined, true, 'and the per-mode cap refuses');
+    eq(geoParseSegments('0,0; 4,4; 0,4', 8).bad !== undefined, true,
+       'an odd number of points is not a set of segments');
+    eq(geoParseSegments('0,0; 4,4; 0,4; 4,0', 8).segments.length, 2, 'and an even number is');
+    eq(geoDedupe(pts('0,0; 0,0; 1,1; 0,0')).dropped, 2, 'duplicates are removed and counted');
+    eq(geoDedupe(pts('0,0; 0,0; 1,1; 0,0')).points.length, 2, 'leaving the distinct points in order');
+  }
+
+  /* --- orient: three routes to one sign, and the one that is wrong ------- */
+  {
+    for (const [spec, det, sgn, fsgn] of [
+      ['0, 0; 4, 0; 2, 3', 12n, 1, 1],
+      ['0, 0; 3, 3; 7, 7', 0n, 0, 0],
+      ['0, 0; 134217729, 134217728; 134217728, 134217727', -1n, -1, 0],
+      ['0, 0; 67108865, 67108864; 67108864, 67108863', -1n, -1, -1],
+      ['0, 0; 7, 3; 5, 2', -1n, -1, -1],
+    ]) {
+      const [a, b, c] = pts(spec);
+      eq(orient2(a, b, c), det, 'the exact determinant of ' + spec);
+      eq(geoDet3(a, b, c), det, 'and the cofactor expansion agrees, on ' + spec);
+      eq(Rtext(detByRational(a, b, c)), String(det),
+         'and so does the same determinant over the rationals, on ' + spec);
+      eq(orientSign(a, b, c), sgn, 'the sign is ' + sgn);
+      eq(geoFloatSign(a, b, c), fsgn, 'and in doubles it is ' + fsgn);
+    }
+    /* The family the course opens on: the same right turn at every magnitude. */
+    const sw = geoNeedleSweep(20, 48);
+    eq(sw.tested, 29, 'the sweep runs 29 magnitudes');
+    eq(sw.rows.every((r) => String(r.det) === '-1'), true,
+       'and the exact determinant is -1 in every one of them, so every row is the same turn');
+    eq(sw.disagree, 22, 'the double test gets 22 of them wrong');
+    eq(sw.first, 27, 'the first at 2^27, which is where 2k passes 53');
+    eq(sw.rows.filter((r) => r.k < 27).every((r) => r.agree), true,
+       'and it is right at every magnitude below that');
+    eq(sw.rows.filter((r) => !r.agree).every((r) => r.float === 0), true,
+       'EVERY disagreement is the double reporting collinear, and never the opposite turn');
+    /* That is not luck, and the sweep below is the evidence. Rounding to
+       nearest is monotone and the coordinate differences here are integers
+       below 2^53, so the rounded products cannot cross. */
+    let seed = 20260927, flips = 0, zeros = 0, tried = 0;
+    const rnd = (n) => { seed = (seed * 16807) % 2147483647; return seed % n; };
+    for (let it = 0; it < 30000; it += 1) {
+      const P = Math.pow(2, 26 + rnd(12));
+      const a = [rnd(5), rnd(5)];
+      const b = [P + rnd(9) - 4, P + rnd(9) - 4];
+      const c = [P + rnd(9) - 4, P + rnd(9) - 4];
+      if (!Number.isSafeInteger(b[0]) || !Number.isSafeInteger(c[0])) continue;
+      tried += 1;
+      const e = orientSign(a, b, c), f = geoFloatSign(a, b, c);
+      if (e !== f) { if (e !== 0 && f !== 0) flips += 1; else zeros += 1; }
+    }
+    eq(tried > 29000, true, 'thirty thousand near-collinear triples at 2^26 and above');
+    eq(zeros > 500, true, 'the double test disagrees on ' + zeros + ' of them');
+    eq(flips, 0, 'and on NOT ONE of them does it report the opposite turn, only collinear');
+    eq(orient2Float([0, 0], [4, 0], [2, 3]), 12, 'the double is exact when the numbers are small');
+  }
+
+  /* --- hull: the definition is the referee ------------------------------- */
+  {
+    for (const [name, spec, h, floatH, wrapH, bnd, dup] of [
+      ['general', '0, 0; 6, 0; 6, 6; 0, 6; 3, 3; 2, 1; 4, 5; 1, 4; 5, 2', 4, 4, 4, 4, 0],
+      ['edges', '0, 0; 2, 0; 4, 0; 4, 2; 4, 4; 2, 4; 0, 4; 0, 2; 2, 2', 4, 4, 6, 8, 0],
+      ['segment', '0, 0; 1, 1; 2, 2; 3, 3; 4, 4', 2, 2, 5, 5, 0],
+      ['duplicate', '0, 0; 0, 0; 4, 0; 0, 4; 2, 2; 4, 0', 3, 3, 3, 4, 2],
+      ['needle', '0, 0; 134217729, 134217728; 134217728, 134217727', 3, 2, 3, 3, 0],
+      ['single', '3, 3; 3, 3', 1, 1, null, 1, 1],
+    ]) {
+      const typed = pts(spec), clean = geoDedupe(typed), P = clean.points;
+      eq(clean.dropped, dup, name + ' drops ' + dup + ' duplicate point(s)');
+      const exact = geoExactHull(P), dbl = geoFloatHull(P);
+      eq(exact.h, h, name + ' has ' + h + ' hull vertices');
+      eq(dbl.h, floatH, 'and ' + floatH + ' under the double predicate');
+      eq(geoBoundaryBrute(P).length, bnd, 'with ' + bnd + ' point(s) on the boundary altogether');
+      if (wrapH !== null) eq(jarvis(P).result.h, wrapH, 'while gift wrapping returns ' + wrapH);
+      /* Three routes to the vertex set, all three required to agree. */
+      eq(keys(exact.hull), keys(geoVertexBrute(P)),
+         'the chain and the separating-line definition agree on ' + name);
+      eq(keys(exact.hull), keys(vertexByCovering(P)),
+         'and so does asking whether each point is covered by a triangle of the others, on ' + name);
+      /* The boundary is a superset of the vertices, and holds gift wrapping. */
+      eq(geoVertexBrute(P).every((p) => geoBoundaryBrute(P).some((q) => geoKey(q) === geoKey(p))),
+         true, 'every vertex of ' + name + ' is on its boundary');
+      if (wrapH !== null) {
+        eq(jarvis(P).result.hull.every(
+             (p) => geoBoundaryBrute(P).some((q) => geoKey(q) === geoKey(p))),
+           true, 'and gift wrapping never returns a point off the boundary, on ' + name);
+      }
+      /* The stack claim: a point is pushed once and popped at most once. */
+      eq(exact.pushes, 2 * P.length, 'the two chains push every point once, on ' + name);
+      eq(exact.pops <= exact.pushes, true, 'and pop no more than they pushed');
+      eq(exact.pushes + exact.pops <= 2 * exact.bound, true, 'so the stack work is bounded by 4n');
+    }
+    /* The vertex oracle is asked about lists that STILL HAVE DUPLICATES in
+       them, because that is the case the kit's deduplication exists for and a
+       test that always dedupes first never reaches it. A point typed twice
+       lies in the hull of the others and is a vertex of nothing, and both
+       oracles have to say so however the duplicate is ordered. */
+    for (const spec of ['0,0; 4,0; 0,0; 0,4', '0,0; 0,0; 4,0; 0,4', '3,3; 3,3',
+                        '0,0; 1,1; 1,1; 2,2', '5,5; 5,5; 5,5',
+                        '0,0; 4,0; 4,4; 0,4; 4,0; 0,0', '2,2; 0,0; 6,0; 0,0; 3,6']) {
+      const raw = geoParse(spec, 16).points;
+      eq(keys(geoVertexBrute(raw)), keys(vertexByCovering(raw)),
+         'the separating-line test and the covering test agree on ' + spec + ', duplicates and all');
+    }
+
+    /* THE DEFECT IN A FILE THIS KIT DOES NOT OWN, pinned so that fixing it
+       upstream fails here and the note in geometry.py is revisited rather than
+       left describing something that stopped being true. */
+    eq(monotoneChain([[3, 3]]).result.h, 0,
+       'algo_core.monotoneChain returns an EMPTY hull for a single point, which is wrong: '
+       + 'lower and upper are both [p] and both are sliced away');
+    eq(geoExactHull([[3, 3]]).h, 1, 'the kit’s chain returns the point, which is the hull');
+    eq(keys(geoVertexBrute([[3, 3]])), '3|3', 'and the definition agrees with the kit');
+    /* Everywhere else the two must be the same algorithm. */
+    let seed = 13572468, mismatch = 0, checked = 0;
+    const rnd = (n) => { seed = (seed * 16807) % 2147483647; return seed % n; };
+    for (let it = 0; it < 3000; it += 1) {
+      const n = 1 + rnd(9), raw = [];
+      for (let i = 0; i < n; i += 1) raw.push([rnd(6) - 3, rnd(6) - 3]);
+      const P = geoDedupe(raw).points;
+      const mine = geoExactHull(P);
+      eq(keys(mine.hull), keys(geoVertexBrute(P)), 'chain and definition agree on a random set');
+      eq(keys(mine.hull), keys(vertexByCovering(P)), 'and so does the covering test');
+      if (P.length >= 2) {
+        checked += 1;
+        if (keys(mine.hull) !== keys(monotoneChain(P).result.hull)) mismatch += 1;
+      }
+      if (P.length >= 3) {
+        eq(jarvis(P).result.hull.every(
+             (p) => geoBoundaryBrute(P).some((q) => geoKey(q) === geoKey(p))),
+           true, 'and gift wrapping stays on the boundary');
+      }
+    }
+    eq(mismatch, 0, 'and on all ' + checked + ' random sets of two or more distinct points the '
+       + 'kit’s predicate-parameterised chain IS algo_core’s monotoneChain');
+    /* The lower-bound reduction the course uses: the hull of the lifted points
+       reads back the sorted order. */
+    const lifted = geoExactHull(liftParabola([5, 1, 9, 3, 7]));
+    eq(lifted.h, 5, 'every point lifted to the parabola is a hull vertex');
+    eq(lifted.lower.map((p) => p[0]).join(','), '1,3,5,7,9',
+       'and the lower chain reads back the sorted order, which is why sorting reduces to hulls');
+  }
+
+  /* --- segments: three routes, on the cases that are usually wrong ------- */
+  {
+    for (const [name, spec, d, proper, touching, boxes, meet] of [
+      ['proper', '0, 0; 6, 6; 0, 6; 6, 0', '-1,1,1,-1', true, false, true, true],
+      ['touch', '0, 0; 6, 0; 3, 0; 3, 5', '1,-1,0,1', false, true, true, true],
+      ['overlap', '0, 0; 6, 0; 4, 0; 10, 0', '0,0,0,0', false, true, true, true],
+      ['apart', '0, 0; 4, 0; 6, 0; 10, 0', '0,0,0,0', false, false, false, false],
+      ['shared', '0, 0; 4, 0; 4, 0; 4, 5', '1,0,0,1', false, true, true, true],
+      ['parallel', '0, 0; 6, 0; 0, 2; 6, 2', '-1,-1,1,1', false, false, false, false],
+      ['point', '3, 2; 3, 2; 0, 0; 6, 4', '0,0,0,0', false, true, true, true],
+    ]) {
+      const [p1, p2, q1, q2] = pts(spec);
+      const s = straddle(p1, p2, q1, q2);
+      eq(s.d.join(','), d, name + ' has these four orientation signs');
+      eq(s.proper, proper, 'proper crossing: ' + proper);
+      eq(s.touching, touching, 'touching: ' + touching);
+      eq(s.boxes, boxes, 'boxes overlap: ' + boxes);
+      eq(s.intersect, meet, 'and the verdict is ' + meet);
+      eq(geoSegOracle(p1, p2, q1, q2).intersect, meet,
+         'which the parametric solve in BigInt reaches too, on ' + name);
+      eq(segByRational(p1, p2, q1, q2), meet,
+         'and so does the same system over the rationals, on ' + name);
+    }
+    /* The pair the box filter gets wrong on its own, which is why it is a
+       filter: 'apart' has no overlap and 'overlap' does, and both are four
+       zero signs. */
+    eq(straddle(...pts('0, 0; 6, 0; 4, 0; 10, 0')).d.join(','),
+       straddle(...pts('0, 0; 4, 0; 6, 0; 10, 0')).d.join(','),
+       'two inputs with the same four signs and opposite answers, which is the whole case for '
+       + 'finishing a collinear pair on the segment rather than on the line');
+    let seed = 99887766;
+    const rnd = (n) => { seed = (seed * 16807) % 2147483647; return seed % n; };
+    for (let it = 0; it < 6000; it += 1) {
+      const P = [];
+      for (let i = 0; i < 4; i += 1) P.push([rnd(7) - 3, rnd(7) - 3]);
+      const a = straddle(P[0], P[1], P[2], P[3]).intersect;
+      const b = geoSegOracle(P[0], P[1], P[2], P[3]).intersect;
+      const c = segByRational(P[0], P[1], P[2], P[3]);
+      eq(a, b, 'four signs and two parameters agree on a random pair of segments');
+      eq(b, c, 'and BigInt parameters agree with rational ones');
+    }
+  }
+
+  /* --- sweep: the work, and the answer it must not change ---------------- */
+  {
+    for (const [name, spec, segs, events, tests, all, found] of [
+      ['spread', '0, 0; 3, 3; 1, 4; 4, 1; 6, 0; 9, 3; 7, 4; 10, 1; 12, 0; 15, 3; 13, 4; 16, 1',
+       6, 12, 3, 15, 3],
+      ['bundle', '0, 0; 8, 8; 0, 8; 8, 0; 0, 4; 8, 4; 4, 0; 4, 8', 4, 8, 6, 6, 6],
+      ['chain', '0, 0; 3, 1; 3, 1; 6, 2; 6, 2; 9, 3; 9, 3; 12, 4', 4, 8, 3, 6, 3],
+      ['none', '0, 0; 2, 1; 3, 0; 5, 1; 6, 0; 8, 1; 0, 4; 2, 5; 3, 4; 5, 5; 6, 4; 8, 5',
+       6, 12, 3, 15, 0],
+    ]) {
+      const S = geoParseSegments(spec, 10).segments;
+      const run = sweepEvents(S), res = run.result;
+      eq(S.length, segs, name + ' has ' + segs + ' segments');
+      eq(res.events.length, events, 'and ' + events + ' events, two per segment');
+      eq(res.tests, tests, 'the sweep made ' + tests + ' pair test(s)');
+      eq(res.allPairs, all, 'out of ' + all + ' pairs there are');
+      eq(res.crossings.length, found, 'and found ' + found + ' crossing(s)');
+      eq(geoPairKeys(res.crossings), geoPairKeys(geoSweepBrute(S)),
+         'which is the set testing every pair finds, on ' + name);
+      eq(geoPairKeys(res.crossings).split(' ').filter((x) => x).sort().join(' '),
+         crossingsByPairs(S), 'and the rational solve finds it too, on ' + name);
+      eq(res.tests <= res.allPairs, true, 'the sweep never does more work than the brute force');
+    }
+    eq(sweepEvents(geoParseSegments('0, 0; 8, 8; 0, 8; 8, 0; 0, 4; 8, 4; 4, 0; 4, 8', 10)
+       .segments).result.tests, 6,
+       'on the bundle the sweep makes EVERY test the brute force makes: sorting bought nothing, '
+       + 'which is the preset that stops the saving being read as a bound');
+    let seed = 55443322;
+    const rnd = (n) => { seed = (seed * 16807) % 2147483647; return seed % n; };
+    for (let it = 0; it < 1500; it += 1) {
+      const k = 2 + rnd(5), S = [];
+      for (let i = 0; i < k; i += 1) S.push([[rnd(9) - 4, rnd(9) - 4], [rnd(9) - 4, rnd(9) - 4]]);
+      eq(geoPairKeys(sweepEvents(S).result.crossings), geoPairKeys(geoSweepBrute(S)),
+         'the sweep and every pair agree on a random set of segments');
+    }
+    /* THE EVENT ORDER, which the crossing set cannot see. The comparator used to
+       be `p.x - q.x || (p.kind === 'start' ? -1 : 1) || p.y - q.y`: its middle
+       term is always truthy, so the y tie-break was unreachable and the function
+       was inconsistent -- cmp(p,q) and cmp(q,p) both -1 for two starts at equal
+       x. "Starts before ends at the same x" is the sweep's correctness argument,
+       and it was resting on the engine's sort rather than on the comparator.
+       These two assertions are about the ORDER, not the answer, because every
+       crossing check above passed throughout. */
+    {
+      let bad = [];
+      for (let it = 0; it < 400; it += 1) {
+        const k = 2 + rnd(5), S = [];
+        for (let i = 0; i < k; i += 1) S.push([[rnd(5) - 2, rnd(5) - 2], [rnd(5) - 2, rnd(5) - 2]]);
+        const ev = sweepEvents(S).result.events;
+        // No fallback and no break: a check that silently stops when its input
+        // moves is a check that reports clean. This file has shipped that twice.
+        eq(Array.isArray(ev) && ev.length === 2 * k, true,
+           'sweepEvents exposes its event list, two per segment');
+        for (let i = 1; i < ev.length; i += 1) {
+          const a = ev[i - 1], b = ev[i];
+          if (a.x > b.x) bad.push('x out of order');
+          else if (a.x === b.x && a.kind === 'end' && b.kind === 'start') bad.push('an end before a start at x = ' + a.x);
+          else if (a.x === b.x && a.kind === b.kind && a.y > b.y) bad.push('y out of order at x = ' + a.x);
+        }
+      }
+      eq([...new Set(bad)].join(' | '), '',
+         'the event list is sorted by x, then starts before ends, then by y -- the ordering the '
+         + 'comparator claims and could not previously deliver');
+    }
+  }
+
+  /* --- closest: the recursion against every pair ------------------------- */
+  {
+    for (const [name, spec, n, d2, dc, strip, bound] of [
+      ['scatter', '2, 9; 5, 1; 8, 14; 11, 4; 14, 12; 17, 2; 20, 10; 23, 6; 26, 15; 29, 3; 12, 5; 13, 4',
+       12, '2', 17, 5, 84],
+      ['column', '0, 0; 0, 3; 0, 6; 0, 9; 0, 12; 1, 1; 1, 4; 1, 7; 1, 10; 1, 13', 10, '2', 13, 5, 70],
+      ['grid', '0, 0; 4, 0; 8, 0; 0, 4; 4, 4; 8, 4; 0, 8; 4, 8; 8, 8', 9, '16', 6, 0, 63],
+      ['duplicate', '0, 0; 5, 5; 9, 2; 5, 5; 3, 8', 5, '0', 4, 0, 35],
+      ['pair', '0, 0; 3, 4', 2, '25', 1, 0, 14],
+    ]) {
+      const P = pts(spec);
+      const run = closestPair(P), res = run.result;
+      eq(P.length, n, name + ' has ' + n + ' points');
+      eq(String(res.d2), d2, 'and a closest squared distance of ' + d2);
+      eq(String(closestByPairs(P)), d2, 'which every pair confirms');
+      eq(String(geoClosestBrute(P).d2), d2, 'and the kit’s own brute force too');
+      eq(run.counts.compares, dc, 'the recursion made ' + dc + ' comparison(s)');
+      eq(res.stripCompares, strip, 'of which ' + strip + ' were in a strip');
+      eq(res.bound, bound, 'against a bound of 7n = ' + bound);
+      eq(res.stripCompares <= res.bound, true, 'so the strip stayed under 7n, on ' + name);
+      eq(String(dist2(res.pair[0], res.pair[1])), d2,
+         'and the pair returned really is at that distance, on ' + name);
+      /* The strip claim, per level: at most seven neighbours each. */
+      res.levels.forEach((l) => {
+        eq(l.compares <= 7 * l.strip, true, 'no strip compared a point with more than seven others');
+      });
+    }
+    eq(String(closestPair(pts('0, 0; 5, 5; 9, 2; 5, 5; 3, 8')).result.d2), '0',
+       'two coincident points are at squared distance 0, which needs no special case because '
+       + 'nothing is square-rooted');
+    let seed = 31415926;
+    const rnd = (n) => { seed = (seed * 16807) % 2147483647; return seed % n; };
+    for (let it = 0; it < 2500; it += 1) {
+      const n = 2 + rnd(14), P = [];
+      for (let i = 0; i < n; i += 1) P.push([rnd(40) - 20, rnd(40) - 20]);
+      const run = closestPair(P);
+      eq(String(run.result.d2), String(closestByPairs(P)),
+         'divide and conquer agrees with every pair on a random point set');
+      eq(run.result.stripCompares <= run.result.bound, true, 'and the strip stayed under 7n');
+    }
+  }
+
+  /* --- polygon: two areas, two definitions of inside --------------------- */
+  {
+    for (const [name, spec, q, a2, crossings, inside, onB, winding, simple] of [
+      ['ell', '0, 0; 6, 0; 6, 2; 2, 2; 2, 6; 0, 6', '1, 5', 40n, 1, true, false, 1, true],
+      ['vertex', '0, 0; 8, 0; 4, 4', '-2, 0', 32n, 2, false, false, 0, true],
+      ['comb', '0, 0; 12, 0; 12, 6; 10, 6; 10, 2; 8, 2; 8, 6; 6, 6; 6, 2; 4, 2; 4, 6; 2, 6; 2, 2; 0, 2',
+       '-1, 4', 96n, 6, false, false, 0, true],
+      ['clockwise', '0, 0; 0, 5; 5, 5; 5, 0', '2, 2', -50n, 1, true, false, -1, true],
+      ['flat', '0, 0; 3, 3; 6, 6', '3, 3', 0n, 0, false, true, 0, true],
+    ]) {
+      const poly = pts(spec), Q = pts(q)[0];
+      eq(shoelace2(poly), a2, name + ' has doubled area ' + a2);
+      eq(geoAreaTrapezoid(poly), a2, 'and the trapezoid rule agrees, on ' + name);
+      eq(areaByFan(poly), a2, 'and so does a fan of triangles from the first vertex, on ' + name);
+      const par = rayParity(poly, Q), w = geoWinding(poly, Q);
+      eq(par.crossings, crossings, 'the ray from ' + q + ' crosses ' + crossings + ' edge(s)');
+      eq(par.inside, inside, 'so the point is ' + (inside ? 'inside' : 'not inside'));
+      eq(par.onBoundary, onB, 'on the boundary: ' + onB);
+      eq(w.winding, winding, 'and the winding number is ' + winding);
+      eq(w.inside, inside, 'which gives the same verdict, on ' + name);
+      eq(insideByVerticalRay(poly, Q).inside, inside,
+         'and casting the ray upwards instead of rightwards gives it too, on ' + name);
+      eq(geoSimple(poly).simple, simple, name + ' is a simple polygon: ' + simple);
+    }
+    /* The sign is the orientation and reversing the vertices flips it. */
+    const sq = pts('0, 0; 5, 0; 5, 5; 0, 5');
+    eq(shoelace2(sq), 50n, 'counter-clockwise is positive');
+    eq(shoelace2(sq.slice().reverse()), -50n, 'and the same square typed backwards is negative');
+    eq(shoelace2(sq) + shoelace2(sq.slice().reverse()), 0n, 'so the magnitude is the same area');
+    /* Every lattice point of a small polygon, both ways round. */
+    let seed = 24680135, tested = 0;
+    const rnd = (n) => { seed = (seed * 16807) % 2147483647; return seed % n; };
+    for (let it = 0; it < 900; it += 1) {
+      const raw = [];
+      for (let i = 0; i < 3 + rnd(6); i += 1) raw.push([rnd(11) - 5, rnd(11) - 5]);
+      const P = geoDedupe(raw).points;
+      const hull = geoExactHull(P).hull;
+      if (hull.length < 3) continue;
+      eq(geoSimple(hull).simple, true, 'a convex hull is always a simple polygon');
+      eq(shoelace2(hull), geoAreaTrapezoid(hull), 'and its two area formulas agree');
+      eq(shoelace2(hull), areaByFan(hull), 'as does the fan');
+      for (let t = 0; t < 6; t += 1) {
+        const Q = [rnd(11) - 5, rnd(11) - 5];
+        const par = rayParity(hull, Q), w = geoWinding(hull, Q);
+        const up = insideByVerticalRay(hull, Q);
+        tested += 1;
+        eq(par.inside, w.inside, 'parity and winding agree on a random query point');
+        eq(par.onBoundary, w.onBoundary, 'and so does the boundary case');
+        eq(par.inside, up.inside, 'and a ray cast upwards agrees with one cast rightwards');
+      }
+    }
+    eq(tested > 3000, true, 'checked on ' + tested + ' query points');
+  }
+
+  /* --- calipers: h pairs against all of them ----------------------------- */
+  {
+    for (const [name, spec, n, h, d2, pairs] of [
+      ['convex', '0, 3; 2, 0; 6, 0; 9, 3; 9, 7; 6, 10; 2, 10; 0, 7', 8, 8, '116', 8],
+      ['cloud', '0, 0; 12, 0; 12, 9; 0, 9; 3, 2; 5, 4; 7, 3; 9, 5; 4, 6; 6, 7; 8, 6; 2, 5; 10, 2; 5, 1; 7, 8; 3, 7',
+       16, 4, '225', 4],
+      ['thin', '0, 0; 40, 1; 20, 1; 10, 0; 30, 1', 5, 4, '1601', 4],
+      ['segment', '0, 0; 3, 3; 6, 6; 9, 9; 12, 12', 5, 2, '288', 2],
+      ['square', '0, 0; 6, 0; 6, 6; 0, 6', 4, 4, '72', 4],
+    ]) {
+      const P = geoDedupe(pts(spec)).points;
+      const hull = geoExactHull(P).hull;
+      const run = calipers(hull), res = run.result;
+      eq(P.length, n, name + ' has ' + n + ' distinct points');
+      eq(hull.length, h, 'and ' + h + ' of them on the hull');
+      eq(String(res.d2), d2, 'the squared diameter is ' + d2);
+      eq(String(diameterBrute(P).d2), d2, 'which testing every pair confirms');
+      eq(res.pairs.length, pairs, 'from ' + pairs + ' antipodal pair(s)');
+      eq(String(dist2(res.pair[0], res.pair[1])), d2,
+         'and the pair returned really is at that distance, on ' + name);
+      /* Nothing on the hull is further apart than the diameter. */
+      hull.forEach((a) => hull.forEach((b) => {
+        eq(dist2(a, b) <= res.d2, true, 'no hull pair of ' + name + ' exceeds the diameter');
+      }));
+    }
+    let seed = 86420975;
+    const rnd = (n) => { seed = (seed * 16807) % 2147483647; return seed % n; };
+    for (let it = 0; it < 1500; it += 1) {
+      const raw = [];
+      for (let i = 0; i < 2 + rnd(12); i += 1) raw.push([rnd(30) - 15, rnd(30) - 15]);
+      const P = geoDedupe(raw).points;
+      if (P.length < 2) continue;
+      const hull = geoExactHull(P).hull;
+      eq(String(calipers(hull).result.d2), String(diameterBrute(P).d2),
+         'the calipers on the hull reach the diameter of the whole set, at random');
+    }
+  }
+
+  /* --- kdtree: what was skipped, and what must not be ------------------- */
+  {
+    for (const [name, spec, rect, n, visited, found] of [
+      ['scatter', '1, 1; 3, 9; 5, 4; 7, 12; 9, 2; 11, 7; 13, 14; 15, 5; 2, 6; 4, 13; 6, 8; 8, 3; 10, 11; 12, 1; 14, 9; 16, 6',
+       [0, 0, 6, 6], 16, 6, 3],
+      ['everything', '1, 1; 3, 9; 5, 4; 7, 12; 9, 2; 11, 7; 13, 14; 15, 5; 2, 6; 4, 13; 6, 8; 8, 3',
+       [0, 0, 20, 20], 12, 12, 12],
+      ['empty', '1, 1; 3, 9; 5, 4; 7, 12; 9, 2; 11, 7; 13, 14; 15, 5; 2, 6; 4, 13; 6, 8; 8, 3',
+       [17, 17, 19, 19], 12, 3, 0],
+      ['column', '1, 1; 3, 9; 5, 4; 7, 12; 9, 2; 11, 7; 13, 14; 15, 5; 2, 6; 4, 13; 6, 8; 8, 3',
+       [4, 0, 6, 20], 12, 6, 3],
+    ]) {
+      const P = geoDedupe(pts(spec)).points;
+      const tree = kdBuild(P, 0);
+      eq(P.length, n, name + ' has ' + n + ' points');
+      eq(countNodes(tree), n, 'and the tree holds every one of them, once');
+      const run = kdRange(tree, rect);
+      eq(run.result.visited, visited, 'the query visited ' + visited + ' node(s)');
+      eq(run.result.found.length, found, 'and reported ' + found);
+      eq(keys(run.result.found), keys(geoRangeBrute(P, rect)),
+         'which is exactly what scanning every point reports, on ' + name);
+      eq(run.result.visited <= n, true, 'and it never visits more nodes than there are');
+    }
+    eq(kdRange(kdBuild(geoDedupe(pts('1, 1; 3, 9; 5, 4; 7, 12; 9, 2; 11, 7; 13, 14; 15, 5; 2, 6; 4, 13; 6, 8; 8, 3'))
+       .points, 0), [0, 0, 20, 20]).result.visited, 12,
+       'a window containing everything visits everything, which is the preset that stops the '
+       + 'pruning being read as a bound');
+    let seed = 19283746;
+    const rnd = (n) => { seed = (seed * 16807) % 2147483647; return seed % n; };
+    for (let it = 0; it < 1500; it += 1) {
+      const raw = [];
+      for (let i = 0; i < 1 + rnd(16); i += 1) raw.push([rnd(20), rnd(20)]);
+      const P = geoDedupe(raw).points;
+      const x0 = rnd(20), y0 = rnd(20), x1 = x0 + rnd(12), y1 = y0 + rnd(12);
+      const run = kdRange(kdBuild(P, 0), [x0, y0, x1, y1]);
+      eq(keys(run.result.found), keys(geoRangeBrute(P, [x0, y0, x1, y1])),
+         'the k-d range query reports what a scan reports, on a random window');
+    }
+    eq(drawTree(null, kdBuild(geoDedupe(pts('1, 1; 3, 9; 5, 4')).points, 0), kdKids,
+                (n) => String(n.point[n.axis])).match(/<circle /g).length, 3,
+       'and the renderer draws every node of the tree');
+  }
+
+  /* --- the kit's own contract -------------------------------------------- */
+  {
+    eq(geometrySrc.indexOf('geometry_lab: unknown mode') > 0, true,
+       'an unknown mode raises rather than falling back to a default');
+    for (const m of ['orient', 'hull', 'segments', 'sweep', 'closest', 'polygon', 'calipers',
+                     'kdtree']) {
+      eq(geometrySrc.indexOf('    "' + m + '": _' + m + ',') > 0, true, 'mode ' + m + ' is registered');
+    }
+    eq(geometrySrc.indexOf('from .algo_core import COUNT_JS, GEOM_JS, TREEDRAW_JS') > 0, true,
+       'and the predicates are IMPORTED from algo_core rather than rewritten here, which is '
+       + 'what makes every check above a check on the code that ships');
+    const headings = geometrySrc.match(/^ +(title|subtitle|panel_title)="[^"]*"/gm) || [];
+    eq(headings.length >= 16, true, 'every mode names a title and a subtitle: ' + headings.length + ' found');
+    eq(headings.filter((h) => /&[a-z]+;|&#\d+;|<[a-z/]/.test(h)).length, 0,
+       'and none of them carries an HTML entity or a tag, which render.py escapes and would '
+       + 'therefore ship to the reader as literal text');
+  }
+}
+
+
+// ------------------------------------------------------------------- random
+console.log('randomised algorithms: exact distributions, against enumerations that share no code');
+{
+  /* THE DISCIPLINE IN THIS SECTION. Every exact quantity the `random` kit
+     prints is checked against an enumeration written HERE, from the
+     definition, sharing no code with the kit:
+
+       the shuffle distributions   re-derived by enumerating the tapes in this
+                                   file and applying the two swap rules spelled
+                                   out here, not by calling `allTapes`
+       the quicksort distribution  re-derived by running a quicksort written
+                                   here over every one of the n! input orders,
+                                   and separately checked against the closed
+                                   form and against a table of known values
+       Karger's probability        re-derived by enumerating every one of the
+                                   |E|! edge ORDERS and contracting along each,
+                                   which is a different computation from the
+                                   memoised recursion over contraction states
+       the witness fraction        re-derived with a modular exponentiation
+                                   written here and the strong-test condition
+                                   read straight off its definition
+       the MAX-3-SAT mean          re-derived by LINEARITY -- clause by clause,
+                                   each clause's own satisfying fraction added
+                                   up -- which never enumerates an assignment
+
+     A long seeded run is never used as an oracle for an expectation anywhere
+     below. That is the mistake the kit itself exists to warn about and it
+     would be an odd thing for its test to make. */
+  const RANDOM_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'random.py');
+  const randomSrc = fs.readFileSync(RANDOM_SOURCE, 'utf8');
+  const rkBlock = (name) => blockFrom(randomSrc, name, RANDOM_SOURCE);
+  eval(block('RATIONAL_JS'));
+  eval(sysdBlock('STREAM_JS'));
+  eval(sysdBlock('HARMONIC_JS'));
+  eval(algoCoreBlock('COUNT_JS'));
+  eval(algoCoreBlock('RFIXED_JS'));
+  eval(algoCoreBlock('SEEDED_JS'));
+  eval(algoCoreBlock('DIGRAPH_JS'));
+  eval(algoCoreBlock('ORACLE_JS'));
+  eval(algoCoreBlock('RANDOM_JS'));
+  eval(rkBlock('RKIT_JS'));
+
+  const graphOf = (text) => {
+    const p = rkParseGraph(text, 8);
+    if (p.bad) { fails += 1; console.log('  FAIL parsing ' + text + ': ' + p.bad); }
+    return p.G;
+  };
+  const cnfOf = (text) => {
+    const p = rkParseCnf(text);
+    if (p.bad) { fails += 1; console.log('  FAIL parsing ' + text + ': ' + p.bad); }
+    return p.formula;
+  };
+  const perms = (n) => {
+    const out = [], a = new Array(n).fill(0), used = new Array(n).fill(false);
+    (function go(k) {
+      if (k === n) { out.push(a.slice()); return; }
+      for (let v = 0; v < n; v += 1) {
+        if (used[v]) continue;
+        used[v] = true; a[k] = v; go(k + 1); used[v] = false;
+      }
+    })(0);
+    return out;
+  };
+
+  /* --- what a reader types ------------------------------------------------ */
+  {
+    eq(graphOf('1-2, 2-3, 3-1').arcs.length, 3, 'three clauses, three edges');
+    eq(graphOf('1-2, 1-2, 2-3').arcs.length, 3,
+       'and a repeated clause is a PARALLEL edge, not a duplicate: Karger needs the multiplicity');
+    eq(rkParseGraph('1-1').bad !== undefined, true, 'a loop is refused -- it is never contracted');
+    eq(rkParseGraph('1-2').bad !== undefined, true, 'and so is a graph with fewer than three vertices');
+    eq(rkParseGraph('1-9, 1-2, 1-3').bad !== undefined, true, 'and a label past the cap');
+    eq(cnfOf('1 2 -3; -1 2').clauses.length + ',' + cnfOf('1 2 -3; -1 2').n, '2,3',
+       'a formula is clauses by semicolon and literals by space, and n is the largest variable');
+    eq(rkParseCnf('1 0 2').bad !== undefined, true, 'there is no variable 0');
+    eq(rkParseCnf('1 x').bad !== undefined, true, 'and a literal that is not a number is refused');
+    eq(rkClauseText([1, -2, 3]), 'x1 ∨ ¬x2 ∨ x3', 'a clause prints with real symbols, not entities');
+  }
+
+  /* --- the shuffles, against tapes enumerated here ------------------------ */
+  {
+    /* The oracle: the two shuffles written out again, over tapes built here.
+       Deliberately not `allTapes` and not `shuffleFrequencies` -- if those two
+       agreed with each other about a wrong answer this would still catch it. */
+    const tapesOf = (n, kind) => {
+      const sizes = [];
+      if (kind === 'naive') { for (let i = 0; i < n; i += 1) sizes.push(n); }
+      else { for (let k = n - 1; k >= 1; k -= 1) sizes.push(k + 1); }
+      let out = [[]];
+      for (const s of sizes) {
+        const next = [];
+        for (const p of out) for (let v = 0; v < s; v += 1) next.push(p.concat([v]));
+        out = next;
+      }
+      return out;
+    };
+    const oracleFreq = (n, kind) => {
+      const freq = new Map();
+      for (const tape of tapesOf(n, kind)) {
+        const a = [];
+        for (let i = 0; i < n; i += 1) a.push(i);
+        if (kind === 'naive') {
+          for (let i = 0; i < n; i += 1) {
+            const j = tape[i] % n, t = a[i]; a[i] = a[j]; a[j] = t;
+          }
+        } else {
+          let at = 0;
+          for (let i = n - 1; i >= 1; i -= 1) {
+            const j = tape[at] % (i + 1); at += 1;
+            const t = a[i]; a[i] = a[j]; a[j] = t;
+          }
+        }
+        const key = a.join('');
+        freq.set(key, (freq.get(key) || 0) + 1);
+      }
+      return freq;
+    };
+    for (const n of [3, 4, 5]) {
+      for (const kind of ['fisheryates', 'naive']) {
+        const shipped = rkShuffleExact(n, kind);
+        const oracle = oracleFreq(n, kind);
+        eq(shipped.tapes, [...oracle.values()].reduce((a, b) => a + b, 0),
+           'n = ' + n + ' ' + kind + ': the tape count matches the enumeration here');
+        let same = true;
+        for (const row of shipped.rows) if (oracle.get(row.perm) !== row.count) same = false;
+        for (const [k, v] of oracle) {
+          const row = shipped.rows.filter((r) => r.perm === k)[0];
+          if (!row || row.count !== v) same = false;
+        }
+        eq(same, true, 'and every permutation gets the same number of tapes, one by one');
+      }
+    }
+    const fy4 = rkShuffleExact(4, 'fisheryates'), nv4 = rkShuffleExact(4, 'naive');
+    eq(fy4.tapes + ',' + fy4.distinct + ',' + fy4.uniform, '24,24,true',
+       'Fisher-Yates at n = 4 is 24 tapes over 24 permutations, one each');
+    eq(Rtext(fy4.rows[0].probability), '1/24', 'so every permutation has probability exactly 1/24');
+    eq(Rtext(rkTotalVariation(fy4.rows, 24)), '0',
+       'and the total variation distance from uniform is 0, exactly');
+    eq(nv4.tapes + ',' + nv4.distinct + ',' + nv4.uniform, '256,24,false',
+       'the naive swap at n = 4 is 256 tapes over the same 24 permutations, and is not uniform');
+    eq(Rtext(rkTotalVariation(nv4.rows, 24)), '25/384',
+       'its total variation distance from uniform is 25/384');
+    const most = nv4.rows.slice().sort((a, b) => b.count - a.count)[0];
+    const least = nv4.rows.slice().sort((a, b) => a.count - b.count)[0];
+    eq(Rtext(most.probability) + ' vs ' + Rtext(least.probability), '15/256 vs 1/32',
+       'its most likely permutation has probability 15/256 and its least 1/32');
+    /* The PROOF, which does not depend on any of the above. */
+    for (const n of [3, 4, 5, 6, 7]) {
+      const d = rkNaiveDivides(n);
+      let fact = 1n;
+      for (let i = 2n; i <= BigInt(n); i += 1n) fact *= i;
+      eq(d.factorial, fact, 'n! at n = ' + n + ' is computed as BigInt');
+      eq(d.tapes, BigInt(n) ** BigInt(n), 'and n^n likewise');
+      eq(d.divides, false, 'and n! does not divide n^n at n = ' + n
+         + ', so the naive swap CANNOT be uniform whatever a sample shows');
+    }
+    eq(rkNaiveDivides(1).divides + ',' + rkNaiveDivides(2).divides, 'true,true',
+       'at n = 1 and n = 2 it does divide, and there the counting argument says nothing -- '
+       + 'which is why the mode does not rest on it alone');
+    /* The cap refuses rather than enumerating 7^7 tapes. */
+    const refuses = (f) => { try { f(); return false; } catch (e) { return /exceeds the exhaustive cap/.test(e.message); } };
+    eq(refuses(() => rkShuffleExact(7, 'naive')), true, 'seven items of naive tapes is refused');
+    eq(refuses(() => rkShuffleExact(8, 'fisheryates')), true, 'and eight of Fisher-Yates');
+    eq(refuses(() => rkShuffleExact(7, 'fisheryates')), false,
+       'while seven of Fisher-Yates is 5040 tapes and is allowed: the caps differ because the '
+       + 'tape counts do');
+  }
+
+  /* --- the quicksort distribution, three ways ----------------------------- */
+  {
+    /* ORACLE ONE: a quicksort written here, run over every input order, with
+       the LAST element as the pivot. Nothing of the kit is called. */
+    const localQuicksort = (input) => {
+      const a = input.slice();
+      let compares = 0;
+      const go = (lo, hi) => {
+        if (lo >= hi) return;
+        const pivot = a[hi];
+        let i = lo;
+        for (let j = lo; j < hi; j += 1) {
+          compares += 1;
+          if (a[j] < pivot) { const t = a[i]; a[i] = a[j]; a[j] = t; i += 1; }
+        }
+        const t = a[i]; a[i] = a[hi]; a[hi] = t;
+        go(lo, i - 1); go(i + 1, hi);
+      };
+      go(0, a.length - 1);
+      return { compares: compares, sorted: a };
+    };
+    const localPmf = (n) => {
+      const tally = new Map();
+      let total = 0n;
+      for (const p of perms(n)) {
+        const run = localQuicksort(p);
+        for (let i = 1; i < n; i += 1) {
+          if (run.sorted[i - 1] > run.sorted[i]) { fails += 1; console.log('  FAIL the local oracle did not sort'); }
+        }
+        tally.set(run.compares, (tally.get(run.compares) || 0n) + 1n);
+        total += 1n;
+      }
+      const out = {};
+      for (const [k, v] of tally) out[k] = R(v, total);
+      return out;
+    };
+    for (const n of [2, 3, 4, 5, 6]) {
+      eq(rqsSamePmf(rqsPmf(n), localPmf(n)), true,
+         'n = ' + n + ': the recursion on block sizes gives the same distribution, value by '
+         + 'value, as a quicksort written in this file run over every input order');
+      eq(rqsSamePmf(rqsPmf(n), rqsOverOrders(n).pmf), true,
+         'and so does the kit\'s own all-orders enumeration, which sorts and counts rather than '
+         + 'reasoning about sizes');
+      eq(rqsOverOrders(n).allSorted, true,
+         'and every one of those ' + rqsOverOrders(n).orders
+         + ' runs produced a sorted permutation of its input -- a comparison COUNT alone would '
+         + 'not have noticed an unsorted one');
+    }
+    /* ORACLE TWO: the closed form, and a table of values that were derived by
+       hand from the recurrence E(n) = (n-1) + (2/n) * sum E(i). */
+    const KNOWN = { 2: '1', 3: '8/3', 4: '29/6', 5: '37/5', 6: '103/10', 7: '472/35',
+                    8: '2369/140', 9: '2593/126', 10: '30791/1260' };
+    for (const n of Object.keys(KNOWN).map(Number)) {
+      eq(Rtext(pmfExpect(rqsPairs(rqsPmf(n)))), KNOWN[n],
+         'the expectation at n = ' + n + ' is ' + KNOWN[n]);
+      eq(Rtext(rqsClosed(n)), KNOWN[n],
+         'and 2(n + 1)H_n - 4n agrees, from a different definition');
+      eq(Rtext(rqsTotal(rqsPairs(rqsPmf(n)))), '1', 'and the probabilities add to exactly 1');
+    }
+    eq(Rtext(rqsClosed(1)) + ',' + Rtext(rqsClosed(0)), '0,0',
+       'and one element costs nothing, as does none');
+    /* THE SUPPORT, which is an ALWAYS claim and is checked as one. */
+    for (const n of [2, 4, 6, 8, 10]) {
+      const pairs = rqsPairs(rqsPmf(n));
+      eq(pairs[pairs.length - 1][0], (n * (n - 1)) / 2,
+         'the largest cost the distribution puts any mass on is n(n - 1)/2 at n = ' + n);
+      eq(pairs[0][0] >= 0, true, 'and the smallest is not negative');
+      eq(Rtext(exactTail(pairs, (n * (n - 1)) / 2 + 1)), '0',
+         'and there is exactly zero probability above it -- the worst case is an ALWAYS bound');
+    }
+    eq(Rtext(exactTail(rqsPairs(rqsPmf(8)), 28)), '1/315',
+       'the probability of hitting the worst case at n = 8 is 1/315');
+    /* The fixed rule pays the worst case on the two inputs it is worst on. */
+    const upto = (n) => { const a = []; for (let i = 1; i <= n; i += 1) a.push(i); return a; };
+    for (const n of [4, 6, 8]) {
+      const asc = upto(n), desc = upto(n).slice().reverse();
+      eq(rqsRun(asc, null).counts.compares, (n * (n - 1)) / 2,
+         'the fixed last-element pivot on a sorted input of ' + n + ' costs n(n - 1)/2');
+      eq(rqsRun(desc, null).counts.compares, (n * (n - 1)) / 2,
+         'and so does a reversed one -- it is not one unlucky input');
+      eq(rqsRun(asc, null).result.ordered + ',' + rqsRun(asc, null).result.permutation, 'true,true',
+         'and what came back is sorted AND a permutation of what went in, both checked');
+    }
+    /* Markov and Chebyshev against the exact tails they bound. */
+    {
+      const pairs = rqsPairs(rqsPmf(8));
+      const mu = pmfExpect(pairs), v = pmfVariance(pairs);
+      eq(Rtext(mu) + ' ' + Rtext(v), '2369/140 160599/19600',
+         'the mean and variance at n = 8 are exact fractions');
+      for (const a of [18, 20, 24, 28]) {
+        eq(Rcmp(exactTail(pairs, a), markovBound(pairs, a).bound) <= 0, true,
+           'Markov bounds the exact tail at ' + a + ': ' + Rtext(exactTail(pairs, a))
+           + ' <= ' + Rtext(markovBound(pairs, a).bound));
+      }
+      for (const t of [2, 4, 6, 8]) {
+        eq(Rcmp(exactDeviation(pairs, t), chebyshevBound(pairs, t).bound) <= 0, true,
+           'and Chebyshev bounds the exact deviation at ' + t);
+      }
+      eq(Rtext(markovBound(pairs, 28).bound), '2369/3920', 'Markov at a = 28 is E/28 = 2369/3920');
+      eq(Rcmp(R(1n, 315n), R(2369n, 3920n)) < 0, true,
+         'and the truth, 1/315, is far under it -- which is what the panel prints the slack for');
+    }
+    /* The measurement is a MEASUREMENT: it must not equal the expectation by
+       construction, and it must move when the seed count does. */
+    {
+      const input = upto(8);
+      const a = rqsSeeds(input, 120), b = rqsSeeds(input, 240);
+      eq(a.allSorted + ',' + b.allSorted, 'true,true',
+         'every seeded run sorted its input -- checked, not assumed');
+      eq(Rtext(a.mean), '415/24', '120 seeds give a sample mean of 415/24');
+      eq(Requ(a.mean, pmfExpect(rqsPairs(rqsPmf(8)))), false,
+         'which is NOT the expectation 2369/140, and the kit never claims it is');
+      eq(Requ(a.mean, b.mean), false, 'and 240 seeds give a different number again');
+      eq(a.min >= 13 && a.max <= 28, true, 'every seeded cost sits inside the exact support');
+      eq(rqsSeedTail(a, 28).hits, 0, 'none of the 120 seeds hit the worst case');
+      eq(rqsSeedTail(a, 13).hits, a.rows.filter((r) => r.compares >= 13).length,
+         'and the measured tail counts what it says it counts');
+      eq(rqsSeeds(input, 24).rows[0].compares, rqsSeeds(input, 240).rows[0].compares,
+         'seed 1 is seed 1 whatever else is asked for: the stream is reproducible');
+      /* The arrangement moves the fixed count and not the distribution. */
+      const alt = [1, 8, 2, 7, 3, 6, 4, 5];
+      eq(rqsRun(alt, null).counts.compares !== 28, true,
+         'the alternating arrangement costs the fixed rule something other than the worst case');
+      eq(rqsSamePmf(rqsPmf(8), rqsPmf(8)), true,
+         'while the random rule\'s distribution is a function of n alone');
+    }
+    const refuses = (f) => { try { f(); return false; } catch (e) { return /exceeds the exhaustive cap/.test(e.message); } };
+    eq(refuses(() => rqsPmf(13)), true, 'thirteen is past the distribution cap and is refused');
+    eq(refuses(() => rqsOverOrders(8)), true, 'and eight input orders is 40320 and is refused');
+  }
+
+  /* --- Karger, against every edge order ----------------------------------- */
+  {
+    /* THE ORACLE, and it is genuinely a different computation. `kargerExact`
+       memoises over CONTRACTION STATES. This enumerates every one of the |E|!
+       orders in which the edges could be offered, contracts along each one
+       skipping the edges that have become self-loops, and weights each order
+       by 1/|E|!. Taking a uniformly random permutation and always contracting
+       the first live edge is the same experiment as repeatedly contracting a
+       uniformly random live edge, which is why the two must agree. */
+    const byOrders = (G) => {
+      const m = G.arcs.length, tally = new Map();
+      let total = 0n;
+      const perm = [], used = new Array(m).fill(false);
+      (function go() {
+        if (perm.length === m) {
+          total += 1n;
+          let group = [];
+          for (let v = 0; v < G.n; v += 1) group.push(v);
+          let groups = G.n;
+          for (const id of perm) {
+            if (groups === 2) break;
+            const arc = G.arcs[id];
+            if (group[arc.u] === group[arc.v]) continue;
+            const from = group[arc.v], into = group[arc.u];
+            group = group.map((g) => (g === from ? into : g));
+            groups -= 1;
+          }
+          const first = group[0];
+          const key = group.map((g) => (g === first ? 0 : 1)).join('');
+          tally.set(key, (tally.get(key) || 0n) + 1n);
+          return;
+        }
+        for (let i = 0; i < m; i += 1) {
+          if (used[i]) continue;
+          used[i] = true; perm.push(i); go(); perm.pop(); used[i] = false;
+        }
+      })();
+      const out = new Map();
+      for (const [k, v] of tally) out.set(k, R(v, total));
+      return out;
+    };
+    const CASES = [
+      ['1-2, 2-3, 3-4, 4-1', 2, 6, '1'],
+      ['1-2, 1-2, 2-3, 3-1', 2, 1, '1/2'],
+      ['1-2, 1-3, 2-3, 3-4, 4-5, 5-3', 2, 6, '1'],
+      ['1-2, 1-3, 2-3, 4-5, 4-6, 5-6, 3-4', 1, 1, '13/35'],
+      ['1-2, 1-3, 2-3, 4-5, 4-6, 5-6, 1-4, 2-5', 2, 3, '19/35'],
+    ];
+    for (const [spec, size, count, anyText] of CASES) {
+      const G = graphOf(spec);
+      const total = rkKargerTotal(G);
+      eq(total.size, size, 'the minimum cut of ' + spec + ' has ' + size
+         + ' edge(s), by exhaustive search over the bipartitions');
+      eq(total.count, count, 'and there are ' + count + ' minimum cuts');
+      eq(Rtext(total.any), anyText, 'and one run returns one of them with probability ' + anyText);
+      eq(total.beatsBound, true, 'which clears the bound 2/(n(n - 1)) = ' + Rtext(total.bound));
+      /* the oracle, where the factorial is small enough */
+      if (G.arcs.length <= 7) {
+        const oracle = byOrders(G);
+        let same = true, summed = R(0n, 1n);
+        for (const row of total.rows) {
+          const got = oracle.get(row.key) || R(0n, 1n);
+          if (!Requ(got, row.probability)) same = false;
+          summed = Radd(summed, got);
+        }
+        eq(same, true, 'and every one of those probabilities is reproduced by enumerating all '
+           + G.arcs.length + '! edge orders -- a different computation entirely');
+        eq(Requ(summed, total.any), true, 'as is their sum');
+      }
+      /* the minimum cut agrees with algo_core's own brute force */
+      eq(minCutBrute(G).size, total.size,
+         'and minCutBrute, which knows nothing about contraction, finds the same minimum');
+    }
+    /* The per-cut bound is about ONE cut and the kit says so. */
+    {
+      const c4 = graphOf('1-2, 2-3, 3-4, 4-1');
+      const one = kargerExact(c4, [0, 0, 1, 1]);
+      eq(Rtext(one.probability) + ',' + Rtext(one.bound), '1/6,1/6',
+         'on the four-cycle a single named cut is returned with probability exactly the bound');
+      eq(Rtext(rkKargerTotal(c4).any), '1',
+         'while the probability of returning SOME minimum cut is 1 -- six cuts at 1/6 each, and '
+         + 'reporting the first number as the success probability would understate it sixfold');
+    }
+    /* Amplification is exact, and the trial count is found by multiplying. */
+    {
+      const p = R(1n, 6n);
+      eq(Rtext(rkAmplify(p, 1).success), '1/6', 'one trial succeeds with probability p');
+      eq(Rtext(rkAmplify(p, 2).success), '11/36', 'two with 1 - (5/6)^2 = 11/36');
+      eq(Rtext(rkAmplify(p, 2).failure), '25/36', 'and both fail with 25/36');
+      eq(Requ(Radd(rkAmplify(p, 5).success, rkAmplify(p, 5).failure), R(1n, 1n)), true,
+         'success and failure add to one at every t');
+      eq(rkTrialsFor(p, R(9n, 10n)), 13, 'thirteen trials reach 9 in 10 at p = 1/6');
+      eq(Rcmp(rkAmplify(p, 13).success, R(9n, 10n)) >= 0, true, 'thirteen clears it');
+      eq(Rcmp(rkAmplify(p, 12).success, R(9n, 10n)) < 0, true, 'twelve leaves it short');
+      eq(rkTrialsFor(R(0n, 1n), R(1n, 2n)), null,
+         'and an algorithm that never succeeds is never amplified into one that does');
+      eq(rkTrialsFor(R(1n, 1n), R(999n, 1000n)), 1, 'while a certainty needs one trial');
+    }
+    /* The measurement, and the failures it is required to show. */
+    {
+      const G = graphOf('1-2, 1-3, 2-3, 4-5, 4-6, 5-6, 1-4, 2-5');
+      const exact = rkKargerTotal(G);
+      const sample = rkKargerSeeds(G, 120, exact.size);
+      eq(sample.hits + sample.missed.length, 120, 'every seed either found a minimum cut or did not');
+      eq(Requ(sample.rate, exact.any), false,
+         'the measured rate over 120 seeds is not the exact probability, and is not meant to be');
+      eq(sample.missed.length > 0, true,
+         'and some seeds DID miss -- a with-high-probability guarantee whose page never shows a '
+         + 'failure has not been demonstrated');
+      eq(sample.rows.every((r) => r.cutSize >= exact.size), true,
+         'no run ever returned a cut smaller than the minimum, which would be impossible');
+      eq(rkKargerSeeds(G, 24, exact.size).rows[0].seed, 1, 'the seeds start at 1');
+      eq(rkKargerSeeds(G, 24, exact.size).rows[0].cutSize,
+         rkKargerSeeds(G, 240, exact.size).rows[0].cutSize, 'and seed 1 is reproducible');
+      const c4 = graphOf('1-2, 2-3, 3-4, 4-1');
+      eq(rkKargerSeeds(c4, 120, 2).missed.length, 0,
+         'on the four-cycle nothing misses, because the exact probability is 1');
+    }
+    const refuses = (f) => { try { f(); return false; } catch (e) { return /exceeds the exhaustive cap/.test(e.message); } };
+    eq(refuses(() => rkMinCuts(dgFromLesson(9, [[1, 2]], false))), true,
+       'nine vertices of bipartitions is refused');
+  }
+
+  /* --- Miller-Rabin, against the definition ------------------------------- */
+  {
+    /* THE ORACLE: modular exponentiation and the strong-test condition written
+       out here from the definition. `strongTest` builds a squaring chain and
+       reads the verdict off it; this raises a to each power directly. */
+    const powMod = (a, e, n) => {
+      let r = 1n;
+      const base = BigInt(a) % BigInt(n), N = BigInt(n);
+      for (let i = 0n; i < BigInt(e); i += 1n) r = (r * base) % N;
+      return r;
+    };
+    const isWitnessByDefinition = (n, a) => {
+      let d = BigInt(n) - 1n, s = 0;
+      while (d % 2n === 0n) { d /= 2n; s += 1; }
+      if (powMod(a, d, n) === 1n) return false;
+      for (let r = 0; r < s; r += 1) {
+        let e = d;
+        for (let i = 0; i < r; i += 1) e *= 2n;
+        if (powMod(a, e, n) === BigInt(n) - 1n) return false;
+      }
+      return true;
+    };
+    for (const n of [9, 15, 21, 25, 49, 91, 121, 341, 561]) {
+      let mismatches = 0, witnesses = 0;
+      for (let a = 2; a <= n - 2; a += 1) {
+        const shipped = strongTest(n, a);
+        const truth = isWitnessByDefinition(n, a);
+        if (shipped.witness !== truth) mismatches += 1;
+        if (truth) witnesses += 1;
+      }
+      eq(mismatches, 0, 'at n = ' + n + ' the shipped strong test agrees with the definition on '
+         + 'every base');
+      eq(witnessCount(n, 2047).witnesses, witnesses,
+         'and witnessCount counts exactly ' + witnesses + ' of them');
+      eq(witnessCount(n, 2047).witnesses + rkLiars(n).count, witnessCount(n, 2047).total,
+         'witnesses and non-witnesses partition the bases at n = ' + n);
+    }
+    for (const n of [11, 13, 97, 101]) {
+      eq(witnessCount(n, 2047).prime, true, 'a prime has no witness at all: n = ' + n);
+      eq(rkLiars(n).count, witnessCount(n, 2047).total,
+         'so every base is a non-witness, which is not a lie -- there is nothing to lie about');
+    }
+    eq(Rtext(witnessCount(561, 2047).fraction), '275/279',
+       '561 has 550 witnesses out of 558, which is 275/279');
+    eq(Rcmp(witnessCount(561, 2047).fraction, R(3n, 4n)) >= 0, true, 'well clear of three quarters');
+    eq(rkLiars(561).count + ',' + rkLiars(561).smallest, '8,50',
+       'eight bases say nothing about 561 and the smallest of them is 50');
+    eq(strongTest(561, 50).witness + ',' + strongTest(561, 50).reason, 'false,a^d is n-1',
+       'and base 50 is exactly why: its chain reaches n - 1');
+    eq(rkLiars(2047).smallest, 2, '2047 is a strong pseudoprime to base 2, the base everyone tries');
+    eq(strongTest(341, 2).witness, true, 'while 341 is a Fermat pseudoprime to base 2 and the '
+       + 'strong test still catches it');
+    eq(String(strongTest(341, 2).nontrivialRoot), '32',
+       'with 32 as a nontrivial square root of 1 -- a certificate, since gcd(31, 341) = 31');
+    eq(341 % 31, 0, 'and 31 really does divide 341');
+    /* The Fermat comparison, split the way the mathematics splits it. */
+    for (const n of [561, 1105, 1729]) {
+      const f = rkFermatCount(n, 2047);
+      eq(f.coprimeWitnesses, 0, n + ' is a Carmichael number: not one coprime base catches it');
+      eq(f.carmichael, true, 'and the kit says so');
+      eq(f.witnesses > 0, true, 'though the bases SHARING a factor with it are caught, '
+         + f.witnesses + ' of them -- which is why one undivided fraction would mislead');
+      eq(Rcmp(witnessCount(n, 2047).fraction, f.coprimeFraction) > 0, true,
+         'and the strong test beats the Fermat test on the coprime bases by every margin there is');
+    }
+    eq(rkFermatCount(2047, 2047).carmichael, false, '2047 is not a Carmichael number');
+    eq(Rtext(rkErrorAfter(R(8n, 558n), 5)), '1024/1690522737399',
+       'five independent bases on 561 leave an exact error of 1024/1690522737399');
+    eq(Rtext(rkQuarterAfter(5)), '1/1024', 'against the bound (1/4)^5 = 1/1024');
+    eq(Rcmp(rkErrorAfter(R(8n, 558n), 5), rkQuarterAfter(5)) < 0, true,
+       'and the truth is far inside the bound, which is what a bound is for');
+    eq(Rtext(rkQuarterAfter(0)) + ',' + Rtext(rkErrorAfter(R(1n, 3n), 0)), '1,1',
+       'and zero bases leave everything uncertain');
+    const refuses = (f) => { try { f(); return false; } catch (e) { return /exceeds the exhaustive cap/.test(e.message); } };
+    eq(refuses(() => rkLiars(2049)), true, 'past the cap the liar search refuses rather than crawls');
+  }
+
+  /* --- MAX-3-SAT, by linearity against by enumeration --------------------- */
+  {
+    /* THE ORACLE: the mean by LINEARITY OF EXPECTATION. Each clause is
+       satisfied by its own share of the assignments to its OWN variables, and
+       those shares add -- no assignment of the whole formula is ever built.
+       `max3satEnumerate` walks all 2^n of them. Two different computations. */
+    const meanByLinearity = (F) => {
+      let total = R(0n, 1n);
+      for (const cl of F.clauses) {
+        const vars = [...new Set(cl.map((l) => Math.abs(l)))];
+        const size = 1 << vars.length;
+        let models = 0;
+        for (let mask = 0; mask < size; mask += 1) {
+          const val = {};
+          vars.forEach((v, j) => { val[v] = !!(mask & (1 << j)); });
+          if (cl.some((l) => (l > 0) === val[Math.abs(l)])) models += 1;
+        }
+        total = Radd(total, R(BigInt(models), BigInt(size)));
+      }
+      return total;
+    };
+    const CASES = [
+      '1 2 -3; -1 2 3; 1 -2 3; -1 -2 -3',
+      '1 2 3; 1 2 -3; 1 -2 3; 1 -2 -3; -1 2 3; -1 2 -3; -1 -2 3; -1 -2 -3',
+      '1 2 -3; -1 2 3; 1 1 2; -2 -3 -1',
+      '1 2 -3; -1 3 4; 2 -4 5; -2 -3 -5; 1 -4 5; -1 2 -5; 3 4 -1; -3 -4 2',
+      '1 2 3',
+      '1 -1 2',
+    ];
+    for (const text of CASES) {
+      const F = cnfOf(text);
+      const ex = max3satEnumerate(F, 12);
+      eq(Requ(ex.mean, meanByLinearity(F)), true,
+         'the mean over every assignment of "' + text + '" is ' + Rtext(ex.mean)
+         + ', which is what linearity gives clause by clause without building an assignment');
+      const widths = rkClauseWidths(F);
+      let shareSum = R(0n, 1n);
+      widths.forEach((w) => { shareSum = Radd(shareSum, w.share); });
+      eq(Requ(shareSum, ex.mean), true, 'and the kit\'s own per-clause shares add to the same mean');
+      const allThree = widths.every((w) => w.distinct === 3);
+      eq(ex.matchesSevenEighths, allThree && Requ(ex.mean, R(BigInt(7 * F.clauses.length), 8n)),
+         'and 7m/8 holds exactly when every clause has three distinct variables');
+      const hist = rkSatHistogram(F, 12);
+      let massCheck = R(0n, 1n), weighted = 0n, totalCount = 0;
+      hist.rows.forEach((r) => {
+        massCheck = Radd(massCheck, r.probability);
+        weighted += BigInt(r.satisfied) * BigInt(r.count);
+        totalCount += r.count;
+      });
+      eq(Rtext(massCheck), '1', 'the histogram is a distribution');
+      eq(BigInt(totalCount), ex.assignments, 'over every assignment');
+      eq(Requ(R(weighted, ex.assignments), ex.mean), true, 'and its own mean is the mean');
+      eq(ex.best, Math.max(...hist.rows.map((r) => r.satisfied)),
+         'and the optimum is the top of the histogram, found by enumeration');
+    }
+    eq(Rtext(max3satEnumerate(cnfOf('1 2 -3; -1 2 3; 1 -2 3; -1 -2 -3'), 12).mean), '7/2',
+       'four clauses on three distinct-variable literals have a mean of exactly 7/2');
+    eq(max3satEnumerate(cnfOf('1 2 3; 1 2 -3; 1 -2 3; 1 -2 -3; -1 2 3; -1 2 -3; -1 -2 3; -1 -2 -3'), 12).best, 7,
+       'all eight clauses on three variables is unsatisfiable, and every assignment gets exactly 7');
+    eq(Rtext(max3satEnumerate(cnfOf('1 2 3; 1 2 -3; 1 -2 3; 1 -2 -3; -1 2 3; -1 2 -3; -1 -2 3; -1 -2 -3'), 12).mean), '7',
+       'so the mean is 7, which is 7m/8 AND the optimum -- the ratio is 1 and the algorithm '
+       + 'cannot do better');
+    eq(max3satEnumerate(cnfOf('1 2 -3; -1 2 3; 1 1 2; -2 -3 -1'), 12).matchesSevenEighths, false,
+       'a clause repeating a variable breaks the equality with 7m/8');
+    eq(rkClauseWidths(cnfOf('1 1 2'))[0].distinct + ',' + Rtext(rkClauseWidths(cnfOf('1 1 2'))[0].share),
+       '2,3/4', 'because that clause has two distinct variables and a share of 3/4, not 7/8');
+    eq(Rtext(rkClauseWidths(cnfOf('1 -1 2'))[0].share), '1',
+       'and a clause holding a variable and its negation is satisfied by everything');
+    /* the measurement is a measurement */
+    {
+      const F = cnfOf('1 2 -3; -1 2 3; 1 -2 3; -1 -2 -3');
+      const s = rkSatSeeds(F, 120);
+      eq(Rtext(s.mean), '139/40', '120 seeded coin tapes give a sample mean of 139/40');
+      eq(Requ(s.mean, max3satEnumerate(F, 12).mean), false, 'which is not 7/2');
+      eq(s.max <= F.clauses.length && s.min >= 0, true, 'and every sample is a legal clause count');
+      eq(s.rows[0].satisfied, rkSatSeeds(F, 240).rows[0].satisfied, 'seed 1 is reproducible');
+      const hist = rkSatHistogram(F, 12);
+      eq(hist.belowCount + hist.rows.filter((r) => 8 * r.satisfied >= 7 * F.clauses.length)
+           .reduce((a, r) => a + r.count, 0), 8,
+         'the assignments below the mean and those at or above it are all of them');
+    }
+  }
+
+
+  /* --- reservoir sampling, which no mode here draws and nothing else tested */
+  {
+    /* `reservoir` ships on every page of this kit because RANDOM_JS is one
+       block, and until now nothing in this repository executed it. Its claim
+       is exact and small enough to enumerate: after the whole stream, every
+       one of the n items is in the reservoir with probability exactly k/n.
+       The draws are enumerated here -- draw i is uniform on 0..i, so the tape
+       space is (k+1)(k+2)...n -- and the frequencies are counted. */
+    const CASES = [[4, 1], [4, 2], [5, 2], [5, 3], [6, 2], [3, 3]];
+    for (const [n, k] of CASES) {
+      const sizes = [];
+      for (let i = k; i < n; i += 1) sizes.push(i + 1);
+      let tapes = [[]];
+      for (const s of sizes) {
+        const next = [];
+        for (const t of tapes) for (let v = 0; v < s; v += 1) next.push(t.concat([v]));
+        tapes = next;
+      }
+      const seen = new Array(n).fill(0);
+      for (const tape of tapes) {
+        const out = reservoir(n, k, tape);
+        eq(out.sample.length, Math.min(k, n), 'the reservoir holds k items');
+        eq(new Set(out.sample).size, out.sample.length, 'and no item twice');
+        out.sample.forEach((i) => { seen[i] += 1; });
+      }
+      let uniform = true;
+      for (let i = 0; i < n; i += 1) {
+        if (!Requ(R(BigInt(seen[i]), BigInt(tapes.length)), R(BigInt(k), BigInt(n)))) uniform = false;
+      }
+      eq(uniform, true, 'n = ' + n + ', k = ' + k + ': over all ' + tapes.length
+         + ' tapes every item is retained with probability exactly ' + k + '/' + n);
+      eq(Rtext(reservoir(n, k, sizes.map(() => 0)).retention), Rtext(R(BigInt(k), BigInt(n))),
+         'which is the retention the routine reports');
+    }
+  }
+  /* --- the kit's own contract --------------------------------------------- */
+  {
+    eq(randomSrc.indexOf('random_lab: unknown mode') > 0, true,
+       'an unknown mode raises rather than falling back to a default');
+    for (const m of ['shuffle', 'costs', 'karger', 'witness', 'max3sat']) {
+      eq(randomSrc.indexOf('    "' + m + '": _' + m + ',') > 0, true, 'mode ' + m + ' is registered');
+    }
+    eq(randomSrc.indexOf('from .algo_core import') > 0, true,
+       'and the arithmetic is IMPORTED from algo_core rather than rewritten, which is what makes '
+       + 'the agreements above structural');
+    eq((randomSrc.match(/window\.redrawLab = redraw;/g) || []).length, 5,
+       'and each of the five modes installs a redraw the harness can call again');
+    eq(randomSrc.indexOf('rkIsRefusal') > 0, true,
+       'and a catch that is not a cap refusal re-throws: a swallowed ReferenceError would print '
+       + 'as "the instance is too big" and look like a feature');
+    /* The drawing helpers return markup and touch nothing, which is what lets
+       this file assert on them. */
+    const svg = rkBarsSvg([{ label: '0', values: [0.5, 0.25] }, { label: '1', values: [0.5, 0.75] }],
+      [{ label: 'exact', colour: 'var(--cyan)' }, { label: 'measured', colour: 'var(--amber)' }],
+      { rules: [{ value: 0.5, label: 'uniform', colour: 'var(--green)' }],
+        marks: [{ at: 1, label: 'E', colour: 'var(--purple)' }] });
+    eq((svg.match(/<rect /g) || []).length, 6, 'two groups of two bars, plus a swatch per series');
+    eq(svg.indexOf('stroke-dasharray') > 0, true, 'the reference line is dashed');
+    eq(svg.indexOf('uniform') > 0 && svg.indexOf('>E<') > 0, true, 'and both annotations are labelled');
+    eq(rkDrawBars(null, [{ label: 'a', values: [1] }], [{ label: 'x', colour: 'var(--cyan)' }]), 
+       rkBarsSvg([{ label: 'a', values: [1] }], [{ label: 'x', colour: 'var(--cyan)' }]),
+       'and the installer returns the same markup it would have written, with a null element');
+  }
+}
+
+
+
+// ---------------------------------------------------------------- reduction
+console.log('reductions: both instances solved, and the map between the solutions checked');
+{
+  /* WHAT THIS SECTION IS FOR. A reduction that is merely DESCRIBED cannot be
+     tested, so the kit builds each one and this file checks the construction
+     against a second construction written here, and the solution map against
+     a second enumeration written here.
+
+     The claim being tested is stronger than "the yes/no answers agree", which
+     is what `checkTspReduction` and `checkIndependentSetReduction` already
+     assert in the algo_core section above. Here the FULL SOLUTION SETS of
+     both sides are enumerated and the map between them is checked for
+     soundness, surjectivity and injectivity separately -- because two of these
+     five reductions are bijections on solutions and three are not, and a kit
+     that claimed all five were would pass every other check in this
+     repository. */
+  const REDUCTION_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'reduction.py');
+  const reductionSrc = fs.readFileSync(REDUCTION_SOURCE, 'utf8');
+  const rdBlock = (name) => blockFrom(reductionSrc, name, REDUCTION_SOURCE);
+  eval(algoCoreBlock('COUNT_JS'));
+  eval(algoCoreBlock('DIGRAPH_JS'));
+  eval(algoCoreBlock('ORACLE_JS'));
+  eval(algoCoreBlock('REDUCTION_JS'));
+  eval(rdBlock('RDKIT_JS'));
+
+  const cnfOf = (text) => {
+    const p = rdParseCnf(text);
+    if (p.bad) { fails += 1; console.log('  FAIL parsing ' + text + ': ' + p.bad); }
+    return p.formula;
+  };
+  const graphOf = (text) => {
+    const p = rdParseGraph(text, 10);
+    if (p.bad) { fails += 1; console.log('  FAIL parsing ' + text + ': ' + p.bad); }
+    return p.G;
+  };
+  /* Every satisfying assignment, enumerated here from the clause definition
+     rather than through satEval. The ORIGINAL side of three reductions, and
+     the thing everything else is measured against. */
+  const modelsOf = (F) => {
+    const out = [];
+    for (let mask = 0; mask < (1 << F.n); mask += 1) {
+      const a = [];
+      for (let i = 0; i < F.n; i += 1) a.push(!!(mask & (1 << i)));
+      let ok = true;
+      for (const cl of F.clauses) {
+        let hit = false;
+        for (const lit of cl) if ((lit > 0) === a[Math.abs(lit) - 1]) hit = true;
+        if (!hit) { ok = false; break; }
+      }
+      if (ok) out.push(a.map((v) => (v ? '1' : '0')).join(''));
+    }
+    return out;
+  };
+
+  /* --- what a reader types ------------------------------------------------ */
+  {
+    eq(cnfOf('1 2 -3; -1 2').clauses.map((c) => c.join(' ')).join(' | '), '1 2 -3 | -1 2',
+       'literals by space, clauses by semicolon');
+    eq(rdParseCnf('1 2; ').formula.clauses.length, 1, 'a trailing separator is not a clause');
+    eq(rdParseCnf('1 0').bad !== undefined, true, 'there is no variable 0');
+    eq(rdParseCnf('1 2 3 4 5 6').formula.n, 6, 'six variables in one clause is allowed');
+    eq(rdParseCnf('1 2 3 4 5 6 7').bad !== undefined, true, 'a seventh variable is past the cap');
+    eq(rdParseCnf('1 2; 3 4; 5 6; 1 3; 2 4; 5 1; 6 2').bad !== undefined, true,
+       'and seven clauses is past the cap this kit can check both sides of');
+    eq(graphOf('1-2, 2-1, 1-2').arcs.length, 1,
+       'a repeated edge is the SAME edge here -- unlike the randomised kit, where multiplicity '
+       + 'changes the answer');
+    eq(rdParseGraph('1-1').bad !== undefined, true, 'a loop belongs to no cover and is refused');
+    eq(rdSetText([0, 2, 3]), '{1, 3, 4}', 'a vertex set prints 1-based');
+    eq(rdAssignKey([true, false, true]), '101', 'and an assignment has a canonical key');
+    eq(rdFormulaText(cnfOf('1 -2')), '(x1 ∨ ¬x2)', 'a formula prints with real symbols');
+  }
+
+  /* --- the solution-map checker itself ------------------------------------ */
+  {
+    /* It is the one piece every mode shares, so it is tested on maps whose
+       properties are known by construction rather than only through a
+       reduction. A checker that called everything a bijection would make
+       every mode below pass. */
+    const idMap = rdSolutionMap(['a', 'b'], ['a', 'b'], (x) => x);
+    eq([idMap.sound, idMap.surjective, idMap.injective, idMap.bijection].join(','),
+       'true,true,true,true', 'the identity on two solutions is a bijection');
+    const collide = rdSolutionMap(['a'], ['x', 'y'], () => 'a');
+    eq([collide.sound, collide.surjective, collide.injective, collide.bijection].join(','),
+       'true,true,false,false', 'two images and one original is sound and surjective, not injective');
+    eq(collide.collisionKeys.join(','), 'a', 'and the collision is reported by name');
+    const missing = rdSolutionMap(['a', 'b'], ['x'], () => 'a');
+    eq([missing.sound, missing.surjective, missing.injective, missing.bijection].join(','),
+       'true,false,true,false', 'one image for two originals is not surjective');
+    eq(missing.unhit.join(','), 'b', 'and the original nothing maps to is named');
+    const wrong = rdSolutionMap(['a'], ['x'], () => 'z');
+    eq([wrong.sound, wrong.surjective, wrong.injective, wrong.bijection].join(','),
+       'false,false,true,false', 'a map landing outside the solution set is NOT sound');
+    eq(wrong.unsound.length, 1, 'and the offending pair is kept');
+    eq(rdSolutionMap([], [], (x) => x).bijection, true, 'two empty sets are a bijection');
+  }
+
+  /* --- search from decision ----------------------------------------------- */
+  {
+    /* THE ORACLE: restriction written here, and satisfiability by
+       enumeration. `fixVariable` drops satisfied clauses and strips falsified
+       literals; this does the same from the definition, and the two must
+       agree on the SET OF MODELS of the restricted formula rather than only
+       on its shape. */
+    const restrict = (F, v, value) => {
+      const clauses = [];
+      for (const cl of F.clauses) {
+        if (cl.some((l) => Math.abs(l) === v && (l > 0) === value)) continue;
+        clauses.push(cl.filter((l) => Math.abs(l) !== v));
+      }
+      return { n: F.n, clauses: clauses };
+    };
+    const CASES = [
+      ['1 2 -3; -1 2 3; 1 -2 3; -1 -2 -3', true, 4],
+      ['1; 2; -3', true, 1],
+      ['1 2; 1 -2; -1 2; -1 -2', false, 0],
+      ['1 2 -3; -1 3 4; 2 -4 1; -2 -3 -4; 1 -2 4', true, 7],
+      ['1 2; -1 2', true, 2],
+      ['1 -1', true, 2],
+    ];
+    for (const [text, satisfiable, models] of CASES) {
+      const F = cnfOf(text);
+      const trace = rdSelfTrace(F);
+      const truth = modelsOf(F);
+      eq(truth.length, models, '"' + text + '" has ' + models + ' models, by enumeration here');
+      eq(trace.satisfiable, satisfiable, 'and the reduction agrees about satisfiability');
+      eq(trace.decided, satisfiable, 'as does the decision oracle it is built on');
+      eq(trace.calls, satisfiable ? F.n + 1 : 1,
+         satisfiable ? 'and it used exactly n + 1 = ' + (F.n + 1) + ' oracle calls'
+                     : 'and ONE call ended it -- n + 1 = ' + (F.n + 1) + ' is the bound for '
+                       + 'building a witness, not the count on a formula with none');
+      eq(trace.callsWithinBound, true, 'and the count is inside the n + 1 bound either way');
+      eq(trace.bruteWork, Math.pow(2, F.n), 'against ' + Math.pow(2, F.n) + ' assignments to try');
+      if (satisfiable) {
+        eq(trace.verified, true, 'the assignment it built satisfies every clause');
+        eq(truth.indexOf(rdAssignKey(trace.run.result.assignment)) >= 0, true,
+           'and it is one of the models enumerated here, not merely a plausible one');
+        eq(trace.everyStepAgrees, true,
+           'every branch it took is the one an independent restriction allows');
+        /* the restriction agrees with the oracle's, model set by model set */
+        let cur = F;
+        for (let v = 1; v <= F.n; v += 1) {
+          const took = trace.run.result.assignment[v - 1];
+          const mine = restrict(cur, v, took), theirs = fixVariable(cur, v, took);
+          eq(modelsOf(mine).join('|'), modelsOf(theirs).join('|'),
+             'restricting x' + v + ' leaves the same models by either construction');
+          cur = theirs;
+        }
+        eq(cur.clauses.filter((c) => c.length === 0).length, 0,
+           'and nothing was left unsatisfiable at the end');
+      } else {
+        eq(trace.run.result.assignment, null, 'an unsatisfiable formula produces no assignment');
+        eq(trace.steps.length, 0, 'and no variable is ever fixed: the first call ends it');
+      }
+    }
+    /* A free variable: both branches are allowed and the reduction takes true. */
+    {
+      const F = cnfOf('1 2; -1 2');
+      const trace = rdSelfTrace(F);
+      eq(trace.steps[0].ifTrue + ',' + trace.steps[0].ifFalse, 'true,true',
+         'x1 appears in both polarities and is not forced, so the oracle allows either');
+      eq(trace.steps[0].took, true, 'and the reduction takes true, deterministically');
+      eq(trace.steps[1].ifFalse, false, 'while x2 is forced: false leaves an empty clause');
+    }
+  }
+
+  /* --- 3-SAT to independent set ------------------------------------------- */
+  {
+    /* THE ORACLE, in three parts. The graph is rebuilt here from the
+       description -- a triangle per clause, an edge between contradictory
+       literals -- and compared edge for edge; the independent sets of size k
+       are enumerated here; and the reverse construction is checked on every
+       model. */
+    const buildHere = (F) => {
+      const nodes = [];
+      F.clauses.forEach((cl, ci) => cl.forEach((lit) => nodes.push({ clause: ci, lit: lit })));
+      const edges = new Set();
+      for (let i = 0; i < nodes.length; i += 1) {
+        for (let j = i + 1; j < nodes.length; j += 1) {
+          if (nodes[i].clause === nodes[j].clause || nodes[i].lit === -nodes[j].lit) {
+            edges.add(i + '-' + j);
+          }
+        }
+      }
+      return { count: nodes.length, edges: edges, nodes: nodes };
+    };
+    const CASES = [
+      ['1 2 -3; -1 2 3', 6, 8],
+      ['1 2 -3; -1 2 3; 1 -2 3', 9, 15],
+      ['1 2; -1 2; 1 -2; -1 -2', 8, 12],
+      ['1; -1 2; -2 3', 5, 4],
+      ['1 1 2; -1 2 3', 6, 8],
+    ];
+    for (const [text, vertices, edges] of CASES) {
+      const F = cnfOf(text);
+      const R = rdIsSolutions(F);
+      const mine = buildHere(F);
+      eq(R.vertices, vertices, '"' + text + '" becomes ' + vertices + ' vertices');
+      eq(R.vertices, mine.count, 'one per literal OCCURRENCE, which is what the count here gives');
+      eq(R.edges, edges, 'and ' + edges + ' edges');
+      eq(R.edges, mine.edges.size, 'the same edges the description gives when built here');
+      let sameEdges = true;
+      R.made.graph.arcs.forEach((a) => {
+        const key = Math.min(a.u, a.v) + '-' + Math.max(a.u, a.v);
+        if (!mine.edges.has(key)) sameEdges = false;
+      });
+      eq(sameEdges, true, 'edge for edge, not merely in count');
+      eq(R.k, F.clauses.length, 'and k is the number of clauses');
+      /* the independent sets of size k, enumerated here */
+      const adj = [];
+      for (let i = 0; i < R.vertices; i += 1) adj.push(new Array(R.vertices).fill(false));
+      for (const key of mine.edges) {
+        const [i, j] = key.split('-').map(Number);
+        adj[i][j] = true; adj[j][i] = true;
+      }
+      const sets = [];
+      for (let mask = 0; mask < (1 << R.vertices); mask += 1) {
+        const m = [];
+        for (let i = 0; i < R.vertices; i += 1) if (mask & (1 << i)) m.push(i);
+        if (m.length !== R.k) continue;
+        let ok = true;
+        for (let i = 0; ok && i < m.length; i += 1) {
+          for (let j = i + 1; j < m.length; j += 1) if (adj[m[i]][m[j]]) { ok = false; break; }
+        }
+        if (ok) sets.push(m.join(','));
+      }
+      eq(R.sets.length, sets.length, 'there are ' + sets.length
+         + ' independent sets of size k, by an enumeration written here');
+      eq(R.sets.map((s) => s.join(',')).join(' | '), sets.join(' | '),
+         'and they are the same sets, in the same order');
+      /* soundness, on every one of them */
+      eq(R.map.sound, true, 'every one maps back to a satisfying assignment');
+      const truth = modelsOf(F);
+      eq(R.models, truth.length, 'and the formula has ' + truth.length + ' models');
+      R.sets.forEach((members) => {
+        eq(truth.indexOf(rdAssignKey(rdIsBack(R.made, members))) >= 0, true,
+           'the set ' + rdSetText(members) + ' maps to a model enumerated here');
+      });
+      /* THE DEFAULT IS A CLAIM AND IS NOW A CHECKED ONE. A variable that no
+         chosen literal mentions is left FALSE. Setting it TRUE instead gives
+         a different -- and still satisfying -- assignment, so soundness,
+         injectivity and surjectivity all survive the change and none of them
+         notices it. The page prints the assignment and explains the
+         surjectivity failure BY this convention, so the convention is what
+         has to be pinned. */
+      R.sets.forEach(function (members) {
+        const mentioned = new Set(members.map((i) => Math.abs(R.made.nodes[i].lit)));
+        const a = rdIsBack(R.made, members);
+        for (let v = 1; v <= F.n; v += 1) {
+          if (mentioned.has(v)) continue;
+          eq(a[v - 1], false,
+             'x' + v + ' is mentioned by no literal of ' + rdSetText(members)
+             + ', so the map back leaves it false');
+        }
+      });
+      /* the reverse construction, on every model */
+      eq(R.backwardWorks, true, 'and every model builds an independent set of size k');
+      eq(R.back.every((b) => b.independent && b.sized), true, 'checked one by one');
+      /* the YES/NO answer, which is the thing a reduction must preserve */
+      eq((R.maximum >= R.k), truth.length > 0,
+         'and an independent set of size k exists exactly when the formula is satisfiable');
+      eq(checkIndependentSetReduction(F).agree, true,
+         'which is what algo_core\'s own check says too, by a different route');
+    }
+    /* The map is NOT injective, and the page is required to know it. */
+    {
+      const F = cnfOf('1 2 -3; -1 2 3');
+      const R = rdIsSolutions(F);
+      eq(R.map.injective, false,
+         'two independent sets map to one assignment when a clause has two true literals');
+      eq(R.map.collisionKeys.length, 1, 'and there is exactly one such assignment here');
+      const key = R.map.collisionKeys[0], group = R.map.collisions[key];
+      eq(group.length >= 2, true, 'with at least two sets in the collision');
+      eq(rdAssignKey(rdIsBack(R.made, group[0])), rdAssignKey(rdIsBack(R.made, group[1])),
+         'and they really do map to the same assignment');
+      eq(group[0].join(',') === group[1].join(','), false, 'while being different sets');
+      eq(R.map.pairs.map((pr) => pr.to).join(' '), '010 000 110 010 010 101 011',
+         'and the seven sets map, in mask order, to exactly these assignments -- which pins the '
+         + 'FALSE default as well as the map');
+      eq(R.map.unhit.join(','), '111',
+         'the one model nothing maps to is 111, because no independent set of size 2 mentions all '
+         + 'three variables positively');
+      eq(R.map.surjective, false,
+         'and it is not surjective either: the map back leaves an unmentioned variable false');
+      eq(R.map.bijection, false, 'so it is not a bijection, and the kit must not say it is');
+    }
+    /* An unsatisfiable formula: the NO answer crosses intact. */
+    {
+      const F = cnfOf('1 2; -1 2; 1 -2; -1 -2');
+      const R = rdIsSolutions(F);
+      eq(R.sets.length + ',' + R.models, '0,0', 'no independent set of size 4 and no model');
+      eq(R.maximum < R.k, true, 'the largest independent set is smaller than k');
+      eq(R.map.bijection, true, 'and two empty solution sets are vacuously in bijection');
+    }
+    const refuses = (f) => { try { f(); return false; } catch (e) { return /exceeds the exhaustive cap/.test(e.message); } };
+    eq(refuses(() => rdIsSolutions(cnfOf('1 2 3; 1 2 3; 1 2 3; 1 2 3; 1 2 3; 1 2 3'))), true,
+       'six clauses is eighteen vertices and is refused');
+  }
+
+  /* --- independent set, cover and clique ---------------------------------- */
+  {
+    /* THE ORACLE: the three predicates written here from their definitions,
+       evaluated on every subset, and counted. This is the one identity in the
+       kit that is checked on all 2^n subsets rather than at the optimum, so
+       the oracle has to cover all of them too. */
+    const CASES = [
+      ['1-2, 2-3, 3-4, 4-5, 5-1', 5, 2, 3],
+      ['1-2, 2-3, 3-4', 4, 2, 2],
+      ['1-2, 1-3, 1-4, 2-3, 2-4, 3-4', 4, 1, 3],
+      ['1-2, 1-3, 1-4, 1-5', 5, 4, 1],
+      ['1-2, 2-3, 3-1, 4-5, 5-6, 6-4', 6, 2, 4],
+      ['1-2', 2, 1, 1],
+    ];
+    for (const [spec, n, alpha, tau] of CASES) {
+      const G = graphOf(spec);
+      const C = rdComplementCheck(G);
+      const adj = [];
+      for (let i = 0; i < n; i += 1) adj.push(new Array(n).fill(false));
+      G.arcs.forEach((a) => { adj[a.u][a.v] = true; adj[a.v][a.u] = true; });
+      let ind = 0, cov = 0, cli = 0, bestI = 0, bestC = n;
+      for (let mask = 0; mask < (1 << n); mask += 1) {
+        const S = [], notS = [];
+        for (let v = 0; v < n; v += 1) ((mask >> v) & 1 ? S : notS).push(v);
+        let isInd = true;
+        for (let i = 0; isInd && i < S.length; i += 1) {
+          for (let j = i + 1; j < S.length; j += 1) if (adj[S[i]][S[j]]) { isInd = false; break; }
+        }
+        let isCov = true;
+        G.arcs.forEach((a) => { if (S.indexOf(a.u) === -1 && S.indexOf(a.v) === -1) isCov = false; });
+        let isCli = true;
+        for (let i = 0; isCli && i < S.length; i += 1) {
+          for (let j = i + 1; j < S.length; j += 1) if (adj[S[i]][S[j]]) { isCli = false; break; }
+        }
+        /* a clique in the COMPLEMENT is a set with no edge of G inside it,
+           which is the same predicate -- written separately so the identity is
+           not assumed here either */
+        if (isInd) { ind += 1; if (S.length > bestI) bestI = S.length; }
+        if (isCov) { cov += 1; if (S.length < bestC) bestC = S.length; }
+        if (isCli) cli += 1;
+        /* the identity, subset by subset */
+        let compCovers = true;
+        G.arcs.forEach((a) => {
+          if (notS.indexOf(a.u) === -1 && notS.indexOf(a.v) === -1) compCovers = false;
+        });
+        if (isInd !== compCovers) {
+          fails += 1;
+          console.log('  FAIL the identity fails on ' + spec + ' at subset ' + mask);
+        }
+      }
+      eq(C.subsets, 1 << n, spec + ': all ' + (1 << n) + ' subsets were examined');
+      eq(C.independentCount, ind, 'and ' + ind + ' of them are independent, counted here too');
+      eq(C.coverCount, cov, 'and ' + cov + ' are covers');
+      eq(C.cliqueCount, cli, 'and ' + cli + ' are cliques in the complement');
+      eq(C.countsAgree, true, 'so the three families have the same size');
+      eq(ind, cli, 'which the oracle here also finds');
+      eq(C.coverBijection + ',' + C.cliqueBijection, 'true,true',
+         'and both identities hold on every subset, not only at the optimum');
+      eq(C.alpha + ',' + C.tau, alpha + ',' + tau, 'alpha is ' + alpha + ' and tau is ' + tau);
+      eq(C.alpha + ',' + C.tau, bestI + ',' + bestC, 'which the search here agrees with');
+      eq(C.identity, true, 'and alpha + tau = n');
+      eq(C.omega, C.alpha, 'and the largest clique in the complement is the same size');
+      eq(C.cliqueMatches, true, 'found by a third routine that shares no code with the first two');
+      /* the complement really is the complement */
+      const H = complementGraph(G);
+      eq(H.arcs.length, (n * (n - 1)) / 2 - G.arcs.length,
+         'the complement has every pair the graph does not, and no other');
+      eq(complementGraph(H).arcs.length, G.arcs.length, 'and complementing twice returns the graph');
+      /* the map is an involution on subsets */
+      let involution = true;
+      for (let mask = 0; mask < (1 << n); mask += 1) {
+        if ((((1 << n) - 1) ^ (((1 << n) - 1) ^ mask)) !== mask) involution = false;
+      }
+      eq(involution, true, 'and S to V minus S applied twice is the identity, on every subset');
+    }
+    const refuses = (f) => { try { f(); return false; } catch (e) { return /exceeds the exhaustive cap/.test(e.message); } };
+    eq(refuses(() => rdComplementCheck(dgFromLesson(13, [[1, 2]], false))), true,
+       'thirteen vertices is refused rather than run');
+  }
+
+  /* --- 3-SAT to subset sum ------------------------------------------------ */
+  {
+    /* THE ORACLE: the digit table rebuilt here from the description, the
+       subsets that hit the target enumerated here, and the models enumerated
+       here. Three independent computations meeting in one claim. */
+    const tableHere = (F) => {
+      const n = F.n, m = F.clauses.length, cols = n + m, rows = [];
+      const digitsToValue = (d) => {
+        let s = 0n, pow = 1n;
+        for (let k = d.length - 1; k >= 0; k -= 1) { s += BigInt(d[k]) * pow; pow *= 10n; }
+        return s;
+      };
+      for (let i = 1; i <= n; i += 1) {
+        for (const value of [true, false]) {
+          const d = new Array(cols).fill(0);
+          d[i - 1] = 1;
+          F.clauses.forEach((cl, ci) => {
+            if (cl.indexOf(value ? i : -i) !== -1) d[n + ci] = 1;
+          });
+          rows.push({ label: 'x' + i + ' ' + (value ? 'true' : 'false'), digits: d,
+                      value: digitsToValue(d) });
+        }
+      }
+      for (let j = 0; j < m; j += 1) {
+        for (let s = 1; s <= 2; s += 1) {
+          const d = new Array(cols).fill(0);
+          d[n + j] = s;
+          rows.push({ label: 'slack', digits: d, value: digitsToValue(d) });
+        }
+      }
+      const t = new Array(cols).fill(0);
+      for (let i = 0; i < n; i += 1) t[i] = 1;
+      for (let j = 0; j < m; j += 1) t[n + j] = 4;
+      return { rows: rows, target: digitsToValue(t), columns: cols };
+    };
+    const CASES = [
+      ['1 2; -1 2', 8, '1144'],
+      ['1 2 -3; -1 2 3', 10, '11144'],
+      ['1 -2; -1 2; 1 2', 10, '11444'],
+      ['1 2; 1 -2; -1 2; -1 -2', 12, '114444'],
+      ['1 2', 6, '114'],
+    ];
+    for (const [text, rows, target] of CASES) {
+      const F = cnfOf(text);
+      const R = rdSubsetSolutions(F);
+      const mine = tableHere(F);
+      eq(R.rows, rows, '"' + text + '" builds ' + rows + ' numbers');
+      eq(R.rows, mine.rows.length, 'which is two per variable and two per clause, counted here');
+      eq(String(R.target), target, 'and a target of ' + target);
+      eq(R.target, mine.target, 'which the table built here agrees with');
+      eq(R.made.rows.map((r) => String(r.value)).join(','),
+         mine.rows.map((r) => String(r.value)).join(','),
+         'and every number matches, digit position by digit position');
+      /* the no-carry obligation */
+      const sums = new Array(mine.columns).fill(0);
+      mine.rows.forEach((r) => r.digits.forEach((d, i) => { sums[i] += d; }));
+      eq(R.columns.sums.join(','), sums.join(','), 'the column totals match the ones computed here');
+      eq(R.columns.max < 10, true, 'and the largest, ' + R.columns.max
+         + ', is under the base, so no column can carry');
+      eq(Math.max(...sums.slice(0, F.n)), 2, 'a variable column totals exactly 2');
+      eq(F.clauses.length === 0 || Math.max(...sums.slice(F.n)) <= 6, true,
+         'and a clause column at most 6: three literal occurrences plus the slack 1 and 2');
+      /* the subsets that hit the target, enumerated here */
+      const hits = [];
+      for (let mask = 0; mask < (1 << mine.rows.length); mask += 1) {
+        let sum = 0n;
+        for (let i = 0; i < mine.rows.length; i += 1) if (mask & (1 << i)) sum += mine.rows[i].value;
+        if (sum === mine.target) hits.push(mask);
+      }
+      eq(R.hits.length, hits.length, 'there are ' + hits.length
+         + ' subsets reaching the target, by an enumeration written here');
+      /* the bijection with the models */
+      const truth = modelsOf(F);
+      eq(R.models, truth.length, 'and ' + truth.length + ' models');
+      eq(R.hits.length, truth.length, 'the two counts are equal, which a bijection requires');
+      eq(R.map.sound + ',' + R.map.surjective + ',' + R.map.injective, 'true,true,true',
+         'and the map is sound, surjective and injective');
+      eq(R.map.bijection, true, 'so it IS a bijection here, unlike the independent-set reduction');
+      R.hits.forEach((members) => {
+        eq(truth.indexOf(rdAssignKey(rdSubsetBack(R.made, F, members))) >= 0, true,
+           'every subset carries back to a model enumerated here');
+      });
+      /* the second route to the yes/no */
+      eq(R.dp.result.found, hits.length > 0,
+         'and the value-indexed dynamic programme reaches the target exactly when a subset does');
+      eq(R.dpAgrees, true, 'which the kit reports');
+      if (R.dp.result.members) {
+        let sum = 0n;
+        R.dp.result.members.forEach((i) => { sum += R.made.rows[i].value; });
+        eq(sum, R.made.target, 'and the subset the table found really does add to the target');
+      }
+    }
+    /* the numbers are exponential in the formula, which is the other half */
+    {
+      const small = rdSubsetSolutions(cnfOf('1 2'));
+      const big = rdSubsetSolutions(cnfOf('1 2 -3; -1 2 3'));
+      eq(String(small.target).length + ',' + String(big.target).length, '3,5',
+         'the target gains a digit per variable and per clause');
+      eq(big.target > small.target, true, 'so it grows exponentially in the input length');
+      eq(typeof big.target, 'bigint',
+         'which is why it is a BigInt: at ten variables it is past what a double holds exactly');
+    }
+    const refuses = (f) => { try { f(); return false; } catch (e) { return /exceeds the exhaustive cap/.test(e.message); } };
+    eq(refuses(() => rdSubsetSolutions(cnfOf('1 2 3; 1 2 3; 1 2 3; 1 2 3; 1 2 3; 1 2 3'))), true,
+       'six variables and six clauses is eighteen numbers and is refused');
+  }
+
+  /* --- Hamilton circuit to travelling salesman ---------------------------- */
+  {
+    /* THE ORACLE: the tours enumerated here, priced against a distance matrix
+       built here, and separately checked against the graph's own edges. The
+       map is the identity, so the claim is that two lists computed in two
+       ways are the same list. */
+    const CASES = [
+      ['1-2, 2-3, 3-4, 4-1', 4, 3, 1, true],
+      ['1-2, 2-3, 3-1', 3, 1, 1, true],
+      ['1-2, 2-3, 3-4, 4-5, 5-1, 1-3', 5, 12, 1, true],
+      ['1-2, 2-3, 3-4', 4, 3, 0, false],
+      ['1-2, 1-3, 1-4, 2-3, 2-4, 3-4', 4, 3, 3, true],
+      ['1-2, 2-3, 3-1, 3-4, 4-5, 5-3', 5, 12, 0, false],
+    ];
+    for (const [spec, n, considered, circuits, hasCircuit] of CASES) {
+      const G = graphOf(spec);
+      const R = rdTourSolutions(G);
+      const adj = [];
+      for (let i = 0; i < n; i += 1) adj.push(new Array(n).fill(false));
+      G.arcs.forEach((a) => { adj[a.u][a.v] = true; adj[a.v][a.u] = true; });
+      const D = [];
+      for (let i = 0; i < n; i += 1) {
+        D.push([]);
+        for (let j = 0; j < n; j += 1) D[i].push(i === j ? 0 : (adj[i][j] ? 1 : 2));
+      }
+      eq(R.D.map((r) => r.join('')).join('|'), D.map((r) => r.join('')).join('|'),
+         spec + ': the distance matrix is 1 on an edge and 2 off it, as built here');
+      eq(R.budget, n, 'and the budget is n = ' + n);
+      /* every canonical tour, here */
+      const mineWithin = [], mineCircuits = [];
+      const rest = [];
+      for (let v = 1; v < n; v += 1) rest.push(v);
+      (function walk(prefix, left) {
+        if (!left.length) {
+          const tour = [0].concat(prefix);
+          if (tour.length > 2 && tour[1] > tour[tour.length - 1]) return;
+          let len = 0, isCircuit = true;
+          for (let i = 0; i < tour.length; i += 1) {
+            const a = tour[i], b = tour[(i + 1) % tour.length];
+            len += D[a][b];
+            if (!adj[a][b]) isCircuit = false;
+          }
+          const key = tour.map((v) => v + 1).join('-');
+          if (len <= n) mineWithin.push(key);
+          if (isCircuit) mineCircuits.push(key);
+          return;
+        }
+        for (let i = 0; i < left.length; i += 1) {
+          walk(prefix.concat([left[i]]), left.slice(0, i).concat(left.slice(i + 1)));
+        }
+      })([], rest);
+      eq(R.considered, considered, 'there are ' + considered
+         + ' tours to consider, which is (n - 1)!/2');
+      eq(R.tours.join('|'), mineWithin.join('|'),
+         'the tours within budget are the ones the enumeration here finds');
+      eq(R.circuits.join('|'), mineCircuits.join('|'), 'and so are the Hamilton circuits');
+      eq(R.circuits.length, circuits, 'there are ' + circuits + ' of them');
+      eq(R.sameList, true, 'and the two lists are identical -- the map is the identity');
+      eq(R.map.bijection, true, 'which makes it a bijection on solutions');
+      eq(R.hasCircuit, hasCircuit, 'the graph ' + (hasCircuit ? 'has' : 'has no')
+         + ' Hamilton circuit');
+      eq(R.answersAgree, true, 'and the two answers, computed by separate searches, agree');
+      eq(R.shortest <= n, hasCircuit,
+         'the shortest tour meets the budget exactly when a circuit exists');
+      eq(checkTspReduction(G).agree, true,
+         'which is what algo_core\'s own check says, by a different route');
+      /* a tour using one non-edge already costs n + 1 */
+      R.all.forEach((t) => {
+        let nonEdges = 0;
+        t.tour.forEach((v, k) => { if (!adj[v][t.tour[(k + 1) % t.tour.length]]) nonEdges += 1; });
+        eq(t.length, n + nonEdges, 'a tour with ' + nonEdges + ' non-edges costs n + ' + nonEdges);
+        eq(t.within, nonEdges === 0, 'so it is within budget exactly when it has none');
+      });
+    }
+    /* the canonical form: a tour and its reverse are one solution */
+    {
+      const G = graphOf('1-2, 1-3, 1-4, 2-3, 2-4, 3-4');
+      const R = rdTourSolutions(G);
+      const keys = R.all.map((t) => t.key);
+      eq(new Set(keys).size, keys.length, 'no tour is listed twice');
+      eq(R.all.every((t) => t.tour[0] === 0), true, 'every tour starts at city 1');
+      eq(R.all.every((t) => t.tour.length < 3 || t.tour[1] <= t.tour[t.tour.length - 1]), true,
+         'and is oriented so that a cycle and its reverse are one entry, not two');
+      eq(rdTourKey(rdCanonicalTour([0, 3, 2, 1])), '1-2-3-4',
+         'the canonical form of a reversed tour is the forward one');
+    }
+    const refuses = (f) => { try { f(); return false; } catch (e) { return /exceeds the exhaustive cap/.test(e.message); } };
+    eq(refuses(() => rdTourSolutions(dgFromLesson(9, [[1, 2]], false))), true,
+       'nine cities is refused rather than enumerated');
+  }
+
+  /* --- the kit's own contract --------------------------------------------- */
+  {
+    eq(reductionSrc.indexOf('reduction_lab: unknown mode') > 0, true,
+       'an unknown mode raises rather than falling back to a default');
+    for (const m of ['selfreduce', 'independentset', 'complement', 'subsetsum', 'tsp']) {
+      eq(reductionSrc.indexOf('    "' + m + '": _' + m + ',') > 0, true,
+         'mode ' + m + ' is registered');
+    }
+    eq((reductionSrc.match(/window\.redrawLab = redraw;/g) || []).length, 5,
+       'each of the five modes installs a redraw the harness can call again');
+    eq(reductionSrc.indexOf('from .algo_core import COUNT_JS, DIGRAPH_JS, ORACLE_JS, REDUCTION_JS') > 0,
+       true, 'the constructions are IMPORTED from algo_core rather than rewritten');
+    eq(reductionSrc.indexOf('from .algebra_core import') === -1, true,
+       'and no rational arithmetic is imported, because there is not a fraction in this kit');
+    /* the drawings return markup and touch nothing */
+    const chain = rdChainSvg([{ variable: 1, ifTrue: true, ifFalse: false, took: true,
+                                clausesAfter: 2 }], true);
+    eq((chain.match(/<rect /g) || []).length, 3, 'one box per variable and one per branch');
+    eq(chain.indexOf('true ✓') > 0 && chain.indexOf('false ✗') > 0, true,
+       'with the allowed and refused branches marked');
+    eq(rdChainSvg([], false).indexOf('the first oracle call said NO') > 0, true,
+       'and an unsatisfiable formula draws the reason rather than an empty box');
+    const cols = rdColumnSvg([2, 6, 2], 10, ['x1', 'c1', 'x2']);
+    eq((cols.match(/<rect /g) || []).length, 3, 'one bar per column of the digit table');
+    eq(cols.indexOf('var(--red)') > 0, true, 'and the carry line is drawn');
+    eq(rdColumnSvg([12], 10, ['c1']).indexOf('fill="var(--red)"') > 0, true,
+       'a column that would carry is drawn red');
+    eq(rdDrawColumns(null, [2], 10, ['x1']), rdColumnSvg([2], 10, ['x1']),
+       'and the installers return the same markup with a null element');
+    const matrix = rdMatrixSvg([[0, 1, 2], [1, 0, 1], [2, 1, 0]], [0, 1, 2]);
+    eq((matrix.match(/<rect /g) || []).length, 9, 'the distance matrix draws one cell per pair');
+    eq((matrix.match(/var\(--green\)/g) || []).length, 4,
+       'a step of the tour that costs 1 is green, and this tour has two of them, each drawn twice '
+       + 'because the matrix is symmetric');
+    eq((matrix.match(/var\(--red\)/g) || []).length, 2,
+       'and the one step that costs 2 is red, both ways round');
+    eq(rdDrawMatrix(null, [[0, 1], [1, 0]], null), rdMatrixSvg([[0, 1], [1, 0]], null),
+       'and the installer returns the same markup with a null element');
+    eq(rdMatrixSvg([[0, 1], [1, 0]], null).indexOf('var(--green)'), -1,
+       'with no tour nothing is coloured');
+    eq(rdDrawChain(null, [], true), rdChainSvg([], true), 'both of them');
+  }
+}
+
+
+
+// ------------------------------------------------------------------- coping
+console.log('coping with intractability: every ratio beside the optimum it is a ratio to');
+{
+  /* THE RULE THIS SECTION ENFORCES. No assertion below compares an
+     approximation against anything but an OPTIMUM computed here or by an
+     exhaustive search in ORACLE_JS, and every "within the bound" is checked
+     with Rcmp on exact fractions rather than on decimals.
+
+     The three things this file adds to what the kit already does:
+
+       a second optimum        every optimum the kit reports is recomputed
+                               here from the definition -- subsets for the
+                               knapsack and the cover, subfamilies for the set
+                               cover, permutations for the tour -- so a broken
+                               oracle cannot certify a broken approximation.
+       every instance of a     `cpWorstRatio` and `cpWorstTourRatio` are
+       size                    checked against enumerations written here, and
+                               the worst ratio they report is checked to be
+                               ATTAINED by the instance they name.
+       the chain, link by      the stays-ahead argument is four inequalities
+       link                    and each is asserted separately, so a kit that
+                               got the right ratio for the wrong reason fails
+                               here. */
+  const COPING_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'coping.py');
+  const copingSrc = fs.readFileSync(COPING_SOURCE, 'utf8');
+  const cpBlock = (name) => blockFrom(copingSrc, name, COPING_SOURCE);
+  eval(block('RATIONAL_JS'));
+  eval(sysdBlock('HARMONIC_JS'));
+  eval(sysdBlock('RCEIL_JS'));
+  eval(algoCoreBlock('COUNT_JS'));
+  eval(algoCoreBlock('RFIXED_JS'));
+  eval(algoCoreBlock('DIGRAPH_JS'));
+  eval(algoCoreBlock('ORACLE_JS'));
+  eval(algoBlock('ALGO_JS'));
+  eval(algoCoreBlock('GRAPHKIT_JS'));
+  eval(algoCoreBlock('GREEDY_JS'));
+  eval(algoCoreBlock('COPING_JS'));
+  eval(cpBlock('CPKIT_JS'));
+
+  const itemsOf = (text) => {
+    const p = cpParseItems(text);
+    if (p.bad) { fails += 1; console.log('  FAIL parsing ' + text + ': ' + p.bad); }
+    return p.items;
+  };
+  const graphOf = (text) => {
+    const p = cpParseGraph(text, 8);
+    if (p.bad) { fails += 1; console.log('  FAIL parsing ' + text + ': ' + p.bad); }
+    return p.G;
+  };
+  const distOf = (text) => {
+    const p = cpParseDistances(text, 7);
+    if (p.bad) { fails += 1; console.log('  FAIL parsing ' + text + ': ' + p.bad); }
+    return p.D;
+  };
+  const setsOf = (text) => {
+    const p = cpParseSets(text);
+    if (p.bad) { fails += 1; console.log('  FAIL parsing ' + text + ': ' + p.bad); }
+    return p;
+  };
+  /* Optima, from the definitions, here. */
+  const bestKnapsack = (items, W) => {
+    let best = 0;
+    for (let mask = 0; mask < (1 << items.length); mask += 1) {
+      let w = 0, v = 0;
+      for (let i = 0; i < items.length; i += 1) if (mask & (1 << i)) { w += items[i].w; v += items[i].v; }
+      if (w <= W && v > best) best = v;
+    }
+    return best;
+  };
+  const bestCover = (G) => {
+    let best = null;
+    for (let mask = 0; mask < (1 << G.n); mask += 1) {
+      const inSet = new Array(G.n).fill(false);
+      let size = 0;
+      for (let v = 0; v < G.n; v += 1) if (mask & (1 << v)) { inSet[v] = true; size += 1; }
+      let ok = true;
+      G.arcs.forEach((a) => { if (!inSet[a.u] && !inSet[a.v]) ok = false; });
+      if (ok && (best === null || size < best)) best = size;
+    }
+    return best;
+  };
+  const bestTour = (D) => {
+    const n = D.length, rest = [];
+    for (let v = 1; v < n; v += 1) rest.push(v);
+    let best = null;
+    (function walk(prefix, left) {
+      if (!left.length) {
+        const tour = [0].concat(prefix);
+        let len = 0;
+        for (let i = 0; i < n; i += 1) len += D[tour[i]][tour[(i + 1) % n]];
+        if (best === null || len < best) best = len;
+        return;
+      }
+      for (let i = 0; i < left.length; i += 1) {
+        walk(prefix.concat([left[i]]), left.slice(0, i).concat(left.slice(i + 1)));
+      }
+    })([], rest);
+    return best;
+  };
+  const bestSetCover = (sets, universe) => {
+    let best = null;
+    for (let mask = 0; mask < (1 << sets.length); mask += 1) {
+      const hit = new Set();
+      let size = 0;
+      for (let i = 0; i < sets.length; i += 1) {
+        if (!(mask & (1 << i))) continue;
+        size += 1;
+        sets[i].forEach((e) => hit.add(e));
+      }
+      if (universe.every((e) => hit.has(e)) && (best === null || size < best)) best = size;
+    }
+    return best;
+  };
+
+  /* --- what a reader types ------------------------------------------------ */
+  {
+    eq(itemsOf('3:5, 4:6').map((i) => i.w + '/' + i.v).join(' '), '3/5 4/6',
+       'an item is weight:value');
+    eq(cpParseItems('3 5').bad !== undefined, true,
+       'and a space is refused, because "3 5" reads as two items');
+    eq(cpParseItems('0:5').bad !== undefined, true, 'an item of weight 0 is refused');
+    eq(cpParseItems('3:1000').bad !== undefined, true, 'and a value past 999');
+    eq(graphOf('1-2, 2-1').arcs.length, 1, 'a repeated edge is the same edge');
+    eq(cpParseGraph('1-1').bad !== undefined, true, 'and a loop is refused');
+    eq(cpParseDistances('1-2 3, 1-3 4').bad, 'the distance 2-3 is missing',
+       'a missing distance is named, not defaulted -- defaulting it would invent data');
+    eq(distOf('1-2 3, 1-3 4, 2-3 5').map((r) => r.join(',')).join('|'), '0,3,4|3,0,5|4,5,0',
+       'and the matrix is symmetric with a zero diagonal');
+    eq(setsOf('1 2 3; 3 4').universe.join(','), '1,2,3,4',
+       'the universe of a set family is its union, in order');
+    eq(setsOf('3 1 2; 2').sets[0].join(','), '1,2,3', 'and each set is sorted');
+    eq(cpParseSets('1 2; ; 3').sets.length, 2, 'an empty piece is not a set');
+    eq(cpSetText([1, 2]) + ' ' + cpVertexText([0, 1]), '{1, 2} {1, 2}',
+       'elements print as themselves and vertices print 1-based');
+  }
+
+  /* --- branch and bound: the bound must not change the answer ------------- */
+  {
+    const CASES = [
+      ['3:5, 4:6, 5:8, 2:3, 6:9', 10],
+      ['2:3, 3:4, 4:5, 5:6', 7],
+      ['2:4, 3:6, 4:8, 5:10, 6:12, 7:14', 13],
+      ['9:30, 1:2, 1:2, 1:2, 1:2, 1:2, 1:2', 9],
+      ['7:12, 8:14, 9:15, 6:10, 5:8, 4:7, 3:5, 2:3', 20],
+      ['5:5', 4],
+    ];
+    for (const [text, W] of CASES) {
+      const items = itemsOf(text);
+      const withB = branchBound(items, W, true), without = branchBound(items, W, false);
+      const truth = bestKnapsack(items, W);
+      eq(withB.result.optimum, truth, text + ' at capacity ' + W + ': the optimum is ' + truth
+         + ', recomputed here over every subset');
+      eq(withB.result.value, truth, 'and the bounded search finds it');
+      eq(without.result.value, truth, 'and so does the unbounded one -- pruning is not a heuristic');
+      eq(withB.result.correct && without.result.correct, true, 'which the kit reports for itself');
+      eq(withB.result.full, Math.pow(2, items.length), 'the whole tree is 2 to the n');
+      eq((without.counts.nodes || 0) <= 2 * withB.result.full, true,
+         'and the unbounded search opens at most one node per subtree');
+      /* the chosen set is legal and worth what is claimed */
+      const w = withB.result.members.reduce((t, i) => t + items[i].w, 0);
+      const v = withB.result.members.reduce((t, i) => t + items[i].v, 0);
+      eq(w <= W, true, 'the set it chose fits in the sack');
+      eq(v, withB.result.value, 'and is worth exactly what was reported');
+      /* the bound really is an upper bound at every node it was computed at */
+      let sound = true;
+      withB.trace.forEach((st) => {
+        if (st.bound === null) return;
+        if (Rcmp(st.bound, R(BigInt(truth), 1n)) < 0 && st.value === 0 && st.depth === 0) sound = false;
+      });
+      eq(sound, true, 'and the bound at the root is at least the optimum, as an upper bound must be');
+      eq(Rcmp(Radd(R(0n, 1n), fractionalKnapsack(items, W).result.value),
+              R(BigInt(truth), 1n)) >= 0, true,
+         'the fractional relaxation is at or above the integral optimum -- the one fact that '
+         + 'makes cutting safe');
+    }
+    /* the bound buys nodes on one instance and need not on another */
+    {
+      const easy = itemsOf('3:5, 4:6, 5:8, 2:3, 6:9');
+      eq(branchBound(easy, 10, true).counts.nodes < branchBound(easy, 10, false).counts.nodes, true,
+         'on the opening instance the bound cuts the tree');
+      eq(branchBound(easy, 10, true).result.pruned > 0, true, 'and the prune count says so');
+      eq(branchBound(easy, 10, false).result.pruned, 0,
+         'while the unbounded search prunes nothing, by construction');
+      const flat = itemsOf('2:4, 3:6, 4:8, 5:10, 6:12, 7:14');
+      eq(branchBound(flat, 13, true).result.value, bestKnapsack(flat, 13),
+         'and on an instance where every density is equal it is still exactly right');
+    }
+    const refuses = (f) => { try { f(); return false; } catch (e) { return /exceeds the exhaustive cap/.test(e.message); } };
+    eq(refuses(() => branchBound(new Array(13).fill({ w: 1, v: 1 }), 4, true)), true,
+       'thirteen items is refused by the optimum it checks itself against');
+  }
+
+  /* --- vertex cover: the chain, and the worst graph of its size ----------- */
+  {
+    const CASES = [
+      ['1-2, 3-4, 5-6', '2'],
+      ['1-2, 1-3, 1-4, 1-5', '2'],
+      ['1-2, 2-3, 3-4, 4-5, 5-6, 6-1', '2'],
+      ['1-2, 2-3, 3-4, 4-5, 5-1', '4/3'],
+      ['1-2, 2-3, 3-4, 4-5', '2'],
+      ['1-2, 2-3, 3-1, 4-5, 5-6, 6-4', '1'],
+      ['1-2', '2'],
+    ];
+    for (const [spec, ratioText] of CASES) {
+      const G = graphOf(spec);
+      const run = maximalMatching(G), res = run.result;
+      const truth = bestCover(G);
+      eq(res.optimum, truth, spec + ': the optimum cover has ' + truth
+         + ' vertices, recomputed here over every subset');
+      eq(Rtext(res.ratio), ratioText, 'and the realised ratio is ' + ratioText);
+      eq(Requ(res.ratio, R(BigInt(res.size), BigInt(res.optimum))), true,
+         'which is the cover divided by that optimum, and nothing else');
+      /* the four links, separately */
+      eq(res.lowerBound <= res.optimum, true, 'matching <= optimum: the matched edges are disjoint');
+      eq(res.optimum <= res.size, true, 'optimum <= cover: the optimum is the smallest cover');
+      eq(res.size, 2 * res.lowerBound, 'cover = 2 x matching: both ends of every matched edge');
+      eq(res.withinTwo, true, 'so cover <= 2 x optimum, which is the promise');
+      eq(Rcmp(res.ratio, R(2n, 1n)) <= 0, true, 'and the ratio never exceeds 2');
+      /* and the cover is a cover, checked against the edge list */
+      const inSet = new Array(G.n).fill(false);
+      res.cover.forEach((v) => { inSet[v] = true; });
+      let covers = true;
+      G.arcs.forEach((a) => { if (!inSet[a.u] && !inSet[a.v]) covers = false; });
+      eq(covers, true, 'and every edge really has an end in it');
+      eq(new Set(res.cover).size, res.cover.length, 'with no vertex counted twice');
+      /* the matching is a matching */
+      const used = new Set();
+      let disjoint = true;
+      res.matching.forEach((id) => {
+        const a = G.arcs[id];
+        if (used.has(a.u) || used.has(a.v)) disjoint = false;
+        used.add(a.u); used.add(a.v);
+      });
+      eq(disjoint, true, 'and the matching shares no vertex, which is what makes it a lower bound');
+    }
+    /* EVERY GRAPH OF A SIZE, against an enumeration here */
+    for (const n of [3, 4, 5]) {
+      const shipped = cpWorstRatio(n);
+      const pairs = (n * (n - 1)) / 2;
+      let worst = null, worstMask = -1, atWorst = 0, withEdges = 0;
+      for (let mask = 1; mask < (1 << pairs); mask += 1) {
+        const G = dgNew(n, false);
+        let bit = 0;
+        for (let i = 0; i < n; i += 1) {
+          for (let j = i + 1; j < n; j += 1) {
+            if (mask & (1 << bit)) dgAdd(G, i, j, 1, 0);
+            bit += 1;
+          }
+        }
+        const opt = bestCover(G);
+        if (!opt) continue;
+        withEdges += 1;
+        const run = maximalMatching(G);
+        const r = R(BigInt(run.result.size), BigInt(opt));
+        const cmp = worst === null ? 1 : Rcmp(r, worst);
+        if (cmp > 0) { worst = r; worstMask = mask; atWorst = 1; }
+        else if (cmp === 0) atWorst += 1;
+      }
+      eq(shipped.graphs, (1 << pairs) - 1, 'n = ' + n + ': every non-empty graph was examined');
+      eq(shipped.withEdges, withEdges, 'and ' + withEdges + ' of them have an edge to cover');
+      eq(Rtext(shipped.worst), Rtext(worst),
+         'and the worst ratio, ' + Rtext(worst) + ', matches the enumeration written here');
+      eq(shipped.atWorst, atWorst, 'as does the number of graphs attaining it');
+      eq(shipped.mask, worstMask, 'and the first graph that does');
+      /* the named instance really does attain it */
+      const attained = maximalMatching(shipped.graph).result;
+      eq(Rtext(R(BigInt(attained.size), BigInt(attained.optimum))), Rtext(shipped.worst),
+         'the instance the kit names attains the ratio it names');
+      const dense = maximalMatching(shipped.densest).result;
+      eq(Rtext(R(BigInt(dense.size), BigInt(dense.optimum))), Rtext(shipped.worst),
+         'and so does the densest one it names');
+      eq(shipped.densest.arcs.length >= shipped.graph.arcs.length, true,
+         'which has at least as many edges, so a reader is not shown a single edge and told the '
+         + 'bound is tight');
+      eq(Rtext(shipped.worst), '2', 'and at every size the worst ratio is exactly 2');
+    }
+    eq(cpEdgeText(cpGraphFromMask(3, 1)), '1-2', 'the mask-to-graph map is the one the search used');
+    eq(cpEdgeText(cpGraphFromMask(3, 7)), '1-2, 1-3, 2-3', 'and the full mask is the triangle');
+    const refuses = (f) => { try { f(); return false; } catch (e) { return /exceeds the exhaustive cap/.test(e.message); } };
+    eq(refuses(() => cpWorstRatio(7)), true,
+       'seven vertices is 2^21 graphs and is refused rather than attempted');
+  }
+
+  /* --- the metric tour, and the hypothesis doing work --------------------- */
+  {
+    const CASES = [
+      ['1-2 2, 1-3 1, 1-4 3, 2-3 3, 2-4 2, 3-4 2', true, '10/7'],
+      ['1-2 3, 1-3 4, 1-4 5, 2-3 3, 2-4 4, 3-4 3', true, '1'],
+      ['1-2 1, 1-3 1, 1-4 2, 1-5 1, 2-3 2, 2-4 1, 2-5 1, 3-4 1, 3-5 2, 4-5 1', true, '8/5'],
+      ['1-2 50, 1-3 1, 1-4 1, 2-3 1, 2-4 1, 3-4 1', false, '53/4'],
+      ['1-2 1, 1-3 2, 1-4 3, 1-5 4, 2-3 1, 2-4 2, 2-5 3, 3-4 1, 3-5 2, 4-5 1', true, '1'],
+    ];
+    for (const [text, metric, ratioText] of CASES) {
+      const D = distOf(text);
+      const run = mstTour(D), res = run.result;
+      const truth = bestTour(D);
+      eq(res.optimum, truth, '"' + text + '": the optimum tour is ' + truth
+         + ', recomputed here over every cyclic order');
+      eq(Rtext(res.ratio), ratioText, 'and the realised ratio is ' + ratioText);
+      eq(Requ(res.ratio, R(BigInt(res.length), BigInt(res.optimum))), true,
+         'which is the tour divided by that optimum');
+      eq(res.metric, metric, 'the instance ' + (metric ? 'is' : 'is NOT') + ' metric');
+      /* metric, checked here from the definition */
+      let mine = true;
+      for (let i = 0; i < D.length; i += 1) {
+        for (let j = 0; j < D.length; j += 1) {
+          for (let k = 0; k < D.length; k += 1) if (D[i][j] > D[i][k] + D[k][j]) mine = false;
+        }
+      }
+      eq(res.metric, mine, 'which an independent check of every triple agrees with');
+      /* the three links, and which of them needs the hypothesis */
+      eq(res.mstWeight <= res.optimum, true,
+         'tree <= optimum: a tour minus an edge is a spanning tree -- no hypothesis');
+      eq(res.length <= 2 * res.mstWeight, metric || res.length <= 2 * res.mstWeight,
+         'the shortcut step is the one that needs the triangle inequality');
+      eq(res.withinTwo, res.length <= 2 * res.optimum, 'and the kit reports the chain\'s end');
+      if (metric) {
+        eq(res.withinTwo, true, 'on a metric instance the promise holds');
+        eq(Rcmp(res.ratio, R(2n, 1n)) <= 0, true, 'and the ratio is at most 2');
+      } else {
+        eq(res.withinTwo, false, 'on a non-metric instance it fails');
+        eq(Rcmp(res.ratio, R(2n, 1n)) > 0, true,
+           'and the ratio is above 2 -- not a bug in the algorithm, the hypothesis doing work');
+      }
+      /* the tour is a tour */
+      eq(new Set(res.tour).size, D.length, 'the tour visits every city exactly once');
+      let len = 0;
+      res.tour.forEach((v, k) => { len += D[v][res.tour[(k + 1) % res.tour.length]]; });
+      eq(len, res.length, 'and its length is what was reported, re-added here');
+      /* the tree is a spanning tree */
+      eq(res.mst.length, D.length - 1, 'the spanning tree has n - 1 edges');
+    }
+    /* EVERY METRIC INSTANCE OF A SIZE, against an enumeration here */
+    for (const n of [3, 4]) {
+      const shipped = cpWorstTourRatio(n, 3);
+      const pairs = [];
+      for (let i = 0; i < n; i += 1) for (let j = i + 1; j < n; j += 1) pairs.push([i, j]);
+      const D = [];
+      for (let i = 0; i < n; i += 1) { D.push([]); for (let j = 0; j < n; j += 1) D[i].push(0); }
+      let worst = null, count = 0, total = 0;
+      (function go(k) {
+        if (k === pairs.length) {
+          total += 1;
+          for (let a = 0; a < n; a += 1) {
+            for (let b = 0; b < n; b += 1) {
+              for (let c = 0; c < n; c += 1) if (D[a][b] > D[a][c] + D[c][b]) return;
+            }
+          }
+          count += 1;
+          const run = mstTour(D);
+          const r = R(BigInt(run.result.length), BigInt(bestTour(D)));
+          if (worst === null || Rcmp(r, worst) > 0) worst = r;
+          return;
+        }
+        for (let w = 1; w <= 3; w += 1) {
+          D[pairs[k][0]][pairs[k][1]] = w; D[pairs[k][1]][pairs[k][0]] = w;
+          go(k + 1);
+        }
+      })(0);
+      eq(shipped.instances, total, 'n = ' + n + ': all ' + total + ' instances were generated');
+      eq(shipped.metric, count, 'and ' + count + ' of them are metric');
+      eq(Rtext(shipped.worst), Rtext(worst),
+         'and the worst ratio, ' + Rtext(worst) + ', matches the enumeration here');
+      eq(Rcmp(shipped.worst, R(2n, 1n)) < 0, true,
+         'which is strictly under 2: a small exhaustive search bounds the ratio BELOW the '
+         + 'promise, and that is not evidence against the promise');
+      /* the named instance attains it */
+      if (shipped.D) {
+        const run = mstTour(shipped.D);
+        eq(Rtext(R(BigInt(run.result.length), BigInt(bestTour(shipped.D)))), Rtext(shipped.worst),
+           'and the instance the kit names attains it');
+        eq(run.result.metric, true, 'and is itself metric');
+      }
+    }
+    eq(cpDistanceText([[0, 3, 4], [3, 0, 5], [4, 5, 0]]), '1-2 3, 1-3 4, 2-3 5',
+       'and a matrix prints back as the clauses that produced it');
+    const refuses = (f) => { try { f(); return false; } catch (e) { return /exceeds the exhaustive cap/.test(e.message); } };
+    eq(refuses(() => cpWorstTourRatio(5, 3)), true,
+       'five cities is 23352 metric instances and is refused');
+  }
+
+  /* --- greedy set cover: the charges, and the bound they prove ------------ */
+  {
+    const CASES = [
+      ['3 4 5 6; 1 2 3; 4 5 6 7', 7, 3, 2, '3/2'],
+      ['4 5 6 7 8 9; 1 2 3 4 5; 6 7 8 9 10; 1 2 3; 10', 10, 3, 2, '3/2'],
+      ['1 2 3 4; 5 6 7 8', 8, 2, 2, '1'],
+      ['1 2 3; 2 3 4; 3 4 5; 4 5 1; 5 1 2', 5, 2, 2, '1'],
+      ['1 2 3 4 5; 1; 2; 3; 4; 5', 5, 1, 1, '1'],
+      ['1 2 3 4; 5 6 7 8; 1 5; 2 6 8; 3 4 7', 8, 2, 2, '1'],
+    ];
+    for (const [text, n, greedy, opt, ratioText] of CASES) {
+      const parsed = setsOf(text);
+      const run = greedySetCover(parsed.sets, parsed.universe), res = run.result;
+      eq(parsed.universe.length, n, '"' + text + '" has a universe of ' + n);
+      eq(bestSetCover(parsed.sets, parsed.universe), opt,
+         'the optimum cover needs ' + opt + ' sets, recomputed here over every subfamily');
+      eq(res.optimum, opt, 'which the kit agrees with');
+      eq(res.size, greedy, 'and greedy takes ' + greedy);
+      eq(Rtext(R(BigInt(res.size), BigInt(res.optimum))), ratioText,
+         'so the realised ratio is ' + ratioText);
+      /* the charge identity, which is what the bound is proved from */
+      eq(res.chargesSumToSize, true, 'the charges add to the number of sets taken');
+      eq(Rtext(res.chargeTotal), String(res.size), 'exactly: ' + Rtext(res.chargeTotal));
+      let sum = R(0n, 1n);
+      Object.keys(res.charges).forEach((e) => { sum = Radd(sum, res.charges[e]); });
+      eq(Requ(sum, R(BigInt(res.size), 1n)), true, 'and re-adding them here gives the same');
+      eq(Object.keys(res.charges).length, n, 'every element was charged exactly once');
+      /* H exact, and the bound it gives */
+      let H = R(0n, 1n);
+      for (let k = 1; k <= n; k += 1) H = Radd(H, R(1n, BigInt(k)));
+      eq(Requ(res.Hn, H), true, 'H over ' + n + ' elements is ' + Rtext(H)
+         + ', a sum of fractions recomputed here');
+      eq(Requ(res.bound, Rmul(H, R(BigInt(opt), 1n))), true, 'and the bound is H times the optimum');
+      eq(res.withinBound, true, 'which greedy is inside');
+      eq(Rcmp(R(BigInt(res.size), 1n), res.bound) <= 0, true, 'checked with Rcmp on fractions');
+      /* the per-element allowance, and the sum of the allowances */
+      const rows = cpChargeRows(run, parsed.universe, res.optimum);
+      eq(rows.uncovered.length, 0, 'greedy covered every element');
+      eq(rows.rows.length, n, 'and priced every one');
+      eq(rows.everyChargeAllowed, true,
+         'and no element paid more than OPT/(elements left), which is the step the bound is '
+         + 'built from');
+      let allowanceSum = R(0n, 1n);
+      rows.rows.forEach((r) => { allowanceSum = Radd(allowanceSum, r.allowed); });
+      eq(Requ(allowanceSum, res.bound), true,
+         'and the allowances add to exactly H times the optimum, which is where the bound '
+         + 'comes from');
+      /* the cover is a cover */
+      const hit = new Set();
+      res.chosen.forEach((i) => parsed.sets[i].forEach((e) => hit.add(e)));
+      eq(parsed.universe.every((e) => hit.has(e)), true, 'and the chosen sets cover the universe');
+    }
+    /* the trap: greedy really does do worse than the optimum */
+    {
+      const parsed = setsOf('3 4 5 6; 1 2 3; 4 5 6 7');
+      const run = greedySetCover(parsed.sets, parsed.universe);
+      eq(run.result.chosen.join(','), '0,1,2',
+         'greedy takes the biggest set first and then needs both of the others');
+      eq(run.trace[0].fresh.length, 4, 'the first step covers four new elements');
+      eq(Rtext(run.trace[0].charge), '1/4', 'so each of them is charged 1/4');
+      eq(run.trace[1].fresh.length + ',' + Rtext(run.trace[1].charge), '2,1/2',
+         'the second covers two and charges 1/2');
+      eq(run.trace[2].fresh.length + ',' + Rtext(run.trace[2].charge), '1,1',
+         'and the third covers one and charges 1');
+      eq(Rtext(Radd(Radd(Rmul(R(4n, 1n), R(1n, 4n)), Rmul(R(2n, 1n), R(1n, 2n))), R(1n, 1n))), '3',
+         'and 4 x 1/4 + 2 x 1/2 + 1 x 1 is 3, the number of sets');
+    }
+    const refuses = (f) => { try { f(); return false; } catch (e) { return /exceeds the exhaustive cap/.test(e.message); } };
+    const many = [];
+    for (let i = 0; i < 13; i += 1) many.push([i + 1]);
+    eq(refuses(() => setCoverBrute(many, many.map((s) => s[0]))), true,
+       'thirteen sets is refused by the optimum it checks itself against');
+  }
+
+  /* --- the FPTAS: the promise is a fraction and is checked as one --------- */
+  {
+    const CASES = [
+      ['3:520, 4:610, 5:805, 2:311, 6:902, 4:455', 12],
+      ['3:5, 4:6, 5:8, 2:3, 6:9', 10],
+      ['5:900, 1:11, 2:19, 3:27, 4:38, 2:14', 9],
+      ['2:100, 3:100, 4:100, 5:100, 6:100', 11],
+      ['7:300, 8:355, 9:400, 6:260, 5:220, 4:180, 3:130, 2:90', 22],
+    ];
+    for (const [text, W] of CASES) {
+      const items = itemsOf(text);
+      const truth = bestKnapsack(items, W);
+      for (const d of [1, 2, 4, 8, 16, 32]) {
+        const eps = R(1n, BigInt(d));
+        const run = fptasScale(items, W, eps), res = run.result;
+        eq(res.optimum, truth, text + ' at eps 1/' + d + ': the optimum is ' + truth
+           + ', recomputed here and unaffected by eps');
+        /* the value reported is the CHOSEN SET at the ORIGINAL prices */
+        const value = res.chosen.reduce((t, i) => t + items[i].v, 0);
+        const weight = res.chosen.reduce((t, i) => t + items[i].w, 0);
+        eq(res.value, value,
+           'the value reported is the set the scaled table chose, priced at the original values');
+        eq(weight <= W, true, 'and that set fits in the sack');
+        eq(res.loss, truth - value, 'the loss is the optimum minus it');
+        eq(res.loss >= 0, true, 'and is never negative -- an approximation cannot beat the optimum');
+        eq(Requ(res.promised, Rmul(eps, R(BigInt(truth), 1n))), true,
+           'the promise is eps times the optimum, exactly');
+        eq(res.withinPromise, Rcmp(R(BigInt(res.loss), 1n), res.promised) <= 0,
+           'and the verdict is an Rcmp on fractions, not a comparison of two decimals');
+        eq(res.withinPromise, true, 'which holds');
+        /* the scaled values are exact floors */
+        items.forEach((it, i) => {
+          const want = Rzero(res.K) ? it.v : Number(Rfloor(Rdiv(R(BigInt(it.v), 1n), res.K)));
+          eq(res.scaled[i].v, want, 'item ' + (i + 1) + ' scales to the exact floor of v/K');
+          eq(res.scaled[i].w, it.w, 'and its weight is untouched');
+        });
+      }
+      /* a small enough epsilon finds the optimum outright */
+      const fine = fptasScale(items, W, R(1n, 1000n));
+      eq(fine.result.value, truth, 'at eps = 1/1000 the FPTAS finds the optimum exactly');
+      eq(fine.result.loss, 0, 'losing nothing');
+    }
+    /* the table size, and the case where scaling makes it bigger */
+    {
+      const big = itemsOf('3:520, 4:610, 5:805, 2:311, 6:902, 4:455');
+      const small = itemsOf('3:5, 4:6, 5:8, 2:3, 6:9');
+      eq(cpExactCells(big), big.reduce((t, i) => t + i.v, 0) + 1,
+         'the exact value table has one cell per achievable value');
+      eq(fptasScale(big, 12, R(1n, 10n)).result.cells < cpExactCells(big), true,
+         'and on large values the scaled table is smaller');
+      eq(fptasScale(small, 10, R(1n, 10n)).result.cells > cpExactCells(small), true,
+         'while on small ones it is BIGGER -- an FPTAS is an asymptotic device and the cell '
+         + 'counts say so rather than the prose');
+      const sweep = cpEpsilonSweep(big, 12, [1, 2, 4, 8]);
+      eq(sweep.length, 4, 'the sweep runs one row per epsilon');
+      eq(sweep.every((r) => r.optimum === bestKnapsack(big, 12)), true,
+         'every row reports the same optimum, because the optimum does not depend on epsilon');
+      eq(sweep.every((r) => r.within), true, 'and every row is inside its own promise');
+      /* AND ON AN INSTANCE WHERE THE FPTAS ACTUALLY LOSES SOMETHING. The
+         sweep above runs on values large enough that every epsilon finds the
+         optimum outright, which makes the optimum column and the value column
+         the same number -- so a sweep that reported the APPROXIMATION as the
+         optimum would look identical. This is the instance where they differ. */
+      const lossy = cpEpsilonSweep(small, 10, [1, 2]);
+      eq(lossy[0].optimum, bestKnapsack(small, 10),
+         'the sweep reports the TRUE optimum, ' + bestKnapsack(small, 10)
+         + ', found here over every subset');
+      eq(lossy[0].value < lossy[0].optimum, true,
+         'and at eps = 1 the approximation really does lose something -- ' + lossy[0].value
+         + ' against ' + lossy[0].optimum + ' -- which is what makes the line above a test');
+      eq(lossy[0].loss, lossy[0].optimum - lossy[0].value, 'the loss is the gap between them');
+      eq(Rcmp(lossy[0].ratio, R(1n, 1n)) < 0, true, 'so the ratio is strictly under 1');
+      eq(lossy[0].within, true, 'and it is still inside the promise');
+      eq(lossy[1].optimum, bestKnapsack(small, 10), 'the second row reports the same optimum');
+      let monotone = true;
+      for (let i = 1; i < sweep.length; i += 1) {
+        if (Rcmp(sweep[i].promised, sweep[i - 1].promised) > 0) monotone = false;
+      }
+      eq(monotone, true, 'and the promise tightens as epsilon falls');
+      eq(sweep.every((r) => Rcmp(r.ratio, Rsub(R(1n, 1n), r.eps)) >= 0), true,
+         'and every realised ratio clears 1 - eps');
+    }
+  }
+
+  /* --- parameterised vertex cover ----------------------------------------- */
+  {
+    const CASES = [
+      ['1-2, 2-3, 3-4, 4-5, 5-6, 6-1', 6, 3],
+      ['1-2, 1-3, 1-4, 1-5, 1-6, 1-7, 1-8', 8, 1],
+      ['1-2, 3-4, 5-6, 7-8', 8, 4],
+      ['1-2, 2-3, 3-1, 4-5, 5-6, 6-4', 6, 4],
+      ['1-2, 2-3, 3-4, 4-5, 5-6, 6-7', 7, 3],
+    ];
+    for (const [spec, n, opt] of CASES) {
+      const G = graphOf(spec);
+      eq(bestCover(G), opt, spec + ': the optimum cover has ' + opt
+         + ' vertices, recomputed here');
+      for (let k = 0; k <= n; k += 1) {
+        const run = fptVertexCover(G, k), res = run.result;
+        eq(res.optimum, opt, 'at k = ' + k + ' the kit reports the same optimum');
+        eq(res.exists, opt <= k,
+           'and answers yes exactly when a cover of size at most ' + k + ' exists');
+        eq(res.correct, true, 'which is the decision the parameter asks about');
+        eq((run.counts.nodes || 0) <= res.treeBound, true,
+           'the search opened at most 2^(k+1) = ' + res.treeBound + ' nodes');
+        eq(res.treeBound, Math.pow(2, k + 1), 'which is a bound in k alone, with n nowhere in it');
+        eq(res.work, Math.pow(2, k) * G.n, 'and the work column is 2^k times n');
+        eq(res.bruteWork, Math.pow(2, G.n), 'against 2^n for trying every subset');
+        if (res.cover) {
+          const inSet = new Array(G.n).fill(false);
+          res.cover.forEach((v) => { inSet[v] = true; });
+          let covers = true;
+          G.arcs.forEach((a) => { if (!inSet[a.u] && !inSet[a.v]) covers = false; });
+          eq(covers, true, 'and the witness it returned is a cover, checked against the edge list');
+          eq(res.cover.length <= k, true, 'of size at most k');
+          eq(res.cover.length >= opt, true,
+             'and at least the optimum -- it answers a decision question and its witness need '
+             + 'not be minimum');
+        }
+      }
+      /* the sweep the page draws */
+      const sweep = cpFptSweep(G, Math.min(6, n));
+      eq(sweep.every((r) => r.correct), true, 'every budget in the sweep answers correctly');
+      eq(sweep.every((r) => r.withinTree), true, 'and stays inside its tree bound');
+      eq(sweep.every((r) => r.optimum === opt), true, 'and reports one optimum throughout');
+      let monotone = true;
+      for (let i = 1; i < sweep.length; i += 1) if (sweep[i - 1].exists && !sweep[i].exists) monotone = false;
+      eq(monotone, true, 'and once a cover of size k exists, one of size k + 1 does too');
+    }
+    /* the crossover: parameterising is a claim about small k, not about the problem */
+    {
+      const G = graphOf('1-2, 3-4, 5-6, 7-8');
+      const sweep = cpFptSweep(G, 6);
+      eq(sweep[4].work > sweep[4].bruteWork === false, true,
+         'at k = 4 on eight vertices the bounded search is still the cheaper column');
+      eq(sweep[6].work > sweep[6].bruteWork, true,
+         'and at k = 6 it is not -- the method buys nothing when the parameter is as large as '
+         + 'it can be');
+      eq(bestCover(G), 4, 'which is exactly the case a perfect matching produces');
+    }
+  }
+
+  /* --- the drawings, and the kit's own contract --------------------------- */
+  {
+    const ladder = cpLadderSvg([
+      { label: 'lower bound', value: 2, colour: 'var(--purple)', text: '2' },
+      { label: 'optimum', value: 3, colour: 'var(--green)', anchor: true, text: '3' },
+      { label: 'answer', value: 4, colour: 'var(--cyan)', text: '4' }
+    ]);
+    eq((ladder.match(/<rect /g) || []).length, 3, 'the ladder draws one bar per row');
+    eq((ladder.match(/<text /g) || []).length, 6, 'each with a label and a value');
+    eq((ladder.match(/stroke-dasharray/g) || []).length, 1,
+       'and exactly one dashed line, at the optimum, so every other bar is read against it');
+    eq(cpDrawLadder(null, [{ label: 'a', value: 1, colour: 'var(--cyan)', text: '1' }]),
+       cpLadderSvg([{ label: 'a', value: 1, colour: 'var(--cyan)', text: '1' }]),
+       'and the installer returns the same markup with a null element');
+    const bars = cpBarsSvg([{ label: 'a', value: 3, colour: 'var(--cyan)' }],
+                           { rule: { value: 6, label: 'the ceiling', colour: 'var(--red)' } });
+    eq((bars.match(/<rect /g) || []).length, 1, 'the bar chart draws one bar per row');
+    eq(bars.indexOf('the ceiling') > 0, true, 'and labels its reference line');
+    eq(cpDrawBars(null, [{ label: 'a', value: 1, colour: 'var(--cyan)' }]),
+       cpBarsSvg([{ label: 'a', value: 1, colour: 'var(--cyan)' }]), 'likewise');
+
+    eq(copingSrc.indexOf('coping_lab: unknown mode') > 0, true,
+       'an unknown mode raises rather than falling back to a default');
+    for (const m of ['branchbound', 'vertexcover', 'tsp', 'setcover', 'fptas', 'fpt']) {
+      eq(copingSrc.indexOf('    "' + m + '": _' + m + ',') > 0, true, 'mode ' + m + ' is registered');
+    }
+    eq((copingSrc.match(/window\.redrawLab = redraw;/g) || []).length, 6,
+       'each of the six modes installs a redraw the harness can call again');
+    eq(copingSrc.indexOf('from .algo_core import (COPING_JS') > 0, true,
+       'the algorithms are IMPORTED from algo_core rather than rewritten');
+    eq(copingSrc.indexOf('_TOUR_JS = (RATIONAL_JS') > 0
+       && copingSrc.indexOf('GRAPHKIT_JS') > 0, true,
+       'and the tour mode takes the graph block for primRun rather than writing a second '
+       + 'minimum spanning tree');
+    eq(copingSrc.indexOf('cpIsRefusal') > 0, true,
+       'and a catch that is not a cap refusal re-throws');
+  }
+}
+
+
+
+// ==========================================================================
+// PRESET PROSE, tied to the number it states
+// ==========================================================================
+//
+// WHY THIS SECTION EXISTS. Every lab preset carries a `label` that a reader
+// operates a <select> with, and most carry a `note` that several kits write
+// straight into the status banner. Nothing in this repository had ever checked
+// one of those strings against the lab it describes, and a sweep found roughly
+// thirty false -- including a label that contradicted the widget beside it and
+// a note that contradicted the correct figures printed in the same banner line.
+//
+// The rule here is the one the rest of the file follows: nothing below asserts
+// that a string EXISTS or has a shape. Each assertion runs the kit's own
+// routines on the preset's own data, turns the measurement into the words the
+// corrected string uses, and requires the string to contain THAT. So a change
+// to any of these figures breaks a check rather than a sentence.
+//
+// The numeral table is the one bridge between a measurement and prose, and it
+// is deliberately total: an unmapped number comes back `undefined`, which no
+// string contains, so a figure that moves out of the table fails here too.
+console.log('lab presets: every corrected preset string against the number it states');
+{
+  const WORD = {
+    0: 'zero', 1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven',
+    8: 'eight', 9: 'nine', 10: 'ten', 11: 'eleven', 12: 'twelve', 13: 'thirteen',
+    14: 'fourteen', 15: 'fifteen', 16: 'sixteen', 18: 'eighteen', 20: 'twenty',
+    26: 'twenty-six', 27: 'twenty-seven', 28: 'twenty-eight', 30: 'thirty', 45: 'forty-five',
+    50: 'fifty', 25: 'twenty-five' };
+  const TIMES = { 1: 'once', 2: 'twice', 3: 'three times', 4: 'four times', 5: 'five times' };
+  const ORD = { 1: 'first', 2: 'second', 3: 'third', 4: 'fourth', 5: 'fifth', 50: 'fiftieth' };
+  const word = (n) => WORD[n];
+  const ord = (n) => ORD[n];
+  const times = (n) => TIMES[n];
+  const capWord = (n) => { const w = WORD[n]; return w ? w[0].toUpperCase() + w.slice(1) : w; };
+
+  /* The preset tables read out of the Python they ship in. Entries are found by
+     brace depth rather than by a line pattern, because three of these kits
+     write a preset on one line and the rest spread it over six. */
+  const labsDir = path.join(__dirname, 'mathpath', 'labs');
+  const pySrcCache = {};
+  const pySrc = (mod) => {
+    if (!pySrcCache[mod]) pySrcCache[mod] = fs.readFileSync(path.join(labsDir, mod + '.py'), 'utf8');
+    return pySrcCache[mod];
+  };
+  /* Every {...} at the top level of a `NAME = [` / `NAME = {` table. */
+  const tableEntries = (src, table) => {
+    const at = src.indexOf('\n' + table + ' = ');
+    if (at < 0) { fails += 1; console.log('  FAIL cannot find ' + table); return []; }
+    let i = at + table.length + 4;              /* the [ or { that opens the table */
+    while (i < src.length && src[i] !== '[' && src[i] !== '{') i += 1;
+    let depth = 0, start = -1, out = [];
+    for (; i < src.length; i += 1) {
+      const ch = src[i];
+      if (ch === '[' || ch === '{') {
+        depth += 1;
+        if (depth === 2 && ch === '{') start = i;
+      } else if (ch === ']' || ch === '}') {
+        depth -= 1;
+        if (depth === 1 && start >= 0) {
+          const before = src.slice(Math.max(0, start - 48), start);
+          const named = /"([A-Za-z0-9_-]+)":\s*$/.exec(before);
+          out.push({ text: src.slice(start, i + 1), name: named ? named[1] : null });
+          start = -1;
+        }
+        if (depth === 0) break;
+      }
+    }
+    return out;
+  };
+  /* The value of one field of one entry, with Python's adjacent-string-literal
+     concatenation performed. Bounded to the entry, so a field name that also
+     appears in a neighbour cannot be picked up by mistake. */
+  const presetField = (mod, table, key, field) => {
+    const entries = tableEntries(pySrc(mod), table);
+    const hit = entries.filter((e) =>
+      e.name === key
+      || e.text.indexOf('"id": "' + key + '"') >= 0
+      || e.text.indexOf('"key": "' + key + '"') >= 0).map((e) => e.text);
+    if (hit.length !== 1) {
+      fails += 1;
+      console.log('  FAIL ' + mod + '.' + table + ': ' + hit.length + ' entries named ' + key);
+      return '';
+    }
+    const m = new RegExp('"' + field + '":\\s*((?:"(?:[^"\\\\]|\\\\.)*"\\s*)+)').exec(hit[0]);
+    if (!m) {
+      fails += 1;
+      console.log('  FAIL ' + mod + '.' + table + '/' + key + ' has no ' + field);
+      return '';
+    }
+    let out = '';
+    const lit = /"((?:[^"\\]|\\.)*)"/g;
+    let piece;
+    while ((piece = lit.exec(m[1])) !== null) out += piece[1].replace(/\\"/g, '"');
+    return out;
+  };
+  /* The assertion this section is made of: a string, and a phrase built out of
+     a measurement that the string has to contain. */
+  const says = (text, phrase, label) => {
+    if (String(text).indexOf(String(phrase)) < 0) {
+      fails += 1;
+      console.log('  FAIL ' + label + ': the string does not contain "' + phrase + '"');
+      console.log('         the string is: ' + text);
+    }
+  };
+  /* Some of these routines return a `runOf` envelope and some return the figures
+     directly; this is the only place that difference is allowed to matter. */
+  const un = (x) => (x && x.result !== undefined) ? x.result : x;
+  const denies = (text, phrase, label) => {
+    if (String(text).indexOf(String(phrase)) >= 0) {
+      fails += 1; console.log('  FAIL ' + label + ': the string still contains "' + phrase + '"');
+    }
+  };
+
+  /* ------------------------------------------------------------ greedy.py */
+  {
+    const gy = (n) => blockFrom(pySrc('greedy'), n, 'greedy.py');
+    eval(block('RATIONAL_JS') + algoCoreBlock('COUNT_JS') + algoCoreBlock('RFIXED_JS')
+       + algoCoreBlock('ORACLE_JS') + algoCoreBlock('TREEDRAW_JS') + sysdBlock('REPLAY_JS')
+       + algoCoreBlock('GREEDY_JS') + gy('GKIT_JS'));
+
+    /* intervals/conflictfails: the middle intervals ARE in the optimum, and what
+       loses them is the single finish-time pointer. */
+    {
+      const note = presetField('greedy', '_IV_PRESETS', 'conflictfails', 'note');
+      const items = gyParseIntervals(presetField('greedy', '_IV_PRESETS', 'conflictfails', 'spec'), 11).items;
+      const rep = ruleReport(items);
+      const fc = rep.rows.filter((r) => r.rule === 'fewestConflicts')[0];
+      eq(rep.optimum, 4, 'conflictfails: the optimum really is four intervals');
+      eq(gyNames(rep.best), 'A B C D', 'and it is A B C D, so B and C are in it');
+      eq(gyNames(fc.chosen), 'A D', 'while fewest-conflicts takes only A and D');
+      says(note, gyNames(fc.chosen).replace(' ', ' and '), 'greedy intervals/conflictfails names the pair taken');
+      says(note, 'the optimum is all ' + word(rep.optimum), 'greedy intervals/conflictfails names the optimum');
+      says(note, 'nothing starts after ' + fc.chosen[1].f,
+           'greedy intervals/conflictfails names the finish time that closes the pointer');
+      denies(note, 'leaves the middle unusable', 'greedy intervals/conflictfails');
+    }
+
+    /* huffman/fibonacci: the merged weights are the running totals. */
+    {
+      const note = presetField('greedy', '_HF_PRESETS', 'fibonacci', 'note');
+      const freqs = gyParseFreqs(presetField('greedy', '_HF_PRESETS', 'fibonacci', 'spec')).freqs;
+      const run = huffmanBuild(freqs);
+      const merges = run.trace.map((s) => s.made);
+      const lens = codeLengths(run.result.codes);
+      const deepest = Math.max.apply(null, Object.keys(lens).map((k) => lens[k]));
+      eq(merges.join(','), '2,4,7,12', 'fibonacci: the merges are 2, 4, 7 and 12');
+      /* each running total is at least the next single weight -- the real reason
+         the tree is a path, and the claim the note now makes */
+      const weights = freqs.map((f) => f.weight);
+      for (let i = 0; i + 2 < weights.length; i += 1) {
+        eq(merges[i] >= weights[i + 2], true,
+           'fibonacci: the total after merge ' + (i + 1) + ' is at least the next weight');
+      }
+      says(note, merges[0] + ', then ' + merges.slice(1).join(', '),
+           'greedy huffman/fibonacci names the merged weights');
+      says(note, word(deepest) + ' bits', 'greedy huffman/fibonacci names the deepest codeword');
+      eq(deepest, 4, 'and that depth is four');
+      denies(note, 'each merge is exactly the next weight', 'greedy huffman/fibonacci');
+    }
+
+    /* knapsack/classic: the gap is 20, not the 80 that two thirds of C is worth. */
+    {
+      const note = presetField('greedy', '_KS_PRESETS', 'classic', 'note');
+      const items = gyParseItems(presetField('greedy', '_KS_PRESETS', 'classic', 'spec')).items;
+      const W = parseInt(presetField('greedy', '_KS_PRESETS', 'classic', 'cap'), 10);
+      const frac = fractionalKnapsack(items, W).result;
+      const opt = knapsackBrute(items, W).result.value;
+      const gap = Rsub(frac.value, R(BigInt(opt), 1n));
+      eq(Rtext(frac.value), '240', 'knapsack/classic: the fractional optimum is 240');
+      eq(opt, 220, 'and the 0/1 optimum is 220');
+      eq(Rtext(gap), '20', 'so the gap is 20 and not the 80 two thirds of the last item is worth');
+      says(note, 'is ' + Rtext(frac.value) + ' and the 0/1 optimum ' + opt,
+           'greedy knapsack/classic names both optima');
+      says(note, 'the ' + Rtext(gap) + ' between them', 'greedy knapsack/classic names the gap');
+    }
+
+    /* knapsack/halfway: density greedy gets a FIFTIETH of the optimum. */
+    {
+      const label = presetField('greedy', '_KS_PRESETS', 'halfway', 'label');
+      const note = presetField('greedy', '_KS_PRESETS', 'halfway', 'note');
+      const items = gyParseItems(presetField('greedy', '_KS_PRESETS', 'halfway', 'spec')).items;
+      const W = parseInt(presetField('greedy', '_KS_PRESETS', 'halfway', 'cap'), 10);
+      const g = greedyKnapsack01(items, W, 'density').result.value;
+      const opt = knapsackBrute(items, W).result.value;
+      eq(Rtext(gyRatio(g, opt)), '1/50', 'knapsack/halfway: density greedy gets one fiftieth');
+      eq(opt % g, 0, 'and the optimum is a whole multiple of what it gets');
+      says(label, ord(opt / g) + ' of the optimum', 'greedy knapsack/halfway LABEL names the ratio');
+      denies(label, 'almost exactly half', 'greedy knapsack/halfway LABEL');
+      /* the note's own claim, which was the correct half of the contradiction */
+      says(note, word(opt / g) + ' times better', 'greedy knapsack/halfway NOTE still names the factor');
+    }
+
+    /* stable/rejections: five proposals, one rejection, no displacement, and the
+       unique stable matching gives every receiver its first choice. */
+    {
+      const label = presetField('greedy', '_SM_PRESETS', 'rejections', 'label');
+      const note = presetField('greedy', '_SM_PRESETS', 'rejections', 'note');
+      const A = gyParsePrefs(presetField('greedy', '_SM_PRESETS', 'rejections', 'a')).rows;
+      const B = gyParsePrefs(presetField('greedy', '_SM_PRESETS', 'rejections', 'b')).rows;
+      const run = galeShapley(A, B);
+      const refusals = run.trace.filter((t) => t.outcome === 'rejected').length;
+      const displaced = run.trace.filter((t) => /, \d+ rejected$/.test(t.outcome)).length;
+      eq(run.result.proposals, 5, 'stable/rejections: five proposals');
+      eq(refusals, 1, 'exactly one of them refused');
+      eq(displaced, 0, 'and nobody displaced at any step');
+      eq(Rtext(run.result.meanReceiverRank), '1', 'every receiver ends on its first choice');
+      eq(blockingPairs(run.result.matchA, A, B).stable, true, 'and the matching is stable');
+      says(label, word(refusals) + ' rejection', 'greedy stable/rejections LABEL names the refusals');
+      says(label, ord(run.result.proposals) + ' proposal',
+           'greedy stable/rejections LABEL names the proposal it costs');
+      says(note, word(run.result.proposals) + ' proposals for ' + word(A.length) + ' people',
+           'greedy stable/rejections NOTE names the proposal count');
+      says(note, 'nobody is ever displaced', 'greedy stable/rejections NOTE names the displacements');
+      says(note, 'first choice', 'greedy stable/rejections NOTE names the receivers\' outcome');
+      denies(label, 'long chain of rejections', 'greedy stable/rejections LABEL');
+    }
+
+    /* caching/hot: FIFO evicts the hot page and gets three; LRU and
+       farthest-in-future keep it and get five. */
+    {
+      const note = presetField('greedy', '_CA_PRESETS', 'hot', 'note');
+      const trace = gyParseTrace(presetField('greedy', '_CA_PRESETS', 'hot', 'spec')).trace;
+      const k = parseInt(presetField('greedy', '_CA_PRESETS', 'hot', 'slots'), 10);
+      const fifo = replayPolicy(trace, k, 'fifo').hits;
+      const lru = replayPolicy(trace, k, 'lru').hits;
+      const opt = replayPolicy(trace, k, 'opt').hits;
+      eq(lru + ',' + opt + ',' + fifo, '5,5,3', 'caching/hot: LRU 5, farthest-in-future 5, FIFO 3');
+      eq(lru === opt && fifo < lru, true, 'so the two that hold the page agree and FIFO does not');
+      says(note, 'get ' + word(lru) + ' hits', 'greedy caching/hot names the hits the two agree on');
+      says(note, 'gets ' + word(fifo), 'greedy caching/hot names FIFO\'s hits');
+      denies(note, 'every policy keeps the hot page', 'greedy caching/hot');
+    }
+  }
+
+  /* ------------------------------------------------------------- dpkit.py */
+  {
+    const dk = (n) => blockFrom(pySrc('dpkit'), n, 'dpkit.py');
+    eval(block('RATIONAL_JS') + algoCoreBlock('COUNT_JS') + algoCoreBlock('RFIXED_JS')
+       + countingBlock('BIGINT_JS') + algoCoreBlock('ORACLE_JS') + algoCoreBlock('TREEDRAW_JS')
+       + algoCoreBlock('SERIES_JS') + algoCoreBlock('DP_JS') + dk('DPKIT_JS'));
+    const P = (t, k, f) => presetField('dpkit', t, k, f);
+
+    /* memo/canonical: 22089 naive calls become 50 over 18 subproblems. The note
+       that used to sit in the same banner line said "into nineteen"; it is gone,
+       and mmNaive, mmMemo and mmSaved are pinned on the page instead. */
+    {
+      const coins = dpParseNums(P('_MM_PRESETS', 'canonical', 'coins')).values;
+      const amount = parseInt(P('_MM_PRESETS', 'canonical', 'amount'), 10);
+      const naive = naiveMinCoins(coins, amount).counts.calls;
+      const memo = memoMinCoins(coins, amount);
+      eq(memo.counts.calls, 50, 'memo/canonical: fifty memoised calls');
+      eq(memo.result.distinct, 18, 'over eighteen distinct subproblems');
+      eq(naive > 10000 && naive < 100000, true, 'against tens of thousands unmemoised: ' + naive);
+    }
+
+    /* memo/sparse: nine amounts are unreachable and 17 is the largest, which is
+       the Frobenius count (4-1)(7-1)/2 and 4*7 - 4 - 7. No tile counts them, so
+       the label no longer claims them and the preset carries the count in a
+       comment; this is what keeps that comment honest. */
+    {
+      const coins = dpParseNums(P('_MM_PRESETS', 'sparse', 'coins')).values;
+      const amount = parseInt(P('_MM_PRESETS', 'sparse', 'amount'), 10);
+      const row = minCoinTable(coins, amount).result.table[coins.length];
+      const bad = [];
+      for (let j = 0; j <= amount; j += 1) if (dpUnreachable(row[j])) bad.push(j);
+      eq(bad.length, (coins[0] - 1) * (coins[1] - 1) / 2,
+         'memo/sparse: the unreachable count is the Frobenius count, ' + bad.length);
+      eq(bad[bad.length - 1], coins[0] * coins[1] - coins[0] - coins[1],
+         'and the largest of them is 4*7 - 4 - 7');
+      eq(bad.length * 2 <= amount + 1, true, 'so it is not MOST of the amounts shown');
+    }
+
+    /* knapsack/ties: the CELLS tie; the optimum at capacity 4 is unique. */
+    {
+      const items = dpParseItems(P('_KN_PRESETS', 'ties', 'spec')).items;
+      const W = parseInt(P('_KN_PRESETS', 'ties', 'cap'), 10);
+      const opt = knapsackBrute(items, W).result.value;
+      const tab = knapTable(items, W).result.table;
+      let optimal = 0;
+      for (let m = 0; m < (1 << items.length); m += 1) {
+        let w = 0, v = 0;
+        for (let i = 0; i < items.length; i += 1) if (m & (1 << i)) { w += items[i].w; v += items[i].v; }
+        if (w <= W && v === opt) optimal += 1;
+      }
+      const tied = [];
+      for (let i = 1; i <= items.length; i += 1) {
+        for (let j = 0; j <= W; j += 1) {
+          if (items[i - 1].w > j) continue;
+          if (tab[i - 1][j - items[i - 1].w] + items[i - 1].v === tab[i - 1][j]) tied.push(j);
+        }
+      }
+      eq(optimal, 1, 'knapsack/ties: exactly ONE subset reaches the optimum at this capacity');
+      eq(opt, 6, 'and the optimum is 6');
+      eq(tied.sort().join(','), '2,3', 'while the cells that tie are at capacity 2 and 3');
+    }
+
+    /* edit/sunday: two insertions, one substitution, and the n becomes an r. */
+    {
+      const a = P('_ED_PRESETS', 'sunday', 'a'), b = P('_ED_PRESETS', 'sunday', 'b');
+      const script = editScript(editTable(a, b), a, b).script || editScript(editTable(a, b), a, b);
+      const ops = (script.script || script);
+      const kept = ops.filter((o) => o.op === 'keep').map((o) => o.ch).join('');
+      const subs = ops.filter((o) => o.op === 'substitute');
+      const ins = ops.filter((o) => o.op === 'insert');
+      eq(editCost(ops), 3, 'edit/sunday: the distance is three');
+      eq(ins.length + ' insertions, ' + subs.length + ' substitution', '2 insertions, 1 substitution',
+         'made of two insertions and one substitution');
+      eq(kept, 'suday', 'the kept letters are s, u, d, a and y');
+      eq(subs.map((o) => o.from + '->' + o.to).join(','), 'n->r', 'and the n is substituted, to an r');
+    }
+
+    /* chain/clrs: the worst bracketing costs 58000 against 15125 -- 3.83 times.
+       chValue, chBrute and chCount are pinned on the page; chWorst is measured
+       here. */
+    {
+      const dims = dpParseNums(P('_CH_PRESETS', 'clrs', 'dims')).values;
+      const ev = everyParenthesisation(dims);
+      eq(ev.cost, 15125, 'chain/clrs: the best bracketing costs 15125');
+      eq(ev.worstCost, 58000, 'and the worst 58000');
+      eq(ev.count, 42, 'over 42 bracketings');
+      eq(ev.worstCost < 4 * ev.cost && ev.worstCost > 3 * ev.cost, true,
+         'so the factor is between three and four, not ten');
+    }
+
+    /* chain/thin: four dimensions are THREE matrices. */
+    {
+      const dims = dpParseNums(P('_CH_PRESETS', 'thin', 'dims')).values;
+      const ev = everyParenthesisation(dims);
+      eq(dims.length - 1, 3, 'chain/thin: four dimensions are three matrices');
+      eq(ev.cost + ' / ' + ev.worstCost, '7500 / 75000', 'and 7500 against 75000');
+      eq(ev.worstCost, 10 * ev.cost, 'which is exactly ten times');
+    }
+
+    /* lis/classic: the tails array and the reconstruction differ, and seven
+       subsequences reach the length. */
+    {
+      const a = dpParseNums(P('_LS_PRESETS', 'classic', 'spec')).values;
+      const tab = lisTable(a).result, tails = lisTails(a);
+      const t = (tails.result !== undefined ? tails.result : tails);
+      let howMany = 0;
+      const walk = (start, cur) => {
+        if (cur.length === tab.length) { howMany += 1; return; }
+        for (let i = start; i < a.length; i += 1) {
+          if (cur.length === 0 || a[i] > cur[cur.length - 1]) walk(i + 1, cur.concat([a[i]]));
+        }
+      };
+      walk(0, []);
+      eq(t.tails.join(' '), '2 3 4 8', 'lis/classic: the tails array ends as 2 3 4 8');
+      eq(tab.subsequence.join(' '), '2 5 7 101', 'while the table reconstructs 2 5 7 101');
+      eq(howMany, 7, 'and seven subsequences reach length four');
+      eq(isSubsequenceOf(t.tails, a) && isIncreasingRun(t.tails), true,
+         'the tails array happening to be one of them on THIS input');
+    }
+
+    /* count/sparse: six amounts are unrepresentable and 11 is the largest --
+       the figures the preset's comment states, and no tile prints. */
+    {
+      const coins = dpParseNums(P('_CO_PRESETS', 'sparse', 'coins')).values;
+      const amount = parseInt(P('_CO_PRESETS', 'sparse', 'amount'), 10);
+      const tab = countWays(coins, amount, 'combinations').result.table;
+      const none = [];
+      for (let j = 0; j <= amount; j += 1) if (tab[j] === 0n) none.push(j);
+      eq(none.length, (coins[0] - 1) * (coins[1] - 1) / 2,
+         'count/sparse: six amounts have no representation');
+      eq(none[none.length - 1], coins[0] * coins[1] - coins[0] - coins[1],
+         'and 11 is the largest of them');
+      eq(none.length * 2 <= amount + 1, true, 'so it is not MOST of the amounts shown');
+    }
+
+    /* tree/binary: the DP TAKES the root -- 26 from the root and all four leaves. */
+    {
+      const parsed = dpParseTree(P('_TR_PRESETS', 'binary', 'spec'));
+      const w = dpParseNums(P('_TR_PRESETS', 'binary', 'weights')).values;
+      const dp = treeDp(parsed.tree, w).result;
+      const brute = misBrute(parsed.tree, w).result;
+      eq(dp.value, 26, 'tree/binary: the DP value is 26');
+      eq(dp.value, brute.value, 'which an exhaustive search over the subsets agrees with');
+      eq(dp.chosen.indexOf(0) >= 0, true, 'and the root IS in the set it chooses');
+      eq(dp.chosen.length, 5, 'along with all four leaves -- five vertices');
+    }
+  }
+
+  /* ------------------------------------------------------------- dpseq.py */
+  {
+    const dq = (n) => blockFrom(pySrc('dpseq'), n, 'dpseq.py');
+    const orSrc = pySrc('or_core'), sysSrc = pySrc('algebra_systems');
+    eval(block('RATIONAL_JS') + blockFrom(sysSrc, 'FORMAT_JS', 'algebra_systems.py')
+       + blockFrom(sysSrc, 'MATRIX_JS', 'algebra_systems.py') + sysdBlock('HARMONIC_JS')
+       + blockFrom(orSrc, 'ORFMT_JS', 'or_core.py') + blockFrom(orSrc, 'DPSEQ_JS', 'or_core.py')
+       + dq('DPKIT_JS') + dq('DPPLOT_JS') + dq('DPPOL_JS') + dq('DPTREE_JS') + dq('DPSTOP_JS'));
+    const P = (t, k, f) => presetField('dpseq', t, k, f);
+    const nums = (s) => s.trim().split(/\s+/).map(Rparse);
+    const mat = (s) => s.split(';').map((r) => nums(r));
+
+    /* allocation/diminishing: Q's second unit is worth the SAME as its first, and
+       two splits tie at 19 -- which is why the preset pins the split the recursion
+       returns and says the tie count is not a tile. */
+    {
+      const parsed = parseReturns(P('_AL_PRESETS', 'diminishing', 'returns'));
+      const units = parseInt(P('_AL_PRESETS', 'diminishing', 'units'), 10);
+      const every = everyAllocation(parsed.acts, units);
+      let strictlyLess = true, neverMore = true;
+      parsed.acts.forEach((a) => {
+        const v = a.ret;
+        for (let i = 2; i < v.length; i += 1) {
+          const prev = Rsub(v[i - 1], v[i - 2]), here = Rsub(v[i], v[i - 1]);
+          if (Rcmp(here, prev) >= 0) strictlyLess = false;
+          if (Rcmp(here, prev) > 0) neverMore = false;
+        }
+      });
+      eq(strictlyLess, false, 'allocation/diminishing: some extra unit is worth the SAME as the last');
+      eq(neverMore, true, 'while none is ever worth MORE');
+      eq(Rtext(every.best), '19', 'the best split is 19');
+      eq(every.at.length, 2, 'and two different splits reach it');
+    }
+
+    /* lotsize/classic: period 1 is ordered alone; only 2 and 3 share an order. */
+    {
+      const d = nums(P('_LS_PRESETS', 'classic', 'demand'));
+      const ww = wagnerWhitin(d, Rparse(P('_LS_PRESETS', 'classic', 'K')),
+                              Rparse(P('_LS_PRESETS', 'classic', 'h')));
+      const grouped = ww.plan.filter((p) => p.covers[1] > p.covers[0]);
+      eq(ww.orders, 5, 'lotsize/classic: five orders');
+      eq(grouped.length, 1, 'exactly one of which covers more than its own period');
+      eq(grouped[0].covers.join(' and '), '2 and 3', 'and it is the order at 2, covering 2 and 3');
+      eq(ww.plan[0].covers.join(','), '1,1', 'period 1 standing alone');
+    }
+
+    /* stochastic/twoact: acting pays LESS in rough, and the policy is stationary. */
+    {
+      const states = P('_SD_PRESETS', 'twoact', 'states').split(/\s+/);
+      const acts = P('_SD_PRESETS', 'twoact', 'acts').split(/\s+/);
+      const Pm = [mat(P('_SD_PRESETS', 'twoact', 'p0')), mat(P('_SD_PRESETS', 'twoact', 'p1'))];
+      const r = mat(P('_SD_PRESETS', 'twoact', 'r'));
+      const T = parseInt(P('_SD_PRESETS', 'twoact', 'T'), 10);
+      const run = stochasticDp(states, acts, Pm, r, T);
+      const rough = states.indexOf('rough'), calm = states.indexOf('calm');
+      const hold = acts.indexOf('hold'), act = acts.indexOf('act');
+      eq(Rcmp(r[act][rough], r[hold][rough]) < 0, true,
+         'twoact: acting pays LESS in rough -- ' + Rtext(r[act][rough])
+         + ' against holding\'s ' + Rtext(r[hold][rough]));
+      eq(Rcmp(r[act][calm], r[hold][calm]) > 0, true, 'and MORE in calm');
+      eq(Rcmp(Pm[act][calm][calm], Pm[hold][calm][calm]) > 0, true, 'acting from calm keeping you there');
+      const rows = [];
+      for (let t = 0; t < T; t += 1) rows.push(run.policy[t].join(','));
+      eq(new Set(rows).size, 1, 'and the optimal policy is the same in all ' + T + ' periods');
+      eq(run.policy[0][calm] + ',' + run.policy[0][rough], act + ',' + hold,
+         'namely: act in calm, hold in rough');
+    }
+
+    /* discount/two: the iteration slider opens at twelve, not twenty. */
+    {
+      const src = pySrc('dpseq');
+      const m = /_range\("dcT", "Iterations", 1, 24, (\d+)\)/.exec(src);
+      eq(m !== null, true, 'discount: the iteration control is still a range');
+      const opens = parseInt(m[1], 10);
+      const Pm = mat(P('_DC_PRESETS', 'two', 'P'));
+      const r = nums(P('_DC_PRESETS', 'two', 'r'));
+      const g = Rparse(P('_DC_PRESETS', 'two', 'gamma'));
+      const fixed = discountedValue(Pm, r, g, opens).v.map((v) => Rtext(v)).join(' and ');
+      eq(fixed, '22/7 and 38/7', 'discount/two: the fixed point is 22/7 and 38/7');
+      /* how many decimal places the slider's own value reaches, and twenty's */
+      /* the largest number of decimal places the iterate and the fixed point agree
+         to: twice the gap has to stay under one unit in that place. Exact, in
+         rationals, so "to five places" is a claim and not a rounding accident. */
+      const placesAt = (T) => {
+        const run = discountedValue(Pm, r, g, T);
+        let gap = Rsub(run.vT[0], run.v[0]);
+        if (Rcmp(gap, R(0n, 1n)) < 0) gap = Rsub(R(0n, 1n), gap);
+        const twice = Rmul(gap, R(2n, 1n));
+        let p = 0, unit = R(1n, 1n);
+        while (p < 9 && Rcmp(twice, unit) < 0) { p += 1; unit = Rdiv(unit, R(10n, 1n)); }
+        return p - 1;
+      };
+      eq(opens, 12, 'the slider opens on twelve iterations');
+      eq(placesAt(opens), 2, 'which agree with the fixed point to two decimal places');
+      eq(placesAt(20), 5, 'and twenty reach five');
+    }
+
+    /* secretary/hundred: the preset asks for 100 candidates and the control is a
+       range that clamps to 60, which is a control bug and not a prose one. The
+       note that described n = 100 is gone and the preset's expectations pin what
+       the page PRINTS at 60; this assertion keeps the mismatch itself recorded,
+       so the day the cap is raised both it and those expectations fail. */
+    {
+      const src = pySrc('dpseq');
+      const m = /_range\("seN", "Candidates", 3, (\d+), int\(chosen\["n"\]\)\)/.exec(src);
+      eq(m !== null, true, 'secretary: the candidate control is still a range');
+      const cap = parseInt(m[1], 10);
+      const n = parseInt(P('_SE_PRESETS', 'hundred', 'n'), 10);
+      const atN = secretaryExact(n), atCap = secretaryExact(Math.min(n, cap));
+      /* what the page prints, against what the preset's own n would print */
+      eq(n > cap, true, 'and the preset asks for more candidates than the control allows: '
+         + n + ' against ' + cap + ' -- so the page renders at ' + cap
+         + ' (best r ' + atCap.best + ', P ' + Rfixed(atCap.bestP, 6)
+         + ') and the note describes n = ' + n + ' (best r ' + atN.best
+         + ', P ' + Rfixed(atN.bestP, 6) + '). RAISE THE CAP rather than retuning the '
+         + 'strings, and re-read the expectations on that preset when you do.');
+    }
+  }
+
+  /* ------------------------------------------------------------ markov.py */
+  {
+    const mkSrc = pySrc('markov'), sysSrc = pySrc('algebra_systems'), orSrc = pySrc('or_core');
+    eval(block('RATIONAL_JS') + blockFrom(sysSrc, 'FORMAT_JS', 'algebra_systems.py')
+       + blockFrom(sysSrc, 'MATRIX_JS', 'algebra_systems.py')
+       + blockFrom(orSrc, 'ORFMT_JS', 'or_core.py') + blockFrom(orSrc, 'CHAIN_JS', 'or_core.py')
+       + blockFrom(mkSrc, 'MARKOV_JS', 'markov.py'));
+
+    /* absorb/trial: TWO transient states, both with a self-loop. */
+    {
+      const label = presetField('markov', 'ABSORB_PRESETS', 'trial', 'label');
+      const Pm = presetField('markov', 'ABSORB_PRESETS', 'trial', 'P')
+                   .split(';').map((r) => r.trim().split(/\s+/).map(Rparse));
+      const revisitable = [];
+      for (let i = 0; i < Pm.length; i += 1) {
+        const absorbing = Requ(Pm[i][i], R(1n, 1n));
+        if (!absorbing && Rcmp(Pm[i][i], R(0n, 1n)) > 0) revisitable.push(i);
+      }
+      const absorbing = Pm.filter((row, i) => Requ(row[i], R(1n, 1n))).length;
+      eq(revisitable.length, 2, 'absorb/trial: TWO states can be revisited, not one');
+      eq(absorbing, 2, 'beside the two absorbing ones');
+      says(label, word(absorbing) + ' ways out', 'markov absorb/trial LABEL names the exits');
+      says(label, word(revisitable.length) + ' states you can go back to',
+           'markov absorb/trial LABEL names the revisitable states');
+      denies(label, 'one state you can revisit', 'markov absorb/trial LABEL');
+    }
+
+    /* MDP_PRESETS carried an "actions" key that `_mdp` never read: it hard-codes
+       "action 1" and "action 2", and the c9 lesson prose says it does. The key is
+       gone, and this is what keeps it gone. */
+    {
+      const src = pySrc('markov');
+      const table = src.slice(src.indexOf('\nMDP_PRESETS = '), src.indexOf('\nMDP_PRESETS = ') + 900);
+      eq(table.indexOf('"actions"') < 0, true,
+         'markov MDP_PRESETS holds no "actions" key, because `_mdp` reads none');
+      eq(src.indexOf("var acts = ['action 1', 'action 2'];") >= 0, true,
+         'and `_mdp` still names them generically, as the lesson prose promises');
+    }
+  }
+
+  /* ----------------------------------------------------------- strings.py */
+  {
+    eval(algoCoreBlock('COUNT_JS') + algoCoreBlock('STRINGS_JS') + algoCoreBlock('TREEDRAW_JS')
+       + blockFrom(pySrc('strings'), 'SKIT_JS', 'strings.py'));
+    const P = (t, k, f) => presetField('strings', t, k, f);
+    /* the inner loop, position by position, from the definition rather than from
+       failureFn's single total -- which is what made the old claim unfalsifiable */
+    const innerPerPosition = (p) => {
+      const fail = failureFn(p).result.fail, out = [];
+      let k = 0;
+      for (let i = 1; i < p.length; i += 1) {
+        let it = 0, cur = k;
+        while (cur > 0 && p[i] !== p[cur]) { cur = fail[cur] > 0 ? fail[cur] : 0; it += 1; if (cur === 0) break; }
+        out.push(it);
+        k = (p[i] === p[cur]) ? cur + 1 : 0;
+      }
+      return out;
+    };
+
+    /* kmp/aabaaab: three presets total two inner iterations; this is the one that
+       spreads them over two positions. */
+    {
+      const here = innerPerPosition(P('_KM_PRESETS', 'aabaaab', 'pattern'));
+      const spots = here.filter((v) => v > 0).length;
+      eq(failureFn(P('_KM_PRESETS', 'aabaaab', 'pattern')).result.inner, 2,
+         'kmp/aabaaab: two inner iterations in total');
+      eq(spots, 2, 'spread over two positions');
+      eq(Math.max.apply(null, here), 1, 'one at each, so its per-position maximum is one');
+      for (const other of ['ababaca', 'abcabcabd']) {
+        const there = innerPerPosition(P('_KM_PRESETS', other, 'pattern'));
+        eq(failureFn(P('_KM_PRESETS', other, 'pattern')).result.inner, 2,
+           other + ' also totals two, so aabaaab is not the only one');
+        eq(there.filter((v) => v > 0).length, 1, 'but takes both of them at a single position');
+        eq(Math.max.apply(null, there), 2, 'where the chain is followed twice over');
+      }
+    }
+
+    /* kmp/abcdefg: 23 comparisons against naive's 34 -- not "exactly" naive. */
+    {
+      const p = P('_KM_PRESETS', 'abcdefg', 'pattern'), t = P('_KM_PRESETS', 'abcdefg', 'text');
+      const fail = failureFn(p).result.fail;
+      const kmp = kmpRun(t, p).counts.compares, naive = naiveRun(t, p).counts.compares;
+      eq(fail.slice(1).join(''), '0'.repeat(p.length), 'kmp/abcdefg: fail[] is all zeros past the sentinel');
+      eq(fail[0], -1, 'the sentinel itself being -1');
+      eq(kmp + ' against ' + naive, '23 against 34', 'and KMP makes 23 comparisons against naive\'s 34');
+      eq(kmp < naive, true, 'so it does not degenerate into naive matching');
+    }
+
+    /* horspool/periodic: every one of the fourteen shifts is 2. */
+    {
+      const t = P('_HO_PRESETS', 'periodic', 'text'), p = P('_HO_PRESETS', 'periodic', 'pattern');
+      const run = horspoolRun(t, p);
+      const shifts = run.trace.map((x) => x.shift);
+      const distinct = Array.from(new Set(shifts));
+      const possible = t.length - p.length + 1;
+      eq(distinct.length, 1, 'horspool/periodic: every shift is the same');
+      eq(distinct[0], 2, 'and it is 2');
+      eq(shifts.length, 14, 'over fourteen alignments');
+      eq(possible, 28, 'where twenty-eight were possible');
+      eq(shifts.length * 2, possible, 'so exactly half of them are looked at');
+    }
+
+    /* rabin/binary: 6 of the 46 primes swept collide -- the FEWEST of the four --
+       and a modulus of 7 is clean where 11, 13 and 17 are not. */
+    {
+      const t = P('_RA_PRESETS', 'binary', 'text'), p = P('_RA_PRESETS', 'binary', 'pattern');
+      const b = parseInt(P('_RA_PRESETS', 'binary', 'base'), 10);
+      const sweep = skModulusSweep(t, p, b, 2, 200);
+      const bad = sweep.rows.filter((r) => r.spurious > 0).map((r) => r.mod);
+      eq(sweep.collided, 6, 'rabin/binary: six of the primes swept collide');
+      eq(sweep.clean, 7, 'and the first clean modulus is 7');
+      const beaten = bad.filter((m) => m > sweep.clean);
+      eq(beaten.join(', '), '11, 13, 17', 'while 11, 13 and 17 -- all bigger -- do not');
+      /* the FEWEST of the four presets, and the reason this instance exists */
+      for (const other of ['english', 'dna', 'abra']) {
+        const s2 = skModulusSweep(P('_RA_PRESETS', other, 'text'), P('_RA_PRESETS', other, 'pattern'),
+                                  parseInt(P('_RA_PRESETS', other, 'base'), 10), 2, 200);
+        eq(s2.collided > sweep.collided, true,
+           other + ' collides on more primes (' + s2.collided + ') than binary does');
+      }
+    }
+
+    /* trie/nested: Aho-Corasick reports SUFFIXES, so a chain of prefixes reports
+       one word at a time; two at once takes `he` inside `she`. */
+    {
+      const words = P('_TR_PRESETS', 'nested', 'words').split(',').map((s) => s.trim());
+      const trie = trieBuild(words, 26);
+      ahoLinks(trie);
+      const run = ahoRun(P('_TR_PRESETS', 'nested', 'text'), trie);
+      const atPos = {};
+      run.result.hits.forEach((h) => { atPos[h.at] = (atPos[h.at] || 0) + 1; });
+      const most = Math.max.apply(null, Object.keys(atPos).map((k) => atPos[k]));
+      const letters = words.join('').length;
+      eq(most, 1, 'trie/nested: at most ONE report at any position, not four');
+      eq(trie.count, 5, 'the trie being one chain of five nodes');
+      eq(letters, 10, 'for ten letters');
+      /* and the preset where two DO land together, which is where a reader who
+         expects four reports at one position should be looking */
+      const cw = P('_TR_PRESETS', 'classic', 'words').split(',').map((s) => s.trim());
+      const ct = trieBuild(cw, 26); ahoLinks(ct);
+      const cr = ahoRun(P('_TR_PRESETS', 'classic', 'text'), ct);
+      const cAt = {};
+      cr.result.hits.forEach((h) => { cAt[h.at] = (cAt[h.at] || 0) + 1; });
+      eq(Math.max.apply(null, Object.keys(cAt).map((k) => cAt[k])), 2,
+         'while `he` inside `she` really does give two at once');
+    }
+
+    /* automaton/aaab: 3 is the longest all-a prefix; the pattern's own longest
+       border is 0. */
+    {
+      const p = P('_AU_PRESETS', 'aaab', 'pattern');
+      const borders = skBorderBrute(p);
+      const table = dfaTable(p, skAlphabet(p)).table;
+      const run = p.replace(/[^a]/g, '');
+      let at = 0;
+      for (let i = 0; i < 12; i += 1) at = table[at].a;
+      eq(borders[p.length], 0, 'automaton/aaab: the longest border of aaab is 0');
+      eq(at, run.length, 'while a run of a\'s saturates at ' + run.length);
+      eq(run.length, 3, 'which is three -- the longest all-a prefix');
+    }
+  }
+
+  /* ---------------------------------------------------------- geometry.py */
+  {
+    eval(algoBlock('ALGO_JS') + algoCoreBlock('COUNT_JS') + algoCoreBlock('TREEDRAW_JS')
+       + block('RATIONAL_JS') + algoCoreBlock('GEOM_JS')
+       + blockFrom(pySrc('geometry'), 'GEOKIT_JS', 'geometry.py'));
+    const P = (t, k, f) => presetField('geometry', t, k, f);
+    const pts = (spec) => geoParse(spec, 64).points;
+
+    /* hull/general: four collinear triples, every one of them through (3, 3). */
+    {
+      const pp = pts(P('_HU_PRESETS', 'general', 'spec'));
+      const triples = [];
+      for (let i = 0; i < pp.length; i += 1) {
+        for (let j = i + 1; j < pp.length; j += 1) {
+          for (let k = j + 1; k < pp.length; k += 1) {
+            if (orientSign(pp[i], pp[j], pp[k]) === 0) triples.push([pp[i], pp[j], pp[k]]);
+          }
+        }
+      }
+      const hull = un(geoExactHull(pp)).hull;
+      const onHull = {};
+      hull.forEach((q) => { onHull[geoKey(q)] = true; });
+      const shared = pp.filter((q) => triples.every((t) => t.some((x) => geoKey(x) === geoKey(q))));
+      eq(pp.length, 9, 'hull/general: nine points');
+      eq(triples.length, 4, 'and FOUR collinear triples, not none');
+      eq(shared.length, 1, 'all of which share one point');
+      eq(geoPointText(shared[0]), '(3, 3)', 'and it is (3, 3)');
+      eq(onHull[geoKey(shared[0])] === undefined, true, 'which is not on the hull');
+      eq(hull.length, 4, 'the hull being four corners');
+      eq(geoSameSet(hull, un(geoVertexBrute(pp))), true, 'and every route agrees on them');
+      eq(geoSameSet(hull, un(jarvis(pp)).hull), true, 'gift wrapping included');
+    }
+
+    /* segments/apart: the boxes are [0,4] and [6,10] -- a gap of 2, and the
+       widget's own box row says NO. */
+    {
+      const pp = pts(P('_SG_PRESETS', 'apart', 'spec'));
+      const xs = [[Math.min(pp[0][0], pp[1][0]), Math.max(pp[0][0], pp[1][0])],
+                  [Math.min(pp[2][0], pp[3][0]), Math.max(pp[2][0], pp[3][0])]];
+      const gap = xs[1][0] - xs[0][1];
+      eq(boxOverlap(pp[0], pp[1], pp[2], pp[3]), false,
+         'segments/apart: the bounding boxes do NOT overlap, so the box row says no');
+      eq(gap, 2, 'the gap between them being 2');
+      eq(straddle(pp[0], pp[1], pp[2], pp[3]).touching, false, 'and they do not touch either');
+      eq(geoSegOracle(pp[0], pp[1], pp[2], pp[3]).collinear, true, 'while staying collinear');
+    }
+
+    /* sweep/spread: three crossings, three tests where all pairs would be fifteen. */
+    {
+      const segs = geoParseSegments(P('_SW_PRESETS', 'spread', 'spec'), 64).segments;
+      const sw = un(sweepEvents(segs));
+      const brute = un(geoSweepBrute(segs));
+      eq(sw.crossings.length, 3, 'sweep/spread: three crossings');
+      eq(geoPairKeys(sw.crossings), geoPairKeys(brute), 'which a comparison of every pair agrees with');
+      eq(sw.tests, 3, 'found in three tests');
+      eq(sw.allPairs, 15, 'where all pairs would be fifteen');
+    }
+
+    /* closest/scatter: the close pair is inside ONE base case, not across the
+       dividing line -- both its points sit in the same half at every level. */
+    {
+      const pp = pts(P('_CL_PRESETS', 'scatter', 'spec'));
+      const run = un(closestPair(pp));
+      const sorted = lexSort(pp);
+      const mid = Math.floor(sorted.length / 2);
+      const left = sorted.slice(0, mid).map(geoKey);
+      const a = geoKey(run.pair[0]), b = geoKey(run.pair[1]);
+      eq(String(run.d2), '2', 'closest/scatter: the close pair is at squared distance 2');
+      eq(String(run.d2), String(un(geoClosestBrute(pp)).d2), 'which every pair agrees with');
+      eq((left.indexOf(a) >= 0) === (left.indexOf(b) >= 0), true,
+         'and both of its points are on the SAME side of the top-level split');
+      eq(run.stripCompares, 5, 'the strip still doing five comparisons');
+    }
+
+    /* kdtree/scatter: three points in the window, six nodes visited of sixteen. */
+    {
+      const pp = pts(P('_KD_PRESETS', 'scatter', 'spec'));
+      const rect = P('_KD_PRESETS', 'scatter', 'rect').split(',').map((s) => parseInt(s.trim(), 10));
+      const q = un(kdRange(un(kdBuild(pp, 0)), rect));
+      eq(q.found.length, 3, 'kdtree/scatter: three points are in the window');
+      eq(geoSameSet(q.found, un(geoRangeBrute(pp, rect))), true, 'which a scan of every point agrees with');
+      eq(q.visited, 6, 'six nodes visited');
+      eq(pp.length, 16, 'out of sixteen');
+    }
+  }
+
+  /* ------------------------------------------------------------ random.py */
+  {
+    eval(block('RATIONAL_JS') + sysdBlock('STREAM_JS') + algoCoreBlock('COUNT_JS')
+       + algoCoreBlock('RFIXED_JS') + algoCoreBlock('SEEDED_JS') + algoCoreBlock('ORACLE_JS')
+       + algoCoreBlock('RANDOM_JS') + blockFrom(pySrc('random'), 'RKIT_JS', 'random.py')
+       + sysdBlock('HARMONIC_JS'));
+    const P = (t, k, f) => presetField('random', t, k, f);
+
+    /* shuffle/naive3: three permutations get 5 tapes and three get 4. The old
+       text was arithmetically impossible -- 4*5 + 2*4 = 28 against 27 tapes. */
+    {
+      const n = parseInt(P('_SH_PRESETS', 'naive3', 'n'), 10);
+      const f = un(shuffleFrequencies(n, P('_SH_PRESETS', 'naive3', 'kind')));
+      const counts = f.rows.map((r) => r.count);
+      const tally = {};
+      counts.forEach((c) => { tally[c] = (tally[c] || 0) + 1; });
+      const sizes = Object.keys(tally).map(Number).sort((x, y) => y - x);
+      eq(f.tapes, 27, 'shuffle/naive3: 27 tapes');
+      eq(f.rows.length, 6, 'over 6 permutations');
+      eq(sizes.join(','), '5,4', 'with only two distinct tape counts, 5 and 4');
+      eq(tally[5] + ',' + tally[4], '3,3', 'three permutations each');
+      eq(tally[5] * 5 + tally[4] * 4, f.tapes, 'and the split adds back to 27, which the old one did not');
+      eq(f.tapes % f.rows.length !== 0, true, 'because 27 does not divide by 6');
+    }
+
+    /* costs/small5: the support is 6..10, so FIVE comparison counts. */
+    {
+      const n = parseInt(P('_CS_PRESETS', 'small5', 'n'), 10);
+      const pairs = rqsPairs(un(rqsPmf(n)));
+      const support = pairs.map((p) => p[0]).sort((a, b) => a - b);
+      let orders = 1;
+      for (let i = 2; i <= n; i += 1) orders *= i;
+      eq(orders, 120, 'costs/small5: 120 input orders');
+      eq(support.length, 5, 'and FIVE possible comparison counts, not ten');
+      eq(support[0] + ' to ' + support[support.length - 1], '6 to 10', 'running from 6 to 10');
+      eq(Rtext(rqsTotal(pairs)), '1', 'the distribution summing to one');
+    }
+  }
+
+  /* -------------------------------------------------------------- hash.py */
+  {
+    eval(block('RATIONAL_JS') + algoCoreBlock('COUNT_JS') + algoCoreBlock('RFIXED_JS')
+       + sysdBlock('STREAM_JS') + algoCoreBlock('SEEDED_JS') + algoCoreBlock('HASH_JS')
+       + blockFrom(pySrc('hash'), 'HASHKIT_JS', 'hash.py'));
+
+    /* The module docstring's own split, checked against the courses that actually
+       ship these modes -- three in data-structures, four in randomised-algorithms.
+       It read 4 and 3, the other way round. */
+    {
+      const src = pySrc('hash');
+      const doc = src.slice(0, src.indexOf('"""', 3));
+      const contentDir = path.join(__dirname, '..', 'content', 'algorithms');
+      const modesIn = (course) => {
+        const dir = path.join(contentDir, course);
+        const found = {};
+        fs.readdirSync(dir).filter((f) => f.endsWith('.py')).forEach((f) => {
+          const text = fs.readFileSync(path.join(dir, f), 'utf8');
+          const re = /"mode":\s*"(chaining|probing|resize|universal|balls|bloom|countmin)"/g;
+          let m;
+          while ((m = re.exec(text)) !== null) found[m[1]] = true;
+        });
+        return Object.keys(found).sort();
+      };
+      const ds = modesIn('c1_data_structures'), ra = modesIn('c8_randomised');
+      eq(ds.join(','), 'chaining,probing,resize', 'hash: data-structures ships three of the modes');
+      eq(ra.join(','), 'balls,bloom,countmin,universal', 'and randomised-algorithms the other four');
+      eq(ds.length + ra.length, 7, 'seven modes in all, each in exactly one course');
+      says(doc, capWord(ds.length) + ' belong to `data-structures`', 'hash docstring counts data-structures');
+      says(doc, word(ra.length) + ' to `randomised-algorithms`', 'hash docstring counts randomised-algorithms');
+      ds.forEach((m) => says(doc, m + ' ', 'hash docstring still lists ' + m));
+      /* every mode line in the table names the course it belongs to */
+      ds.forEach((m) => {
+        const line = doc.split('\n').filter((l) => l.trim().indexOf(m) === 0)[0] || '';
+        says(line, 'data-structures', 'hash docstring puts ' + m + ' in data-structures');
+      });
+      ra.forEach((m) => {
+        const line = doc.split('\n').filter((l) => l.trim().indexOf(m) === 0)[0] || '';
+        says(line, 'randomised-algorithms', 'hash docstring puts ' + m + ' in randomised-algorithms');
+      });
+    }
+
+    /* countmin/heavy: the tail is 2 + (i % 11) over i = 0..23, so two keys land
+       three times and nine land twice. "eleven others twice" was false. */
+    {
+      const label = presetField('hash', 'COUNTMIN_PRESETS', 'heavy-hitter', 'label');
+      const stream = streamPreset('heavy', 2);
+      const tally = {};
+      stream.forEach((k) => { tally[k] = (tally[k] || 0) + 1; });
+      const keys = Object.keys(tally).map(Number).sort((a, b) => a - b);
+      const top = keys.filter((k) => tally[k] === 40);
+      const thrice = keys.filter((k) => tally[k] === 3);
+      const twice = keys.filter((k) => tally[k] === 2);
+      eq(top.join(','), '1', 'countmin/heavy: one key appears forty times');
+      eq(keys.length - top.length, 11, 'and eleven others appear at all');
+      eq(thrice.join(',') + ' | ' + twice.length, '2,3 | 9',
+         'but keys 2 and 3 appear three times and only nine appear twice');
+      eq(thrice.length + twice.length, 11, 'the eleven being made of both groups');
+      says(label, 'one key forty times', 'hash countmin/heavy LABEL names the heavy hitter');
+      says(label, word(thrice.length) + ' others ' + times(3) + ' and '
+           + word(twice.length) + ' ' + times(2),
+           'hash countmin/heavy LABEL names each tail group by size');
+      denies(label, 'eleven others twice', 'hash countmin/heavy LABEL');
+    }
+  }
+
+  /* -------------------------------------------------------------- tree.py */
+  {
+    /* treap/two-shuffles: the second order is `reversed`, and the panel's own
+       status line prints that word, so the old label contradicted the widget. */
+    const label = presetField('tree', 'TREAP_PRESETS', 'two-shuffles', 'label');
+    const a = presetField('tree', 'TREAP_PRESETS', 'two-shuffles', 'a');
+    const b = presetField('tree', 'TREAP_PRESETS', 'two-shuffles', 'b');
+    const src = pySrc('tree');
+    eq(a, 'shuffled', 'treap/two-shuffles: the first order is a shuffle');
+    eq(b, 'reversed', 'and the second is REVERSED, not a second shuffle');
+    eq(/NAMES = \{[^}]*reversed: 'reversed'/.test(src), true,
+       'and the panel prints that order by name, so the label has to agree with it');
+    says(label, 'shuffle against the reverse', 'tree treap/two-shuffles LABEL names both orders');
+    denies(label, 'two different shuffles', 'tree treap/two-shuffles LABEL');
+  }
+
+  /* --------------------------------------------------------- reduction.py */
+  {
+    eval(algoCoreBlock('COUNT_JS') + algoCoreBlock('DIGRAPH_JS') + algoCoreBlock('ORACLE_JS')
+       + algoCoreBlock('REDUCTION_JS') + blockFrom(pySrc('reduction'), 'RDKIT_JS', 'reduction.py'));
+    const P = (t, k, f) => presetField('reduction', t, k, f);
+
+    /* selfreduce/free: both variables are mentioned; what is free is x1's VALUE. */
+    {
+      const label = P('_SR_PRESETS', 'free', 'label');
+      const F = rdParseCnf(P('_SR_PRESETS', 'free', 'cnf')).formula;
+      const seen = {};
+      F.clauses.forEach((cl) => cl.forEach((l) => { seen[Math.abs(l)] = true; }));
+      const trace = rdSelfTrace(F);
+      const both = trace.steps.filter((s) => s.ifTrue && s.ifFalse);
+      eq(Object.keys(seen).length, F.n, 'selfreduce/free: every variable IS mentioned by a clause');
+      eq(both.length, 1, 'and exactly one variable is allowed either way');
+      eq(both[0].variable, 1, 'namely x1');
+      says(label, 'allows either way', 'reduction selfreduce/free LABEL says what is free');
+      denies(label, 'no clause mentions', 'reduction selfreduce/free LABEL');
+    }
+
+    /* independentset/two: THREE of the seven independent sets share one image. */
+    {
+      const F = rdParseCnf(P('_IS_PRESETS', 'two', 'cnf')).formula;
+      const r = rdIsSolutions(F);
+      const byImage = {};
+      r.map.pairs.forEach((p) => { byImage[p.to] = (byImage[p.to] || 0) + 1; });
+      const most = Math.max.apply(null, Object.keys(byImage).map((k) => byImage[k]));
+      eq(r.sets.length, 7, 'independentset/two: seven independent sets of size k');
+      eq(most, 3, 'and THREE of them share one assignment, not two');
+      eq(r.map.injective, false, 'so the map is not injective');
+    }
+
+    /* independentset/chain: clause 1 has ONE literal and clauses 2 and 3 have two,
+       so "one literal per clause" was false; what is true is that only one is
+       available once the clause before it is settled. */
+    {
+      const F = rdParseCnf(P('_IS_PRESETS', 'chain', 'cnf')).formula;
+      const r = rdIsSolutions(F);
+      const widths = F.clauses.map((cl) => cl.length);
+      eq(widths.join(','), '1,2,2', 'independentset/chain: the clauses are 1, 2 and 2 literals wide');
+      eq(r.sets.length, 1, 'exactly one independent set of size m exists');
+      eq(r.map.bijection, true, 'so the map is a bijection');
+    }
+
+    /* complement/path4: P4 is self-complementary -- the complement is the path
+       3-1-4-2, drawn by the lab. */
+    {
+      const G = rdParseGraph(P('_CM_PRESETS', 'path4', 'spec'), 12).G;
+      const C = un(complementGraph(G));
+      const id = un(checkComplementIdentity(G));
+      const deg = new Array(G.n).fill(0);
+      C.arcs.forEach((a) => { deg[a.u] += 1; deg[a.v] += 1; });
+      const ends = deg.filter((d) => d === 1).length, middles = deg.filter((d) => d === 2).length;
+      eq(C.arcs.length, G.arcs.length, 'complement/path4: the complement has as many edges as P4 itself');
+      eq(ends + ',' + middles, '2,2', 'with two degree-1 ends and two degree-2 middles -- a path');
+      eq(id.independent + ',' + id.cover, '2,2', 'two independent vertices and two in the cover');
+      eq(C.arcs.map((a) => (a.u + 1) + '-' + (a.v + 1)).join(' '), '1-3 1-4 2-4',
+         'and its edges are 1-3, 1-4 and 2-4: the path 3-1-4-2');
+    }
+
+    /* subsetsum/unsat: TWELVE numbers, which is what the KPI on the page says. */
+    {
+      const F = rdParseCnf(P('_SS_PRESETS', 'unsat', 'cnf')).formula;
+      const made = un(satToSubsetSum(F));
+      const nums = made.rows.map((r) => BigInt(r.value));
+      const T = BigInt(made.target);
+      let hits = 0;
+      for (let m = 0; m < (1 << nums.length); m += 1) {
+        let s = 0n;
+        for (let i = 0; i < nums.length; i += 1) if (m & (1 << i)) s += nums[i];
+        if (s === T) hits += 1;
+      }
+      eq(made.rows.length, 2 * F.n + 2 * F.clauses.length,
+         'subsetsum/unsat: two rows per variable and two per clause');
+      eq(made.rows.length, 12, 'which is twelve, not ten');
+      eq(hits, 0, 'and no subset of them reaches the target');
+    }
+
+    /* rdSelfTrace's oracle-call count: `algo_core.selfReduce` returns early on an
+       unsatisfiable formula without `oracleCalls`, and the old fallback printed
+       n + 1. It now reads the counter, which is what the status line describes. */
+    {
+      const F = rdParseCnf(P('_SR_PRESETS', 'unsat', 'cnf')).formula;
+      const run = selfReduce(F);
+      const trace = rdSelfTrace(F);
+      eq(run.result.oracleCalls, undefined, 'selfReduce still returns no oracleCalls on a NO');
+      eq(run.counts.calls, 1, 'but its counter says one call was made');
+      eq(trace.calls, 1, 'and the kit now reports that one call');
+      eq(trace.expectedCalls, F.n + 1, 'with n + 1 = 3 kept as the BOUND');
+      eq(trace.callsWithinBound, true, 'which one call is inside');
+      eq(trace.steps.length, 0, 'no variable having been fixed, as the status line says');
+      const src = pySrc('reduction');
+      eq(src.indexOf('run.counts && run.counts.calls !== undefined') >= 0, true,
+         'the count coming from the counter rather than from formula.n + 1');
+    }
+  }
+
+  /* ------------------------------------------------------------ coping.py */
+  {
+    eval(block('RATIONAL_JS') + algoCoreBlock('RFIXED_JS') + algoCoreBlock('COUNT_JS')
+       + algoCoreBlock('DIGRAPH_JS') + algoCoreBlock('ORACLE_JS') + algoCoreBlock('COPING_JS')
+       + algoBlock('ALGO_JS') + sysdBlock('HARMONIC_JS') + sysdBlock('RCEIL_JS')
+       + algoCoreBlock('GRAPHKIT_JS') + algoCoreBlock('GREEDY_JS')
+       + blockFrom(pySrc('coping'), 'CPKIT_JS', 'coping.py'));
+    const P = (t, k, f) => presetField('coping', t, k, f);
+    const bb = (k) => {
+      const items = cpParseItems(P('_BB_PRESETS', k, 'items')).items;
+      const W = parseInt(P('_BB_PRESETS', k, 'cap'), 10);
+      const on = branchBound(items, W, true), off = branchBound(items, W, false);
+      return { items: items, W: W, on: on, off: off,
+               with: on.counts.nodes, without: off.counts.nodes, full: un(on).full };
+    };
+
+    /* branchbound/useless: the bound cuts 86 nodes to 30 -- a factor of under
+       three, against forty-five on the heavy-prize preset. Not "almost nothing". */
+    {
+      const label = P('_BB_PRESETS', 'useless', 'label');
+      const u = bb('useless'), g = bb('gap');
+      const frac = un(fractionalKnapsack(u.items, u.W));
+      eq(u.without + ' to ' + u.with, '86 to 30', 'branchbound/useless: 86 nodes become 30');
+      eq(u.without < 3 * u.with, true, 'a factor of under three');
+      eq(Rtext(frac.value), '26', 'the fractional optimum being 26');
+      eq(un(u.on).value, 26, 'which the integer optimum equals here too');
+      eq(Math.floor(g.without / g.with), 45, 'against forty-five on the heavy-prize preset');
+      denies(label, 'the bound stops helping', 'coping branchbound/useless LABEL');
+    }
+
+    /* branchbound/gap: the prize fills the sack, so the root bound IS the integer
+       optimum -- the mode's TIGHTEST bound, 3 nodes against 135. */
+    {
+      const g = bb('gap');
+      const frac = un(fractionalKnapsack(g.items, g.W));
+      eq(Rtext(frac.value), '30', 'branchbound/gap: the fractional relaxation is 30');
+      eq(un(g.on).value, 30, 'and so is the integer optimum -- no gap at all');
+      eq(g.items[0].w, g.W, 'because the prize alone fills the sack exactly');
+      eq(g.with + ' against ' + g.without, '3 against 135', 'the search closing in 3 nodes against 135');
+      /* the tightest in the mode, measured against every other preset here */
+      for (const other of ['five', 'tight', 'useless', 'small']) {
+        const o = bb(other);
+        eq(g.with < o.with, true, 'and fewer nodes than the ' + other + ' preset (' + o.with + ')');
+      }
+    }
+
+    /* The KPI that held 2^n beside two visited-node counts, so 44 > 32 read as
+       impossible. 2^n is the LEAVES, and the label now says so. */
+    {
+      const src = pySrc('coping');
+      const f = bb('five');
+      eq(f.full, Math.pow(2, f.items.length), 'branchbound: `full` is 2^n, the leaves of the whole tree');
+      eq(f.without > f.full, true,
+         'and the without-bound node count EXCEEDS it (' + f.without + ' > ' + f.full
+         + '), which only reads sensibly once the label names the unit');
+      eq(src.indexOf('("Leaves in the whole tree, 2^n", "bbFull")') >= 0, true,
+         'so the KPI label names leaves');
+      eq(src.indexOf('("The whole tree", "bbFull")') < 0, true, 'and no longer just "the whole tree"');
+      eq(src.indexOf("' leaves. A bound that never cuts") >= 0
+         || src.indexOf("+ ' leaves") >= 0, true, 'matching the word the status line already used');
+    }
+
+    /* tsp/broken: 50 is the DISTANCE; the ratio against going round is 25. */
+    {
+      const D = cpParseDistances(P('_TS_PRESETS', 'broken', 'spec'), 8).D;
+      let worst = null;
+      for (let i = 0; i < D.length; i += 1) {
+        for (let j = 0; j < D.length; j += 1) {
+          for (let k = 0; k < D.length; k += 1) {
+            if (i === j || j === k || i === k) continue;
+            const round = D[i][k] + D[k][j];
+            if (D[i][j] > round && (worst === null || D[i][j] / round > worst.ratio)) {
+              worst = { hop: D[i][j], round: round, ratio: D[i][j] / round };
+            }
+          }
+        }
+      }
+      eq(worst.hop, 50, 'tsp/broken: the direct hop is 50');
+      eq(worst.round, 2, 'and going round costs 2');
+      eq(worst.ratio, 25, 'so the hop is twenty-five times the detour, not fifty');
+    }
+
+    /* setcover/overlap: five of the ten pairs cover everything and five do not. */
+    {
+      const parsed = cpParseSets(P('_SC_PRESETS', 'overlap', 'sets'), 12);
+      const S = parsed.sets, U = parsed.universe;
+      const work = [], fail = [];
+      for (let i = 0; i < S.length; i += 1) {
+        for (let j = i + 1; j < S.length; j += 1) {
+          const hit = {};
+          S[i].forEach((e) => { hit[e] = true; });
+          S[j].forEach((e) => { hit[e] = true; });
+          const missing = U.filter((e) => !hit[e]);
+          (missing.length ? fail : work).push({ pair: [i + 1, j + 1], missing: missing });
+        }
+      }
+      const greedy = un(greedySetCover(S, U));
+      eq(work.length + fail.length, 10, 'setcover/overlap: ten pairs in all');
+      eq(work.length + ' cover, ' + fail.length + ' do not', '5 cover, 5 do not',
+         'five of which cover everything and five do not');
+      eq(fail[0].pair.join(' and ') + ' misses ' + fail[0].missing.join(','), '1 and 2 misses 5',
+         'sets 1 and 2 together missing element 5');
+      eq(greedy.chosen.length, un(setCoverBrute(S, U)).size, 'and greedy finds one of the pairs that work');
+    }
+
+    /* fptas/big: the epsilon slider opens at 1/10 -- a TENTH, ten percent -- and
+       buys a table of 238 cells against the exact 3604. */
+    {
+      const src = pySrc('coping');
+      const m = /_range\("fpEps", "Accuracy: &epsilon; is one over this", 1, 60, (\d+)\)/.exec(src)
+             || /_range\("fpEps", "Accuracy: ε is one over this", 1, 60, (\d+)\)/.exec(src);
+      eq(m !== null, true, 'fptas: the epsilon control is still a range over 1/this');
+      const opens = parseInt(m[1], 10);
+      const items = cpParseItems(P('_FP_PRESETS', 'big', 'items')).items;
+      const W = parseInt(P('_FP_PRESETS', 'big', 'cap'), 10);
+      const exact = cpExactCells(items);
+      const sweptAt = cpEpsilonSweep(items, W, [opens]);
+      const row = (sweptAt.rows || sweptAt)[0];
+      eq(opens, 10, 'fptas/big: the slider opens on epsilon = 1/10');
+      eq(Rtext(row.eps), '1/' + opens, 'which is a tenth -- ten percent, not a tenth of a percent');
+      eq(exact, 3604, 'the exact table having 3604 cells');
+      eq(row.cells, 238, 'and the scaled one 238');
+    }
+
+    /* fptas/equal: the realised loss is 0 at every epsilon swept, so it does not
+       "come entirely from the floor" -- there is none. */
+    {
+      const items = cpParseItems(P('_FP_PRESETS', 'equal', 'items')).items;
+      const W = parseInt(P('_FP_PRESETS', 'equal', 'cap'), 10);
+      const swept = cpEpsilonSweep(items, W, [2, 4, 5, 10, 20]);
+      const sweep = { rows: swept.rows || swept };
+      const values = items.map((it) => it.v);
+      eq(new Set(values).size, 1, 'fptas/equal: every value is the same');
+      eq(sweep.rows.map((r) => r.loss).join(','), '0,0,0,0,0',
+         'and the realised loss is 0 at every epsilon swept');
+      eq(sweep.rows.every((r) => Rtext(r.ratio) === '1'), true, 'the ratio being exactly 1 throughout');
+      eq(sweep.rows.every((r) => Rcmp(r.promised, R(0n, 1n)) > 0), true,
+         'while the promise it is allowed to lose is positive, so the bound is not tight');
+    }
+
+    /* fpt/cycle6: the printed tree bound is 2^(k+1) = 16 and the measured count
+       is 9, so "at most 2^3" was below both. */
+    {
+      const G = cpParseGraph(P('_FT_PRESETS', 'cycle6', 'spec'), 8).G;
+      const k = parseInt(P('_FT_PRESETS', 'cycle6', 'k'), 10);
+      const run = fptVertexCover(G, k);
+      eq(un(run).treeBound, Math.pow(2, k + 1), 'fpt/cycle6: the tree bound the kit prints is 2^(k+1)');
+      eq(un(run).treeBound, 16, 'which is 16');
+      eq(run.counts.nodes, 9, 'and the measured node count is 9');
+      eq(run.counts.nodes > Math.pow(2, k), true, 'which is already more than 2^3');
+      eq(un(run).bruteWork, Math.pow(2, G.n), 'against 2^6 subsets exhaustively');
+      eq(un(run).bruteWork, 64, 'which is 64');
+    }
+  }
+
+  /* -------- the three kits that were ignoring the panel copy they are given.
+     `reduction`, `coping` and `random` built their Lab with a literal
+     panel_title and panel_intro, so a lesson author who set either in the lab
+     config was silently ignored while every other kit on the path honoured it. */
+  {
+    for (const mod of ['reduction', 'coping', 'random']) {
+      const src = pySrc(mod);
+      const literalTitles = (src.match(/^        panel_title="/gm) || []).length;
+      const literalIntros = (src.match(/^        panel_intro=\(/gm) || []).length;
+      const viaCfg = (src.match(/panel_title=cfg\.get\("panel_title"/g) || []).length;
+      const introViaCfg = (src.match(/panel_intro=cfg\.get\(/g) || []).length;
+      eq(literalTitles, 0, mod + '.py passes no panel_title the config cannot override');
+      eq(literalIntros, 0, mod + '.py passes no panel_intro the config cannot override');
+      eq(viaCfg > 0 && viaCfg === introViaCfg, true,
+         mod + '.py reads both from cfg, on all ' + viaCfg + ' of its modes');
+    }
+  }
+}
+
+
+/* ==========================================================================
+   PRESET PROSE, second pass: the kits nobody had reported
+   ==========================================================================
+
+   The thirty strings reported to me were found incidentally by authors who
+   happened to need those numbers. Sweeping the rest of the preset tables the
+   same way turned up eight more, in three kits nobody had looked at: a label
+   that counted arcs and called them nodes, three that claimed distinct edge
+   weights on graphs with a repeat, a negative-arc count that was one too many,
+   and three schedule notes about steps that happen at a different step. These
+   are the assertions that keep them fixed. */
+console.log('lab presets: the second sweep, over the kits nobody had reported');
+{
+  const labsDir2 = path.join(__dirname, 'mathpath', 'labs');
+  const py2 = {};
+  const src2 = (mod) => {
+    if (!py2[mod]) py2[mod] = fs.readFileSync(path.join(labsDir2, mod + '.py'), 'utf8');
+    return py2[mod];
+  };
+  const entries2 = (src, table) => {
+    const at = src.indexOf('\n' + table + ' = ');
+    if (at < 0) { fails += 1; console.log('  FAIL cannot find ' + table); return []; }
+    let i = at + table.length + 4;
+    while (i < src.length && src[i] !== '[' && src[i] !== '{') i += 1;
+    let depth = 0, start = -1, out = [];
+    for (; i < src.length; i += 1) {
+      const ch = src[i];
+      if (ch === '[' || ch === '{') { depth += 1; if (depth === 2 && ch === '{') start = i; }
+      else if (ch === ']' || ch === '}') {
+        depth -= 1;
+        if (depth === 1 && start >= 0) { out.push(src.slice(start, i + 1)); start = -1; }
+        if (depth === 0) break;
+      }
+    }
+    return out;
+  };
+  const field2 = (mod, table, key, field) => {
+    const hit = entries2(src2(mod), table).filter((e) =>
+      e.indexOf('"id": "' + key + '"') >= 0 || e.indexOf('"key": "' + key + '"') >= 0);
+    if (hit.length !== 1) {
+      fails += 1; console.log('  FAIL ' + mod + '.' + table + ': ' + hit.length + ' named ' + key);
+      return '';
+    }
+    const m = new RegExp('"' + field + '":\\s*((?:"(?:[^"\\\\]|\\\\.)*"\\s*)+)').exec(hit[0]);
+    if (!m) { fails += 1; console.log('  FAIL ' + mod + '/' + key + ' has no ' + field); return ''; }
+    let out = '';
+    const lit = /"((?:[^"\\]|\\.)*)"/g;
+    let piece;
+    while ((piece = lit.exec(m[1])) !== null) {
+      out += piece[1].replace(/\\"/g, '"')
+                     .replace(/\\u2013/g, '–').replace(/\\u2014/g, '—')
+                     .replace(/\\'/g, "'");
+    }
+    return out;
+  };
+  const says2 = (text, phrase, label) => {
+    if (String(text).indexOf(String(phrase)) < 0) {
+      fails += 1;
+      console.log('  FAIL ' + label + ': does not contain "' + phrase + '"');
+      console.log('         the string is: ' + text);
+    }
+  };
+  const denies2 = (text, phrase, label) => {
+    if (String(text).indexOf(String(phrase)) >= 0) {
+      fails += 1; console.log('  FAIL ' + label + ': still contains "' + phrase + '"');
+    }
+  };
+  const WORD2 = { 1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven',
+                  8: 'eight', 9: 'nine', 10: 'ten', 24: '24' };
+  const w2 = (n) => WORD2[n];
+  /* `a-b 4` / `a>b 4` / `a>b 4:2`, which is every weighted-graph spec in these
+     three kits. The first number is the weight this section cares about. */
+  const graphOf = (spec, sep) => {
+    const arcs = [], seen = {};
+    spec.split(',').forEach((piece) => {
+      const m = new RegExp('^\\s*(\\w+)\\s*' + sep + '\\s*(\\w+)\\s+(-?\\d+)').exec(piece);
+      if (!m) { fails += 1; console.log('  FAIL cannot read "' + piece + '" as an arc'); return; }
+      seen[m[1]] = true; seen[m[2]] = true;
+      arcs.push({ u: m[1], v: m[2], w: parseInt(m[3], 10) });
+    });
+    const ws = arcs.map((a) => a.w);
+    const dup = ws.filter((x, i) => ws.indexOf(x) !== i).filter((x, i, l) => l.indexOf(x) === i);
+    return { nodes: Object.keys(seen), arcs: arcs, weights: ws, repeated: dup,
+             negative: ws.filter((x) => x < 0).length,
+             at: (weight) => arcs.filter((a) => a.w === weight).map((a) => a.u + '–' + a.v) };
+  };
+
+  /* ------------------------------------------------------------ network.py */
+  {
+    /* bellmanford/prices: s, a, b, t is FOUR nodes. Five is the arc count. */
+    const label = field2('network', '_BF_PRESETS', 'prices', 'label');
+    const g = graphOf(field2('network', '_BF_PRESETS', 'prices', 'spec'), '>');
+    eq(g.nodes.length, 4, 'network bellmanford/prices: four nodes');
+    eq(g.arcs.length, 5, 'and five arcs -- which is where the "five" came from');
+    eq(g.negative, 0, 'every cost being positive, as the label also says');
+    says2(label, w2(g.nodes.length) + ' nodes, ' + w2(g.arcs.length) + ' arcs',
+          'network bellmanford/prices LABEL counts nodes and arcs');
+    denies2(label, 'five nodes', 'network bellmanford/prices LABEL');
+  }
+
+  /* ----------------------------------------------------------- graphkit.py */
+  {
+    /* prim/classic and kruskal/classic share one graph, and the weight 2 is on
+       two of its edges. The minimum tree is unique all the same, which is the
+       stronger lesson: distinct weights are SUFFICIENT for uniqueness, not
+       necessary, and these strings used to claim the shortcut. */
+    const pmSpec = field2('graphkit', '_PM_PRESETS', 'classic', 'spec');
+    const krSpec = field2('graphkit', '_KR_PRESETS', 'classic', 'spec');
+    eq(pmSpec, krSpec, 'graphkit: prim/classic and kruskal/classic are the same graph');
+    const g = graphOf(pmSpec, '-');
+    eq(g.nodes.length, 7, 'graphkit prim/classic: seven vertices');
+    eq(g.arcs.length, 9, 'and nine edges');
+    eq(g.repeated.join(','), '2', 'with the weight 2 repeated -- so NOT all different');
+    eq(g.at(2).join(' and '), '2–3 and 6–7', 'on 2-3 and 6-7');
+    /* every spanning tree, enumerated here, so "unique" is a count and not a claim */
+    {
+      const n = g.nodes.length, ix = {};
+      g.nodes.forEach((v, i) => { ix[v] = i; });
+      let best = null, howMany = 0;
+      const pick = (at, chosen) => {
+        if (chosen.length === n - 1) {
+          const par = [];
+          for (let i = 0; i < n; i += 1) par.push(i);
+          const find = (x) => { while (par[x] !== x) { par[x] = par[par[x]]; x = par[x]; } return x; };
+          let ok = true, total = 0;
+          for (const e of chosen) {
+            const a = find(ix[e.u]), b = find(ix[e.v]);
+            if (a === b) { ok = false; break; }
+            par[a] = b; total += e.w;
+          }
+          if (!ok) return;
+          if (best === null || total < best) { best = total; howMany = 1; }
+          else if (total === best) howMany += 1;
+          return;
+        }
+        for (let i = at; i < g.arcs.length; i += 1) pick(i + 1, chosen.concat([g.arcs[i]]));
+      };
+      pick(0, []);
+      eq(best, 19, 'graphkit prim/classic: the minimum spanning tree weighs 19');
+      eq(howMany, 1, 'and there is exactly ONE of them, repeat or no repeat');
+      /* graphkit has since been converted to `expect`: its preset notes are
+         gone and the figures they stated are pinned on the built page instead,
+         read out of getElementById(kpi).textContent by labcheck.js. The three
+         NOTE assertions that stood here are not weakened, they have MOVED --
+         prim/classic pins pmWeight "19", kruskal/classic pins krReject
+         "3 of 9", bellmanford/negative pins bfCycle "none" -- and what is left
+         here is the arithmetic that produced them, plus the LABEL guards,
+         because a label is still prose no check can read. */
+      const pmLabel = field2('graphkit', '_PM_PRESETS', 'classic', 'label');
+      says2(pmLabel, w2(g.nodes.length) + ' vertices, ' + w2(g.arcs.length)
+            + ' edges, weight ' + g.repeated[0] + ' on two of them',
+            'graphkit prim/classic LABEL counts honestly');
+      denies2(pmLabel, 'all weights different', 'graphkit prim/classic LABEL');
+      const krLabel = field2('graphkit', '_KR_PRESETS', 'classic', 'label');
+      says2(krLabel, w2(g.nodes.length) + ' vertices, ' + w2(g.arcs.length)
+            + ' edges, one weight repeated', 'graphkit kruskal/classic LABEL counts honestly');
+      denies2(krLabel, 'all weights different', 'graphkit kruskal/classic LABEL');
+      eq(g.arcs.length - (g.nodes.length - 1), 3, 'kruskal/classic: three edges are rejected');
+    }
+
+    /* relax/classic: the weight 9 is on two of its edges too. */
+    {
+      const label = field2('graphkit', '_RX_PRESETS', 'classic', 'label');
+      const r = graphOf(field2('graphkit', '_RX_PRESETS', 'classic', 'spec'), '-');
+      eq(r.nodes.length, 6, 'graphkit relax/classic: six vertices');
+      eq(r.arcs.length, 9, 'and nine edges');
+      eq(r.repeated.join(','), '9', 'with the weight 9 repeated');
+      eq(r.at(9).join(' and '), '1–3 and 5–6', 'on 1-3 and 5-6');
+      says2(label, w2(r.nodes.length) + ' vertices, ' + w2(r.arcs.length)
+            + ' edges, one weight repeated', 'graphkit relax/classic LABEL counts honestly');
+      denies2(label, 'weights all different', 'graphkit relax/classic LABEL');
+    }
+
+    /* bellmanford/negative: -4, -3 and -2 is THREE negative arcs. The note that
+       once said four is gone with the rest of graphkit's notes; the count it
+       got wrong is now in the LABEL, where the same guard applies. */
+    {
+      const label = field2('graphkit', '_BF_PRESETS', 'negative', 'label');
+      const b = graphOf(field2('graphkit', '_BF_PRESETS', 'negative', 'spec'), '>');
+      eq(b.negative, 3, 'graphkit bellmanford/negative: three negative arcs, not four');
+      eq(b.arcs.length, 10, 'out of ten');
+      says2(label, w2(b.arcs.length) + ' arcs, ' + w2(b.negative) + ' of them negative',
+            'graphkit bellmanford/negative LABEL counts them');
+      denies2(label, 'four negative arcs', 'graphkit bellmanford/negative LABEL');
+    }
+  }
+
+  /* ----------------------------------------------------------- schedule.py */
+  {
+    const orSrc3 = src2('or_core'), sysSrc3 = src2('algebra_systems');
+    eval(block('RATIONAL_JS') + blockFrom(sysSrc3, 'FORMAT_JS', 'algebra_systems.py')
+       + blockFrom(orSrc3, 'ORFMT_JS', 'or_core.py') + blockFrom(orSrc3, 'SCHED_JS', 'or_core.py')
+       + blockFrom(src2('schedule'), 'SCHEDDRAW_JS', 'schedule.py')
+       + blockFrom(src2('schedule'), 'SCHEDKIT_JS', 'schedule.py'));
+
+    /* parallel/even: the two LOWER BOUNDS are 8 and 4 and do not meet. What
+       meets is the average-load bound and the makespan LPT reaches. */
+    {
+      const jobs = fillJobs(parseJobs(field2('schedule', '_PAR_PRESETS', 'even', 'jobs'),
+                                      ['p'], ['p']).jobs);
+      const m = parseInt(field2('schedule', '_PAR_PRESETS', 'even', 'machines'), 10);
+      const par = parallelAssign(jobs, m, 'lpt');
+      eq(Rtext(par.bounds.average), '8', 'parallel/even: the average-load bound is 8');
+      eq(Rtext(par.bounds.longest), '4', 'and the longest single job is 4');
+      eq(Requ(par.bounds.average, par.bounds.longest), false, 'so the two bounds do NOT meet');
+      eq(Requ(par.makespan, par.bounds.best), true, 'what meets is the makespan and the better bound');
+      eq(Rtext(par.makespan) + ' = ' + Rtext(par.optimum), '8 = 8', 'LPT reaching the optimum, 8');
+      /* schedule has since been converted to `expect`, so its notes are gone
+         and the three sentences that stood here are pinned on the built page
+         instead: parallel/even pins plBound "8 - the average" beside plMake and
+         plOpt, which is the same claim in a channel labcheck.js can read off
+         getElementById(kpi).textContent. The measurements stay because they are
+         what produced the figures. */
+    }
+
+    /* edd/onelate: which job decides L max splits evenly over the 24 orders, and
+       D is late in none of them. */
+    {
+      const jobs = fillJobs(parseJobs(field2('schedule', '_EDD_PRESETS', 'onelate', 'jobs'),
+                                      ['p', 'd'], ['p', 'd']).jobs);
+      const tally = {};
+      let orders = 0, dLate = 0;
+      const perm = (left, cur) => {
+        if (!left.length) {
+          orders += 1;
+          const o = seqObjectives(cur, jobs);
+          let top = null, who = null;
+          o.rows.forEach((r, k) => {
+            const L = Rsub(r.C, jobs[cur[k]].d);
+            if (top === null || Rcmp(L, top) > 0) { top = L; who = jobs[cur[k]].id; }
+            if (jobs[cur[k]].id === 'D' && Rcmp(L, R(0n, 1n)) > 0) dLate += 1;
+          });
+          tally[who] = (tally[who] || 0) + 1;
+          return;
+        }
+        for (let i = 0; i < left.length; i += 1) {
+          perm(left.slice(0, i).concat(left.slice(i + 1)), cur.concat([left[i]]));
+        }
+      };
+      perm(jobs.map((_, i) => i), []);
+      eq(orders, 24, 'edd/onelate: 24 orders');
+      eq(dLate, 0, 'D is late in none of them');
+      eq(Object.keys(tally).sort().join(','), 'A,B,C', 'and A, B and C each decide L max somewhere');
+      eq(Object.keys(tally).map((k) => tally[k]).join(','), '8,8,8',
+         'eight orders each -- so C does NOT decide it wherever it goes');
+      /* The note is gone with the rest of schedule's; edd/onelate pins edWins
+         "4 of 4" and edLmax "4" on the page instead. Neither states the 24-order
+         split, which no tile prints -- so the enumeration above is now the only
+         place that fact is checked, and it is checked directly rather than
+         through a sentence quoting it. */
+    }
+
+    /* late/throws: the discard happens at the SECOND step, and the job thrown out
+       had been on time for ONE round. */
+    {
+      const jobs = fillJobs(parseJobs(field2('schedule', '_LATE_PRESETS', 'throws', 'jobs'),
+                                      ['p', 'd'], ['p', 'd']).jobs);
+      const mh = mooreHodgson(jobs);
+      const run = (mh.result !== undefined) ? mh.result : mh;
+      const firstDiscard = run.steps.map((s, i) => ({ at: i + 1, s: s }))
+                                    .filter((x) => x.s.removed !== null)[0];
+      eq(firstDiscard.at, 2, 'late/throws: the first discard happens at step TWO');
+      eq(firstDiscard.s.id, 'D', 'the job that joins there being D');
+      eq(firstDiscard.s.removedId, 'B', 'and the job thrown out being B');
+      eq(run.steps[0].id + '/' + (run.steps[0].removed === null), 'B/true',
+         'B having been accepted and kept at step one, so one round on time and not two');
+      eq(run.steps[2].id + '/' + run.steps[2].removedId, 'A/A',
+         'and A being thrown out at step three the moment it joins');
+      /* What the note said about WHICH jobs survive is now pinned as the page's
+         own output: late/throws pins mhKept "3: D, C, E" and mhDrop "B, A", so
+         the order of the two discards is checked against the shipped page
+         rather than against a sentence beside it. */
+    }
+  }
+}
+
+
+/* THE VERDICT. There is a second `if (fails)` gate half way up this file, at
+   what used to be its end; every section appended after it -- the lp, simplex,
+   duality, network, transport and integer kits, the sequence and heap kits, the
+   sorting section and the hash and tree section -- ran BELOW that gate, so a
+   failing assertion in any of them printed its FAIL line and the file then
+   announced that every arithmetic assertion passes, and exited zero. A harness
+   that cannot fail is not a harness. The gate above stays, because failing
+   fast on the core arithmetic is worth having; this one is the verdict. */
+if (fails) {
+  console.log('\n' + fails + ' assertion(s) FAILED');
+  process.exit(1);
 }
 
 console.log('\nevery arithmetic assertion passes');

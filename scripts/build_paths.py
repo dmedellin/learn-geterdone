@@ -15,6 +15,7 @@ directories happen to exist.
 """
 
 import argparse
+import json
 import sys
 from pathlib import Path
 
@@ -33,39 +34,79 @@ GENERATED_PATHS = (DISCRETE_MATH_PATH, ALGEBRA_PATH, SYSTEM_DESIGN_PATH)
 SITE = REPO_ROOT / "site"
 # The list of pages this build produces, consumed by scripts/labcheck.js.
 MANIFEST = REPO_ROOT / "scripts" / "generated-pages.txt"
+# What each of those pages must PRINT, also consumed by scripts/labcheck.js.
+EXPECTATIONS = REPO_ROOT / "scripts" / "generated-expectations.json"
+
+# THE SWITCH. One lab key per line; a kit is converted by adding it here.
+#
+# A preset's menu text is prose, and no check in this repository can read it --
+# a sweep of fifteen kits found 57 preset strings that were false about the lab
+# they described, and every check passed on all of them. What a preset makes the
+# page PRINT is checkable, so each preset now carries an `expect` dict and
+# labcheck.js reads the tile out of the built page. For a kit listed here the
+# check is a GATE: every option of every declared preset <select> must pin at
+# least one tile or the page fails, because a mechanism authors can skip is an
+# intention rather than a mechanism.
+#
+# The remaining kits are not listed, so they are not gated, and adding one
+# before its presets carry expectations is what makes its pages fail. That is
+# the intended order: convert the kit, then add the line.
+KITS_WITH_EXPECTATIONS = ("greedy", "random", "hash", "tree", "reduction", "coping",
+                          "dpkit", "dpseq", "strings", "geometry",
+                          "markov", "schedule", "network", "graphkit", "flowkit",)
 
 
 def path_pages(path):
-    """[(relative path under site/, markup)] for one path."""
-    out = [("paths/%s/index.html" % path["slug"], render.path_page(path))]
+    """[(relative path under site/, markup, expectations or None)] for one path.
+
+    The third item is the page's entry in the expectations manifest, and it is
+    None for every page whose kit is not in KITS_WITH_EXPECTATIONS -- a page
+    absent from that manifest is a page labcheck.js does not gate.
+    """
+    out = [("paths/%s/index.html" % path["slug"], render.path_page(path), None)]
     courses = path["courses"]
     for index, course in enumerate(courses):
         out.append((
             "%s/index.html" % course["slug"],
             render.course_home(course=course, index=index, courses=courses, path=path),
+            None,
         ))
         lessons = course["lessons"]
         for position, lesson in enumerate(lessons):
-            out.append((
-                "%s/%s/index.html" % (course["slug"], lesson["slug"]),
-                render.lesson_page(
-                    path=path,
-                    course=course,
-                    lesson=lesson,
-                    index=position,
-                    prev_lesson=lessons[position - 1] if position else None,
-                    next_lesson=lessons[position + 1] if position + 1 < len(lessons) else None,
-                ),
-            ))
+            markup, lab = render.lesson_page_with_lab(
+                path=path,
+                course=course,
+                lesson=lesson,
+                index=position,
+                prev_lesson=lessons[position - 1] if position else None,
+                next_lesson=lessons[position + 1] if position + 1 < len(lessons) else None,
+            )
+            kit = lesson["lab"][0]
+            expect = None
+            if kit in KITS_WITH_EXPECTATIONS:
+                # Emitted even when the lab declared nothing, because an empty
+                # entry is what makes labcheck.js fail the page. A kit that is
+                # switched on and then quietly emptied must not fall silent.
+                expect = {"kit": kit, "selects": lab.expect}
+            out.append(("%s/%s/index.html" % (course["slug"], lesson["slug"]), markup, expect))
     return out
 
 
 def pages():
-    """[(relative path under site/, markup)] for every generated path."""
+    """[(relative path under site/, markup, expectations or None)] for every path."""
     out = []
     for path in GENERATED_PATHS:
         out.extend(path_pages(path))
     return out
+
+
+def expectations_body(built):
+    """The manifest text, for the pages in `built` that carry expectations."""
+    return json.dumps(
+        {"pages": {"site/" + relative: entry
+                   for relative, _markup, entry in built if entry is not None}},
+        indent=1, sort_keys=True,
+    ) + "\n"
 
 
 def main(argv=None):
@@ -83,17 +124,18 @@ def main(argv=None):
     # features the harness deliberately does not implement, and reporting them
     # as failures would be reporting a limitation of the harness as a defect in
     # those pages.
-    manifest = MANIFEST
-    manifest_body = "\n".join("site/" + relative for relative, _m in built) + "\n"
-
-    changed, written, manifest_written = [], 0, 0
-    current_manifest = manifest.read_text(encoding="utf-8") if manifest.is_file() else None
-    if current_manifest != manifest_body:
-        changed.append(str(manifest.relative_to(REPO_ROOT)))
-        if not args.check:
-            manifest.write_text(manifest_body, encoding="utf-8")
-            manifest_written = 1
-    for relative, markup in built:
+    manifest_written = 0
+    changed, written = [], 0
+    for manifest, body in ((MANIFEST, "\n".join("site/" + relative
+                                                for relative, _m, _e in built) + "\n"),
+                           (EXPECTATIONS, expectations_body(built))):
+        current = manifest.read_text(encoding="utf-8") if manifest.is_file() else None
+        if current != body:
+            changed.append(str(manifest.relative_to(REPO_ROOT)))
+            if not args.check:
+                manifest.write_text(body, encoding="utf-8")
+                manifest_written += 1
+    for relative, markup, _entry in built:
         target = SITE / relative
         current = target.read_text(encoding="utf-8") if target.is_file() else None
         if current == markup:
@@ -123,7 +165,7 @@ def main(argv=None):
     # report "-1 already current" on a full rebuild.
     print("wrote %d page(s), %d already current%s"
           % (written, len(built) - written,
-             "; manifest updated" if manifest_written else ""))
+             "; %d manifest(s) updated" % manifest_written if manifest_written else ""))
     return 0
 
 

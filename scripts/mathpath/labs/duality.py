@@ -1425,7 +1425,7 @@ def _slackness(cfg):
     document.getElementById('slY').textContent = sc.consistent
       ? sc.y.map(function (v) { return Rshort(v, 3); }).join(', ') : 'none exist';
     document.getElementById('slZ').textContent = Rshort(sc.primal.obj, 3);
-    document.getElementById('slBy').textContent = sc.dualValue === null ? '&mdash;'
+    document.getElementById('slBy').textContent = sc.dualValue === null ? '—'
       : Rshort(sc.dualValue, 3);
     document.getElementById('slVerdict').textContent =
       sc.verdict === 'certified' ? 'certified' : (sc.verdict === 'infeasible' ? 'not even feasible'
@@ -2451,7 +2451,7 @@ def _parametric(cfg):
     document.getElementById('paCorner').textContent = here < 0 ? 'none'
       : model.names.map(function (nm, k) {
           return nm + ' = ' + Rshort(front.corners[here].x[k], 3); }).join(', ');
-    document.getElementById('paScores').textContent = here < 0 ? '&mdash;'
+    document.getElementById('paScores').textContent = here < 0 ? '—'
       : Rshort(front.corners[here].f1, 3) + ' and ' + Rshort(front.corners[here].f2, 3);
     document.getElementById('paBreaks').textContent = front.breakpoints.length
       ? front.breakpoints.map(Rtext).join(', ') : 'none';

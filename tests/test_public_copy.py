@@ -117,7 +117,8 @@ class TestPublicCopy(unittest.TestCase):
 
     def test_generated_lab_dynamic_strings_use_titles(self):
         import test_course_ui as ui
-        routes = {'/' + relative.removesuffix('index.html') for relative, _html in ui.build_paths.pages()}
+        routes = {'/' + relative.removesuffix('index.html')
+                  for relative, _html, _expect in ui.build_paths.pages()}
         self.assertGreater(len(routes), 200, 'generated owner inventory must not be empty')
         subject = os.environ.get('AB_SUBJECT')
         if subject:

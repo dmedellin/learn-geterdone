@@ -48,10 +48,10 @@ PATH = {
     "level": "Intermediate → Advanced",
     "level_note": 'algebra for the first three courses; discrete probability after that',
     "tagline": (
-        'Decisions with a number attached and a constraint in the way: what to make, what to ship, what to schedule, what to stock and when to stop &mdash; each written as a model, solved exactly, and then read back to find out what the answer cost and what would change it. Ten courses and 94 lessons are available.'
+        'Decisions with a number attached and a constraint in the way: what to make, what to ship, what to schedule, what to stock and when to stop &mdash; each written as a model, solved exactly, and then read back to find out what the answer cost and what would change it. Ten courses and 92 lessons are available.'
     ),
     "description": (
-        'The Operations Research Subject: ten courses in one order, from linear programming models and the simplex method through duality and sensitivity, networks, integer programming, scheduling, sequential decisions, inventory, Markov chains and queues, to simulation. Every solve on this path is exact arithmetic &mdash; tableaux in fractions, expectations as fractions, steady states from a linear system &mdash; and every lesson ends by asking what the model assumed. All ten courses and 94 lessons are available.'
+        'The Operations Research Subject: ten courses in one order, from linear programming models and the simplex method through duality and sensitivity, networks, integer programming, scheduling, sequential decisions, inventory, Markov chains and queues, to simulation. Every solve on this path is exact arithmetic &mdash; tableaux in fractions, expectations as fractions, steady states from a linear system &mdash; and every lesson ends by asking what the model assumed. All ten courses and 92 lessons are available.'
     ),
     "key": [
         "max cᵀx  s.t. Ax ≤ b, x ≥ 0    ⟷    min bᵀy  s.t. Aᵀy ≥ c, y ≥ 0",
@@ -62,12 +62,12 @@ PATH = {
         "πP = π                         a steady state is a linear system, not a limit",
     ],
     "sequence_intro": (
-        'Each course assumes the ones before it. The first three build one object &mdash; the linear program, the algorithm that solves it, and the second program hidden inside the first &mdash; and a reader who stops after Duality and Sensitivity Analysis has a complete subject. Network Optimisation and Integer Programming are that object with structure added; the four courses after them replace the linear program with exchange arguments, backward recursion and linear systems; Simulation is what is left when none of those applies.'
+        'Each course assumes the ones before it. The first three build one object &mdash; the linear program, the algorithm that solves it, and the second program hidden inside the first &mdash; and a reader who stops after Duality and Sensitivity Analysis has a complete subject. Networks: Flows, Paths and Assignments and Integer Programming are that object with structure added; the four courses after them replace the linear program with exchange arguments, backward recursion and linear systems; Simulation is what is left when none of those applies.'
     ),
     "why_order": [
         'Linear Programming Models comes first, and it is a course about writing models rather than solving them, because the modelling error is the one that survives a correct solve. A reader who can pivot flawlessly through a tableau built from the wrong constraint has learned a technique and not a subject, and nothing later in the path will tell them.',
         'The Simplex Method precedes Duality and Sensitivity Analysis because the dual vector is read off the final tableau. Meeting duality first as a theorem and second as six numbers already sitting in the row above the slack columns is worth more than either half alone &mdash; and the sensitivity ranges are ratio tests on that same tableau, so the machinery is already built when the ideas arrive.',
-        'Network Optimisation and Integer Programming come fourth and fifth because both are linear programs with structure, and the contrast between them is the point: a network LP has integer corners for a reason that can be proved, and a general integer program does not, which is why one is solved by the simplex method and the other by a search that uses it. That contrast is invisible before duality and obvious after it.',
+        'Networks: Flows, Paths and Assignments and Integer Programming come next because both are linear programs with structure, and the contrast between them is the point: a network LP has integer corners for a reason that can be proved, and a general integer program does not, which is why one is solved by the simplex method and the other by a search that uses it. That contrast is invisible before duality and obvious after it.',
         'Scheduling, Dynamic Programming and Sequential Decisions, Inventory Models, and Markov Chains, Decisions and Queues each replace the linear program with a different exact method &mdash; an adjacent exchange, a backward recursion, a discriminant, a linear system &mdash; and are ordered by how much probability they need. Simulation comes last because it is the method of last resort, and it is the only course on the path whose answers arrive with an error bar rather than a proof.',
     ],
     "prerequisites": [

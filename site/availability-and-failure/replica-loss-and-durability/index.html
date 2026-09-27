@@ -1573,7 +1573,14 @@ two copies at R = 24 h</div><p>Both levers are in view now and they are not the 
   function Rparse(text) {
     var s = String(text).trim();
     var m = /^([+-]?\d+)\s*\/\s*(\d+)$/.exec(s);
-    if (m) return R(BigInt(m[1]), BigInt(m[2]));
+    /* A zero denominator is not a number this function can read, so it comes
+       back null like every other unreadable string. It used to reach R(), which
+       THROWS -- and a throw out of a parser is not a refusal, it is a dead
+       page: the lab's redraw stops, the panel keeps the last good figures, and
+       nothing tells the reader why. Typing 1/0 into the availability chain on
+       a published page did exactly that. Callers all handle null already;
+       every one of them was written to. */
+    if (m) return m[2] === '0' || /^0+$/.test(m[2]) ? null : R(BigInt(m[1]), BigInt(m[2]));
     m = /^([+-]?\d+)$/.exec(s);
     if (m) return R(BigInt(m[1]));
     m = /^([+-]?)(\d*)\.(\d+)$/.exec(s);
@@ -2245,10 +2252,10 @@ two copies at R = 24 h</div><p>Both levers are in view now and they are not the 
 
     document.getElementById('duP').textContent = sciText(p, 3);
     document.getElementById('duHalf').textContent = sciText(half, 3);
-    document.getElementById('duFactor').textContent = Math.pow(2, n - 1) + '&times;';
+    document.getElementById('duFactor').textContent = Math.pow(2, n - 1) + '×';
     document.getElementById('duExact').textContent = Rtext(exact);
     document.getElementById('duFleet').textContent = sciText(fleet, 3) + ' a year';
-    document.getElementById('duYears').textContent = fleet > 0 ? sciText(1 / fleet, 3) + ' years' : '&mdash;';
+    document.getElementById('duYears').textContent = fleet > 0 ? sciText(1 / fleet, 3) + ' years' : '—';
 
     var rows = '', i;
     for (i = 2; i <= 6; i += 1) {

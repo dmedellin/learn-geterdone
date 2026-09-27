@@ -29,9 +29,12 @@ Four decisions run through all three.
   the rule readers break: a cycle may CROSS an empty cell but may only TURN at
   an occupied one. And `rectangleGuess` runs the guess a reader makes first --
   along the entering row to the first occupied cell, down that column, back --
-  and names the corner that breaks it when it is empty. On the worked example
-  the guess closes; on the second iteration it does not, and the corner is
-  highlighted rather than described.
+  and names the corner that breaks it when it is empty. On the default view the
+  guess is REFUSED FIRST, at (2,1), and closes on the second iteration; the
+  empty corner is highlighted rather than described. That order is the right way
+  round for the lesson -- a reader meets the failure before the shortcut that
+  usually works -- and the surplus preset's first three pivots are all plain
+  rectangles, so the guess is not being set up to fail.
 
   THE COVER IS KOENIG'S, NEVER "DRAW LINES UNTIL YOU CANNOT". `or_core.hungarian`
   builds the bipartite graph of the zero cells, calls `bipartiteMatch`, and

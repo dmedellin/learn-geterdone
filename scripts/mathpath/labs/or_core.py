@@ -1072,11 +1072,22 @@ RANGE_JS = r"""
       var to = (rg.hi === null || Rcmp(rg.hi, hi) > 0) ? hi : rg.hi;
       var zHere = cur.z[cur.n];
       var zFrom = Radd(zHere, Rmul(rg.y_i, Rsub(from, rg.b)));
-      var zTo = Radd(zHere, Rmul(rg.y_i, Rsub(to, rg.b)));
+      /* zEnd IS z PLUS slope TIMES THE WIDTH, in whichever direction z is
+         reported. It used to be computed as its own negated expression --
+         `cur.maximised ? zTo : Rneg(zTo)` for zTo = zHere + y_i(to - b) -- and
+         on a MINIMISATION that negates the endpoint while leaving `slope`
+         alone, so the piece came back as z MINUS slope times the width. Every
+         one of the ten pieces across the three crash presets was wrong, and
+         the error is reader-visible: the time-cost curve was drawn as four
+         disconnected RISING segments where the true curve is convex and
+         decreasing, and the pieces table printed a right-hand total that
+         contradicted the next row's left-hand total.
+         Nothing caught it because `confirmed` re-solves at `from` only. */
+      var zStart = cur.maximised ? zFrom : Rneg(zFrom);
       pieces.push({ from: from, to: to, slope: rg.y_i, basis: cur.basis.slice(),
                     names: cur.basis.map(function (c) { return cur.names[c]; }),
-                    z: cur.maximised ? zFrom : Rneg(zFrom),
-                    zEnd: cur.maximised ? zTo : Rneg(zTo) });
+                    z: zStart,
+                    zEnd: Radd(zStart, Rmul(rg.y_i, Rsub(to, from))) });
       if (Rcmp(to, hi) >= 0) break;
       breaks.push(to);
       /* Move to the breakpoint exactly, then pivot out the basic variable that
@@ -1678,10 +1689,19 @@ NET_JS = r"""
     for (j = 0; j < right.length; j += 1) if (zr[j]) { coverR.push(right[j]); NS.push(right[j]); }
     return { matching: matching, size: matching.length,
              cover: { left: coverL, right: coverR, size: coverL.length + coverR.length },
+             /* Both of these were named for the opposite of what they hold.
+                `hall` was true exactly when HALL'S CONDITION FAILS, and
+                `perfect` was true when the matching saturates the SMALLER
+                side -- so a three-by-two instance reported perfect: true with
+                an applicant unplaced. Nothing reader-facing was wrong only
+                because the one caller recomputes its own verdict. Renamed to
+                what they are; a caller reaching for either name now gets the
+                sense it reads as. */
              deficient: { S: S, N: NS, gap: S.length - NS.length,
-                          hall: S.length > NS.length },
+                          violated: S.length > NS.length },
              alternating: { left: S.slice(), right: NS.slice() },
-             perfect: matching.length === Math.min(left.length, right.length),
+             saturatesSmallerSide:
+               matching.length === Math.min(left.length, right.length),
              matchL: matchL, matchR: matchR };
   }
 """
@@ -2378,8 +2398,12 @@ IP_JS = r"""
       var kids = [];
       for (k2 = 0; k2 < shortest.length; k2 += 1) {
         var from = shortest[k2], to = node.assignment[from];
+        /* ONE-BASED, because the picture is. ipTourSvg draws city i with the
+           label i + 1, so a table row reading "ban 0->4" beside a ring whose
+           cities are 1..n names two cities that are not the ones it forbids.
+           The bans themselves stay zero-based -- this is the display string. */
         var child = make(node.bans.concat([[from, to]]), node.id,
-                         'ban ' + from + '->' + to);
+                         'ban ' + (from + 1) + '->' + (to + 1));
         kids.push(child.id);
       }
       node.children = kids;
@@ -3319,10 +3343,10 @@ SIM_JS = r"""
 
      Streams are NOT new and nothing here re-implements one: lcgStream,
      streamUniform and sampleFromPmf all ship in sysdesign_core.STREAM_JS, and
-     inverse-transform sampling is C10 L1's whole lesson.  number.py's lcgRun
-     is a CYCLE DETECTOR and is the wrong tool, but its hullDobell(a, c, m) is
-     the right one for the full-period certificate the lesson prints beside the
-     stream. */
+     inverse-transform sampling is the simulation course's own first lesson.
+     number.py's lcgRun is a CYCLE DETECTOR and is the wrong tool, but its
+     hullDobell(a, c, m) is the right one for the full-period certificate the
+     lesson prints beside the stream. */
 
   function sampleMean(xs) {
     if (!xs.length) return null;

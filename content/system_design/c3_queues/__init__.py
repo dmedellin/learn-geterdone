@@ -44,10 +44,10 @@ COURSE = {
     ],
     "assumes_short": "Capacity Estimation and Latency and the Tail; geometric and binomial distributions",
     "assumes_long": (
-        "C1, C2. Discrete Mathematics `geometric-distribution`, `binomial-distribution`, "
-        "`expected-value`, `hashing-and-pseudorandom-numbers`. Algebra "
-        "`infinite-geometric-series`, `the-number-e`, `graphs-and-asymptotes`, "
-        "`literal-equations-and-formulas`"
+        "Capacity Estimation and Latency and the Tail. Discrete Mathematics: the "
+        "geometric and binomial distributions, expected value, and the seeded "
+        "generator. Algebra: infinite geometric series, the number e, graphs and "
+        "asymptotes, and literal equations"
     ),
     "outcomes_intro": (
         "By the end you can compute the three quantities of a queue from a trace, from a "

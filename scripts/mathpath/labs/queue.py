@@ -44,18 +44,28 @@ Four decisions run through all of them.
   -- which is why the page prints the exact Geo/Geo/1 answer beside Kingman's
   and lets them disagree.
 
-  AND THE ROUNDED ONE HAS A RANGE. sysdesign_core's `expNegApprox` sums the
-  ALTERNATING series for e^-x, whose largest term is about e^x/sqrt(2*pi*x)
-  while the answer is e^-x, so it loses roughly 2x/ln(10) significant digits to
-  cancellation. Measured: the relative error is 3e-9 at x = 10, 1.6e-7 at
-  x = 12, 4e-3 at x = 17, 173% at x = 20, and past x = 21 the SIGN is wrong.
-  That is a defect in the core -- 1/exp(x) by a positive-term series would be
-  right everywhere -- and fixing it there is not this kit's to do while nine
-  other kits are being built against the same file. So `memoryless` and
-  `poisson` bound their controls to x <= 12, `expNegSafe` returns NaN outside
-  that, and both pages say on their face where the limit is and why. The exact
-  columns on both pages have no such limit, which is the argument for exactness
-  stated in one number.
+  AND THE ROUNDED ONE IS THE ROUNDED ONE, WHICH IS A DIFFERENT CLAIM.
+  This passage used to say that sysdesign_core's `expNegApprox` sums the
+  ALTERNATING series for e^-x and therefore loses roughly 2x/ln(10) significant
+  digits to cancellation -- "3e-9 out at x = 10 ... 173% at x = 20, and past
+  x = 21 the SIGN is wrong". The core was fixed: it now returns the reciprocal
+  of the POSITIVE-term series for e^x, where nothing cancels. Measured against
+  Math.exp, the relative error is 1.5e-16 at x = 1, 3.0e-16 at x = 10,
+  5.5e-16 at x = 12, 6.4e-16 at x = 17, 4.0e-16 at x = 20 and 5.4e-16 at
+  x = 40 -- last-bit, everywhere this kit can reach.
+
+  The description outlived the thing it described, and it was reader-facing on
+  two published pages. Prose in one module about another module's internals
+  has nothing holding it to the truth; `mathcheck.js` now pins those figures,
+  so the next method change fails a check instead of ageing quietly.
+
+  The bound stays at x <= 12, for the reason that is actually true. The EXACT
+  column is (1 - lambda*Delta)^(t/Delta) as a fraction, and its denominator
+  grows with the exponent: 161 digits at lambda*t = 4, 401 at 10, 801 at 20.
+  The limit is the size of the exact side, not the accuracy of the rounded one,
+  and that is what the pages now say. `expNegSafe` still refuses outside the
+  bound, because a control that cannot be reached should not be reachable by a
+  hand-written preset either.
 
 The modes, and the lesson each belongs to:
 
@@ -415,21 +425,19 @@ QUEUE_KIT_JS = r"""
     if (!both || !past || Rzero(past)) return null;
     return Rdiv(both, past);
   }
-  /* e^-x, from the core, WITH ITS RANGE STATED.
+  /* e^-x, from the core, WITH THE REASON FOR ITS RANGE STATED.
 
-     expNegApprox sums the alternating series 1 - x + x^2/2! - ..., whose largest
-     term is about e^x/sqrt(2*pi*x) while the answer is e^-x, so it throws away
-     roughly 2x/ln(10) significant digits to cancellation. In double precision
-     that is all sixteen of them by about x = 19, and past x = 21 the result
-     changes sign. Measured: the relative error is 3e-9 at x = 10, 1.6e-7 at
-     x = 12, 4e-3 at x = 17 and 173% at x = 20.
+     expNegApprox returns the reciprocal of the positive-term series for e^x.
+     Nothing cancels, and the relative error against Math.exp is last-bit from
+     x = 1 to x = 40 -- 1.5e-16, 3.0e-16, 5.5e-16, 6.4e-16, 4.0e-16, 5.4e-16 at
+     1, 10, 12, 17, 20 and 40. mathcheck pins those.
 
-     So this kit does not hand it an x it cannot answer. The two modes that call
-     it bound their controls to EXP_SAFE_X and say so on the page, and the two
-     functions below refuse rather than return a number that is confidently
-     wrong -- which on a page promising checkable arithmetic is the worse
-     failure of the two. Widening the bound is a change to the core's method,
-     not to this kit. */
+     EXP_SAFE_X is therefore NOT an accuracy bound, whatever the comment here
+     said for as long as it was wrong. It bounds the EXACT column, whose
+     denominator has 161 digits at lambda*t = 4, 401 at 10 and 801 at 20; past
+     that the fraction the page is arguing for stops being something a reader
+     can look at. The refusal stays, so a hand-written preset cannot step round
+     a control the page does not offer. */
   var EXP_SAFE_X = 12;
   function expNegSafe(x) {
     if (!(x >= 0) || x > EXP_SAFE_X) return NaN;
@@ -1493,11 +1501,11 @@ _DELTAS = [("1", "&Delta; = 1 second"), ("2", "&Delta; = 1/2 second"),
            ("10", "&Delta; = 1/10 second"), ("100", "&Delta; = 1/100 second")]
 
 
-# The exponential column is computed by the core's alternating series, which is
-# accurate to about seven significant figures at x = 12 and to none at all by
-# x = 19. lambda*t IS that x, so the controls stop where the method does and the
-# panel says why. A preset that asked for more would print a wrong number under
-# a promise of a checkable one, so it raises instead.
+# The controls stop at lambda*t = 12 because of the EXACT column, not the
+# rounded one: (1 - lambda*Delta)^(t/Delta) has a 401-digit denominator at
+# lambda*t = 10 and 801 at 20. The core's e^-x is last-bit accurate to x = 40.
+# (This comment previously gave the accuracy of the core's old alternating
+# series as the reason; that series was replaced and the reason with it.)
 _EXP_SAFE_X = 12
 
 
@@ -1508,9 +1516,9 @@ def _memoryless(cfg):
     already = int(cfg.get("already", 3))
     if lam10 * t > 10 * _EXP_SAFE_X:
         raise ValueError(
-            "queue mode 'memoryless': lambda*t = %s exceeds %d, where the core's "
-            "alternating series for e^-x has lost every significant digit to "
-            "cancellation" % (lam10 * t / 10.0, _EXP_SAFE_X)
+            "queue mode 'memoryless': lambda*t = %s exceeds %d, past which the "
+            "EXACT column's denominator runs to hundreds of digits and stops "
+            "being something a reader can look at" % (lam10 * t / 10.0, _EXP_SAFE_X)
         )
 
     markup = (
@@ -1543,12 +1551,14 @@ def _memoryless(cfg):
             "meHint",
             "The geometric column is an exact fraction: (1 &minus; &lambda;&Delta;) is rational and "
             "the exponent t/&Delta; is a whole number of slots. The exponential column is "
-            "<em>not</em> exact &mdash; e<sup>&minus;x</sup> is computed by its series and says so. "
+            "<em>not</em> exact &mdash; e<sup>&minus;x</sup> is computed by a series and says so, "
+            "though it is accurate to the last bit of a double everywhere this page can reach. "
             "Shrink &Delta; and the exact column walks toward the rounded one. The sliders stop at "
-            "&lambda;t = 12 because that is where the series stops being able to answer: it "
-            "alternates, so it loses about 2x/ln&nbsp;10 significant digits to cancellation, and by "
-            "x = 19 a double has none left. The exact column has no such limit, which is the "
-            "argument for exactness in one line.",
+            "&lambda;t = 12 because of the <em>exact</em> side, not the rounded one: "
+            "(1 &minus; &lambda;&Delta;)<sup>t/&Delta;</sup> is a fraction whose denominator runs "
+            "to 161 digits at &lambda;t = 4 and 801 at &lambda;t = 20, and past that the thing this "
+            "page is arguing for stops being something you can look at. Being exact has a price, "
+            "and this is where you can see it.",
         )
     )
 
@@ -1645,7 +1655,7 @@ def _memoryless(cfg):
       + Rfixed(geo, 6) + '</strong> exactly, as the fraction (1 &minus; ' + Rtext(Rmul(lam, R(1n, BigInt(inv))))
       + ')<sup>' + commas(t * inv) + '</sup>. The exponential answer is <strong>' + ex.toFixed(6)
       + '</strong>, <span class="tone-red">rounded</span> &mdash; e<sup>&minus;x</sup> is computed by '
-      + 'its alternating series here, because it is not a fraction. They differ by ' + Rfixed(gap, 6)
+      + 'a series here, because it is not a fraction. They differ by ' + Rfixed(gap, 6)
       + ' at &Delta; = ' + Rtext(R(1n, BigInt(inv))) + ', and the table shows that difference shrinking '
       + 'with the slot. '
       + (cond
@@ -1736,12 +1746,13 @@ def _poisson(cfg):
             "poHint",
             "\"1000 per second\" does not mean 1000 arrive each second. With a Poisson count the "
             "standard deviation is &radic;m, so a mean of 1000 is 1000 &plusmn; 32 and a window "
-            "sized at exactly the mean is over capacity about half the time. Two limits are worth "
-            "knowing: the chopping stops at 20m because the bars are <em>exact</em> fractions and at "
-            "100m the denominators run to two thousand digits; and the mean stops at 12 because the "
-            "<em>rounded</em> column cannot go further &mdash; e<sup>&minus;m</sup> is summed by an "
-            "alternating series that has lost every significant digit by m = 19. The exact column "
-            "would have been happy to continue.",
+            "sized at exactly the mean is over capacity about half the time. Both limits on this "
+            "page come from the <em>exact</em> side rather than the rounded one: the chopping stops "
+            "at 20m because the bars are exact fractions and at 100m the denominators run to two "
+            "thousand digits, and the mean stops at 12 for the same reason. The rounded column "
+            "would have been happy to continue &mdash; e<sup>&minus;m</sup> is the reciprocal of a "
+            "positive-term series, so nothing cancels and it is accurate to the last bit of a "
+            "double well past any mean this page offers.",
         )
     )
 
@@ -1826,8 +1837,8 @@ def _poisson(cfg):
       + '<tr><td>&radic;m, the spread</td><td colspan="2" class="tone-red">' + sigma.toFixed(4)
       + ' &mdash; a square root, so this one rounds too</td></tr>'
       + '<tr><td>method</td><td class="tone-cyan">exact fractions over BigInt</td>'
-      + '<td class="tone-red">e<sup>&minus;m</sup> by an alternating series, good to about seven '
-      + 'figures here and to none past m = 19 &mdash; which is why the mean stops at 12</td></tr>'
+      + '<td class="tone-red">e<sup>&minus;m</sup> as the reciprocal of a positive-term series, '
+      + 'so nothing cancels &mdash; last-bit accurate here, but still a rounded number</td></tr>'
       + '</tbody>';
 
     status.innerHTML = 'A window whose mean is <strong>' + m + '</strong> has variance <strong>'
