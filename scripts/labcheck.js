@@ -24,9 +24,26 @@
  *
  * --all still runs everything, for anyone extending the shim.
  *
+ * EXPECTATIONS. A preset's <option> text says which instance it is. What the
+ * page then PRINTS is a separate claim, and until now nothing compared the two:
+ * fifteen kits shipped 57 false preset strings and every check in the repository
+ * passed. scripts/build_paths.py writes scripts/generated-expectations.json --
+ * page -> select id -> option value -> {kpi element id: exact text} -- and this
+ * file selects each option, dispatches the control's own change handler, reads
+ * getElementById(kpi).textContent out of the shipped page, and compares. It is
+ * the page's own output that is checked, never the source that produced it.
+ *
  * Usage:  node scripts/labcheck.js site/<course>/<lesson>/index.html ...
  *         node scripts/labcheck.js --generated    (the generated path)
  *         node scripts/labcheck.js --all          (every page under site/)
+ *         node scripts/labcheck.js --expect <manifest.json>   (that manifest's
+ *             pages, with its expectations; for a path not yet in
+ *             GENERATED_PATHS, rendered anywhere, keys relative to the
+ *             manifest's parent directory)
+ *         node scripts/labcheck.js --observe <page.html>
+ *             print every <select> option's KPI tiles as the page prints them,
+ *             as JSON. This is how an author reads the figures an expectation
+ *             pins: by running the kit, never by reading its source.
  */
 
 const fs = require('fs');
@@ -122,6 +139,32 @@ function idsOf(markup) {
   return ids;
 }
 
+/* Every <select> on the page, with the values of its options in document
+   order. One parser, used by the control sweep, by the expectation pass and by
+   the gate that says an option without an expectation is a page failure. */
+function selectsOf(markup) {
+  const out = new Map();
+  const selectRe = /<select\b([^>]*)>([\s\S]*?)<\/select>/gi;
+  let m;
+  while ((m = selectRe.exec(markup))) {
+    const idm = /\bid="([^"]+)"/.exec(m[1]);
+    if (!idm) continue;
+    out.set(idm[1], [...m[2].matchAll(/<option\b([^>]*)>/g)]
+      .map((o) => { const v = /\bvalue="([^"]*)"/.exec(o[1]); return v ? v[1] : ''; }));
+  }
+  return out;
+}
+
+/* Every KPI tile: [element id, the label printed beside it]. This is the shape
+   _kpis() emits in every kit on every generated path, and it is what --observe
+   reports so an author writing an expectation sees the tile's own wording next
+   to the figure. */
+function kpisOf(markup) {
+  return [...markup.matchAll(
+    /<div class="kpi"><span>([\s\S]*?)<\/span><strong id="([^"]+)"/g)]
+    .map((m) => [m[2], m[1]]);
+}
+
 /* Initial value of a <select> (its selected option, else its first) and of an
    <input> (its value attribute), so a lab that reads a control before writing
    it sees what a browser would see. */
@@ -165,13 +208,8 @@ function initialValues(markup) {
 function controlValues(markup) {
   const out = [];
   let m;
-  const selectRe = /<select\b([^>]*)>([\s\S]*?)<\/select>/gi;
-  while ((m = selectRe.exec(markup))) {
-    const idm = /\bid="([^"]+)"/.exec(m[1]);
-    if (!idm) continue;
-    const values = [...m[2].matchAll(/<option\b([^>]*)>/g)]
-      .map((o) => { const v = /\bvalue="([^"]*)"/.exec(o[1]); return v ? v[1] : ''; });
-    if (values.length) out.push([idm[1], values]);
+  for (const [id, values] of selectsOf(markup)) {
+    if (values.length) out.push([id, values]);
   }
   const inputRe = /<input\b([^>]*)>/gi;
   while ((m = inputRe.exec(markup))) {
@@ -203,7 +241,12 @@ function scriptsOf(markup) {
 
 // ------------------------------------------------------------------- run
 
-function runPage(file, sweep) {
+/* One evaluation of one page: its scripts run, its first redraw done. Returned
+   rather than consumed here, because the expectation pass needs a page whose
+   controls are still at the values the markup shipped -- the sweep below leaves
+   text boxes holding "banana" on its way past, and an expectation must be read
+   from the page a reader actually opens. */
+function loadPage(file) {
   const markup = fs.readFileSync(file, 'utf8');
   const doc = new Doc(idsOf(markup));
   for (const [id, value] of initialValues(markup)) {
@@ -246,6 +289,183 @@ function runPage(file, sweep) {
   } else if (/window\.redrawLab/.test(markup)) {
     problems.push('the page assigns window.redrawLab but it is not callable after load');
   }
+
+  return { markup, doc, sandbox, problems };
+}
+
+/* Set one <select> to one value the way a reader does. DISPATCH, do not just
+   redraw: several labs rebuild dependent controls in the change handler, and
+   every preset menu in scripts/mathpath/labs rewrites the text boxes there --
+   skip it and the figures read belong to the previous preset. */
+function choose(page, el, value) {
+  el.value = value;
+  if (el.checked !== undefined) el.checked = value === 'on';
+  if (el.listeners && (el.listeners.change || el.listeners.input)) {
+    el.dispatch('change');
+    el.dispatch('input');
+  } else {
+    page.sandbox.redrawLab();
+  }
+}
+
+/* Which <select>s on this page are PRESET menus, decided by BEHAVIOUR rather
+   than by name: a preset menu is one whose own change handler rewrites another
+   control's value. Nothing here reads an id, a label or a line of source, so a
+   second preset menu added under any name still has to be declared -- which is
+   the hole a declaration-only gate leaves open. A menu that merely redraws (the
+   greedy rule, the cache policy) rewrites nothing and is not one. */
+function presetSelects(file, markup) {
+  const found = [];
+  for (const [selectId, values] of selectsOf(markup)) {
+    if (values.length < 2) continue;
+    const page = loadPage(file);
+    if (page.problems.length || typeof page.sandbox.redrawLab !== 'function') continue;
+    const el = page.doc.getElementById(selectId);
+    if (!el) continue;
+    const others = [...page.doc.byId.values()].filter(
+      (e) => e !== el && (e.tagName === 'INPUT' || e.tagName === 'SELECT'));
+    const before = others.map((e) => e.value);
+    for (const value of values) {
+      if (value === el.value) continue;
+      try { choose(page, el, value); } catch (err) { break; }
+      if (others.some((e, i) => e.value !== before[i])) { found.push(selectId); break; }
+    }
+  }
+  return found;
+}
+
+// ------------------------------------------------------- the expectation pass
+//
+// A preset carries two claims. Its <option> text -- "density greedy at a
+// fiftieth of the optimum" -- says which instance it is; no check can read it.
+// Its expectations say what the page PRINTS once it is selected, and that is
+// checked here, against the shipped page, by reading the element.
+//
+// THE GATE. Every option of every declared select must carry at least one
+// expectation. Without it the mechanism decays into whichever presets an author
+// felt like filling in, which is the state that let 57 false strings ship.
+function checkExpectations(file, entry, markup) {
+  const problems = [];
+  const selects = entry && entry.selects ? entry.selects : {};
+  const kit = (entry && entry.kit) || '(unnamed kit)';
+  if (!Object.keys(selects).length) {
+    problems.push(`${kit}: this kit is listed in build_paths.KITS_WITH_EXPECTATIONS `
+      + 'but the page declares no preset expectations at all');
+    return problems;
+  }
+
+  const onPage = selectsOf(markup);
+  for (const selectId of presetSelects(file, markup)) {
+    if (!(selectId in selects)) {
+      problems.push(`${kit}: #${selectId} rewrites other controls when it changes, so it is a `
+        + 'preset menu, and it declares no expectations');
+    }
+  }
+  for (const [selectId, byOption] of Object.entries(selects)) {
+    const options = onPage.get(selectId);
+    if (!options) {
+      problems.push(`${kit}: expectations name #${selectId}, which is not a <select> on this page`);
+      continue;
+    }
+    for (const value of options) {
+      const want = byOption[value];
+      if (!want || !Object.keys(want).length) {
+        problems.push(`${kit}: preset "${value}" of #${selectId} carries no expectation -- `
+          + 'every option a reader can choose must pin at least one KPI it prints');
+      }
+    }
+    for (const value of Object.keys(byOption)) {
+      if (!options.includes(value)) {
+        problems.push(`${kit}: an expectation names preset "${value}" of #${selectId}, `
+          + 'which the page does not offer');
+      }
+    }
+  }
+
+  for (const [selectId, byOption] of Object.entries(selects)) {
+    if (!onPage.has(selectId)) continue;
+    // A fresh page per select: every other control at the value the markup
+    // shipped, which is the state the expectation is a statement about.
+    const page = loadPage(file);
+    // A page that cannot load already fails above, and reporting the same
+    // breakage twice buries it.
+    if (page.problems.length) continue;
+    if (typeof page.sandbox.redrawLab !== 'function') {
+      problems.push(`${kit}: #${selectId} cannot be exercised -- the page has no redrawLab`);
+      continue;
+    }
+    const el = page.doc.getElementById(selectId);
+    if (!el) {
+      problems.push(`${kit}: #${selectId} is in the markup but the harness has no element for it`);
+      continue;
+    }
+    for (const value of onPage.get(selectId)) {
+      const want = byOption[value];
+      // An option with nothing pinned is already a failure above; there is
+      // nothing here to read it against.
+      if (!want || !Object.keys(want).length) continue;
+      try {
+        choose(page, el, value);
+      } catch (err) {
+        problems.push(`${kit}: #${selectId} = ${JSON.stringify(value)} threw before its `
+          + `figures could be read: ${err && err.message}`);
+        continue;
+      }
+      for (const [kpi, expected] of Object.entries(want)) {
+        const tile = page.doc.getElementById(kpi);
+        if (!tile) {
+          problems.push(`${kit}: #${selectId} = ${JSON.stringify(value)} expects #${kpi}, `
+            + 'which is not an element on this page');
+          continue;
+        }
+        const found = tile.textContent;
+        if (found !== expected) {
+          problems.push(`${kit}: #${selectId} = ${JSON.stringify(value)}: #${kpi} should read `
+            + `${JSON.stringify(expected)}, the page printed ${JSON.stringify(found)}`);
+        }
+      }
+    }
+  }
+  return problems;
+}
+
+/* --observe. Every option of every <select>, and what the KPI tiles then hold.
+   The author's instrument: the figures an expectation pins are read off a
+   running kit here, never copied out of the code that computes them. */
+function observePage(file) {
+  const markup = fs.readFileSync(file, 'utf8');
+  const kpis = kpisOf(markup);
+  const out = { page: file, labels: {}, selects: {} };
+  kpis.forEach(([id, label]) => { out.labels[id] = label; });
+  for (const [selectId, values] of selectsOf(markup)) {
+    if (!values.length) continue;
+    const page = loadPage(file);
+    if (page.problems.length) { out.selects[selectId] = { error: page.problems }; continue; }
+    if (typeof page.sandbox.redrawLab !== 'function') continue;
+    const el = page.doc.getElementById(selectId);
+    if (!el) continue;
+    const seen = {};
+    for (const value of values) {
+      try { choose(page, el, value); } catch (err) {
+        seen[value] = { error: String(err && err.message) };
+        continue;
+      }
+      const row = {};
+      kpis.forEach(([id]) => {
+        const tile = page.doc.getElementById(id);
+        if (tile) row[id] = tile.textContent;
+      });
+      seen[value] = row;
+    }
+    out.selects[selectId] = seen;
+  }
+  return out;
+}
+
+function runPage(file, sweep, entry) {
+  const page = loadPage(file);
+  const { markup, doc, sandbox } = page;
+  const problems = page.problems;
 
   // Now every value of every control, one control at a time, each restored
   // before the next. A page that throws on one slider position is broken for
@@ -301,6 +521,8 @@ function runPage(file, sweep) {
       problems.push(`quiz data does not parse: ${err && err.message}`);
     }
   }
+
+  if (entry) problems.push(...checkExpectations(file, entry, markup));
   return problems;
 }
 
@@ -314,16 +536,56 @@ function collect(dir) {
   return out;
 }
 
+/* The expectations manifest. Keys are page paths relative to the manifest's
+   parent directory, exactly as scripts/generated-pages.txt spells them, so the
+   two manifests are read the same way and a page is the same string in both. */
+function readExpectations(manifestFile) {
+  const root = path.resolve(path.dirname(manifestFile), '..');
+  const raw = JSON.parse(fs.readFileSync(manifestFile, 'utf8'));
+  const byFile = new Map();
+  for (const [relative, entry] of Object.entries(raw.pages || {})) {
+    byFile.set(path.resolve(root, relative), entry);
+  }
+  return byFile;
+}
+
 function main(argv) {
-  let files = argv.slice(2).filter((a) => a !== '--no-sweep');
+  const args = argv.slice(2);
   // The sweep is the default, because the claim in AGENTS.md is the default.
-  const sweep = !argv.includes('--no-sweep');
+  const sweep = !args.includes('--no-sweep');
+  let files = args.filter((a) => a !== '--no-sweep');
+
+  const observeAt = files.indexOf('--observe');
+  if (observeAt !== -1) {
+    const targets = files.slice(observeAt + 1);
+    if (!targets.length) {
+      console.error('usage: node scripts/labcheck.js --observe <page.html> ...');
+      return 2;
+    }
+    console.log(JSON.stringify(targets.map((f) => observePage(path.resolve(f))), null, 1));
+    return 0;
+  }
+
+  // Where the expectations come from: --expect names a manifest anywhere, which
+  // is how a path not yet in GENERATED_PATHS gets checked; otherwise
+  // --generated picks up the one build_paths.py writes beside the page list.
+  let expectFile = null;
+  const expectAt = files.indexOf('--expect');
+  if (expectAt !== -1) {
+    expectFile = path.resolve(files[expectAt + 1] || '');
+    if (!expectFile || !fs.existsSync(expectFile)) {
+      console.error('no expectations manifest at ' + expectFile);
+      return 2;
+    }
+    files.splice(expectAt, 2);
+  }
+
   if (files[0] === '--all') {
     files = collect(path.join(__dirname, '..', 'site'));
   } else if (files[0] === '--generated') {
     const manifest = path.join(__dirname, 'generated-pages.txt');
     if (!fs.existsSync(manifest)) {
-      console.error('no manifest at ' + manifest + '; run scripts/build_discrete_math.py');
+      console.error('no manifest at ' + manifest + '; run scripts/build_paths.py');
       return 2;
     }
     files = fs.readFileSync(manifest, 'utf8')
@@ -331,21 +593,52 @@ function main(argv) {
       .map((line) => line.trim())
       .filter(Boolean)
       .map((rel) => path.join(__dirname, '..', rel));
+    if (!expectFile) {
+      const generated = path.join(__dirname, 'generated-expectations.json');
+      if (fs.existsSync(generated)) expectFile = generated;
+    }
   }
+
+  let expectations = new Map();
+  if (expectFile) {
+    try {
+      expectations = readExpectations(expectFile);
+    } catch (err) {
+      console.error('the expectations manifest does not parse: ' + (err && err.message));
+      return 2;
+    }
+    // A manifest on its own is a page list too: the pages it names are exactly
+    // the ones whose figures are pinned.
+    if (!files.length) files = [...expectations.keys()];
+  }
+
   if (!files.length) {
-    console.error('usage: node scripts/labcheck.js <page.html> ... | --generated | --all');
+    console.error('usage: node scripts/labcheck.js <page.html> ... '
+      + '| --generated | --all | --expect <manifest.json> | --observe <page.html>');
     return 2;
   }
   let failed = 0;
+  let pinned = 0;
   for (const file of files) {
-    const problems = runPage(file, sweep);
+    const entry = expectations.get(path.resolve(file)) || null;
+    if (entry) pinned += 1;
+    // A manifest naming a page that was never built is a stale manifest, and
+    // saying so beats an ENOENT stack trace from the middle of the sweep.
+    if (!fs.existsSync(file)) {
+      failed += 1;
+      console.log(`FAIL ${path.relative(process.cwd(), file)}`);
+      console.log('      no such page; the manifest is stale, run scripts/build_paths.py');
+      continue;
+    }
+    const problems = runPage(file, sweep, entry);
     if (problems.length) {
       failed += 1;
       console.log(`FAIL ${path.relative(process.cwd(), file)}`);
       problems.forEach((p) => console.log(`      ${p}`));
     }
   }
-  console.log(`${files.length} page(s) executed${sweep ? ' and swept' : ''}, ${failed} failing`);
+  console.log(`${files.length} page(s) executed${sweep ? ' and swept' : ''}`
+    + `, ${pinned} with pinned figures, ${failed} failing`);
   return failed ? 1 : 0;
 }
 

@@ -19,8 +19,19 @@ import json
 
 
 class Lab:
+    """One lab.
+
+    `expect` is the third rule, and it is newer than the two above. It maps
+    {<select> element id: {option value: {kpi element id: exact printed text}}}
+    and it is NOT rendered: it goes into scripts/generated-expectations.json,
+    and scripts/labcheck.js selects each option on the built page, dispatches
+    the control's change handler and compares the tile's textContent with it.
+    A preset's menu text is prose no check can read; this is the part of the
+    same claim that a machine can.
+    """
+
     def __init__(self, *, title, subtitle, markup, script, legend=(), controls="",
-                 panel_title="", panel_intro="", note=""):
+                 panel_title="", panel_intro="", note="", expect=None):
         self.title = title
         self.subtitle = subtitle
         self.markup = markup
@@ -30,6 +41,10 @@ class Lab:
         self.panel_title = panel_title
         self.panel_intro = panel_intro
         self.note = note
+        self.expect = {
+            select: {option: dict(tiles) for option, tiles in options.items()}
+            for select, options in (expect or {}).items()
+        }
 
 
 def cfg_literal(name, value):

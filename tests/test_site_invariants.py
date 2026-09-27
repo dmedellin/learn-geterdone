@@ -3284,7 +3284,7 @@ class TestGeneratedPathIsCurrent(unittest.TestCase):
             raise unittest.SkipTest("cannot import the build script: %s" % exc)
 
         stale = []
-        for relative, markup in pages():
+        for relative, markup, _expect in pages():
             target = SITE_ROOT / relative
             if not target.is_file():
                 stale.append("%s (missing)" % relative)

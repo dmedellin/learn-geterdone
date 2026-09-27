@@ -154,6 +154,21 @@ authors noticed independently, each wrote a private sweep, and each threw it
 away; the sweep is now in `labcheck.js` and the claim is true. It found a
 published page that dies on a typed `1/0`. Pass `--no-sweep` for the old
 behaviour.)
+
+It also checks what a preset makes the page PRINT. `build_paths.py` writes
+`scripts/generated-expectations.json` — page → `<select>` id → option value →
+`{kpi element id: exact text}` — and `labcheck.js` selects each option,
+dispatches the change handler and compares `textContent` against it. For a kit
+listed in `build_paths.KITS_WITH_EXPECTATIONS` this is a gate: an option with no
+expectation fails the page, and so does a preset menu that declares none — which
+menus those are is decided by running the page and seeing which `<select>`
+rewrites another control, never by reading a name. It exists because a preset's own menu text is prose
+that no check can read, and a sweep of fifteen kits found 57 of those strings
+false about the lab they described. `greedy.py` is converted; the switch is how
+each remaining kit is turned on. `node scripts/labcheck.js --observe <page>`
+prints every option's tiles as the page prints them, which is how the figures
+are read.
+
 `mathcheck.js` proves the arithmetic those labs are built on is right, by
 executing the shipped JavaScript extracted from
 `scripts/mathpath/labs/algebra_core.py`. A lab that reports confidently wrong

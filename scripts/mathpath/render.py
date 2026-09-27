@@ -97,6 +97,18 @@ def _block(kind, payload):
 
 def lesson_page(*, path, course, lesson, index, prev_lesson, next_lesson):
     """One lesson: /<course-slug>/<lesson-slug>/ ."""
+    return lesson_page_with_lab(
+        path=path, course=course, lesson=lesson, index=index,
+        prev_lesson=prev_lesson, next_lesson=next_lesson)[0]
+
+
+def lesson_page_with_lab(*, path, course, lesson, index, prev_lesson, next_lesson):
+    """(markup, the Lab it was built from).
+
+    The lab is handed back rather than rebuilt: scripts/build_paths.py needs
+    lab.expect to write the expectations manifest, and building the lab twice
+    would double the cost of a full render for a dictionary it already has.
+    """
     number = "%02d" % (index + 1)
     total = len(course["lessons"])
     url = "/%s/%s/" % (course["slug"], lesson["slug"])
@@ -312,7 +324,7 @@ def lesson_page(*, path, course, lesson, index, prev_lesson, next_lesson):
                              + progress.LESSON_JS % json.dumps(lesson_id)
                              + feedback.STORE_JS
                              + feedback.LESSON_JS))
-    return chrome.name_horizontal_scrollers("".join(parts))
+    return chrome.name_horizontal_scrollers("".join(parts)), lab
 
 
 def _first_upper(text):

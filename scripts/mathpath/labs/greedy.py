@@ -24,6 +24,15 @@ So the figure a reader is asked to trust is never "greedy got 4". It is
 best of the 512 is 4, and here is the subset". A rule that is wrong is shown
 losing on a named instance rather than described as heuristic.
 
+EVERY PRESET PINS WHAT IT PRINTS. This is the first kit converted to the
+`expect` contract: each of the 28 presets carries a dict of {kpi element id:
+the exact text the page prints}, and scripts/labcheck.js selects the option on
+the BUILT page, dispatches the menu's own change handler and compares the
+tile's textContent. A preset's `label` and `note` are prose about an outcome
+and no check can read either -- a sweep of fifteen kits found 57 of those
+strings false -- so the part of the claim a machine can hold is held here. See
+`_expect` below and scripts/mathpath/AGENTS.md for the rule.
+
 NOTHING HERE IS ROUNDED, and two quantities are genuinely fractional. The
 expected codeword length of a Huffman code is (total bits)/(total weight) and
 the fractional knapsack's optimum is a sum of rationals; both are exact over
@@ -993,6 +1002,37 @@ def _options(presets):
     return [(p["id"], p["label"]) for p in presets]
 
 
+def _expect(presets):
+    """{preset id: {kpi element id: the exact text the page prints}}.
+
+    A preset carries two claims and only one of them can be checked. Its
+    `label` -- what the reader picks out of the menu -- is prose about an
+    instance, and no check in this repository can read it. Its `expect` says
+    what the page PRINTS once that preset is selected, tile by tile, and
+    scripts/labcheck.js selects the option, dispatches the change handler and
+    compares getElementById(kpi).textContent against it. The figures were read
+    off the running kit (`node scripts/labcheck.js --observe <page>`), never
+    copied out of the code that computes them.
+
+    Every option a reader can choose must pin at least one tile or the page
+    fails, which is the difference between a mechanism and an intention. And a
+    menu is recognised by behaviour: labcheck.js flags any <select> that rewrites
+    another control on change and is not declared here, so adding a second preset
+    menu to a mode does not slip past.
+
+    A tile is read with every OTHER control at the value the markup ships --
+    the earliest-finish rule, the density rule, LRU -- so a claim that only
+    becomes visible under a different rule cannot be pinned here. Those are
+    named in the comment beside the preset that makes them.
+
+    A missing `expect` is NOT an error here. It becomes an empty entry in the
+    manifest, and scripts/labcheck.js fails the page naming the preset -- which
+    puts the complaint in the check that runs the page rather than in a
+    KeyError from the builder, and keeps the gate in one place.
+    """
+    return {p["id"]: dict(p.get("expect") or {}) for p in presets}
+
+
 def _chosen(presets, cfg):
     want = str(cfg.get("preset", presets[0]["id"]))
     for p in presets:
@@ -1026,6 +1066,11 @@ _IV_PRESETS = [
         "id": "eleven",
         "label": "eleven activities, the usual worked example",
         "spec": "1-4, 3-5, 0-6, 5-7, 3-9, 5-9, 6-10, 8-11, 8-12, 2-14, 12-16",
+        "expect": {
+            "ivSize": "4",
+            "ivOpt": "4",
+            "ivSubsets": "2048",
+        },
         "note": "the earliest-finish rule takes four of the eleven, and four is the most any "
                 "of the 2048 subsets can manage — shortest-first happens to reach it too, "
                 "which is what being right on one instance looks like",
@@ -1034,6 +1079,14 @@ _IV_PRESETS = [
         "id": "shortestfails",
         "label": "three intervals that kill the shortest-first rule",
         "spec": "0-5, 4-6, 5-10",
+        # Only part of this preset's point is pinnable: the tiles are read with
+        # ivRule at the value the markup ships (earliest finish), which SUCCEEDS
+        # here. "shortest-first takes one where two fit" is visible only after the
+        # reader moves the rule, so what is pinned is the instance and the optimum.
+        "expect": {
+            "ivN": "3",
+            "ivOpt": "2",
+        },
         "note": "the short one in the middle blocks both of the others, so the rule that "
                 "sounds most careful takes one where two fit",
     },
@@ -1041,6 +1094,11 @@ _IV_PRESETS = [
         "id": "startfails",
         "label": "one long interval that kills the earliest-start rule",
         "spec": "0-10, 1-2, 3-4, 5-6, 7-8",
+        "expect": {
+            "ivN": "5",
+            "ivSize": "4",
+            "ivOpt": "4",
+        },
         "note": "starting first is not finishing first, and the interval that starts first "
                 "here occupies the whole day",
     },
@@ -1048,6 +1106,11 @@ _IV_PRESETS = [
         "id": "conflictfails",
         "label": "seven intervals that kill the fewest-conflicts rule",
         "spec": "0-2, 2-4, 4-6, 6-8, 1-3, 3-5, 5-7",
+        "expect": {
+            "ivN": "7",
+            "ivSize": "4",
+            "ivOpt": "4",
+        },
         "note": "the two intervals with the fewest conflicts are the two ends, A and D, and "
                 "B and C still fit around them — the optimum is all four. What loses them is "
                 "the single finish-time pointer: once D is taken nothing starts after 8",
@@ -1203,6 +1266,7 @@ def _intervals(cfg):
             "swap at a time, with feasibility rechecked after each.",
         ),
         script=script,
+        expect={"ivPreset": _expect(_IV_PRESETS)},
     )
 
 
@@ -1215,6 +1279,11 @@ _PT_PRESETS = [
         "id": "lectures",
         "label": "ten lectures, three rooms needed",
         "spec": "0-3, 1-4, 2-5, 4-7, 5-8, 6-9, 8-11, 9-12, 10-13, 12-15",
+        "expect": {
+            "ptN": "10",
+            "ptUsed": "3",
+            "ptNeeded": "3",
+        },
         "note": "three lectures are live at the same instant, so three rooms is not a "
                 "property of the algorithm but of the instance",
     },
@@ -1222,6 +1291,10 @@ _PT_PRESETS = [
         "id": "staircase",
         "label": "a staircase: every interval overlaps the next",
         "spec": "0-4, 2-6, 4-8, 6-10, 8-12",
+        "expect": {
+            "ptUsed": "2",
+            "ptNeeded": "2",
+        },
         "note": "each interval meets only its neighbour, so two rooms suffice however many "
                 "intervals there are",
     },
@@ -1229,6 +1302,11 @@ _PT_PRESETS = [
         "id": "pileup",
         "label": "five intervals over one instant",
         "spec": "0-9, 1-9, 2-9, 3-9, 4-9",
+        "expect": {
+            "ptUsed": "5",
+            "ptNeeded": "5",
+            "ptAt": "4",
+        },
         "note": "all five are alive at t = 4, and no schedule of any kind uses fewer than "
                 "five rooms",
     },
@@ -1236,6 +1314,10 @@ _PT_PRESETS = [
         "id": "disjoint",
         "label": "nothing overlaps at all",
         "spec": "0-2, 2-4, 4-6, 6-8, 8-10",
+        "expect": {
+            "ptUsed": "1",
+            "ptNeeded": "1",
+        },
         "note": "the depth is one, and one room is what greedy uses",
     },
 ]
@@ -1374,6 +1456,7 @@ def _partition(cfg):
             "that make it true.",
         ),
         script=script,
+        expect={"ptPreset": _expect(_PT_PRESETS)},
     )
 
 
@@ -1387,6 +1470,11 @@ _HF_PRESETS = [
         "label": "six symbols, the usual worked example",
         "spec": "a:45, b:13, c:12, d:16, e:9, f:5",
         "message": "abcdef",
+        "expect": {
+            "hfN": "6",
+            "hfExp": "56/25 = 2.240",
+            "hfFixed": "3",
+        },
         "note": "the expected length is 56/25 bits against 3 for a fixed-length code over six "
                 "symbols",
     },
@@ -1395,6 +1483,13 @@ _HF_PRESETS = [
         "label": "one symbol dominates",
         "spec": "a:60, b:20, c:10, d:5, e:5",
         "message": "aaabac",
+        # The codeword lengths -- one bit for the common symbol, four for the rare
+        # ones -- are table rows, not tiles, so the saving is pinned as the tiles
+        # state it: 17/10 bits against a fixed-length 3.
+        "expect": {
+            "hfExp": "17/10 = 1.700",
+            "hfFixed": "3",
+        },
         "note": "the common symbol gets one bit and the rare ones four, which is where the "
                 "saving comes from",
     },
@@ -1403,6 +1498,11 @@ _HF_PRESETS = [
         "label": "four equal weights",
         "spec": "a:10, b:10, c:10, d:10",
         "message": "abcd",
+        "expect": {
+            "hfExp": "2 = 2.000",
+            "hfFixed": "2",
+            "hfMin": "yes",
+        },
         "note": "with equal weights every codeword is two bits and Huffman saves nothing at "
                 "all — the saving is a fact about the distribution, not about the algorithm",
     },
@@ -1411,6 +1511,14 @@ _HF_PRESETS = [
         "label": "Fibonacci weights, the deepest possible tree",
         "spec": "a:1, b:1, c:2, d:3, e:5",
         "message": "abcde",
+        # The tree being a path, and the depth of 4 that follows, live in the
+        # drawing and the code table; no tile reports either. hfExp is what the
+        # depth costs, and it is what can be pinned.
+        "expect": {
+            "hfN": "5",
+            "hfExp": "25/12 = 2.083",
+            "hfMin": "yes",
+        },
         "note": "each merge is the running total of everything merged so far — 2, then 4, 7, "
                 "12 — and every one of those totals is at least the next weight, so the new "
                 "node pairs with the next symbol every time: the tree is a path and the two "
@@ -1601,6 +1709,7 @@ def _huffman(cfg):
             "knows nothing about merging the two lightest.",
         ),
         script=script,
+        expect={"hfPreset": _expect(_HF_PRESETS)},
     )
 
 
@@ -1614,6 +1723,10 @@ _KS_PRESETS = [
         "label": "three items, capacity 50",
         "spec": "10/60, 20/100, 30/120",
         "cap": "50",
+        "expect": {
+            "ksFrac": "240",
+            "ksOpt": "220",
+        },
         "note": "the fractional optimum is 240 and the 0/1 optimum 220, and the 20 between "
                 "them is what refusing to cut that last item costs",
     },
@@ -1622,6 +1735,10 @@ _KS_PRESETS = [
         "label": "the item that dense greedy skips",
         "spec": "1/2, 10/10, 10/10",
         "cap": "20",
+        "expect": {
+            "ksOpt": "20",
+            "ksGreedy": "12",
+        },
         "note": "the tiny dense item is taken first and wastes a unit of capacity that one of "
                 "the big items needed",
     },
@@ -1630,6 +1747,11 @@ _KS_PRESETS = [
         "label": "density greedy at a fiftieth of the optimum",
         "spec": "1/2, 50/100",
         "cap": "50",
+        "expect": {
+            "ksOpt": "100",
+            "ksGreedy": "2",
+            "ksRatio": "1/50 = 0.020",
+        },
         "note": "density picks the crumb and stops; the single most valuable item alone does "
                 "fifty times better, which is why the guarantee takes the better of the two",
     },
@@ -1638,6 +1760,11 @@ _KS_PRESETS = [
         "label": "six items, everything is tight",
         "spec": "12/24, 7/13, 11/23, 8/15, 9/16, 5/9",
         "cap": "26",
+        "expect": {
+            "ksFrac": "421/8",
+            "ksOpt": "51",
+            "ksGreedy": "47",
+        },
         "note": "the fractional optimum is 421/8, which no subset of whole items can reach, "
                 "and none of the three rules reaches the 0/1 optimum either",
     },
@@ -1811,6 +1938,7 @@ def _knapsack(cfg):
             "any rule.",
         ),
         script=script,
+        expect={"ksPreset": _expect(_KS_PRESETS)},
     )
 
 
@@ -1825,6 +1953,11 @@ _MT_PRESETS = [
         "kind": "uniform",
         "spec": "2",
         "weights": "9 7 5 3 1",
+        "expect": {
+            "mtFam": "16",
+            "mtRank": "2",
+            "mtIs": "yes",
+        },
         "note": "the rank is 2 and every pair is a basis, which is the simplest matroid there "
                 "is and the one every proof is sanity-checked on",
     },
@@ -1834,6 +1967,11 @@ _MT_PRESETS = [
         "kind": "graphic",
         "spec": "1-2, 2-3, 3-1, 3-4, 1-4",
         "weights": "8 6 5 4 2",
+        "expect": {
+            "mtFam": "24",
+            "mtRank": "3",
+            "mtIs": "yes",
+        },
         "note": "greedy over this family IS Kruskal's algorithm, and the bases are the "
                 "spanning trees",
     },
@@ -1843,6 +1981,11 @@ _MT_PRESETS = [
         "kind": "partition",
         "spec": "1 1 2 2 3",
         "weights": "7 6 5 4 3",
+        "expect": {
+            "mtRank": "3",
+            "mtIs": "yes",
+            "mtGreedy": "yes",
+        },
         "note": "three groups, one element each, so the rank is 3 and the greedy answer is the "
                 "heaviest element of each group",
     },
@@ -1852,6 +1995,11 @@ _MT_PRESETS = [
         "kind": "matching",
         "spec": "1-2, 2-3, 3-4",
         "weights": "2 3 2",
+        "expect": {
+            "mtPairs": "7",
+            "mtIs": "no",
+            "mtGreedy": "NO",
+        },
         "note": "the middle edge alone cannot be grown, while the two ends together can, which "
                 "is the exchange property failing at the smallest possible instance",
     },
@@ -2107,6 +2255,7 @@ def _matroid(cfg):
             "than quoted.",
         ),
         script=script,
+        expect={"mtPreset": _expect(_MT_PRESETS)},
     )
 
 
@@ -2120,6 +2269,11 @@ _SM_PRESETS = [
         "label": "four on each side, several stable matchings",
         "a": "1 2 3 4; 2 1 3 4; 3 4 1 2; 4 3 1 2",
         "b": "4 3 2 1; 3 4 1 2; 2 1 4 3; 1 2 3 4",
+        "expect": {
+            "smStable": "6",
+            "smRankA": "1 = 1.00",
+            "smRankB": "4 = 4.00",
+        },
         "note": "the proposers all get their first choice and the receivers all get their "
                 "last, which is the asymmetry in its starkest form",
     },
@@ -2128,6 +2282,11 @@ _SM_PRESETS = [
         "label": "three, and only one stable matching exists",
         "a": "1 2 3; 1 2 3; 1 2 3",
         "b": "1 2 3; 1 2 3; 1 2 3",
+        "expect": {
+            "smStable": "1",
+            "smRankA": "2 = 2.00",
+            "smRankB": "2 = 2.00",
+        },
         "note": "everyone agrees on the ranking, so there is nothing for the algorithm to "
                 "choose and both sides get the same answer",
     },
@@ -2136,6 +2295,11 @@ _SM_PRESETS = [
         "label": "three, where the two sides want opposite things",
         "a": "1 2 3; 2 3 1; 3 1 2",
         "b": "2 3 1; 3 1 2; 1 2 3",
+        "expect": {
+            "smStable": "3",
+            "smRankA": "1 = 1.00",
+            "smRankB": "3 = 3.00",
+        },
         "note": "three stable matchings exist and the algorithm reaches the one its proposers "
                 "prefer",
     },
@@ -2144,6 +2308,11 @@ _SM_PRESETS = [
         "label": "four, where one rejection already costs a fifth proposal",
         "a": "2 1 4 3; 2 3 1 4; 1 2 3 4; 4 1 3 2",
         "b": "3 4 1 2; 1 2 3 4; 2 1 4 3; 4 3 2 1",
+        "expect": {
+            "smProps": "5",
+            "smStable": "1",
+            "smRankB": "1 = 1.00",
+        },
         "note": "B2 is holding its own first choice when A2 asks, so A2 is refused and has "
                 "to ask again — five proposals for four people, and nobody is ever displaced. "
                 "The matching it reaches is the only stable one, and it gives every receiver "
@@ -2330,6 +2499,7 @@ def _stable(cfg):
             "rather than taken from the algorithm that produced one of them.",
         ),
         script=script,
+        expect={"smPreset": _expect(_SM_PRESETS)},
     )
 
 
@@ -2343,6 +2513,10 @@ _CA_PRESETS = [
         "label": "thirteen references over five pages",
         "spec": "1 2 3 1 4 1 2 5 1 2 3 4 5",
         "slots": "3",
+        "expect": {
+            "caHits": "4",
+            "caOpt": "6",
+        },
         "note": "farthest-in-future beats both online policies here, and the gap is what no "
                 "online policy can close",
     },
@@ -2351,6 +2525,11 @@ _CA_PRESETS = [
         "label": "the trace FIFO gets worse on",
         "spec": "1 2 3 4 1 2 5 1 2 3 4 5",
         "slots": "3",
+        "expect": {
+            "caHits": "2",
+            "caOpt": "5",
+            "caAnom": "yes",
+        },
         "note": "FIFO with four slots gets FEWER hits than with three, which is the anomaly "
                 "and the reason a bigger cache is not automatically better",
     },
@@ -2359,6 +2538,11 @@ _CA_PRESETS = [
         "label": "a loop one page too long for the cache",
         "spec": "1 2 3 4 1 2 3 4 1 2 3 4",
         "slots": "3",
+        "expect": {
+            "caHits": "0",
+            "caRate": "0 = 0.0%",
+            "caOpt": "6",
+        },
         "note": "LRU evicts exactly the page about to be used and scores nothing at all, while "
                 "the offline optimum keeps most of the loop",
     },
@@ -2367,6 +2551,13 @@ _CA_PRESETS = [
         "label": "one hot page among cold ones",
         "spec": "1 2 1 3 1 4 1 5 1 6 1 7",
         "slots": "2",
+        # caPolicy ships as LRU, so FIFO's three hits -- the contrast this preset
+        # exists for -- are in the policy table rather than in a tile. What is
+        # pinned is that LRU attains the offline bound on this trace.
+        "expect": {
+            "caHits": "5",
+            "caOpt": "5",
+        },
         "note": "LRU and farthest-in-future both hold the hot page and get five hits; FIFO "
                 "evicts it by age and gets three, so an easy workload is not where the "
                 "policies stop differing",
@@ -2529,6 +2720,7 @@ def _caching(cfg):
             "of this size could make, which knows nothing about looking ahead.",
         ),
         script=script,
+        expect={"caPreset": _expect(_CA_PRESETS)},
     )
 
 
