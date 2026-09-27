@@ -1380,7 +1380,8 @@ _AL_PRESETS = [
         "label": "three activities with diminishing returns",
         "returns": "P 0 5 9 12 14; Q 0 4 8 11 13; R 0 6 9 11 12",
         "units": "4",
-        "note": "each extra unit is worth less than the last, and the split is still not obvious",
+        "note": "no extra unit is ever worth more than the last, and two different splits still "
+                "tie at 19",
     },
     {
         "id": "lumpy",
@@ -1601,7 +1602,8 @@ _LS_PRESETS = [
         "demand": "10 62 12 130 154 129",
         "K": "54",
         "h": "2",
-        "note": "the cheap early periods are covered together and the heavy late ones are not",
+        "note": "the only periods that share an order are 2 and 3 — period 1 stands alone and "
+                "each of the three heavy late ones gets its own, five orders in all",
     },
     {
         "id": "flat",
@@ -2031,7 +2033,9 @@ _SD_PRESETS = [
         "p1": "3/4 1/4; 1/2 1/2",
         "r": "1 3; 2 1",
         "T": "3",
-        "note": "acting pays more in the rough state and moves you out of it, and the two pull apart",
+        "note": "acting pays more in the calm state and keeps you there, so it is taken in calm "
+                "at every step; in rough it pays 1 against holding's 3 and the better escape "
+                "never buys that back, so the policy is the same in all three periods",
     },
     {
         "id": "absorb",
@@ -2937,7 +2941,8 @@ _DC_PRESETS = [
         "P": "1/2 1/2; 1/4 3/4",
         "r": "1 3",
         "gamma": "1/2",
-        "note": "twenty iterations reach the fixed point to five places, and never arrive",
+        "note": "the twelve iterations the slider opens on reach two decimal places and twenty "
+                "reach five, and no number of them ever arrives at 22/7 and 38/7",
     },
     {
         "id": "patient",

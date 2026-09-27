@@ -1671,7 +1671,7 @@ def _tu(cfg):
 _BF_PRESETS = [
     {
         "id": "prices",
-        "label": "five nodes, every cost positive",
+        "label": "four nodes, five arcs, every cost positive",
         "spec": "s>a 4, s>b 2, b>a 1, a>t 3, b>t 7",
         "note": "the labels settle after two rounds and price every arc",
     },

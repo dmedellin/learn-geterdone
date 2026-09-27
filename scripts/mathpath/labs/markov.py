@@ -429,13 +429,17 @@ ABSORB_PRESETS = {
         "absorbing": "1 5",
     },
     "trial": {
-        "label": "A trial with two ways out and one state you can revisit",
+        "label": "A trial with two ways out and two states you can go back to",
         "P": "1/2 1/4 1/8 1/8; 1/4 1/2 1/8 1/8; 0 0 1 0; 0 0 0 1",
         "names": "new, review, accepted, rejected",
         "absorbing": "3 4",
     },
 }
 
+# `_mdp` heads its two action columns "action 1" and "action 2" deliberately -- the c9 lesson
+# prose says so, and tells the reader that which real-world choice each stands for lives in the
+# matrices and rewards they typed. So there is no per-preset action NAME here: a key holding
+# one would be read by nothing, and the label already says what the two actions are.
 MDP_PRESETS = {
     "machine": {
         "label": "Run it or service it: two states, two actions",
@@ -444,7 +448,6 @@ MDP_PRESETS = {
         "r0": "1 3",
         "r1": "2 1",
         "names": "good, worn",
-        "actions": "run, service",
     },
     "stock": {
         "label": "Hold or restock, with a penalty for being empty",
@@ -453,7 +456,6 @@ MDP_PRESETS = {
         "r0": "4 1 -3",
         "r1": "1 0 -1",
         "names": "full, low, empty",
-        "actions": "hold, restock",
     },
 }
 

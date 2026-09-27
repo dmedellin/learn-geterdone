@@ -1620,7 +1620,8 @@ _EDD_PRESETS = [
         "label": "one job is hopeless and drags L max with it",
         "jobs": "A 3:4, B 2:3, C 8:9, D 4:30",
         "seq": "B A C D",
-        "note": "D is never late; C decides L max wherever it goes",
+        "note": "D is never late in any of the 24 orders, and which job decides L max splits "
+                "evenly between A, B and C — eight orders each",
     },
     {
         "id": "slack",
@@ -1821,7 +1822,9 @@ _LATE_PRESETS = [
         "id": "throws",
         "label": "the job thrown out is not the job that was late",
         "jobs": "A 6:8, B 4:4, C 5:12, D 3:6, E 7:20",
-        "note": "at the third step the algorithm discards a job that had been on time for two rounds",
+        "note": "at the second step D makes the schedule late and B — accepted and on time a "
+                "step earlier — is the longest so far, so B is what gets thrown out; A is then "
+                "thrown out at the third step, the moment it joins",
     },
     {
         "id": "onebad",
@@ -2253,7 +2256,8 @@ _PAR_PRESETS = [
         "label": "work that divides exactly",
         "jobs": "A 4, B 4, C 4, D 4, E 4, F 4",
         "machines": "3",
-        "note": "the two bounds meet, so the optimum is known before any schedule is built",
+        "note": "the work divides exactly by the machines, so the average-load bound is 8 on "
+                "the nose and LPT reaches it — the optimum is known before any schedule is built",
     },
 ]
 

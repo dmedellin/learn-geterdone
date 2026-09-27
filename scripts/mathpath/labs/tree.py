@@ -1298,7 +1298,7 @@ def _augment(cfg):
 TREAP_PRESETS = [
     {"key": "sorted-against-shuffled", "label": "sorted against a shuffle of the same keys",
      "n": 12, "seed": 5, "a": "sorted", "b": "shuffled"},
-    {"key": "two-shuffles", "label": "two different shuffles of the same keys",
+    {"key": "two-shuffles", "label": "a shuffle against the reverse of the same keys",
      "n": 12, "seed": 8, "a": "shuffled", "b": "reversed"},
     {"key": "larger", "label": "twenty keys",
      "n": 20, "seed": 5, "a": "sorted", "b": "shuffled"},

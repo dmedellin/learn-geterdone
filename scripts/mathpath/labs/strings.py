@@ -735,14 +735,17 @@ _KM_PRESETS = [
         "label": "where the inner loop actually iterates",
         "pattern": "aabaaab",
         "text": "aabaaabaaabaabaaab",
-        "note": "the only preset here where the fallback chain is followed more than once",
+        "note": "the inner loop runs at two different positions here, once at each, where "
+                "ababaca and abcabcabd take both of their iterations at a single position",
     },
     {
         "id": "abcdefg",
         "label": "no two characters alike: no borders at all",
         "pattern": "abcdefg",
         "text": "abcdefgabcdefh abcdefg",
-        "note": "fail[] is all zeros, and KMP degenerates into naive matching exactly",
+        "note": "fail[] is all zeros past the sentinel, so there is never anything to fall "
+                "back on — and KMP still makes 23 comparisons against naive's 34, because "
+                "its text pointer never goes back",
     },
 ]
 
@@ -952,7 +955,9 @@ _HO_PRESETS = [
         "label": "a periodic text, where the table repeats too",
         "text": "abababababababababababababababab",
         "pattern": "ababb",
-        "note": "shifts alternate between 1 and 2, and the skipping saves about half",
+        "note": "the text has period 2 and the pattern is 5 long, so the character under the "
+                "last position is always a and every shift is 2 — fourteen alignments where "
+                "twenty-eight were possible, exactly half",
     },
 ]
 
@@ -1173,7 +1178,7 @@ _RA_PRESETS = [
     },
     {
         "id": "binary",
-        "label": "two letters, where collisions are worst",
+        "label": "two letters, where a modulus of 7 beats 11, 13 and 17",
         "text": "101100101101001011010010110100101101",
         "pattern": "10110",
         "base": "2",
@@ -1430,7 +1435,9 @@ _TR_PRESETS = [
         "words": "a, ab, abc, abcd",
         "prefix": "ab",
         "text": "abcdabcab",
-        "note": "every position that ends abcd ends abc, ab and a as well: four reports at once",
+        "note": "the four words nest as prefixes, so the trie is one chain of five nodes for "
+                "ten letters — and still only one report at any position, because two at once "
+                "takes one word being a SUFFIX of another, which is what he inside she does",
     },
 ]
 
@@ -1866,7 +1873,9 @@ _AU_PRESETS = [
         "label": "a run of one letter",
         "pattern": "aaab",
         "text": "aaaaabaaabaaaab",
-        "note": "every a climbs one state and saturates at 3, which is the longest border",
+        "note": "every a climbs one state and saturates at 3, because aaa is the longest "
+                "prefix of aaab that a run of a's can match — the pattern's own longest "
+                "border is 0",
     },
     {
         "id": "binary",

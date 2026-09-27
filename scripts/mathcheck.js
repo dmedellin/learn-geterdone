@@ -17052,7 +17052,11 @@ console.log('reductions: both instances solved, and the map between the solution
       eq(truth.length, models, '"' + text + '" has ' + models + ' models, by enumeration here');
       eq(trace.satisfiable, satisfiable, 'and the reduction agrees about satisfiability');
       eq(trace.decided, satisfiable, 'as does the decision oracle it is built on');
-      eq(trace.calls, F.n + 1, 'and it used exactly n + 1 = ' + (F.n + 1) + ' oracle calls');
+      eq(trace.calls, satisfiable ? F.n + 1 : 1,
+         satisfiable ? 'and it used exactly n + 1 = ' + (F.n + 1) + ' oracle calls'
+                     : 'and ONE call ended it -- n + 1 = ' + (F.n + 1) + ' is the bound for '
+                       + 'building a witness, not the count on a formula with none');
+      eq(trace.callsWithinBound, true, 'and the count is inside the n + 1 bound either way');
       eq(trace.bruteWork, Math.pow(2, F.n), 'against ' + Math.pow(2, F.n) + ' assignments to try');
       if (satisfiable) {
         eq(trace.verified, true, 'the assignment it built satisfies every clause');
@@ -18177,6 +18181,1597 @@ console.log('coping with intractability: every ratio beside the optimum it is a 
        + 'minimum spanning tree');
     eq(copingSrc.indexOf('cpIsRefusal') > 0, true,
        'and a catch that is not a cap refusal re-throws');
+  }
+}
+
+
+
+// ==========================================================================
+// PRESET PROSE, tied to the number it states
+// ==========================================================================
+//
+// WHY THIS SECTION EXISTS. Every lab preset carries a `label` that a reader
+// operates a <select> with, and most carry a `note` that several kits write
+// straight into the status banner. Nothing in this repository had ever checked
+// one of those strings against the lab it describes, and a sweep found roughly
+// thirty false -- including a label that contradicted the widget beside it and
+// a note that contradicted the correct figures printed in the same banner line.
+//
+// The rule here is the one the rest of the file follows: nothing below asserts
+// that a string EXISTS or has a shape. Each assertion runs the kit's own
+// routines on the preset's own data, turns the measurement into the words the
+// corrected string uses, and requires the string to contain THAT. So a change
+// to any of these figures breaks a check rather than a sentence.
+//
+// The numeral table is the one bridge between a measurement and prose, and it
+// is deliberately total: an unmapped number comes back `undefined`, which no
+// string contains, so a figure that moves out of the table fails here too.
+console.log('lab presets: every corrected preset string against the number it states');
+{
+  const WORD = {
+    0: 'zero', 1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven',
+    8: 'eight', 9: 'nine', 10: 'ten', 11: 'eleven', 12: 'twelve', 13: 'thirteen',
+    14: 'fourteen', 15: 'fifteen', 16: 'sixteen', 18: 'eighteen', 20: 'twenty',
+    26: 'twenty-six', 27: 'twenty-seven', 28: 'twenty-eight', 30: 'thirty', 45: 'forty-five',
+    50: 'fifty', 25: 'twenty-five' };
+  const TIMES = { 1: 'once', 2: 'twice', 3: 'three times', 4: 'four times', 5: 'five times' };
+  const ORD = { 1: 'first', 2: 'second', 3: 'third', 4: 'fourth', 5: 'fifth', 50: 'fiftieth' };
+  const word = (n) => WORD[n];
+  const ord = (n) => ORD[n];
+  const times = (n) => TIMES[n];
+  const capWord = (n) => { const w = WORD[n]; return w ? w[0].toUpperCase() + w.slice(1) : w; };
+
+  /* The preset tables read out of the Python they ship in. Entries are found by
+     brace depth rather than by a line pattern, because three of these kits
+     write a preset on one line and the rest spread it over six. */
+  const labsDir = path.join(__dirname, 'mathpath', 'labs');
+  const pySrcCache = {};
+  const pySrc = (mod) => {
+    if (!pySrcCache[mod]) pySrcCache[mod] = fs.readFileSync(path.join(labsDir, mod + '.py'), 'utf8');
+    return pySrcCache[mod];
+  };
+  /* Every {...} at the top level of a `NAME = [` / `NAME = {` table. */
+  const tableEntries = (src, table) => {
+    const at = src.indexOf('\n' + table + ' = ');
+    if (at < 0) { fails += 1; console.log('  FAIL cannot find ' + table); return []; }
+    let i = at + table.length + 4;              /* the [ or { that opens the table */
+    while (i < src.length && src[i] !== '[' && src[i] !== '{') i += 1;
+    let depth = 0, start = -1, out = [];
+    for (; i < src.length; i += 1) {
+      const ch = src[i];
+      if (ch === '[' || ch === '{') {
+        depth += 1;
+        if (depth === 2 && ch === '{') start = i;
+      } else if (ch === ']' || ch === '}') {
+        depth -= 1;
+        if (depth === 1 && start >= 0) {
+          const before = src.slice(Math.max(0, start - 48), start);
+          const named = /"([A-Za-z0-9_-]+)":\s*$/.exec(before);
+          out.push({ text: src.slice(start, i + 1), name: named ? named[1] : null });
+          start = -1;
+        }
+        if (depth === 0) break;
+      }
+    }
+    return out;
+  };
+  /* The value of one field of one entry, with Python's adjacent-string-literal
+     concatenation performed. Bounded to the entry, so a field name that also
+     appears in a neighbour cannot be picked up by mistake. */
+  const presetField = (mod, table, key, field) => {
+    const entries = tableEntries(pySrc(mod), table);
+    const hit = entries.filter((e) =>
+      e.name === key
+      || e.text.indexOf('"id": "' + key + '"') >= 0
+      || e.text.indexOf('"key": "' + key + '"') >= 0).map((e) => e.text);
+    if (hit.length !== 1) {
+      fails += 1;
+      console.log('  FAIL ' + mod + '.' + table + ': ' + hit.length + ' entries named ' + key);
+      return '';
+    }
+    const m = new RegExp('"' + field + '":\\s*((?:"(?:[^"\\\\]|\\\\.)*"\\s*)+)').exec(hit[0]);
+    if (!m) {
+      fails += 1;
+      console.log('  FAIL ' + mod + '.' + table + '/' + key + ' has no ' + field);
+      return '';
+    }
+    let out = '';
+    const lit = /"((?:[^"\\]|\\.)*)"/g;
+    let piece;
+    while ((piece = lit.exec(m[1])) !== null) out += piece[1].replace(/\\"/g, '"');
+    return out;
+  };
+  /* The assertion this section is made of: a string, and a phrase built out of
+     a measurement that the string has to contain. */
+  const says = (text, phrase, label) => {
+    if (String(text).indexOf(String(phrase)) < 0) {
+      fails += 1;
+      console.log('  FAIL ' + label + ': the string does not contain "' + phrase + '"');
+      console.log('         the string is: ' + text);
+    }
+  };
+  /* Some of these routines return a `runOf` envelope and some return the figures
+     directly; this is the only place that difference is allowed to matter. */
+  const un = (x) => (x && x.result !== undefined) ? x.result : x;
+  const denies = (text, phrase, label) => {
+    if (String(text).indexOf(String(phrase)) >= 0) {
+      fails += 1; console.log('  FAIL ' + label + ': the string still contains "' + phrase + '"');
+    }
+  };
+
+  /* ------------------------------------------------------------ greedy.py */
+  {
+    const gy = (n) => blockFrom(pySrc('greedy'), n, 'greedy.py');
+    eval(block('RATIONAL_JS') + algoCoreBlock('COUNT_JS') + algoCoreBlock('RFIXED_JS')
+       + algoCoreBlock('ORACLE_JS') + algoCoreBlock('TREEDRAW_JS') + sysdBlock('REPLAY_JS')
+       + algoCoreBlock('GREEDY_JS') + gy('GKIT_JS'));
+
+    /* intervals/conflictfails: the middle intervals ARE in the optimum, and what
+       loses them is the single finish-time pointer. */
+    {
+      const note = presetField('greedy', '_IV_PRESETS', 'conflictfails', 'note');
+      const items = gyParseIntervals(presetField('greedy', '_IV_PRESETS', 'conflictfails', 'spec'), 11).items;
+      const rep = ruleReport(items);
+      const fc = rep.rows.filter((r) => r.rule === 'fewestConflicts')[0];
+      eq(rep.optimum, 4, 'conflictfails: the optimum really is four intervals');
+      eq(gyNames(rep.best), 'A B C D', 'and it is A B C D, so B and C are in it');
+      eq(gyNames(fc.chosen), 'A D', 'while fewest-conflicts takes only A and D');
+      says(note, gyNames(fc.chosen).replace(' ', ' and '), 'greedy intervals/conflictfails names the pair taken');
+      says(note, 'the optimum is all ' + word(rep.optimum), 'greedy intervals/conflictfails names the optimum');
+      says(note, 'nothing starts after ' + fc.chosen[1].f,
+           'greedy intervals/conflictfails names the finish time that closes the pointer');
+      denies(note, 'leaves the middle unusable', 'greedy intervals/conflictfails');
+    }
+
+    /* huffman/fibonacci: the merged weights are the running totals. */
+    {
+      const note = presetField('greedy', '_HF_PRESETS', 'fibonacci', 'note');
+      const freqs = gyParseFreqs(presetField('greedy', '_HF_PRESETS', 'fibonacci', 'spec')).freqs;
+      const run = huffmanBuild(freqs);
+      const merges = run.trace.map((s) => s.made);
+      const lens = codeLengths(run.result.codes);
+      const deepest = Math.max.apply(null, Object.keys(lens).map((k) => lens[k]));
+      eq(merges.join(','), '2,4,7,12', 'fibonacci: the merges are 2, 4, 7 and 12');
+      /* each running total is at least the next single weight -- the real reason
+         the tree is a path, and the claim the note now makes */
+      const weights = freqs.map((f) => f.weight);
+      for (let i = 0; i + 2 < weights.length; i += 1) {
+        eq(merges[i] >= weights[i + 2], true,
+           'fibonacci: the total after merge ' + (i + 1) + ' is at least the next weight');
+      }
+      says(note, merges[0] + ', then ' + merges.slice(1).join(', '),
+           'greedy huffman/fibonacci names the merged weights');
+      says(note, word(deepest) + ' bits', 'greedy huffman/fibonacci names the deepest codeword');
+      eq(deepest, 4, 'and that depth is four');
+      denies(note, 'each merge is exactly the next weight', 'greedy huffman/fibonacci');
+    }
+
+    /* knapsack/classic: the gap is 20, not the 80 that two thirds of C is worth. */
+    {
+      const note = presetField('greedy', '_KS_PRESETS', 'classic', 'note');
+      const items = gyParseItems(presetField('greedy', '_KS_PRESETS', 'classic', 'spec')).items;
+      const W = parseInt(presetField('greedy', '_KS_PRESETS', 'classic', 'cap'), 10);
+      const frac = fractionalKnapsack(items, W).result;
+      const opt = knapsackBrute(items, W).result.value;
+      const gap = Rsub(frac.value, R(BigInt(opt), 1n));
+      eq(Rtext(frac.value), '240', 'knapsack/classic: the fractional optimum is 240');
+      eq(opt, 220, 'and the 0/1 optimum is 220');
+      eq(Rtext(gap), '20', 'so the gap is 20 and not the 80 two thirds of the last item is worth');
+      says(note, 'is ' + Rtext(frac.value) + ' and the 0/1 optimum ' + opt,
+           'greedy knapsack/classic names both optima');
+      says(note, 'the ' + Rtext(gap) + ' between them', 'greedy knapsack/classic names the gap');
+    }
+
+    /* knapsack/halfway: density greedy gets a FIFTIETH of the optimum. */
+    {
+      const label = presetField('greedy', '_KS_PRESETS', 'halfway', 'label');
+      const note = presetField('greedy', '_KS_PRESETS', 'halfway', 'note');
+      const items = gyParseItems(presetField('greedy', '_KS_PRESETS', 'halfway', 'spec')).items;
+      const W = parseInt(presetField('greedy', '_KS_PRESETS', 'halfway', 'cap'), 10);
+      const g = greedyKnapsack01(items, W, 'density').result.value;
+      const opt = knapsackBrute(items, W).result.value;
+      eq(Rtext(gyRatio(g, opt)), '1/50', 'knapsack/halfway: density greedy gets one fiftieth');
+      eq(opt % g, 0, 'and the optimum is a whole multiple of what it gets');
+      says(label, ord(opt / g) + ' of the optimum', 'greedy knapsack/halfway LABEL names the ratio');
+      denies(label, 'almost exactly half', 'greedy knapsack/halfway LABEL');
+      /* the note's own claim, which was the correct half of the contradiction */
+      says(note, word(opt / g) + ' times better', 'greedy knapsack/halfway NOTE still names the factor');
+    }
+
+    /* stable/rejections: five proposals, one rejection, no displacement, and the
+       unique stable matching gives every receiver its first choice. */
+    {
+      const label = presetField('greedy', '_SM_PRESETS', 'rejections', 'label');
+      const note = presetField('greedy', '_SM_PRESETS', 'rejections', 'note');
+      const A = gyParsePrefs(presetField('greedy', '_SM_PRESETS', 'rejections', 'a')).rows;
+      const B = gyParsePrefs(presetField('greedy', '_SM_PRESETS', 'rejections', 'b')).rows;
+      const run = galeShapley(A, B);
+      const refusals = run.trace.filter((t) => t.outcome === 'rejected').length;
+      const displaced = run.trace.filter((t) => /, \d+ rejected$/.test(t.outcome)).length;
+      eq(run.result.proposals, 5, 'stable/rejections: five proposals');
+      eq(refusals, 1, 'exactly one of them refused');
+      eq(displaced, 0, 'and nobody displaced at any step');
+      eq(Rtext(run.result.meanReceiverRank), '1', 'every receiver ends on its first choice');
+      eq(blockingPairs(run.result.matchA, A, B).stable, true, 'and the matching is stable');
+      says(label, word(refusals) + ' rejection', 'greedy stable/rejections LABEL names the refusals');
+      says(label, ord(run.result.proposals) + ' proposal',
+           'greedy stable/rejections LABEL names the proposal it costs');
+      says(note, word(run.result.proposals) + ' proposals for ' + word(A.length) + ' people',
+           'greedy stable/rejections NOTE names the proposal count');
+      says(note, 'nobody is ever displaced', 'greedy stable/rejections NOTE names the displacements');
+      says(note, 'first choice', 'greedy stable/rejections NOTE names the receivers\' outcome');
+      denies(label, 'long chain of rejections', 'greedy stable/rejections LABEL');
+    }
+
+    /* caching/hot: FIFO evicts the hot page and gets three; LRU and
+       farthest-in-future keep it and get five. */
+    {
+      const note = presetField('greedy', '_CA_PRESETS', 'hot', 'note');
+      const trace = gyParseTrace(presetField('greedy', '_CA_PRESETS', 'hot', 'spec')).trace;
+      const k = parseInt(presetField('greedy', '_CA_PRESETS', 'hot', 'slots'), 10);
+      const fifo = replayPolicy(trace, k, 'fifo').hits;
+      const lru = replayPolicy(trace, k, 'lru').hits;
+      const opt = replayPolicy(trace, k, 'opt').hits;
+      eq(lru + ',' + opt + ',' + fifo, '5,5,3', 'caching/hot: LRU 5, farthest-in-future 5, FIFO 3');
+      eq(lru === opt && fifo < lru, true, 'so the two that hold the page agree and FIFO does not');
+      says(note, 'get ' + word(lru) + ' hits', 'greedy caching/hot names the hits the two agree on');
+      says(note, 'gets ' + word(fifo), 'greedy caching/hot names FIFO\'s hits');
+      denies(note, 'every policy keeps the hot page', 'greedy caching/hot');
+    }
+  }
+
+  /* ------------------------------------------------------------- dpkit.py */
+  {
+    const dk = (n) => blockFrom(pySrc('dpkit'), n, 'dpkit.py');
+    eval(block('RATIONAL_JS') + algoCoreBlock('COUNT_JS') + algoCoreBlock('RFIXED_JS')
+       + countingBlock('BIGINT_JS') + algoCoreBlock('ORACLE_JS') + algoCoreBlock('TREEDRAW_JS')
+       + algoCoreBlock('SERIES_JS') + algoCoreBlock('DP_JS') + dk('DPKIT_JS'));
+    const P = (t, k, f) => presetField('dpkit', t, k, f);
+
+    /* memo/canonical: 22089 naive calls become 50 over 18 subproblems, and the
+       banner prints both of those figures in the same line the note sits in. */
+    {
+      const note = P('_MM_PRESETS', 'canonical', 'note');
+      const coins = dpParseNums(P('_MM_PRESETS', 'canonical', 'coins')).values;
+      const amount = parseInt(P('_MM_PRESETS', 'canonical', 'amount'), 10);
+      const naive = naiveMinCoins(coins, amount).counts.calls;
+      const memo = memoMinCoins(coins, amount);
+      eq(memo.counts.calls, 50, 'memo/canonical: fifty memoised calls');
+      eq(memo.result.distinct, 18, 'over eighteen distinct subproblems');
+      eq(naive > 10000 && naive < 100000, true, 'against tens of thousands unmemoised: ' + naive);
+      says(note, 'into ' + word(memo.counts.calls), 'dpkit memo/canonical names the memoised calls');
+      says(note, word(memo.result.distinct) + ' distinct', 'dpkit memo/canonical names the subproblems');
+      denies(note, 'into nineteen', 'dpkit memo/canonical');
+    }
+
+    /* memo/sparse: nine amounts are unreachable and 17 is the largest, which is
+       the Frobenius count (4-1)(7-1)/2 and 4*7 - 4 - 7. */
+    {
+      const label = P('_MM_PRESETS', 'sparse', 'label');
+      const coins = dpParseNums(P('_MM_PRESETS', 'sparse', 'coins')).values;
+      const amount = parseInt(P('_MM_PRESETS', 'sparse', 'amount'), 10);
+      const row = minCoinTable(coins, amount).result.table[coins.length];
+      const bad = [];
+      for (let j = 0; j <= amount; j += 1) if (dpUnreachable(row[j])) bad.push(j);
+      eq(bad.length, (coins[0] - 1) * (coins[1] - 1) / 2,
+         'memo/sparse: the unreachable count is the Frobenius count, ' + bad.length);
+      eq(bad[bad.length - 1], coins[0] * coins[1] - coins[0] - coins[1],
+         'and the largest of them is 4*7 - 4 - 7');
+      eq(bad.length * 2 <= amount + 1, true, 'so it is not MOST of the amounts shown');
+      says(label, word(bad.length) + ' amounts', 'dpkit memo/sparse LABEL names how many');
+      says(label, bad[bad.length - 1] + ' the largest', 'dpkit memo/sparse LABEL names the largest');
+      denies(label, 'most amounts', 'dpkit memo/sparse LABEL');
+    }
+
+    /* knapsack/ties: the CELLS tie; the optimum at capacity 4 is unique. */
+    {
+      const note = P('_KN_PRESETS', 'ties', 'note');
+      const items = dpParseItems(P('_KN_PRESETS', 'ties', 'spec')).items;
+      const W = parseInt(P('_KN_PRESETS', 'ties', 'cap'), 10);
+      const opt = knapsackBrute(items, W).result.value;
+      const tab = knapTable(items, W).result.table;
+      let optimal = 0;
+      for (let m = 0; m < (1 << items.length); m += 1) {
+        let w = 0, v = 0;
+        for (let i = 0; i < items.length; i += 1) if (m & (1 << i)) { w += items[i].w; v += items[i].v; }
+        if (w <= W && v === opt) optimal += 1;
+      }
+      const tied = [];
+      for (let i = 1; i <= items.length; i += 1) {
+        for (let j = 0; j <= W; j += 1) {
+          if (items[i - 1].w > j) continue;
+          if (tab[i - 1][j - items[i - 1].w] + items[i - 1].v === tab[i - 1][j]) tied.push(j);
+        }
+      }
+      eq(optimal, 1, 'knapsack/ties: exactly ONE subset reaches the optimum at this capacity');
+      eq(opt, 6, 'and the optimum is 6');
+      eq(tied.sort().join(','), '2,3', 'while the cells that tie are at capacity 2 and 3');
+      says(note, 'capacity ' + tied[0] + ' or ' + tied[1], 'dpkit knapsack/ties names the tied capacities');
+      says(note, opt + ' is reached by', 'dpkit knapsack/ties names the optimum');
+      denies(note, 'two different sets reach', 'dpkit knapsack/ties');
+    }
+
+    /* edit/sunday: two insertions, one substitution, and the n becomes an r. */
+    {
+      const note = P('_ED_PRESETS', 'sunday', 'note');
+      const a = P('_ED_PRESETS', 'sunday', 'a'), b = P('_ED_PRESETS', 'sunday', 'b');
+      const script = editScript(editTable(a, b), a, b).script || editScript(editTable(a, b), a, b);
+      const ops = (script.script || script);
+      const kept = ops.filter((o) => o.op === 'keep').map((o) => o.ch).join('');
+      const subs = ops.filter((o) => o.op === 'substitute');
+      const ins = ops.filter((o) => o.op === 'insert');
+      eq(editCost(ops), 3, 'edit/sunday: the distance is three');
+      eq(ins.length + ' insertions, ' + subs.length + ' substitution', '2 insertions, 1 substitution',
+         'made of two insertions and one substitution');
+      eq(kept, 'suday', 'the kept letters are s, u, d, a and y');
+      eq(subs.map((o) => o.from + '->' + o.to).join(','), 'n->r', 'and the n is substituted, to an r');
+      says(note, word(ins.length) + ' insertions and ' + word(subs.length) + ' substitution',
+           'dpkit edit/sunday names the operation mix');
+      says(note, 'the ' + subs[0].from + ' becomes an ' + subs[0].to,
+           'dpkit edit/sunday names the substitution');
+      denies(note, 'the nday', 'dpkit edit/sunday');
+    }
+
+    /* chain/clrs: the worst bracketing costs 58000 against 15125 -- 3.83 times,
+       not the "more than ten" the note used to claim. */
+    {
+      const note = P('_CH_PRESETS', 'clrs', 'note');
+      const dims = dpParseNums(P('_CH_PRESETS', 'clrs', 'dims')).values;
+      const ev = everyParenthesisation(dims);
+      eq(ev.cost, 15125, 'chain/clrs: the best bracketing costs 15125');
+      eq(ev.worstCost, 58000, 'and the worst 58000');
+      eq(ev.count, 42, 'over 42 bracketings');
+      eq(ev.worstCost < 4 * ev.cost && ev.worstCost > 3 * ev.cost, true,
+         'so the factor is between three and four, not ten');
+      says(note, 'costs ' + ev.worstCost, 'dpkit chain/clrs names the worst cost');
+      says(note, 'all ' + ev.count + ' bracketings', 'dpkit chain/clrs names the bracketing count');
+      says(note, 'not quite ' + word(4) + ' times', 'dpkit chain/clrs names the factor');
+      denies(note, 'more than ten times', 'dpkit chain/clrs');
+    }
+
+    /* chain/thin: four dimensions are THREE matrices. */
+    {
+      const note = P('_CH_PRESETS', 'thin', 'note');
+      const dims = dpParseNums(P('_CH_PRESETS', 'thin', 'dims')).values;
+      const ev = everyParenthesisation(dims);
+      eq(dims.length - 1, 3, 'chain/thin: four dimensions are three matrices');
+      eq(ev.cost + ' / ' + ev.worstCost, '7500 / 75000', 'and 7500 against 75000');
+      eq(ev.worstCost, 10 * ev.cost, 'which is exactly ten times');
+      says(note, word(dims.length - 1) + ' matrices', 'dpkit chain/thin names the matrix count');
+      says(note, ev.cost + ' against ' + ev.worstCost, 'dpkit chain/thin names both costs');
+      denies(note, 'four matrices', 'dpkit chain/thin');
+    }
+
+    /* lis/classic: the tails array and the reconstruction differ, and seven
+       subsequences reach the length. */
+    {
+      const note = P('_LS_PRESETS', 'classic', 'note');
+      const a = dpParseNums(P('_LS_PRESETS', 'classic', 'spec')).values;
+      const tab = lisTable(a).result, tails = lisTails(a);
+      const t = (tails.result !== undefined ? tails.result : tails);
+      let howMany = 0;
+      const walk = (start, cur) => {
+        if (cur.length === tab.length) { howMany += 1; return; }
+        for (let i = start; i < a.length; i += 1) {
+          if (cur.length === 0 || a[i] > cur[cur.length - 1]) walk(i + 1, cur.concat([a[i]]));
+        }
+      };
+      walk(0, []);
+      eq(t.tails.join(' '), '2 3 4 8', 'lis/classic: the tails array ends as 2 3 4 8');
+      eq(tab.subsequence.join(' '), '2 5 7 101', 'while the table reconstructs 2 5 7 101');
+      eq(howMany, 7, 'and seven subsequences reach length four');
+      eq(isSubsequenceOf(t.tails, a) && isIncreasingRun(t.tails), true,
+         'the tails array happening to be one of them on THIS input');
+      says(note, 'ends as ' + t.tails.join(' '), 'dpkit lis/classic names the tails array');
+      says(note, 'reconstructs ' + tab.subsequence.join(' '), 'dpkit lis/classic names what the table gives');
+      says(note, word(howMany) + ' subsequences reach length ' + word(tab.length),
+           'dpkit lis/classic names how many reach the length');
+      denies(note, '2 3 7 18', 'dpkit lis/classic');
+    }
+
+    /* count/sparse: six amounts are unrepresentable and 11 is the largest. */
+    {
+      const label = P('_CO_PRESETS', 'sparse', 'label');
+      const coins = dpParseNums(P('_CO_PRESETS', 'sparse', 'coins')).values;
+      const amount = parseInt(P('_CO_PRESETS', 'sparse', 'amount'), 10);
+      const tab = countWays(coins, amount, 'combinations').result.table;
+      const none = [];
+      for (let j = 0; j <= amount; j += 1) if (tab[j] === 0n) none.push(j);
+      eq(none.length, (coins[0] - 1) * (coins[1] - 1) / 2,
+         'count/sparse: six amounts have no representation');
+      eq(none[none.length - 1], coins[0] * coins[1] - coins[0] - coins[1],
+         'and 11 is the largest of them');
+      eq(none.length * 2 <= amount + 1, true, 'so it is not MOST of the amounts shown');
+      says(label, word(none.length) + ' amounts', 'dpkit count/sparse LABEL names how many');
+      says(label, none[none.length - 1] + ' the largest', 'dpkit count/sparse LABEL names the largest');
+      denies(label, 'most amounts', 'dpkit count/sparse LABEL');
+    }
+
+    /* tree/binary: the DP TAKES the root -- 26 from the root and all four leaves. */
+    {
+      const note = P('_TR_PRESETS', 'binary', 'note');
+      const parsed = dpParseTree(P('_TR_PRESETS', 'binary', 'spec'));
+      const w = dpParseNums(P('_TR_PRESETS', 'binary', 'weights')).values;
+      const dp = treeDp(parsed.tree, w).result;
+      const brute = misBrute(parsed.tree, w).result;
+      eq(dp.value, 26, 'tree/binary: the DP value is 26');
+      eq(dp.value, brute.value, 'which an exhaustive search over the subsets agrees with');
+      eq(dp.chosen.indexOf(0) >= 0, true, 'and the root IS in the set it chooses');
+      eq(dp.chosen.length, 5, 'along with all four leaves -- five vertices');
+      says(note, 'takes all ' + word(dp.chosen.length) + ' for ' + dp.value,
+           'dpkit tree/binary names what the DP takes');
+      denies(note, 'declines the root and', 'dpkit tree/binary');
+    }
+  }
+
+  /* ------------------------------------------------------------- dpseq.py */
+  {
+    const dq = (n) => blockFrom(pySrc('dpseq'), n, 'dpseq.py');
+    const orSrc = pySrc('or_core'), sysSrc = pySrc('algebra_systems');
+    eval(block('RATIONAL_JS') + blockFrom(sysSrc, 'FORMAT_JS', 'algebra_systems.py')
+       + blockFrom(sysSrc, 'MATRIX_JS', 'algebra_systems.py') + sysdBlock('HARMONIC_JS')
+       + blockFrom(orSrc, 'ORFMT_JS', 'or_core.py') + blockFrom(orSrc, 'DPSEQ_JS', 'or_core.py')
+       + dq('DPKIT_JS') + dq('DPPLOT_JS') + dq('DPPOL_JS') + dq('DPTREE_JS') + dq('DPSTOP_JS'));
+    const P = (t, k, f) => presetField('dpseq', t, k, f);
+    const nums = (s) => s.trim().split(/\s+/).map(Rparse);
+    const mat = (s) => s.split(';').map((r) => nums(r));
+
+    /* allocation/diminishing: Q's second unit is worth the SAME as its first, so
+       "worth less than the last" was false; two splits tie at 19. */
+    {
+      const note = P('_AL_PRESETS', 'diminishing', 'note');
+      const parsed = parseReturns(P('_AL_PRESETS', 'diminishing', 'returns'));
+      const units = parseInt(P('_AL_PRESETS', 'diminishing', 'units'), 10);
+      const every = everyAllocation(parsed.acts, units);
+      let strictlyLess = true, neverMore = true;
+      parsed.acts.forEach((a) => {
+        const v = a.ret;
+        for (let i = 2; i < v.length; i += 1) {
+          const prev = Rsub(v[i - 1], v[i - 2]), here = Rsub(v[i], v[i - 1]);
+          if (Rcmp(here, prev) >= 0) strictlyLess = false;
+          if (Rcmp(here, prev) > 0) neverMore = false;
+        }
+      });
+      eq(strictlyLess, false, 'allocation/diminishing: some extra unit is worth the SAME as the last');
+      eq(neverMore, true, 'while none is ever worth MORE');
+      eq(Rtext(every.best), '19', 'the best split is 19');
+      eq(every.at.length, 2, 'and two different splits reach it');
+      says(note, 'worth more than the last', 'dpseq allocation/diminishing states the weaker claim');
+      says(note, word(every.at.length) + ' different splits still tie at ' + Rtext(every.best),
+           'dpseq allocation/diminishing names the tie');
+      denies(note, 'worth less than the last', 'dpseq allocation/diminishing');
+    }
+
+    /* lotsize/classic: period 1 is ordered alone; only 2 and 3 share an order. */
+    {
+      const note = P('_LS_PRESETS', 'classic', 'note');
+      const d = nums(P('_LS_PRESETS', 'classic', 'demand'));
+      const ww = wagnerWhitin(d, Rparse(P('_LS_PRESETS', 'classic', 'K')),
+                              Rparse(P('_LS_PRESETS', 'classic', 'h')));
+      const grouped = ww.plan.filter((p) => p.covers[1] > p.covers[0]);
+      eq(ww.orders, 5, 'lotsize/classic: five orders');
+      eq(grouped.length, 1, 'exactly one of which covers more than its own period');
+      eq(grouped[0].covers.join(' and '), '2 and 3', 'and it is the order at 2, covering 2 and 3');
+      eq(ww.plan[0].covers.join(','), '1,1', 'period 1 standing alone');
+      says(note, 'are ' + grouped[0].covers.join(' and '), 'dpseq lotsize/classic names the grouped periods');
+      says(note, word(ww.orders) + ' orders in all', 'dpseq lotsize/classic names the order count');
+      denies(note, 'cheap early periods are covered together', 'dpseq lotsize/classic');
+    }
+
+    /* stochastic/twoact: acting pays LESS in rough, and the policy is stationary. */
+    {
+      const note = P('_SD_PRESETS', 'twoact', 'note');
+      const states = P('_SD_PRESETS', 'twoact', 'states').split(/\s+/);
+      const acts = P('_SD_PRESETS', 'twoact', 'acts').split(/\s+/);
+      const Pm = [mat(P('_SD_PRESETS', 'twoact', 'p0')), mat(P('_SD_PRESETS', 'twoact', 'p1'))];
+      const r = mat(P('_SD_PRESETS', 'twoact', 'r'));
+      const T = parseInt(P('_SD_PRESETS', 'twoact', 'T'), 10);
+      const run = stochasticDp(states, acts, Pm, r, T);
+      const rough = states.indexOf('rough'), calm = states.indexOf('calm');
+      const hold = acts.indexOf('hold'), act = acts.indexOf('act');
+      eq(Rcmp(r[act][rough], r[hold][rough]) < 0, true,
+         'twoact: acting pays LESS in rough -- ' + Rtext(r[act][rough])
+         + ' against holding\'s ' + Rtext(r[hold][rough]));
+      eq(Rcmp(r[act][calm], r[hold][calm]) > 0, true, 'and MORE in calm');
+      eq(Rcmp(Pm[act][calm][calm], Pm[hold][calm][calm]) > 0, true, 'acting from calm keeping you there');
+      const rows = [];
+      for (let t = 0; t < T; t += 1) rows.push(run.policy[t].join(','));
+      eq(new Set(rows).size, 1, 'and the optimal policy is the same in all ' + T + ' periods');
+      eq(run.policy[0][calm] + ',' + run.policy[0][rough], act + ',' + hold,
+         'namely: act in calm, hold in rough');
+      says(note, 'pays ' + Rtext(r[act][rough]) + ' against holding\'s ' + Rtext(r[hold][rough]),
+           'dpseq stochastic/twoact names both rough payoffs');
+      says(note, 'the same in all ' + word(T) + ' periods', 'dpseq stochastic/twoact names the stationarity');
+      denies(note, 'acting pays more in the rough state', 'dpseq stochastic/twoact');
+    }
+
+    /* discount/two: the iteration slider opens at twelve, not twenty. */
+    {
+      const note = P('_DC_PRESETS', 'two', 'note');
+      const src = pySrc('dpseq');
+      const m = /_range\("dcT", "Iterations", 1, 24, (\d+)\)/.exec(src);
+      eq(m !== null, true, 'discount: the iteration control is still a range');
+      const opens = parseInt(m[1], 10);
+      const Pm = mat(P('_DC_PRESETS', 'two', 'P'));
+      const r = nums(P('_DC_PRESETS', 'two', 'r'));
+      const g = Rparse(P('_DC_PRESETS', 'two', 'gamma'));
+      const fixed = discountedValue(Pm, r, g, opens).v.map((v) => Rtext(v)).join(' and ');
+      eq(fixed, '22/7 and 38/7', 'discount/two: the fixed point is 22/7 and 38/7');
+      /* how many decimal places the slider's own value reaches, and twenty's */
+      /* the largest number of decimal places the iterate and the fixed point agree
+         to: twice the gap has to stay under one unit in that place. Exact, in
+         rationals, so "to five places" is a claim and not a rounding accident. */
+      const placesAt = (T) => {
+        const run = discountedValue(Pm, r, g, T);
+        let gap = Rsub(run.vT[0], run.v[0]);
+        if (Rcmp(gap, R(0n, 1n)) < 0) gap = Rsub(R(0n, 1n), gap);
+        const twice = Rmul(gap, R(2n, 1n));
+        let p = 0, unit = R(1n, 1n);
+        while (p < 9 && Rcmp(twice, unit) < 0) { p += 1; unit = Rdiv(unit, R(10n, 1n)); }
+        return p - 1;
+      };
+      eq(opens, 12, 'the slider opens on twelve iterations');
+      eq(placesAt(opens), 2, 'which agree with the fixed point to two decimal places');
+      eq(placesAt(20), 5, 'and twenty reach five');
+      says(note, 'the ' + word(opens) + ' iterations the slider opens on',
+           'dpseq discount/two names the default the reader sees');
+      says(note, word(placesAt(opens)) + ' decimal places', 'dpseq discount/two names what twelve reach');
+      says(note, word(20) + ' reach ' + word(placesAt(20)), 'dpseq discount/two names what twenty reach');
+      says(note, fixed, 'dpseq discount/two names the fixed point it never arrives at');
+      denies(note, 'twenty iterations reach', 'dpseq discount/two');
+    }
+
+    /* secretary/hundred is NOT corrected here: its strings are true at n = 100
+       and the control clamps to 60, which is a control bug and not a prose one.
+       This assertion records the mismatch so the day the cap is raised the
+       failure points at this comment. */
+    {
+      const src = pySrc('dpseq');
+      const m = /_range\("seN", "Candidates", 3, (\d+), int\(chosen\["n"\]\)\)/.exec(src);
+      eq(m !== null, true, 'secretary: the candidate control is still a range');
+      const cap = parseInt(m[1], 10);
+      const n = parseInt(P('_SE_PRESETS', 'hundred', 'n'), 10);
+      const note = P('_SE_PRESETS', 'hundred', 'note');
+      const atN = secretaryExact(n), atCap = secretaryExact(Math.min(n, cap));
+      /* the note's figures are the ones at the preset's OWN n */
+      says(note, 'look at ' + (atN.best - 1), 'dpseq secretary/hundred names the r for its own n');
+      says(note, Rfixed(Rmul(atN.bestP, R(100n, 1n)), 1) + '%',
+           'dpseq secretary/hundred names the probability for its own n');
+      eq(n > cap, true, 'and the preset asks for more candidates than the control allows: '
+         + n + ' against ' + cap + ' -- so the page renders at ' + cap
+         + ' (best r ' + atCap.best + ', P ' + Rfixed(atCap.bestP, 6)
+         + ') and the note describes n = ' + n + ' (best r ' + atN.best
+         + ', P ' + Rfixed(atN.bestP, 6) + '). RAISE THE CAP rather than retuning the note.');
+    }
+  }
+
+  /* ------------------------------------------------------------ markov.py */
+  {
+    const mkSrc = pySrc('markov'), sysSrc = pySrc('algebra_systems'), orSrc = pySrc('or_core');
+    eval(block('RATIONAL_JS') + blockFrom(sysSrc, 'FORMAT_JS', 'algebra_systems.py')
+       + blockFrom(sysSrc, 'MATRIX_JS', 'algebra_systems.py')
+       + blockFrom(orSrc, 'ORFMT_JS', 'or_core.py') + blockFrom(orSrc, 'CHAIN_JS', 'or_core.py')
+       + blockFrom(mkSrc, 'MARKOV_JS', 'markov.py'));
+
+    /* absorb/trial: TWO transient states, both with a self-loop. */
+    {
+      const label = presetField('markov', 'ABSORB_PRESETS', 'trial', 'label');
+      const Pm = presetField('markov', 'ABSORB_PRESETS', 'trial', 'P')
+                   .split(';').map((r) => r.trim().split(/\s+/).map(Rparse));
+      const revisitable = [];
+      for (let i = 0; i < Pm.length; i += 1) {
+        const absorbing = Requ(Pm[i][i], R(1n, 1n));
+        if (!absorbing && Rcmp(Pm[i][i], R(0n, 1n)) > 0) revisitable.push(i);
+      }
+      const absorbing = Pm.filter((row, i) => Requ(row[i], R(1n, 1n))).length;
+      eq(revisitable.length, 2, 'absorb/trial: TWO states can be revisited, not one');
+      eq(absorbing, 2, 'beside the two absorbing ones');
+      says(label, word(absorbing) + ' ways out', 'markov absorb/trial LABEL names the exits');
+      says(label, word(revisitable.length) + ' states you can go back to',
+           'markov absorb/trial LABEL names the revisitable states');
+      denies(label, 'one state you can revisit', 'markov absorb/trial LABEL');
+    }
+
+    /* MDP_PRESETS carried an "actions" key that `_mdp` never read: it hard-codes
+       "action 1" and "action 2", and the c9 lesson prose says it does. The key is
+       gone, and this is what keeps it gone. */
+    {
+      const src = pySrc('markov');
+      const table = src.slice(src.indexOf('\nMDP_PRESETS = '), src.indexOf('\nMDP_PRESETS = ') + 900);
+      eq(table.indexOf('"actions"') < 0, true,
+         'markov MDP_PRESETS holds no "actions" key, because `_mdp` reads none');
+      eq(src.indexOf("var acts = ['action 1', 'action 2'];") >= 0, true,
+         'and `_mdp` still names them generically, as the lesson prose promises');
+    }
+  }
+
+  /* ----------------------------------------------------------- strings.py */
+  {
+    eval(algoCoreBlock('COUNT_JS') + algoCoreBlock('STRINGS_JS') + algoCoreBlock('TREEDRAW_JS')
+       + blockFrom(pySrc('strings'), 'SKIT_JS', 'strings.py'));
+    const P = (t, k, f) => presetField('strings', t, k, f);
+    /* the inner loop, position by position, from the definition rather than from
+       failureFn's single total -- which is what made the old claim unfalsifiable */
+    const innerPerPosition = (p) => {
+      const fail = failureFn(p).result.fail, out = [];
+      let k = 0;
+      for (let i = 1; i < p.length; i += 1) {
+        let it = 0, cur = k;
+        while (cur > 0 && p[i] !== p[cur]) { cur = fail[cur] > 0 ? fail[cur] : 0; it += 1; if (cur === 0) break; }
+        out.push(it);
+        k = (p[i] === p[cur]) ? cur + 1 : 0;
+      }
+      return out;
+    };
+
+    /* kmp/aabaaab: three presets total two inner iterations; this is the one that
+       spreads them over two positions. */
+    {
+      const note = P('_KM_PRESETS', 'aabaaab', 'note');
+      const here = innerPerPosition(P('_KM_PRESETS', 'aabaaab', 'pattern'));
+      const spots = here.filter((v) => v > 0).length;
+      eq(failureFn(P('_KM_PRESETS', 'aabaaab', 'pattern')).result.inner, 2,
+         'kmp/aabaaab: two inner iterations in total');
+      eq(spots, 2, 'spread over two positions');
+      eq(Math.max.apply(null, here), 1, 'one at each, so its per-position maximum is one');
+      for (const other of ['ababaca', 'abcabcabd']) {
+        const there = innerPerPosition(P('_KM_PRESETS', other, 'pattern'));
+        eq(failureFn(P('_KM_PRESETS', other, 'pattern')).result.inner, 2,
+           other + ' also totals two, so aabaaab is not the only one');
+        eq(there.filter((v) => v > 0).length, 1, 'but takes both of them at a single position');
+        eq(Math.max.apply(null, there), 2, 'where the chain is followed twice over');
+        says(note, other, 'strings kmp/aabaaab names ' + other + ', which ties it');
+      }
+      says(note, 'at ' + word(spots) + ' different positions', 'strings kmp/aabaaab names the positions');
+      denies(note, 'the only preset here', 'strings kmp/aabaaab');
+    }
+
+    /* kmp/abcdefg: 23 comparisons against naive's 34 -- not "exactly" naive. */
+    {
+      const note = P('_KM_PRESETS', 'abcdefg', 'note');
+      const p = P('_KM_PRESETS', 'abcdefg', 'pattern'), t = P('_KM_PRESETS', 'abcdefg', 'text');
+      const fail = failureFn(p).result.fail;
+      const kmp = kmpRun(t, p).counts.compares, naive = naiveRun(t, p).counts.compares;
+      eq(fail.slice(1).join(''), '0'.repeat(p.length), 'kmp/abcdefg: fail[] is all zeros past the sentinel');
+      eq(fail[0], -1, 'the sentinel itself being -1');
+      eq(kmp + ' against ' + naive, '23 against 34', 'and KMP makes 23 comparisons against naive\'s 34');
+      eq(kmp < naive, true, 'so it does not degenerate into naive matching');
+      says(note, 'makes ' + kmp + ' comparisons against naive\'s ' + naive,
+           'strings kmp/abcdefg names both counts');
+      says(note, 'text pointer never goes back', 'strings kmp/abcdefg names the reason');
+      denies(note, 'degenerates into naive matching exactly', 'strings kmp/abcdefg');
+    }
+
+    /* horspool/periodic: every one of the fourteen shifts is 2. */
+    {
+      const note = P('_HO_PRESETS', 'periodic', 'note');
+      const t = P('_HO_PRESETS', 'periodic', 'text'), p = P('_HO_PRESETS', 'periodic', 'pattern');
+      const run = horspoolRun(t, p);
+      const shifts = run.trace.map((x) => x.shift);
+      const distinct = Array.from(new Set(shifts));
+      const possible = t.length - p.length + 1;
+      eq(distinct.length, 1, 'horspool/periodic: every shift is the same');
+      eq(distinct[0], 2, 'and it is 2');
+      eq(shifts.length, 14, 'over fourteen alignments');
+      eq(possible, 28, 'where twenty-eight were possible');
+      eq(shifts.length * 2, possible, 'so exactly half of them are looked at');
+      says(note, 'every shift is ' + distinct[0], 'strings horspool/periodic names the shift');
+      says(note, word(shifts.length) + ' alignments', 'strings horspool/periodic names the alignments');
+      says(note, word(possible) + ' were possible', 'strings horspool/periodic names the possible ones');
+      denies(note, 'alternate between 1 and 2', 'strings horspool/periodic');
+    }
+
+    /* rabin/binary: 6 of the 46 primes swept collide -- the FEWEST of the four --
+       and a modulus of 7 is clean where 11, 13 and 17 are not. */
+    {
+      const label = P('_RA_PRESETS', 'binary', 'label');
+      const t = P('_RA_PRESETS', 'binary', 'text'), p = P('_RA_PRESETS', 'binary', 'pattern');
+      const b = parseInt(P('_RA_PRESETS', 'binary', 'base'), 10);
+      const sweep = skModulusSweep(t, p, b, 2, 200);
+      const bad = sweep.rows.filter((r) => r.spurious > 0).map((r) => r.mod);
+      eq(sweep.collided, 6, 'rabin/binary: six of the primes swept collide');
+      eq(sweep.clean, 7, 'and the first clean modulus is 7');
+      const beaten = bad.filter((m) => m > sweep.clean);
+      eq(beaten.join(', '), '11, 13, 17', 'while 11, 13 and 17 -- all bigger -- do not');
+      /* the FEWEST of the four presets, which is what the old label denied */
+      for (const other of ['english', 'dna', 'abra']) {
+        const s2 = skModulusSweep(P('_RA_PRESETS', other, 'text'), P('_RA_PRESETS', other, 'pattern'),
+                                  parseInt(P('_RA_PRESETS', other, 'base'), 10), 2, 200);
+        eq(s2.collided > sweep.collided, true,
+           other + ' collides on more primes (' + s2.collided + ') than binary does');
+      }
+      says(label, 'modulus of ' + sweep.clean + ' beats ' + beaten.slice(0, -1).join(', ')
+           + ' and ' + beaten[beaten.length - 1], 'strings rabin/binary LABEL names the moduli');
+      denies(label, 'collisions are worst', 'strings rabin/binary LABEL');
+    }
+
+    /* trie/nested: Aho-Corasick reports SUFFIXES, so a chain of prefixes reports
+       one word at a time; two at once takes `he` inside `she`. */
+    {
+      const note = P('_TR_PRESETS', 'nested', 'note');
+      const words = P('_TR_PRESETS', 'nested', 'words').split(',').map((s) => s.trim());
+      const trie = trieBuild(words, 26);
+      ahoLinks(trie);
+      const run = ahoRun(P('_TR_PRESETS', 'nested', 'text'), trie);
+      const atPos = {};
+      run.result.hits.forEach((h) => { atPos[h.at] = (atPos[h.at] || 0) + 1; });
+      const most = Math.max.apply(null, Object.keys(atPos).map((k) => atPos[k]));
+      const letters = words.join('').length;
+      eq(most, 1, 'trie/nested: at most ONE report at any position, not four');
+      eq(trie.count, 5, 'the trie being one chain of five nodes');
+      eq(letters, 10, 'for ten letters');
+      /* and the preset where two DO land together is the one the note now names */
+      const cw = P('_TR_PRESETS', 'classic', 'words').split(',').map((s) => s.trim());
+      const ct = trieBuild(cw, 26); ahoLinks(ct);
+      const cr = ahoRun(P('_TR_PRESETS', 'classic', 'text'), ct);
+      const cAt = {};
+      cr.result.hits.forEach((h) => { cAt[h.at] = (cAt[h.at] || 0) + 1; });
+      eq(Math.max.apply(null, Object.keys(cAt).map((k) => cAt[k])), 2,
+         'while `he` inside `she` really does give two at once');
+      says(note, word(trie.count) + ' nodes for ' + word(letters) + ' letters',
+           'strings trie/nested names the sharing');
+      says(note, 'only ' + word(most) + ' report at any position', 'strings trie/nested names the reports');
+      says(note, 'he inside she', 'strings trie/nested names where two DO land together');
+      denies(note, 'four reports at once', 'strings trie/nested');
+    }
+
+    /* automaton/aaab: 3 is the longest all-a prefix; the pattern's own longest
+       border is 0. */
+    {
+      const note = P('_AU_PRESETS', 'aaab', 'note');
+      const p = P('_AU_PRESETS', 'aaab', 'pattern');
+      const borders = skBorderBrute(p);
+      const table = dfaTable(p, skAlphabet(p)).table;
+      const run = p.replace(/[^a]/g, '');
+      let at = 0;
+      for (let i = 0; i < 12; i += 1) at = table[at].a;
+      eq(borders[p.length], 0, 'automaton/aaab: the longest border of aaab is 0');
+      eq(at, run.length, 'while a run of a\'s saturates at ' + run.length);
+      eq(run.length, 3, 'which is three -- the longest all-a prefix');
+      says(note, 'saturates at ' + at, 'strings automaton/aaab names where it saturates');
+      says(note, 'longest prefix of ' + p, 'strings automaton/aaab says what 3 actually is');
+      says(note, 'longest border is ' + borders[p.length], 'strings automaton/aaab names the real border');
+      denies(note, 'which is the longest border', 'strings automaton/aaab');
+    }
+  }
+
+  /* ---------------------------------------------------------- geometry.py */
+  {
+    eval(algoBlock('ALGO_JS') + algoCoreBlock('COUNT_JS') + algoCoreBlock('TREEDRAW_JS')
+       + block('RATIONAL_JS') + algoCoreBlock('GEOM_JS')
+       + blockFrom(pySrc('geometry'), 'GEOKIT_JS', 'geometry.py'));
+    const P = (t, k, f) => presetField('geometry', t, k, f);
+    const pts = (spec) => geoParse(spec, 64).points;
+
+    /* hull/general: four collinear triples, every one of them through (3, 3). */
+    {
+      const label = P('_HU_PRESETS', 'general', 'label');
+      const note = P('_HU_PRESETS', 'general', 'note');
+      const pp = pts(P('_HU_PRESETS', 'general', 'spec'));
+      const triples = [];
+      for (let i = 0; i < pp.length; i += 1) {
+        for (let j = i + 1; j < pp.length; j += 1) {
+          for (let k = j + 1; k < pp.length; k += 1) {
+            if (orientSign(pp[i], pp[j], pp[k]) === 0) triples.push([pp[i], pp[j], pp[k]]);
+          }
+        }
+      }
+      const hull = un(geoExactHull(pp)).hull;
+      const onHull = {};
+      hull.forEach((q) => { onHull[geoKey(q)] = true; });
+      const shared = pp.filter((q) => triples.every((t) => t.some((x) => geoKey(x) === geoKey(q))));
+      eq(pp.length, 9, 'hull/general: nine points');
+      eq(triples.length, 4, 'and FOUR collinear triples, not none');
+      eq(shared.length, 1, 'all of which share one point');
+      eq(geoPointText(shared[0]), '(3, 3)', 'and it is (3, 3)');
+      eq(onHull[geoKey(shared[0])] === undefined, true, 'which is not on the hull');
+      eq(hull.length, 4, 'the hull being four corners');
+      eq(geoSameSet(hull, un(geoVertexBrute(pp))), true, 'and every route agrees on them');
+      eq(geoSameSet(hull, un(jarvis(pp)).hull), true, 'gift wrapping included');
+      says(label, word(triples.length) + ' collinear triples', 'geometry hull/general LABEL names the triples');
+      says(note, 'all ' + word(triples.length) + ' collinear triples', 'geometry hull/general NOTE names them');
+      says(note, 'interior point ' + geoPointText(shared[0]), 'geometry hull/general names the shared point');
+      says(note, 'same ' + word(hull.length) + ' corners', 'geometry hull/general names the hull');
+      denies(label, 'general position', 'geometry hull/general LABEL');
+      denies(note, 'no three collinear', 'geometry hull/general NOTE');
+    }
+
+    /* segments/apart: the boxes are [0,4] and [6,10] -- a gap of 2, and the
+       widget's own box row says NO. */
+    {
+      const label = P('_SG_PRESETS', 'apart', 'label');
+      const pp = pts(P('_SG_PRESETS', 'apart', 'spec'));
+      const xs = [[Math.min(pp[0][0], pp[1][0]), Math.max(pp[0][0], pp[1][0])],
+                  [Math.min(pp[2][0], pp[3][0]), Math.max(pp[2][0], pp[3][0])]];
+      const gap = xs[1][0] - xs[0][1];
+      eq(boxOverlap(pp[0], pp[1], pp[2], pp[3]), false,
+         'segments/apart: the bounding boxes do NOT overlap, so the box row says no');
+      eq(gap, 2, 'the gap between them being 2');
+      eq(straddle(pp[0], pp[1], pp[2], pp[3]).touching, false, 'and they do not touch either');
+      eq(geoSegOracle(pp[0], pp[1], pp[2], pp[3]).collinear, true, 'while staying collinear');
+      says(label, 'gap of ' + gap, 'geometry segments/apart LABEL names the gap');
+      denies(label, 'boxes touching', 'geometry segments/apart LABEL');
+    }
+
+    /* sweep/spread: three crossings, three tests where all pairs would be fifteen. */
+    {
+      const note = P('_SW_PRESETS', 'spread', 'note');
+      const segs = geoParseSegments(P('_SW_PRESETS', 'spread', 'spec'), 64).segments;
+      const sw = un(sweepEvents(segs));
+      const brute = un(geoSweepBrute(segs));
+      eq(sw.crossings.length, 3, 'sweep/spread: three crossings');
+      eq(geoPairKeys(sw.crossings), geoPairKeys(brute), 'which a comparison of every pair agrees with');
+      eq(sw.tests, 3, 'found in three tests');
+      eq(sw.allPairs, 15, 'where all pairs would be fifteen');
+      says(note, word(sw.crossings.length) + ' crossings', 'geometry sweep/spread names the crossings');
+      says(note, 'in ' + word(sw.tests) + ' tests', 'geometry sweep/spread names the tests');
+      says(note, 'would be ' + word(sw.allPairs), 'geometry sweep/spread names the pair count');
+      denies(note, 'two crossings', 'geometry sweep/spread');
+    }
+
+    /* closest/scatter: the close pair is inside ONE base case, not across the
+       dividing line -- both its points sit in the same half at every level. */
+    {
+      const note = P('_CL_PRESETS', 'scatter', 'note');
+      const pp = pts(P('_CL_PRESETS', 'scatter', 'spec'));
+      const run = un(closestPair(pp));
+      const sorted = lexSort(pp);
+      const mid = Math.floor(sorted.length / 2);
+      const left = sorted.slice(0, mid).map(geoKey);
+      const a = geoKey(run.pair[0]), b = geoKey(run.pair[1]);
+      eq(String(run.d2), '2', 'closest/scatter: the close pair is at squared distance 2');
+      eq(String(run.d2), String(un(geoClosestBrute(pp)).d2), 'which every pair agrees with');
+      eq((left.indexOf(a) >= 0) === (left.indexOf(b) >= 0), true,
+         'and both of its points are on the SAME side of the top-level split');
+      eq(run.stripCompares, 5, 'the strip still doing five comparisons');
+      says(note, 'squared distance ' + run.d2, 'geometry closest/scatter names the distance');
+      says(note, word(run.stripCompares) + ' comparisons', 'geometry closest/scatter names the strip work');
+      says(note, 'base case', 'geometry closest/scatter says where the pair is found');
+      denies(note, 'straddles the dividing line', 'geometry closest/scatter');
+    }
+
+    /* kdtree/scatter: three points in the window, six nodes visited of sixteen. */
+    {
+      const note = P('_KD_PRESETS', 'scatter', 'note');
+      const pp = pts(P('_KD_PRESETS', 'scatter', 'spec'));
+      const rect = P('_KD_PRESETS', 'scatter', 'rect').split(',').map((s) => parseInt(s.trim(), 10));
+      const q = un(kdRange(un(kdBuild(pp, 0)), rect));
+      eq(q.found.length, 3, 'kdtree/scatter: three points are in the window');
+      eq(geoSameSet(q.found, un(geoRangeBrute(pp, rect))), true, 'which a scan of every point agrees with');
+      eq(q.visited, 6, 'six nodes visited');
+      eq(pp.length, 16, 'out of sixteen');
+      says(note, word(q.found.length) + ' points found', 'geometry kdtree/scatter names the points');
+      says(note, word(q.visited) + ' nodes visited out of ' + word(pp.length),
+           'geometry kdtree/scatter names the visits');
+      denies(note, 'four points found', 'geometry kdtree/scatter');
+    }
+  }
+
+  /* ------------------------------------------------------------ random.py */
+  {
+    eval(block('RATIONAL_JS') + sysdBlock('STREAM_JS') + algoCoreBlock('COUNT_JS')
+       + algoCoreBlock('RFIXED_JS') + algoCoreBlock('SEEDED_JS') + algoCoreBlock('ORACLE_JS')
+       + algoCoreBlock('RANDOM_JS') + blockFrom(pySrc('random'), 'RKIT_JS', 'random.py')
+       + sysdBlock('HARMONIC_JS'));
+    const P = (t, k, f) => presetField('random', t, k, f);
+
+    /* shuffle/naive3: three permutations get 5 tapes and three get 4. The old
+       text was arithmetically impossible -- 4*5 + 2*4 = 28 against 27 tapes. */
+    {
+      const note = P('_SH_PRESETS', 'naive3', 'note');
+      const n = parseInt(P('_SH_PRESETS', 'naive3', 'n'), 10);
+      const f = un(shuffleFrequencies(n, P('_SH_PRESETS', 'naive3', 'kind')));
+      const counts = f.rows.map((r) => r.count);
+      const tally = {};
+      counts.forEach((c) => { tally[c] = (tally[c] || 0) + 1; });
+      const sizes = Object.keys(tally).map(Number).sort((x, y) => y - x);
+      eq(f.tapes, 27, 'shuffle/naive3: 27 tapes');
+      eq(f.rows.length, 6, 'over 6 permutations');
+      eq(sizes.join(','), '5,4', 'with only two distinct tape counts, 5 and 4');
+      eq(tally[5] + ',' + tally[4], '3,3', 'three permutations each');
+      eq(tally[5] * 5 + tally[4] * 4, f.tapes, 'and the split adds back to 27, which the old one did not');
+      eq(f.tapes % f.rows.length !== 0, true, 'because 27 does not divide by 6');
+      says(note, word(tally[sizes[0]]) + ' of them get ' + sizes[0] + ' tapes and '
+           + word(tally[sizes[1]]) + ' get ' + sizes[1], 'random shuffle/naive3 names the split');
+      says(note, f.tapes + ' does not divide by ' + f.rows.length,
+           'random shuffle/naive3 names why it cannot be even');
+      denies(note, 'four of them get 5 tapes', 'random shuffle/naive3');
+    }
+
+    /* costs/small5: the support is 6..10, so FIVE comparison counts. */
+    {
+      const note = P('_CS_PRESETS', 'small5', 'note');
+      const n = parseInt(P('_CS_PRESETS', 'small5', 'n'), 10);
+      const pairs = rqsPairs(un(rqsPmf(n)));
+      const support = pairs.map((p) => p[0]).sort((a, b) => a - b);
+      let orders = 1;
+      for (let i = 2; i <= n; i += 1) orders *= i;
+      eq(orders, 120, 'costs/small5: 120 input orders');
+      eq(support.length, 5, 'and FIVE possible comparison counts, not ten');
+      eq(support[0] + ' to ' + support[support.length - 1], '6 to 10', 'running from 6 to 10');
+      eq(Rtext(rqsTotal(pairs)), '1', 'the distribution summing to one');
+      says(note, orders + ' input orders', 'random costs/small5 names the orders');
+      says(note, word(support.length) + ' possible comparison counts from ' + support[0]
+           + ' to ' + support[support.length - 1], 'random costs/small5 names the support');
+      denies(note, '10 possible comparison counts', 'random costs/small5');
+    }
+  }
+
+  /* -------------------------------------------------------------- hash.py */
+  {
+    eval(block('RATIONAL_JS') + algoCoreBlock('COUNT_JS') + algoCoreBlock('RFIXED_JS')
+       + sysdBlock('STREAM_JS') + algoCoreBlock('SEEDED_JS') + algoCoreBlock('HASH_JS')
+       + blockFrom(pySrc('hash'), 'HASHKIT_JS', 'hash.py'));
+
+    /* The module docstring's own split, checked against the courses that actually
+       ship these modes -- three in data-structures, four in randomised-algorithms.
+       It read 4 and 3, the other way round. */
+    {
+      const src = pySrc('hash');
+      const doc = src.slice(0, src.indexOf('"""', 3));
+      const contentDir = path.join(__dirname, '..', 'content', 'algorithms');
+      const modesIn = (course) => {
+        const dir = path.join(contentDir, course);
+        const found = {};
+        fs.readdirSync(dir).filter((f) => f.endsWith('.py')).forEach((f) => {
+          const text = fs.readFileSync(path.join(dir, f), 'utf8');
+          const re = /"mode":\s*"(chaining|probing|resize|universal|balls|bloom|countmin)"/g;
+          let m;
+          while ((m = re.exec(text)) !== null) found[m[1]] = true;
+        });
+        return Object.keys(found).sort();
+      };
+      const ds = modesIn('c1_data_structures'), ra = modesIn('c8_randomised');
+      eq(ds.join(','), 'chaining,probing,resize', 'hash: data-structures ships three of the modes');
+      eq(ra.join(','), 'balls,bloom,countmin,universal', 'and randomised-algorithms the other four');
+      eq(ds.length + ra.length, 7, 'seven modes in all, each in exactly one course');
+      says(doc, capWord(ds.length) + ' belong to `data-structures`', 'hash docstring counts data-structures');
+      says(doc, word(ra.length) + ' to `randomised-algorithms`', 'hash docstring counts randomised-algorithms');
+      ds.forEach((m) => says(doc, m + ' ', 'hash docstring still lists ' + m));
+      /* every mode line in the table names the course it belongs to */
+      ds.forEach((m) => {
+        const line = doc.split('\n').filter((l) => l.trim().indexOf(m) === 0)[0] || '';
+        says(line, 'data-structures', 'hash docstring puts ' + m + ' in data-structures');
+      });
+      ra.forEach((m) => {
+        const line = doc.split('\n').filter((l) => l.trim().indexOf(m) === 0)[0] || '';
+        says(line, 'randomised-algorithms', 'hash docstring puts ' + m + ' in randomised-algorithms');
+      });
+    }
+
+    /* countmin/heavy: the tail is 2 + (i % 11) over i = 0..23, so two keys land
+       three times and nine land twice. "eleven others twice" was false. */
+    {
+      const label = presetField('hash', 'COUNTMIN_PRESETS', 'heavy-hitter', 'label');
+      const stream = streamPreset('heavy', 2);
+      const tally = {};
+      stream.forEach((k) => { tally[k] = (tally[k] || 0) + 1; });
+      const keys = Object.keys(tally).map(Number).sort((a, b) => a - b);
+      const top = keys.filter((k) => tally[k] === 40);
+      const thrice = keys.filter((k) => tally[k] === 3);
+      const twice = keys.filter((k) => tally[k] === 2);
+      eq(top.join(','), '1', 'countmin/heavy: one key appears forty times');
+      eq(keys.length - top.length, 11, 'and eleven others appear at all');
+      eq(thrice.join(',') + ' | ' + twice.length, '2,3 | 9',
+         'but keys 2 and 3 appear three times and only nine appear twice');
+      eq(thrice.length + twice.length, 11, 'the eleven being made of both groups');
+      says(label, 'one key forty times', 'hash countmin/heavy LABEL names the heavy hitter');
+      says(label, word(thrice.length) + ' others ' + times(3) + ' and '
+           + word(twice.length) + ' ' + times(2),
+           'hash countmin/heavy LABEL names each tail group by size');
+      denies(label, 'eleven others twice', 'hash countmin/heavy LABEL');
+    }
+  }
+
+  /* -------------------------------------------------------------- tree.py */
+  {
+    /* treap/two-shuffles: the second order is `reversed`, and the panel's own
+       status line prints that word, so the old label contradicted the widget. */
+    const label = presetField('tree', 'TREAP_PRESETS', 'two-shuffles', 'label');
+    const a = presetField('tree', 'TREAP_PRESETS', 'two-shuffles', 'a');
+    const b = presetField('tree', 'TREAP_PRESETS', 'two-shuffles', 'b');
+    const src = pySrc('tree');
+    eq(a, 'shuffled', 'treap/two-shuffles: the first order is a shuffle');
+    eq(b, 'reversed', 'and the second is REVERSED, not a second shuffle');
+    eq(/NAMES = \{[^}]*reversed: 'reversed'/.test(src), true,
+       'and the panel prints that order by name, so the label has to agree with it');
+    says(label, 'shuffle against the reverse', 'tree treap/two-shuffles LABEL names both orders');
+    denies(label, 'two different shuffles', 'tree treap/two-shuffles LABEL');
+  }
+
+  /* --------------------------------------------------------- reduction.py */
+  {
+    eval(algoCoreBlock('COUNT_JS') + algoCoreBlock('DIGRAPH_JS') + algoCoreBlock('ORACLE_JS')
+       + algoCoreBlock('REDUCTION_JS') + blockFrom(pySrc('reduction'), 'RDKIT_JS', 'reduction.py'));
+    const P = (t, k, f) => presetField('reduction', t, k, f);
+
+    /* selfreduce/free: both variables are mentioned; what is free is x1's VALUE. */
+    {
+      const label = P('_SR_PRESETS', 'free', 'label');
+      const F = rdParseCnf(P('_SR_PRESETS', 'free', 'cnf')).formula;
+      const seen = {};
+      F.clauses.forEach((cl) => cl.forEach((l) => { seen[Math.abs(l)] = true; }));
+      const trace = rdSelfTrace(F);
+      const both = trace.steps.filter((s) => s.ifTrue && s.ifFalse);
+      eq(Object.keys(seen).length, F.n, 'selfreduce/free: every variable IS mentioned by a clause');
+      eq(both.length, 1, 'and exactly one variable is allowed either way');
+      eq(both[0].variable, 1, 'namely x1');
+      says(label, 'allows either way', 'reduction selfreduce/free LABEL says what is free');
+      denies(label, 'no clause mentions', 'reduction selfreduce/free LABEL');
+    }
+
+    /* independentset/two: THREE of the seven independent sets share one image. */
+    {
+      const note = P('_IS_PRESETS', 'two', 'note');
+      const F = rdParseCnf(P('_IS_PRESETS', 'two', 'cnf')).formula;
+      const r = rdIsSolutions(F);
+      const byImage = {};
+      r.map.pairs.forEach((p) => { byImage[p.to] = (byImage[p.to] || 0) + 1; });
+      const most = Math.max.apply(null, Object.keys(byImage).map((k) => byImage[k]));
+      eq(r.sets.length, 7, 'independentset/two: seven independent sets of size k');
+      eq(most, 3, 'and THREE of them share one assignment, not two');
+      eq(r.map.injective, false, 'so the map is not injective');
+      says(note, word(most) + ' of the ' + word(r.sets.length) + ' independent sets',
+           'reduction independentset/two names how many collide');
+      denies(note, 'two independent sets of size 2 map', 'reduction independentset/two');
+    }
+
+    /* independentset/chain: clause 1 has ONE literal and clauses 2 and 3 have two,
+       so "one literal per clause" was false; what is true is that only one is
+       available once the clause before it is settled. */
+    {
+      const note = P('_IS_PRESETS', 'chain', 'note');
+      const F = rdParseCnf(P('_IS_PRESETS', 'chain', 'cnf')).formula;
+      const r = rdIsSolutions(F);
+      const widths = F.clauses.map((cl) => cl.length);
+      eq(widths.join(','), '1,2,2', 'independentset/chain: the clauses are 1, 2 and 2 literals wide');
+      eq(r.sets.length, 1, 'exactly one independent set of size m exists');
+      eq(r.map.bijection, true, 'so the map is a bijection');
+      says(note, 'once the clause before it is settled', 'reduction independentset/chain names the real cause');
+      says(note, 'bijection', 'reduction independentset/chain keeps the bijection claim');
+      denies(note, 'one literal per clause', 'reduction independentset/chain');
+    }
+
+    /* complement/path4: P4 is self-complementary -- the complement is the path
+       3-1-4-2, drawn by the lab. */
+    {
+      const note = P('_CM_PRESETS', 'path4', 'note');
+      const G = rdParseGraph(P('_CM_PRESETS', 'path4', 'spec'), 12).G;
+      const C = un(complementGraph(G));
+      const id = un(checkComplementIdentity(G));
+      const deg = new Array(G.n).fill(0);
+      C.arcs.forEach((a) => { deg[a.u] += 1; deg[a.v] += 1; });
+      const ends = deg.filter((d) => d === 1).length, middles = deg.filter((d) => d === 2).length;
+      eq(C.arcs.length, G.arcs.length, 'complement/path4: the complement has as many edges as P4 itself');
+      eq(ends + ',' + middles, '2,2', 'with two degree-1 ends and two degree-2 middles -- a path');
+      eq(id.independent + ',' + id.cover, '2,2', 'two independent vertices and two in the cover');
+      eq(C.arcs.map((a) => (a.u + 1) + '-' + (a.v + 1)).join(' '), '1-3 1-4 2-4',
+         'and its edges are 1-3, 1-4 and 2-4: the path 3-1-4-2');
+      says(note, 'the complement is another path', 'reduction complement/path4 says the complement IS a path');
+      says(note, 'self-complementary', 'reduction complement/path4 names why');
+      says(note, '3', 'reduction complement/path4 names the path it draws');
+      denies(note, 'rather than a path', 'reduction complement/path4');
+    }
+
+    /* subsetsum/unsat: TWELVE numbers, which is what the KPI on the page says. */
+    {
+      const note = P('_SS_PRESETS', 'unsat', 'note');
+      const F = rdParseCnf(P('_SS_PRESETS', 'unsat', 'cnf')).formula;
+      const made = un(satToSubsetSum(F));
+      const nums = made.rows.map((r) => BigInt(r.value));
+      const T = BigInt(made.target);
+      let hits = 0;
+      for (let m = 0; m < (1 << nums.length); m += 1) {
+        let s = 0n;
+        for (let i = 0; i < nums.length; i += 1) if (m & (1 << i)) s += nums[i];
+        if (s === T) hits += 1;
+      }
+      eq(made.rows.length, 2 * F.n + 2 * F.clauses.length,
+         'subsetsum/unsat: two rows per variable and two per clause');
+      eq(made.rows.length, 12, 'which is twelve, not ten');
+      eq(hits, 0, 'and no subset of them reaches the target');
+      says(note, word(made.rows.length) + ' numbers', 'reduction subsetsum/unsat names how many numbers');
+      says(note, 'target of ' + made.target, 'reduction subsetsum/unsat names the target');
+      denies(note, 'the ten numbers', 'reduction subsetsum/unsat');
+    }
+
+    /* rdSelfTrace's oracle-call count: `algo_core.selfReduce` returns early on an
+       unsatisfiable formula without `oracleCalls`, and the old fallback printed
+       n + 1. It now reads the counter, which is what the status line describes. */
+    {
+      const F = rdParseCnf(P('_SR_PRESETS', 'unsat', 'cnf')).formula;
+      const run = selfReduce(F);
+      const trace = rdSelfTrace(F);
+      eq(run.result.oracleCalls, undefined, 'selfReduce still returns no oracleCalls on a NO');
+      eq(run.counts.calls, 1, 'but its counter says one call was made');
+      eq(trace.calls, 1, 'and the kit now reports that one call');
+      eq(trace.expectedCalls, F.n + 1, 'with n + 1 = 3 kept as the BOUND');
+      eq(trace.callsWithinBound, true, 'which one call is inside');
+      eq(trace.steps.length, 0, 'no variable having been fixed, as the status line says');
+      const src = pySrc('reduction');
+      eq(src.indexOf('run.counts && run.counts.calls !== undefined') >= 0, true,
+         'the count coming from the counter rather than from formula.n + 1');
+    }
+  }
+
+  /* ------------------------------------------------------------ coping.py */
+  {
+    eval(block('RATIONAL_JS') + algoCoreBlock('RFIXED_JS') + algoCoreBlock('COUNT_JS')
+       + algoCoreBlock('DIGRAPH_JS') + algoCoreBlock('ORACLE_JS') + algoCoreBlock('COPING_JS')
+       + algoBlock('ALGO_JS') + sysdBlock('HARMONIC_JS') + sysdBlock('RCEIL_JS')
+       + algoCoreBlock('GRAPHKIT_JS') + algoCoreBlock('GREEDY_JS')
+       + blockFrom(pySrc('coping'), 'CPKIT_JS', 'coping.py'));
+    const P = (t, k, f) => presetField('coping', t, k, f);
+    const bb = (k) => {
+      const items = cpParseItems(P('_BB_PRESETS', k, 'items')).items;
+      const W = parseInt(P('_BB_PRESETS', k, 'cap'), 10);
+      const on = branchBound(items, W, true), off = branchBound(items, W, false);
+      return { items: items, W: W, on: on, off: off,
+               with: on.counts.nodes, without: off.counts.nodes, full: un(on).full };
+    };
+
+    /* branchbound/useless: the bound cuts 86 nodes to 30 -- a factor of under
+       three, against forty-five on the heavy-prize preset. Not "almost nothing". */
+    {
+      const label = P('_BB_PRESETS', 'useless', 'label');
+      const note = P('_BB_PRESETS', 'useless', 'note');
+      const u = bb('useless'), g = bb('gap');
+      const frac = un(fractionalKnapsack(u.items, u.W));
+      eq(u.without + ' to ' + u.with, '86 to 30', 'branchbound/useless: 86 nodes become 30');
+      eq(u.without < 3 * u.with, true, 'a factor of under three');
+      eq(Rtext(frac.value), '26', 'the fractional optimum being 26');
+      eq(un(u.on).value, 26, 'which the integer optimum equals here too');
+      eq(Math.floor(g.without / g.with), 45, 'against forty-five on the heavy-prize preset');
+      says(note, 'optimum is ' + Rtext(frac.value), 'coping branchbound/useless names the bound');
+      says(note, 'cuts ' + u.without + ' nodes to ' + u.with, 'coping branchbound/useless names both counts');
+      says(note, 'under ' + word(3), 'coping branchbound/useless names the factor');
+      says(note, word(Math.floor(g.without / g.with)), 'coping branchbound/useless names the comparison');
+      denies(note, 'tells the search almost nothing', 'coping branchbound/useless NOTE');
+      denies(label, 'the bound stops helping', 'coping branchbound/useless LABEL');
+    }
+
+    /* branchbound/gap: the prize fills the sack, so the root bound IS the integer
+       optimum -- the mode's TIGHTEST bound, 3 nodes against 135. */
+    {
+      const note = P('_BB_PRESETS', 'gap', 'note');
+      const g = bb('gap');
+      const frac = un(fractionalKnapsack(g.items, g.W));
+      eq(Rtext(frac.value), '30', 'branchbound/gap: the fractional relaxation is 30');
+      eq(un(g.on).value, 30, 'and so is the integer optimum -- no gap at all');
+      eq(g.items[0].w, g.W, 'because the prize alone fills the sack exactly');
+      eq(g.with + ' against ' + g.without, '3 against 135', 'the search closing in 3 nodes against 135');
+      /* the tightest in the mode, measured against every other preset here */
+      for (const other of ['five', 'tight', 'useless', 'small']) {
+        const o = bb(other);
+        eq(g.with < o.with, true, 'and fewer nodes than the ' + other + ' preset (' + o.with + ')');
+      }
+      says(note, 'relaxation is ' + Rtext(frac.value), 'coping branchbound/gap names the relaxation');
+      says(note, g.with + ' nodes against ' + g.without, 'coping branchbound/gap names both counts');
+      says(note, 'tightest bound', 'coping branchbound/gap says which way round it is');
+      denies(note, 'the bound is loose', 'coping branchbound/gap');
+    }
+
+    /* The KPI that held 2^n beside two visited-node counts, so 44 > 32 read as
+       impossible. 2^n is the LEAVES, and the label now says so. */
+    {
+      const src = pySrc('coping');
+      const f = bb('five');
+      eq(f.full, Math.pow(2, f.items.length), 'branchbound: `full` is 2^n, the leaves of the whole tree');
+      eq(f.without > f.full, true,
+         'and the without-bound node count EXCEEDS it (' + f.without + ' > ' + f.full
+         + '), which only reads sensibly once the label names the unit');
+      eq(src.indexOf('("Leaves in the whole tree, 2^n", "bbFull")') >= 0, true,
+         'so the KPI label names leaves');
+      eq(src.indexOf('("The whole tree", "bbFull")') < 0, true, 'and no longer just "the whole tree"');
+      eq(src.indexOf("' leaves. A bound that never cuts") >= 0
+         || src.indexOf("+ ' leaves") >= 0, true, 'matching the word the status line already used');
+    }
+
+    /* tsp/broken: 50 is the DISTANCE; the ratio against going round is 25. */
+    {
+      const note = P('_TS_PRESETS', 'broken', 'note');
+      const D = cpParseDistances(P('_TS_PRESETS', 'broken', 'spec'), 8).D;
+      let worst = null;
+      for (let i = 0; i < D.length; i += 1) {
+        for (let j = 0; j < D.length; j += 1) {
+          for (let k = 0; k < D.length; k += 1) {
+            if (i === j || j === k || i === k) continue;
+            const round = D[i][k] + D[k][j];
+            if (D[i][j] > round && (worst === null || D[i][j] / round > worst.ratio)) {
+              worst = { hop: D[i][j], round: round, ratio: D[i][j] / round };
+            }
+          }
+        }
+      }
+      eq(worst.hop, 50, 'tsp/broken: the direct hop is 50');
+      eq(worst.round, 2, 'and going round costs 2');
+      eq(worst.ratio, 25, 'so the hop is twenty-five times the detour, not fifty');
+      says(note, 'hop of ' + worst.hop, 'coping tsp/broken names the hop');
+      says(note, word(worst.ratio) + ' times the ' + worst.round, 'coping tsp/broken names the ratio');
+      denies(note, 'fifty times longer', 'coping tsp/broken');
+    }
+
+    /* setcover/overlap: five of the ten pairs cover everything and five do not. */
+    {
+      const note = P('_SC_PRESETS', 'overlap', 'note');
+      const parsed = cpParseSets(P('_SC_PRESETS', 'overlap', 'sets'), 12);
+      const S = parsed.sets, U = parsed.universe;
+      const work = [], fail = [];
+      for (let i = 0; i < S.length; i += 1) {
+        for (let j = i + 1; j < S.length; j += 1) {
+          const hit = {};
+          S[i].forEach((e) => { hit[e] = true; });
+          S[j].forEach((e) => { hit[e] = true; });
+          const missing = U.filter((e) => !hit[e]);
+          (missing.length ? fail : work).push({ pair: [i + 1, j + 1], missing: missing });
+        }
+      }
+      const greedy = un(greedySetCover(S, U));
+      eq(work.length + fail.length, 10, 'setcover/overlap: ten pairs in all');
+      eq(work.length + ' cover, ' + fail.length + ' do not', '5 cover, 5 do not',
+         'five of which cover everything and five do not');
+      eq(fail[0].pair.join(' and ') + ' misses ' + fail[0].missing.join(','), '1 and 2 misses 5',
+         'sets 1 and 2 together missing element 5');
+      eq(greedy.chosen.length, un(setCoverBrute(S, U)).size, 'and greedy finds one of the pairs that work');
+      says(note, word(work.length) + ' of the ' + word(10) + ' pairs cover all ' + word(U.length),
+           'coping setcover/overlap names how many work');
+      says(note, 'sets ' + fail[0].pair.join(' and ') + ' together miss element ' + fail[0].missing[0],
+           'coping setcover/overlap names a pair that does not');
+      denies(note, 'any two of these cover', 'coping setcover/overlap');
+    }
+
+    /* fptas/big: the epsilon slider opens at 1/10 -- a TENTH, ten percent -- and
+       buys a table of 238 cells against the exact 3604. */
+    {
+      const note = P('_FP_PRESETS', 'big', 'note');
+      const src = pySrc('coping');
+      const m = /_range\("fpEps", "Accuracy: &epsilon; is one over this", 1, 60, (\d+)\)/.exec(src)
+             || /_range\("fpEps", "Accuracy: ε is one over this", 1, 60, (\d+)\)/.exec(src);
+      eq(m !== null, true, 'fptas: the epsilon control is still a range over 1/this');
+      const opens = parseInt(m[1], 10);
+      const items = cpParseItems(P('_FP_PRESETS', 'big', 'items')).items;
+      const W = parseInt(P('_FP_PRESETS', 'big', 'cap'), 10);
+      const exact = cpExactCells(items);
+      const sweptAt = cpEpsilonSweep(items, W, [opens]);
+      const row = (sweptAt.rows || sweptAt)[0];
+      eq(opens, 10, 'fptas/big: the slider opens on epsilon = 1/10');
+      eq(Rtext(row.eps), '1/' + opens, 'which is a tenth -- ten percent, not a tenth of a percent');
+      eq(exact, 3604, 'the exact table having 3604 cells');
+      eq(row.cells, 238, 'and the scaled one 238');
+      says(note, 'has ' + exact + ' cells', 'coping fptas/big names the exact table');
+      says(note, 'one of ' + row.cells, 'coping fptas/big names the scaled table');
+      says(note, 'ten percent', 'coping fptas/big names the epsilon in percent');
+      denies(note, 'a tenth of a percent', 'coping fptas/big');
+    }
+
+    /* fptas/equal: the realised loss is 0 at every epsilon swept, so it does not
+       "come entirely from the floor" -- there is none. */
+    {
+      const note = P('_FP_PRESETS', 'equal', 'note');
+      const items = cpParseItems(P('_FP_PRESETS', 'equal', 'items')).items;
+      const W = parseInt(P('_FP_PRESETS', 'equal', 'cap'), 10);
+      const swept = cpEpsilonSweep(items, W, [2, 4, 5, 10, 20]);
+      const sweep = { rows: swept.rows || swept };
+      const values = items.map((it) => it.v);
+      eq(new Set(values).size, 1, 'fptas/equal: every value is the same');
+      eq(sweep.rows.map((r) => r.loss).join(','), '0,0,0,0,0',
+         'and the realised loss is 0 at every epsilon swept');
+      eq(sweep.rows.every((r) => Rtext(r.ratio) === '1'), true, 'the ratio being exactly 1 throughout');
+      eq(sweep.rows.every((r) => Rcmp(r.promised, R(0n, 1n)) > 0), true,
+         'while the promise it is allowed to lose is positive, so the bound is not tight');
+      says(note, 'realised loss is ' + sweep.rows[0].loss, 'coping fptas/equal names the loss');
+      says(note, 'not tight here', 'coping fptas/equal says the bound is slack');
+      denies(note, 'comes entirely from the floor', 'coping fptas/equal');
+    }
+
+    /* fpt/cycle6: the printed tree bound is 2^(k+1) = 16 and the measured count
+       is 9, so "at most 2^3" was below both. */
+    {
+      const note = P('_FT_PRESETS', 'cycle6', 'note');
+      const G = cpParseGraph(P('_FT_PRESETS', 'cycle6', 'spec'), 8).G;
+      const k = parseInt(P('_FT_PRESETS', 'cycle6', 'k'), 10);
+      const run = fptVertexCover(G, k);
+      eq(un(run).treeBound, Math.pow(2, k + 1), 'fpt/cycle6: the tree bound the kit prints is 2^(k+1)');
+      eq(un(run).treeBound, 16, 'which is 16');
+      eq(run.counts.nodes, 9, 'and the measured node count is 9');
+      eq(run.counts.nodes > Math.pow(2, k), true, 'which is already more than 2^3');
+      eq(un(run).bruteWork, Math.pow(2, G.n), 'against 2^6 subsets exhaustively');
+      eq(un(run).bruteWork, 64, 'which is 64');
+      says(note, '2^(k+1) = ' + un(run).treeBound + ' nodes', 'coping fpt/cycle6 names the tree bound');
+      says(note, 'takes ' + run.counts.nodes + ' here', 'coping fpt/cycle6 names the measurement');
+      says(note, '2^' + G.n + ' = ' + un(run).bruteWork + ' subsets', 'coping fpt/cycle6 names the brute count');
+      denies(note, 'at most 2^3 branches', 'coping fpt/cycle6');
+    }
+  }
+
+  /* -------- the three kits that were ignoring the panel copy they are given.
+     `reduction`, `coping` and `random` built their Lab with a literal
+     panel_title and panel_intro, so a lesson author who set either in the lab
+     config was silently ignored while every other kit on the path honoured it. */
+  {
+    for (const mod of ['reduction', 'coping', 'random']) {
+      const src = pySrc(mod);
+      const literalTitles = (src.match(/^        panel_title="/gm) || []).length;
+      const literalIntros = (src.match(/^        panel_intro=\(/gm) || []).length;
+      const viaCfg = (src.match(/panel_title=cfg\.get\("panel_title"/g) || []).length;
+      const introViaCfg = (src.match(/panel_intro=cfg\.get\(/g) || []).length;
+      eq(literalTitles, 0, mod + '.py passes no panel_title the config cannot override');
+      eq(literalIntros, 0, mod + '.py passes no panel_intro the config cannot override');
+      eq(viaCfg > 0 && viaCfg === introViaCfg, true,
+         mod + '.py reads both from cfg, on all ' + viaCfg + ' of its modes');
+    }
+  }
+}
+
+
+/* ==========================================================================
+   PRESET PROSE, second pass: the kits nobody had reported
+   ==========================================================================
+
+   The thirty strings reported to me were found incidentally by authors who
+   happened to need those numbers. Sweeping the rest of the preset tables the
+   same way turned up eight more, in three kits nobody had looked at: a label
+   that counted arcs and called them nodes, three that claimed distinct edge
+   weights on graphs with a repeat, a negative-arc count that was one too many,
+   and three schedule notes about steps that happen at a different step. These
+   are the assertions that keep them fixed. */
+console.log('lab presets: the second sweep, over the kits nobody had reported');
+{
+  const labsDir2 = path.join(__dirname, 'mathpath', 'labs');
+  const py2 = {};
+  const src2 = (mod) => {
+    if (!py2[mod]) py2[mod] = fs.readFileSync(path.join(labsDir2, mod + '.py'), 'utf8');
+    return py2[mod];
+  };
+  const entries2 = (src, table) => {
+    const at = src.indexOf('\n' + table + ' = ');
+    if (at < 0) { fails += 1; console.log('  FAIL cannot find ' + table); return []; }
+    let i = at + table.length + 4;
+    while (i < src.length && src[i] !== '[' && src[i] !== '{') i += 1;
+    let depth = 0, start = -1, out = [];
+    for (; i < src.length; i += 1) {
+      const ch = src[i];
+      if (ch === '[' || ch === '{') { depth += 1; if (depth === 2 && ch === '{') start = i; }
+      else if (ch === ']' || ch === '}') {
+        depth -= 1;
+        if (depth === 1 && start >= 0) { out.push(src.slice(start, i + 1)); start = -1; }
+        if (depth === 0) break;
+      }
+    }
+    return out;
+  };
+  const field2 = (mod, table, key, field) => {
+    const hit = entries2(src2(mod), table).filter((e) =>
+      e.indexOf('"id": "' + key + '"') >= 0 || e.indexOf('"key": "' + key + '"') >= 0);
+    if (hit.length !== 1) {
+      fails += 1; console.log('  FAIL ' + mod + '.' + table + ': ' + hit.length + ' named ' + key);
+      return '';
+    }
+    const m = new RegExp('"' + field + '":\\s*((?:"(?:[^"\\\\]|\\\\.)*"\\s*)+)').exec(hit[0]);
+    if (!m) { fails += 1; console.log('  FAIL ' + mod + '/' + key + ' has no ' + field); return ''; }
+    let out = '';
+    const lit = /"((?:[^"\\]|\\.)*)"/g;
+    let piece;
+    while ((piece = lit.exec(m[1])) !== null) {
+      out += piece[1].replace(/\\"/g, '"')
+                     .replace(/\\u2013/g, '–').replace(/\\u2014/g, '—')
+                     .replace(/\\'/g, "'");
+    }
+    return out;
+  };
+  const says2 = (text, phrase, label) => {
+    if (String(text).indexOf(String(phrase)) < 0) {
+      fails += 1;
+      console.log('  FAIL ' + label + ': does not contain "' + phrase + '"');
+      console.log('         the string is: ' + text);
+    }
+  };
+  const denies2 = (text, phrase, label) => {
+    if (String(text).indexOf(String(phrase)) >= 0) {
+      fails += 1; console.log('  FAIL ' + label + ': still contains "' + phrase + '"');
+    }
+  };
+  const WORD2 = { 1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five', 6: 'six', 7: 'seven',
+                  8: 'eight', 9: 'nine', 10: 'ten', 24: '24' };
+  const w2 = (n) => WORD2[n];
+  /* `a-b 4` / `a>b 4` / `a>b 4:2`, which is every weighted-graph spec in these
+     three kits. The first number is the weight this section cares about. */
+  const graphOf = (spec, sep) => {
+    const arcs = [], seen = {};
+    spec.split(',').forEach((piece) => {
+      const m = new RegExp('^\\s*(\\w+)\\s*' + sep + '\\s*(\\w+)\\s+(-?\\d+)').exec(piece);
+      if (!m) { fails += 1; console.log('  FAIL cannot read "' + piece + '" as an arc'); return; }
+      seen[m[1]] = true; seen[m[2]] = true;
+      arcs.push({ u: m[1], v: m[2], w: parseInt(m[3], 10) });
+    });
+    const ws = arcs.map((a) => a.w);
+    const dup = ws.filter((x, i) => ws.indexOf(x) !== i).filter((x, i, l) => l.indexOf(x) === i);
+    return { nodes: Object.keys(seen), arcs: arcs, weights: ws, repeated: dup,
+             negative: ws.filter((x) => x < 0).length,
+             at: (weight) => arcs.filter((a) => a.w === weight).map((a) => a.u + '–' + a.v) };
+  };
+
+  /* ------------------------------------------------------------ network.py */
+  {
+    /* bellmanford/prices: s, a, b, t is FOUR nodes. Five is the arc count. */
+    const label = field2('network', '_BF_PRESETS', 'prices', 'label');
+    const g = graphOf(field2('network', '_BF_PRESETS', 'prices', 'spec'), '>');
+    eq(g.nodes.length, 4, 'network bellmanford/prices: four nodes');
+    eq(g.arcs.length, 5, 'and five arcs -- which is where the "five" came from');
+    eq(g.negative, 0, 'every cost being positive, as the label also says');
+    says2(label, w2(g.nodes.length) + ' nodes, ' + w2(g.arcs.length) + ' arcs',
+          'network bellmanford/prices LABEL counts nodes and arcs');
+    denies2(label, 'five nodes', 'network bellmanford/prices LABEL');
+  }
+
+  /* ----------------------------------------------------------- graphkit.py */
+  {
+    /* prim/classic and kruskal/classic share one graph, and the weight 2 is on
+       two of its edges. The minimum tree is unique all the same, which is the
+       stronger lesson: distinct weights are SUFFICIENT for uniqueness, not
+       necessary, and these strings used to claim the shortcut. */
+    const pmSpec = field2('graphkit', '_PM_PRESETS', 'classic', 'spec');
+    const krSpec = field2('graphkit', '_KR_PRESETS', 'classic', 'spec');
+    eq(pmSpec, krSpec, 'graphkit: prim/classic and kruskal/classic are the same graph');
+    const g = graphOf(pmSpec, '-');
+    eq(g.nodes.length, 7, 'graphkit prim/classic: seven vertices');
+    eq(g.arcs.length, 9, 'and nine edges');
+    eq(g.repeated.join(','), '2', 'with the weight 2 repeated -- so NOT all different');
+    eq(g.at(2).join(' and '), '2–3 and 6–7', 'on 2-3 and 6-7');
+    /* every spanning tree, enumerated here, so "unique" is a count and not a claim */
+    {
+      const n = g.nodes.length, ix = {};
+      g.nodes.forEach((v, i) => { ix[v] = i; });
+      let best = null, howMany = 0;
+      const pick = (at, chosen) => {
+        if (chosen.length === n - 1) {
+          const par = [];
+          for (let i = 0; i < n; i += 1) par.push(i);
+          const find = (x) => { while (par[x] !== x) { par[x] = par[par[x]]; x = par[x]; } return x; };
+          let ok = true, total = 0;
+          for (const e of chosen) {
+            const a = find(ix[e.u]), b = find(ix[e.v]);
+            if (a === b) { ok = false; break; }
+            par[a] = b; total += e.w;
+          }
+          if (!ok) return;
+          if (best === null || total < best) { best = total; howMany = 1; }
+          else if (total === best) howMany += 1;
+          return;
+        }
+        for (let i = at; i < g.arcs.length; i += 1) pick(i + 1, chosen.concat([g.arcs[i]]));
+      };
+      pick(0, []);
+      eq(best, 19, 'graphkit prim/classic: the minimum spanning tree weighs 19');
+      eq(howMany, 1, 'and there is exactly ONE of them, repeat or no repeat');
+      const pmNote = field2('graphkit', '_PM_PRESETS', 'classic', 'note');
+      const pmLabel = field2('graphkit', '_PM_PRESETS', 'classic', 'label');
+      says2(pmNote, 'the weight ' + g.repeated[0] + ' appears twice, on ' + g.at(2).join(' and '),
+            'graphkit prim/classic NOTE names the repeat');
+      says2(pmNote, 'unique all the same — ' + best, 'graphkit prim/classic NOTE names the weight');
+      says2(pmLabel, 'unique anyway', 'graphkit prim/classic LABEL says the tree is unique');
+      denies2(pmNote, 'distinct weights, so', 'graphkit prim/classic NOTE');
+      denies2(pmLabel, 'all weights different', 'graphkit prim/classic LABEL');
+      const krLabel = field2('graphkit', '_KR_PRESETS', 'classic', 'label');
+      says2(krLabel, w2(g.nodes.length) + ' vertices, ' + w2(g.arcs.length)
+            + ' edges, one weight repeated', 'graphkit kruskal/classic LABEL counts honestly');
+      denies2(krLabel, 'all weights different', 'graphkit kruskal/classic LABEL');
+      /* the note's own claim: nine edges, six in the tree, three rejected */
+      const krNote = field2('graphkit', '_KR_PRESETS', 'classic', 'note');
+      eq(g.arcs.length - (g.nodes.length - 1), 3, 'kruskal/classic: three edges are rejected');
+      says2(krNote, w2(3) + ' edges rejected', 'graphkit kruskal/classic NOTE names the rejections');
+    }
+
+    /* relax/classic: the weight 9 is on two of its edges too. */
+    {
+      const label = field2('graphkit', '_RX_PRESETS', 'classic', 'label');
+      const r = graphOf(field2('graphkit', '_RX_PRESETS', 'classic', 'spec'), '-');
+      eq(r.nodes.length, 6, 'graphkit relax/classic: six vertices');
+      eq(r.arcs.length, 9, 'and nine edges');
+      eq(r.repeated.join(','), '9', 'with the weight 9 repeated');
+      eq(r.at(9).join(' and '), '1–3 and 5–6', 'on 1-3 and 5-6');
+      says2(label, w2(r.nodes.length) + ' vertices, ' + w2(r.arcs.length)
+            + ' edges, one weight repeated', 'graphkit relax/classic LABEL counts honestly');
+      denies2(label, 'weights all different', 'graphkit relax/classic LABEL');
+    }
+
+    /* bellmanford/negative: -4, -3 and -2 is THREE negative arcs. */
+    {
+      const note = field2('graphkit', '_BF_PRESETS', 'negative', 'note');
+      const b = graphOf(field2('graphkit', '_BF_PRESETS', 'negative', 'spec'), '>');
+      eq(b.negative, 3, 'graphkit bellmanford/negative: three negative arcs, not four');
+      eq(b.arcs.length, 10, 'out of ten');
+      says2(note, w2(b.negative) + ' negative arcs', 'graphkit bellmanford/negative NOTE counts them');
+      denies2(note, 'four negative arcs', 'graphkit bellmanford/negative NOTE');
+    }
+  }
+
+  /* ----------------------------------------------------------- schedule.py */
+  {
+    const orSrc3 = src2('or_core'), sysSrc3 = src2('algebra_systems');
+    eval(block('RATIONAL_JS') + blockFrom(sysSrc3, 'FORMAT_JS', 'algebra_systems.py')
+       + blockFrom(orSrc3, 'ORFMT_JS', 'or_core.py') + blockFrom(orSrc3, 'SCHED_JS', 'or_core.py')
+       + blockFrom(src2('schedule'), 'SCHEDDRAW_JS', 'schedule.py')
+       + blockFrom(src2('schedule'), 'SCHEDKIT_JS', 'schedule.py'));
+
+    /* parallel/even: the two LOWER BOUNDS are 8 and 4 and do not meet. What
+       meets is the average-load bound and the makespan LPT reaches. */
+    {
+      const note = field2('schedule', '_PAR_PRESETS', 'even', 'note');
+      const jobs = fillJobs(parseJobs(field2('schedule', '_PAR_PRESETS', 'even', 'jobs'),
+                                      ['p'], ['p']).jobs);
+      const m = parseInt(field2('schedule', '_PAR_PRESETS', 'even', 'machines'), 10);
+      const par = parallelAssign(jobs, m, 'lpt');
+      eq(Rtext(par.bounds.average), '8', 'parallel/even: the average-load bound is 8');
+      eq(Rtext(par.bounds.longest), '4', 'and the longest single job is 4');
+      eq(Requ(par.bounds.average, par.bounds.longest), false, 'so the two bounds do NOT meet');
+      eq(Requ(par.makespan, par.bounds.best), true, 'what meets is the makespan and the better bound');
+      eq(Rtext(par.makespan) + ' = ' + Rtext(par.optimum), '8 = 8', 'LPT reaching the optimum, 8');
+      says2(note, 'average-load bound is ' + Rtext(par.bounds.average) + ' on',
+            'schedule parallel/even NOTE names the bound');
+      says2(note, 'LPT reaches it', 'schedule parallel/even NOTE says LPT attains it');
+      denies2(note, 'the two bounds meet', 'schedule parallel/even NOTE');
+    }
+
+    /* edd/onelate: which job decides L max splits evenly over the 24 orders, and
+       D is late in none of them. */
+    {
+      const note = field2('schedule', '_EDD_PRESETS', 'onelate', 'note');
+      const jobs = fillJobs(parseJobs(field2('schedule', '_EDD_PRESETS', 'onelate', 'jobs'),
+                                      ['p', 'd'], ['p', 'd']).jobs);
+      const tally = {};
+      let orders = 0, dLate = 0;
+      const perm = (left, cur) => {
+        if (!left.length) {
+          orders += 1;
+          const o = seqObjectives(cur, jobs);
+          let top = null, who = null;
+          o.rows.forEach((r, k) => {
+            const L = Rsub(r.C, jobs[cur[k]].d);
+            if (top === null || Rcmp(L, top) > 0) { top = L; who = jobs[cur[k]].id; }
+            if (jobs[cur[k]].id === 'D' && Rcmp(L, R(0n, 1n)) > 0) dLate += 1;
+          });
+          tally[who] = (tally[who] || 0) + 1;
+          return;
+        }
+        for (let i = 0; i < left.length; i += 1) {
+          perm(left.slice(0, i).concat(left.slice(i + 1)), cur.concat([left[i]]));
+        }
+      };
+      perm(jobs.map((_, i) => i), []);
+      eq(orders, 24, 'edd/onelate: 24 orders');
+      eq(dLate, 0, 'D is late in none of them');
+      eq(Object.keys(tally).sort().join(','), 'A,B,C', 'and A, B and C each decide L max somewhere');
+      eq(Object.keys(tally).map((k) => tally[k]).join(','), '8,8,8',
+         'eight orders each -- so C does NOT decide it wherever it goes');
+      says2(note, 'any of the ' + orders + ' orders', 'schedule edd/onelate NOTE names the orders');
+      says2(note, w2(8) + ' orders each', 'schedule edd/onelate NOTE names the even split');
+      denies2(note, 'C decides L max wherever it goes', 'schedule edd/onelate NOTE');
+    }
+
+    /* late/throws: the discard happens at the SECOND step, and the job thrown out
+       had been on time for ONE round. */
+    {
+      const note = field2('schedule', '_LATE_PRESETS', 'throws', 'note');
+      const jobs = fillJobs(parseJobs(field2('schedule', '_LATE_PRESETS', 'throws', 'jobs'),
+                                      ['p', 'd'], ['p', 'd']).jobs);
+      const mh = mooreHodgson(jobs);
+      const run = (mh.result !== undefined) ? mh.result : mh;
+      const firstDiscard = run.steps.map((s, i) => ({ at: i + 1, s: s }))
+                                    .filter((x) => x.s.removed !== null)[0];
+      eq(firstDiscard.at, 2, 'late/throws: the first discard happens at step TWO');
+      eq(firstDiscard.s.id, 'D', 'the job that joins there being D');
+      eq(firstDiscard.s.removedId, 'B', 'and the job thrown out being B');
+      eq(run.steps[0].id + '/' + (run.steps[0].removed === null), 'B/true',
+         'B having been accepted and kept at step one, so one round on time and not two');
+      eq(run.steps[2].id + '/' + run.steps[2].removedId, 'A/A',
+         'and A being thrown out at step three the moment it joins');
+      says2(note, 'at the second step ' + firstDiscard.s.id, 'schedule late/throws names the step');
+      says2(note, 'so ' + firstDiscard.s.removedId + ' is what gets thrown out',
+            'schedule late/throws names the job thrown out');
+      says2(note, 'thrown out at the third step', 'schedule late/throws names what happens next');
+      denies2(note, 'at the third step the algorithm discards', 'schedule late/throws NOTE');
+    }
   }
 }
 

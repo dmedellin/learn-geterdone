@@ -322,8 +322,12 @@ RDKIT_JS = r"""
       ? satEval(formula, run.result.assignment) === formula.clauses.length : null;
     return { run: run, steps: steps, decided: decided, verified: verified,
              satisfiable: run.result.satisfiable,
-             calls: run.result.oracleCalls === undefined ? formula.n + 1 : run.result.oracleCalls,
+             calls: (run.counts && run.counts.calls !== undefined) ? run.counts.calls
+                    : (run.result.oracleCalls === undefined ? formula.n + 1
+                       : run.result.oracleCalls),
              expectedCalls: formula.n + 1,
+             callsWithinBound: ((run.counts && run.counts.calls !== undefined)
+                                 ? run.counts.calls : formula.n + 1) <= formula.n + 1,
              bruteWork: Math.pow(2, formula.n),
              solutions: solutions,
              agrees: run.result.satisfiable === decided,
@@ -916,7 +920,7 @@ _SR_PRESETS = [
     },
     {
         "id": "free",
-        "label": "a variable no clause mentions",
+        "label": "a variable the oracle allows either way",
         "cnf": "1 2; -1 2",
         "note": "x2 is forced and x1 is free, so the oracle allows both branches at x1 and the "
                 "reduction takes the first",
@@ -1000,8 +1004,13 @@ def _selfreduce(cfg):
 
     document.getElementById('srSize').textContent = F.n + ' variables, ' + F.clauses.length + ' clauses';
     document.getElementById('srDecide').textContent = trace.decided ? 'yes, satisfiable' : 'no';
-    document.getElementById('srCalls').textContent = trace.calls + ' — n + 1 is '
-      + trace.expectedCalls + (trace.calls === trace.expectedCalls ? '' : ' — MISMATCH');
+    document.getElementById('srCalls').textContent = trace.calls
+      + (trace.calls === trace.expectedCalls
+          ? ' — n + 1 is ' + trace.expectedCalls
+          : (trace.satisfiable
+              ? ' — n + 1 is ' + trace.expectedCalls + ' — MISMATCH'
+              : ' — the first no ends it; n + 1 = ' + trace.expectedCalls
+                + ' is the bound for BUILDING a witness'));
     document.getElementById('srBrute').textContent = String(trace.bruteWork);
     document.getElementById('srFound').textContent = trace.run.result.assignment
       ? rdAssignText(trace.run.result.assignment) : 'none, and there is none';
@@ -1040,10 +1049,13 @@ def _selfreduce(cfg):
       + (trace.run.result.assignment ? rdAssignText(trace.run.result.assignment) : '—')
       + '</td><td class="' + (trace.verified === null ? 'tone-muted">no assignment to check'
           : (trace.verified ? 'tone-green">verified' : 'tone-red">NOT verified')) + '</td></tr>'
-      + '<tr><td>calls used against variables</td><td>' + trace.calls + ' calls for ' + F.n
+      + '<tr><td>calls used against variables</td><td>' + trace.calls + ' call'
+      + rdPlural(trace.calls, '', 's') + ' for ' + F.n
       + ' variables</td><td class="'
       + (trace.calls === trace.expectedCalls ? 'tone-green">n + 1, as promised'
-          : 'tone-red">not n + 1') + '</td></tr>'
+          : (trace.callsWithinBound
+              ? 'tone-green">fewer than n + 1, because the first no ended the search'
+              : 'tone-red">more than n + 1')) + '</td></tr>'
       + '<tr><td>what the oracle costs, and why that is beside the point</td>'
       + '<td>each call is a search over ' + trace.bruteWork + ' assignments</td>'
       + '<td class="tone-amber">the reduction is POLYNOMIAL in calls; the oracle is not '
@@ -1091,12 +1103,13 @@ def _selfreduce(cfg):
         subtitle="The oracle only says yes or no, and asking it once per variable produces a satisfying assignment it never returned",
         markup=markup,
         controls=controls,
-        panel_title="Edit the formula and watch a branch be refused",
-        panel_intro=(
+        panel_title=cfg.get("panel_title", "Edit the formula and watch a branch be refused"),
+        panel_intro=cfg.get(
+            "panel_intro",
             "Every restricted formula is re-decided by brute force, separately from the reduction, "
             "and the two answers are required to agree at every step. The assignment at the end is "
             "checked clause by clause rather than assumed &mdash; a reduction that produced a "
-            "confident wrong witness would look identical without that check."
+            "confident wrong witness would look identical without that check.",
         ),
         script=script,
     )
@@ -1111,8 +1124,8 @@ _IS_PRESETS = [
         "id": "two",
         "label": "two clauses — six vertices, and a collision",
         "cnf": "1 2 -3; -1 2 3",
-        "note": "two independent sets of size 2 map to the same assignment, because a clause with "
-                "two true literals can be satisfied by either",
+        "note": "three of the seven independent sets of size 2 map to the same assignment, "
+                "because a clause with two true literals can be satisfied by either",
     },
     {
         "id": "three",
@@ -1132,7 +1145,8 @@ _IS_PRESETS = [
         "id": "chain",
         "label": "a forced chain",
         "cnf": "1; -1 2; -2 3",
-        "note": "one literal per clause leaves no choice at all, so the map is a bijection on this "
+        "note": "once the clause before it is settled only one literal of each clause is left to "
+                "satisfy it, so there is no choice anywhere and the map is a bijection on this "
                 "formula and on very few others",
     },
     {
@@ -1334,12 +1348,13 @@ def _independentset(cfg):
         subtitle="A triangle per clause and an edge between contradictory literals — the graph is built here, a set is carried back, and the map is checked in both directions",
         markup=markup,
         controls=controls,
-        panel_title="Step through the independent sets and watch two of them give one assignment",
-        panel_intro=(
+        panel_title=cfg.get("panel_title", "Step through the independent sets and watch two of them give one assignment"),
+        panel_intro=cfg.get(
+            "panel_intro",
             "Both problems are solved exhaustively: every independent set of size k, and every "
             "satisfying assignment. The map between them is checked for soundness, for surjectivity "
             "and for injectivity separately, because this reduction has the first and not the other "
-            "two &mdash; and it is correct anyway."
+            "two &mdash; and it is correct anyway.",
         ),
         script=script,
     )
@@ -1361,8 +1376,8 @@ _CM_PRESETS = [
         "id": "path4",
         "label": "a path on four vertices",
         "spec": "1-2, 2-3, 3-4",
-        "note": "two independent vertices, two in the cover, and the complement is a path's "
-                "complement rather than a path",
+        "note": "two independent vertices, two in the cover, and the complement is another path "
+                "— 3–1–4–2 — because P4 is self-complementary",
     },
     {
         "id": "k4",
@@ -1571,12 +1586,13 @@ def _complement(cfg):
         subtitle="S is independent exactly when V − S is a cover, and exactly when S is a clique in the complement — checked on every subset, not only the largest",
         markup=markup,
         controls=controls,
-        panel_title="Step through the subsets and watch the three columns move together",
-        panel_intro=(
+        panel_title=cfg.get("panel_title", "Step through the subsets and watch the three columns move together"),
+        panel_intro=cfg.get(
+            "panel_intro",
             "The map here is an involution: apply it twice and you are back where you started, so "
             "it is a bijection in the strongest sense the kit contains. The three optima are found "
             "by three separate exhaustive searches, and α + τ = n falls out of them rather than "
-            "being asserted."
+            "being asserted.",
         ),
         script=script,
     )
@@ -1610,8 +1626,8 @@ _SS_PRESETS = [
         "id": "unsat",
         "label": "unsatisfiable — nothing reaches the target",
         "cnf": "1 2; 1 -2; -1 2; -1 -2",
-        "note": "no subset of the ten numbers adds to the target, which is the NO answer arriving "
-                "on the other side",
+        "note": "no subset of the twelve numbers adds to the target of 114444, which is the NO "
+                "answer arriving on the other side",
     },
     {
         "id": "single",
@@ -1820,12 +1836,13 @@ def _subsetsum(cfg):
         subtitle="One column per variable and per clause, a target of 1s and 4s, and a base large enough that no column can carry",
         markup=markup,
         controls=controls,
-        panel_title="Read the table as the construction, then carry a subset back",
-        panel_intro=(
+        panel_title=cfg.get("panel_title", "Read the table as the construction, then carry a subset back"),
+        panel_intro=cfg.get(
+            "panel_intro",
             "The column totals are computed over every row and drawn against the base, because "
             "&ldquo;no column carries&rdquo; is the proof obligation the whole reduction rests on. "
             "Both sides are solved exhaustively and the map between them is checked to be a "
-            "bijection &mdash; which this one is, unlike the independent-set reduction."
+            "bijection &mdash; which this one is, unlike the independent-set reduction.",
         ),
         script=script,
     )
@@ -2070,12 +2087,13 @@ def _tsp(cfg):
         subtitle="Distance 1 on an edge and 2 off it, budget n — the tours within budget and the Hamilton circuits come out as the same list",
         markup=markup,
         controls=controls,
-        panel_title="Step through the tours and watch the budget do the separating",
-        panel_intro=(
+        panel_title=cfg.get("panel_title", "Step through the tours and watch the budget do the separating"),
+        panel_intro=cfg.get(
+            "panel_intro",
             "Every tour is enumerated and priced, and every one is separately checked against the "
             "graph to see whether it is a Hamilton circuit. The two lists are then compared as "
             "lists. This is the one reduction here whose solution map is the identity, which is "
-            "what makes it the right first example and a misleading only example."
+            "what makes it the right first example and a misleading only example.",
         ),
         script=script,
     )

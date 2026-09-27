@@ -947,7 +947,8 @@ _SH_PRESETS = [
         "id": "naive3",
         "label": "the naive swap at n = 3 — the smallest case that fails",
         "n": "3", "kind": "naive",
-        "note": "27 tapes over 6 permutations: four of them get 5 tapes and two get 4",
+        "note": "27 tapes over 6 permutations: three of them get 5 tapes and three get 4, "
+                "because 27 does not divide by 6",
     },
     {
         "id": "naive5",
@@ -1135,12 +1136,13 @@ def _shuffle(cfg):
         subtitle="Fisher–Yates gives each permutation exactly one tape; the naive swap has n^n of them and n! does not divide it",
         markup=markup,
         controls=controls,
-        panel_title="Set n, choose the shuffle, and read the exact column against the measured one",
-        panel_intro=(
+        panel_title=cfg.get("panel_title", "Set n, choose the shuffle, and read the exact column against the measured one"),
+        panel_intro=cfg.get(
+            "panel_intro",
             "The exact column enumerates <em>every</em> tape, so the probabilities are fractions "
             "rather than estimates. The measured column runs the shuffle over the seeds the slider "
             "names. They disagree, and the disagreement is the point: a sample cannot establish "
-            "uniformity, and the counting argument below can refute it."
+            "uniformity, and the counting argument below can refute it.",
         ),
         script=script,
     )
@@ -1176,8 +1178,8 @@ _CS_PRESETS = [
         "id": "small5",
         "label": "n = 5 — small enough to read every execution off the table",
         "n": "5", "order": "sorted",
-        "note": "120 input orders, 10 possible comparison counts, and the whole distribution fits "
-                "on screen",
+        "note": "120 input orders, five possible comparison counts from 6 to 10, and the whole "
+                "distribution fits on screen",
     },
     {
         "id": "sorted10",
@@ -1413,12 +1415,13 @@ def _costs(cfg):
         subtitle="The fixed rule pays n(n − 1)/2 on this input every time; the random rule has an expectation of 2(n + 1)H − 4n and a spread around it",
         markup=markup,
         controls=controls,
-        panel_title="Change the input and watch the fixed count move while the distribution does not",
-        panel_intro=(
+        panel_title=cfg.get("panel_title", "Change the input and watch the fixed count move while the distribution does not"),
+        panel_intro=cfg.get(
+            "panel_intro",
             "The exact distribution is computed by recursion on the block sizes, checked against the "
             "closed form and against running the fixed-pivot algorithm on <em>every</em> input order. "
             "The measured column is a sample. Markov and Chebyshev sit beside the exact tails they "
-            "bound, so the slack in each is a number rather than a word."
+            "bound, so the slack in each is a number rather than a word.",
         ),
         script=script,
     )
@@ -1666,13 +1669,14 @@ def _karger(cfg):
         subtitle="The success probability is a recursion over contraction states, exact; the measured rate over seeds is not it, and repetition is what makes either of them useful",
         markup=markup,
         controls=controls,
-        panel_title="Edit the graph, then read the exact probability against the measured rate",
-        panel_intro=(
+        panel_title=cfg.get("panel_title", "Edit the graph, then read the exact probability against the measured rate"),
+        panel_intro=cfg.get(
+            "panel_intro",
             "Every minimum cut is found by exhaustive search over the bipartitions, and each one "
             "gets its exact probability. The algorithm succeeds if it returns <em>any</em> of them, "
             "which is a different number from the bound, and the bound is about one named cut. The "
             "seeds that failed are listed, because a with-high-probability guarantee that never "
-            "shows a failure has not been demonstrated."
+            "shows a failure has not been demonstrated.",
         ),
         script=script,
     )
@@ -1926,12 +1930,13 @@ def _witness(cfg):
         subtitle="At least three quarters of the bases are witnesses for a composite — here is the exact fraction, and the smallest base that is not one",
         markup=markup,
         controls=controls,
-        panel_title="Trace one base, then read the fraction over all of them",
-        panel_intro=(
+        panel_title=cfg.get("panel_title", "Trace one base, then read the fraction over all of them"),
+        panel_intro=cfg.get(
+            "panel_intro",
             "Every base from 2 to n − 2 is tested, so the witness fraction is exact rather than "
             "sampled. The Fermat test runs beside it on the same bases, split by whether the base "
             "shares a factor with n &mdash; which is the split that decides whether a Carmichael "
-            "number defeats it."
+            "number defeats it.",
         ),
         script=script,
     )
@@ -2152,12 +2157,13 @@ def _max3sat(cfg):
         subtitle="The mean over every assignment is a fraction, the best assignment is found by enumeration, and the ratio between them is what the algorithm earns",
         markup=markup,
         controls=controls,
-        panel_title="Edit the formula and watch the equality with 7m/8 break",
-        panel_intro=(
+        panel_title=cfg.get("panel_title", "Edit the formula and watch the equality with 7m/8 break"),
+        panel_intro=cfg.get(
+            "panel_intro",
             "Every assignment is enumerated, so the mean is exact and the optimum is the true one. "
             "The clause table computes each clause's own share of the mean from its own variables, "
             "and those shares add to the mean by linearity &mdash; which holds whether or not the "
-            "clauses share variables, and is the step the 7m/8 argument actually needs."
+            "clauses share variables, and is the step the 7m/8 argument actually needs.",
         ),
         script=script,
     )

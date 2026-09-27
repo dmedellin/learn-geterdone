@@ -932,8 +932,8 @@ _MM_PRESETS = [
         "label": "coins 1, 2, 5 and an amount of 18",
         "coins": "1 2 5",
         "amount": "18",
-        "note": "the memo turns tens of thousands of calls into nineteen, and the answer does "
-                "not move",
+        "note": "the memo turns tens of thousands of calls into fifty, over eighteen distinct "
+                "subproblems, and the answer does not move",
     },
     {
         "id": "awkward",
@@ -945,7 +945,7 @@ _MM_PRESETS = [
     },
     {
         "id": "sparse",
-        "label": "coins 4, 7 — most amounts cannot be made at all",
+        "label": "coins 4, 7 — nine amounts cannot be made at all, 17 the largest",
         "coins": "4 7",
         "amount": "17",
         "note": "an unreachable amount is a real answer and the table says so rather than "
@@ -1164,8 +1164,10 @@ _KN_PRESETS = [
         "label": "two items of equal value",
         "spec": "2/3, 2/3, 3/4",
         "cap": "4",
-        "note": "two different sets reach the same optimum, and the reconstruction returns "
-                "whichever the tie-break reached first",
+        "note": "the two equal items tie cell against cell — at capacity 2 or 3 either one "
+                "alone is as good — so which cells the path walks back through is the "
+                "tie-break's choice; the optimum at capacity 4 is not, and 6 is reached by "
+                "taking both of them and by nothing else",
     },
     {
         "id": "wasteful",
@@ -1367,7 +1369,8 @@ _ED_PRESETS = [
         "id": "sunday",
         "label": "sunday to saturday",
         "a": "sunday", "b": "saturday",
-        "note": "three again, and the alignment keeps the s, the u and the nday",
+        "note": "three again — two insertions and one substitution — and the alignment keeps "
+                "the s, the u and the day while the n becomes an r",
     },
     {
         "id": "prefix",
@@ -1548,13 +1551,14 @@ _CH_PRESETS = [
         "label": "six matrices, the usual worked example",
         "dims": "30 35 15 5 10 20 25",
         "note": "15125 multiplications against 15125 from enumerating all 42 bracketings, and "
-                "the worst bracketing costs more than ten times that",
+                "the worst bracketing costs 58000, not quite four times as much",
     },
     {
         "id": "thin",
         "label": "a thin matrix in the middle",
         "dims": "10 100 5 50",
-        "note": "7500 against 75000 — one bracketing is ten times the other, on four matrices",
+        "note": "7500 against 75000 — one bracketing is ten times the other, on three "
+                "matrices",
     },
     {
         "id": "square",
@@ -1768,8 +1772,10 @@ _LS_PRESETS = [
         "id": "classic",
         "label": "ten values, longest run of four",
         "spec": "10 9 2 5 3 7 101 18 4 8",
-        "note": "the tails array ends as 2 3 4 8 and the answer is 2 3 7 18 or 2 3 7 101 — the "
-                "right length and the wrong contents, which is the misconception",
+        "note": "the tails array ends as 2 3 4 8 while the table reconstructs 2 5 7 101 — seven "
+                "subsequences reach length four here, and the tails array happens to be one "
+                "of them, which is exactly why the misconception survives: the length is all "
+                "it ever guarantees",
     },
     {
         "id": "sorted",
@@ -1974,7 +1980,7 @@ _CO_PRESETS = [
     },
     {
         "id": "sparse",
-        "label": "coins 3, 7 — most amounts have no representation",
+        "label": "coins 3, 7 — six amounts have no representation, 11 the largest",
         "coins": "3 7",
         "amount": "20",
         "note": "zero ways is a real answer, and the row of zeros in the table is where the "
@@ -2197,8 +2203,9 @@ _TR_PRESETS = [
         "label": "a small binary tree",
         "spec": "1-2, 1-3, 2-4, 2-5, 3-6, 3-7",
         "weights": "10 2 2 4 4 4 4",
-        "note": "the root is worth ten and the four leaves sixteen, so the DP declines the "
-                "root and the greedy instinct is wrong",
+        "note": "the root is worth ten and the four leaves sixteen, and the root only blocks "
+                "its two light children, so the DP takes all five for 26 — declining a heavy "
+                "root is the instinct, and here it is wrong",
     },
     {
         "id": "caterpillar",

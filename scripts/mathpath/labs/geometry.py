@@ -856,9 +856,11 @@ def _orient(cfg):
 _HU_PRESETS = [
     {
         "id": "general",
-        "label": "nine points in general position",
+        "label": "nine points whose four collinear triples are all interior",
         "spec": "0, 0; 6, 0; 6, 6; 0, 6; 3, 3; 2, 1; 4, 5; 1, 4; 5, 2",
-        "note": "no three collinear, so both algorithms and both predicates agree",
+        "note": "all four collinear triples run through the interior point (3, 3), so no "
+                "collinearity ever reaches the hull and both algorithms and both predicates "
+                "agree on the same four corners",
     },
     {
         "id": "edges",
@@ -1110,7 +1112,7 @@ _SG_PRESETS = [
     },
     {
         "id": "apart",
-        "label": "collinear, boxes touching, no overlap",
+        "label": "collinear, with a gap of 2 between the boxes",
         "spec": "0, 0; 4, 0; 6, 0; 10, 0",
         "note": "all four signs zero again, and this time they really do miss",
     },
@@ -1296,7 +1298,8 @@ _SW_PRESETS = [
         "id": "spread",
         "label": "six segments spread along the line",
         "spec": "0, 0; 3, 3; 1, 4; 4, 1; 6, 0; 9, 3; 7, 4; 10, 1; 12, 0; 15, 3; 13, 4; 16, 1",
-        "note": "two crossings, and the sweep never compares the first pair with the last",
+        "note": "three crossings, found in three tests where all pairs would be fifteen — the "
+                "sweep never compares the first pair with the last",
     },
     {
         "id": "bundle",
@@ -1477,7 +1480,9 @@ _CL_PRESETS = [
         "id": "scatter",
         "label": "twelve points, one close pair",
         "spec": "2, 9; 5, 1; 8, 14; 11, 4; 14, 12; 17, 2; 20, 10; 23, 6; 26, 15; 29, 3; 12, 5; 13, 4",
-        "note": "the close pair straddles the dividing line, which is what the strip is for",
+        "note": "the close pair at squared distance 2 turns up inside a single base case "
+                "rather than across a dividing line; the strip still makes five comparisons "
+                "and finds nothing closer, which is what makes that answer safe",
     },
     {
         "id": "column",
@@ -2051,7 +2056,7 @@ _KD_PRESETS = [
         "label": "sixteen points, a small window",
         "spec": "1, 1; 3, 9; 5, 4; 7, 12; 9, 2; 11, 7; 13, 14; 15, 5; 2, 6; 4, 13; 6, 8; 8, 3; 10, 11; 12, 1; 14, 9; 16, 6",
         "rect": "0, 0, 6, 6",
-        "note": "four points found, and far fewer than sixteen nodes visited to find them",
+        "note": "three points found, and six nodes visited out of sixteen to find them",
     },
     {
         "id": "everything",

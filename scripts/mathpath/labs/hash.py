@@ -1,17 +1,17 @@
 """Hash tables: chaining, probing, resizing, universality, and three probabilities.
 
-Seven modes, seven lessons, two courses. Four belong to `data-structures`, where
+Seven modes, seven lessons, two courses. Three belong to `data-structures`, where
 a hash table is a structure whose cost has to be executed to be believed, and
-three to `randomised-algorithms`, where the same table is the place exact
+four to `randomised-algorithms`, where the same table is the place exact
 probability is easiest to check by hand:
 
-    chaining    Hashing with Chaining
-    probing     Open Addressing and Linear Probing
-    resize      Resizing and the Load Factor
-    universal   Universal Hashing
-    balls       Balls in Bins and the Birthday Bound
-    bloom       Bloom Filters
-    countmin    The Count-Min Sketch
+    chaining    Hashing with Chaining                data-structures
+    probing     Open Addressing and Linear Probing    data-structures
+    resize      Resizing and the Load Factor          data-structures
+    balls       Balls in Bins and the Birthday Bound  randomised-algorithms
+    universal   Universal Hashing                     randomised-algorithms
+    bloom       Bloom Filters                         randomised-algorithms
+    countmin    The Count-Min Sketch                  randomised-algorithms
 
 THE ARITHMETIC IS `algo_core.HASH_JS`, concatenated as it ships. Load factors,
 expected chain lengths, collision rates, the all-distinct product, the Bloom
@@ -1705,7 +1705,7 @@ def _bloom(cfg):
 # ============================================================= mode: countmin
 
 COUNTMIN_PRESETS = [
-    {"key": "heavy-hitter", "label": "one key forty times, eleven others twice",
+    {"key": "heavy-hitter", "label": "one key forty times, two others three times and nine twice",
      "kind": "heavy", "w": 8, "d": 3, "seed": 2},
     {"key": "uniform", "label": "ten keys, six times each",
      "kind": "uniform", "w": 8, "d": 3, "seed": 2},

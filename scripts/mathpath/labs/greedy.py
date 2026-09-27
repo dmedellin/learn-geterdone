@@ -1048,8 +1048,9 @@ _IV_PRESETS = [
         "id": "conflictfails",
         "label": "seven intervals that kill the fewest-conflicts rule",
         "spec": "0-2, 2-4, 4-6, 6-8, 1-3, 3-5, 5-7",
-        "note": "the two intervals with the fewest conflicts are the two ends, and taking "
-                "both of them leaves the middle unusable",
+        "note": "the two intervals with the fewest conflicts are the two ends, A and D, and "
+                "B and C still fit around them — the optimum is all four. What loses them is "
+                "the single finish-time pointer: once D is taken nothing starts after 8",
     },
 ]
 
@@ -1410,8 +1411,10 @@ _HF_PRESETS = [
         "label": "Fibonacci weights, the deepest possible tree",
         "spec": "a:1, b:1, c:2, d:3, e:5",
         "message": "abcde",
-        "note": "each merge is exactly the next weight, so the tree is a path and the rarest "
-                "symbol needs four bits",
+        "note": "each merge is the running total of everything merged so far — 2, then 4, 7, "
+                "12 — and every one of those totals is at least the next weight, so the new "
+                "node pairs with the next symbol every time: the tree is a path and the two "
+                "rarest symbols need four bits",
     },
 ]
 
@@ -1611,8 +1614,8 @@ _KS_PRESETS = [
         "label": "three items, capacity 50",
         "spec": "10/60, 20/100, 30/120",
         "cap": "50",
-        "note": "the fractional optimum is 240 and the 0/1 optimum 220, and the difference is "
-                "the two thirds of the last item that cannot be cut",
+        "note": "the fractional optimum is 240 and the 0/1 optimum 220, and the 20 between "
+                "them is what refusing to cut that last item costs",
     },
     {
         "id": "densitytrap",
@@ -1624,7 +1627,7 @@ _KS_PRESETS = [
     },
     {
         "id": "halfway",
-        "label": "greedy at almost exactly half",
+        "label": "density greedy at a fiftieth of the optimum",
         "spec": "1/2, 50/100",
         "cap": "50",
         "note": "density picks the crumb and stops; the single most valuable item alone does "
@@ -2138,11 +2141,13 @@ _SM_PRESETS = [
     },
     {
         "id": "rejections",
-        "label": "four, with a long chain of rejections",
+        "label": "four, where one rejection already costs a fifth proposal",
         "a": "2 1 4 3; 2 3 1 4; 1 2 3 4; 4 1 3 2",
         "b": "3 4 1 2; 1 2 3 4; 2 1 4 3; 4 3 2 1",
-        "note": "one proposal displaces a partner who displaces another, which is why the "
-                "proposal count is larger than the number of people",
+        "note": "B2 is holding its own first choice when A2 asks, so A2 is refused and has "
+                "to ask again — five proposals for four people, and nobody is ever displaced. "
+                "The matching it reaches is the only stable one, and it gives every receiver "
+                "their first choice",
     },
 ]
 
@@ -2362,8 +2367,9 @@ _CA_PRESETS = [
         "label": "one hot page among cold ones",
         "spec": "1 2 1 3 1 4 1 5 1 6 1 7",
         "slots": "2",
-        "note": "every policy keeps the hot page; the difference between them disappears when "
-                "the workload is this easy",
+        "note": "LRU and farthest-in-future both hold the hot page and get five hits; FIFO "
+                "evicts it by age and gets three, so an easy workload is not where the "
+                "policies stop differing",
     },
 ]
 

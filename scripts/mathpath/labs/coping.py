@@ -730,10 +730,11 @@ _BB_PRESETS = [
         },
     {
         "id": "useless",
-        "label": "every item the same density — the bound stops helping",
+        "label": "every item the same density — the bound barely separates branches",
         "items": "2:4, 3:6, 4:8, 5:10, 6:12, 7:14", "cap": "13",
-        "note": "the fractional optimum equals the sum of the best prefix and tells the search "
-                "almost nothing, which is what a weak bound looks like",
+        "note": "the fractional optimum is 26 and the best prefix already reaches it, so the "
+                "bound rarely separates two branches: it cuts 86 nodes to 30, a factor of "
+                "under three against the forty-five the heavy-prize preset gets",
     },
     {
         "id": "small",
@@ -745,8 +746,9 @@ _BB_PRESETS = [
         "id": "gap",
         "label": "one heavy prize and a lot of filler",
         "items": "9:30, 1:2, 1:2, 1:2, 1:2, 1:2, 1:2", "cap": "9",
-        "note": "the fractional relaxation takes nine tenths of the prize and the integer answer "
-                "cannot, so the bound is loose exactly where it matters",
+        "note": "the prize fills the sack on its own, so the fractional relaxation is 30 — the "
+                "integer optimum exactly — and the search closes in 3 nodes against 135 "
+                "without it: the mode's tightest bound rather than its loosest",
     },
 ]
 
@@ -783,7 +785,7 @@ def _branchbound(cfg):
                  ("They agree", "bbCorrect"),
                  ("Nodes with the bound", "bbWith"),
                  ("Nodes without it", "bbWithout"),
-                 ("The whole tree", "bbFull"),
+                 ("Leaves in the whole tree, 2^n", "bbFull"),
                  ("Branches pruned", "bbPruned")])
         + _hint(
             "bbHint",
@@ -956,11 +958,12 @@ def _branchbound(cfg):
         subtitle="The fractional relaxation is an upper bound on any completion, so a branch that cannot beat the best found is cut — and the answer is still exactly the optimum",
         markup=markup,
         controls=controls,
-        panel_title="Switch the bound off and watch the node count, not the answer, change",
-        panel_intro=(
+        panel_title=cfg.get("panel_title", "Switch the bound off and watch the node count, not the answer, change"),
+        panel_intro=cfg.get(
+            "panel_intro",
             "Both searches run on every redraw and both are compared against an exhaustive search "
             "over every subset. Pruning is not a heuristic: it must leave the answer alone, and "
-            "the only way to know it did is to compute the optimum a third way."
+            "the only way to know it did is to compute the optimum a third way.",
         ),
         script=script,
     )
@@ -1194,12 +1197,13 @@ def _vertexcover(cfg):
         subtitle="The matched edges share no vertex, so the optimum is above the matching; the cover is twice it — and the optimum appears only in the last line",
         markup=markup,
         controls=controls,
-        panel_title="Edit the graph, then search every graph of a size for the worst ratio",
-        panel_intro=(
+        panel_title=cfg.get("panel_title", "Edit the graph, then search every graph of a size for the worst ratio"),
+        panel_intro=cfg.get(
+            "panel_intro",
             "The optimum is an exhaustive search over the subsets, computed separately from the "
             "algorithm, so the realised ratio has a real denominator. The second table goes "
             "further and enumerates <em>every</em> graph on the number of vertices you choose, "
-            "which turns &ldquo;the bound is tight&rdquo; from a word into an instance."
+            "which turns &ldquo;the bound is tight&rdquo; from a word into an instance.",
         ),
         script=script,
     )
@@ -1236,7 +1240,7 @@ _TS_PRESETS = [
         "label": "one distance raised until the triangle inequality breaks",
         "spec": "1-2 50, 1-3 1, 1-4 1, 2-3 1, 2-4 1, 3-4 1",
         "note": "the shortcut step assumed a direct hop is no longer than going round, and here "
-                "it is fifty times longer",
+                "the hop of 50 is twenty-five times the 2 that going round costs",
     },
     {
         "id": "grid",
@@ -1458,12 +1462,13 @@ def _tsp(cfg):
         subtitle="The tree is below the optimum and the walk is twice the tree — and the shortcut step, the only one that needs the triangle inequality, is the one the slider breaks",
         markup=markup,
         controls=controls,
-        panel_title="Raise one distance until the instance stops being metric",
-        panel_intro=(
+        panel_title=cfg.get("panel_title", "Raise one distance until the instance stops being metric"),
+        panel_intro=cfg.get(
+            "panel_intro",
             "Each link of the chain is a separate row, with what it needs written beside it, "
             "because only one of the three uses the triangle inequality. The optimum is an "
             "exhaustive search over the tours, and a second search covers every metric instance "
-            "of a size so the worst case is a number rather than an adjective."
+            "of a size so the worst case is a number rather than an adjective.",
         ),
         script=script,
     )
@@ -1498,7 +1503,8 @@ _SC_PRESETS = [
         "id": "overlap",
         "label": "heavy overlap — several optimal covers",
         "sets": "1 2 3; 2 3 4; 3 4 5; 4 5 1; 5 1 2",
-        "note": "any two of these cover all five elements, and greedy finds one of them",
+        "note": "five of the ten pairs cover all five elements and five do not — sets 1 and 2 "
+                "together miss element 5 — and greedy finds one of the five that work",
     },
     {
         "id": "singletons",
@@ -1692,12 +1698,13 @@ def _setcover(cfg):
         subtitle="A set covering k new elements charges each of them 1/k — the charges add to the answer, and each one has its own allowance",
         markup=markup,
         controls=controls,
-        panel_title="Step through the choices and watch the charges fall",
-        panel_intro=(
+        panel_title=cfg.get("panel_title", "Step through the choices and watch the charges fall"),
+        panel_intro=cfg.get(
+            "panel_intro",
             "The charge identity is checked rather than shown: the fractions must add to the "
             "number of sets taken, exactly, and a mismatch would mean the accounting behind the "
             "bound is wrong. H is the exact harmonic number, a sum of fractions and not a "
-            "logarithm, and the optimum is an exhaustive search over the subfamilies."
+            "logarithm, and the optimum is an exhaustive search over the subfamilies.",
         ),
         script=script,
     )
@@ -1712,8 +1719,8 @@ _FP_PRESETS = [
         "id": "big",
         "label": "six items with large values — the scaling shrinks the table",
         "items": "3:520, 4:610, 5:805, 2:311, 6:902, 4:455", "cap": "12",
-        "note": "the exact table has 3604 cells and a tenth of a percent of the optimum buys a "
-                "much smaller one",
+        "note": "the exact table has 3604 cells and the epsilon the slider opens on — a tenth "
+                "of the optimum, ten percent — buys one of 238",
     },
     {
         "id": "small",
@@ -1733,7 +1740,9 @@ _FP_PRESETS = [
         "id": "equal",
         "label": "every value the same",
         "items": "2:100, 3:100, 4:100, 5:100, 6:100", "cap": "11",
-        "note": "scaling cannot distinguish them, so the loss comes entirely from the floor",
+        "note": "every value scales and floors to the same integer, so the scaled instance is "
+                "the original one relabelled and the realised loss is 0 at every epsilon — the "
+                "promise is not tight here and nothing can make it so",
     },
     {
         "id": "tight",
@@ -1931,11 +1940,12 @@ def _fptas(cfg):
         subtitle="Scale the values down, solve the scaled instance exactly, and lose at most ε × the optimum — with ε a fraction, so the promise is a number",
         markup=markup,
         controls=controls,
-        panel_title="Move ε and watch the table and the loss move in opposite directions",
-        panel_intro=(
+        panel_title=cfg.get("panel_title", "Move ε and watch the table and the loss move in opposite directions"),
+        panel_intro=cfg.get(
+            "panel_intro",
             "The value reported is the set the scaled table chose, priced at the <em>original</em> "
             "values &mdash; which is what the guarantee is about, and what an FPTAS lab gets wrong "
-            "when it reports the scaled total instead. Both columns are in the item table."
+            "when it reports the scaled total instead. Both columns are in the item table.",
         ),
         script=script,
     )
@@ -1950,7 +1960,8 @@ _FT_PRESETS = [
         "id": "cycle6",
         "label": "a six-cycle — a cover of 3 exists and 2 does not",
         "spec": "1-2, 2-3, 3-4, 4-5, 5-6, 6-1", "k": "3",
-        "note": "the search tree has at most 2^3 branches and the graph has 2^6 subsets",
+        "note": "the search tree is bounded by 2^(k+1) = 16 nodes and takes 9 here, against the "
+                "2^6 = 64 subsets an exhaustive search checks",
     },
     {
         "id": "star8",
@@ -2169,12 +2180,13 @@ def _fpt(cfg):
         subtitle="One end of an uncovered edge must be in the cover, so the tree has 2^k branches and the graph's size enters only as a scan",
         markup=markup,
         controls=controls,
-        panel_title="Move the budget and watch the two work columns separate",
-        panel_intro=(
+        panel_title=cfg.get("panel_title", "Move the budget and watch the two work columns separate"),
+        panel_intro=cfg.get(
+            "panel_intro",
             "Every budget from 0 upwards is run, and each answer is checked against an exhaustive "
             "search over the subsets. The last two columns are the point: one doubles with the "
             "budget and the other is fixed by the graph, and they cross where parameterising "
-            "stops being worth it."
+            "stops being worth it.",
         ),
         script=script,
     )

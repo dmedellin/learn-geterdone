@@ -1856,10 +1856,12 @@ def _cutproperty(cfg):
 _PM_PRESETS = [
     {
         "id": "classic",
-        "label": "seven vertices, all weights different",
+        "label": "seven vertices, and a minimum tree that is unique anyway",
         "spec": "1-2 4, 1-3 3, 2-3 2, 2-4 5, 3-4 7, 4-5 1, 5-6 6, 5-7 8, 6-7 2",
         "start": "1",
-        "note": "distinct weights, so the minimum tree is unique and both algorithms find it",
+        "note": "the weight 2 appears twice, on 2\u20133 and 6\u20137, and the minimum tree is unique "
+                "all the same \u2014 19, reached by both algorithms \u2014 because the repeat is not on "
+                "a shared cycle",
     },
     {
         "id": "lazy",
@@ -2094,7 +2096,7 @@ def _prim(cfg):
 _KR_PRESETS = [
     {
         "id": "classic",
-        "label": "seven vertices, all weights different",
+        "label": "seven vertices, nine edges, one weight repeated",
         "spec": "1-2 4, 1-3 3, 2-3 2, 2-4 5, 3-4 7, 4-5 1, 5-6 6, 5-7 8, 6-7 2",
         "note": "three edges rejected, each by a find that returned the same root twice",
     },
@@ -2333,7 +2335,7 @@ def _kruskal(cfg):
 _RX_PRESETS = [
     {
         "id": "classic",
-        "label": "six vertices, weights all different",
+        "label": "six vertices, nine edges, one weight repeated",
         "spec": "1-2 7, 1-3 9, 1-6 14, 2-3 10, 2-4 15, 3-4 11, 3-6 2, 4-5 6, 5-6 9",
         "source": "1",
         "note": "the schedule changes how much work happens and not one distance",
@@ -2617,7 +2619,7 @@ _BF_PRESETS = [
         "label": "negative arcs, and no negative cycle",
         "spec": "1>2 6, 1>3 7, 2>3 8, 2>4 5, 2>5 -4, 3>4 -3, 3>5 9, 4>2 -2, 5>1 2, 5>4 7",
         "source": "1",
-        "note": "four negative arcs and every shortest path still exists, which is the point",
+        "note": "three negative arcs and every shortest path still exists, which is the point",
     },
     {
         "id": "negcycle",
