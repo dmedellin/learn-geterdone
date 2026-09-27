@@ -960,7 +960,7 @@ def _hitrate_bytes(cfg):
     document.getElementById('hbCOut').textContent = 'top ' + c + ' (' + Rpercent(R(BigInt(c), BigInt(n)), 1) + ' of the catalogue)';
     document.getElementById('hbBOut').textContent = 'b = ' + b;
     document.getElementById('hbEgressOut').textContent = groupNum(gb) + ' GB/day';
-    document.getElementById('hbPriceOut').textContent = price + '&cent;/GB';
+    document.getElementById('hbPriceOut').textContent = price + '¢/GB';
 
     var rounded = n > PRESET.limit;
     var req = zipfShare(c, n, s, PRESET.limit);
@@ -1880,8 +1880,8 @@ def _stampede(cfg):
 
     document.getElementById('stSize').textContent = Rtext(size) + ' per key';
     document.getElementById('stCount').textContent = groupNum(Rshow(total, 1)) + ' in flight';
-    document.getElementById('stCoal').textContent = Rtext(coalesced) + ' &mdash; one per key';
-    document.getElementById('stRatio').textContent = Rtext(ratio) + ' = ' + Rshow(ratio, 2) + '&times;';
+    document.getElementById('stCoal').textContent = Rtext(coalesced) + ' — one per key';
+    document.getElementById('stRatio').textContent = Rtext(ratio) + ' = ' + Rshow(ratio, 2) + '×';
 
     var rows = '', marks = [1, 10, 50, 100, 500, 2000], i;
     for (i = 0; i < marks.length; i += 1) {
@@ -2043,7 +2043,7 @@ def _write(cfg):
       + groupNum(rate) + ' rps';
     document.getElementById('wrBack').textContent = co.distinct + ' on this trace, '
       + Rshow(backRate, 1) + ' rps';
-    document.getElementById('wrRatio').textContent = Rtext(co.ratio) + ' = ' + Rshow(co.ratio, 3) + '&times;';
+    document.getElementById('wrRatio').textContent = Rtext(co.ratio) + ' = ' + Rshow(co.ratio, 3) + '×';
     document.getElementById('wrRisk').textContent = bytesText(risk.n / risk.d) + ' over '
       + Rshow(Rmul(flushSecs, R(1000n, 1n)), 1) + ' ms';
 

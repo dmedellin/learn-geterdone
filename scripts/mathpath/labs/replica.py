@@ -977,12 +977,12 @@ def _fanout(cfg):
     var plan = fanoutPlan(c, n, rho);
     var one = fanoutPlan(c, 1, rho);
 
-    document.getElementById('fnRead').textContent = n + '&times; = ' + Rtext(plan.readCapacity) + ' reads/s';
-    document.getElementById('fnWrite').textContent = '1&times; = ' + Rtext(plan.writeCapacity) + ' writes/s';
-    document.getElementById('fnWork').textContent = n + '&times; (' + n + ' applications of every write)';
-    document.getElementById('fnStore').textContent = n + '&times; the bytes';
+    document.getElementById('fnRead').textContent = n + '× = ' + Rtext(plan.readCapacity) + ' reads/s';
+    document.getElementById('fnWrite').textContent = '1× = ' + Rtext(plan.writeCapacity) + ' writes/s';
+    document.getElementById('fnWork').textContent = n + '× (' + n + ' applications of every write)';
+    document.getElementById('fnStore').textContent = n + '× the bytes';
     document.getElementById('fnTotal').textContent = Rfixed(plan.total, 1) + ' ops/s';
-    document.getElementById('fnSpeed').textContent = Rfixed(plan.speedup, 4) + '&times;, ceiling '
+    document.getElementById('fnSpeed').textContent = Rfixed(plan.speedup, 4) + '×, ceiling '
       + Rtext(plan.ceiling) + '&times;';
 
     var rows = '', i, prev = null;
@@ -2757,7 +2757,7 @@ def _drift(cfg):
     var ppm = +ppmS.value, iv = +syncS.value, gapUs = +gapS.value;
     document.getElementById('drPpmOut').textContent = ppm + ' ppm';
     document.getElementById('drSyncOut').textContent = iv + ' s';
-    document.getElementById('drGapOut').textContent = group(gapUs) + ' &micro;s';
+    document.getElementById('drGapOut').textContent = group(gapUs) + ' µs';
 
     var eps = skewMicros(ppm, iv), win = commitWaitMicros(ppm, iv);
     var gap = R(BigInt(gapUs), 1n);

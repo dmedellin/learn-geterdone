@@ -876,7 +876,7 @@ def _count(cfg):
     document.getElementById('scNodeOut').textContent = group(BigInt(+nodeS.value)) + ' /s';
     document.getElementById('scRhoOut').textContent = (+rhoS.value) + '%';
     document.getElementById('scDataOut').textContent = (+dataS.value) + ' TB';
-    document.getElementById('scRfOut').textContent = '&times;' + (+rfS.value);
+    document.getElementById('scRfOut').textContent = '×' + (+rfS.value);
     document.getElementById('scNodeTbOut').textContent = (+ntbS.value) + ' TB';
 
     var byLoad = shardsForLoad(lam, per, rho), byStore = shardsForStorage(data, rf, nodeCap);
@@ -1533,7 +1533,7 @@ def _range_mode(cfg):
     document.getElementById('sgNow').textContent = Rpct(worst, 2) + ' of that window';
     document.getElementById('sgLife').textContent = Rpct(life, 2) + ' of all writes';
     document.getElementById('sgEven').textContent = Rpct(even, 2);
-    document.getElementById('sgOver').textContent = Rfixed(Rdiv(worst, even), 2) + '&times;';
+    document.getElementById('sgOver').textContent = Rfixed(Rdiv(worst, even), 2) + '×';
     document.getElementById('sgScan').textContent = scan + ' of ' + n;
     document.getElementById('sgLive').textContent = live + ' of ' + n;
 
@@ -1690,7 +1690,7 @@ def _hotkey(cfg):
     var salted = hottestLoadSalted(lam, f, n, s), floor = hotAsymptote(lam, f);
     document.getElementById('shHot').textContent = Rfixed(hot, 0) + ' /s';
     document.getElementById('shMean').textContent = Rfixed(mean, 0) + ' /s';
-    document.getElementById('shImb').textContent = Rfixed(hotImbalance(lam, f, n), 2) + '&times; the mean';
+    document.getElementById('shImb').textContent = Rfixed(hotImbalance(lam, f, n), 2) + '× the mean';
     document.getElementById('shFloor').textContent = Rfixed(floor, 0) + ' /s';
     document.getElementById('shSalted').textContent = Rfixed(salted, 0) + ' /s';
     document.getElementById('shCost').textContent = Rfixed(saltReadAmplification(f, s), 2)
@@ -1855,7 +1855,7 @@ def _straggler(cfg):
     document.getElementById('ssOneP99').textContent = pmfQuantile(pmf, Q99) + ' ms';
     document.getElementById('ssJobMean').textContent = Rfixed(pmfMean(job), 2) + ' ms';
     document.getElementById('ssJobP99').textContent = pmfQuantile(job, Q99) + ' ms';
-    document.getElementById('ssTax').textContent = tax.ratio === null ? '&mdash;'
+    document.getElementById('ssTax').textContent = tax.ratio === null ? '—'
       : Rfixed(tax.ratio, 2) + '&times; one partition';
     var slow = pmfQuantile(pmf, Q99);          /* "slow" means a single partition's own p99 */
     document.getElementById('ssAny').textContent = Rpct(anySlowerThan(pmf, n, slow), 2)
@@ -1999,8 +1999,8 @@ def _twochoice(cfg):
     document.getElementById('stMany').textContent = occMax(many) + ' keys';
     document.getElementById('stMean').textContent = '1 key a bin, exactly';
     var s1 = oneChoiceStatedApprox(n), s2 = twoChoiceStatedApprox(n);
-    document.getElementById('stStatedOne').textContent = isFinite(s1) ? s1.toFixed(2) : '&mdash;';
-    document.getElementById('stStatedTwo').textContent = isFinite(s2) ? s2.toFixed(2) : '&mdash;';
+    document.getElementById('stStatedOne').textContent = isFinite(s1) ? s1.toFixed(2) : '—';
+    document.getElementById('stStatedTwo').textContent = isFinite(s2) ? s2.toFixed(2) : '—';
     document.getElementById('stEmpty').textContent = group(BigInt(occEmpty(one))) + ' / '
       + group(BigInt(occEmpty(many)));
 
@@ -2163,7 +2163,7 @@ def _scatter(cfg):
     var q = R(BigInt(rate), 1n), req = shardRequestRate(q, n), exact = pmfMax(pmf, n);
     var sample = scatterSample(pmf, n, QUERIES, seed);
     document.getElementById('sxReq').textContent = Rfixed(req, 0) + ' /s';
-    document.getElementById('sxAmp').textContent = Rtext(requestAmplification(n)) + '&times;';
+    document.getElementById('sxAmp').textContent = Rtext(requestAmplification(n)) + '×';
     document.getElementById('sxRouted').textContent = Rfixed(routedRequestRate(q), 0) + ' /s';
     document.getElementById('sxP99').textContent = pmfQuantile(exact, Q99) + ' ms';
     document.getElementById('sxP99s').textContent = percentile(sample, Q99) + ' ms';
@@ -2324,9 +2324,9 @@ def _index(cfg):
     document.getElementById('siGlobal').textContent = Rfixed(global_, 0) + ' shard ops /s';
     document.getElementById('siPick').textContent = pick === 'equal' ? 'exactly equal'
       : (pick === 'local' ? 'the local index' : 'the global index');
-    document.getElementById('siBy').textContent = pick === 'equal' ? '&mdash;'
+    document.getElementById('siBy').textContent = pick === 'equal' ? '—'
       : Rfixed(Rdiv(pick === 'local' ? global_ : local, pick === 'local' ? local : global_), 2) + '&times;';
-    document.getElementById('siCross').textContent = cross === null ? '&mdash;'
+    document.getElementById('siCross').textContent = cross === null ? '—'
       : Rtext(cross) + ' = ' + Rfixed(cross, 4);
     document.getElementById('siRatio').textContent = ratio === null
       ? 'writes are zero' : Rtext(ratio) + ' = ' + Rfixed(ratio, 3);
@@ -2657,8 +2657,8 @@ def _rebalance(cfg):
     var bytes = movedBytes(frac, data), secs = rebalanceSeconds(frac, data, thr);
     var stolen = stolenShare(thr, budget), load = rebalanceLoad(lam, mu, thr, budget);
     document.getElementById('szBytes').textContent = byteText(bytes);
-    document.getElementById('szTime').textContent = secs === null ? '&mdash;' : durText(secs);
-    document.getElementById('szSteal').textContent = stolen === null ? '&mdash;'
+    document.getElementById('szTime').textContent = secs === null ? '—' : durText(secs);
+    document.getElementById('szSteal').textContent = stolen === null ? '—'
       : Rtext(stolen) + ' = ' + Rpct(stolen, 2);
     document.getElementById('szRhoA').textContent = Rpct(load.before.rho, 2);
     document.getElementById('szRhoB').textContent = Rcmp(stolen, R(1n, 1n)) >= 0

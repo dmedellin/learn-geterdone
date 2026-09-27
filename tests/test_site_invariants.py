@@ -4632,3 +4632,44 @@ class TestAPathCountsItsOwnCourses(unittest.TestCase):
                                         real[kind], kind))
         self.assertEqual([], wrong,
                          "a Subject advertises a count it does not have: %s" % wrong)
+
+
+class TestNoEntityReachesTextContent(unittest.TestCase):
+    """`textContent` does not decode entities, so one written there ships raw.
+
+    A KPI tile on site/caching-and-hit-rates/write-policies read
+
+        5/3 = 1.667&times;
+
+    to every reader, and 43 assignments across eight kits did the same on 19
+    published pages. The entity is CORRECT in an `innerHTML` string and in
+    markup; it is only wrong on the far side of a `textContent` assignment, and
+    those two live side by side in every kit, often on the same line. So this
+    splits the line and looks only at the textContent half.
+
+    This is the same class `scripts/mathpath/AGENTS.md` already warns about for
+    `topbar()`, which shows that naming a trap is not the same as catching it.
+    """
+
+    ENTITY = re.compile(r"&[a-zA-Z][a-zA-Z0-9]*;")
+
+    def test_no_kit_writes_an_entity_through_text_content(self):
+        labs = REPO_ROOT / "scripts" / "mathpath" / "labs"
+        self.assertTrue(labs.is_dir(), "the lab kits must be where this expects them")
+        seen, leaks = 0, []
+        for path in sorted(labs.glob("*.py")):
+            for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+                if ".textContent" not in line or "=" not in line:
+                    continue
+                seen += 1
+                start = line.index(".textContent")
+                stop = line.index("innerHTML") if "innerHTML" in line else len(line)
+                if stop <= start:
+                    stop = len(line)
+                for hit in self.ENTITY.finditer(line[start:stop]):
+                    leaks.append("%s:%d writes %s through textContent"
+                                 % (path.name, number, hit.group(0)))
+        # A scan that matched nothing would pass for the wrong reason.
+        self.assertGreater(seen, 200,
+                           "found only %d textContent assignments to scan; the kits moved" % seen)
+        self.assertEqual([], leaks, "these reach the reader as literal characters: %s" % leaks[:8])

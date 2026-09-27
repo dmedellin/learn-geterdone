@@ -1313,7 +1313,7 @@ def _lattice(cfg):
     var zlp = lp.status === 'optimal' ? lp.zOrig : null;
     document.getElementById('ltZlp').textContent = zlp === null ? lp.status : Rtext(zlp);
     document.getElementById('ltZip').textContent = best ? Rtext(best.objective) : 'no integer point';
-    document.getElementById('ltGap').textContent = (zlp !== null && best) ? Rtext(Rabs(Rsub(zlp, best.objective))) : '&mdash;';
+    document.getElementById('ltGap').textContent = (zlp !== null && best) ? Rtext(Rabs(Rsub(zlp, best.objective))) : '—';
     document.getElementById('ltBest').textContent = bestRound === null ? 'none is feasible' : Rtext(bestRound);
     document.getElementById('ltFeas').textContent = feasRoundings + ' of ' + (lp.status === 'optimal' ? ipRoundings(lp.x).length : 0);
     document.getElementById('ltCount').textContent = String(lat.feasibleCount);
@@ -1462,7 +1462,7 @@ def _logic(cfg):
       grid.innerHTML = '';
       table.innerHTML = '';
       ['lgRows', 'lgAgree', 'lgBad', 'lgWitness'].forEach(function (id) {
-        document.getElementById(id).textContent = '&mdash;';
+        document.getElementById(id).textContent = '—';
       });
       document.getElementById('lgVerdict').textContent = 'unreadable';
       status.innerHTML = 'That is not an inequality this page can read: <strong>' + res.error
@@ -1747,8 +1747,8 @@ def _knapsack(cfg):
     document.getElementById('knLp').textContent = lp === null ? relaxed.status : Rshort(lp, 3);
     document.getElementById('knGreedy').textContent = greedy.feasible ? Rtext(greedy.value) : 'greed cannot finish';
     document.getElementById('knOpt').textContent = exact.value === null ? 'no feasible choice' : Rtext(exact.value);
-    document.getElementById('knGapLp').textContent = (lp !== null && exact.value !== null) ? Rshort(Rsub(exact.value, lp), 3) : '&mdash;';
-    document.getElementById('knGapGreedy').textContent = (greedy.feasible && exact.value !== null) ? Rtext(Rsub(greedy.value, exact.value)) : '&mdash;';
+    document.getElementById('knGapLp').textContent = (lp !== null && exact.value !== null) ? Rshort(Rsub(exact.value, lp), 3) : '—';
+    document.getElementById('knGapGreedy').textContent = (greedy.feasible && exact.value !== null) ? Rtext(Rsub(greedy.value, exact.value)) : '—';
     document.getElementById('knCount').textContent = group(String(exact.count));
 
     var frac = [];
@@ -1941,10 +1941,10 @@ def _tsp(cfg):
     var gap = exact.best ? ipGap(exact.best.cost, heur.cost, false) : { abs: null, rel: null, proved: '' };
     document.getElementById('tsCount').textContent = group(String(counts.tours)) + ' distinct';
     document.getElementById('tsOpt').textContent = exact.best ? Rtext(exact.best.cost) : 'too many to enumerate';
-    document.getElementById('tsRoot').textContent = root === null ? '&mdash;' : Rtext(root);
+    document.getElementById('tsRoot').textContent = root === null ? '—' : Rtext(root);
     document.getElementById('tsNodes').textContent = String(branch.counts.explored);
     document.getElementById('tsHeurCost').textContent = Rtext(heur.cost);
-    document.getElementById('tsGap').textContent = gap.abs === null ? '&mdash;'
+    document.getElementById('tsGap').textContent = gap.abs === null ? '—'
       : Rtext(gap.abs) + (gap.rel === null ? '' : ' (' + Rpct(gap.rel, 1) + ')');
 
     status.innerHTML = 'At <strong>' + n + ' cities</strong> this instance has <strong>'
@@ -2128,10 +2128,10 @@ def _bb(cfg):
     var gap = ipGap(global, tree.best, true);
     document.getElementById('bbNodes').textContent = String(tree.counts.explored);
     document.getElementById('bbInc').textContent = tree.best === null ? 'none yet' : Rtext(tree.best);
-    document.getElementById('bbBound').textContent = global === null ? '&mdash;' : Rshort(global, 3);
+    document.getElementById('bbBound').textContent = global === null ? '—' : Rshort(global, 3);
     document.getElementById('bbGap').textContent = gap.abs === null ? 'nothing yet' : Rshort(gap.abs, 3);
     document.getElementById('bbNodeBound').textContent = node && node.bound !== null ? Rtext(node.bound) : 'infeasible';
-    document.getElementById('bbNodeWhy').textContent = node ? (node.prunedBy || 'it is still open') : '&mdash;';
+    document.getElementById('bbNodeWhy').textContent = node ? (node.prunedBy || 'it is still open') : '—';
     document.getElementById('bbWhy').innerHTML = node && node.branch
       ? node.branch.why
       : (node && node.prunedBy
@@ -2288,9 +2288,9 @@ def _gap(cfg):
     var last = t.length ? t[t.length - 1] : { incumbent: null, bound: null };
     var gap = ipGap(last.bound, last.incumbent, true);
     document.getElementById('gpInc').textContent = last.incumbent === null ? 'none yet' : Rtext(last.incumbent);
-    document.getElementById('gpBound').textContent = last.bound === null ? '&mdash;' : Rshort(last.bound, 3);
-    document.getElementById('gpAbs').textContent = gap.abs === null ? '&mdash;' : Rshort(gap.abs, 3);
-    document.getElementById('gpRel').textContent = gap.rel === null ? '&mdash;' : Rpct(gap.rel, 2);
+    document.getElementById('gpBound').textContent = last.bound === null ? '—' : Rshort(last.bound, 3);
+    document.getElementById('gpAbs').textContent = gap.abs === null ? '—' : Rshort(gap.abs, 3);
+    document.getElementById('gpRel').textContent = gap.rel === null ? '—' : Rpct(gap.rel, 2);
     document.getElementById('gpDf').textContent = full.df.refused ? 'over 60' : String(full.df.counts.explored);
     document.getElementById('gpBb').textContent = full.bb.refused ? 'over 60' : String(full.bb.counts.explored);
 
@@ -2863,7 +2863,7 @@ def _disjunction(cfg):
       : (yVal === null ? '&mdash;' : Rtext(yVal));
     document.getElementById('djPoint').textContent = sol.status === 'optimal'
       ? '(' + Rtext(sol.x[0]) + ', ' + Rtext(sol.x[1]) + ')' : ipEsc(sol.status);
-    document.getElementById('djZ').textContent = sol.status === 'optimal' ? Rtext(sol.zOrig) : '&mdash;';
+    document.getElementById('djZ').textContent = sol.status === 'optimal' ? Rtext(sol.zOrig) : '—';
     document.getElementById('djTightA').textContent = Rtext(tA);
     document.getElementById('djTightB').textContent = Rtext(tB);
     var meaning = 'both jobs run, one after the other';

@@ -655,7 +655,7 @@ def _lightspeed(cfg):
 
     document.getElementById('lsFloor').textContent = Rfixed(floor, 3) + ' ms';
     document.getElementById('lsMeasured').textContent = measured + ' ms';
-    document.getElementById('lsRatio').textContent = Rfixed(ratio, 3) + '&times;';
+    document.getElementById('lsRatio').textContent = Rfixed(ratio, 3) + '×';
     document.getElementById('lsRest').textContent = Rfixed(rest, 3) + ' ms';
 
     table.innerHTML = '<thead><tr><th>step</th><th>exactly</th><th>ms</th></tr></thead><tbody>'

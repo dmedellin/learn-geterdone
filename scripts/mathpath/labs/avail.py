@@ -1438,7 +1438,7 @@ def _correlated(cfg):
     document.getElementById('ccPval').textContent = Rtext(p);
     document.getElementById('ccInd').textContent = Rtext(ind);
     document.getElementById('ccBoth').textContent = Rfixed(both, 8);
-    document.getElementById('ccRatio').textContent = ratio === null ? '&mdash;' : Rfixed(ratio, 2) + '&times;';
+    document.getElementById('ccRatio').textContent = ratio === null ? '—' : Rfixed(ratio, 2) + '×';
     document.getElementById('ccBreak').textContent = Rtext(brk) + ' = ' + Rfixed(brk, 6);
     document.getElementById('ccPair').textContent = Rpct(Rsub(R(1n, 1n), both), 5);
 
@@ -1740,7 +1740,7 @@ def _retry(cfg):
     document.getElementById('rtAtt').textContent = Rfixed(attempts, 4);
     document.getElementById('rtSucc').textContent = Rpct(success, 4);
     document.getElementById('rtFail').textContent = Rtext(lost) + ' = ' + Rfixed(lost, 8);
-    document.getElementById('rtAmp').textContent = Rfixed(attempts, 3) + '&times;';
+    document.getElementById('rtAmp').textContent = Rfixed(attempts, 3) + '×';
     document.getElementById('rtAmpLoad').textContent = Rfixed(amplified, 1) + ' /s';
     document.getElementById('rtDup').textContent = Rpct(duplicateShare(p, r), 2);
 
@@ -1883,9 +1883,9 @@ def _storm(cfg):
     var above = Rcmp(fix.lo, cap) > 0, below = Rcmp(fix.hi, cap) <= 0;
 
     document.getElementById('stStart').textContent = Rfixed(lambda, 4) + ' of capacity';
-    document.getElementById('stFix').textContent = Rfixed(fix.lo, 5) + ' &hellip; ' + Rfixed(fix.hi, 5);
+    document.getElementById('stFix').textContent = Rfixed(fix.lo, 5) + ' … ' + Rfixed(fix.hi, 5);
     document.getElementById('stFixP').textContent = Rfixed(pAt, 5);
-    document.getElementById('stAmp').textContent = Rfixed(ampAt, 4) + '&times;';
+    document.getElementById('stAmp').textContent = Rfixed(ampAt, 4) + '×';
     document.getElementById('stNoRetry').textContent = Rfixed(lambda, 4) + ' of capacity';
     document.getElementById('stVerdict').textContent = above ? 'above capacity'
       : (below ? 'below capacity' : 'astride capacity');
@@ -2213,7 +2213,7 @@ def _shed(cfg):
       + Rpct(rejectedFraction(offered, threshold), 1) + ')';
     document.getElementById('shRho').textContent = Rfixed(rhoShed, 4);
     document.getElementById('shRhoU').textContent = Rfixed(rhoUn, 4);
-    document.getElementById('shRatio').textContent = ratio === null ? '&mdash;' : Rfixed(ratio, 2) + '&times;';
+    document.getElementById('shRatio').textContent = ratio === null ? '—' : Rfixed(ratio, 2) + '×';
 
     var loads = [50, 90, 100, 150, 200, 300, 400], rows = '', i;
     for (i = 0; i < loads.length; i += 1) {
@@ -2361,10 +2361,10 @@ def _durability(cfg):
 
     document.getElementById('duP').textContent = sciText(p, 3);
     document.getElementById('duHalf').textContent = sciText(half, 3);
-    document.getElementById('duFactor').textContent = Math.pow(2, n - 1) + '&times;';
+    document.getElementById('duFactor').textContent = Math.pow(2, n - 1) + '×';
     document.getElementById('duExact').textContent = Rtext(exact);
     document.getElementById('duFleet').textContent = sciText(fleet, 3) + ' a year';
-    document.getElementById('duYears').textContent = fleet > 0 ? sciText(1 / fleet, 3) + ' years' : '&mdash;';
+    document.getElementById('duYears').textContent = fleet > 0 ? sciText(1 / fleet, 3) + ' years' : '—';
 
     var rows = '', i;
     for (i = 2; i <= 6; i += 1) {
