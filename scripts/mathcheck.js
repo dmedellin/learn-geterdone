@@ -15135,6 +15135,2888 @@ console.log('operations research: the sequential-decisions kit, and every policy
   }
 }
 
+// ----------------------------------------------------------------- strings
+console.log('strings: every match position checked against a scan over every offset');
+{
+  /* THE ORACLE, and it is deliberately not the kit's own. `skBrute` in
+     strings.py compares slices; this file finds the same positions with the
+     engine's own substring search, which shares no code with it. Six routines
+     on these pages report match positions and every one of them is checked
+     against this, on every preset and on random texts -- because the way a
+     matcher fails is by returning a SHORTER list, and a shorter list of match
+     positions is not visibly wrong.
+
+     The same rule holds for the other four oracles here. The failure function
+     is checked against the longest border derived from the smallest PERIOD,
+     which is a different characterisation rather than a second implementation
+     of the same one; the automaton's table is rebuilt from that border array
+     by the recurrence delta(i, c) = delta(border(i), c); the suffix array is
+     rebuilt by sorting with a character-by-character comparator; and every
+     rolling hash is recomputed from scratch. */
+  const STRINGS_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'strings.py');
+  const stringsSrc = fs.readFileSync(STRINGS_SOURCE, 'utf8');
+  const skBlock = (name) => blockFrom(stringsSrc, name, STRINGS_SOURCE);
+  eval(algoCoreBlock('COUNT_JS'));
+  eval(algoCoreBlock('STRINGS_JS'));
+  eval(algoCoreBlock('TREEDRAW_JS'));
+  eval(skBlock('SKIT_JS'));
+
+  /* Every offset at which the pattern occurs, found by the engine's search. */
+  const bruteHits = (t, p) => {
+    const out = [];
+    let at = t.indexOf(p);
+    while (at >= 0) { out.push(at); at = t.indexOf(p, at + 1); }
+    return out;
+  };
+  /* The longest proper border of every prefix, from the smallest PERIOD:
+     p[0..i-1] has period d when p[j] === p[j+d] wherever both exist, and its
+     longest border is i minus its smallest period. A different fact about the
+     same string, not a second copy of the same loop. */
+  const borderByPeriod = (p) => {
+    const out = [0];
+    for (let i = 1; i <= p.length; i += 1) {
+      let q = i;
+      for (let d = 1; d < i; d += 1) {
+        let ok = true;
+        for (let j = 0; j + d < i; j += 1) if (p[j] !== p[j + d]) { ok = false; break; }
+        if (ok) { q = d; break; }
+      }
+      out.push(i - q);
+    }
+    return out;
+  };
+  /* The automaton's table from that border array, by the recurrence rather
+     than by asking what the longest suffix of p[0..i-1]+c is. */
+  const dfaByBorder = (p, alphabet) => {
+    const b = borderByPeriod(p), table = [];
+    for (let i = 0; i <= p.length; i += 1) {
+      const row = {};
+      for (const ch of alphabet) {
+        let s = i, k = 0;
+        for (;;) {
+          if (s < p.length && p[s] === ch) { k = s + 1; break; }
+          if (s === 0) { k = 0; break; }
+          s = b[s];
+        }
+        row[ch] = k;
+      }
+      table.push(row);
+    }
+    return table;
+  };
+  /* The suffix array by a character-by-character comparator, and the LCP array
+     by growing a shared prefix until the two suffixes differ. */
+  const suffixByCompare = (s) => {
+    const idx = [];
+    for (let i = 0; i < s.length; i += 1) idx.push(i);
+    idx.sort((a, b) => {
+      let k = 0;
+      while (a + k < s.length && b + k < s.length) {
+        if (s[a + k] !== s[b + k]) return s[a + k] < s[b + k] ? -1 : 1;
+        k += 1;
+      }
+      return (s.length - a) - (s.length - b);
+    });
+    const lcp = [0];
+    for (let i = 1; i < idx.length; i += 1) {
+      let k = 0;
+      while (s.slice(idx[i - 1], idx[i - 1] + k + 1) === s.slice(idx[i], idx[i] + k + 1)
+             && idx[i] + k < s.length) k += 1;
+      lcp.push(k);
+    }
+    return { sa: idx, lcp: lcp };
+  };
+  const hashFromScratch = (s, b, mod) => {
+    const B = BigInt(b), M = BigInt(mod);
+    let h = 0n;
+    for (let i = 0; i < s.length; i += 1) h = (h * B + BigInt(s.charCodeAt(i))) % M;
+    return h;
+  };
+  /* Everything the kit reports about one text and pattern, checked at once.
+     This is called on every preset of every mode and on a few thousand random
+     pairs, because a matcher that is right on the presets and wrong on the
+     text a reader types is the failure this whole section is for. */
+  const checkAll = (t, p, where) => {
+    const truth = bruteHits(t, p);
+    eq(skBrute(t, p).join(','), truth.join(','), 'the kit’s own scan finds the matches of ' + where);
+    eq(naiveRun(t, p).result.hits.join(','), truth.join(','), 'naive matching finds them on ' + where);
+    eq(kmpRun(t, p).result.hits.join(','), truth.join(','), 'KMP finds them on ' + where);
+    eq(horspoolRun(t, p).result.hits.join(','), truth.join(','),
+       'Horspool finds them on ' + where + ' -- the check that matters, because it skips');
+    eq(rollingHash(t, p, 256, 101).result.hits.join(','), truth.join(','),
+       'Rabin-Karp finds them on ' + where + ' after verifying every equal hash');
+    const alpha = skAlphabet(t + p);
+    if (alpha.length <= 16 && p.length <= 14) {
+      const table = dfaTable(p, alpha);
+      eq(dfaRun(t, table.table, p.length).result.hits.join(','), truth.join(','),
+         'and the automaton finds them on ' + where + ' in exactly n steps');
+    }
+    const fail = failureFn(p).result.fail;
+    const mine = [];
+    for (let k = 1; k <= p.length; k += 1) mine.push(fail[k] > 0 ? fail[k] : 0);
+    eq(mine.join(','), borderByPeriod(p).slice(1).join(','),
+       'and the failure function of ' + where + ' is the longest border at every prefix');
+    eq(mine.join(','), skBorderBrute(p).slice(1).join(','),
+       'which is also what the kit’s own by-definition search finds');
+  };
+
+  /* --- the parser, and what it refuses ---------------------------------- */
+  {
+    eq(skParse('abcabc', 'abc').t, 'abcabc', 'a text and a pattern come back as typed');
+    eq(skParse('abcabc', '').bad !== undefined, true, 'an empty pattern is refused, because every offset matches it');
+    eq(skParse('', 'a').bad !== undefined, true, 'so is an empty text');
+    eq(skParse('ab', 'abc').bad !== undefined, true, 'and a pattern longer than the text: there is no alignment to try');
+    eq(skParse('abc', 'a', 2).bad !== undefined, true, 'the text cap refuses rather than truncating');
+    eq(skParse('abcabc', 'ABC').t, 'abcabc', 'nothing is lower-cased: a matcher is case-sensitive');
+    eq(bruteHits('abcabc', 'ABC').length, 0, 'and the oracle agrees that the upper-case pattern is absent');
+    eq(skEsc('<b>&"'), '&lt;b&gt;&amp;&quot;', 'reader text is escaped before it reaches innerHTML');
+    eq(skAlphabet('banana').join(''), 'abn', 'the alphabet is the distinct characters, sorted');
+    eq(skNaiveBound(24, 5), 100, 'the naive bound is m(n - m + 1)');
+    eq(skRepeat('ab', 3), 'ababab', 'and repeating a text is the growth table’s only lever');
+  }
+
+  /* --- naive: the count, the bound, and the two texts -------------------- */
+  {
+    const t = 'the rain in spain stays mainly in the plain', p = 'ain';
+    const run = naiveRun(t, p);
+    eq(run.result.alignments, t.length - p.length + 1, 'every offset is one alignment');
+    eq(run.counts.compares, 50, 'the prose preset costs 50 comparisons');
+    eq(run.trace.reduce((a, s) => a + s.compares, 0), run.counts.compares,
+       'and the per-alignment trace sums to the total, which is what the bar chart draws');
+    eq(skNaiveBound(t.length, p.length), 123, 'against a bound of 123, so the bound is 2.46 times the truth');
+    eq(kmpRun(t, p).counts.compares, 44, 'KMP takes 44 on it');
+    eq(horspoolRun(t, p).counts.compares, 25, 'and Horspool 25');
+    /* The preset whose whole point is that naive wins. */
+    const absent = naiveRun(t, 'zebra').counts.compares;
+    eq(absent, 39, 'a pattern that is absent costs naive one comparison per alignment');
+    eq(kmpRun(t, 'zebra').counts.compares, 43, 'and KMP 43, which is more');
+    eq(absent < kmpRun(t, 'zebra').counts.compares, true,
+       'so the page’s claim that naive beats KMP on a rare pattern is a measurement, not a story');
+    /* The preset that reaches the bound, and the family that is quadratic. */
+    const adv = naiveRun('aaaaaaaaaaaaaaaaaaaaaaaa', 'aaaab');
+    eq(adv.counts.compares, 100, 'the adversarial preset costs 100');
+    eq(adv.counts.compares, skNaiveBound(24, 5), 'which IS the bound, exactly');
+    const family = [];
+    for (let q = 2; q <= 10; q += 1) {
+      const wp = naiveWorstPair(q + 1, 2 * q);
+      const c = naiveRun(wp.text, wp.pattern).counts.compares;
+      eq(c, skNaiveBound(wp.text.length, wp.pattern.length),
+         'every row of the worst-case family sits on the bound, at m = ' + wp.pattern.length);
+      eq(kmpRun(wp.text, wp.pattern).counts.compares, 3 * q,
+         'while KMP on the same row costs 3m, which is linear');
+      family.push(c);
+    }
+    eq(family.join(','), '6,12,20,30,42,56,72,90,110',
+       'and the family’s counts are m(m + 1): quadratic in n, because m grows WITH n');
+    /* Growing n alone cannot produce a quadratic, which is the claim the page
+       had to be corrected to stop making. */
+    const lin = [];
+    for (let k = 1; k <= 4; k += 1) lin.push(naiveRun(skRepeat(t, k), p).counts.compares);
+    eq(lin.join(','), '50,102,154,206',
+       'repeating the text with m fixed grows the count LINEARLY, by a constant per copy');
+    eq(Rtext(expectedPerAlignment(2)), '2', 'over two letters the expected comparisons per alignment is 2');
+    eq(Rtext(expectedPerAlignment(26)), '26/25', 'over 26 it is 26/25');
+    eq(Rtext(expectedPerAlignment(4)), '4/3', 'and it is sigma/(sigma - 1), exactly, never a decimal');
+  }
+
+  /* --- kmp: the failure function, and the amortised claim as a count ----- */
+  {
+    eq(failureFn('ababaca').result.fail.join(','), '-1,0,0,1,2,3,0,1',
+       'the standard example’s failure function');
+    eq(failureFn('ababaca').result.borders.join(','), '7,1',
+       'and its fallback chain from the whole pattern');
+    eq(failureFn('aaaaa').result.fail.join(','), '-1,0,1,2,3,4', 'a run of one letter borders itself');
+    eq(failureFn('abcdefg').result.fail.join(','), '-1,0,0,0,0,0,0,0',
+       'and a pattern with no repeated character has no border anywhere');
+    for (const p of ['ababaca', 'aaaaa', 'abcabcabd', 'aabaaab', 'abcdefg', 'aabaabaaa', 'abaababa']) {
+      const f = failureFn(p).result;
+      const mine = [];
+      for (let k = 1; k <= p.length; k += 1) mine.push(f.fail[k] > 0 ? f.fail[k] : 0);
+      eq(mine.join(','), borderByPeriod(p).slice(1).join(','),
+         'the linear construction agrees with the smallest-period definition on ' + p);
+      eq(f.inner <= f.bound, true, 'and its inner loop stayed under 2m on ' + p);
+      eq(f.bound, 2 * p.length, 'which is the bound the page draws');
+      /* The chain must strictly decrease and end at the empty border. */
+      for (let i = 1; i < f.borders.length; i += 1) {
+        eq(f.borders[i] < f.borders[i - 1], true, 'the fallback chain of ' + p + ' strictly decreases');
+      }
+    }
+    eq(failureFn('aabaaab').result.inner, 2, 'the preset chosen because its inner loop DOES iterate');
+    eq(failureFn('aaaaa').result.inner, 0, 'and the one where it never does');
+    const t = 'abababacaba ababacaab ababaca';
+    eq(kmpRun(t, 'ababaca').counts.compares, 34, 'KMP on the opening text of that page');
+    eq(kmpRun(t, 'ababaca').counts.compares <= 2 * t.length, true, 'under 2n, which is the proved bound');
+    eq(naiveRun(t, 'ababaca').counts.compares, 61, 'against naive’s 61 on the same text');
+    eq(kmpRun(t, 'ababaca').result.bound, 2 * t.length, 'and the bound the page prints is 2n');
+  }
+
+  /* --- horspool: skipping, and the text where it is five times worse ----- */
+  {
+    const t = 'the rain in spain stays mainly in the plain and never in the hills';
+    const run = horspoolRun(t, 'mainly');
+    eq(run.trace.length, 14, 'Horspool examined 14 alignments of the prose preset');
+    eq(t.length - 'mainly'.length + 1, 61, 'out of 61 there are');
+    eq(run.counts.compares, 19, 'for 19 comparisons');
+    eq(run.result.skipped, 52, 'having skipped 52 alignments outright');
+    eq(run.result.skipped, run.trace.reduce((a, s) => a + s.shift - 1, 0),
+       'and skipped is the sum of (shift - 1), which is what the average-shift KPI divides');
+    /* The shift table is the last occurrence in the first m - 1 characters. */
+    for (const p of ['mainly', 'GATTACA', 'baaaa', 'cccz', 'ababb']) {
+      const table = horspoolRun('x'.repeat(40), p).result.table;
+      for (const ch of skAlphabet(p)) {
+        let last = -1;
+        for (let i = 0; i < p.length - 1; i += 1) if (p[i] === ch) last = i;
+        if (last < 0) {
+          eq(table[ch], undefined, ch + ' does not appear in the first m - 1 of ' + p + ', so it has no entry');
+        } else {
+          eq(table[ch], p.length - 1 - last, 'the shift for ' + ch + ' in ' + p + ' is m - 1 - its last index');
+        }
+      }
+    }
+    /* The case the page exists to show: skipping made it worse. */
+    const stuck = horspoolRun('a'.repeat(30), 'baaaa');
+    eq(stuck.result.skipped, 0, 'on a run of a’s against baaaa nothing is skipped at all');
+    eq(stuck.counts.compares, 130, 'and it costs 130 comparisons');
+    eq(naiveRun('a'.repeat(30), 'baaaa').counts.compares, 26, 'where naive costs 26');
+    eq(stuck.counts.compares, 5 * 26,
+       'exactly m times naive’s count -- a full window at every alignment, from the wrong end');
+  }
+
+  /* --- rabin: the collisions, counted rather than described -------------- */
+  {
+    const cases = [
+      ['the rain in spain stays mainly in the plain', 'ain', 256, 41, 4, 3],
+      ['GATTACAGATTACCAGATTACAGGATTACAGATTAC', 'GATTACA', 4, 13, 3, 3],
+      ['101100101101001011010010110100101101', '10110', 2, 11, 5, 4],
+      ['abracadabra abracadabra abracadabra', 'abra', 256, 13, 6, 4],
+      ['the rain in spain stays mainly in the plain', 'ain', 256, 1000003, 4, 0],
+    ];
+    for (const [t, p, b, mod, hits, spurious] of cases) {
+      const run = rollingHash(t, p, b, mod), res = run.result;
+      eq(res.hits.join(','), bruteHits(t, p).join(','),
+         'at base ' + b + ' modulus ' + mod + ' the verified hits are the real matches');
+      eq(res.hits.length, hits, 'and there are ' + hits + ' of them');
+      eq(res.spurious, spurious, 'with ' + spurious + ' window(s) whose hash matched and whose text did not');
+      eq(res.verifications, res.hits.length + res.spurious,
+         'every equal hash was verified, and a verification is a match or a collision and nothing else');
+      eq(run.counts.compares, res.verifications * p.length,
+         'each verification costs m character comparisons, including the ones that fail');
+      /* The rolling update is the only value derived from a previous value. */
+      let drift = 0;
+      run.trace.forEach((w) => {
+        if (hashFromScratch(t.slice(w.at, w.at + p.length), b, mod) !== w.hash) drift += 1;
+      });
+      eq(drift, 0, 'and every window’s rolled hash equals the same hash computed from scratch');
+      eq(res.target, hashFromScratch(p, b, mod), 'as does the pattern’s own');
+      /* A collision is a real collision: same hash, different characters. */
+      run.trace.forEach((w) => {
+        if (!w.equal) return;
+        eq(w.hash, res.target, 'an equal-hash window really does hash to the target');
+        eq(t.slice(w.at, w.at + p.length) === p, w.match,
+           'and whether it is a match is decided by the characters, never by the hash');
+      });
+    }
+    const sw = skModulusSweep('the rain in spain stays mainly in the plain', 'ain', 256, 2, 200);
+    eq(sw.tested, 46, 'there are 46 primes under 200');
+    eq(sw.collided, 18, 'and 18 of them collide on that text: not a rare event, a counted one');
+    eq(sw.lastBad, 137, 'the largest that does is 137');
+    eq(sw.clean, 11, 'while 11, far smaller, does not -- so collisions do not stop at a threshold');
+    eq(sw.rows.every((r) => r.verifications === r.hits + r.spurious), true,
+       'and every row of the sweep balances: verifications are matches plus collisions');
+    eq(skIsPrime(1), false, 'one is not prime');
+    eq(skIsPrime(2) && skIsPrime(101) && !skIsPrime(91), true, 'and the sieve the sweep uses is right');
+  }
+
+  /* --- trie: the space question, and one pass against k passes ----------- */
+  {
+    const words = ['he', 'she', 'his', 'hers'];
+    const trie = trieBuild(words, 26);
+    eq(trie.count, 10, 'the four classic words need ten nodes');
+    eq(trie.slots, 260, 'and 260 array cells if every node held a dense row of 26');
+    eq(words.reduce((a, w) => a + w.length, 0), 12, 'they have 12 characters between them');
+    eq(trie.count, 12 + 1 - 3,
+       'so three of those positions were shared and the trie stored each of them once');
+    for (const [list, prefix] of [[['he', 'she', 'his', 'hers'], 'h'],
+                                  [['interest', 'interesting', 'interior', 'internal', 'intern'], 'inte'],
+                                  [['alpha', 'bravo', 'charlie', 'delta'], 'b'],
+                                  [['a', 'ab', 'abc', 'abcd'], 'ab'],
+                                  [['he', 'she', 'his', 'hers'], 'zz']]) {
+      const tr = trieBuild(list, 26);
+      eq(triePrefix(tr, prefix).sort().join(','),
+         list.filter((w) => w.startsWith(prefix)).sort().join(','),
+         'walking the trie for ' + prefix + ' finds what filtering the list finds');
+      eq(skPrefixBrute(list, prefix).join(','), list.filter((w) => w.startsWith(prefix)).sort().join(','),
+         'and the kit’s own filter agrees with the engine’s startsWith');
+      /* One pass against one pass per word, on the page's own text. */
+      const text = 'ushers hers his she he interning alphabravo abcdabcab';
+      const built = trieBuild(list, 26);
+      ahoLinks(built);
+      const idToWord = {};
+      (function walk(n, acc) {
+        if (n.end) idToWord[n.id] = acc;
+        trieKids(n).forEach((k) => walk(k, acc + k.ch));
+      })(built.root, '');
+      const byWord = {};
+      ahoRun(text, built).result.hits.forEach((h) => {
+        const w = idToWord[h.node];
+        eq(w === undefined, false, 'every Aho-Corasick output node names a word');
+        (byWord[w] = byWord[w] || []).push(h.at - w.length + 1);
+      });
+      list.forEach((w) => {
+        eq((byWord[w] || []).sort((a, b) => a - b).join(','), bruteHits(text, w).join(','),
+           'one Aho-Corasick pass reports every occurrence of ' + w + ' that a scan for it alone finds');
+      });
+    }
+    eq(trieBuild(['alpha', 'bravo', 'charlie', 'delta'], 26).count, 23,
+       'four words sharing no prefix need one node per character plus the root, and save nothing');
+    eq(drawTree(null, trie.root, trieKids, (n) => (n.ch === '' ? '.' : n.ch))
+       .match(/<circle /g).length, 10, 'and the renderer draws every node of it');
+  }
+
+  /* --- suffix: the order, and the two things it then answers ------------- */
+  {
+    for (const s of ['banana', 'mississippi', 'abracadabra', 'abcdefgh', 'aaaaaaaa',
+                     'abababab', 'the rain in spain']) {
+      const run = suffixArray(s), k = kasai(s, run.result.sa);
+      const truth = suffixByCompare(s);
+      eq(run.result.sa.join(','), truth.sa.join(','),
+         'prefix doubling reaches the same order as a character-by-character sort of ' + s);
+      eq(k.result.lcp.join(','), truth.lcp.join(','),
+         'and Kasai’s one pass gives the same LCP array as comparing each adjacent pair');
+      eq(skSuffixBrute(s).sa.join(','), truth.sa.join(','),
+         'the kit’s own by-definition sort agrees too, on ' + s);
+      eq(skSuffixBrute(s).lcp.join(','), truth.lcp.join(','), 'including its LCP array');
+      /* The distinct-substring identity, which is the mode's headline. */
+      const n = BigInt(s.length);
+      const total = (n * (n + 1n)) / 2n;
+      const lcpSum = k.result.lcp.reduce((a, v) => a + BigInt(v), 0n);
+      eq(k.result.distinctSubstrings, total - lcpSum,
+         'distinct substrings of ' + s + ' is n(n+1)/2 minus the sum of the LCP array');
+      /* The longest repeat is the largest LCP entry and really does repeat. */
+      eq(k.result.longestRepeat, Math.max(0, ...k.result.lcp),
+         'and the longest repeated substring is the largest LCP entry, on ' + s);
+      if (k.result.longestRepeat > 0) {
+        const L = k.result.longestRepeat;
+        const rep = s.slice(k.result.repeatAt, k.result.repeatAt + L);
+        eq(bruteHits(s, rep).length >= 2, true, 'which occurs at least twice in ' + s);
+        /* And nothing longer does, checked over every substring of length L + 1. */
+        let longer = 0;
+        for (let i = 0; i + L + 1 <= s.length; i += 1) {
+          if (bruteHits(s, s.slice(i, i + L + 1)).length >= 2) longer += 1;
+        }
+        eq(longer, 0, 'and no substring of ' + s + ' one character longer repeats at all');
+      }
+    }
+    eq(suffixArray('banana').result.sa.join(','), '5,3,1,0,4,2', 'banana, in order');
+    eq(suffixArray('banana').result.rounds.length, 2, 'in two doubling rounds');
+    eq(kasai('banana', suffixArray('banana').result.sa).result.lcp.join(','), '0,1,3,0,0,2',
+       'with these overlaps');
+    eq(String(kasai('banana', suffixArray('banana').result.sa).result.distinctSubstrings), '15',
+       'and 15 distinct substrings out of 21 counted with repeats');
+    eq(String(kasai('aaaaaaaa', suffixArray('aaaaaaaa').result.sa).result.distinctSubstrings), '8',
+       'a run of eight a’s has exactly 8 distinct substrings, the extreme the preset is for');
+    eq(String(kasai('abcdefgh', suffixArray('abcdefgh').result.sa).result.distinctSubstrings), '36',
+       'and eight distinct letters have all 36, which is the other extreme');
+  }
+
+  /* --- automaton: the table, and a run of exactly n steps ---------------- */
+  {
+    for (const [p, t] of [['ababc', 'abababcababcabababc'], ['aaab', 'aaaaabaaabaaaab'],
+                          ['10110', '101100101101001011010010110100101101'],
+                          ['abcd', 'abcabcdabdabcd'], ['the', 'the theory of the theatre is the thing']]) {
+      const alpha = skAlphabet(t + p);
+      const built = dfaTable(p, alpha);
+      eq(built.states, p.length + 1, 'one state per number of characters matched, on ' + p);
+      eq(built.cells, (p.length + 1) * alpha.length, 'and (m + 1) * sigma cells');
+      eq(built.counts.writes, built.cells, 'every one of which was written once');
+      const mine = dfaByBorder(p, alpha);
+      for (let i = 0; i <= p.length; i += 1) {
+        for (const ch of alpha) {
+          eq(built.table[i][ch], mine[i][ch],
+             'the transition from state ' + i + ' on ' + ch + ' agrees with the border recurrence, on ' + p);
+        }
+      }
+      const run = dfaRun(t, built.table, p.length);
+      eq(run.result.hits.join(','), bruteHits(t, p).join(','), 'the run finds every occurrence of ' + p);
+      eq(run.counts.reads, t.length, 'in exactly n steps, with no comparison and no back-up');
+      eq(run.result.steps, t.length, 'which is what the page prints');
+      /* The state is the number of pattern characters matched, always. */
+      run.trace.forEach((s) => {
+        const k = s.state;
+        eq(t.slice(s.at - k + 1, s.at + 1), p.slice(0, k),
+           'the state after every character of ' + t + ' is the matched prefix length');
+      });
+    }
+    eq(dfaTable('ababc', ['a', 'b', 'c']).table[4]['a'], 3,
+       'after abab an a goes to state 3, not to 0: the border is in the table');
+    eq(dfaTable('abcd', ['a', 'b', 'c', 'd']).table[3]['a'], 1,
+       'while a pattern with no border restarts from 1 at best');
+  }
+
+  /* --- and on text nobody chose ------------------------------------------ */
+  {
+    /* The presets are chosen; these are not. A deterministic stream, so a
+       failure here is reproducible rather than a flake. */
+    let seed = 20260926;
+    const rnd = (n) => { seed = (seed * 16807) % 2147483647; return seed % n; };
+    let cases = 0;
+    for (const alphabet of ['ab', 'abc', 'abcdefgh']) {
+      for (let it = 0; it < 240; it += 1) {
+        const n = 4 + rnd(30), m = 1 + rnd(5);
+        let t = '', p = '';
+        for (let i = 0; i < n; i += 1) t += alphabet[rnd(alphabet.length)];
+        for (let i = 0; i < m; i += 1) p += alphabet[rnd(alphabet.length)];
+        if (p.length > t.length) continue;
+        cases += 1;
+        checkAll(t, p, 'a random text over ' + alphabet.length + ' letters');
+        /* The two bounds, on every one of them. */
+        eq(naiveRun(t, p).counts.compares <= skNaiveBound(n, m), true,
+           'naive stayed under m(n - m + 1) on a random text');
+        eq(kmpRun(t, p).counts.compares <= 2 * n, true, 'and KMP under 2n');
+        eq(failureFn(p).result.inner <= 2 * m, true, 'and the failure function under 2m');
+      }
+    }
+    eq(cases, 712, 'and there were 712 of them, over three alphabets');
+    /* Every preset of every mode, through the same gate. */
+    for (const [t, p] of [
+      ['the rain in spain stays mainly in the plain', 'ain'],
+      ['the rain in spain stays mainly in the plain', 'zebra'],
+      ['aaaaaaaaaaaaaaaaaaaaaaaa', 'aaaab'],
+      ['GATTACAGATTACCAGATTACAGGATTACAGATTAC', 'GATTACA'],
+      ['101100101101001011010010110100101101', '10110'],
+      ['abababababababababababab', 'abababb'],
+      ['abababacaba ababacaab ababaca', 'ababaca'],
+      ['aaaaaaaaaaaaaaaaaaaa', 'aaaaa'],
+      ['abcabcabcabcabdabcabcabd', 'abcabcabd'],
+      ['aabaaabaaabaabaaab', 'aabaaab'],
+      ['abcdefgabcdefh abcdefg', 'abcdefg'],
+      ['the rain in spain stays mainly in the plain and never in the hills', 'mainly'],
+      ['GATTACAGATTACCAGATTACAGGATTACAGATTACAGGATTA', 'GATTACA'],
+      ['aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'baaaa'],
+      ['abcabcabcabcabcabcabcabcabcabcabcabcabcz', 'cccz'],
+      ['abababababababababababababababab', 'ababb'],
+      ['abracadabra abracadabra abracadabra', 'abra'],
+      ['abababcababcabababc', 'ababc'],
+      ['aaaaabaaabaaaab', 'aaab'],
+      ['abcabcdabdabcd', 'abcd'],
+      ['the theory of the theatre is the thing', 'the'],
+    ]) {
+      checkAll(t, p, 'the preset ' + p + ' in ' + t.slice(0, 18));
+    }
+  }
+
+  /* --- the kit's own contract -------------------------------------------- */
+  {
+    eq(stringsSrc.indexOf('strings_lab: unknown mode') > 0, true,
+       'an unknown mode raises rather than falling back to a default');
+    for (const m of ['naive', 'kmp', 'horspool', 'rabin', 'trie', 'suffix', 'automaton']) {
+      eq(stringsSrc.indexOf('    "' + m + '": _' + m + ',') > 0, true, 'mode ' + m + ' is registered');
+    }
+    eq(stringsSrc.indexOf('from .algo_core import COUNT_JS, STRINGS_JS, TREEDRAW_JS') > 0, true,
+       'and the algorithms are IMPORTED from algo_core rather than rewritten here, which is what '
+       + 'makes every check above a check on the code that ships');
+    const headings = stringsSrc.match(/^ +(title|subtitle|panel_title)="[^"]*"/gm) || [];
+    eq(headings.length >= 14, true, 'every mode names a title and a subtitle: ' + headings.length + ' found');
+    eq(headings.filter((h) => /&[a-z]+;|&#\d+;|<[a-z/]/.test(h)).length, 0,
+       'and none of them carries an HTML entity or a tag, which render.py escapes and would '
+       + 'therefore ship to the reader as literal text');
+  }
+}
+
+// ---------------------------------------------------------------- geometry
+console.log('geometry: exact predicates, and the hull checked against the definition');
+{
+  /* THE ORACLES, and none of them is the kit's own. geometry.py ships
+     `geoVertexBrute`, which decides whether a point is a hull vertex by
+     rotating a separating line about it; this file decides the same thing by
+     asking whether the point lies in any TRIANGLE, SEGMENT or duplicate among
+     the others, which is a different reading of "p is not in the hull of the
+     rest" and shares no code with it. Likewise `geoDet3` is the kit's second
+     route to the determinant and `detByRational` below is a third, in
+     algebra_core's rationals rather than in BigInt; `geoSegOracle` solves for
+     the two parameters in BigInt and `segByRational` solves the same system in
+     rationals; ray parity sweeps horizontally, `geoWinding` counts turns, and
+     `insideByVerticalRay` casts the ray the other way.
+
+     Three routes to a sign, three to a hull, three to an intersection and
+     three to an inside/outside verdict. Where any two of them disagree this
+     section fails, and it does not decide which one was right.
+
+     The preset point sets asserted on are the ones the pages open with, so a
+     change that breaks a lesson's opening figure fails here rather than in a
+     browser. */
+  const GEOMETRY_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'geometry.py');
+  const geometrySrc = fs.readFileSync(GEOMETRY_SOURCE, 'utf8');
+  const gBlock = (name) => blockFrom(geometrySrc, name, GEOMETRY_SOURCE);
+  eval(algoBlock('ALGO_JS'));
+  eval(algoCoreBlock('COUNT_JS'));
+  eval(algoCoreBlock('TREEDRAW_JS'));
+  eval(algoCoreBlock('GEOM_JS'));
+  eval(gBlock('GEOKIT_JS'));
+
+  const pts = (spec) => {
+    const p = geoParse(spec, 64);
+    if (p.bad) { fails += 1; console.log('  FAIL parsing ' + spec + ': ' + p.bad); return []; }
+    return p.points;
+  };
+  const keys = (list) => list.map((p) => p[0] + '|' + p[1]).sort().join(' ');
+
+  /* The determinant a third time, over algebra_core's rationals. */
+  const detByRational = (a, b, c) => {
+    const Q = (v) => R(BigInt(v));
+    const t1 = Rmul(Rsub(Q(b[0]), Q(a[0])), Rsub(Q(c[1]), Q(a[1])));
+    const t2 = Rmul(Rsub(Q(b[1]), Q(a[1])), Rsub(Q(c[0]), Q(a[0])));
+    return Rsub(t1, t2);
+  };
+  /* p is a hull VERTEX unless it coincides with another point, lies on a
+     segment between two others, or lies inside or on a triangle of three
+     others. O(n^4) and it never rotates anything. */
+  const inTriangle = (a, b, c, q) => {
+    const s1 = orientSign(a, b, q), s2 = orientSign(b, c, q), s3 = orientSign(c, a, q);
+    const neg = (s1 < 0) || (s2 < 0) || (s3 < 0);
+    const pos = (s1 > 0) || (s2 > 0) || (s3 > 0);
+    return !(neg && pos);
+  };
+  const vertexByCovering = (points) => {
+    const out = [];
+    for (let i = 0; i < points.length; i += 1) {
+      const q = points[i];
+      const rest = points.filter((_, j) => j !== i);
+      let covered = rest.some((r) => r[0] === q[0] && r[1] === q[1]);
+      for (let a = 0; a < rest.length && !covered; a += 1) {
+        for (let b = a + 1; b < rest.length && !covered; b += 1) {
+          if (onSegment(rest[a], rest[b], q)) covered = true;
+          for (let c = b + 1; c < rest.length && !covered; c += 1) {
+            if (orientSign(rest[a], rest[b], rest[c]) === 0) continue;
+            if (inTriangle(rest[a], rest[b], rest[c], q)) covered = true;
+          }
+        }
+      }
+      if (!covered) out.push(q);
+    }
+    return out;
+  };
+  /* The two parameters again, this time as rationals with gcd reduction. */
+  const segByRational = (p1, p2, q1, q2) => {
+    const Q = (v) => R(BigInt(v));
+    const cross = (ax, ay, bx, by) => Rsub(Rmul(ax, by), Rmul(ay, bx));
+    const rx = Rsub(Q(p2[0]), Q(p1[0])), ry = Rsub(Q(p2[1]), Q(p1[1]));
+    const sx = Rsub(Q(q2[0]), Q(q1[0])), sy = Rsub(Q(q2[1]), Q(q1[1]));
+    const wx = Rsub(Q(q1[0]), Q(p1[0])), wy = Rsub(Q(q1[1]), Q(p1[1]));
+    const den = cross(rx, ry, sx, sy);
+    const zero = R(0n), one = R(1n);
+    if (Rcmp(den, zero) !== 0) {
+      const t = Rdiv(cross(wx, wy, sx, sy), den);
+      const u = Rdiv(cross(wx, wy, rx, ry), den);
+      return Rcmp(t, zero) >= 0 && Rcmp(t, one) <= 0
+          && Rcmp(u, zero) >= 0 && Rcmp(u, one) <= 0;
+    }
+    /* Parallel: only a collinear overlap can meet, and that is a 1-d question. */
+    if (Rcmp(cross(wx, wy, rx, ry), zero) !== 0) return false;
+    const rr = Radd(Rmul(rx, rx), Rmul(ry, ry));
+    if (Rcmp(rr, zero) === 0) return onSegment(q1, q2, p1);
+    const t0 = Radd(Rmul(wx, rx), Rmul(wy, ry));
+    const t1 = Radd(t0, Radd(Rmul(sx, rx), Rmul(sy, ry)));
+    const lo = Rcmp(t0, t1) <= 0 ? t0 : t1, hi = Rcmp(t0, t1) <= 0 ? t1 : t0;
+    return Rcmp(hi, zero) >= 0 && Rcmp(lo, rr) <= 0;
+  };
+  /* Inside, by a ray cast UPWARDS rather than to the right. */
+  const insideByVerticalRay = (poly, q) => {
+    let crossings = 0, on = false;
+    for (let i = 0; i < poly.length; i += 1) {
+      const a = poly[i], b = poly[(i + 1) % poly.length];
+      if (onSegment(a, b, q)) on = true;
+      if ((a[0] > q[0]) !== (b[0] > q[0])) {
+        const side = orientSign(a, b, q) * (b[0] > a[0] ? -1 : 1);
+        if (side > 0) crossings += 1;
+      }
+    }
+    return { inside: !on && crossings % 2 === 1, onBoundary: on, crossings: crossings };
+  };
+  const areaByFan = (poly) => {
+    let s = 0n;
+    for (let i = 1; i + 1 < poly.length; i += 1) s += orient2(poly[0], poly[i], poly[i + 1]);
+    return s;
+  };
+  const closestByPairs = (points) => {
+    let best = null;
+    for (let i = 0; i < points.length; i += 1) {
+      for (let j = i + 1; j < points.length; j += 1) {
+        const d = dist2(points[i], points[j]);
+        if (best === null || d < best) best = d;
+      }
+    }
+    return best;
+  };
+  const crossingsByPairs = (segs) => {
+    const out = [];
+    for (let i = 0; i < segs.length; i += 1) {
+      for (let j = i + 1; j < segs.length; j += 1) {
+        if (segByRational(segs[i][0], segs[i][1], segs[j][0], segs[j][1])) out.push(i + '-' + j);
+      }
+    }
+    return out.sort().join(' ');
+  };
+  const countNodes = (t) => (t ? 1 + countNodes(t.l) + countNodes(t.r) : 0);
+
+  /* --- what a reader types, and what is refused ------------------------- */
+  {
+    eq(geoParse('0, 0; 4, 0; 2, 3', 8).points.length, 3, 'three clauses are three points');
+    eq(geoParse('(0, 0); (4, 0)', 8).points.map(geoPointText).join(' '), '(0, 0) (4, 0)',
+       'brackets are stripped inside a clause');
+    eq(geoParse('(0, 0) (4, 0)', 8).bad !== undefined, true,
+       'but a space is not a clause separator: two points on one clause is four numbers, and '
+       + 'the parser says so rather than guessing which pairing was meant');
+    eq(geoParse('0 0\n4 0', 8).points.map(geoPointText).join(' '), '(0, 0) (4, 0)',
+       'and a newline separates clauses too');
+    eq(geoParse('0.5, 1', 8).bad !== undefined, true,
+       'a coordinate that is not a whole number is REFUSED, not rounded: every predicate here '
+       + 'is an integer determinant and a rounded input is a different question');
+    eq(geoParse('1, 2, 3', 8).bad !== undefined, true, 'a clause of three numbers is not a point');
+    eq(geoParse('', 8).bad !== undefined, true, 'and an empty box is refused rather than drawn empty');
+    eq(geoParse('9007199254740993, 0', 8).bad !== undefined, true,
+       'a coordinate past 2^53 is refused, because the NUMBER is already wrong before any '
+       + 'determinant is taken');
+    eq(geoParse('0,0; 1,1; 2,2', 2).bad !== undefined, true, 'and the per-mode cap refuses');
+    eq(geoParseSegments('0,0; 4,4; 0,4', 8).bad !== undefined, true,
+       'an odd number of points is not a set of segments');
+    eq(geoParseSegments('0,0; 4,4; 0,4; 4,0', 8).segments.length, 2, 'and an even number is');
+    eq(geoDedupe(pts('0,0; 0,0; 1,1; 0,0')).dropped, 2, 'duplicates are removed and counted');
+    eq(geoDedupe(pts('0,0; 0,0; 1,1; 0,0')).points.length, 2, 'leaving the distinct points in order');
+  }
+
+  /* --- orient: three routes to one sign, and the one that is wrong ------- */
+  {
+    for (const [spec, det, sgn, fsgn] of [
+      ['0, 0; 4, 0; 2, 3', 12n, 1, 1],
+      ['0, 0; 3, 3; 7, 7', 0n, 0, 0],
+      ['0, 0; 134217729, 134217728; 134217728, 134217727', -1n, -1, 0],
+      ['0, 0; 67108865, 67108864; 67108864, 67108863', -1n, -1, -1],
+      ['0, 0; 7, 3; 5, 2', -1n, -1, -1],
+    ]) {
+      const [a, b, c] = pts(spec);
+      eq(orient2(a, b, c), det, 'the exact determinant of ' + spec);
+      eq(geoDet3(a, b, c), det, 'and the cofactor expansion agrees, on ' + spec);
+      eq(Rtext(detByRational(a, b, c)), String(det),
+         'and so does the same determinant over the rationals, on ' + spec);
+      eq(orientSign(a, b, c), sgn, 'the sign is ' + sgn);
+      eq(geoFloatSign(a, b, c), fsgn, 'and in doubles it is ' + fsgn);
+    }
+    /* The family the course opens on: the same right turn at every magnitude. */
+    const sw = geoNeedleSweep(20, 48);
+    eq(sw.tested, 29, 'the sweep runs 29 magnitudes');
+    eq(sw.rows.every((r) => String(r.det) === '-1'), true,
+       'and the exact determinant is -1 in every one of them, so every row is the same turn');
+    eq(sw.disagree, 22, 'the double test gets 22 of them wrong');
+    eq(sw.first, 27, 'the first at 2^27, which is where 2k passes 53');
+    eq(sw.rows.filter((r) => r.k < 27).every((r) => r.agree), true,
+       'and it is right at every magnitude below that');
+    eq(sw.rows.filter((r) => !r.agree).every((r) => r.float === 0), true,
+       'EVERY disagreement is the double reporting collinear, and never the opposite turn');
+    /* That is not luck, and the sweep below is the evidence. Rounding to
+       nearest is monotone and the coordinate differences here are integers
+       below 2^53, so the rounded products cannot cross. */
+    let seed = 20260927, flips = 0, zeros = 0, tried = 0;
+    const rnd = (n) => { seed = (seed * 16807) % 2147483647; return seed % n; };
+    for (let it = 0; it < 30000; it += 1) {
+      const P = Math.pow(2, 26 + rnd(12));
+      const a = [rnd(5), rnd(5)];
+      const b = [P + rnd(9) - 4, P + rnd(9) - 4];
+      const c = [P + rnd(9) - 4, P + rnd(9) - 4];
+      if (!Number.isSafeInteger(b[0]) || !Number.isSafeInteger(c[0])) continue;
+      tried += 1;
+      const e = orientSign(a, b, c), f = geoFloatSign(a, b, c);
+      if (e !== f) { if (e !== 0 && f !== 0) flips += 1; else zeros += 1; }
+    }
+    eq(tried > 29000, true, 'thirty thousand near-collinear triples at 2^26 and above');
+    eq(zeros > 500, true, 'the double test disagrees on ' + zeros + ' of them');
+    eq(flips, 0, 'and on NOT ONE of them does it report the opposite turn, only collinear');
+    eq(orient2Float([0, 0], [4, 0], [2, 3]), 12, 'the double is exact when the numbers are small');
+  }
+
+  /* --- hull: the definition is the referee ------------------------------- */
+  {
+    for (const [name, spec, h, floatH, wrapH, bnd, dup] of [
+      ['general', '0, 0; 6, 0; 6, 6; 0, 6; 3, 3; 2, 1; 4, 5; 1, 4; 5, 2', 4, 4, 4, 4, 0],
+      ['edges', '0, 0; 2, 0; 4, 0; 4, 2; 4, 4; 2, 4; 0, 4; 0, 2; 2, 2', 4, 4, 6, 8, 0],
+      ['segment', '0, 0; 1, 1; 2, 2; 3, 3; 4, 4', 2, 2, 5, 5, 0],
+      ['duplicate', '0, 0; 0, 0; 4, 0; 0, 4; 2, 2; 4, 0', 3, 3, 3, 4, 2],
+      ['needle', '0, 0; 134217729, 134217728; 134217728, 134217727', 3, 2, 3, 3, 0],
+      ['single', '3, 3; 3, 3', 1, 1, null, 1, 1],
+    ]) {
+      const typed = pts(spec), clean = geoDedupe(typed), P = clean.points;
+      eq(clean.dropped, dup, name + ' drops ' + dup + ' duplicate point(s)');
+      const exact = geoExactHull(P), dbl = geoFloatHull(P);
+      eq(exact.h, h, name + ' has ' + h + ' hull vertices');
+      eq(dbl.h, floatH, 'and ' + floatH + ' under the double predicate');
+      eq(geoBoundaryBrute(P).length, bnd, 'with ' + bnd + ' point(s) on the boundary altogether');
+      if (wrapH !== null) eq(jarvis(P).result.h, wrapH, 'while gift wrapping returns ' + wrapH);
+      /* Three routes to the vertex set, all three required to agree. */
+      eq(keys(exact.hull), keys(geoVertexBrute(P)),
+         'the chain and the separating-line definition agree on ' + name);
+      eq(keys(exact.hull), keys(vertexByCovering(P)),
+         'and so does asking whether each point is covered by a triangle of the others, on ' + name);
+      /* The boundary is a superset of the vertices, and holds gift wrapping. */
+      eq(geoVertexBrute(P).every((p) => geoBoundaryBrute(P).some((q) => geoKey(q) === geoKey(p))),
+         true, 'every vertex of ' + name + ' is on its boundary');
+      if (wrapH !== null) {
+        eq(jarvis(P).result.hull.every(
+             (p) => geoBoundaryBrute(P).some((q) => geoKey(q) === geoKey(p))),
+           true, 'and gift wrapping never returns a point off the boundary, on ' + name);
+      }
+      /* The stack claim: a point is pushed once and popped at most once. */
+      eq(exact.pushes, 2 * P.length, 'the two chains push every point once, on ' + name);
+      eq(exact.pops <= exact.pushes, true, 'and pop no more than they pushed');
+      eq(exact.pushes + exact.pops <= 2 * exact.bound, true, 'so the stack work is bounded by 4n');
+    }
+    /* The vertex oracle is asked about lists that STILL HAVE DUPLICATES in
+       them, because that is the case the kit's deduplication exists for and a
+       test that always dedupes first never reaches it. A point typed twice
+       lies in the hull of the others and is a vertex of nothing, and both
+       oracles have to say so however the duplicate is ordered. */
+    for (const spec of ['0,0; 4,0; 0,0; 0,4', '0,0; 0,0; 4,0; 0,4', '3,3; 3,3',
+                        '0,0; 1,1; 1,1; 2,2', '5,5; 5,5; 5,5',
+                        '0,0; 4,0; 4,4; 0,4; 4,0; 0,0', '2,2; 0,0; 6,0; 0,0; 3,6']) {
+      const raw = geoParse(spec, 16).points;
+      eq(keys(geoVertexBrute(raw)), keys(vertexByCovering(raw)),
+         'the separating-line test and the covering test agree on ' + spec + ', duplicates and all');
+    }
+
+    /* THE DEFECT IN A FILE THIS KIT DOES NOT OWN, pinned so that fixing it
+       upstream fails here and the note in geometry.py is revisited rather than
+       left describing something that stopped being true. */
+    eq(monotoneChain([[3, 3]]).result.h, 0,
+       'algo_core.monotoneChain returns an EMPTY hull for a single point, which is wrong: '
+       + 'lower and upper are both [p] and both are sliced away');
+    eq(geoExactHull([[3, 3]]).h, 1, 'the kit’s chain returns the point, which is the hull');
+    eq(keys(geoVertexBrute([[3, 3]])), '3|3', 'and the definition agrees with the kit');
+    /* Everywhere else the two must be the same algorithm. */
+    let seed = 13572468, mismatch = 0, checked = 0;
+    const rnd = (n) => { seed = (seed * 16807) % 2147483647; return seed % n; };
+    for (let it = 0; it < 3000; it += 1) {
+      const n = 1 + rnd(9), raw = [];
+      for (let i = 0; i < n; i += 1) raw.push([rnd(6) - 3, rnd(6) - 3]);
+      const P = geoDedupe(raw).points;
+      const mine = geoExactHull(P);
+      eq(keys(mine.hull), keys(geoVertexBrute(P)), 'chain and definition agree on a random set');
+      eq(keys(mine.hull), keys(vertexByCovering(P)), 'and so does the covering test');
+      if (P.length >= 2) {
+        checked += 1;
+        if (keys(mine.hull) !== keys(monotoneChain(P).result.hull)) mismatch += 1;
+      }
+      if (P.length >= 3) {
+        eq(jarvis(P).result.hull.every(
+             (p) => geoBoundaryBrute(P).some((q) => geoKey(q) === geoKey(p))),
+           true, 'and gift wrapping stays on the boundary');
+      }
+    }
+    eq(mismatch, 0, 'and on all ' + checked + ' random sets of two or more distinct points the '
+       + 'kit’s predicate-parameterised chain IS algo_core’s monotoneChain');
+    /* The lower-bound reduction the course uses: the hull of the lifted points
+       reads back the sorted order. */
+    const lifted = geoExactHull(liftParabola([5, 1, 9, 3, 7]));
+    eq(lifted.h, 5, 'every point lifted to the parabola is a hull vertex');
+    eq(lifted.lower.map((p) => p[0]).join(','), '1,3,5,7,9',
+       'and the lower chain reads back the sorted order, which is why sorting reduces to hulls');
+  }
+
+  /* --- segments: three routes, on the cases that are usually wrong ------- */
+  {
+    for (const [name, spec, d, proper, touching, boxes, meet] of [
+      ['proper', '0, 0; 6, 6; 0, 6; 6, 0', '-1,1,1,-1', true, false, true, true],
+      ['touch', '0, 0; 6, 0; 3, 0; 3, 5', '1,-1,0,1', false, true, true, true],
+      ['overlap', '0, 0; 6, 0; 4, 0; 10, 0', '0,0,0,0', false, true, true, true],
+      ['apart', '0, 0; 4, 0; 6, 0; 10, 0', '0,0,0,0', false, false, false, false],
+      ['shared', '0, 0; 4, 0; 4, 0; 4, 5', '1,0,0,1', false, true, true, true],
+      ['parallel', '0, 0; 6, 0; 0, 2; 6, 2', '-1,-1,1,1', false, false, false, false],
+      ['point', '3, 2; 3, 2; 0, 0; 6, 4', '0,0,0,0', false, true, true, true],
+    ]) {
+      const [p1, p2, q1, q2] = pts(spec);
+      const s = straddle(p1, p2, q1, q2);
+      eq(s.d.join(','), d, name + ' has these four orientation signs');
+      eq(s.proper, proper, 'proper crossing: ' + proper);
+      eq(s.touching, touching, 'touching: ' + touching);
+      eq(s.boxes, boxes, 'boxes overlap: ' + boxes);
+      eq(s.intersect, meet, 'and the verdict is ' + meet);
+      eq(geoSegOracle(p1, p2, q1, q2).intersect, meet,
+         'which the parametric solve in BigInt reaches too, on ' + name);
+      eq(segByRational(p1, p2, q1, q2), meet,
+         'and so does the same system over the rationals, on ' + name);
+    }
+    /* The pair the box filter gets wrong on its own, which is why it is a
+       filter: 'apart' has no overlap and 'overlap' does, and both are four
+       zero signs. */
+    eq(straddle(...pts('0, 0; 6, 0; 4, 0; 10, 0')).d.join(','),
+       straddle(...pts('0, 0; 4, 0; 6, 0; 10, 0')).d.join(','),
+       'two inputs with the same four signs and opposite answers, which is the whole case for '
+       + 'finishing a collinear pair on the segment rather than on the line');
+    let seed = 99887766;
+    const rnd = (n) => { seed = (seed * 16807) % 2147483647; return seed % n; };
+    for (let it = 0; it < 6000; it += 1) {
+      const P = [];
+      for (let i = 0; i < 4; i += 1) P.push([rnd(7) - 3, rnd(7) - 3]);
+      const a = straddle(P[0], P[1], P[2], P[3]).intersect;
+      const b = geoSegOracle(P[0], P[1], P[2], P[3]).intersect;
+      const c = segByRational(P[0], P[1], P[2], P[3]);
+      eq(a, b, 'four signs and two parameters agree on a random pair of segments');
+      eq(b, c, 'and BigInt parameters agree with rational ones');
+    }
+  }
+
+  /* --- sweep: the work, and the answer it must not change ---------------- */
+  {
+    for (const [name, spec, segs, events, tests, all, found] of [
+      ['spread', '0, 0; 3, 3; 1, 4; 4, 1; 6, 0; 9, 3; 7, 4; 10, 1; 12, 0; 15, 3; 13, 4; 16, 1',
+       6, 12, 3, 15, 3],
+      ['bundle', '0, 0; 8, 8; 0, 8; 8, 0; 0, 4; 8, 4; 4, 0; 4, 8', 4, 8, 6, 6, 6],
+      ['chain', '0, 0; 3, 1; 3, 1; 6, 2; 6, 2; 9, 3; 9, 3; 12, 4', 4, 8, 3, 6, 3],
+      ['none', '0, 0; 2, 1; 3, 0; 5, 1; 6, 0; 8, 1; 0, 4; 2, 5; 3, 4; 5, 5; 6, 4; 8, 5',
+       6, 12, 3, 15, 0],
+    ]) {
+      const S = geoParseSegments(spec, 10).segments;
+      const run = sweepEvents(S), res = run.result;
+      eq(S.length, segs, name + ' has ' + segs + ' segments');
+      eq(res.events.length, events, 'and ' + events + ' events, two per segment');
+      eq(res.tests, tests, 'the sweep made ' + tests + ' pair test(s)');
+      eq(res.allPairs, all, 'out of ' + all + ' pairs there are');
+      eq(res.crossings.length, found, 'and found ' + found + ' crossing(s)');
+      eq(geoPairKeys(res.crossings), geoPairKeys(geoSweepBrute(S)),
+         'which is the set testing every pair finds, on ' + name);
+      eq(geoPairKeys(res.crossings).split(' ').filter((x) => x).sort().join(' '),
+         crossingsByPairs(S), 'and the rational solve finds it too, on ' + name);
+      eq(res.tests <= res.allPairs, true, 'the sweep never does more work than the brute force');
+    }
+    eq(sweepEvents(geoParseSegments('0, 0; 8, 8; 0, 8; 8, 0; 0, 4; 8, 4; 4, 0; 4, 8', 10)
+       .segments).result.tests, 6,
+       'on the bundle the sweep makes EVERY test the brute force makes: sorting bought nothing, '
+       + 'which is the preset that stops the saving being read as a bound');
+    let seed = 55443322;
+    const rnd = (n) => { seed = (seed * 16807) % 2147483647; return seed % n; };
+    for (let it = 0; it < 1500; it += 1) {
+      const k = 2 + rnd(5), S = [];
+      for (let i = 0; i < k; i += 1) S.push([[rnd(9) - 4, rnd(9) - 4], [rnd(9) - 4, rnd(9) - 4]]);
+      eq(geoPairKeys(sweepEvents(S).result.crossings), geoPairKeys(geoSweepBrute(S)),
+         'the sweep and every pair agree on a random set of segments');
+    }
+  }
+
+  /* --- closest: the recursion against every pair ------------------------- */
+  {
+    for (const [name, spec, n, d2, dc, strip, bound] of [
+      ['scatter', '2, 9; 5, 1; 8, 14; 11, 4; 14, 12; 17, 2; 20, 10; 23, 6; 26, 15; 29, 3; 12, 5; 13, 4',
+       12, '2', 17, 5, 84],
+      ['column', '0, 0; 0, 3; 0, 6; 0, 9; 0, 12; 1, 1; 1, 4; 1, 7; 1, 10; 1, 13', 10, '2', 13, 5, 70],
+      ['grid', '0, 0; 4, 0; 8, 0; 0, 4; 4, 4; 8, 4; 0, 8; 4, 8; 8, 8', 9, '16', 6, 0, 63],
+      ['duplicate', '0, 0; 5, 5; 9, 2; 5, 5; 3, 8', 5, '0', 4, 0, 35],
+      ['pair', '0, 0; 3, 4', 2, '25', 1, 0, 14],
+    ]) {
+      const P = pts(spec);
+      const run = closestPair(P), res = run.result;
+      eq(P.length, n, name + ' has ' + n + ' points');
+      eq(String(res.d2), d2, 'and a closest squared distance of ' + d2);
+      eq(String(closestByPairs(P)), d2, 'which every pair confirms');
+      eq(String(geoClosestBrute(P).d2), d2, 'and the kit’s own brute force too');
+      eq(run.counts.compares, dc, 'the recursion made ' + dc + ' comparison(s)');
+      eq(res.stripCompares, strip, 'of which ' + strip + ' were in a strip');
+      eq(res.bound, bound, 'against a bound of 7n = ' + bound);
+      eq(res.stripCompares <= res.bound, true, 'so the strip stayed under 7n, on ' + name);
+      eq(String(dist2(res.pair[0], res.pair[1])), d2,
+         'and the pair returned really is at that distance, on ' + name);
+      /* The strip claim, per level: at most seven neighbours each. */
+      res.levels.forEach((l) => {
+        eq(l.compares <= 7 * l.strip, true, 'no strip compared a point with more than seven others');
+      });
+    }
+    eq(String(closestPair(pts('0, 0; 5, 5; 9, 2; 5, 5; 3, 8')).result.d2), '0',
+       'two coincident points are at squared distance 0, which needs no special case because '
+       + 'nothing is square-rooted');
+    let seed = 31415926;
+    const rnd = (n) => { seed = (seed * 16807) % 2147483647; return seed % n; };
+    for (let it = 0; it < 2500; it += 1) {
+      const n = 2 + rnd(14), P = [];
+      for (let i = 0; i < n; i += 1) P.push([rnd(40) - 20, rnd(40) - 20]);
+      const run = closestPair(P);
+      eq(String(run.result.d2), String(closestByPairs(P)),
+         'divide and conquer agrees with every pair on a random point set');
+      eq(run.result.stripCompares <= run.result.bound, true, 'and the strip stayed under 7n');
+    }
+  }
+
+  /* --- polygon: two areas, two definitions of inside --------------------- */
+  {
+    for (const [name, spec, q, a2, crossings, inside, onB, winding, simple] of [
+      ['ell', '0, 0; 6, 0; 6, 2; 2, 2; 2, 6; 0, 6', '1, 5', 40n, 1, true, false, 1, true],
+      ['vertex', '0, 0; 8, 0; 4, 4', '-2, 0', 32n, 2, false, false, 0, true],
+      ['comb', '0, 0; 12, 0; 12, 6; 10, 6; 10, 2; 8, 2; 8, 6; 6, 6; 6, 2; 4, 2; 4, 6; 2, 6; 2, 2; 0, 2',
+       '-1, 4', 96n, 6, false, false, 0, true],
+      ['clockwise', '0, 0; 0, 5; 5, 5; 5, 0', '2, 2', -50n, 1, true, false, -1, true],
+      ['flat', '0, 0; 3, 3; 6, 6', '3, 3', 0n, 0, false, true, 0, true],
+    ]) {
+      const poly = pts(spec), Q = pts(q)[0];
+      eq(shoelace2(poly), a2, name + ' has doubled area ' + a2);
+      eq(geoAreaTrapezoid(poly), a2, 'and the trapezoid rule agrees, on ' + name);
+      eq(areaByFan(poly), a2, 'and so does a fan of triangles from the first vertex, on ' + name);
+      const par = rayParity(poly, Q), w = geoWinding(poly, Q);
+      eq(par.crossings, crossings, 'the ray from ' + q + ' crosses ' + crossings + ' edge(s)');
+      eq(par.inside, inside, 'so the point is ' + (inside ? 'inside' : 'not inside'));
+      eq(par.onBoundary, onB, 'on the boundary: ' + onB);
+      eq(w.winding, winding, 'and the winding number is ' + winding);
+      eq(w.inside, inside, 'which gives the same verdict, on ' + name);
+      eq(insideByVerticalRay(poly, Q).inside, inside,
+         'and casting the ray upwards instead of rightwards gives it too, on ' + name);
+      eq(geoSimple(poly).simple, simple, name + ' is a simple polygon: ' + simple);
+    }
+    /* The sign is the orientation and reversing the vertices flips it. */
+    const sq = pts('0, 0; 5, 0; 5, 5; 0, 5');
+    eq(shoelace2(sq), 50n, 'counter-clockwise is positive');
+    eq(shoelace2(sq.slice().reverse()), -50n, 'and the same square typed backwards is negative');
+    eq(shoelace2(sq) + shoelace2(sq.slice().reverse()), 0n, 'so the magnitude is the same area');
+    /* Every lattice point of a small polygon, both ways round. */
+    let seed = 24680135, tested = 0;
+    const rnd = (n) => { seed = (seed * 16807) % 2147483647; return seed % n; };
+    for (let it = 0; it < 900; it += 1) {
+      const raw = [];
+      for (let i = 0; i < 3 + rnd(6); i += 1) raw.push([rnd(11) - 5, rnd(11) - 5]);
+      const P = geoDedupe(raw).points;
+      const hull = geoExactHull(P).hull;
+      if (hull.length < 3) continue;
+      eq(geoSimple(hull).simple, true, 'a convex hull is always a simple polygon');
+      eq(shoelace2(hull), geoAreaTrapezoid(hull), 'and its two area formulas agree');
+      eq(shoelace2(hull), areaByFan(hull), 'as does the fan');
+      for (let t = 0; t < 6; t += 1) {
+        const Q = [rnd(11) - 5, rnd(11) - 5];
+        const par = rayParity(hull, Q), w = geoWinding(hull, Q);
+        const up = insideByVerticalRay(hull, Q);
+        tested += 1;
+        eq(par.inside, w.inside, 'parity and winding agree on a random query point');
+        eq(par.onBoundary, w.onBoundary, 'and so does the boundary case');
+        eq(par.inside, up.inside, 'and a ray cast upwards agrees with one cast rightwards');
+      }
+    }
+    eq(tested > 3000, true, 'checked on ' + tested + ' query points');
+  }
+
+  /* --- calipers: h pairs against all of them ----------------------------- */
+  {
+    for (const [name, spec, n, h, d2, pairs] of [
+      ['convex', '0, 3; 2, 0; 6, 0; 9, 3; 9, 7; 6, 10; 2, 10; 0, 7', 8, 8, '116', 8],
+      ['cloud', '0, 0; 12, 0; 12, 9; 0, 9; 3, 2; 5, 4; 7, 3; 9, 5; 4, 6; 6, 7; 8, 6; 2, 5; 10, 2; 5, 1; 7, 8; 3, 7',
+       16, 4, '225', 4],
+      ['thin', '0, 0; 40, 1; 20, 1; 10, 0; 30, 1', 5, 4, '1601', 4],
+      ['segment', '0, 0; 3, 3; 6, 6; 9, 9; 12, 12', 5, 2, '288', 2],
+      ['square', '0, 0; 6, 0; 6, 6; 0, 6', 4, 4, '72', 4],
+    ]) {
+      const P = geoDedupe(pts(spec)).points;
+      const hull = geoExactHull(P).hull;
+      const run = calipers(hull), res = run.result;
+      eq(P.length, n, name + ' has ' + n + ' distinct points');
+      eq(hull.length, h, 'and ' + h + ' of them on the hull');
+      eq(String(res.d2), d2, 'the squared diameter is ' + d2);
+      eq(String(diameterBrute(P).d2), d2, 'which testing every pair confirms');
+      eq(res.pairs.length, pairs, 'from ' + pairs + ' antipodal pair(s)');
+      eq(String(dist2(res.pair[0], res.pair[1])), d2,
+         'and the pair returned really is at that distance, on ' + name);
+      /* Nothing on the hull is further apart than the diameter. */
+      hull.forEach((a) => hull.forEach((b) => {
+        eq(dist2(a, b) <= res.d2, true, 'no hull pair of ' + name + ' exceeds the diameter');
+      }));
+    }
+    let seed = 86420975;
+    const rnd = (n) => { seed = (seed * 16807) % 2147483647; return seed % n; };
+    for (let it = 0; it < 1500; it += 1) {
+      const raw = [];
+      for (let i = 0; i < 2 + rnd(12); i += 1) raw.push([rnd(30) - 15, rnd(30) - 15]);
+      const P = geoDedupe(raw).points;
+      if (P.length < 2) continue;
+      const hull = geoExactHull(P).hull;
+      eq(String(calipers(hull).result.d2), String(diameterBrute(P).d2),
+         'the calipers on the hull reach the diameter of the whole set, at random');
+    }
+  }
+
+  /* --- kdtree: what was skipped, and what must not be ------------------- */
+  {
+    for (const [name, spec, rect, n, visited, found] of [
+      ['scatter', '1, 1; 3, 9; 5, 4; 7, 12; 9, 2; 11, 7; 13, 14; 15, 5; 2, 6; 4, 13; 6, 8; 8, 3; 10, 11; 12, 1; 14, 9; 16, 6',
+       [0, 0, 6, 6], 16, 6, 3],
+      ['everything', '1, 1; 3, 9; 5, 4; 7, 12; 9, 2; 11, 7; 13, 14; 15, 5; 2, 6; 4, 13; 6, 8; 8, 3',
+       [0, 0, 20, 20], 12, 12, 12],
+      ['empty', '1, 1; 3, 9; 5, 4; 7, 12; 9, 2; 11, 7; 13, 14; 15, 5; 2, 6; 4, 13; 6, 8; 8, 3',
+       [17, 17, 19, 19], 12, 3, 0],
+      ['column', '1, 1; 3, 9; 5, 4; 7, 12; 9, 2; 11, 7; 13, 14; 15, 5; 2, 6; 4, 13; 6, 8; 8, 3',
+       [4, 0, 6, 20], 12, 6, 3],
+    ]) {
+      const P = geoDedupe(pts(spec)).points;
+      const tree = kdBuild(P, 0);
+      eq(P.length, n, name + ' has ' + n + ' points');
+      eq(countNodes(tree), n, 'and the tree holds every one of them, once');
+      const run = kdRange(tree, rect);
+      eq(run.result.visited, visited, 'the query visited ' + visited + ' node(s)');
+      eq(run.result.found.length, found, 'and reported ' + found);
+      eq(keys(run.result.found), keys(geoRangeBrute(P, rect)),
+         'which is exactly what scanning every point reports, on ' + name);
+      eq(run.result.visited <= n, true, 'and it never visits more nodes than there are');
+    }
+    eq(kdRange(kdBuild(geoDedupe(pts('1, 1; 3, 9; 5, 4; 7, 12; 9, 2; 11, 7; 13, 14; 15, 5; 2, 6; 4, 13; 6, 8; 8, 3'))
+       .points, 0), [0, 0, 20, 20]).result.visited, 12,
+       'a window containing everything visits everything, which is the preset that stops the '
+       + 'pruning being read as a bound');
+    let seed = 19283746;
+    const rnd = (n) => { seed = (seed * 16807) % 2147483647; return seed % n; };
+    for (let it = 0; it < 1500; it += 1) {
+      const raw = [];
+      for (let i = 0; i < 1 + rnd(16); i += 1) raw.push([rnd(20), rnd(20)]);
+      const P = geoDedupe(raw).points;
+      const x0 = rnd(20), y0 = rnd(20), x1 = x0 + rnd(12), y1 = y0 + rnd(12);
+      const run = kdRange(kdBuild(P, 0), [x0, y0, x1, y1]);
+      eq(keys(run.result.found), keys(geoRangeBrute(P, [x0, y0, x1, y1])),
+         'the k-d range query reports what a scan reports, on a random window');
+    }
+    eq(drawTree(null, kdBuild(geoDedupe(pts('1, 1; 3, 9; 5, 4')).points, 0), kdKids,
+                (n) => String(n.point[n.axis])).match(/<circle /g).length, 3,
+       'and the renderer draws every node of the tree');
+  }
+
+  /* --- the kit's own contract -------------------------------------------- */
+  {
+    eq(geometrySrc.indexOf('geometry_lab: unknown mode') > 0, true,
+       'an unknown mode raises rather than falling back to a default');
+    for (const m of ['orient', 'hull', 'segments', 'sweep', 'closest', 'polygon', 'calipers',
+                     'kdtree']) {
+      eq(geometrySrc.indexOf('    "' + m + '": _' + m + ',') > 0, true, 'mode ' + m + ' is registered');
+    }
+    eq(geometrySrc.indexOf('from .algo_core import COUNT_JS, GEOM_JS, TREEDRAW_JS') > 0, true,
+       'and the predicates are IMPORTED from algo_core rather than rewritten here, which is '
+       + 'what makes every check above a check on the code that ships');
+    const headings = geometrySrc.match(/^ +(title|subtitle|panel_title)="[^"]*"/gm) || [];
+    eq(headings.length >= 16, true, 'every mode names a title and a subtitle: ' + headings.length + ' found');
+    eq(headings.filter((h) => /&[a-z]+;|&#\d+;|<[a-z/]/.test(h)).length, 0,
+       'and none of them carries an HTML entity or a tag, which render.py escapes and would '
+       + 'therefore ship to the reader as literal text');
+  }
+}
+
+
+// ------------------------------------------------------------------- random
+console.log('randomised algorithms: exact distributions, against enumerations that share no code');
+{
+  /* THE DISCIPLINE IN THIS SECTION. Every exact quantity the `random` kit
+     prints is checked against an enumeration written HERE, from the
+     definition, sharing no code with the kit:
+
+       the shuffle distributions   re-derived by enumerating the tapes in this
+                                   file and applying the two swap rules spelled
+                                   out here, not by calling `allTapes`
+       the quicksort distribution  re-derived by running a quicksort written
+                                   here over every one of the n! input orders,
+                                   and separately checked against the closed
+                                   form and against a table of known values
+       Karger's probability        re-derived by enumerating every one of the
+                                   |E|! edge ORDERS and contracting along each,
+                                   which is a different computation from the
+                                   memoised recursion over contraction states
+       the witness fraction        re-derived with a modular exponentiation
+                                   written here and the strong-test condition
+                                   read straight off its definition
+       the MAX-3-SAT mean          re-derived by LINEARITY -- clause by clause,
+                                   each clause's own satisfying fraction added
+                                   up -- which never enumerates an assignment
+
+     A long seeded run is never used as an oracle for an expectation anywhere
+     below. That is the mistake the kit itself exists to warn about and it
+     would be an odd thing for its test to make. */
+  const RANDOM_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'random.py');
+  const randomSrc = fs.readFileSync(RANDOM_SOURCE, 'utf8');
+  const rkBlock = (name) => blockFrom(randomSrc, name, RANDOM_SOURCE);
+  eval(block('RATIONAL_JS'));
+  eval(sysdBlock('STREAM_JS'));
+  eval(sysdBlock('HARMONIC_JS'));
+  eval(algoCoreBlock('COUNT_JS'));
+  eval(algoCoreBlock('RFIXED_JS'));
+  eval(algoCoreBlock('SEEDED_JS'));
+  eval(algoCoreBlock('DIGRAPH_JS'));
+  eval(algoCoreBlock('ORACLE_JS'));
+  eval(algoCoreBlock('RANDOM_JS'));
+  eval(rkBlock('RKIT_JS'));
+
+  const graphOf = (text) => {
+    const p = rkParseGraph(text, 8);
+    if (p.bad) { fails += 1; console.log('  FAIL parsing ' + text + ': ' + p.bad); }
+    return p.G;
+  };
+  const cnfOf = (text) => {
+    const p = rkParseCnf(text);
+    if (p.bad) { fails += 1; console.log('  FAIL parsing ' + text + ': ' + p.bad); }
+    return p.formula;
+  };
+  const perms = (n) => {
+    const out = [], a = new Array(n).fill(0), used = new Array(n).fill(false);
+    (function go(k) {
+      if (k === n) { out.push(a.slice()); return; }
+      for (let v = 0; v < n; v += 1) {
+        if (used[v]) continue;
+        used[v] = true; a[k] = v; go(k + 1); used[v] = false;
+      }
+    })(0);
+    return out;
+  };
+
+  /* --- what a reader types ------------------------------------------------ */
+  {
+    eq(graphOf('1-2, 2-3, 3-1').arcs.length, 3, 'three clauses, three edges');
+    eq(graphOf('1-2, 1-2, 2-3').arcs.length, 3,
+       'and a repeated clause is a PARALLEL edge, not a duplicate: Karger needs the multiplicity');
+    eq(rkParseGraph('1-1').bad !== undefined, true, 'a loop is refused -- it is never contracted');
+    eq(rkParseGraph('1-2').bad !== undefined, true, 'and so is a graph with fewer than three vertices');
+    eq(rkParseGraph('1-9, 1-2, 1-3').bad !== undefined, true, 'and a label past the cap');
+    eq(cnfOf('1 2 -3; -1 2').clauses.length + ',' + cnfOf('1 2 -3; -1 2').n, '2,3',
+       'a formula is clauses by semicolon and literals by space, and n is the largest variable');
+    eq(rkParseCnf('1 0 2').bad !== undefined, true, 'there is no variable 0');
+    eq(rkParseCnf('1 x').bad !== undefined, true, 'and a literal that is not a number is refused');
+    eq(rkClauseText([1, -2, 3]), 'x1 ∨ ¬x2 ∨ x3', 'a clause prints with real symbols, not entities');
+  }
+
+  /* --- the shuffles, against tapes enumerated here ------------------------ */
+  {
+    /* The oracle: the two shuffles written out again, over tapes built here.
+       Deliberately not `allTapes` and not `shuffleFrequencies` -- if those two
+       agreed with each other about a wrong answer this would still catch it. */
+    const tapesOf = (n, kind) => {
+      const sizes = [];
+      if (kind === 'naive') { for (let i = 0; i < n; i += 1) sizes.push(n); }
+      else { for (let k = n - 1; k >= 1; k -= 1) sizes.push(k + 1); }
+      let out = [[]];
+      for (const s of sizes) {
+        const next = [];
+        for (const p of out) for (let v = 0; v < s; v += 1) next.push(p.concat([v]));
+        out = next;
+      }
+      return out;
+    };
+    const oracleFreq = (n, kind) => {
+      const freq = new Map();
+      for (const tape of tapesOf(n, kind)) {
+        const a = [];
+        for (let i = 0; i < n; i += 1) a.push(i);
+        if (kind === 'naive') {
+          for (let i = 0; i < n; i += 1) {
+            const j = tape[i] % n, t = a[i]; a[i] = a[j]; a[j] = t;
+          }
+        } else {
+          let at = 0;
+          for (let i = n - 1; i >= 1; i -= 1) {
+            const j = tape[at] % (i + 1); at += 1;
+            const t = a[i]; a[i] = a[j]; a[j] = t;
+          }
+        }
+        const key = a.join('');
+        freq.set(key, (freq.get(key) || 0) + 1);
+      }
+      return freq;
+    };
+    for (const n of [3, 4, 5]) {
+      for (const kind of ['fisheryates', 'naive']) {
+        const shipped = rkShuffleExact(n, kind);
+        const oracle = oracleFreq(n, kind);
+        eq(shipped.tapes, [...oracle.values()].reduce((a, b) => a + b, 0),
+           'n = ' + n + ' ' + kind + ': the tape count matches the enumeration here');
+        let same = true;
+        for (const row of shipped.rows) if (oracle.get(row.perm) !== row.count) same = false;
+        for (const [k, v] of oracle) {
+          const row = shipped.rows.filter((r) => r.perm === k)[0];
+          if (!row || row.count !== v) same = false;
+        }
+        eq(same, true, 'and every permutation gets the same number of tapes, one by one');
+      }
+    }
+    const fy4 = rkShuffleExact(4, 'fisheryates'), nv4 = rkShuffleExact(4, 'naive');
+    eq(fy4.tapes + ',' + fy4.distinct + ',' + fy4.uniform, '24,24,true',
+       'Fisher-Yates at n = 4 is 24 tapes over 24 permutations, one each');
+    eq(Rtext(fy4.rows[0].probability), '1/24', 'so every permutation has probability exactly 1/24');
+    eq(Rtext(rkTotalVariation(fy4.rows, 24)), '0',
+       'and the total variation distance from uniform is 0, exactly');
+    eq(nv4.tapes + ',' + nv4.distinct + ',' + nv4.uniform, '256,24,false',
+       'the naive swap at n = 4 is 256 tapes over the same 24 permutations, and is not uniform');
+    eq(Rtext(rkTotalVariation(nv4.rows, 24)), '25/384',
+       'its total variation distance from uniform is 25/384');
+    const most = nv4.rows.slice().sort((a, b) => b.count - a.count)[0];
+    const least = nv4.rows.slice().sort((a, b) => a.count - b.count)[0];
+    eq(Rtext(most.probability) + ' vs ' + Rtext(least.probability), '15/256 vs 1/32',
+       'its most likely permutation has probability 15/256 and its least 1/32');
+    /* The PROOF, which does not depend on any of the above. */
+    for (const n of [3, 4, 5, 6, 7]) {
+      const d = rkNaiveDivides(n);
+      let fact = 1n;
+      for (let i = 2n; i <= BigInt(n); i += 1n) fact *= i;
+      eq(d.factorial, fact, 'n! at n = ' + n + ' is computed as BigInt');
+      eq(d.tapes, BigInt(n) ** BigInt(n), 'and n^n likewise');
+      eq(d.divides, false, 'and n! does not divide n^n at n = ' + n
+         + ', so the naive swap CANNOT be uniform whatever a sample shows');
+    }
+    eq(rkNaiveDivides(1).divides + ',' + rkNaiveDivides(2).divides, 'true,true',
+       'at n = 1 and n = 2 it does divide, and there the counting argument says nothing -- '
+       + 'which is why the mode does not rest on it alone');
+    /* The cap refuses rather than enumerating 7^7 tapes. */
+    const refuses = (f) => { try { f(); return false; } catch (e) { return /exceeds the exhaustive cap/.test(e.message); } };
+    eq(refuses(() => rkShuffleExact(7, 'naive')), true, 'seven items of naive tapes is refused');
+    eq(refuses(() => rkShuffleExact(8, 'fisheryates')), true, 'and eight of Fisher-Yates');
+    eq(refuses(() => rkShuffleExact(7, 'fisheryates')), false,
+       'while seven of Fisher-Yates is 5040 tapes and is allowed: the caps differ because the '
+       + 'tape counts do');
+  }
+
+  /* --- the quicksort distribution, three ways ----------------------------- */
+  {
+    /* ORACLE ONE: a quicksort written here, run over every input order, with
+       the LAST element as the pivot. Nothing of the kit is called. */
+    const localQuicksort = (input) => {
+      const a = input.slice();
+      let compares = 0;
+      const go = (lo, hi) => {
+        if (lo >= hi) return;
+        const pivot = a[hi];
+        let i = lo;
+        for (let j = lo; j < hi; j += 1) {
+          compares += 1;
+          if (a[j] < pivot) { const t = a[i]; a[i] = a[j]; a[j] = t; i += 1; }
+        }
+        const t = a[i]; a[i] = a[hi]; a[hi] = t;
+        go(lo, i - 1); go(i + 1, hi);
+      };
+      go(0, a.length - 1);
+      return { compares: compares, sorted: a };
+    };
+    const localPmf = (n) => {
+      const tally = new Map();
+      let total = 0n;
+      for (const p of perms(n)) {
+        const run = localQuicksort(p);
+        for (let i = 1; i < n; i += 1) {
+          if (run.sorted[i - 1] > run.sorted[i]) { fails += 1; console.log('  FAIL the local oracle did not sort'); }
+        }
+        tally.set(run.compares, (tally.get(run.compares) || 0n) + 1n);
+        total += 1n;
+      }
+      const out = {};
+      for (const [k, v] of tally) out[k] = R(v, total);
+      return out;
+    };
+    for (const n of [2, 3, 4, 5, 6]) {
+      eq(rqsSamePmf(rqsPmf(n), localPmf(n)), true,
+         'n = ' + n + ': the recursion on block sizes gives the same distribution, value by '
+         + 'value, as a quicksort written in this file run over every input order');
+      eq(rqsSamePmf(rqsPmf(n), rqsOverOrders(n).pmf), true,
+         'and so does the kit\'s own all-orders enumeration, which sorts and counts rather than '
+         + 'reasoning about sizes');
+      eq(rqsOverOrders(n).allSorted, true,
+         'and every one of those ' + rqsOverOrders(n).orders
+         + ' runs produced a sorted permutation of its input -- a comparison COUNT alone would '
+         + 'not have noticed an unsorted one');
+    }
+    /* ORACLE TWO: the closed form, and a table of values that were derived by
+       hand from the recurrence E(n) = (n-1) + (2/n) * sum E(i). */
+    const KNOWN = { 2: '1', 3: '8/3', 4: '29/6', 5: '37/5', 6: '103/10', 7: '472/35',
+                    8: '2369/140', 9: '2593/126', 10: '30791/1260' };
+    for (const n of Object.keys(KNOWN).map(Number)) {
+      eq(Rtext(pmfExpect(rqsPairs(rqsPmf(n)))), KNOWN[n],
+         'the expectation at n = ' + n + ' is ' + KNOWN[n]);
+      eq(Rtext(rqsClosed(n)), KNOWN[n],
+         'and 2(n + 1)H_n - 4n agrees, from a different definition');
+      eq(Rtext(rqsTotal(rqsPairs(rqsPmf(n)))), '1', 'and the probabilities add to exactly 1');
+    }
+    eq(Rtext(rqsClosed(1)) + ',' + Rtext(rqsClosed(0)), '0,0',
+       'and one element costs nothing, as does none');
+    /* THE SUPPORT, which is an ALWAYS claim and is checked as one. */
+    for (const n of [2, 4, 6, 8, 10]) {
+      const pairs = rqsPairs(rqsPmf(n));
+      eq(pairs[pairs.length - 1][0], (n * (n - 1)) / 2,
+         'the largest cost the distribution puts any mass on is n(n - 1)/2 at n = ' + n);
+      eq(pairs[0][0] >= 0, true, 'and the smallest is not negative');
+      eq(Rtext(exactTail(pairs, (n * (n - 1)) / 2 + 1)), '0',
+         'and there is exactly zero probability above it -- the worst case is an ALWAYS bound');
+    }
+    eq(Rtext(exactTail(rqsPairs(rqsPmf(8)), 28)), '1/315',
+       'the probability of hitting the worst case at n = 8 is 1/315');
+    /* The fixed rule pays the worst case on the two inputs it is worst on. */
+    const upto = (n) => { const a = []; for (let i = 1; i <= n; i += 1) a.push(i); return a; };
+    for (const n of [4, 6, 8]) {
+      const asc = upto(n), desc = upto(n).slice().reverse();
+      eq(rqsRun(asc, null).counts.compares, (n * (n - 1)) / 2,
+         'the fixed last-element pivot on a sorted input of ' + n + ' costs n(n - 1)/2');
+      eq(rqsRun(desc, null).counts.compares, (n * (n - 1)) / 2,
+         'and so does a reversed one -- it is not one unlucky input');
+      eq(rqsRun(asc, null).result.ordered + ',' + rqsRun(asc, null).result.permutation, 'true,true',
+         'and what came back is sorted AND a permutation of what went in, both checked');
+    }
+    /* Markov and Chebyshev against the exact tails they bound. */
+    {
+      const pairs = rqsPairs(rqsPmf(8));
+      const mu = pmfExpect(pairs), v = pmfVariance(pairs);
+      eq(Rtext(mu) + ' ' + Rtext(v), '2369/140 160599/19600',
+         'the mean and variance at n = 8 are exact fractions');
+      for (const a of [18, 20, 24, 28]) {
+        eq(Rcmp(exactTail(pairs, a), markovBound(pairs, a).bound) <= 0, true,
+           'Markov bounds the exact tail at ' + a + ': ' + Rtext(exactTail(pairs, a))
+           + ' <= ' + Rtext(markovBound(pairs, a).bound));
+      }
+      for (const t of [2, 4, 6, 8]) {
+        eq(Rcmp(exactDeviation(pairs, t), chebyshevBound(pairs, t).bound) <= 0, true,
+           'and Chebyshev bounds the exact deviation at ' + t);
+      }
+      eq(Rtext(markovBound(pairs, 28).bound), '2369/3920', 'Markov at a = 28 is E/28 = 2369/3920');
+      eq(Rcmp(R(1n, 315n), R(2369n, 3920n)) < 0, true,
+         'and the truth, 1/315, is far under it -- which is what the panel prints the slack for');
+    }
+    /* The measurement is a MEASUREMENT: it must not equal the expectation by
+       construction, and it must move when the seed count does. */
+    {
+      const input = upto(8);
+      const a = rqsSeeds(input, 120), b = rqsSeeds(input, 240);
+      eq(a.allSorted + ',' + b.allSorted, 'true,true',
+         'every seeded run sorted its input -- checked, not assumed');
+      eq(Rtext(a.mean), '415/24', '120 seeds give a sample mean of 415/24');
+      eq(Requ(a.mean, pmfExpect(rqsPairs(rqsPmf(8)))), false,
+         'which is NOT the expectation 2369/140, and the kit never claims it is');
+      eq(Requ(a.mean, b.mean), false, 'and 240 seeds give a different number again');
+      eq(a.min >= 13 && a.max <= 28, true, 'every seeded cost sits inside the exact support');
+      eq(rqsSeedTail(a, 28).hits, 0, 'none of the 120 seeds hit the worst case');
+      eq(rqsSeedTail(a, 13).hits, a.rows.filter((r) => r.compares >= 13).length,
+         'and the measured tail counts what it says it counts');
+      eq(rqsSeeds(input, 24).rows[0].compares, rqsSeeds(input, 240).rows[0].compares,
+         'seed 1 is seed 1 whatever else is asked for: the stream is reproducible');
+      /* The arrangement moves the fixed count and not the distribution. */
+      const alt = [1, 8, 2, 7, 3, 6, 4, 5];
+      eq(rqsRun(alt, null).counts.compares !== 28, true,
+         'the alternating arrangement costs the fixed rule something other than the worst case');
+      eq(rqsSamePmf(rqsPmf(8), rqsPmf(8)), true,
+         'while the random rule\'s distribution is a function of n alone');
+    }
+    const refuses = (f) => { try { f(); return false; } catch (e) { return /exceeds the exhaustive cap/.test(e.message); } };
+    eq(refuses(() => rqsPmf(13)), true, 'thirteen is past the distribution cap and is refused');
+    eq(refuses(() => rqsOverOrders(8)), true, 'and eight input orders is 40320 and is refused');
+  }
+
+  /* --- Karger, against every edge order ----------------------------------- */
+  {
+    /* THE ORACLE, and it is genuinely a different computation. `kargerExact`
+       memoises over CONTRACTION STATES. This enumerates every one of the |E|!
+       orders in which the edges could be offered, contracts along each one
+       skipping the edges that have become self-loops, and weights each order
+       by 1/|E|!. Taking a uniformly random permutation and always contracting
+       the first live edge is the same experiment as repeatedly contracting a
+       uniformly random live edge, which is why the two must agree. */
+    const byOrders = (G) => {
+      const m = G.arcs.length, tally = new Map();
+      let total = 0n;
+      const perm = [], used = new Array(m).fill(false);
+      (function go() {
+        if (perm.length === m) {
+          total += 1n;
+          let group = [];
+          for (let v = 0; v < G.n; v += 1) group.push(v);
+          let groups = G.n;
+          for (const id of perm) {
+            if (groups === 2) break;
+            const arc = G.arcs[id];
+            if (group[arc.u] === group[arc.v]) continue;
+            const from = group[arc.v], into = group[arc.u];
+            group = group.map((g) => (g === from ? into : g));
+            groups -= 1;
+          }
+          const first = group[0];
+          const key = group.map((g) => (g === first ? 0 : 1)).join('');
+          tally.set(key, (tally.get(key) || 0n) + 1n);
+          return;
+        }
+        for (let i = 0; i < m; i += 1) {
+          if (used[i]) continue;
+          used[i] = true; perm.push(i); go(); perm.pop(); used[i] = false;
+        }
+      })();
+      const out = new Map();
+      for (const [k, v] of tally) out.set(k, R(v, total));
+      return out;
+    };
+    const CASES = [
+      ['1-2, 2-3, 3-4, 4-1', 2, 6, '1'],
+      ['1-2, 1-2, 2-3, 3-1', 2, 1, '1/2'],
+      ['1-2, 1-3, 2-3, 3-4, 4-5, 5-3', 2, 6, '1'],
+      ['1-2, 1-3, 2-3, 4-5, 4-6, 5-6, 3-4', 1, 1, '13/35'],
+      ['1-2, 1-3, 2-3, 4-5, 4-6, 5-6, 1-4, 2-5', 2, 3, '19/35'],
+    ];
+    for (const [spec, size, count, anyText] of CASES) {
+      const G = graphOf(spec);
+      const total = rkKargerTotal(G);
+      eq(total.size, size, 'the minimum cut of ' + spec + ' has ' + size
+         + ' edge(s), by exhaustive search over the bipartitions');
+      eq(total.count, count, 'and there are ' + count + ' minimum cuts');
+      eq(Rtext(total.any), anyText, 'and one run returns one of them with probability ' + anyText);
+      eq(total.beatsBound, true, 'which clears the bound 2/(n(n - 1)) = ' + Rtext(total.bound));
+      /* the oracle, where the factorial is small enough */
+      if (G.arcs.length <= 7) {
+        const oracle = byOrders(G);
+        let same = true, summed = R(0n, 1n);
+        for (const row of total.rows) {
+          const got = oracle.get(row.key) || R(0n, 1n);
+          if (!Requ(got, row.probability)) same = false;
+          summed = Radd(summed, got);
+        }
+        eq(same, true, 'and every one of those probabilities is reproduced by enumerating all '
+           + G.arcs.length + '! edge orders -- a different computation entirely');
+        eq(Requ(summed, total.any), true, 'as is their sum');
+      }
+      /* the minimum cut agrees with algo_core's own brute force */
+      eq(minCutBrute(G).size, total.size,
+         'and minCutBrute, which knows nothing about contraction, finds the same minimum');
+    }
+    /* The per-cut bound is about ONE cut and the kit says so. */
+    {
+      const c4 = graphOf('1-2, 2-3, 3-4, 4-1');
+      const one = kargerExact(c4, [0, 0, 1, 1]);
+      eq(Rtext(one.probability) + ',' + Rtext(one.bound), '1/6,1/6',
+         'on the four-cycle a single named cut is returned with probability exactly the bound');
+      eq(Rtext(rkKargerTotal(c4).any), '1',
+         'while the probability of returning SOME minimum cut is 1 -- six cuts at 1/6 each, and '
+         + 'reporting the first number as the success probability would understate it sixfold');
+    }
+    /* Amplification is exact, and the trial count is found by multiplying. */
+    {
+      const p = R(1n, 6n);
+      eq(Rtext(rkAmplify(p, 1).success), '1/6', 'one trial succeeds with probability p');
+      eq(Rtext(rkAmplify(p, 2).success), '11/36', 'two with 1 - (5/6)^2 = 11/36');
+      eq(Rtext(rkAmplify(p, 2).failure), '25/36', 'and both fail with 25/36');
+      eq(Requ(Radd(rkAmplify(p, 5).success, rkAmplify(p, 5).failure), R(1n, 1n)), true,
+         'success and failure add to one at every t');
+      eq(rkTrialsFor(p, R(9n, 10n)), 13, 'thirteen trials reach 9 in 10 at p = 1/6');
+      eq(Rcmp(rkAmplify(p, 13).success, R(9n, 10n)) >= 0, true, 'thirteen clears it');
+      eq(Rcmp(rkAmplify(p, 12).success, R(9n, 10n)) < 0, true, 'twelve leaves it short');
+      eq(rkTrialsFor(R(0n, 1n), R(1n, 2n)), null,
+         'and an algorithm that never succeeds is never amplified into one that does');
+      eq(rkTrialsFor(R(1n, 1n), R(999n, 1000n)), 1, 'while a certainty needs one trial');
+    }
+    /* The measurement, and the failures it is required to show. */
+    {
+      const G = graphOf('1-2, 1-3, 2-3, 4-5, 4-6, 5-6, 1-4, 2-5');
+      const exact = rkKargerTotal(G);
+      const sample = rkKargerSeeds(G, 120, exact.size);
+      eq(sample.hits + sample.missed.length, 120, 'every seed either found a minimum cut or did not');
+      eq(Requ(sample.rate, exact.any), false,
+         'the measured rate over 120 seeds is not the exact probability, and is not meant to be');
+      eq(sample.missed.length > 0, true,
+         'and some seeds DID miss -- a with-high-probability guarantee whose page never shows a '
+         + 'failure has not been demonstrated');
+      eq(sample.rows.every((r) => r.cutSize >= exact.size), true,
+         'no run ever returned a cut smaller than the minimum, which would be impossible');
+      eq(rkKargerSeeds(G, 24, exact.size).rows[0].seed, 1, 'the seeds start at 1');
+      eq(rkKargerSeeds(G, 24, exact.size).rows[0].cutSize,
+         rkKargerSeeds(G, 240, exact.size).rows[0].cutSize, 'and seed 1 is reproducible');
+      const c4 = graphOf('1-2, 2-3, 3-4, 4-1');
+      eq(rkKargerSeeds(c4, 120, 2).missed.length, 0,
+         'on the four-cycle nothing misses, because the exact probability is 1');
+    }
+    const refuses = (f) => { try { f(); return false; } catch (e) { return /exceeds the exhaustive cap/.test(e.message); } };
+    eq(refuses(() => rkMinCuts(dgFromLesson(9, [[1, 2]], false))), true,
+       'nine vertices of bipartitions is refused');
+  }
+
+  /* --- Miller-Rabin, against the definition ------------------------------- */
+  {
+    /* THE ORACLE: modular exponentiation and the strong-test condition written
+       out here from the definition. `strongTest` builds a squaring chain and
+       reads the verdict off it; this raises a to each power directly. */
+    const powMod = (a, e, n) => {
+      let r = 1n;
+      const base = BigInt(a) % BigInt(n), N = BigInt(n);
+      for (let i = 0n; i < BigInt(e); i += 1n) r = (r * base) % N;
+      return r;
+    };
+    const isWitnessByDefinition = (n, a) => {
+      let d = BigInt(n) - 1n, s = 0;
+      while (d % 2n === 0n) { d /= 2n; s += 1; }
+      if (powMod(a, d, n) === 1n) return false;
+      for (let r = 0; r < s; r += 1) {
+        let e = d;
+        for (let i = 0; i < r; i += 1) e *= 2n;
+        if (powMod(a, e, n) === BigInt(n) - 1n) return false;
+      }
+      return true;
+    };
+    for (const n of [9, 15, 21, 25, 49, 91, 121, 341, 561]) {
+      let mismatches = 0, witnesses = 0;
+      for (let a = 2; a <= n - 2; a += 1) {
+        const shipped = strongTest(n, a);
+        const truth = isWitnessByDefinition(n, a);
+        if (shipped.witness !== truth) mismatches += 1;
+        if (truth) witnesses += 1;
+      }
+      eq(mismatches, 0, 'at n = ' + n + ' the shipped strong test agrees with the definition on '
+         + 'every base');
+      eq(witnessCount(n, 2047).witnesses, witnesses,
+         'and witnessCount counts exactly ' + witnesses + ' of them');
+      eq(witnessCount(n, 2047).witnesses + rkLiars(n).count, witnessCount(n, 2047).total,
+         'witnesses and non-witnesses partition the bases at n = ' + n);
+    }
+    for (const n of [11, 13, 97, 101]) {
+      eq(witnessCount(n, 2047).prime, true, 'a prime has no witness at all: n = ' + n);
+      eq(rkLiars(n).count, witnessCount(n, 2047).total,
+         'so every base is a non-witness, which is not a lie -- there is nothing to lie about');
+    }
+    eq(Rtext(witnessCount(561, 2047).fraction), '275/279',
+       '561 has 550 witnesses out of 558, which is 275/279');
+    eq(Rcmp(witnessCount(561, 2047).fraction, R(3n, 4n)) >= 0, true, 'well clear of three quarters');
+    eq(rkLiars(561).count + ',' + rkLiars(561).smallest, '8,50',
+       'eight bases say nothing about 561 and the smallest of them is 50');
+    eq(strongTest(561, 50).witness + ',' + strongTest(561, 50).reason, 'false,a^d is n-1',
+       'and base 50 is exactly why: its chain reaches n - 1');
+    eq(rkLiars(2047).smallest, 2, '2047 is a strong pseudoprime to base 2, the base everyone tries');
+    eq(strongTest(341, 2).witness, true, 'while 341 is a Fermat pseudoprime to base 2 and the '
+       + 'strong test still catches it');
+    eq(String(strongTest(341, 2).nontrivialRoot), '32',
+       'with 32 as a nontrivial square root of 1 -- a certificate, since gcd(31, 341) = 31');
+    eq(341 % 31, 0, 'and 31 really does divide 341');
+    /* The Fermat comparison, split the way the mathematics splits it. */
+    for (const n of [561, 1105, 1729]) {
+      const f = rkFermatCount(n, 2047);
+      eq(f.coprimeWitnesses, 0, n + ' is a Carmichael number: not one coprime base catches it');
+      eq(f.carmichael, true, 'and the kit says so');
+      eq(f.witnesses > 0, true, 'though the bases SHARING a factor with it are caught, '
+         + f.witnesses + ' of them -- which is why one undivided fraction would mislead');
+      eq(Rcmp(witnessCount(n, 2047).fraction, f.coprimeFraction) > 0, true,
+         'and the strong test beats the Fermat test on the coprime bases by every margin there is');
+    }
+    eq(rkFermatCount(2047, 2047).carmichael, false, '2047 is not a Carmichael number');
+    eq(Rtext(rkErrorAfter(R(8n, 558n), 5)), '1024/1690522737399',
+       'five independent bases on 561 leave an exact error of 1024/1690522737399');
+    eq(Rtext(rkQuarterAfter(5)), '1/1024', 'against the bound (1/4)^5 = 1/1024');
+    eq(Rcmp(rkErrorAfter(R(8n, 558n), 5), rkQuarterAfter(5)) < 0, true,
+       'and the truth is far inside the bound, which is what a bound is for');
+    eq(Rtext(rkQuarterAfter(0)) + ',' + Rtext(rkErrorAfter(R(1n, 3n), 0)), '1,1',
+       'and zero bases leave everything uncertain');
+    const refuses = (f) => { try { f(); return false; } catch (e) { return /exceeds the exhaustive cap/.test(e.message); } };
+    eq(refuses(() => rkLiars(2049)), true, 'past the cap the liar search refuses rather than crawls');
+  }
+
+  /* --- MAX-3-SAT, by linearity against by enumeration --------------------- */
+  {
+    /* THE ORACLE: the mean by LINEARITY OF EXPECTATION. Each clause is
+       satisfied by its own share of the assignments to its OWN variables, and
+       those shares add -- no assignment of the whole formula is ever built.
+       `max3satEnumerate` walks all 2^n of them. Two different computations. */
+    const meanByLinearity = (F) => {
+      let total = R(0n, 1n);
+      for (const cl of F.clauses) {
+        const vars = [...new Set(cl.map((l) => Math.abs(l)))];
+        const size = 1 << vars.length;
+        let models = 0;
+        for (let mask = 0; mask < size; mask += 1) {
+          const val = {};
+          vars.forEach((v, j) => { val[v] = !!(mask & (1 << j)); });
+          if (cl.some((l) => (l > 0) === val[Math.abs(l)])) models += 1;
+        }
+        total = Radd(total, R(BigInt(models), BigInt(size)));
+      }
+      return total;
+    };
+    const CASES = [
+      '1 2 -3; -1 2 3; 1 -2 3; -1 -2 -3',
+      '1 2 3; 1 2 -3; 1 -2 3; 1 -2 -3; -1 2 3; -1 2 -3; -1 -2 3; -1 -2 -3',
+      '1 2 -3; -1 2 3; 1 1 2; -2 -3 -1',
+      '1 2 -3; -1 3 4; 2 -4 5; -2 -3 -5; 1 -4 5; -1 2 -5; 3 4 -1; -3 -4 2',
+      '1 2 3',
+      '1 -1 2',
+    ];
+    for (const text of CASES) {
+      const F = cnfOf(text);
+      const ex = max3satEnumerate(F, 12);
+      eq(Requ(ex.mean, meanByLinearity(F)), true,
+         'the mean over every assignment of "' + text + '" is ' + Rtext(ex.mean)
+         + ', which is what linearity gives clause by clause without building an assignment');
+      const widths = rkClauseWidths(F);
+      let shareSum = R(0n, 1n);
+      widths.forEach((w) => { shareSum = Radd(shareSum, w.share); });
+      eq(Requ(shareSum, ex.mean), true, 'and the kit\'s own per-clause shares add to the same mean');
+      const allThree = widths.every((w) => w.distinct === 3);
+      eq(ex.matchesSevenEighths, allThree && Requ(ex.mean, R(BigInt(7 * F.clauses.length), 8n)),
+         'and 7m/8 holds exactly when every clause has three distinct variables');
+      const hist = rkSatHistogram(F, 12);
+      let massCheck = R(0n, 1n), weighted = 0n, totalCount = 0;
+      hist.rows.forEach((r) => {
+        massCheck = Radd(massCheck, r.probability);
+        weighted += BigInt(r.satisfied) * BigInt(r.count);
+        totalCount += r.count;
+      });
+      eq(Rtext(massCheck), '1', 'the histogram is a distribution');
+      eq(BigInt(totalCount), ex.assignments, 'over every assignment');
+      eq(Requ(R(weighted, ex.assignments), ex.mean), true, 'and its own mean is the mean');
+      eq(ex.best, Math.max(...hist.rows.map((r) => r.satisfied)),
+         'and the optimum is the top of the histogram, found by enumeration');
+    }
+    eq(Rtext(max3satEnumerate(cnfOf('1 2 -3; -1 2 3; 1 -2 3; -1 -2 -3'), 12).mean), '7/2',
+       'four clauses on three distinct-variable literals have a mean of exactly 7/2');
+    eq(max3satEnumerate(cnfOf('1 2 3; 1 2 -3; 1 -2 3; 1 -2 -3; -1 2 3; -1 2 -3; -1 -2 3; -1 -2 -3'), 12).best, 7,
+       'all eight clauses on three variables is unsatisfiable, and every assignment gets exactly 7');
+    eq(Rtext(max3satEnumerate(cnfOf('1 2 3; 1 2 -3; 1 -2 3; 1 -2 -3; -1 2 3; -1 2 -3; -1 -2 3; -1 -2 -3'), 12).mean), '7',
+       'so the mean is 7, which is 7m/8 AND the optimum -- the ratio is 1 and the algorithm '
+       + 'cannot do better');
+    eq(max3satEnumerate(cnfOf('1 2 -3; -1 2 3; 1 1 2; -2 -3 -1'), 12).matchesSevenEighths, false,
+       'a clause repeating a variable breaks the equality with 7m/8');
+    eq(rkClauseWidths(cnfOf('1 1 2'))[0].distinct + ',' + Rtext(rkClauseWidths(cnfOf('1 1 2'))[0].share),
+       '2,3/4', 'because that clause has two distinct variables and a share of 3/4, not 7/8');
+    eq(Rtext(rkClauseWidths(cnfOf('1 -1 2'))[0].share), '1',
+       'and a clause holding a variable and its negation is satisfied by everything');
+    /* the measurement is a measurement */
+    {
+      const F = cnfOf('1 2 -3; -1 2 3; 1 -2 3; -1 -2 -3');
+      const s = rkSatSeeds(F, 120);
+      eq(Rtext(s.mean), '139/40', '120 seeded coin tapes give a sample mean of 139/40');
+      eq(Requ(s.mean, max3satEnumerate(F, 12).mean), false, 'which is not 7/2');
+      eq(s.max <= F.clauses.length && s.min >= 0, true, 'and every sample is a legal clause count');
+      eq(s.rows[0].satisfied, rkSatSeeds(F, 240).rows[0].satisfied, 'seed 1 is reproducible');
+      const hist = rkSatHistogram(F, 12);
+      eq(hist.belowCount + hist.rows.filter((r) => 8 * r.satisfied >= 7 * F.clauses.length)
+           .reduce((a, r) => a + r.count, 0), 8,
+         'the assignments below the mean and those at or above it are all of them');
+    }
+  }
+
+  /* --- the kit's own contract --------------------------------------------- */
+  {
+    eq(randomSrc.indexOf('random_lab: unknown mode') > 0, true,
+       'an unknown mode raises rather than falling back to a default');
+    for (const m of ['shuffle', 'costs', 'karger', 'witness', 'max3sat']) {
+      eq(randomSrc.indexOf('    "' + m + '": _' + m + ',') > 0, true, 'mode ' + m + ' is registered');
+    }
+    eq(randomSrc.indexOf('from .algo_core import') > 0, true,
+       'and the arithmetic is IMPORTED from algo_core rather than rewritten, which is what makes '
+       + 'the agreements above structural');
+    eq((randomSrc.match(/window\.redrawLab = redraw;/g) || []).length, 5,
+       'and each of the five modes installs a redraw the harness can call again');
+    eq(randomSrc.indexOf('rkIsRefusal') > 0, true,
+       'and a catch that is not a cap refusal re-throws: a swallowed ReferenceError would print '
+       + 'as "the instance is too big" and look like a feature');
+    /* The drawing helpers return markup and touch nothing, which is what lets
+       this file assert on them. */
+    const svg = rkBarsSvg([{ label: '0', values: [0.5, 0.25] }, { label: '1', values: [0.5, 0.75] }],
+      [{ label: 'exact', colour: 'var(--cyan)' }, { label: 'measured', colour: 'var(--amber)' }],
+      { rules: [{ value: 0.5, label: 'uniform', colour: 'var(--green)' }],
+        marks: [{ at: 1, label: 'E', colour: 'var(--purple)' }] });
+    eq((svg.match(/<rect /g) || []).length, 6, 'two groups of two bars, plus a swatch per series');
+    eq(svg.indexOf('stroke-dasharray') > 0, true, 'the reference line is dashed');
+    eq(svg.indexOf('uniform') > 0 && svg.indexOf('>E<') > 0, true, 'and both annotations are labelled');
+    eq(rkDrawBars(null, [{ label: 'a', values: [1] }], [{ label: 'x', colour: 'var(--cyan)' }]), 
+       rkBarsSvg([{ label: 'a', values: [1] }], [{ label: 'x', colour: 'var(--cyan)' }]),
+       'and the installer returns the same markup it would have written, with a null element');
+  }
+}
+
+
+
+// ---------------------------------------------------------------- reduction
+console.log('reductions: both instances solved, and the map between the solutions checked');
+{
+  /* WHAT THIS SECTION IS FOR. A reduction that is merely DESCRIBED cannot be
+     tested, so the kit builds each one and this file checks the construction
+     against a second construction written here, and the solution map against
+     a second enumeration written here.
+
+     The claim being tested is stronger than "the yes/no answers agree", which
+     is what `checkTspReduction` and `checkIndependentSetReduction` already
+     assert in the algo_core section above. Here the FULL SOLUTION SETS of
+     both sides are enumerated and the map between them is checked for
+     soundness, surjectivity and injectivity separately -- because two of these
+     five reductions are bijections on solutions and three are not, and a kit
+     that claimed all five were would pass every other check in this
+     repository. */
+  const REDUCTION_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'reduction.py');
+  const reductionSrc = fs.readFileSync(REDUCTION_SOURCE, 'utf8');
+  const rdBlock = (name) => blockFrom(reductionSrc, name, REDUCTION_SOURCE);
+  eval(algoCoreBlock('COUNT_JS'));
+  eval(algoCoreBlock('DIGRAPH_JS'));
+  eval(algoCoreBlock('ORACLE_JS'));
+  eval(algoCoreBlock('REDUCTION_JS'));
+  eval(rdBlock('RDKIT_JS'));
+
+  const cnfOf = (text) => {
+    const p = rdParseCnf(text);
+    if (p.bad) { fails += 1; console.log('  FAIL parsing ' + text + ': ' + p.bad); }
+    return p.formula;
+  };
+  const graphOf = (text) => {
+    const p = rdParseGraph(text, 10);
+    if (p.bad) { fails += 1; console.log('  FAIL parsing ' + text + ': ' + p.bad); }
+    return p.G;
+  };
+  /* Every satisfying assignment, enumerated here from the clause definition
+     rather than through satEval. The ORIGINAL side of three reductions, and
+     the thing everything else is measured against. */
+  const modelsOf = (F) => {
+    const out = [];
+    for (let mask = 0; mask < (1 << F.n); mask += 1) {
+      const a = [];
+      for (let i = 0; i < F.n; i += 1) a.push(!!(mask & (1 << i)));
+      let ok = true;
+      for (const cl of F.clauses) {
+        let hit = false;
+        for (const lit of cl) if ((lit > 0) === a[Math.abs(lit) - 1]) hit = true;
+        if (!hit) { ok = false; break; }
+      }
+      if (ok) out.push(a.map((v) => (v ? '1' : '0')).join(''));
+    }
+    return out;
+  };
+
+  /* --- what a reader types ------------------------------------------------ */
+  {
+    eq(cnfOf('1 2 -3; -1 2').clauses.map((c) => c.join(' ')).join(' | '), '1 2 -3 | -1 2',
+       'literals by space, clauses by semicolon');
+    eq(rdParseCnf('1 2; ').formula.clauses.length, 1, 'a trailing separator is not a clause');
+    eq(rdParseCnf('1 0').bad !== undefined, true, 'there is no variable 0');
+    eq(rdParseCnf('1 2 3 4 5 6').formula.n, 6, 'six variables in one clause is allowed');
+    eq(rdParseCnf('1 2 3 4 5 6 7').bad !== undefined, true, 'a seventh variable is past the cap');
+    eq(rdParseCnf('1 2; 3 4; 5 6; 1 3; 2 4; 5 1; 6 2').bad !== undefined, true,
+       'and seven clauses is past the cap this kit can check both sides of');
+    eq(graphOf('1-2, 2-1, 1-2').arcs.length, 1,
+       'a repeated edge is the SAME edge here -- unlike the randomised kit, where multiplicity '
+       + 'changes the answer');
+    eq(rdParseGraph('1-1').bad !== undefined, true, 'a loop belongs to no cover and is refused');
+    eq(rdSetText([0, 2, 3]), '{1, 3, 4}', 'a vertex set prints 1-based');
+    eq(rdAssignKey([true, false, true]), '101', 'and an assignment has a canonical key');
+    eq(rdFormulaText(cnfOf('1 -2')), '(x1 ∨ ¬x2)', 'a formula prints with real symbols');
+  }
+
+  /* --- the solution-map checker itself ------------------------------------ */
+  {
+    /* It is the one piece every mode shares, so it is tested on maps whose
+       properties are known by construction rather than only through a
+       reduction. A checker that called everything a bijection would make
+       every mode below pass. */
+    const idMap = rdSolutionMap(['a', 'b'], ['a', 'b'], (x) => x);
+    eq([idMap.sound, idMap.surjective, idMap.injective, idMap.bijection].join(','),
+       'true,true,true,true', 'the identity on two solutions is a bijection');
+    const collide = rdSolutionMap(['a'], ['x', 'y'], () => 'a');
+    eq([collide.sound, collide.surjective, collide.injective, collide.bijection].join(','),
+       'true,true,false,false', 'two images and one original is sound and surjective, not injective');
+    eq(collide.collisionKeys.join(','), 'a', 'and the collision is reported by name');
+    const missing = rdSolutionMap(['a', 'b'], ['x'], () => 'a');
+    eq([missing.sound, missing.surjective, missing.injective, missing.bijection].join(','),
+       'true,false,true,false', 'one image for two originals is not surjective');
+    eq(missing.unhit.join(','), 'b', 'and the original nothing maps to is named');
+    const wrong = rdSolutionMap(['a'], ['x'], () => 'z');
+    eq([wrong.sound, wrong.surjective, wrong.injective, wrong.bijection].join(','),
+       'false,false,true,false', 'a map landing outside the solution set is NOT sound');
+    eq(wrong.unsound.length, 1, 'and the offending pair is kept');
+    eq(rdSolutionMap([], [], (x) => x).bijection, true, 'two empty sets are a bijection');
+  }
+
+  /* --- search from decision ----------------------------------------------- */
+  {
+    /* THE ORACLE: restriction written here, and satisfiability by
+       enumeration. `fixVariable` drops satisfied clauses and strips falsified
+       literals; this does the same from the definition, and the two must
+       agree on the SET OF MODELS of the restricted formula rather than only
+       on its shape. */
+    const restrict = (F, v, value) => {
+      const clauses = [];
+      for (const cl of F.clauses) {
+        if (cl.some((l) => Math.abs(l) === v && (l > 0) === value)) continue;
+        clauses.push(cl.filter((l) => Math.abs(l) !== v));
+      }
+      return { n: F.n, clauses: clauses };
+    };
+    const CASES = [
+      ['1 2 -3; -1 2 3; 1 -2 3; -1 -2 -3', true, 4],
+      ['1; 2; -3', true, 1],
+      ['1 2; 1 -2; -1 2; -1 -2', false, 0],
+      ['1 2 -3; -1 3 4; 2 -4 1; -2 -3 -4; 1 -2 4', true, 7],
+      ['1 2; -1 2', true, 2],
+      ['1 -1', true, 2],
+    ];
+    for (const [text, satisfiable, models] of CASES) {
+      const F = cnfOf(text);
+      const trace = rdSelfTrace(F);
+      const truth = modelsOf(F);
+      eq(truth.length, models, '"' + text + '" has ' + models + ' models, by enumeration here');
+      eq(trace.satisfiable, satisfiable, 'and the reduction agrees about satisfiability');
+      eq(trace.decided, satisfiable, 'as does the decision oracle it is built on');
+      eq(trace.calls, F.n + 1, 'and it used exactly n + 1 = ' + (F.n + 1) + ' oracle calls');
+      eq(trace.bruteWork, Math.pow(2, F.n), 'against ' + Math.pow(2, F.n) + ' assignments to try');
+      if (satisfiable) {
+        eq(trace.verified, true, 'the assignment it built satisfies every clause');
+        eq(truth.indexOf(rdAssignKey(trace.run.result.assignment)) >= 0, true,
+           'and it is one of the models enumerated here, not merely a plausible one');
+        eq(trace.everyStepAgrees, true,
+           'every branch it took is the one an independent restriction allows');
+        /* the restriction agrees with the oracle's, model set by model set */
+        let cur = F;
+        for (let v = 1; v <= F.n; v += 1) {
+          const took = trace.run.result.assignment[v - 1];
+          const mine = restrict(cur, v, took), theirs = fixVariable(cur, v, took);
+          eq(modelsOf(mine).join('|'), modelsOf(theirs).join('|'),
+             'restricting x' + v + ' leaves the same models by either construction');
+          cur = theirs;
+        }
+        eq(cur.clauses.filter((c) => c.length === 0).length, 0,
+           'and nothing was left unsatisfiable at the end');
+      } else {
+        eq(trace.run.result.assignment, null, 'an unsatisfiable formula produces no assignment');
+        eq(trace.steps.length, 0, 'and no variable is ever fixed: the first call ends it');
+      }
+    }
+    /* A free variable: both branches are allowed and the reduction takes true. */
+    {
+      const F = cnfOf('1 2; -1 2');
+      const trace = rdSelfTrace(F);
+      eq(trace.steps[0].ifTrue + ',' + trace.steps[0].ifFalse, 'true,true',
+         'x1 appears in both polarities and is not forced, so the oracle allows either');
+      eq(trace.steps[0].took, true, 'and the reduction takes true, deterministically');
+      eq(trace.steps[1].ifFalse, false, 'while x2 is forced: false leaves an empty clause');
+    }
+  }
+
+  /* --- 3-SAT to independent set ------------------------------------------- */
+  {
+    /* THE ORACLE, in three parts. The graph is rebuilt here from the
+       description -- a triangle per clause, an edge between contradictory
+       literals -- and compared edge for edge; the independent sets of size k
+       are enumerated here; and the reverse construction is checked on every
+       model. */
+    const buildHere = (F) => {
+      const nodes = [];
+      F.clauses.forEach((cl, ci) => cl.forEach((lit) => nodes.push({ clause: ci, lit: lit })));
+      const edges = new Set();
+      for (let i = 0; i < nodes.length; i += 1) {
+        for (let j = i + 1; j < nodes.length; j += 1) {
+          if (nodes[i].clause === nodes[j].clause || nodes[i].lit === -nodes[j].lit) {
+            edges.add(i + '-' + j);
+          }
+        }
+      }
+      return { count: nodes.length, edges: edges, nodes: nodes };
+    };
+    const CASES = [
+      ['1 2 -3; -1 2 3', 6, 8],
+      ['1 2 -3; -1 2 3; 1 -2 3', 9, 15],
+      ['1 2; -1 2; 1 -2; -1 -2', 8, 12],
+      ['1; -1 2; -2 3', 5, 4],
+      ['1 1 2; -1 2 3', 6, 8],
+    ];
+    for (const [text, vertices, edges] of CASES) {
+      const F = cnfOf(text);
+      const R = rdIsSolutions(F);
+      const mine = buildHere(F);
+      eq(R.vertices, vertices, '"' + text + '" becomes ' + vertices + ' vertices');
+      eq(R.vertices, mine.count, 'one per literal OCCURRENCE, which is what the count here gives');
+      eq(R.edges, edges, 'and ' + edges + ' edges');
+      eq(R.edges, mine.edges.size, 'the same edges the description gives when built here');
+      let sameEdges = true;
+      R.made.graph.arcs.forEach((a) => {
+        const key = Math.min(a.u, a.v) + '-' + Math.max(a.u, a.v);
+        if (!mine.edges.has(key)) sameEdges = false;
+      });
+      eq(sameEdges, true, 'edge for edge, not merely in count');
+      eq(R.k, F.clauses.length, 'and k is the number of clauses');
+      /* the independent sets of size k, enumerated here */
+      const adj = [];
+      for (let i = 0; i < R.vertices; i += 1) adj.push(new Array(R.vertices).fill(false));
+      for (const key of mine.edges) {
+        const [i, j] = key.split('-').map(Number);
+        adj[i][j] = true; adj[j][i] = true;
+      }
+      const sets = [];
+      for (let mask = 0; mask < (1 << R.vertices); mask += 1) {
+        const m = [];
+        for (let i = 0; i < R.vertices; i += 1) if (mask & (1 << i)) m.push(i);
+        if (m.length !== R.k) continue;
+        let ok = true;
+        for (let i = 0; ok && i < m.length; i += 1) {
+          for (let j = i + 1; j < m.length; j += 1) if (adj[m[i]][m[j]]) { ok = false; break; }
+        }
+        if (ok) sets.push(m.join(','));
+      }
+      eq(R.sets.length, sets.length, 'there are ' + sets.length
+         + ' independent sets of size k, by an enumeration written here');
+      eq(R.sets.map((s) => s.join(',')).join(' | '), sets.join(' | '),
+         'and they are the same sets, in the same order');
+      /* soundness, on every one of them */
+      eq(R.map.sound, true, 'every one maps back to a satisfying assignment');
+      const truth = modelsOf(F);
+      eq(R.models, truth.length, 'and the formula has ' + truth.length + ' models');
+      R.sets.forEach((members) => {
+        eq(truth.indexOf(rdAssignKey(rdIsBack(R.made, members))) >= 0, true,
+           'the set ' + rdSetText(members) + ' maps to a model enumerated here');
+      });
+      /* the reverse construction, on every model */
+      eq(R.backwardWorks, true, 'and every model builds an independent set of size k');
+      eq(R.back.every((b) => b.independent && b.sized), true, 'checked one by one');
+      /* the YES/NO answer, which is the thing a reduction must preserve */
+      eq((R.maximum >= R.k), truth.length > 0,
+         'and an independent set of size k exists exactly when the formula is satisfiable');
+      eq(checkIndependentSetReduction(F).agree, true,
+         'which is what algo_core\'s own check says too, by a different route');
+    }
+    /* The map is NOT injective, and the page is required to know it. */
+    {
+      const F = cnfOf('1 2 -3; -1 2 3');
+      const R = rdIsSolutions(F);
+      eq(R.map.injective, false,
+         'two independent sets map to one assignment when a clause has two true literals');
+      eq(R.map.collisionKeys.length, 1, 'and there is exactly one such assignment here');
+      const key = R.map.collisionKeys[0], group = R.map.collisions[key];
+      eq(group.length >= 2, true, 'with at least two sets in the collision');
+      eq(rdAssignKey(rdIsBack(R.made, group[0])), rdAssignKey(rdIsBack(R.made, group[1])),
+         'and they really do map to the same assignment');
+      eq(group[0].join(',') === group[1].join(','), false, 'while being different sets');
+      eq(R.map.surjective, false,
+         'and it is not surjective either: the map back leaves an unmentioned variable false');
+      eq(R.map.bijection, false, 'so it is not a bijection, and the kit must not say it is');
+    }
+    /* An unsatisfiable formula: the NO answer crosses intact. */
+    {
+      const F = cnfOf('1 2; -1 2; 1 -2; -1 -2');
+      const R = rdIsSolutions(F);
+      eq(R.sets.length + ',' + R.models, '0,0', 'no independent set of size 4 and no model');
+      eq(R.maximum < R.k, true, 'the largest independent set is smaller than k');
+      eq(R.map.bijection, true, 'and two empty solution sets are vacuously in bijection');
+    }
+    const refuses = (f) => { try { f(); return false; } catch (e) { return /exceeds the exhaustive cap/.test(e.message); } };
+    eq(refuses(() => rdIsSolutions(cnfOf('1 2 3; 1 2 3; 1 2 3; 1 2 3; 1 2 3; 1 2 3'))), true,
+       'six clauses is eighteen vertices and is refused');
+  }
+
+  /* --- independent set, cover and clique ---------------------------------- */
+  {
+    /* THE ORACLE: the three predicates written here from their definitions,
+       evaluated on every subset, and counted. This is the one identity in the
+       kit that is checked on all 2^n subsets rather than at the optimum, so
+       the oracle has to cover all of them too. */
+    const CASES = [
+      ['1-2, 2-3, 3-4, 4-5, 5-1', 5, 2, 3],
+      ['1-2, 2-3, 3-4', 4, 2, 2],
+      ['1-2, 1-3, 1-4, 2-3, 2-4, 3-4', 4, 1, 3],
+      ['1-2, 1-3, 1-4, 1-5', 5, 4, 1],
+      ['1-2, 2-3, 3-1, 4-5, 5-6, 6-4', 6, 2, 4],
+      ['1-2', 2, 1, 1],
+    ];
+    for (const [spec, n, alpha, tau] of CASES) {
+      const G = graphOf(spec);
+      const C = rdComplementCheck(G);
+      const adj = [];
+      for (let i = 0; i < n; i += 1) adj.push(new Array(n).fill(false));
+      G.arcs.forEach((a) => { adj[a.u][a.v] = true; adj[a.v][a.u] = true; });
+      let ind = 0, cov = 0, cli = 0, bestI = 0, bestC = n;
+      for (let mask = 0; mask < (1 << n); mask += 1) {
+        const S = [], notS = [];
+        for (let v = 0; v < n; v += 1) ((mask >> v) & 1 ? S : notS).push(v);
+        let isInd = true;
+        for (let i = 0; isInd && i < S.length; i += 1) {
+          for (let j = i + 1; j < S.length; j += 1) if (adj[S[i]][S[j]]) { isInd = false; break; }
+        }
+        let isCov = true;
+        G.arcs.forEach((a) => { if (S.indexOf(a.u) === -1 && S.indexOf(a.v) === -1) isCov = false; });
+        let isCli = true;
+        for (let i = 0; isCli && i < S.length; i += 1) {
+          for (let j = i + 1; j < S.length; j += 1) if (adj[S[i]][S[j]]) { isCli = false; break; }
+        }
+        /* a clique in the COMPLEMENT is a set with no edge of G inside it,
+           which is the same predicate -- written separately so the identity is
+           not assumed here either */
+        if (isInd) { ind += 1; if (S.length > bestI) bestI = S.length; }
+        if (isCov) { cov += 1; if (S.length < bestC) bestC = S.length; }
+        if (isCli) cli += 1;
+        /* the identity, subset by subset */
+        let compCovers = true;
+        G.arcs.forEach((a) => {
+          if (notS.indexOf(a.u) === -1 && notS.indexOf(a.v) === -1) compCovers = false;
+        });
+        if (isInd !== compCovers) {
+          fails += 1;
+          console.log('  FAIL the identity fails on ' + spec + ' at subset ' + mask);
+        }
+      }
+      eq(C.subsets, 1 << n, spec + ': all ' + (1 << n) + ' subsets were examined');
+      eq(C.independentCount, ind, 'and ' + ind + ' of them are independent, counted here too');
+      eq(C.coverCount, cov, 'and ' + cov + ' are covers');
+      eq(C.cliqueCount, cli, 'and ' + cli + ' are cliques in the complement');
+      eq(C.countsAgree, true, 'so the three families have the same size');
+      eq(ind, cli, 'which the oracle here also finds');
+      eq(C.coverBijection + ',' + C.cliqueBijection, 'true,true',
+         'and both identities hold on every subset, not only at the optimum');
+      eq(C.alpha + ',' + C.tau, alpha + ',' + tau, 'alpha is ' + alpha + ' and tau is ' + tau);
+      eq(C.alpha + ',' + C.tau, bestI + ',' + bestC, 'which the search here agrees with');
+      eq(C.identity, true, 'and alpha + tau = n');
+      eq(C.omega, C.alpha, 'and the largest clique in the complement is the same size');
+      eq(C.cliqueMatches, true, 'found by a third routine that shares no code with the first two');
+      /* the complement really is the complement */
+      const H = complementGraph(G);
+      eq(H.arcs.length, (n * (n - 1)) / 2 - G.arcs.length,
+         'the complement has every pair the graph does not, and no other');
+      eq(complementGraph(H).arcs.length, G.arcs.length, 'and complementing twice returns the graph');
+      /* the map is an involution on subsets */
+      let involution = true;
+      for (let mask = 0; mask < (1 << n); mask += 1) {
+        if ((((1 << n) - 1) ^ (((1 << n) - 1) ^ mask)) !== mask) involution = false;
+      }
+      eq(involution, true, 'and S to V minus S applied twice is the identity, on every subset');
+    }
+    const refuses = (f) => { try { f(); return false; } catch (e) { return /exceeds the exhaustive cap/.test(e.message); } };
+    eq(refuses(() => rdComplementCheck(dgFromLesson(13, [[1, 2]], false))), true,
+       'thirteen vertices is refused rather than run');
+  }
+
+  /* --- 3-SAT to subset sum ------------------------------------------------ */
+  {
+    /* THE ORACLE: the digit table rebuilt here from the description, the
+       subsets that hit the target enumerated here, and the models enumerated
+       here. Three independent computations meeting in one claim. */
+    const tableHere = (F) => {
+      const n = F.n, m = F.clauses.length, cols = n + m, rows = [];
+      const digitsToValue = (d) => {
+        let s = 0n, pow = 1n;
+        for (let k = d.length - 1; k >= 0; k -= 1) { s += BigInt(d[k]) * pow; pow *= 10n; }
+        return s;
+      };
+      for (let i = 1; i <= n; i += 1) {
+        for (const value of [true, false]) {
+          const d = new Array(cols).fill(0);
+          d[i - 1] = 1;
+          F.clauses.forEach((cl, ci) => {
+            if (cl.indexOf(value ? i : -i) !== -1) d[n + ci] = 1;
+          });
+          rows.push({ label: 'x' + i + ' ' + (value ? 'true' : 'false'), digits: d,
+                      value: digitsToValue(d) });
+        }
+      }
+      for (let j = 0; j < m; j += 1) {
+        for (let s = 1; s <= 2; s += 1) {
+          const d = new Array(cols).fill(0);
+          d[n + j] = s;
+          rows.push({ label: 'slack', digits: d, value: digitsToValue(d) });
+        }
+      }
+      const t = new Array(cols).fill(0);
+      for (let i = 0; i < n; i += 1) t[i] = 1;
+      for (let j = 0; j < m; j += 1) t[n + j] = 4;
+      return { rows: rows, target: digitsToValue(t), columns: cols };
+    };
+    const CASES = [
+      ['1 2; -1 2', 8, '1144'],
+      ['1 2 -3; -1 2 3', 10, '11144'],
+      ['1 -2; -1 2; 1 2', 10, '11444'],
+      ['1 2; 1 -2; -1 2; -1 -2', 12, '114444'],
+      ['1 2', 6, '114'],
+    ];
+    for (const [text, rows, target] of CASES) {
+      const F = cnfOf(text);
+      const R = rdSubsetSolutions(F);
+      const mine = tableHere(F);
+      eq(R.rows, rows, '"' + text + '" builds ' + rows + ' numbers');
+      eq(R.rows, mine.rows.length, 'which is two per variable and two per clause, counted here');
+      eq(String(R.target), target, 'and a target of ' + target);
+      eq(R.target, mine.target, 'which the table built here agrees with');
+      eq(R.made.rows.map((r) => String(r.value)).join(','),
+         mine.rows.map((r) => String(r.value)).join(','),
+         'and every number matches, digit position by digit position');
+      /* the no-carry obligation */
+      const sums = new Array(mine.columns).fill(0);
+      mine.rows.forEach((r) => r.digits.forEach((d, i) => { sums[i] += d; }));
+      eq(R.columns.sums.join(','), sums.join(','), 'the column totals match the ones computed here');
+      eq(R.columns.max < 10, true, 'and the largest, ' + R.columns.max
+         + ', is under the base, so no column can carry');
+      eq(Math.max(...sums.slice(0, F.n)), 2, 'a variable column totals exactly 2');
+      eq(F.clauses.length === 0 || Math.max(...sums.slice(F.n)) <= 6, true,
+         'and a clause column at most 6: three literal occurrences plus the slack 1 and 2');
+      /* the subsets that hit the target, enumerated here */
+      const hits = [];
+      for (let mask = 0; mask < (1 << mine.rows.length); mask += 1) {
+        let sum = 0n;
+        for (let i = 0; i < mine.rows.length; i += 1) if (mask & (1 << i)) sum += mine.rows[i].value;
+        if (sum === mine.target) hits.push(mask);
+      }
+      eq(R.hits.length, hits.length, 'there are ' + hits.length
+         + ' subsets reaching the target, by an enumeration written here');
+      /* the bijection with the models */
+      const truth = modelsOf(F);
+      eq(R.models, truth.length, 'and ' + truth.length + ' models');
+      eq(R.hits.length, truth.length, 'the two counts are equal, which a bijection requires');
+      eq(R.map.sound + ',' + R.map.surjective + ',' + R.map.injective, 'true,true,true',
+         'and the map is sound, surjective and injective');
+      eq(R.map.bijection, true, 'so it IS a bijection here, unlike the independent-set reduction');
+      R.hits.forEach((members) => {
+        eq(truth.indexOf(rdAssignKey(rdSubsetBack(R.made, F, members))) >= 0, true,
+           'every subset carries back to a model enumerated here');
+      });
+      /* the second route to the yes/no */
+      eq(R.dp.result.found, hits.length > 0,
+         'and the value-indexed dynamic programme reaches the target exactly when a subset does');
+      eq(R.dpAgrees, true, 'which the kit reports');
+      if (R.dp.result.members) {
+        let sum = 0n;
+        R.dp.result.members.forEach((i) => { sum += R.made.rows[i].value; });
+        eq(sum, R.made.target, 'and the subset the table found really does add to the target');
+      }
+    }
+    /* the numbers are exponential in the formula, which is the other half */
+    {
+      const small = rdSubsetSolutions(cnfOf('1 2'));
+      const big = rdSubsetSolutions(cnfOf('1 2 -3; -1 2 3'));
+      eq(String(small.target).length + ',' + String(big.target).length, '3,5',
+         'the target gains a digit per variable and per clause');
+      eq(big.target > small.target, true, 'so it grows exponentially in the input length');
+      eq(typeof big.target, 'bigint',
+         'which is why it is a BigInt: at ten variables it is past what a double holds exactly');
+    }
+    const refuses = (f) => { try { f(); return false; } catch (e) { return /exceeds the exhaustive cap/.test(e.message); } };
+    eq(refuses(() => rdSubsetSolutions(cnfOf('1 2 3; 1 2 3; 1 2 3; 1 2 3; 1 2 3; 1 2 3'))), true,
+       'six variables and six clauses is eighteen numbers and is refused');
+  }
+
+  /* --- Hamilton circuit to travelling salesman ---------------------------- */
+  {
+    /* THE ORACLE: the tours enumerated here, priced against a distance matrix
+       built here, and separately checked against the graph's own edges. The
+       map is the identity, so the claim is that two lists computed in two
+       ways are the same list. */
+    const CASES = [
+      ['1-2, 2-3, 3-4, 4-1', 4, 3, 1, true],
+      ['1-2, 2-3, 3-1', 3, 1, 1, true],
+      ['1-2, 2-3, 3-4, 4-5, 5-1, 1-3', 5, 12, 1, true],
+      ['1-2, 2-3, 3-4', 4, 3, 0, false],
+      ['1-2, 1-3, 1-4, 2-3, 2-4, 3-4', 4, 3, 3, true],
+      ['1-2, 2-3, 3-1, 3-4, 4-5, 5-3', 5, 12, 0, false],
+    ];
+    for (const [spec, n, considered, circuits, hasCircuit] of CASES) {
+      const G = graphOf(spec);
+      const R = rdTourSolutions(G);
+      const adj = [];
+      for (let i = 0; i < n; i += 1) adj.push(new Array(n).fill(false));
+      G.arcs.forEach((a) => { adj[a.u][a.v] = true; adj[a.v][a.u] = true; });
+      const D = [];
+      for (let i = 0; i < n; i += 1) {
+        D.push([]);
+        for (let j = 0; j < n; j += 1) D[i].push(i === j ? 0 : (adj[i][j] ? 1 : 2));
+      }
+      eq(R.D.map((r) => r.join('')).join('|'), D.map((r) => r.join('')).join('|'),
+         spec + ': the distance matrix is 1 on an edge and 2 off it, as built here');
+      eq(R.budget, n, 'and the budget is n = ' + n);
+      /* every canonical tour, here */
+      const mineWithin = [], mineCircuits = [];
+      const rest = [];
+      for (let v = 1; v < n; v += 1) rest.push(v);
+      (function walk(prefix, left) {
+        if (!left.length) {
+          const tour = [0].concat(prefix);
+          if (tour.length > 2 && tour[1] > tour[tour.length - 1]) return;
+          let len = 0, isCircuit = true;
+          for (let i = 0; i < tour.length; i += 1) {
+            const a = tour[i], b = tour[(i + 1) % tour.length];
+            len += D[a][b];
+            if (!adj[a][b]) isCircuit = false;
+          }
+          const key = tour.map((v) => v + 1).join('-');
+          if (len <= n) mineWithin.push(key);
+          if (isCircuit) mineCircuits.push(key);
+          return;
+        }
+        for (let i = 0; i < left.length; i += 1) {
+          walk(prefix.concat([left[i]]), left.slice(0, i).concat(left.slice(i + 1)));
+        }
+      })([], rest);
+      eq(R.considered, considered, 'there are ' + considered
+         + ' tours to consider, which is (n - 1)!/2');
+      eq(R.tours.join('|'), mineWithin.join('|'),
+         'the tours within budget are the ones the enumeration here finds');
+      eq(R.circuits.join('|'), mineCircuits.join('|'), 'and so are the Hamilton circuits');
+      eq(R.circuits.length, circuits, 'there are ' + circuits + ' of them');
+      eq(R.sameList, true, 'and the two lists are identical -- the map is the identity');
+      eq(R.map.bijection, true, 'which makes it a bijection on solutions');
+      eq(R.hasCircuit, hasCircuit, 'the graph ' + (hasCircuit ? 'has' : 'has no')
+         + ' Hamilton circuit');
+      eq(R.answersAgree, true, 'and the two answers, computed by separate searches, agree');
+      eq(R.shortest <= n, hasCircuit,
+         'the shortest tour meets the budget exactly when a circuit exists');
+      eq(checkTspReduction(G).agree, true,
+         'which is what algo_core\'s own check says, by a different route');
+      /* a tour using one non-edge already costs n + 1 */
+      R.all.forEach((t) => {
+        let nonEdges = 0;
+        t.tour.forEach((v, k) => { if (!adj[v][t.tour[(k + 1) % t.tour.length]]) nonEdges += 1; });
+        eq(t.length, n + nonEdges, 'a tour with ' + nonEdges + ' non-edges costs n + ' + nonEdges);
+        eq(t.within, nonEdges === 0, 'so it is within budget exactly when it has none');
+      });
+    }
+    /* the canonical form: a tour and its reverse are one solution */
+    {
+      const G = graphOf('1-2, 1-3, 1-4, 2-3, 2-4, 3-4');
+      const R = rdTourSolutions(G);
+      const keys = R.all.map((t) => t.key);
+      eq(new Set(keys).size, keys.length, 'no tour is listed twice');
+      eq(R.all.every((t) => t.tour[0] === 0), true, 'every tour starts at city 1');
+      eq(R.all.every((t) => t.tour.length < 3 || t.tour[1] <= t.tour[t.tour.length - 1]), true,
+         'and is oriented so that a cycle and its reverse are one entry, not two');
+      eq(rdTourKey(rdCanonicalTour([0, 3, 2, 1])), '1-2-3-4',
+         'the canonical form of a reversed tour is the forward one');
+    }
+    const refuses = (f) => { try { f(); return false; } catch (e) { return /exceeds the exhaustive cap/.test(e.message); } };
+    eq(refuses(() => rdTourSolutions(dgFromLesson(9, [[1, 2]], false))), true,
+       'nine cities is refused rather than enumerated');
+  }
+
+  /* --- the kit's own contract --------------------------------------------- */
+  {
+    eq(reductionSrc.indexOf('reduction_lab: unknown mode') > 0, true,
+       'an unknown mode raises rather than falling back to a default');
+    for (const m of ['selfreduce', 'independentset', 'complement', 'subsetsum', 'tsp']) {
+      eq(reductionSrc.indexOf('    "' + m + '": _' + m + ',') > 0, true,
+         'mode ' + m + ' is registered');
+    }
+    eq((reductionSrc.match(/window\.redrawLab = redraw;/g) || []).length, 5,
+       'each of the five modes installs a redraw the harness can call again');
+    eq(reductionSrc.indexOf('from .algo_core import COUNT_JS, DIGRAPH_JS, ORACLE_JS, REDUCTION_JS') > 0,
+       true, 'the constructions are IMPORTED from algo_core rather than rewritten');
+    eq(reductionSrc.indexOf('from .algebra_core import') === -1, true,
+       'and no rational arithmetic is imported, because there is not a fraction in this kit');
+    /* the drawings return markup and touch nothing */
+    const chain = rdChainSvg([{ variable: 1, ifTrue: true, ifFalse: false, took: true,
+                                clausesAfter: 2 }], true);
+    eq((chain.match(/<rect /g) || []).length, 3, 'one box per variable and one per branch');
+    eq(chain.indexOf('true ✓') > 0 && chain.indexOf('false ✗') > 0, true,
+       'with the allowed and refused branches marked');
+    eq(rdChainSvg([], false).indexOf('the first oracle call said NO') > 0, true,
+       'and an unsatisfiable formula draws the reason rather than an empty box');
+    const cols = rdColumnSvg([2, 6, 2], 10, ['x1', 'c1', 'x2']);
+    eq((cols.match(/<rect /g) || []).length, 3, 'one bar per column of the digit table');
+    eq(cols.indexOf('var(--red)') > 0, true, 'and the carry line is drawn');
+    eq(rdColumnSvg([12], 10, ['c1']).indexOf('fill="var(--red)"') > 0, true,
+       'a column that would carry is drawn red');
+    eq(rdDrawColumns(null, [2], 10, ['x1']), rdColumnSvg([2], 10, ['x1']),
+       'and the installers return the same markup with a null element');
+    eq(rdDrawChain(null, [], true), rdChainSvg([], true), 'both of them');
+  }
+}
+
+
+
+// ------------------------------------------------------------------- coping
+console.log('coping with intractability: every ratio beside the optimum it is a ratio to');
+{
+  /* THE RULE THIS SECTION ENFORCES. No assertion below compares an
+     approximation against anything but an OPTIMUM computed here or by an
+     exhaustive search in ORACLE_JS, and every "within the bound" is checked
+     with Rcmp on exact fractions rather than on decimals.
+
+     The three things this file adds to what the kit already does:
+
+       a second optimum        every optimum the kit reports is recomputed
+                               here from the definition -- subsets for the
+                               knapsack and the cover, subfamilies for the set
+                               cover, permutations for the tour -- so a broken
+                               oracle cannot certify a broken approximation.
+       every instance of a     `cpWorstRatio` and `cpWorstTourRatio` are
+       size                    checked against enumerations written here, and
+                               the worst ratio they report is checked to be
+                               ATTAINED by the instance they name.
+       the chain, link by      the stays-ahead argument is four inequalities
+       link                    and each is asserted separately, so a kit that
+                               got the right ratio for the wrong reason fails
+                               here. */
+  const COPING_SOURCE = path.join(__dirname, 'mathpath', 'labs', 'coping.py');
+  const copingSrc = fs.readFileSync(COPING_SOURCE, 'utf8');
+  const cpBlock = (name) => blockFrom(copingSrc, name, COPING_SOURCE);
+  eval(block('RATIONAL_JS'));
+  eval(sysdBlock('HARMONIC_JS'));
+  eval(sysdBlock('RCEIL_JS'));
+  eval(algoCoreBlock('COUNT_JS'));
+  eval(algoCoreBlock('RFIXED_JS'));
+  eval(algoCoreBlock('DIGRAPH_JS'));
+  eval(algoCoreBlock('ORACLE_JS'));
+  eval(algoBlock('ALGO_JS'));
+  eval(algoCoreBlock('GRAPHKIT_JS'));
+  eval(algoCoreBlock('GREEDY_JS'));
+  eval(algoCoreBlock('COPING_JS'));
+  eval(cpBlock('CPKIT_JS'));
+
+  const itemsOf = (text) => {
+    const p = cpParseItems(text);
+    if (p.bad) { fails += 1; console.log('  FAIL parsing ' + text + ': ' + p.bad); }
+    return p.items;
+  };
+  const graphOf = (text) => {
+    const p = cpParseGraph(text, 8);
+    if (p.bad) { fails += 1; console.log('  FAIL parsing ' + text + ': ' + p.bad); }
+    return p.G;
+  };
+  const distOf = (text) => {
+    const p = cpParseDistances(text, 7);
+    if (p.bad) { fails += 1; console.log('  FAIL parsing ' + text + ': ' + p.bad); }
+    return p.D;
+  };
+  const setsOf = (text) => {
+    const p = cpParseSets(text);
+    if (p.bad) { fails += 1; console.log('  FAIL parsing ' + text + ': ' + p.bad); }
+    return p;
+  };
+  /* Optima, from the definitions, here. */
+  const bestKnapsack = (items, W) => {
+    let best = 0;
+    for (let mask = 0; mask < (1 << items.length); mask += 1) {
+      let w = 0, v = 0;
+      for (let i = 0; i < items.length; i += 1) if (mask & (1 << i)) { w += items[i].w; v += items[i].v; }
+      if (w <= W && v > best) best = v;
+    }
+    return best;
+  };
+  const bestCover = (G) => {
+    let best = null;
+    for (let mask = 0; mask < (1 << G.n); mask += 1) {
+      const inSet = new Array(G.n).fill(false);
+      let size = 0;
+      for (let v = 0; v < G.n; v += 1) if (mask & (1 << v)) { inSet[v] = true; size += 1; }
+      let ok = true;
+      G.arcs.forEach((a) => { if (!inSet[a.u] && !inSet[a.v]) ok = false; });
+      if (ok && (best === null || size < best)) best = size;
+    }
+    return best;
+  };
+  const bestTour = (D) => {
+    const n = D.length, rest = [];
+    for (let v = 1; v < n; v += 1) rest.push(v);
+    let best = null;
+    (function walk(prefix, left) {
+      if (!left.length) {
+        const tour = [0].concat(prefix);
+        let len = 0;
+        for (let i = 0; i < n; i += 1) len += D[tour[i]][tour[(i + 1) % n]];
+        if (best === null || len < best) best = len;
+        return;
+      }
+      for (let i = 0; i < left.length; i += 1) {
+        walk(prefix.concat([left[i]]), left.slice(0, i).concat(left.slice(i + 1)));
+      }
+    })([], rest);
+    return best;
+  };
+  const bestSetCover = (sets, universe) => {
+    let best = null;
+    for (let mask = 0; mask < (1 << sets.length); mask += 1) {
+      const hit = new Set();
+      let size = 0;
+      for (let i = 0; i < sets.length; i += 1) {
+        if (!(mask & (1 << i))) continue;
+        size += 1;
+        sets[i].forEach((e) => hit.add(e));
+      }
+      if (universe.every((e) => hit.has(e)) && (best === null || size < best)) best = size;
+    }
+    return best;
+  };
+
+  /* --- what a reader types ------------------------------------------------ */
+  {
+    eq(itemsOf('3:5, 4:6').map((i) => i.w + '/' + i.v).join(' '), '3/5 4/6',
+       'an item is weight:value');
+    eq(cpParseItems('3 5').bad !== undefined, true,
+       'and a space is refused, because "3 5" reads as two items');
+    eq(cpParseItems('0:5').bad !== undefined, true, 'an item of weight 0 is refused');
+    eq(cpParseItems('3:1000').bad !== undefined, true, 'and a value past 999');
+    eq(graphOf('1-2, 2-1').arcs.length, 1, 'a repeated edge is the same edge');
+    eq(cpParseGraph('1-1').bad !== undefined, true, 'and a loop is refused');
+    eq(cpParseDistances('1-2 3, 1-3 4').bad, 'the distance 2-3 is missing',
+       'a missing distance is named, not defaulted -- defaulting it would invent data');
+    eq(distOf('1-2 3, 1-3 4, 2-3 5').map((r) => r.join(',')).join('|'), '0,3,4|3,0,5|4,5,0',
+       'and the matrix is symmetric with a zero diagonal');
+    eq(setsOf('1 2 3; 3 4').universe.join(','), '1,2,3,4',
+       'the universe of a set family is its union, in order');
+    eq(setsOf('3 1 2; 2').sets[0].join(','), '1,2,3', 'and each set is sorted');
+    eq(cpParseSets('1 2; ; 3').sets.length, 2, 'an empty piece is not a set');
+    eq(cpSetText([1, 2]) + ' ' + cpVertexText([0, 1]), '{1, 2} {1, 2}',
+       'elements print as themselves and vertices print 1-based');
+  }
+
+  /* --- branch and bound: the bound must not change the answer ------------- */
+  {
+    const CASES = [
+      ['3:5, 4:6, 5:8, 2:3, 6:9', 10],
+      ['2:3, 3:4, 4:5, 5:6', 7],
+      ['2:4, 3:6, 4:8, 5:10, 6:12, 7:14', 13],
+      ['9:30, 1:2, 1:2, 1:2, 1:2, 1:2, 1:2', 9],
+      ['7:12, 8:14, 9:15, 6:10, 5:8, 4:7, 3:5, 2:3', 20],
+      ['5:5', 4],
+    ];
+    for (const [text, W] of CASES) {
+      const items = itemsOf(text);
+      const withB = branchBound(items, W, true), without = branchBound(items, W, false);
+      const truth = bestKnapsack(items, W);
+      eq(withB.result.optimum, truth, text + ' at capacity ' + W + ': the optimum is ' + truth
+         + ', recomputed here over every subset');
+      eq(withB.result.value, truth, 'and the bounded search finds it');
+      eq(without.result.value, truth, 'and so does the unbounded one -- pruning is not a heuristic');
+      eq(withB.result.correct && without.result.correct, true, 'which the kit reports for itself');
+      eq(withB.result.full, Math.pow(2, items.length), 'the whole tree is 2 to the n');
+      eq((without.counts.nodes || 0) <= 2 * withB.result.full, true,
+         'and the unbounded search opens at most one node per subtree');
+      /* the chosen set is legal and worth what is claimed */
+      const w = withB.result.members.reduce((t, i) => t + items[i].w, 0);
+      const v = withB.result.members.reduce((t, i) => t + items[i].v, 0);
+      eq(w <= W, true, 'the set it chose fits in the sack');
+      eq(v, withB.result.value, 'and is worth exactly what was reported');
+      /* the bound really is an upper bound at every node it was computed at */
+      let sound = true;
+      withB.trace.forEach((st) => {
+        if (st.bound === null) return;
+        if (Rcmp(st.bound, R(BigInt(truth), 1n)) < 0 && st.value === 0 && st.depth === 0) sound = false;
+      });
+      eq(sound, true, 'and the bound at the root is at least the optimum, as an upper bound must be');
+      eq(Rcmp(Radd(R(0n, 1n), fractionalKnapsack(items, W).result.value),
+              R(BigInt(truth), 1n)) >= 0, true,
+         'the fractional relaxation is at or above the integral optimum -- the one fact that '
+         + 'makes cutting safe');
+    }
+    /* the bound buys nodes on one instance and need not on another */
+    {
+      const easy = itemsOf('3:5, 4:6, 5:8, 2:3, 6:9');
+      eq(branchBound(easy, 10, true).counts.nodes < branchBound(easy, 10, false).counts.nodes, true,
+         'on the opening instance the bound cuts the tree');
+      eq(branchBound(easy, 10, true).result.pruned > 0, true, 'and the prune count says so');
+      eq(branchBound(easy, 10, false).result.pruned, 0,
+         'while the unbounded search prunes nothing, by construction');
+      const flat = itemsOf('2:4, 3:6, 4:8, 5:10, 6:12, 7:14');
+      eq(branchBound(flat, 13, true).result.value, bestKnapsack(flat, 13),
+         'and on an instance where every density is equal it is still exactly right');
+    }
+    const refuses = (f) => { try { f(); return false; } catch (e) { return /exceeds the exhaustive cap/.test(e.message); } };
+    eq(refuses(() => branchBound(new Array(13).fill({ w: 1, v: 1 }), 4, true)), true,
+       'thirteen items is refused by the optimum it checks itself against');
+  }
+
+  /* --- vertex cover: the chain, and the worst graph of its size ----------- */
+  {
+    const CASES = [
+      ['1-2, 3-4, 5-6', '2'],
+      ['1-2, 1-3, 1-4, 1-5', '2'],
+      ['1-2, 2-3, 3-4, 4-5, 5-6, 6-1', '2'],
+      ['1-2, 2-3, 3-4, 4-5, 5-1', '4/3'],
+      ['1-2, 2-3, 3-4, 4-5', '2'],
+      ['1-2, 2-3, 3-1, 4-5, 5-6, 6-4', '1'],
+      ['1-2', '2'],
+    ];
+    for (const [spec, ratioText] of CASES) {
+      const G = graphOf(spec);
+      const run = maximalMatching(G), res = run.result;
+      const truth = bestCover(G);
+      eq(res.optimum, truth, spec + ': the optimum cover has ' + truth
+         + ' vertices, recomputed here over every subset');
+      eq(Rtext(res.ratio), ratioText, 'and the realised ratio is ' + ratioText);
+      eq(Requ(res.ratio, R(BigInt(res.size), BigInt(res.optimum))), true,
+         'which is the cover divided by that optimum, and nothing else');
+      /* the four links, separately */
+      eq(res.lowerBound <= res.optimum, true, 'matching <= optimum: the matched edges are disjoint');
+      eq(res.optimum <= res.size, true, 'optimum <= cover: the optimum is the smallest cover');
+      eq(res.size, 2 * res.lowerBound, 'cover = 2 x matching: both ends of every matched edge');
+      eq(res.withinTwo, true, 'so cover <= 2 x optimum, which is the promise');
+      eq(Rcmp(res.ratio, R(2n, 1n)) <= 0, true, 'and the ratio never exceeds 2');
+      /* and the cover is a cover, checked against the edge list */
+      const inSet = new Array(G.n).fill(false);
+      res.cover.forEach((v) => { inSet[v] = true; });
+      let covers = true;
+      G.arcs.forEach((a) => { if (!inSet[a.u] && !inSet[a.v]) covers = false; });
+      eq(covers, true, 'and every edge really has an end in it');
+      eq(new Set(res.cover).size, res.cover.length, 'with no vertex counted twice');
+      /* the matching is a matching */
+      const used = new Set();
+      let disjoint = true;
+      res.matching.forEach((id) => {
+        const a = G.arcs[id];
+        if (used.has(a.u) || used.has(a.v)) disjoint = false;
+        used.add(a.u); used.add(a.v);
+      });
+      eq(disjoint, true, 'and the matching shares no vertex, which is what makes it a lower bound');
+    }
+    /* EVERY GRAPH OF A SIZE, against an enumeration here */
+    for (const n of [3, 4, 5]) {
+      const shipped = cpWorstRatio(n);
+      const pairs = (n * (n - 1)) / 2;
+      let worst = null, worstMask = -1, atWorst = 0, withEdges = 0;
+      for (let mask = 1; mask < (1 << pairs); mask += 1) {
+        const G = dgNew(n, false);
+        let bit = 0;
+        for (let i = 0; i < n; i += 1) {
+          for (let j = i + 1; j < n; j += 1) {
+            if (mask & (1 << bit)) dgAdd(G, i, j, 1, 0);
+            bit += 1;
+          }
+        }
+        const opt = bestCover(G);
+        if (!opt) continue;
+        withEdges += 1;
+        const run = maximalMatching(G);
+        const r = R(BigInt(run.result.size), BigInt(opt));
+        const cmp = worst === null ? 1 : Rcmp(r, worst);
+        if (cmp > 0) { worst = r; worstMask = mask; atWorst = 1; }
+        else if (cmp === 0) atWorst += 1;
+      }
+      eq(shipped.graphs, (1 << pairs) - 1, 'n = ' + n + ': every non-empty graph was examined');
+      eq(shipped.withEdges, withEdges, 'and ' + withEdges + ' of them have an edge to cover');
+      eq(Rtext(shipped.worst), Rtext(worst),
+         'and the worst ratio, ' + Rtext(worst) + ', matches the enumeration written here');
+      eq(shipped.atWorst, atWorst, 'as does the number of graphs attaining it');
+      eq(shipped.mask, worstMask, 'and the first graph that does');
+      /* the named instance really does attain it */
+      const attained = maximalMatching(shipped.graph).result;
+      eq(Rtext(R(BigInt(attained.size), BigInt(attained.optimum))), Rtext(shipped.worst),
+         'the instance the kit names attains the ratio it names');
+      const dense = maximalMatching(shipped.densest).result;
+      eq(Rtext(R(BigInt(dense.size), BigInt(dense.optimum))), Rtext(shipped.worst),
+         'and so does the densest one it names');
+      eq(shipped.densest.arcs.length >= shipped.graph.arcs.length, true,
+         'which has at least as many edges, so a reader is not shown a single edge and told the '
+         + 'bound is tight');
+      eq(Rtext(shipped.worst), '2', 'and at every size the worst ratio is exactly 2');
+    }
+    eq(cpEdgeText(cpGraphFromMask(3, 1)), '1-2', 'the mask-to-graph map is the one the search used');
+    eq(cpEdgeText(cpGraphFromMask(3, 7)), '1-2, 1-3, 2-3', 'and the full mask is the triangle');
+    const refuses = (f) => { try { f(); return false; } catch (e) { return /exceeds the exhaustive cap/.test(e.message); } };
+    eq(refuses(() => cpWorstRatio(7)), true,
+       'seven vertices is 2^21 graphs and is refused rather than attempted');
+  }
+
+  /* --- the metric tour, and the hypothesis doing work --------------------- */
+  {
+    const CASES = [
+      ['1-2 2, 1-3 1, 1-4 3, 2-3 3, 2-4 2, 3-4 2', true, '10/7'],
+      ['1-2 3, 1-3 4, 1-4 5, 2-3 3, 2-4 4, 3-4 3', true, '1'],
+      ['1-2 1, 1-3 1, 1-4 2, 1-5 1, 2-3 2, 2-4 1, 2-5 1, 3-4 1, 3-5 2, 4-5 1', true, '8/5'],
+      ['1-2 50, 1-3 1, 1-4 1, 2-3 1, 2-4 1, 3-4 1', false, '53/4'],
+      ['1-2 1, 1-3 2, 1-4 3, 1-5 4, 2-3 1, 2-4 2, 2-5 3, 3-4 1, 3-5 2, 4-5 1', true, '1'],
+    ];
+    for (const [text, metric, ratioText] of CASES) {
+      const D = distOf(text);
+      const run = mstTour(D), res = run.result;
+      const truth = bestTour(D);
+      eq(res.optimum, truth, '"' + text + '": the optimum tour is ' + truth
+         + ', recomputed here over every cyclic order');
+      eq(Rtext(res.ratio), ratioText, 'and the realised ratio is ' + ratioText);
+      eq(Requ(res.ratio, R(BigInt(res.length), BigInt(res.optimum))), true,
+         'which is the tour divided by that optimum');
+      eq(res.metric, metric, 'the instance ' + (metric ? 'is' : 'is NOT') + ' metric');
+      /* metric, checked here from the definition */
+      let mine = true;
+      for (let i = 0; i < D.length; i += 1) {
+        for (let j = 0; j < D.length; j += 1) {
+          for (let k = 0; k < D.length; k += 1) if (D[i][j] > D[i][k] + D[k][j]) mine = false;
+        }
+      }
+      eq(res.metric, mine, 'which an independent check of every triple agrees with');
+      /* the three links, and which of them needs the hypothesis */
+      eq(res.mstWeight <= res.optimum, true,
+         'tree <= optimum: a tour minus an edge is a spanning tree -- no hypothesis');
+      eq(res.length <= 2 * res.mstWeight, metric || res.length <= 2 * res.mstWeight,
+         'the shortcut step is the one that needs the triangle inequality');
+      eq(res.withinTwo, res.length <= 2 * res.optimum, 'and the kit reports the chain\'s end');
+      if (metric) {
+        eq(res.withinTwo, true, 'on a metric instance the promise holds');
+        eq(Rcmp(res.ratio, R(2n, 1n)) <= 0, true, 'and the ratio is at most 2');
+      } else {
+        eq(res.withinTwo, false, 'on a non-metric instance it fails');
+        eq(Rcmp(res.ratio, R(2n, 1n)) > 0, true,
+           'and the ratio is above 2 -- not a bug in the algorithm, the hypothesis doing work');
+      }
+      /* the tour is a tour */
+      eq(new Set(res.tour).size, D.length, 'the tour visits every city exactly once');
+      let len = 0;
+      res.tour.forEach((v, k) => { len += D[v][res.tour[(k + 1) % res.tour.length]]; });
+      eq(len, res.length, 'and its length is what was reported, re-added here');
+      /* the tree is a spanning tree */
+      eq(res.mst.length, D.length - 1, 'the spanning tree has n - 1 edges');
+    }
+    /* EVERY METRIC INSTANCE OF A SIZE, against an enumeration here */
+    for (const n of [3, 4]) {
+      const shipped = cpWorstTourRatio(n, 3);
+      const pairs = [];
+      for (let i = 0; i < n; i += 1) for (let j = i + 1; j < n; j += 1) pairs.push([i, j]);
+      const D = [];
+      for (let i = 0; i < n; i += 1) { D.push([]); for (let j = 0; j < n; j += 1) D[i].push(0); }
+      let worst = null, count = 0, total = 0;
+      (function go(k) {
+        if (k === pairs.length) {
+          total += 1;
+          for (let a = 0; a < n; a += 1) {
+            for (let b = 0; b < n; b += 1) {
+              for (let c = 0; c < n; c += 1) if (D[a][b] > D[a][c] + D[c][b]) return;
+            }
+          }
+          count += 1;
+          const run = mstTour(D);
+          const r = R(BigInt(run.result.length), BigInt(bestTour(D)));
+          if (worst === null || Rcmp(r, worst) > 0) worst = r;
+          return;
+        }
+        for (let w = 1; w <= 3; w += 1) {
+          D[pairs[k][0]][pairs[k][1]] = w; D[pairs[k][1]][pairs[k][0]] = w;
+          go(k + 1);
+        }
+      })(0);
+      eq(shipped.instances, total, 'n = ' + n + ': all ' + total + ' instances were generated');
+      eq(shipped.metric, count, 'and ' + count + ' of them are metric');
+      eq(Rtext(shipped.worst), Rtext(worst),
+         'and the worst ratio, ' + Rtext(worst) + ', matches the enumeration here');
+      eq(Rcmp(shipped.worst, R(2n, 1n)) < 0, true,
+         'which is strictly under 2: a small exhaustive search bounds the ratio BELOW the '
+         + 'promise, and that is not evidence against the promise');
+      /* the named instance attains it */
+      if (shipped.D) {
+        const run = mstTour(shipped.D);
+        eq(Rtext(R(BigInt(run.result.length), BigInt(bestTour(shipped.D)))), Rtext(shipped.worst),
+           'and the instance the kit names attains it');
+        eq(run.result.metric, true, 'and is itself metric');
+      }
+    }
+    eq(cpDistanceText([[0, 3, 4], [3, 0, 5], [4, 5, 0]]), '1-2 3, 1-3 4, 2-3 5',
+       'and a matrix prints back as the clauses that produced it');
+    const refuses = (f) => { try { f(); return false; } catch (e) { return /exceeds the exhaustive cap/.test(e.message); } };
+    eq(refuses(() => cpWorstTourRatio(5, 3)), true,
+       'five cities is 23352 metric instances and is refused');
+  }
+
+  /* --- greedy set cover: the charges, and the bound they prove ------------ */
+  {
+    const CASES = [
+      ['3 4 5 6; 1 2 3; 4 5 6 7', 7, 3, 2, '3/2'],
+      ['4 5 6 7 8 9; 1 2 3 4 5; 6 7 8 9 10; 1 2 3; 10', 10, 3, 2, '3/2'],
+      ['1 2 3 4; 5 6 7 8', 8, 2, 2, '1'],
+      ['1 2 3; 2 3 4; 3 4 5; 4 5 1; 5 1 2', 5, 2, 2, '1'],
+      ['1 2 3 4 5; 1; 2; 3; 4; 5', 5, 1, 1, '1'],
+      ['1 2 3 4; 5 6 7 8; 1 5; 2 6 8; 3 4 7', 8, 2, 2, '1'],
+    ];
+    for (const [text, n, greedy, opt, ratioText] of CASES) {
+      const parsed = setsOf(text);
+      const run = greedySetCover(parsed.sets, parsed.universe), res = run.result;
+      eq(parsed.universe.length, n, '"' + text + '" has a universe of ' + n);
+      eq(bestSetCover(parsed.sets, parsed.universe), opt,
+         'the optimum cover needs ' + opt + ' sets, recomputed here over every subfamily');
+      eq(res.optimum, opt, 'which the kit agrees with');
+      eq(res.size, greedy, 'and greedy takes ' + greedy);
+      eq(Rtext(R(BigInt(res.size), BigInt(res.optimum))), ratioText,
+         'so the realised ratio is ' + ratioText);
+      /* the charge identity, which is what the bound is proved from */
+      eq(res.chargesSumToSize, true, 'the charges add to the number of sets taken');
+      eq(Rtext(res.chargeTotal), String(res.size), 'exactly: ' + Rtext(res.chargeTotal));
+      let sum = R(0n, 1n);
+      Object.keys(res.charges).forEach((e) => { sum = Radd(sum, res.charges[e]); });
+      eq(Requ(sum, R(BigInt(res.size), 1n)), true, 'and re-adding them here gives the same');
+      eq(Object.keys(res.charges).length, n, 'every element was charged exactly once');
+      /* H exact, and the bound it gives */
+      let H = R(0n, 1n);
+      for (let k = 1; k <= n; k += 1) H = Radd(H, R(1n, BigInt(k)));
+      eq(Requ(res.Hn, H), true, 'H over ' + n + ' elements is ' + Rtext(H)
+         + ', a sum of fractions recomputed here');
+      eq(Requ(res.bound, Rmul(H, R(BigInt(opt), 1n))), true, 'and the bound is H times the optimum');
+      eq(res.withinBound, true, 'which greedy is inside');
+      eq(Rcmp(R(BigInt(res.size), 1n), res.bound) <= 0, true, 'checked with Rcmp on fractions');
+      /* the per-element allowance, and the sum of the allowances */
+      const rows = cpChargeRows(run, parsed.universe, res.optimum);
+      eq(rows.uncovered.length, 0, 'greedy covered every element');
+      eq(rows.rows.length, n, 'and priced every one');
+      eq(rows.everyChargeAllowed, true,
+         'and no element paid more than OPT/(elements left), which is the step the bound is '
+         + 'built from');
+      let allowanceSum = R(0n, 1n);
+      rows.rows.forEach((r) => { allowanceSum = Radd(allowanceSum, r.allowed); });
+      eq(Requ(allowanceSum, res.bound), true,
+         'and the allowances add to exactly H times the optimum, which is where the bound '
+         + 'comes from');
+      /* the cover is a cover */
+      const hit = new Set();
+      res.chosen.forEach((i) => parsed.sets[i].forEach((e) => hit.add(e)));
+      eq(parsed.universe.every((e) => hit.has(e)), true, 'and the chosen sets cover the universe');
+    }
+    /* the trap: greedy really does do worse than the optimum */
+    {
+      const parsed = setsOf('3 4 5 6; 1 2 3; 4 5 6 7');
+      const run = greedySetCover(parsed.sets, parsed.universe);
+      eq(run.result.chosen.join(','), '0,1,2',
+         'greedy takes the biggest set first and then needs both of the others');
+      eq(run.trace[0].fresh.length, 4, 'the first step covers four new elements');
+      eq(Rtext(run.trace[0].charge), '1/4', 'so each of them is charged 1/4');
+      eq(run.trace[1].fresh.length + ',' + Rtext(run.trace[1].charge), '2,1/2',
+         'the second covers two and charges 1/2');
+      eq(run.trace[2].fresh.length + ',' + Rtext(run.trace[2].charge), '1,1',
+         'and the third covers one and charges 1');
+      eq(Rtext(Radd(Radd(Rmul(R(4n, 1n), R(1n, 4n)), Rmul(R(2n, 1n), R(1n, 2n))), R(1n, 1n))), '3',
+         'and 4 x 1/4 + 2 x 1/2 + 1 x 1 is 3, the number of sets');
+    }
+    const refuses = (f) => { try { f(); return false; } catch (e) { return /exceeds the exhaustive cap/.test(e.message); } };
+    const many = [];
+    for (let i = 0; i < 13; i += 1) many.push([i + 1]);
+    eq(refuses(() => setCoverBrute(many, many.map((s) => s[0]))), true,
+       'thirteen sets is refused by the optimum it checks itself against');
+  }
+
+  /* --- the FPTAS: the promise is a fraction and is checked as one --------- */
+  {
+    const CASES = [
+      ['3:520, 4:610, 5:805, 2:311, 6:902, 4:455', 12],
+      ['3:5, 4:6, 5:8, 2:3, 6:9', 10],
+      ['5:900, 1:11, 2:19, 3:27, 4:38, 2:14', 9],
+      ['2:100, 3:100, 4:100, 5:100, 6:100', 11],
+      ['7:300, 8:355, 9:400, 6:260, 5:220, 4:180, 3:130, 2:90', 22],
+    ];
+    for (const [text, W] of CASES) {
+      const items = itemsOf(text);
+      const truth = bestKnapsack(items, W);
+      for (const d of [1, 2, 4, 8, 16, 32]) {
+        const eps = R(1n, BigInt(d));
+        const run = fptasScale(items, W, eps), res = run.result;
+        eq(res.optimum, truth, text + ' at eps 1/' + d + ': the optimum is ' + truth
+           + ', recomputed here and unaffected by eps');
+        /* the value reported is the CHOSEN SET at the ORIGINAL prices */
+        const value = res.chosen.reduce((t, i) => t + items[i].v, 0);
+        const weight = res.chosen.reduce((t, i) => t + items[i].w, 0);
+        eq(res.value, value,
+           'the value reported is the set the scaled table chose, priced at the original values');
+        eq(weight <= W, true, 'and that set fits in the sack');
+        eq(res.loss, truth - value, 'the loss is the optimum minus it');
+        eq(res.loss >= 0, true, 'and is never negative -- an approximation cannot beat the optimum');
+        eq(Requ(res.promised, Rmul(eps, R(BigInt(truth), 1n))), true,
+           'the promise is eps times the optimum, exactly');
+        eq(res.withinPromise, Rcmp(R(BigInt(res.loss), 1n), res.promised) <= 0,
+           'and the verdict is an Rcmp on fractions, not a comparison of two decimals');
+        eq(res.withinPromise, true, 'which holds');
+        /* the scaled values are exact floors */
+        items.forEach((it, i) => {
+          const want = Rzero(res.K) ? it.v : Number(Rfloor(Rdiv(R(BigInt(it.v), 1n), res.K)));
+          eq(res.scaled[i].v, want, 'item ' + (i + 1) + ' scales to the exact floor of v/K');
+          eq(res.scaled[i].w, it.w, 'and its weight is untouched');
+        });
+      }
+      /* a small enough epsilon finds the optimum outright */
+      const fine = fptasScale(items, W, R(1n, 1000n));
+      eq(fine.result.value, truth, 'at eps = 1/1000 the FPTAS finds the optimum exactly');
+      eq(fine.result.loss, 0, 'losing nothing');
+    }
+    /* the table size, and the case where scaling makes it bigger */
+    {
+      const big = itemsOf('3:520, 4:610, 5:805, 2:311, 6:902, 4:455');
+      const small = itemsOf('3:5, 4:6, 5:8, 2:3, 6:9');
+      eq(cpExactCells(big), big.reduce((t, i) => t + i.v, 0) + 1,
+         'the exact value table has one cell per achievable value');
+      eq(fptasScale(big, 12, R(1n, 10n)).result.cells < cpExactCells(big), true,
+         'and on large values the scaled table is smaller');
+      eq(fptasScale(small, 10, R(1n, 10n)).result.cells > cpExactCells(small), true,
+         'while on small ones it is BIGGER -- an FPTAS is an asymptotic device and the cell '
+         + 'counts say so rather than the prose');
+      const sweep = cpEpsilonSweep(big, 12, [1, 2, 4, 8]);
+      eq(sweep.length, 4, 'the sweep runs one row per epsilon');
+      eq(sweep.every((r) => r.optimum === bestKnapsack(big, 12)), true,
+         'every row reports the same optimum, because the optimum does not depend on epsilon');
+      eq(sweep.every((r) => r.within), true, 'and every row is inside its own promise');
+      let monotone = true;
+      for (let i = 1; i < sweep.length; i += 1) {
+        if (Rcmp(sweep[i].promised, sweep[i - 1].promised) > 0) monotone = false;
+      }
+      eq(monotone, true, 'and the promise tightens as epsilon falls');
+      eq(sweep.every((r) => Rcmp(r.ratio, Rsub(R(1n, 1n), r.eps)) >= 0), true,
+         'and every realised ratio clears 1 - eps');
+    }
+  }
+
+  /* --- parameterised vertex cover ----------------------------------------- */
+  {
+    const CASES = [
+      ['1-2, 2-3, 3-4, 4-5, 5-6, 6-1', 6, 3],
+      ['1-2, 1-3, 1-4, 1-5, 1-6, 1-7, 1-8', 8, 1],
+      ['1-2, 3-4, 5-6, 7-8', 8, 4],
+      ['1-2, 2-3, 3-1, 4-5, 5-6, 6-4', 6, 4],
+      ['1-2, 2-3, 3-4, 4-5, 5-6, 6-7', 7, 3],
+    ];
+    for (const [spec, n, opt] of CASES) {
+      const G = graphOf(spec);
+      eq(bestCover(G), opt, spec + ': the optimum cover has ' + opt
+         + ' vertices, recomputed here');
+      for (let k = 0; k <= n; k += 1) {
+        const run = fptVertexCover(G, k), res = run.result;
+        eq(res.optimum, opt, 'at k = ' + k + ' the kit reports the same optimum');
+        eq(res.exists, opt <= k,
+           'and answers yes exactly when a cover of size at most ' + k + ' exists');
+        eq(res.correct, true, 'which is the decision the parameter asks about');
+        eq((run.counts.nodes || 0) <= res.treeBound, true,
+           'the search opened at most 2^(k+1) = ' + res.treeBound + ' nodes');
+        eq(res.treeBound, Math.pow(2, k + 1), 'which is a bound in k alone, with n nowhere in it');
+        eq(res.work, Math.pow(2, k) * G.n, 'and the work column is 2^k times n');
+        eq(res.bruteWork, Math.pow(2, G.n), 'against 2^n for trying every subset');
+        if (res.cover) {
+          const inSet = new Array(G.n).fill(false);
+          res.cover.forEach((v) => { inSet[v] = true; });
+          let covers = true;
+          G.arcs.forEach((a) => { if (!inSet[a.u] && !inSet[a.v]) covers = false; });
+          eq(covers, true, 'and the witness it returned is a cover, checked against the edge list');
+          eq(res.cover.length <= k, true, 'of size at most k');
+          eq(res.cover.length >= opt, true,
+             'and at least the optimum -- it answers a decision question and its witness need '
+             + 'not be minimum');
+        }
+      }
+      /* the sweep the page draws */
+      const sweep = cpFptSweep(G, Math.min(6, n));
+      eq(sweep.every((r) => r.correct), true, 'every budget in the sweep answers correctly');
+      eq(sweep.every((r) => r.withinTree), true, 'and stays inside its tree bound');
+      eq(sweep.every((r) => r.optimum === opt), true, 'and reports one optimum throughout');
+      let monotone = true;
+      for (let i = 1; i < sweep.length; i += 1) if (sweep[i - 1].exists && !sweep[i].exists) monotone = false;
+      eq(monotone, true, 'and once a cover of size k exists, one of size k + 1 does too');
+    }
+    /* the crossover: parameterising is a claim about small k, not about the problem */
+    {
+      const G = graphOf('1-2, 3-4, 5-6, 7-8');
+      const sweep = cpFptSweep(G, 6);
+      eq(sweep[4].work > sweep[4].bruteWork === false, true,
+         'at k = 4 on eight vertices the bounded search is still the cheaper column');
+      eq(sweep[6].work > sweep[6].bruteWork, true,
+         'and at k = 6 it is not -- the method buys nothing when the parameter is as large as '
+         + 'it can be');
+      eq(bestCover(G), 4, 'which is exactly the case a perfect matching produces');
+    }
+  }
+
+  /* --- the drawings, and the kit's own contract --------------------------- */
+  {
+    const ladder = cpLadderSvg([
+      { label: 'lower bound', value: 2, colour: 'var(--purple)', text: '2' },
+      { label: 'optimum', value: 3, colour: 'var(--green)', anchor: true, text: '3' },
+      { label: 'answer', value: 4, colour: 'var(--cyan)', text: '4' }
+    ]);
+    eq((ladder.match(/<rect /g) || []).length, 3, 'the ladder draws one bar per row');
+    eq((ladder.match(/<text /g) || []).length, 6, 'each with a label and a value');
+    eq((ladder.match(/stroke-dasharray/g) || []).length, 1,
+       'and exactly one dashed line, at the optimum, so every other bar is read against it');
+    eq(cpDrawLadder(null, [{ label: 'a', value: 1, colour: 'var(--cyan)', text: '1' }]),
+       cpLadderSvg([{ label: 'a', value: 1, colour: 'var(--cyan)', text: '1' }]),
+       'and the installer returns the same markup with a null element');
+    const bars = cpBarsSvg([{ label: 'a', value: 3, colour: 'var(--cyan)' }],
+                           { rule: { value: 6, label: 'the ceiling', colour: 'var(--red)' } });
+    eq((bars.match(/<rect /g) || []).length, 1, 'the bar chart draws one bar per row');
+    eq(bars.indexOf('the ceiling') > 0, true, 'and labels its reference line');
+    eq(cpDrawBars(null, [{ label: 'a', value: 1, colour: 'var(--cyan)' }]),
+       cpBarsSvg([{ label: 'a', value: 1, colour: 'var(--cyan)' }]), 'likewise');
+
+    eq(copingSrc.indexOf('coping_lab: unknown mode') > 0, true,
+       'an unknown mode raises rather than falling back to a default');
+    for (const m of ['branchbound', 'vertexcover', 'tsp', 'setcover', 'fptas', 'fpt']) {
+      eq(copingSrc.indexOf('    "' + m + '": _' + m + ',') > 0, true, 'mode ' + m + ' is registered');
+    }
+    eq((copingSrc.match(/window\.redrawLab = redraw;/g) || []).length, 6,
+       'each of the six modes installs a redraw the harness can call again');
+    eq(copingSrc.indexOf('from .algo_core import (COPING_JS') > 0, true,
+       'the algorithms are IMPORTED from algo_core rather than rewritten');
+    eq(copingSrc.indexOf('_TOUR_JS = (RATIONAL_JS') > 0
+       && copingSrc.indexOf('GRAPHKIT_JS') > 0, true,
+       'and the tour mode takes the graph block for primRun rather than writing a second '
+       + 'minimum spanning tree');
+    eq(copingSrc.indexOf('cpIsRefusal') > 0, true,
+       'and a catch that is not a cap refusal re-throws');
+  }
+}
+
+
 /* THE VERDICT. There is a second `if (fails)` gate half way up this file, at
    what used to be its end; every section appended after it -- the lp, simplex,
    duality, network, transport and integer kits, the sequence and heap kits, the

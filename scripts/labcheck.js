@@ -147,13 +147,63 @@ function initialValues(markup) {
   return out;
 }
 
+// Every value each control can take, which is what AGENTS.md §1a has always
+// said this file checks and what it did not do until now: it ran the page once
+// and called redrawLab() once, never setting a control or dispatching an event.
+// The third clause of that sentence was false for every lab in the repository.
+//
+// Three authors noticed the gap independently and each wrote a private sweep in
+// a scratchpad, ran it over their own kit, and threw it away. This is that
+// sweep, kept.
+//
+// A range is swept at min, max and a middle step rather than every step: the
+// failures this finds are at the ends and at a value the arithmetic divides by,
+// and a hundred-step slider costs a hundred redraws to learn nothing more. Text
+// boxes get the inputs that have actually broken labs here -- empty, a word, a
+// bare operator -- because a parser that returns undefined on "banana" and a
+// panel that then formats it is the shape of the bug.
+function controlValues(markup) {
+  const out = [];
+  let m;
+  const selectRe = /<select\b([^>]*)>([\s\S]*?)<\/select>/gi;
+  while ((m = selectRe.exec(markup))) {
+    const idm = /\bid="([^"]+)"/.exec(m[1]);
+    if (!idm) continue;
+    const values = [...m[2].matchAll(/<option\b([^>]*)>/g)]
+      .map((o) => { const v = /\bvalue="([^"]*)"/.exec(o[1]); return v ? v[1] : ''; });
+    if (values.length) out.push([idm[1], values]);
+  }
+  const inputRe = /<input\b([^>]*)>/gi;
+  while ((m = inputRe.exec(markup))) {
+    const attrs = m[1];
+    const idm = /\bid="([^"]+)"/.exec(attrs);
+    if (!idm) continue;
+    const type = (/\btype="([^"]*)"/.exec(attrs) || [, 'text'])[1];
+    if (type === 'range') {
+      const num = (name, fallback) => {
+        const hit = new RegExp('\\b' + name + '="([^"]*)"').exec(attrs);
+        const v = hit ? Number(hit[1]) : NaN;
+        return Number.isFinite(v) ? v : fallback;
+      };
+      const lo = num('min', 0), hi = num('max', 100), step = num('step', 1) || 1;
+      const mid = lo + Math.floor(((hi - lo) / step) / 2) * step;
+      out.push([idm[1], [...new Set([lo, mid, hi])].map(String)]);
+    } else if (type === 'checkbox' || type === 'radio') {
+      out.push([idm[1], ['', 'on']]);
+    } else {
+      out.push([idm[1], ['', 'banana', '0', '-1', '1/0', 'A>B']]);
+    }
+  }
+  return out;
+}
+
 function scriptsOf(markup) {
   return [...markup.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) => m[1]);
 }
 
 // ------------------------------------------------------------------- run
 
-function runPage(file) {
+function runPage(file, sweep) {
   const markup = fs.readFileSync(file, 'utf8');
   const doc = new Doc(idsOf(markup));
   for (const [id, value] of initialValues(markup)) {
@@ -197,6 +247,45 @@ function runPage(file) {
     problems.push('the page assigns window.redrawLab but it is not callable after load');
   }
 
+  // Now every value of every control, one control at a time, each restored
+  // before the next. A page that throws on one slider position is broken for
+  // the reader who moves that slider, and nothing else here would say so.
+  if (sweep && typeof sandbox.redrawLab === 'function') {
+    for (const [id, values] of controlValues(markup)) {
+      const el = doc.getElementById(id);
+      if (!el) continue;
+      const was = el.value;
+      // DISPATCH, do not just redraw. A browser fires the control's own change
+      // handler, and several labs do real work there -- the probability kit
+      // rebuilds its two event menus when the experiment changes, and calls
+      // redraw() afterwards. Setting .value and calling redrawLab() skips that
+      // rebuild and leaves an event index pointing into the previous
+      // experiment's list, which throws. The first version of this sweep did
+      // exactly that and reported two "failures" that no reader can reach.
+      const listened = (el.listeners && (el.listeners.change || el.listeners.input)) ? true : false;
+      for (const value of values) {
+        el.value = value;
+        if (el.checked !== undefined) el.checked = value === 'on';
+        try {
+          if (listened) {
+            el.dispatch('change');
+            el.dispatch('input');
+          } else {
+            sandbox.redrawLab();
+          }
+        } catch (err) {
+          problems.push(`${id} = ${JSON.stringify(value)}: ${err && err.message}`);
+          break;                       // one report per control, not per value
+        }
+      }
+      el.value = was;
+      if (listened) { try { el.dispatch('change'); } catch (err) { /* restored below */ } }
+    }
+    try { sandbox.redrawLab(); } catch (err) {
+      problems.push(`redrawLab() after the sweep: ${err && err.message}`);
+    }
+  }
+
   // The quiz is data, and every question must be answerable: the correct index
   // has to point at a real choice.
   const quizMatch = /var QUIZ = (\[[\s\S]*?\]);\n/.exec(markup);
@@ -226,7 +315,9 @@ function collect(dir) {
 }
 
 function main(argv) {
-  let files = argv.slice(2);
+  let files = argv.slice(2).filter((a) => a !== '--no-sweep');
+  // The sweep is the default, because the claim in AGENTS.md is the default.
+  const sweep = !argv.includes('--no-sweep');
   if (files[0] === '--all') {
     files = collect(path.join(__dirname, '..', 'site'));
   } else if (files[0] === '--generated') {
@@ -247,14 +338,14 @@ function main(argv) {
   }
   let failed = 0;
   for (const file of files) {
-    const problems = runPage(file);
+    const problems = runPage(file, sweep);
     if (problems.length) {
       failed += 1;
       console.log(`FAIL ${path.relative(process.cwd(), file)}`);
       problems.forEach((p) => console.log(`      ${p}`));
     }
   }
-  console.log(`${files.length} page(s) executed, ${failed} failing`);
+  console.log(`${files.length} page(s) executed${sweep ? ' and swept' : ''}, ${failed} failing`);
   return failed ? 1 : 0;
 }
 

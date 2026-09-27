@@ -136,7 +136,16 @@ so the change appears to work and then vanishes.
     node scripts/labcheck.js --generated               # execute every lab
 
 The last two are different questions and CI runs both. `labcheck.js` proves each
-published lab runs, redraws, and survives every value of its own controls;
+published lab runs, redraws, and survives its controls being moved: it sweeps
+every option of every `<select>`, the two ends and a middle step of every
+range, and a handful of hostile strings through every text box, firing each
+control's own `change` handler the way a browser does. (Until 2026-09-26 this
+sentence said "survives every value of its own controls" and the file did no
+such thing -- it ran the page once and called `redrawLab()` once. Three kit
+authors noticed independently, each wrote a private sweep, and each threw it
+away; the sweep is now in `labcheck.js` and the claim is true. It found a
+published page that dies on a typed `1/0`. Pass `--no-sweep` for the old
+behaviour.)
 `mathcheck.js` proves the arithmetic those labs are built on is right, by
 executing the shipped JavaScript extracted from
 `scripts/mathpath/labs/algebra_core.py`. A lab that reports confidently wrong
