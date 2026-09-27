@@ -2341,7 +2341,7 @@ def _matching(cfg):
       + tr([rowhead('S'), tdl('{' + m.deficient.S.join(', ') + '}, size ' + m.deficient.S.length)])
       + tr([rowhead('N(S)'), tdl('{' + m.deficient.N.join(', ') + '}, size ' + m.deficient.N.length)])
       + tr([rowhead('|N(S)| − |S|'), tdl(tone(String(m.deficient.N.length - m.deficient.S.length),
-          m.deficient.hall ? 'red' : 'green'))])
+          m.deficient.violated ? 'red' : 'green'))])
       + '</tbody>';
 
     document.getElementById('mtSize').textContent = bip.left.length + ' and ' + bip.right.length;
@@ -2351,7 +2351,7 @@ def _matching(cfg):
       + m.deficient.S.length;
     document.getElementById('mtNS').textContent = '{' + m.deficient.N.join(', ') + '}, size '
       + m.deficient.N.length;
-    document.getElementById('mtHall').textContent = m.deficient.hall
+    document.getElementById('mtHall').textContent = m.deficient.violated
       ? 'fails on S' : 'holds on every subset';
 
     status.innerHTML = (perfect

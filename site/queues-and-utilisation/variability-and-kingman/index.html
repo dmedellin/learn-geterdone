@@ -2157,21 +2157,19 @@ exact chain          W_q = 4 slots</div><p>The factor of two in the middle block
     if (!both || !past || Rzero(past)) return null;
     return Rdiv(both, past);
   }
-  /* e^-x, from the core, WITH ITS RANGE STATED.
+  /* e^-x, from the core, WITH THE REASON FOR ITS RANGE STATED.
 
-     expNegApprox sums the alternating series 1 - x + x^2/2! - ..., whose largest
-     term is about e^x/sqrt(2*pi*x) while the answer is e^-x, so it throws away
-     roughly 2x/ln(10) significant digits to cancellation. In double precision
-     that is all sixteen of them by about x = 19, and past x = 21 the result
-     changes sign. Measured: the relative error is 3e-9 at x = 10, 1.6e-7 at
-     x = 12, 4e-3 at x = 17 and 173% at x = 20.
+     expNegApprox returns the reciprocal of the positive-term series for e^x.
+     Nothing cancels, and the relative error against Math.exp is last-bit from
+     x = 1 to x = 40 -- 1.5e-16, 3.0e-16, 5.5e-16, 6.4e-16, 4.0e-16, 5.4e-16 at
+     1, 10, 12, 17, 20 and 40. mathcheck pins those.
 
-     So this kit does not hand it an x it cannot answer. The two modes that call
-     it bound their controls to EXP_SAFE_X and say so on the page, and the two
-     functions below refuse rather than return a number that is confidently
-     wrong -- which on a page promising checkable arithmetic is the worse
-     failure of the two. Widening the bound is a change to the core's method,
-     not to this kit. */
+     EXP_SAFE_X is therefore NOT an accuracy bound, whatever the comment here
+     said for as long as it was wrong. It bounds the EXACT column, whose
+     denominator has 161 digits at lambda*t = 4, 401 at 10 and 801 at 20; past
+     that the fraction the page is arguing for stops being something a reader
+     can look at. The refusal stays, so a hand-written preset cannot step round
+     a control the page does not offer. */
   var EXP_SAFE_X = 12;
   function expNegSafe(x) {
     if (!(x >= 0) || x > EXP_SAFE_X) return NaN;

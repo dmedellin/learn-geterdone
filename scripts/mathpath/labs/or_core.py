@@ -1678,10 +1678,19 @@ NET_JS = r"""
     for (j = 0; j < right.length; j += 1) if (zr[j]) { coverR.push(right[j]); NS.push(right[j]); }
     return { matching: matching, size: matching.length,
              cover: { left: coverL, right: coverR, size: coverL.length + coverR.length },
+             /* Both of these were named for the opposite of what they hold.
+                `hall` was true exactly when HALL'S CONDITION FAILS, and
+                `perfect` was true when the matching saturates the SMALLER
+                side -- so a three-by-two instance reported perfect: true with
+                an applicant unplaced. Nothing reader-facing was wrong only
+                because the one caller recomputes its own verdict. Renamed to
+                what they are; a caller reaching for either name now gets the
+                sense it reads as. */
              deficient: { S: S, N: NS, gap: S.length - NS.length,
-                          hall: S.length > NS.length },
+                          violated: S.length > NS.length },
              alternating: { left: S.slice(), right: NS.slice() },
-             perfect: matching.length === Math.min(left.length, right.length),
+             saturatesSmallerSide:
+               matching.length === Math.min(left.length, right.length),
              matchL: matchL, matchR: matchR };
   }
 """
