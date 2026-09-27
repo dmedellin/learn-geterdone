@@ -77,10 +77,14 @@ the second opinion:
 
 THE MODES:
 
-  shuffle    both shuffles over EVERY tape at n ≤ 6, the exact probability of
-             each permutation, the total variation distance from uniform, and
-             n! against n^n -- the divisibility argument that proves the naive
-             swap cannot be uniform whatever a sample shows
+  shuffle    both shuffles over EVERY tape, the exact probability of each
+             permutation, the total variation distance from uniform, and n!
+             against n^n -- the divisibility argument that proves the naive
+             swap cannot be uniform whatever a sample shows. The slider offers
+             n = 3 to 5, because 120 bars is as many as the figure can carry;
+             `rkShuffleCap` refuses above six for the naive swap and above
+             seven for Fisher-Yates, which are different numbers because the
+             tape counts are n^n and n!
   costs      randomised quicksort: the fixed-pivot count on the input the
              reader chose, the exact distribution over every execution, the
              closed form, the mean over the seeds shown, and Markov and
@@ -121,8 +125,9 @@ and a mode cannot take half of it.
 WHAT RANDOM_JS SHIPS THAT NO MODE HERE CALLS, named rather than left to be
 discovered: `reservoir` and its k/n retention claim. It is on every page in
 this kit because RANDOM_JS is indivisible, and there is no lesson behind it
-yet. mathcheck tests it in the algo_core section; a sixth mode is where it
-belongs, and adding one costs nothing on the wire.
+yet. Nothing in this repository executed it either until this kit's mathcheck
+section did -- the claim is now enumerated over every tape at six items or
+fewer -- and a sixth mode is where it belongs, costing nothing on the wire.
 
 NOTHING HERE ROUNDS EXCEPT A PRINTED DECIMAL, AND NOTHING IS IRRATIONAL. Every
 probability, expectation, variance, mean, tail and bound in this kit is a ratio
@@ -1064,9 +1069,6 @@ def _shuffle(cfg):
         + '<td>' + hits + '</td><td>' + Rtext(R(BigInt(hits), BigInt(seeds))) + '</td></tr>';
     });
     permT.innerHTML = head + body + '</tbody>';
-    if (byCount.length > MAXROWS) {
-      status.innerHTML = '';
-    }
 
     /* The proof, as arithmetic rather than as a sentence. */
     proofT.innerHTML = '<thead><tr><th>the counting argument</th><th>value</th></tr></thead><tbody>'

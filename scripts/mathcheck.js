@@ -16779,6 +16779,42 @@ console.log('randomised algorithms: exact distributions, against enumerations th
     }
   }
 
+
+  /* --- reservoir sampling, which no mode here draws and nothing else tested */
+  {
+    /* `reservoir` ships on every page of this kit because RANDOM_JS is one
+       block, and until now nothing in this repository executed it. Its claim
+       is exact and small enough to enumerate: after the whole stream, every
+       one of the n items is in the reservoir with probability exactly k/n.
+       The draws are enumerated here -- draw i is uniform on 0..i, so the tape
+       space is (k+1)(k+2)...n -- and the frequencies are counted. */
+    const CASES = [[4, 1], [4, 2], [5, 2], [5, 3], [6, 2], [3, 3]];
+    for (const [n, k] of CASES) {
+      const sizes = [];
+      for (let i = k; i < n; i += 1) sizes.push(i + 1);
+      let tapes = [[]];
+      for (const s of sizes) {
+        const next = [];
+        for (const t of tapes) for (let v = 0; v < s; v += 1) next.push(t.concat([v]));
+        tapes = next;
+      }
+      const seen = new Array(n).fill(0);
+      for (const tape of tapes) {
+        const out = reservoir(n, k, tape);
+        eq(out.sample.length, Math.min(k, n), 'the reservoir holds k items');
+        eq(new Set(out.sample).size, out.sample.length, 'and no item twice');
+        out.sample.forEach((i) => { seen[i] += 1; });
+      }
+      let uniform = true;
+      for (let i = 0; i < n; i += 1) {
+        if (!Requ(R(BigInt(seen[i]), BigInt(tapes.length)), R(BigInt(k), BigInt(n)))) uniform = false;
+      }
+      eq(uniform, true, 'n = ' + n + ', k = ' + k + ': over all ' + tapes.length
+         + ' tapes every item is retained with probability exactly ' + k + '/' + n);
+      eq(Rtext(reservoir(n, k, sizes.map(() => 0)).retention), Rtext(R(BigInt(k), BigInt(n))),
+         'which is the retention the routine reports');
+    }
+  }
   /* --- the kit's own contract --------------------------------------------- */
   {
     eq(randomSrc.indexOf('random_lab: unknown mode') > 0, true,
@@ -17045,6 +17081,23 @@ console.log('reductions: both instances solved, and the map between the solution
         eq(truth.indexOf(rdAssignKey(rdIsBack(R.made, members))) >= 0, true,
            'the set ' + rdSetText(members) + ' maps to a model enumerated here');
       });
+      /* THE DEFAULT IS A CLAIM AND IS NOW A CHECKED ONE. A variable that no
+         chosen literal mentions is left FALSE. Setting it TRUE instead gives
+         a different -- and still satisfying -- assignment, so soundness,
+         injectivity and surjectivity all survive the change and none of them
+         notices it. The page prints the assignment and explains the
+         surjectivity failure BY this convention, so the convention is what
+         has to be pinned. */
+      R.sets.forEach(function (members) {
+        const mentioned = new Set(members.map((i) => Math.abs(R.made.nodes[i].lit)));
+        const a = rdIsBack(R.made, members);
+        for (let v = 1; v <= F.n; v += 1) {
+          if (mentioned.has(v)) continue;
+          eq(a[v - 1], false,
+             'x' + v + ' is mentioned by no literal of ' + rdSetText(members)
+             + ', so the map back leaves it false');
+        }
+      });
       /* the reverse construction, on every model */
       eq(R.backwardWorks, true, 'and every model builds an independent set of size k');
       eq(R.back.every((b) => b.independent && b.sized), true, 'checked one by one');
@@ -17066,6 +17119,12 @@ console.log('reductions: both instances solved, and the map between the solution
       eq(rdAssignKey(rdIsBack(R.made, group[0])), rdAssignKey(rdIsBack(R.made, group[1])),
          'and they really do map to the same assignment');
       eq(group[0].join(',') === group[1].join(','), false, 'while being different sets');
+      eq(R.map.pairs.map((pr) => pr.to).join(' '), '010 000 110 010 010 101 011',
+         'and the seven sets map, in mask order, to exactly these assignments -- which pins the '
+         + 'FALSE default as well as the map');
+      eq(R.map.unhit.join(','), '111',
+         'the one model nothing maps to is 111, because no independent set of size 2 mentions all '
+         + 'three variables positively');
       eq(R.map.surjective, false,
          'and it is not surjective either: the map back leaves an unmentioned variable false');
       eq(R.map.bijection, false, 'so it is not a bijection, and the kit must not say it is');
@@ -17390,6 +17449,17 @@ console.log('reductions: both instances solved, and the map between the solution
        'a column that would carry is drawn red');
     eq(rdDrawColumns(null, [2], 10, ['x1']), rdColumnSvg([2], 10, ['x1']),
        'and the installers return the same markup with a null element');
+    const matrix = rdMatrixSvg([[0, 1, 2], [1, 0, 1], [2, 1, 0]], [0, 1, 2]);
+    eq((matrix.match(/<rect /g) || []).length, 9, 'the distance matrix draws one cell per pair');
+    eq((matrix.match(/var\(--green\)/g) || []).length, 4,
+       'a step of the tour that costs 1 is green, and this tour has two of them, each drawn twice '
+       + 'because the matrix is symmetric');
+    eq((matrix.match(/var\(--red\)/g) || []).length, 2,
+       'and the one step that costs 2 is red, both ways round');
+    eq(rdDrawMatrix(null, [[0, 1], [1, 0]], null), rdMatrixSvg([[0, 1], [1, 0]], null),
+       'and the installer returns the same markup with a null element');
+    eq(rdMatrixSvg([[0, 1], [1, 0]], null).indexOf('var(--green)'), -1,
+       'with no tour nothing is coloured');
     eq(rdDrawChain(null, [], true), rdChainSvg([], true), 'both of them');
   }
 }
@@ -17909,6 +17979,22 @@ console.log('coping with intractability: every ratio beside the optimum it is a 
       eq(sweep.every((r) => r.optimum === bestKnapsack(big, 12)), true,
          'every row reports the same optimum, because the optimum does not depend on epsilon');
       eq(sweep.every((r) => r.within), true, 'and every row is inside its own promise');
+      /* AND ON AN INSTANCE WHERE THE FPTAS ACTUALLY LOSES SOMETHING. The
+         sweep above runs on values large enough that every epsilon finds the
+         optimum outright, which makes the optimum column and the value column
+         the same number -- so a sweep that reported the APPROXIMATION as the
+         optimum would look identical. This is the instance where they differ. */
+      const lossy = cpEpsilonSweep(small, 10, [1, 2]);
+      eq(lossy[0].optimum, bestKnapsack(small, 10),
+         'the sweep reports the TRUE optimum, ' + bestKnapsack(small, 10)
+         + ', found here over every subset');
+      eq(lossy[0].value < lossy[0].optimum, true,
+         'and at eps = 1 the approximation really does lose something -- ' + lossy[0].value
+         + ' against ' + lossy[0].optimum + ' -- which is what makes the line above a test');
+      eq(lossy[0].loss, lossy[0].optimum - lossy[0].value, 'the loss is the gap between them');
+      eq(Rcmp(lossy[0].ratio, R(1n, 1n)) < 0, true, 'so the ratio is strictly under 1');
+      eq(lossy[0].within, true, 'and it is still inside the promise');
+      eq(lossy[1].optimum, bestKnapsack(small, 10), 'the second row reports the same optimum');
       let monotone = true;
       for (let i = 1; i < sweep.length; i += 1) {
         if (Rcmp(sweep[i].promised, sweep[i - 1].promised) > 0) monotone = false;

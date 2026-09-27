@@ -26,12 +26,21 @@ figure in it whose denominator was guessed.
 
 AND THE INSTANCE THAT ATTAINS THE WORST CASE, FOUND RATHER THAN QUOTED.
 "Tight" is the word a textbook uses and a reader cannot check. `vertexcover`
-enumerates EVERY graph on the number of vertices the slider names -- 1024 of
-them at five vertices, each solved exactly -- and reports the worst ratio any
-of them produced and the graph that produced it. The answer is 2 and the graph
-is a perfect matching, which is what the books say; the difference is that the
-page found it. `fptas` does the same over epsilon, and `setcover` opens on the
-family that forces the logarithm.
+enumerates EVERY graph on the number of vertices the slider names -- 1023
+non-empty graphs at five vertices, each solved exactly -- and reports the
+worst ratio any of them produced, the first graph attaining it and the DENSEST
+one. Both, because the first is a single edge and a reader shown only that
+concludes the bound is an artefact of a degenerate case; at five vertices the
+densest witness has seven edges. The answer is 2 at every size, and the page
+found it rather than quoting it.
+
+`tsp` does the same over every metric instance on four cities with distances
+up to 3 -- 482 of them -- and the worst ratio there is 10/7, comfortably
+inside the promise of 2, which is itself the lesson: a small exhaustive search
+bounds the ratio BELOW the guarantee and that is not evidence against the
+guarantee. `fptas` sweeps epsilon instead, printing the promise and the
+realised loss at each, and `setcover` opens on a family where greedy really
+does take more sets than the optimum, which most families do not.
 
 WHAT IS COMPUTED AND WHAT IS CHECKED AGAINST SOMETHING ELSE.
 `algo_core.COPING_JS` holds the algorithms -- `branchBound`, `maximalMatching`,
@@ -103,7 +112,7 @@ Algorithms course 1 lesson 1, whose body is heavier than the median. Against
 the repository's 62 KB ceiling:
 
     vertexcover 46.5   fpt 46.7   setcover 46.9   fptas 51.2
-    branchbound 51.3   tsp 56.3
+    branchbound 51.6   tsp 56.3
 
 Re-derive them rather than trusting them. `tsp` is the heaviest at 56.3, five
 kilobytes clear of the next, and the reason is in the table above: it is the
@@ -848,19 +857,33 @@ def _branchbound(cfg):
     document.getElementById('bbPruned').textContent = withBound.result.pruned
       + ' branches cut with the bound, ' + without.result.pruned + ' without';
 
+    /* WHAT THIS COLUMN MAY AND MAY NOT SAY. The trace records the bound at
+       each node; it does not record the best value known AT THAT MOMENT, and
+       the search prunes against that running best rather than against the
+       final one. So a row cannot honestly be labelled "pruned". What CAN be
+       said from the two numbers on the row is exact either way: a bound at or
+       below the final answer means the branch held nothing better than the
+       final answer, and a bound above it means the branch was certainly
+       explored, because the running best never exceeds the final best. The
+       number of branches actually cut is the counter the algorithm kept, and
+       it is in the panel above rather than inferred here. */
     var head = '<thead><tr><th>node</th><th>depth</th><th>value so far</th>'
-      + '<th>bound on any completion</th><th>what happened</th></tr></thead><tbody>';
+      + '<th>bound on any completion</th><th>what the two numbers settle</th>'
+      + '</tr></thead><tbody>';
     var body = '';
     var lo = Math.max(0, Math.min(at - 6, run.trace.length - MAXROWS));
     run.trace.slice(Math.max(0, lo), Math.max(0, lo) + MAXROWS).forEach(function (st) {
-      var cut = st.bound !== null && Rcmp(st.bound, R(BigInt(run.result.value), 1n)) <= 0;
+      var under = st.bound !== null && Rcmp(st.bound, R(BigInt(run.result.value), 1n)) <= 0;
       body += '<tr' + (st.at === at ? ' class="on"' : '') + '><td>' + (st.at + 1) + '</td>'
         + '<td>' + st.depth + '</td><td class="tt">' + st.value + '</td>'
         + '<td class="tt">' + (st.bound === null ? 'not computed — the bound is off'
             : cpBoth(st.bound, 3)) + '</td>'
-        + '<td class="' + (st.bound === null ? 'tone-muted">expanded'
-            : (cut ? 'tone-cyan">the bound is at or below the best found, so this branch is cut'
-                : 'tone-muted">the bound leaves room, so it is expanded')) + '</td></tr>';
+        + '<td class="' + (st.bound === null ? 'tone-muted">nothing: with the bound off every '
+              + 'node is expanded'
+            : (under ? 'tone-cyan">at or below the ' + run.result.value + ' the search ended '
+                  + 'with, so this branch held nothing better'
+                : 'tone-muted">above ' + run.result.value + ', so this branch was certainly '
+                  + 'explored')) + '</td></tr>';
     });
     traceT.innerHTML = head + body + '</tbody>';
 

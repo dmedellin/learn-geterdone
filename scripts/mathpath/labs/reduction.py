@@ -17,15 +17,18 @@ on the page, in four parts that no mode is allowed to skip:
                             for injectivity -- three verdicts, not one word
 
 THE FOURTH PART IS THE ONE THAT USUALLY GETS ASSERTED, AND IT IS OFTEN FALSE.
-Two of these five reductions really are bijections on solutions and the page
-says so because it computed it; two are sound and complete but NOT injective,
-and the page says that too, with the two solutions of the transformed instance
-that map to the same solution of the original on screen. A lab that printed
-"bijection" over all five would be wrong about three of them, and no markup
-check anywhere would notice. What a reduction has to preserve is the ANSWER;
-preserving the solutions one-for-one is a stronger property that some
-reductions have and some do not, and the difference is exactly the thing worth
-computing.
+Three of these five reductions really are bijections on solutions -- and the
+page says so because it computed all three properties, not because a textbook
+does. One is sound in both directions and is neither injective nor surjective,
+and the page says THAT, with the two independent sets that map to one
+assignment on screen and the reason the map back cannot hit every assignment
+written beside them. The fifth is not a map between instances at all.
+
+A lab that printed "bijection" over all five would be wrong about two of them
+and no markup check anywhere would notice. What a reduction has to preserve is
+the ANSWER; preserving the solutions one for one is a stronger property that
+some reductions have and some do not, and the difference is exactly the thing
+worth computing rather than asserting.
 
     selfreduce      search from decision: n + 1 calls to a yes/no oracle
                     build a satisfying assignment. Not a map between
@@ -33,10 +36,14 @@ computing.
                     so the fourth part here is that every restricted formula's
                     answer is checked against brute force and the assignment
                     is verified clause by clause at the end.
-    independentset  3-SAT to independent set. Sound and complete, NOT
-                    injective: a clause with two true literals gives two
-                    independent sets that map to the same assignment, and the
-                    page finds one.
+    independentset  3-SAT to independent set. Sound, and the reverse
+                    construction works on every model, but the solution map is
+                    neither injective nor surjective: a clause with two true
+                    literals gives two independent sets that map to the same
+                    assignment, and the map back leaves any variable no chosen
+                    literal mentions at false, so an assignment that sets one
+                    of those true is the image of nothing. The page computes
+                    all four facts and names them separately.
     complement      independent set, vertex cover and clique in the
                     complement. A genuine bijection, and the page checks it on
                     EVERY subset rather than on the optimal ones: S is
@@ -86,6 +93,15 @@ the solution-level checking that turns a reduction into a fact:
                              deliberately absent: two exhaustive routes that
                              agree are evidence, one clever route is not.
 
+THE THREE DRAWINGS ARE IN THE BLOCK, NOT IN THE MODES. `rdChainSvg` draws the
+self-reduction's branch chain, `rdColumnSvg` the digit table's column totals
+against the base, and `rdMatrixSvg` the distance matrix with the tour's steps
+coloured. Each takes what it draws and returns a string; each has an installer
+that takes the element FIRST and may be handed null. That is algo_core's rule
+and it is not stylistic: `rdMatrixSvg` spent a draft closed over the mode's
+`mat` element, where it drew half of what the travelling-salesman mode claims
+and no test could call it.
+
 BLOCKS PER MODE. COUNT_JS, DIGRAPH_JS, ORACLE_JS, REDUCTION_JS and this kit's
 own block are on every page here; RATIONAL_JS is added by nothing, because
 there is not a single fraction in this kit -- every figure is a count, a size,
@@ -97,8 +113,8 @@ Measured, gzipped, on a real shipped lesson page with this lab swapped in --
 Algorithms course 1 lesson 1, whose body is heavier than the median. Against
 the repository's 62 KB ceiling:
 
-    selfreduce 43.4   complement 43.6   independentset 43.7   subsetsum 43.8
-    tsp 44.1
+    selfreduce 43.8   complement 44.1   independentset 44.2   tsp 44.2
+    subsetsum 44.3
 
 Re-derive them rather than trusting them. The spread is under a kilobyte
 because every mode here carries the same four blocks: REDUCTION_JS is one
@@ -680,6 +696,46 @@ RDKIT_JS = r"""
     if (el) el.innerHTML = out;
     return out;
   }
+
+  /* The distance matrix, drawn, with the tour's steps filled in. It lives
+     here rather than inside the mode for the reason SERIES_JS and dgSvg do:
+     a helper closed over an element cannot be called from a test, and this
+     one is half of what the travelling-salesman mode is claiming. A step that
+     costs 1 is green and a step that costs 2 is red, so "every step is an
+     edge" is a colour the reader can check against the graph beside it. */
+  function rdMatrixSvg(D, tour) {
+    var n = D.length, cell = Math.min(44, 380 / (n + 1)), x0 = 40, y0 = 40, s = '', i, j;
+    var onPath = {};
+    (tour || []).forEach(function (v, k) {
+      var w = tour[(k + 1) % tour.length];
+      onPath[v + ',' + w] = true; onPath[w + ',' + v] = true;
+    });
+    for (i = 0; i < n; i += 1) {
+      s += '<text x="' + (x0 - 14) + '" y="' + (y0 + i * cell + cell / 2 + 4)
+        + '" text-anchor="middle" font-size="12" font-weight="700" fill="var(--muted)">'
+        + (i + 1) + '</text>'
+        + '<text x="' + (x0 + i * cell + cell / 2) + '" y="' + (y0 - 8)
+        + '" text-anchor="middle" font-size="12" font-weight="700" fill="var(--muted)">'
+        + (i + 1) + '</text>';
+      for (j = 0; j < n; j += 1) {
+        var on = onPath[i + ',' + j], d = D[i][j];
+        s += '<rect x="' + (x0 + j * cell) + '" y="' + (y0 + i * cell) + '" width="' + (cell - 2)
+          + '" height="' + (cell - 2) + '" fill="'
+          + (i === j ? 'var(--panel-3)' : (on ? (d === 1 ? 'var(--green)' : 'var(--red)')
+              : 'var(--panel-solid)'))
+          + '" stroke="var(--line)" />'
+          + '<text x="' + (x0 + j * cell + cell / 2 - 1) + '" y="' + (y0 + i * cell + cell / 2 + 3)
+          + '" text-anchor="middle" font-size="12" font-weight="700" fill="'
+          + (on ? 'var(--on-accent)' : 'var(--text)') + '">' + d + '</text>';
+      }
+    }
+    return s;
+  }
+  function rdDrawMatrix(el, D, tour) {
+    var out = rdMatrixSvg(D, tour);
+    if (el) el.innerHTML = out;
+    return out;
+  }
 """
 
 
@@ -887,7 +943,7 @@ def _selfreduce(cfg):
     controls = (
         _select("srPreset", "Worked example", _options(_SR_PRESETS), chosen["id"])
         + _text("srCnf", "Clauses, literals by spaces and clauses by a semicolon", chosen["cnf"])
-        + _range("srStep", "Show the formula after this many variables are fixed", 0, 6, 0)
+        + _range("srStep", "Highlight the question asked about this variable", 1, 6, 1)
         + _kpis([("Variables and clauses", "srSize"),
                  ("The decision oracle says", "srDecide"),
                  ("Oracle calls used", "srCalls"),
@@ -929,9 +985,16 @@ def _selfreduce(cfg):
     var trace;
     try { trace = rdSelfTrace(F); }
     catch (e) { if (!rdIsRefusal(e)) throw e; blank(e.message); return; }
-    stepIn.max = F.n;
-    var at = Math.max(0, Math.min(F.n, parseInt(stepIn.value, 10)));
-    stepOut.textContent = at + ' of ' + F.n;
+    stepIn.max = Math.max(1, F.n);
+    /* The label says this highlights the question about one variable, and
+       that is all it does. A slider whose label promises more than its code
+       delivers is the same defect as a figure that is wrong, and harder to
+       see: nothing downstream can tell that the row it lit was not the row
+       the caption named. */
+    var at = Math.max(1, Math.min(Math.max(1, F.n), parseInt(stepIn.value, 10)));
+    stepOut.textContent = trace.steps.length
+      ? 'x' + at + ', question ' + at + ' of ' + F.n
+      : 'no question was asked: the first oracle call ended it';
 
     plot.innerHTML = rdChainSvg(trace.steps, trace.satisfiable);
 
@@ -1014,7 +1077,7 @@ def _selfreduce(cfg):
   function apply() {
     var p = SRP[presetIn.value];
     if (!p) return;
-    cnfIn.value = p.cnf; stepIn.value = '0';
+    cnfIn.value = p.cnf; stepIn.value = '1';
     redraw();
   }
   presetIn.addEventListener('change', apply);
@@ -1872,39 +1935,6 @@ def _tsp(cfg):
       + '<span class="tt">1-2</span>.';
   }
 
-  /* The matrix as SVG text, so both halves of the construction sit on the same
-     stage. A table would be the better shape and it would not sit beside the
-     drawing; this is the compromise, and it is the reason the cell values are
-     the only thing drawn. */
-  function matrixSvg(D, tour) {
-    var n = D.length, cell = Math.min(44, 380 / (n + 1)), x0 = 40, y0 = 40, s = '', i, j;
-    var onPath = {};
-    (tour || []).forEach(function (v, k) {
-      var w = tour[(k + 1) % tour.length];
-      onPath[v + ',' + w] = true; onPath[w + ',' + v] = true;
-    });
-    for (i = 0; i < n; i += 1) {
-      s += '<text x="' + (x0 - 14) + '" y="' + (y0 + i * cell + cell / 2 + 4)
-        + '" text-anchor="middle" font-size="12" font-weight="700" fill="var(--muted)">'
-        + (i + 1) + '</text>'
-        + '<text x="' + (x0 + i * cell + cell / 2) + '" y="' + (y0 - 8)
-        + '" text-anchor="middle" font-size="12" font-weight="700" fill="var(--muted)">'
-        + (i + 1) + '</text>';
-      for (j = 0; j < n; j += 1) {
-        var on = onPath[i + ',' + j], d = D[i][j];
-        s += '<rect x="' + (x0 + j * cell) + '" y="' + (y0 + i * cell) + '" width="' + (cell - 2)
-          + '" height="' + (cell - 2) + '" fill="'
-          + (i === j ? 'var(--panel-3)' : (on ? (d === 1 ? 'var(--green)' : 'var(--red)')
-              : 'var(--panel-solid)'))
-          + '" stroke="var(--line)" />'
-          + '<text x="' + (x0 + j * cell + cell / 2 - 1) + '" y="' + (y0 + i * cell + cell / 2 + 3)
-          + '" text-anchor="middle" font-size="12" font-weight="700" fill="'
-          + (on ? 'var(--on-accent)' : 'var(--text)') + '">' + d + '</text>';
-      }
-    }
-    return s;
-  }
-
   function redraw() {
     var parsed = rdParseGraph(specIn.value, 8);
     if (parsed.bad) { blank(parsed.bad); return; }
@@ -1926,7 +1956,7 @@ def _tsp(cfg):
     });
     plot.innerHTML = dgSvg(G, { points: pts, label: 'none', highlight: highlight,
                                 colours: rdColours(n, shown.tour, 0) });
-    mat.innerHTML = matrixSvg(R.D, shown.tour);
+    mat.innerHTML = rdMatrixSvg(R.D, shown.tour);
 
     document.getElementById('tsSize').textContent = n + ' vertices, ' + G.arcs.length + ' edges';
     document.getElementById('tsBudget').textContent = (n * n) + ' distances, budget ' + R.budget;

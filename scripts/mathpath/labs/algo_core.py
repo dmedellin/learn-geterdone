@@ -168,7 +168,11 @@ Dependencies a kit must concatenate alongside:
                            ORACLE_JS
     REDUCTION_JS           DIGRAPH_JS and ORACLE_JS
     COPING_JS              RATIONAL_JS, DIGRAPH_JS, ORACLE_JS, GRAPHKIT_JS (for
-                           primRun), GREEDY_JS (for fractionalKnapsack),
+                           primRun) AND ALGO_JS (for ilog2, which primRun calls
+                           to fill its `bound` field -- a page that takes
+                           GRAPHKIT_JS and not ALGO_JS throws a ReferenceError
+                           the first time it draws an MST tour, and this row
+                           did not say so), GREEDY_JS (for fractionalKnapsack),
                            sysdesign_core's HARMONIC_JS for the H_n * OPT bound
                            and the charges, and RCEIL_JS for the FPTAS's floor
 
@@ -4518,9 +4522,18 @@ RANDOM_JS = r"""
 
   /* KARGER'S CONTRACTION, EXACTLY.
 
-     The success probability CANNOT be obtained by enumerating edge orders: that
-     is |E|! and it is wrong as well as slow, because different orders reach the
-     same contracted graph and the algorithm's future depends only on the graph.
+     Enumerating edge orders is SLOW -- |E|! of them -- but it is not wrong,
+     which this comment claimed until mathcheck.js was made to enumerate them.
+     Taking a uniformly random permutation and always contracting the first
+     live edge is the same experiment as repeatedly contracting a uniformly
+     random live edge, because the relative order of the live edges in a
+     uniform permutation is itself uniform. The two agree cut by cut, as exact
+     rationals, on five graphs; the assertion is in the randomised-algorithms
+     section and it is the oracle for everything below.
+
+     What is true is that the enumeration is the wrong SHAPE for this function:
+     different orders reach the same contracted graph and the algorithm's
+     future depends only on the graph.
      So this is a memoised recursion over CONTRACTION STATES -- a state being
      the current partition of the vertices into supernodes -- and the value at a
      state is the probability of reaching two supernodes without ever having
