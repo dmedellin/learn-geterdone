@@ -61,6 +61,18 @@ TWO THINGS THE ENGINE DID NOT HAVE AND A PANEL NEEDS.
   where the two checks disagree. It is built here rather than stored as data,
   so `bstValid` and `bstLocallyValid` are evaluated on it in the reader's
   browser like everything else.
+
+EVERY PRESET PINS WHAT IT PRINTS. Each of the 24 presets carries `expect`:
+{kpi element id: the exact text the page prints}, one to three tiles, read off
+the running kit with `node scripts/labcheck.js --observe <page>` rather than
+out of TREE_JS. scripts/labcheck.js selects the option on the BUILT page,
+dispatches the menu's change handler and compares the tile's textContent -- a
+`label` is prose no check can read, and a sweep of fifteen kits found 57 such
+strings false about the lab they described. `expect` never reaches the browser:
+`_js_presets` strips it before cfg_literal embeds the presets. Two tiles are
+deliberately never pinned and say why in a comment: the local/global invariant
+pair on `bst` is about a fixed demonstration tree, and `2 ln n` is an asymptote
+rather than a prediction about the tree on screen.
 """
 
 from .algebra_core import RATIONAL_JS
@@ -419,6 +431,40 @@ def _preset_index(cfg, presets, mode):
     )
 
 
+def _expect(presets):
+    """{preset key: {kpi element id: the exact text the page prints}}.
+
+    A preset's `label` is prose about an instance and no check here can read
+    it -- a sweep of fifteen kits found 57 preset strings false about the lab
+    they described. This is the part of the claim a machine can hold:
+    scripts/build_paths.py writes it to scripts/generated-expectations.json,
+    and scripts/labcheck.js selects the option on the BUILT page, dispatches
+    the menu's change handler and compares getElementById(kpi).textContent.
+    Every figure was read off the running kit with
+    `node scripts/labcheck.js --observe <page>`, never out of TREE_JS.
+
+    Tiles are read with every OTHER control at the value the markup ships, so
+    a claim that needs a second control moved -- another rotation, a different
+    query, a longer key sequence -- is a comment beside the preset rather than
+    a weaker pin.
+
+    This kit serves two courses. No mode appears in both, and `--observe` over
+    all seven pages shows no tile whose value depends on which lesson embedded
+    the mode, so a preset's figures are the same wherever it is offered.
+    """
+    return {p["key"]: dict(p.get("expect") or {}) for p in presets}
+
+
+def _js_presets(presets):
+    """The presets as the page's script sees them, WITHOUT `expect`.
+
+    cfg_literal embeds the whole dict in the page, so a key added for the
+    build would otherwise ship to every reader. `expect` is for
+    scripts/labcheck.js and never for the browser.
+    """
+    return [{k: v for k, v in q.items() if k != "expect"} for q in presets]
+
+
 # Every mode needs the rationals, the counter convention, the renderer and the
 # engine. The seeded stream, the plot and the logarithm are added only by the
 # modes that use them, because the ceiling on a published page is 62 KB gzipped.
@@ -436,14 +482,22 @@ _SKIP_JS = RATIONAL_JS + COUNT_JS + RFIXED_JS + SERIES_JS + STREAM_JS + SEEDED_J
 # ================================================================== mode: bst
 
 BST_PRESETS = [
+    # tbLocalCheck and tbGlobalCheck are about the FIXED tree the mode builds to
+    # separate the two invariants, not about the sequence a preset types, so they read
+    # the same under every option here and pinning them would prove nothing about any
+    # of them.
     {"key": "two-child-delete", "label": "build a tree, then delete a node with two children",
-     "ops": "50 30 70 20 40 60 80 -30"},
+     "ops": "50 30 70 20 40 60 80 -30",
+     "expect": {"tbNote": "successor 40 moved up", "tbNodes": "6", "tbHeight": "2"}},
     {"key": "delete-the-root", "label": "delete the root, so the successor comes from the far side",
-     "ops": "50 30 70 20 40 60 80 -50"},
-    {"key": "degenerate", "label": "insert in sorted order and get a path",
-     "ops": "10 20 30 40 50 60"},
+     "ops": "50 30 70 20 40 60 80 -50",
+     "expect": {"tbNote": "successor 60 moved up", "tbHeight": "2"}},
+    {"key": "degenerate", "label": "insert six keys in sorted order",
+     "ops": "10 20 30 40 50 60",
+     "expect": {"tbHeight": "5", "tbNodes": "6"}},
     {"key": "search", "label": "build, then look two keys up",
-     "ops": "50 30 70 20 40 60 80 ?40 ?55"},
+     "ops": "50 30 70 20 40 60 80 ?40 ?55",
+     "expect": {"tbNote": "found via 50 -> 30 -> 40", "tbCompares": "16"}},
 ]
 
 BST_SCRIPT = r"""
@@ -591,19 +645,27 @@ def _bst(cfg):
             "node, about whole subtrees. The second picture is a tree that satisfies the same "
             "claim about each node and its two children and is not a search tree at all.",
         ),
-        script=_BASIC_JS + cfg_literal("PRESETS", BST_PRESETS) + BST_SCRIPT,
+        script=_BASIC_JS + cfg_literal("PRESETS", _js_presets(BST_PRESETS)) + BST_SCRIPT,
+        expect={"tbPreset": _expect(BST_PRESETS)},
     )
 
 
 # =============================================================== mode: orders
 
 ORDERS_PRESETS = [
-    {"key": "sorted", "label": "sorted input, which gives a path", "order": "sorted",
-     "n": 15, "seed": 7},
+    # toWorst and toBest are the two reference heights for this n and do not move with
+    # the order the preset selects; toAsym is 2 ln n, an asymptote rather than a
+    # prediction, and it is pinned once -- on bisect, where the page prints 5.416
+    # beside a counted height of 3 and the distance between them is the point.
+    {"key": "sorted", "label": "sorted input, fifteen keys", "order": "sorted",
+     "n": 15, "seed": 7,
+     "expect": {"toHeight": "14 — counted", "toMean": "7 = 7.000 — counted", "toCompares": "105"}},
     {"key": "shuffled", "label": "a seeded shuffle of the same keys", "order": "shuffled",
-     "n": 15, "seed": 7},
-    {"key": "bisect", "label": "middle first, which gives the shortest tree", "order": "bisect",
-     "n": 15, "seed": 7},
+     "n": 15, "seed": 7,
+     "expect": {"toHeight": "6 — counted", "toMean": "44/15 = 2.933 — counted"}},
+    {"key": "bisect", "label": "middle first, fifteen keys", "order": "bisect",
+     "n": 15, "seed": 7,
+     "expect": {"toHeight": "3 — counted", "toAsym": "5.416 — asymptotic"}},
 ]
 
 ORDERS_SCRIPT = r"""
@@ -776,7 +838,8 @@ def _orders(cfg):
             "the keys admit; a seeded shuffle gives something close to `O(log n)`. The dashed "
             "`2 ln n` is an asymptote for the mean depth, not a prediction of this tree's height.",
         ),
-        script=_DEPTH_JS + cfg_literal("PRESETS", ORDERS_PRESETS) + ORDERS_SCRIPT,
+        script=_DEPTH_JS + cfg_literal("PRESETS", _js_presets(ORDERS_PRESETS)) + ORDERS_SCRIPT,
+        expect={"toPreset": _expect(ORDERS_PRESETS)},
     )
 
 
@@ -784,11 +847,14 @@ def _orders(cfg):
 
 ROTATE_PRESETS = [
     {"key": "right-heavy", "label": "a left-leaning tree, rotated right at the root",
-     "keys": "50 30 70 20 40 10", "node": 4, "dir": "right"},
+     "keys": "50 30 70 20 40 10", "node": 4, "dir": "right",
+     "expect": {"trSame": "unchanged", "trHBefore": "3", "trHAfter": "2"}},
     {"key": "left-heavy", "label": "a right-leaning tree, rotated left at the root",
-     "keys": "20 10 40 30 50 60", "node": 1, "dir": "left"},
+     "keys": "20 10 40 30 50 60", "node": 1, "dir": "left",
+     "expect": {"trSame": "unchanged", "trHBefore": "3", "trHAfter": "2"}},
     {"key": "inner", "label": "a rotation below the root",
-     "keys": "50 30 70 20 40 35 45", "node": 1, "dir": "left"},
+     "keys": "50 30 70 20 40 35 45", "node": 1, "dir": "left",
+     "expect": {"trSame": "unchanged", "trHBefore": "3", "trHAfter": "3"}},
 ]
 
 ROTATE_SCRIPT = r"""
@@ -936,7 +1002,8 @@ def _rotate(cfg):
             "else moves, and no key changes its position in sorted order — which is the whole "
             "licence every balanced tree operates under.",
         ),
-        script=_BASIC_JS + cfg_literal("PRESETS", ROTATE_PRESETS) + ROTATE_SCRIPT,
+        script=_BASIC_JS + cfg_literal("PRESETS", _js_presets(ROTATE_PRESETS)) + ROTATE_SCRIPT,
+        expect={"trPreset": _expect(ROTATE_PRESETS)},
     )
 
 
@@ -944,13 +1011,18 @@ def _rotate(cfg):
 
 AVL_PRESETS = [
     {"key": "ascending", "label": "insert one to ten in order",
-     "keys": "1 2 3 4 5 6 7 8 9 10", "count": 10},
-    {"key": "ll", "label": "the outside case on the left", "keys": "30 20 10", "count": 3},
-    {"key": "lr", "label": "the inside case on the left, which needs two rotations",
-     "keys": "30 10 20", "count": 3},
-    {"key": "rl", "label": "the inside case on the right", "keys": "10 30 20", "count": 3},
+     "keys": "1 2 3 4 5 6 7 8 9 10", "count": 10,
+     "expect": {"taHeight": "3", "taPlainH": "9", "taRots": "6"}},
+    {"key": "ll", "label": "the outside case on the left", "keys": "30 20 10", "count": 3,
+     "expect": {"taCases": "LL", "taDoubles": "0"}},
+    {"key": "lr", "label": "the inside case on the left",
+     "keys": "30 10 20", "count": 3,
+     "expect": {"taCases": "LR", "taDoubles": "1"}},
+    {"key": "rl", "label": "the inside case on the right", "keys": "10 30 20", "count": 3,
+     "expect": {"taCases": "RL", "taDoubles": "1"}},
     {"key": "mixed", "label": "a sequence that produces all four cases",
-     "keys": "50 25 75 10 5 30 27 60 90 80 70 98 62", "count": 13},
+     "keys": "50 25 75 10 5 30 27 60 90 80 70 98 62", "count": 13,
+     "expect": {"taCases": "LL, LR, RL, RR", "taRots": "4", "taDoubles": "2"}},
 ]
 
 AVL_SCRIPT = r"""
@@ -1099,7 +1171,8 @@ def _avl(cfg):
             "fixed by one of four cases. The inside cases need a double rotation, and a single "
             "one there moves the problem rather than removing it.",
         ),
-        script=_BASIC_JS + cfg_literal("PRESETS", AVL_PRESETS) + AVL_SCRIPT,
+        script=_BASIC_JS + cfg_literal("PRESETS", _js_presets(AVL_PRESETS)) + AVL_SCRIPT,
+        expect={"taPreset": _expect(AVL_PRESETS)},
     )
 
 
@@ -1107,11 +1180,14 @@ def _avl(cfg):
 
 AUGMENT_PRESETS = [
     {"key": "select", "label": "select the i-th smallest key", "op": "select",
-     "keys": "50 25 75 12 37 62 87 6 18", "i": 3, "lo": 20, "hi": 70},
+     "keys": "50 25 75 12 37 62 87 6 18", "i": 3, "lo": 20, "hi": 70,
+     "expect": {"tgAnswer": "18", "tgScan": "agrees with a scan", "tgVisited": "4 of 9"}},
     {"key": "rank", "label": "rank a key", "op": "rank",
-     "keys": "50 25 75 12 37 62 87 6 18", "i": 5, "lo": 20, "hi": 70},
+     "keys": "50 25 75 12 37 62 87 6 18", "i": 5, "lo": 20, "hi": 70,
+     "expect": {"tgAnswer": "5", "tgScan": "agrees with a scan", "tgVisited": "3 of 9"}},
     {"key": "range", "label": "count the keys in an interval", "op": "range",
-     "keys": "50 25 75 12 37 62 87 6 18", "i": 3, "lo": 20, "hi": 70},
+     "keys": "50 25 75 12 37 62 87 6 18", "i": 3, "lo": 20, "hi": 70,
+     "expect": {"tgAnswer": "4", "tgScan": "agrees with a scan", "tgVisited": "7 of 9"}},
 ]
 
 AUGMENT_SCRIPT = r"""
@@ -1289,19 +1365,39 @@ def _augment(cfg):
             "root-to-node walks. The price is that every rotation must recompute the field — and "
             "the panel checks that it did, rather than taking the number on trust.",
         ),
-        script=_BASIC_JS + cfg_literal("PRESETS", AUGMENT_PRESETS) + AUGMENT_SCRIPT,
+        script=_BASIC_JS + cfg_literal("PRESETS", _js_presets(AUGMENT_PRESETS)) + AUGMENT_SCRIPT,
+        expect={"tgPreset": _expect(AUGMENT_PRESETS)},
     )
 
 
 # ================================================================ mode: treap
 
 TREAP_PRESETS = [
+    # "a treap is a random BST" is a statement about the distribution over priority
+    # assignments, and the seed slider fixes one of them. What a tile can hold is the
+    # uniqueness claim -- both insertion orders give the same tree, node for node --
+    # and the plain search tree on the same order beside it.
     {"key": "sorted-against-shuffled", "label": "sorted against a shuffle of the same keys",
-     "n": 12, "seed": 5, "a": "sorted", "b": "shuffled"},
+     "n": 12, "seed": 5, "a": "sorted", "b": "shuffled",
+     "expect": {
+                "tpSame": "the same tree, node for node",
+                "tpHeightA": "5 — counted",
+                "tpPlain": "11 — counted"
+                }},
     {"key": "two-shuffles", "label": "a shuffle against the reverse of the same keys",
-     "n": 12, "seed": 8, "a": "shuffled", "b": "reversed"},
+     "n": 12, "seed": 8, "a": "shuffled", "b": "reversed",
+     "expect": {
+                "tpSame": "the same tree, node for node",
+                "tpHeightA": "5 — counted",
+                "tpRots": "11 and 8"
+                }},
     {"key": "larger", "label": "twenty keys",
-     "n": 20, "seed": 5, "a": "sorted", "b": "shuffled"},
+     "n": 20, "seed": 5, "a": "sorted", "b": "shuffled",
+     "expect": {
+                "tpSame": "the same tree, node for node",
+                "tpHeightA": "6 — counted",
+                "tpPlain": "19 — counted"
+                }},
 ]
 
 TREAP_SCRIPT = r"""
@@ -1459,17 +1555,21 @@ def _treap(cfg):
             "resulting tree is unique — so two insertion orders of the same `(key, priority)` set "
             "end at the same tree, and the shape no longer depends on the order at all.",
         ),
-        script=_TREAP_JS + cfg_literal("PRESETS", TREAP_PRESETS) + TREAP_SCRIPT,
+        script=_TREAP_JS + cfg_literal("PRESETS", _js_presets(TREAP_PRESETS)) + TREAP_SCRIPT,
+        expect={"tpPreset": _expect(TREAP_PRESETS)},
     )
 
 
 # ============================================================= mode: skiplist
 
 SKIPLIST_PRESETS = [
-    {"key": "sixteen", "label": "sixteen keys from one coin tape", "n": 16, "seed": 1, "target": 12},
+    {"key": "sixteen", "label": "sixteen keys from one coin tape", "n": 16, "seed": 1, "target": 12,
+     "expect": {"tsMax": "L4", "tsMean": "77/16 = 4.813 — counted", "tsPromoted": "10 of 16"}},
     {"key": "eight", "label": "eight keys, so every level is readable", "n": 8, "seed": 6,
-     "target": 6},
-    {"key": "thirty", "label": "thirty keys", "n": 30, "seed": 6, "target": 20},
+     "target": 6,
+     "expect": {"tsMax": "L2", "tsMean": "13/4 = 3.250 — counted", "tsPromoted": "2 of 8"}},
+    {"key": "thirty", "label": "thirty keys", "n": 30, "seed": 6, "target": 20,
+     "expect": {"tsMax": "L5", "tsMean": "83/15 = 5.533 — counted", "tsPromoted": "16 of 30"}},
 ]
 
 SKIPLIST_SCRIPT = r"""
@@ -1616,7 +1716,8 @@ def _skiplist(cfg):
             "search drops a level whenever the next node overshoots, and every hop it takes is "
             "counted — the dashed `2 log₂ n` beside the count is a reference curve, not a claim.",
         ),
-        script=_SKIP_JS + cfg_literal("PRESETS", SKIPLIST_PRESETS) + SKIPLIST_SCRIPT,
+        script=_SKIP_JS + cfg_literal("PRESETS", _js_presets(SKIPLIST_PRESETS)) + SKIPLIST_SCRIPT,
+        expect={"tsPreset": _expect(SKIPLIST_PRESETS)},
     )
 
 

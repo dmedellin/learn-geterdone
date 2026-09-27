@@ -130,6 +130,18 @@ mathcheck's algo_core section and it is waiting for a mode that can afford it.
 
 NOTHING HERE ROUNDS AND NOTHING HERE IS A PROBABILITY. Every quantity is an
 integer or a verdict.
+
+EVERY PRESET PINS WHAT IT PRINTS, AND NO PRESET CARRIES A NOTE. Each of the 25
+presets used to carry a `label` and a `note`, both prose about an outcome that
+nothing here could check -- a sweep of fifteen kits found 57 of those strings
+false. The notes are deleted and each preset now carries `expect`: {kpi element
+id: the exact text the page prints}, one to three tiles read off the running
+kit with `node scripts/labcheck.js --observe <page>`. scripts/labcheck.js
+selects the option on the BUILT page, dispatches the menu's change handler and
+compares the tile's textContent. The oracle-call tile is the one to read
+carefully: on an unsatisfiable formula `selfReduce` makes ONE call and the page
+says so, with n + 1 kept as the bound for BUILDING a witness, and that whole
+string is what `unsat` pins. See `_expect` below.
 """
 
 from .algo_core import COUNT_JS, DIGRAPH_JS, ORACLE_JS, REDUCTION_JS
@@ -860,6 +872,35 @@ def _options(presets):
     return [(p["id"], p["label"]) for p in presets]
 
 
+def _expect(presets):
+    """{preset id: {kpi element id: the exact text the page prints}}.
+
+    A preset used to carry a `label` and a `note` and both were prose about an
+    outcome that no check here could read -- a sweep of fifteen kits found 57
+    of those strings false about the lab they described. The note is gone and
+    this replaces it: scripts/build_paths.py writes it to
+    scripts/generated-expectations.json, and scripts/labcheck.js selects the
+    option on the BUILT page, dispatches the menu's own change handler and
+    compares getElementById(kpi).textContent. The figures were read off the
+    running kit with `node scripts/labcheck.js --observe <page>`, never copied
+    out of the code that computes them.
+
+    WHAT A REDUCTION PRESET PINS. Every mode here prints four things: the
+    instance, the object built from it, the two solution lists, and the
+    verdict that the two agree. A preset exists to make one of those four say
+    something, so that is what it pins -- the oracle-call count on
+    `selfreduce`, the collision on `independentset`, alpha + tau on
+    `complement`, the target and the subsets that reach it on `subsetsum`, the
+    circuit count against the tour count on `tsp`.
+
+    Tiles are read with every OTHER control at the value the markup ships --
+    the pick sliders at 1, the budget the construction sets -- so a claim that
+    needs one of those moved is a comment beside the preset rather than a
+    weaker pin.
+    """
+    return {p["id"]: dict(p.get("expect") or {}) for p in presets}
+
+
 def _chosen(presets, cfg):
     want = str(cfg.get("preset", presets[0]["id"]))
     for p in presets:
@@ -894,36 +935,54 @@ _SR_PRESETS = [
         "id": "three",
         "label": "three variables, four clauses — satisfiable",
         "cnf": "1 2 -3; -1 2 3; 1 -2 3; -1 -2 -3",
-        "note": "four oracle calls build an assignment that eight would have been needed to find "
-                "by search",
+        "expect": {
+            "srCalls": "4 — n + 1 is 4",
+            "srBrute": "8",
+            "srFound": "x1=T x2=T x3=F",
+        },
     },
     {
         "id": "forced",
         "label": "a formula with exactly one model",
         "cnf": "1; 2; -3",
-        "note": "each question has only one allowed answer, and the trace shows the other branch "
-                "being refused",
+        "expect": {
+            "srModels": "1 of 8",
+            "srFound": "x1=T x2=T x3=F",
+            "srCalls": "4 — n + 1 is 4",
+        },
     },
     {
         "id": "unsat",
-        "label": "unsatisfiable — the first call ends it",
+        "label": "two variables, four clauses — unsatisfiable",
         "cnf": "1 2; 1 -2; -1 2; -1 -2",
-        "note": "the decision oracle says no once and the search stops without fixing a single "
-                "variable",
+        "expect": {
+            "srDecide": "no",
+            "srCalls": "1 — the first no ends it; n + 1 = 3 is the bound for BUILDING a witness",
+            "srFound": "none, and there is none",
+        },
     },
     {
         "id": "four",
         "label": "four variables, five clauses",
         "cnf": "1 2 -3; -1 3 4; 2 -4 1; -2 -3 -4; 1 -2 4",
-        "note": "five calls against sixteen assignments, and the gap doubles with every variable "
-                "added",
+        "expect": {
+            "srCalls": "5 — n + 1 is 5",
+            "srBrute": "16",
+            "srModels": "7 of 16",
+        },
     },
     {
         "id": "free",
         "label": "a variable the oracle allows either way",
         "cnf": "1 2; -1 2",
-        "note": "x2 is forced and x1 is free, so the oracle allows both branches at x1 and the "
-                "reduction takes the first",
+        # "the oracle allows either way at x1" is a row of the trace table, not a tile:
+        # what a KPI can hold is the branch the reduction then took, srFound, and the
+        # two models the formula has.
+        "expect": {
+            "srCalls": "3 — n + 1 is 3",
+            "srFound": "x1=T x2=T",
+            "srModels": "2 of 4",
+        },
     },
 ]
 
@@ -967,7 +1026,7 @@ def _selfreduce(cfg):
             "<em>reduction</em>, not an efficient algorithm.",
         )
     )
-    script = _BASE_JS + _FOUR_PARTS + _presets_js("SRP", _SR_PRESETS, ["cnf", "note"]) + r"""
+    script = _BASE_JS + _FOUR_PARTS + _presets_js("SRP", _SR_PRESETS, ["cnf"]) + r"""
   var presetIn = document.getElementById('srPreset'), cnfIn = document.getElementById('srCnf');
   var stepIn = document.getElementById('srStep'), stepOut = document.getElementById('srStepOut');
   var plot = document.getElementById('srPlot');
@@ -1112,6 +1171,7 @@ def _selfreduce(cfg):
             "confident wrong witness would look identical without that check.",
         ),
         script=script,
+        expect={"srPreset": _expect(_SR_PRESETS)},
     )
 
 
@@ -1122,39 +1182,56 @@ def _selfreduce(cfg):
 _IS_PRESETS = [
     {
         "id": "two",
-        "label": "two clauses — six vertices, and a collision",
+        "label": "two clauses on three variables",
         "cnf": "1 2 -3; -1 2 3",
-        "note": "three of the seven independent sets of size 2 map to the same assignment, "
-                "because a clause with two true literals can be satisfied by either",
+        "expect": {
+            "isCount": "7",
+            "isModels": "6 of 8",
+            "isInject": "1 model is shared",
+        },
     },
     {
         "id": "three",
-        "label": "three clauses — nine vertices, twelve independent sets",
+        "label": "three clauses on three variables",
         "cnf": "1 2 -3; -1 2 3; 1 -2 3",
-        "note": "every satisfying assignment is the image of at least one independent set here, "
-                "and most are the image of several",
+        "expect": {
+            "isGraph": "9 vertices, 15 edges",
+            "isCount": "12",
+            "isInject": "4 models are shared",
+        },
     },
     {
         "id": "unsat",
-        "label": "unsatisfiable — no independent set reaches m",
+        "label": "four clauses on two variables — unsatisfiable",
         "cnf": "1 2; -1 2; 1 -2; -1 -2",
-        "note": "the largest independent set is smaller than the number of clauses, which is the "
-                "NO answer arriving on the other side",
+        "expect": {
+            "isK": "4",
+            "isCount": "0",
+            "isModels": "0 of 4",
+        },
     },
     {
         "id": "chain",
         "label": "a forced chain",
         "cnf": "1; -1 2; -2 3",
-        "note": "once the clause before it is settled only one literal of each clause is left to "
-                "satisfy it, so there is no choice anywhere and the map is a bijection on this "
-                "formula and on very few others",
+        "expect": {
+            "isCount": "1",
+            "isModels": "1 of 8",
+            "isInject": "none: the map is injective here",
+        },
     },
     {
         "id": "repeat",
         "label": "a clause that repeats a literal",
         "cnf": "1 1 2; -1 2 3",
-        "note": "the triangle still allows only one of the two copies, so the gadget survives a "
-                "clause the prose never mentions",
+        # "the triangle allows only one of the two copies" is the drawing and the set
+        # table; the tiles pin the graph the gadget built and the two counts it has to
+        # reconcile.
+        "expect": {
+            "isGraph": "6 vertices, 8 edges",
+            "isCount": "7",
+            "isModels": "5 of 8",
+        },
     },
 ]
 
@@ -1197,7 +1274,7 @@ def _independentset(cfg):
             "every clause, and reading those literals off is an assignment.",
         )
     )
-    script = _BASE_JS + _FOUR_PARTS + _presets_js("ISP", _IS_PRESETS, ["cnf", "note"]) + r"""
+    script = _BASE_JS + _FOUR_PARTS + _presets_js("ISP", _IS_PRESETS, ["cnf"]) + r"""
   var presetIn = document.getElementById('isPreset'), cnfIn = document.getElementById('isCnf');
   var pickIn = document.getElementById('isPick'), pickOut = document.getElementById('isPickOut');
   var plot = document.getElementById('isPlot');
@@ -1357,6 +1434,7 @@ def _independentset(cfg):
             "two &mdash; and it is correct anyway.",
         ),
         script=script,
+        expect={"isPreset": _expect(_IS_PRESETS)},
     )
 
 
@@ -1367,37 +1445,52 @@ def _independentset(cfg):
 _CM_PRESETS = [
     {
         "id": "cycle5",
-        "label": "a five-cycle — α = 2, τ = 3",
+        "label": "a five-cycle",
         "spec": "1-2, 2-3, 3-4, 4-5, 5-1",
-        "note": "an odd cycle, where the independent set and the cover are both awkward and the "
-                "identity still holds exactly",
+        "expect": {
+            "cmIdentity": "2 + 3 = 5, which is n",
+            "cmInd": "11",
+            "cmBij1": "on all 32 subsets",
+        },
     },
     {
         "id": "path4",
         "label": "a path on four vertices",
         "spec": "1-2, 2-3, 3-4",
-        "note": "two independent vertices, two in the cover, and the complement is another path "
-                "— 3–1–4–2 — because P4 is self-complementary",
+        "expect": {
+            "cmIdentity": "2 + 2 = 4, which is n",
+            "cmInd": "8",
+            "cmBij2": "on all 16 subsets",
+        },
     },
     {
         "id": "k4",
         "label": "K4 — every pair joined",
         "spec": "1-2, 1-3, 1-4, 2-3, 2-4, 3-4",
-        "note": "the complement has no edges at all, so its largest clique is one vertex and so is "
-                "the largest independent set here",
+        "expect": {
+            "cmIdentity": "1 + 3 = 4, which is n",
+            "cmInd": "5",
+            "cmCli": "5",
+        },
     },
     {
         "id": "star",
         "label": "a star — one hub, four leaves",
         "spec": "1-2, 1-3, 1-4, 1-5",
-        "note": "the hub alone covers everything, and the four leaves are independent: 4 + 1 = 5",
+        "expect": {
+            "cmIdentity": "4 + 1 = 5, which is n",
+            "cmInd": "17",
+        },
     },
     {
         "id": "two",
         "label": "two disjoint triangles",
         "spec": "1-2, 2-3, 3-1, 4-5, 5-6, 6-4",
-        "note": "the complement joins the two triangles into a complete bipartite graph, and its "
-                "largest clique is one vertex from each",
+        "expect": {
+            "cmIdentity": "2 + 4 = 6, which is n",
+            "cmSubsetCount": "64",
+            "cmInd": "16",
+        },
     },
 ]
 
@@ -1447,7 +1540,7 @@ def _complement(cfg):
             "case.",
         )
     )
-    script = _BASE_JS + _FOUR_PARTS + _presets_js("CMP", _CM_PRESETS, ["spec", "note"]) + r"""
+    script = _BASE_JS + _FOUR_PARTS + _presets_js("CMP", _CM_PRESETS, ["spec"]) + r"""
   var presetIn = document.getElementById('cmPreset'), specIn = document.getElementById('cmSpec');
   var pickIn = document.getElementById('cmPick'), pickOut = document.getElementById('cmPickOut');
   var showIn = document.getElementById('cmShow');
@@ -1595,6 +1688,7 @@ def _complement(cfg):
             "being asserted.",
         ),
         script=script,
+        expect={"cmPreset": _expect(_CM_PRESETS)},
     )
 
 
@@ -1605,35 +1699,53 @@ def _complement(cfg):
 _SS_PRESETS = [
     {
         "id": "two",
-        "label": "two variables, two clauses — eight numbers",
+        "label": "two variables, two clauses",
         "cnf": "1 2; -1 2",
-        "note": "four columns, a target of 1144, and two subsets that reach it",
+        "expect": {
+            "ssTarget": "1144",
+            "ssHits": "2",
+            "ssModels": "2 of 4",
+        },
     },
     {
         "id": "three",
-        "label": "three variables, two clauses — the table gets wide fast",
+        "label": "three variables, two clauses",
         "cnf": "1 2 -3; -1 2 3",
-        "note": "ten numbers of five digits each, and the numbers are exponential in the formula "
-                "even though the table is not",
+        "expect": {
+            "ssRows": "10 numbers of 5 digits",
+            "ssTarget": "11144",
+            "ssColumn": "6 against the base 10 — no column can carry",
+        },
     },
     {
         "id": "forced",
-        "label": "one satisfying assignment, one subset",
+        "label": "three clauses on two variables",
         "cnf": "1 -2; -1 2; 1 2",
-        "note": "a single subset hits the target, and it is the single model read off the digits",
+        "expect": {
+            "ssHits": "1",
+            "ssModels": "1 of 4",
+            "ssBij": "a bijection: sound, surjective and injective",
+        },
     },
     {
         "id": "unsat",
-        "label": "unsatisfiable — nothing reaches the target",
+        "label": "four clauses on two variables — unsatisfiable",
         "cnf": "1 2; 1 -2; -1 2; -1 -2",
-        "note": "no subset of the twelve numbers adds to the target of 114444, which is the NO "
-                "answer arriving on the other side",
+        "expect": {
+            "ssHits": "0",
+            "ssModels": "0 of 4",
+            "ssDp": "cannot reach it — agrees",
+        },
     },
     {
         "id": "single",
-        "label": "one clause — the smallest table there is",
+        "label": "one clause",
         "cnf": "1 2",
-        "note": "six numbers, three columns, and every step of the argument visible at once",
+        "expect": {
+            "ssRows": "6 numbers of 3 digits",
+            "ssTarget": "114",
+            "ssHits": "3",
+        },
     },
 ]
 
@@ -1678,7 +1790,7 @@ def _subsetsum(cfg):
             "why <span class=\"tt\">k = 0</span> can never be fixed.",
         )
     )
-    script = _BASE_JS + _FOUR_PARTS + _presets_js("SSP", _SS_PRESETS, ["cnf", "note"]) + r"""
+    script = _BASE_JS + _FOUR_PARTS + _presets_js("SSP", _SS_PRESETS, ["cnf"]) + r"""
   var presetIn = document.getElementById('ssPreset'), cnfIn = document.getElementById('ssCnf');
   var pickIn = document.getElementById('ssPick'), pickOut = document.getElementById('ssPickOut');
   var plot = document.getElementById('ssPlot');
@@ -1845,6 +1957,7 @@ def _subsetsum(cfg):
             "bijection &mdash; which this one is, unlike the independent-set reduction.",
         ),
         script=script,
+        expect={"ssPreset": _expect(_SS_PRESETS)},
     )
 
 
@@ -1856,36 +1969,56 @@ def _subsetsum(cfg):
 _TS_PRESETS = [
     {
         "id": "cycle5",
-        "label": "a five-cycle — one circuit, one tour within budget",
+        "label": "a five-cycle",
         "spec": "1-2, 2-3, 3-4, 4-5, 5-1",
-        "note": "twelve tours to consider, one of length 5, and it is the cycle itself",
+        "expect": {
+            "tsCircuits": "1",
+            "tsWithin": "1",
+            "tsShortest": "5 against a budget of 5",
+        },
     },
     {
         "id": "chorded",
-        "label": "a five-cycle with a chord — the chord changes nothing",
+        "label": "a five-cycle with a chord",
         "spec": "1-2, 2-3, 3-4, 4-5, 5-1, 1-3",
-        "note": "an extra edge adds no new Hamilton circuit here, and the tour list does not move "
-                "either",
+        # "the chord changes nothing" is a claim about two presets at once. It is
+        # checked as the pair: these three tiles against cycle5's, same circuit count
+        # and same tours within budget on a graph with one more edge.
+        "expect": {
+            "tsSize": "5 vertices, 6 edges",
+            "tsCircuits": "1",
+            "tsWithin": "1",
+        },
     },
     {
         "id": "path",
-        "label": "a path — no circuit, and every tour is over budget",
+        "label": "a path on four vertices",
         "spec": "1-2, 2-3, 3-4",
-        "note": "the shortest tour costs 5 against a budget of 4, which is the NO answer arriving "
-                "on the other side",
+        "expect": {
+            "tsCircuits": "0",
+            "tsWithin": "0",
+            "tsShortest": "5 against a budget of 4",
+        },
     },
     {
         "id": "k4",
-        "label": "K4 — three circuits, three tours",
+        "label": "K4 — every pair joined",
         "spec": "1-2, 1-3, 1-4, 2-3, 2-4, 3-4",
-        "note": "every ordering is a circuit, so the two lists are both the whole list",
+        "expect": {
+            "tsCount": "3 — that is (n − 1)!/2",
+            "tsCircuits": "3",
+            "tsWithin": "3",
+        },
     },
     {
         "id": "bowtie",
-        "label": "two triangles sharing a vertex — no Hamilton circuit at all",
+        "label": "two triangles sharing a vertex",
         "spec": "1-2, 2-3, 3-1, 3-4, 4-5, 5-3",
-        "note": "a cut vertex makes a Hamilton circuit impossible, and every tour pays at least "
-                "one distance of 2",
+        "expect": {
+            "tsCircuits": "0",
+            "tsWithin": "0",
+            "tsShortest": "6 against a budget of 5",
+        },
     },
 ]
 
@@ -1934,7 +2067,7 @@ def _tsp(cfg):
             "once, starting at city 1.",
         )
     )
-    script = _BASE_JS + _FOUR_PARTS + _presets_js("TSP2", _TS_PRESETS, ["spec", "note"]) + r"""
+    script = _BASE_JS + _FOUR_PARTS + _presets_js("TSP2", _TS_PRESETS, ["spec"]) + r"""
   var presetIn = document.getElementById('tsPreset'), specIn = document.getElementById('tsSpec');
   var pickIn = document.getElementById('tsPick'), pickOut = document.getElementById('tsPickOut');
   var filterIn = document.getElementById('tsFilter');
@@ -2096,6 +2229,7 @@ def _tsp(cfg):
             "what makes it the right first example and a misleading only example.",
         ),
         script=script,
+        expect={"tsPreset": _expect(_TS_PRESETS)},
     )
 
 

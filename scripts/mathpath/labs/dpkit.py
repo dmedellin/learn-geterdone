@@ -39,6 +39,19 @@ exactly like a right one. So no mode prints a table's answer alone:
     tsp         Held-Karp against ORACLE_JS.tspBrute, and the tour it returns
                 re-measured from the distance matrix.
 
+EVERY PRESET PINS WHAT IT PRINTS, AND NO PRESET CARRIES PROSE ANY MORE. Each
+of the 36 presets used to carry a `note`, and this kit RENDERED the selected
+one into its status banner -- which is as visible as a string in this
+repository ever gets, and the fifteen-kit sweep still found five or six of the
+36 false about the lab they described. One said the memo turned tens of
+thousands of calls "into nineteen", in the same banner line where the page
+printed 50 and 18.
+Rendering prose does not check it. So the note is gone from every preset here,
+and the slot it occupied holds `expect`: {kpi element id: the exact text the
+page prints}. scripts/labcheck.js selects the option on the BUILT page,
+dispatches the menu's own change handler and compares the tile's textContent.
+See `_expect` below and scripts/mathpath/AGENTS.md for the rule.
+
 THE FILL ORDER IS A FIRST-CLASS CONTROL, in `chain` and in `coins`, because
 both lessons ARE the order:
 
@@ -899,6 +912,25 @@ def _options(presets):
     return [(p["id"], p["label"]) for p in presets]
 
 
+def _expect(presets):
+    """{preset id: {kpi element id: the exact text the page prints}}.
+
+    A preset's `label` is prose about an instance and no check in this
+    repository can read it. This is the other half of the same claim, and it is
+    the half a machine can hold: what the page PRINTS once the preset is
+    selected. scripts/labcheck.js selects the option on the BUILT page,
+    dispatches the menu's own change handler and compares
+    getElementById(kpi).textContent with the string here. Every figure below
+    was read off the running kit with `node scripts/labcheck.js --observe
+    <page>`, never copied out of the code that computes it.
+
+    Tiles are read with every OTHER control at the value the markup ships, so a
+    claim that only becomes visible once another control moves cannot be pinned
+    here; those are named in a comment beside the preset that makes them.
+    """
+    return {p["id"]: dict(p.get("expect") or {}) for p in presets}
+
+
 def _chosen(presets, cfg):
     want = str(cfg.get("preset", presets[0]["id"]))
     for p in presets:
@@ -932,32 +964,45 @@ _MM_PRESETS = [
         "label": "coins 1, 2, 5 and an amount of 18",
         "coins": "1 2 5",
         "amount": "18",
-        "note": "the memo turns tens of thousands of calls into fifty, over eighteen distinct "
-                "subproblems, and the answer does not move",
+        "expect": {
+            "mmNaive": "22089",
+            "mmMemo": "50",
+            "mmSaved": "22089/50 = 441.8 times fewer",
+        },
     },
     {
         "id": "awkward",
         "label": "coins 1, 3, 4 — where taking the largest first is wrong",
         "coins": "1 3 4",
         "amount": "6",
-        "note": "greedy would take 4 then 1 then 1 for three coins; the recurrence finds 3 and "
-                "3, which is two",
+        # The instance is here because the largest coin first gives 4 + 1 + 1, and the
+        # recurrence finds 3 + 3. Only the second of those is on the page: no tile runs
+        # a greedy rule, so what is pinned is the answer the three routes agree on.
+        "expect": {
+            "mmBest": "2",
+        },
     },
     {
         "id": "sparse",
-        "label": "coins 4, 7 — nine amounts cannot be made at all, 17 the largest",
+        "label": "coins 4, 7 and an amount of 17",
         "coins": "4 7",
         "amount": "17",
-        "note": "an unreachable amount is a real answer and the table says so rather than "
-                "printing a large number",
+        # Nine amounts below 17 cannot be made from 4 and 7 and 17 is the largest of
+        # them, which is the row of dots in the table rather than a tile; the amount
+        # this preset ships is the largest one, and that one IS a tile.
+        "expect": {
+            "mmBest": "cannot be made",
+        },
     },
     {
         "id": "wide",
         "label": "five coin types, amount 20",
         "coins": "1 2 5 10 20",
         "amount": "20",
-        "note": "more coin types make the naive recursion worse and the table wider by not one "
-                "column",
+        "expect": {
+            "mmNaive": "66282",
+            "mmCells": "126",
+        },
     },
 ]
 
@@ -999,7 +1044,7 @@ def _memo(cfg):
         )
     )
     script = _CORE_JS + _TWO_ROUTES + _presets_js(
-        "MMP", _MM_PRESETS, ["coins", "amount", "note"]) + r"""
+        "MMP", _MM_PRESETS, ["coins", "amount"]) + r"""
   var presetIn = document.getElementById('mmPreset'), coinsIn = document.getElementById('mmCoins');
   var amtIn = document.getElementById('mmAmount');
   var cellIn = document.getElementById('mmCell'), cellOut = document.getElementById('mmCellOut');
@@ -1095,7 +1140,6 @@ def _memo(cfg):
     routesT.innerHTML = '<thead><tr><th>route</th><th>answer</th><th>what it cost</th>'
       + '</tr></thead><tbody>' + rows + '</tbody>';
 
-    var note = MMP[presetIn.value] ? MMP[presetIn.value].note : '';
     status.innerHTML = 'Making ' + amount + ' from {' + coins.join(', ') + '} needs <strong>'
       + (best === null ? 'no number of these coins' : best + ' coin' + (best === 1 ? '' : 's'))
       + '</strong>. ' + (naive
@@ -1114,8 +1158,7 @@ def _memo(cfg):
             + 'the page says so rather than showing the prettiest.')
       + ' The highlighted cell read ' + deps.length + ' other cell'
       + (deps.length === 1 ? '' : 's') + ', painted amber — that list was recorded by the '
-      + 'recurrence\'s own reads, not written down beside it.'
-      + (note ? ' <span class="tone-muted">' + note + '.</span>' : '');
+      + 'recurrence\'s own reads, not written down beside it.';
   }
 
   presetIn.addEventListener('change', function () {
@@ -1143,6 +1186,7 @@ def _memo(cfg):
             "anything for is that they do not.",
         ),
         script=script,
+        expect={"mmPreset": _expect(_MM_PRESETS)},
     )
 
 
@@ -1156,34 +1200,42 @@ _KN_PRESETS = [
         "label": "four items, capacity 7",
         "spec": "1/1, 3/4, 4/5, 5/7",
         "cap": "7",
-        "note": "the optimum is 9 and it takes the two middle items, which neither the "
-                "heaviest nor the densest rule would pick",
+        "expect": {
+            "knValue": "9",
+            "knBrute": "9",
+            "knCheck": "7 of 7, worth 9",
+        },
     },
     {
         "id": "ties",
         "label": "two items of equal value",
         "spec": "2/3, 2/3, 3/4",
         "cap": "4",
-        "note": "the two equal items tie cell against cell — at capacity 2 or 3 either one "
-                "alone is as good — so which cells the path walks back through is the "
-                "tie-break's choice; the optimum at capacity 4 is not, and 6 is reached by "
-                "taking both of them and by nothing else",
+        "expect": {
+            "knValue": "6",
+            "knCheck": "4 of 4, worth 6",
+        },
     },
     {
         "id": "wasteful",
         "label": "capacity that cannot be filled",
         "spec": "4/5, 4/5, 4/5",
         "cap": "9",
-        "note": "one unit of capacity is unusable whatever is chosen, which the table shows as "
-                "a run of equal cells",
+        "expect": {
+            "knValue": "10",
+            "knCheck": "8 of 9, worth 10",
+        },
     },
     {
         "id": "unbounded",
         "label": "three items, capacity 11, worth comparing one-row",
         "spec": "2/3, 3/5, 5/9",
         "cap": "11",
-        "note": "the one-row table run forward lets an item be taken again and again; run "
-                "backward it does not, and the two numbers differ",
+        "expect": {
+            "knValue": "17",
+            "knBack": "17",
+            "knFwd": "19",
+        },
     },
 ]
 
@@ -1227,7 +1279,7 @@ def _knapsack(cfg):
         )
     )
     script = _CORE_JS + _TWO_ROUTES + _presets_js(
-        "KNP", _KN_PRESETS, ["spec", "cap", "note"]) + r"""
+        "KNP", _KN_PRESETS, ["spec", "cap"]) + r"""
   var presetIn = document.getElementById('knPreset'), specIn = document.getElementById('knSpec');
   var capIn = document.getElementById('knCap');
   var rowIn = document.getElementById('knRow'), rowOut = document.getElementById('knRowOut');
@@ -1300,7 +1352,6 @@ def _knapsack(cfg):
     pathT.innerHTML = '<thead><tr><th>cell</th><th>item</th><th>decision</th><th>goes to</th>'
       + '</tr></thead><tbody>' + rows + '</tbody>';
 
-    var note = KNP[presetIn.value] ? KNP[presetIn.value].note : '';
     status.innerHTML = 'The table says <strong>' + value + '</strong> and the best of all '
       + brute.counts.nodes + ' subsets says <strong>' + brute.result.value + '</strong>'
       + (value === brute.result.value
@@ -1320,8 +1371,7 @@ def _knapsack(cfg):
       + (fwd.result.value >= back.result.value
           ? 'forward reuses each item within its own row, so it solves the UNBOUNDED problem, '
             + 'and the difference between the two numbers is one loop running the other way.'
-          : 'which should not happen: forward can only do better.')
-      + (note ? ' <span class="tone-muted">' + note + '.</span>' : '');
+          : 'which should not happen: forward can only do better.');
   }
 
   presetIn.addEventListener('change', function () {
@@ -1350,6 +1400,7 @@ def _knapsack(cfg):
             "items.",
         ),
         script=script,
+        expect={"knPreset": _expect(_KN_PRESETS)},
     )
 
 
@@ -1362,28 +1413,41 @@ _ED_PRESETS = [
         "id": "kitten",
         "label": "kitten to sitting",
         "a": "kitten", "b": "sitting",
-        "note": "three operations: two substitutions and one insertion, and the script "
-                "performed turns the first word into the second",
+        "expect": {
+            "edDist": "3",
+            "edApply": "sitting",
+        },
     },
     {
         "id": "sunday",
         "label": "sunday to saturday",
         "a": "sunday", "b": "saturday",
-        "note": "three again — two insertions and one substitution — and the alignment keeps "
-                "the s, the u and the day while the n becomes an r",
+        "expect": {
+            "edDist": "3",
+            "edApply": "saturday",
+        },
     },
     {
         "id": "prefix",
         "label": "one word is a prefix of the other",
         "a": "dog", "b": "dogma",
-        "note": "the distance is the length difference and every operation is an insertion",
+        # That every one of the operations is an insertion is in the script table, one
+        # row per operation, and not in any tile; the count of them and the word they
+        # build are.
+        "expect": {
+            "edDist": "2",
+            "edOps": "2",
+            "edApply": "dogma",
+        },
     },
     {
         "id": "disjoint",
         "label": "nothing in common",
         "a": "abc", "b": "xyz",
-        "note": "three substitutions, which is the most the distance can be when the lengths "
-                "match",
+        "expect": {
+            "edDist": "3",
+            "edApply": "xyz",
+        },
     },
 ]
 
@@ -1424,7 +1488,7 @@ def _edit(cfg):
         )
     )
     script = _CORE_JS + _TWO_ROUTES + _presets_js(
-        "EDP", _ED_PRESETS, ["a", "b", "note"]) + r"""
+        "EDP", _ED_PRESETS, ["a", "b"]) + r"""
   var presetIn = document.getElementById('edPreset');
   var aIn = document.getElementById('edA'), bIn = document.getElementById('edB');
   var rowIn = document.getElementById('edRow'), rowOut = document.getElementById('edRowOut');
@@ -1490,7 +1554,6 @@ def _edit(cfg):
     scriptT.innerHTML = '<thead><tr><th>step</th><th>operation</th><th>on</th>'
       + '<th>the word so far</th></tr></thead><tbody>' + rows + '</tbody>';
 
-    var note = EDP[presetIn.value] ? EDP[presetIn.value].note : '';
     status.innerHTML = 'Turning <span class="tt">' + (a || 'the empty word') + '</span> into '
       + '<span class="tt">' + (b || 'the empty word') + '</span> costs <strong>' + dist
       + '</strong> operations. ' + (naive
@@ -1510,7 +1573,7 @@ def _edit(cfg):
               ? 'gives <span class="tt">' + made + '</span> — the second word, so the script is '
                 + 'the answer and not merely the right length'
               : 'gives <span class="tone-red">' + made + '</span>, which is not the second word'))
-      + '.' + (note ? ' <span class="tone-muted">' + note + '.</span>' : '');
+      + '.';
   }
 
   presetIn.addEventListener('change', function () {
@@ -1538,6 +1601,7 @@ def _edit(cfg):
             "names a character that is not where it says it is.",
         ),
         script=script,
+        expect={"edPreset": _expect(_ED_PRESETS)},
     )
 
 
@@ -1550,29 +1614,44 @@ _CH_PRESETS = [
         "id": "clrs",
         "label": "six matrices, the usual worked example",
         "dims": "30 35 15 5 10 20 25",
-        "note": "15125 multiplications against 15125 from enumerating all 42 bracketings, and "
-                "the worst bracketing costs 58000, not quite four times as much",
+        # Tiles are read with chOrder at the value the markup ships, by interval length.
+        # Row-major on this instance prints 9000 for the same table, which is the mode's
+        # point and cannot be pinned from here because it needs the other menu moved.
+        "expect": {
+            "chValue": "15125",
+            "chBrute": "15125",
+            "chCount": "42",
+        },
     },
     {
         "id": "thin",
         "label": "a thin matrix in the middle",
         "dims": "10 100 5 50",
-        "note": "7500 against 75000 — one bracketing is ten times the other, on three "
-                "matrices",
+        "expect": {
+            "chValue": "7500",
+            "chWorst": "75000",
+        },
     },
     {
         "id": "square",
         "label": "all the same size",
         "dims": "10 10 10 10 10",
-        "note": "every bracketing costs the same, so the optimum is unique in value and not in "
-                "shape",
+        "expect": {
+            "chValue": "3000",
+            "chWorst": "3000",
+        },
     },
     {
         "id": "long",
         "label": "seven matrices",
         "dims": "5 10 3 12 5 50 6 4",
-        "note": "132 bracketings, and the fill order matters more here than anywhere else in "
-                "the course",
+        # Row-major fill prints 200 here against the table's 2052 -- the widest the two
+        # orders come apart in the kit -- and that number needs chOrder moved, so it is
+        # recorded here rather than pinned.
+        "expect": {
+            "chValue": "2052",
+            "chCount": "132",
+        },
     },
 ]
 
@@ -1617,7 +1696,7 @@ def _chain(cfg):
         )
     )
     script = _CORE_JS + _TWO_ROUTES + _presets_js(
-        "CHP", _CH_PRESETS, ["dims", "note"]) + r"""
+        "CHP", _CH_PRESETS, ["dims"]) + r"""
   var presetIn = document.getElementById('chPreset'), dimsIn = document.getElementById('chDims');
   var orderIn = document.getElementById('chOrder');
   var rowIn = document.getElementById('chRow'), rowOut = document.getElementById('chRowOut');
@@ -1711,7 +1790,6 @@ def _chain(cfg):
     ordersT.innerHTML = '<thead><tr><th>route</th><th>answer</th><th>why</th></tr></thead>'
       + '<tbody>' + rows + '</tbody>';
 
-    var note = CHP[presetIn.value] ? CHP[presetIn.value].note : '';
     status.innerHTML = 'Filling ' + (orderIn.value === 'rowmajor' ? 'row by row' : 'by interval '
       + 'length') + ' gives <strong>' + value + '</strong> multiplications for '
       + n + ' matrices. '
@@ -1731,8 +1809,7 @@ def _chain(cfg):
       + (early.length === 1 ? '' : 's') + ' landed on a cell that had not been filled yet'
       + (early.length
           ? ', and a null read as zero is how a table finishes with a number nobody can use.'
-          : '.')
-      + (note ? ' <span class="tone-muted">' + note + '.</span>' : '');
+          : '.');
   }
 
   presetIn.addEventListener('change', function () {
@@ -1760,6 +1837,7 @@ def _chain(cfg):
             "is checked against every bracketing, enumerated without a table.",
         ),
         script=script,
+        expect={"chPreset": _expect(_CH_PRESETS)},
     )
 
 
@@ -1770,33 +1848,41 @@ def _chain(cfg):
 _LS_PRESETS = [
     {
         "id": "classic",
-        "label": "ten values, longest run of four",
+        "label": "ten values, the usual worked example",
         "spec": "10 9 2 5 3 7 101 18 4 8",
-        "note": "the tails array ends as 2 3 4 8 while the table reconstructs 2 5 7 101 — seven "
-                "subsequences reach length four here, and the tails array happens to be one "
-                "of them, which is exactly why the misconception survives: the length is all "
-                "it ever guarantees",
+        "expect": {
+            "lsTable": "4",
+            "lsBrute": "4",
+            "lsSame": "no",
+        },
     },
     {
         "id": "sorted",
         "label": "already increasing",
         "spec": "1 2 3 4 5 6 7 8",
-        "note": "the answer is the whole sequence and the tails array happens to be it too, "
-                "which is what makes the misconception survive",
+        "expect": {
+            "lsTable": "8",
+            "lsSame": "on this input, yes",
+        },
     },
     {
         "id": "reversed",
         "label": "strictly decreasing",
         "spec": "9 8 7 6 5 4 3 2",
-        "note": "every longest increasing subsequence has length one, and there are eight of "
-                "them",
+        "expect": {
+            "lsTable": "1",
+            "lsBrute": "1",
+        },
     },
     {
         "id": "ties",
         "label": "repeated values",
         "spec": "3 1 4 1 5 9 2 6 5 3",
-        "note": "equal values cannot both be in a strictly increasing run, which the binary "
-                "search handles by replacing rather than extending",
+        "expect": {
+            "lsTable": "4",
+            "lsBrute": "4",
+            "lsSame": "no",
+        },
     },
 ]
 
@@ -1839,7 +1925,7 @@ def _lis(cfg):
         )
     )
     script = _CORE_JS + _TWO_ROUTES + _presets_js(
-        "LSP", _LS_PRESETS, ["spec", "note"]) + r"""
+        "LSP", _LS_PRESETS, ["spec"]) + r"""
   var presetIn = document.getElementById('lsPreset'), specIn = document.getElementById('lsSpec');
   var stepIn = document.getElementById('lsStep'), stepOut = document.getElementById('lsStepOut');
   var plot = document.getElementById('lsPlot'), grid = document.getElementById('lsGrid');
@@ -1902,7 +1988,6 @@ def _lis(cfg):
     stepsT.innerHTML = '<thead><tr><th>step</th><th>value</th><th>lands at</th>'
       + '<th>tails after it</th></tr></thead><tbody>' + rows + '</tbody>';
 
-    var note = LSP[presetIn.value] ? LSP[presetIn.value].note : '';
     status.innerHTML = 'The longest increasing subsequence has length <strong>'
       + table.result.length + '</strong> by the table, <strong>' + tails.result.length
       + '</strong> by the tails array'
@@ -1925,7 +2010,7 @@ def _lis(cfg):
                 + 'misconception survives'
               : 'is <span class="tone-amber">a different list</span>: it has the right length '
                 + 'and the wrong contents, which is what it is for')
-      + '.' + (note ? ' <span class="tone-muted">' + note + '.</span>' : '');
+      + '.';
   }
 
   presetIn.addEventListener('change', function () {
@@ -1953,6 +2038,7 @@ def _lis(cfg):
             "the two properties it must have.",
         ),
         script=script,
+        expect={"lsPreset": _expect(_LS_PRESETS)},
     )
 
 
@@ -1966,33 +2052,45 @@ _CO_PRESETS = [
         "label": "coins 1, 2, 5 and an amount of 5",
         "coins": "1 2 5",
         "amount": "5",
-        "note": "four combinations and nine ordered sequences, and both lists are short enough "
-                "to read",
+        "expect": {
+            "coComb": "4",
+            "coPerm": "9",
+            "coList": "4",
+        },
     },
     {
         "id": "big",
         "label": "coins 1, 2, 5 and an amount of 100",
         "coins": "1 2 5",
         "amount": "100",
-        "note": "91197869007632925819218 ordered sequences against 541 combinations — the "
-                "first of those is twenty-three digits, and a page holding it as a double "
-                "would print a number that is merely close",
+        "expect": {
+            "coComb": "541",
+            "coPerm": "91197869007632925819218",
+            "coBig": "yes, the sequence count is",
+        },
     },
     {
         "id": "sparse",
-        "label": "coins 3, 7 — six amounts have no representation, 11 the largest",
+        "label": "coins 3, 7 and an amount of 20",
         "coins": "3 7",
         "amount": "20",
-        "note": "zero ways is a real answer, and the row of zeros in the table is where the "
-                "recurrence says so",
+        # Six amounts below 20 have no representation in 3 and 7, 11 the largest, and
+        # that is the run of zeros in the table rather than a tile. What the tiles hold
+        # is the one amount this preset ships.
+        "expect": {
+            "coComb": "1",
+            "coPerm": "6",
+        },
     },
     {
         "id": "uk",
         "label": "the old British change problem",
         "coins": "1 2 5 10 20 50",
         "amount": "40",
-        "note": "236 combinations and 1255678045 ordered sequences — the shopkeeper wants "
-                "the first number and the loop order decides which one you get",
+        "expect": {
+            "coComb": "236",
+            "coPerm": "1255678045",
+        },
     },
 ]
 
@@ -2033,7 +2131,7 @@ def _coins(cfg):
         )
     )
     script = _CORE_JS + _TWO_ROUTES + _presets_js(
-        "COP", _CO_PRESETS, ["coins", "amount", "note"]) + r"""
+        "COP", _CO_PRESETS, ["coins", "amount"]) + r"""
   var presetIn = document.getElementById('coPreset'), coinsIn = document.getElementById('coCoins');
   var amtIn = document.getElementById('coAmount');
   var rowIn = document.getElementById('coRow'), rowOut = document.getElementById('coRowOut');
@@ -2115,7 +2213,6 @@ def _coins(cfg):
     waysT.innerHTML = '<thead><tr><th>what is counted</th><th>how many</th><th>loop order</th>'
       + '<th>second route</th></tr></thead><tbody>' + wrows + '</tbody>';
 
-    var note = COP[presetIn.value] ? COP[presetIn.value].note : '';
     status.innerHTML = 'There are <strong>' + comb.result.count + '</strong> combinations of {'
       + coins.join(', ') + '} making ' + amount + ', and <strong>' + perm.result.count
       + '</strong> ordered sequences — the same two loops, swapped. '
@@ -2144,8 +2241,7 @@ def _coins(cfg):
             + 'number that is <em>close</em>. This one is a BigInt and the digits are the '
             + 'digits.'
           : ' Both counts fit in a double here; they do not at larger amounts, which is why '
-            + 'they are BigInts throughout.')
-      + (note ? ' <span class="tone-muted">' + note + '.</span>' : '');
+            + 'they are BigInts throughout.');
   }
 
   presetIn.addEventListener('change', function () {
@@ -2174,6 +2270,7 @@ def _coins(cfg):
             "checked by counting them.",
         ),
         script=script,
+        expect={"coPreset": _expect(_CO_PRESETS)},
     )
 
 
@@ -2187,33 +2284,41 @@ _TR_PRESETS = [
         "label": "a centre with four leaves",
         "spec": "1-2, 1-3, 1-4, 1-5",
         "weights": "3 4 2 1 5",
-        "note": "taking the centre costs all four leaves, and here the four leaves together "
-                "are worth more",
+        "expect": {
+            "trValue": "12",
+            "trBrute": "12",
+        },
     },
     {
         "id": "path",
         "label": "a path of six",
         "spec": "1-2, 2-3, 3-4, 4-5, 5-6",
         "weights": "5 1 5 1 5 1",
-        "note": "alternating vertices, which is the answer a reader guesses and is right about "
-                "on a path and wrong about in general",
+        "expect": {
+            "trValue": "15",
+            "trBrute": "15",
+        },
     },
     {
         "id": "binary",
         "label": "a small binary tree",
         "spec": "1-2, 1-3, 2-4, 2-5, 3-6, 3-7",
         "weights": "10 2 2 4 4 4 4",
-        "note": "the root is worth ten and the four leaves sixteen, and the root only blocks "
-                "its two light children, so the DP takes all five for 26 — declining a heavy "
-                "root is the instinct, and here it is wrong",
+        "expect": {
+            "trValue": "26",
+            "trBrute": "26",
+            "trIndep": "yes",
+        },
     },
     {
         "id": "caterpillar",
         "label": "a spine with legs",
         "spec": "1-2, 2-3, 3-4, 2-5, 3-6, 4-7",
         "weights": "1 6 6 6 1 1 1",
-        "note": "the three heavy spine vertices are adjacent, so at most two of them can be "
-                "taken and the DP finds which two",
+        "expect": {
+            "trValue": "13",
+            "trBrute": "13",
+        },
     },
 ]
 
@@ -2253,7 +2358,7 @@ def _tree(cfg):
         )
     )
     script = _CORE_JS + _TWO_ROUTES + _presets_js(
-        "TRP", _TR_PRESETS, ["spec", "weights", "note"]) + r"""
+        "TRP", _TR_PRESETS, ["spec", "weights"]) + r"""
   var presetIn = document.getElementById('trPreset'), specIn = document.getElementById('trSpec');
   var wIn = document.getElementById('trWeights');
   var tree = document.getElementById('trTree');
@@ -2329,7 +2434,6 @@ def _tree(cfg):
     passT.innerHTML = '<thead><tr><th>vertex</th><th>weight</th><th>with it</th>'
       + '<th>without it</th><th></th></tr></thead><tbody>' + rows + '</tbody>';
 
-    var note = TRP[presetIn.value] ? TRP[presetIn.value].note : '';
     status.innerHTML = 'One postorder pass over ' + parsed.n + ' vertices — '
       + run.counts.calls + ' visits — gives <strong>' + run.result.value + '</strong>. '
       + (brute
@@ -2346,8 +2450,7 @@ def _tree(cfg):
       + ' — and re-weighed to ' + weight
       + (weight === run.result.value
           ? ', which is the number above, added a second time from the weights.'
-          : ' <span class="tone-red">, which is not the number above.</span>')
-      + (note ? ' <span class="tone-muted">' + note + '.</span>' : '');
+          : ' <span class="tone-red">, which is not the number above.</span>');
   }
 
   presetIn.addEventListener('change', function () {
@@ -2375,6 +2478,7 @@ def _tree(cfg):
             "and the set it returns is re-checked independent and re-weighed.",
         ),
         script=script,
+        expect={"trPreset": _expect(_TR_PRESETS)},
     )
 
 
@@ -2388,31 +2492,40 @@ _GM_PRESETS = [
         "label": "take 1, 2 or 3",
         "moves": "1 2 3",
         "upto": "16",
-        "note": "the losing positions are the multiples of 4, and the period is what a reader "
-                "is asked to spot before it is proved",
+        "expect": {
+            "gmLose": "0 4 8 12 16",
+            "gmPeriod": "4",
+        },
     },
     {
         "id": "subtract12",
         "label": "take 1 or 2",
         "moves": "1 2",
         "upto": "14",
-        "note": "the multiples of 3 lose, which is the same argument with a different modulus",
+        "expect": {
+            "gmLose": "0 3 6 9 12",
+            "gmPeriod": "3",
+        },
     },
     {
         "id": "subtract134",
         "label": "take 1, 3 or 4",
         "moves": "1 3 4",
         "upto": "18",
-        "note": "the pattern has period 7 and is not the multiples of anything, which is why "
-                "the table is computed rather than guessed",
+        "expect": {
+            "gmLose": "0 2 7 9 14 16",
+            "gmPeriod": "7",
+        },
     },
     {
         "id": "subtract25",
         "label": "take 2 or 5",
         "moves": "2 5",
         "upto": "18",
-        "note": "positions 0 and 1 both lose, so the pattern starts with two losses in a row "
-                "and a reader who assumes otherwise misreads the table",
+        "expect": {
+            "gmLose": "0 1 4 7 8 11 14 15 18",
+            "gmPeriod": "7",
+        },
     },
 ]
 
@@ -2451,7 +2564,7 @@ def _game(cfg):
         )
     )
     script = _CORE_JS + _TWO_ROUTES + _presets_js(
-        "GMP", _GM_PRESETS, ["moves", "upto", "note"]) + r"""
+        "GMP", _GM_PRESETS, ["moves", "upto"]) + r"""
   var presetIn = document.getElementById('gmPreset'), movesIn = document.getElementById('gmMoves');
   var uptoIn = document.getElementById('gmUpto');
   var grid = document.getElementById('gmGrid');
@@ -2517,7 +2630,6 @@ def _game(cfg):
     rowsT.innerHTML = '<thead><tr><th>position</th><th>moves lead to</th><th>verdict</th>'
       + '<th>why</th></tr></thead><tbody>' + rows + '</tbody>';
 
-    var note = GMP[presetIn.value] ? GMP[presetIn.value].note : '';
     status.innerHTML = 'Taking from {' + moveSet.join(', ') + '}, the losing positions up to '
       + upto + ' are <strong>' + (run.result.losing.join(', ') || 'none') + '</strong>'
       + (run.result.period === null
@@ -2533,8 +2645,7 @@ def _game(cfg):
               : 'Every label was recomputed by a recursion with no table, and all '
                 + positions.length + ' agree.'))
       + ' Position 0 is losing because the player to move has no move at all, which is where '
-      + 'the whole table starts.'
-      + (note ? ' <span class="tone-muted">' + note + '.</span>' : '');
+      + 'the whole table starts.';
   }
 
   presetIn.addEventListener('change', function () {
@@ -2562,6 +2673,7 @@ def _game(cfg):
             "recomputed by a memo-free recursion.",
         ),
         script=script,
+        expect={"gmPreset": _expect(_GM_PRESETS)},
     )
 
 
@@ -2574,30 +2686,39 @@ _TS_PRESETS = [
         "id": "four",
         "label": "four cities, asymmetric",
         "spec": "0 2 9 10; 1 0 6 4; 15 7 0 8; 6 3 12 0",
-        "note": "the distance from 1 to 2 is not the distance from 2 to 1, and nothing here "
-                "assumes it is",
+        "expect": {
+            "tsHK": "21",
+            "tsBrute": "21",
+        },
     },
     {
         "id": "five",
         "label": "five cities on a rough circle",
         "spec": "0 3 4 2 7; 3 0 4 6 3; 4 4 0 5 8; 2 6 5 0 6; 7 3 8 6 0",
-        "note": "800 against 24: exponential still beats factorial only in the limit, and "
-                "five cities is nowhere near it",
+        "expect": {
+            "tsHK": "19",
+            "tsWorkHK": "800",
+            "tsWorkBF": "24",
+        },
     },
     {
         "id": "six",
         "label": "six cities, where the counts pull apart",
         "spec": "0 4 7 3 9 5; 4 0 6 8 2 7; 7 6 0 5 8 3; 3 8 5 0 6 4; 9 2 8 6 0 5; 5 7 3 4 5 0",
-        "note": "2304 units of work for the table against 120 tours for brute force — the "
-                "table LOSES at this size, and n squared 2 to the n does not drop below "
-                "n minus 1 factorial until ten cities",
+        "expect": {
+            "tsHK": "22",
+            "tsWorkHK": "2304",
+            "tsWorkBF": "120",
+        },
     },
     {
         "id": "trap",
         "label": "a matrix that violates the triangle inequality",
         "spec": "0 1 1 50; 1 0 1 1; 1 1 0 1; 50 1 1 0",
-        "note": "going straight from 1 to 4 costs fifty and going round costs three, so no "
-                "shortcut argument applies and the exact answer is the only answer",
+        "expect": {
+            "tsHK": "4",
+            "tsBrute": "4",
+        },
     },
 ]
 
@@ -2640,7 +2761,7 @@ def _tsp(cfg):
         )
     )
     script = _CORE_JS + _TWO_ROUTES + _presets_js(
-        "TSP", _TS_PRESETS, ["spec", "note"]) + r"""
+        "TSP", _TS_PRESETS, ["spec"]) + r"""
   var presetIn = document.getElementById('tsPreset'), specIn = document.getElementById('tsSpec');
   var stepIn = document.getElementById('tsStep'), stepOut = document.getElementById('tsStepOut');
   var plot = document.getElementById('tsPlot'), grid = document.getElementById('tsGrid');
@@ -2712,7 +2833,6 @@ def _tsp(cfg):
     rowsT.innerHTML = '<thead><tr><th>route</th><th>tour</th><th>length</th><th>cost</th>'
       + '</tr></thead><tbody>' + rows + '</tbody>';
 
-    var note = TSP[presetIn.value] ? TSP[presetIn.value].note : '';
     status.innerHTML = 'The shortest tour of these ' + n + ' cities is <strong>'
       + hk.result.length + '</strong>' + (brute
           ? ', and trying all ' + brute.counts.nodes + ' orderings gives ' + brute.result.length
@@ -2736,8 +2856,7 @@ def _tsp(cfg):
           ? 'At this size the table LOSES, which is the honest part: 2^n beats n! only once n '
             + 'is large enough, and here it is not.'
           : 'The table wins here, and the margin grows without bound — but 2^n is still '
-            + 'exponential, and no amount of it makes this problem tractable.')
-      + (note ? ' <span class="tone-muted">' + note + '.</span>' : '');
+            + 'exponential, and no amount of it makes this problem tractable.');
   }
 
   presetIn.addEventListener('change', function () {
@@ -2765,6 +2884,7 @@ def _tsp(cfg):
             "the matrix, and the two work figures are exact integers rather than classes.",
         ),
         script=script,
+        expect={"tsPreset": _expect(_TS_PRESETS)},
     )
 
 

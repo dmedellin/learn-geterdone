@@ -70,6 +70,25 @@ frame 19.9 KB gzipped, plus the lab:
 against the 62 KB ceiling. Splitting the kit block was worth about 3 KB on the
 heaviest page; re-derive these rather than trusting them, because they go stale
 as the engine grows.
+
+EVERY PRESET PINS WHAT IT PRINTS, AND NO PRESET CARRIES A NOTE ANY MORE.
+A preset used to carry two pieces of prose: a `label` in the <select> and a
+`note` about the outcome. Nothing in this repository could read either, and a
+sweep of fifteen kits found 57 of those strings false about the lab they
+described. Rendering does not help -- `dpkit` printed its selected note into
+the status banner and had a HIGHER correction rate than `graphkit`, which
+rendered none -- so the notes here are deleted rather than re-checked, and
+each preset now carries `expect`: {kpi element id: the exact text the page
+prints}. scripts/build_paths.py writes it to
+scripts/generated-expectations.json and scripts/labcheck.js selects the option
+on the BUILT page, dispatches the menu's own change handler and compares
+getElementById(id).textContent. Every figure below was read off the running
+kit with `node scripts/labcheck.js --observe <page>`. See `_expect` and
+scripts/mathpath/AGENTS.md.
+
+THE MINIMUM-COST BANNER NO LONGER QUOTES THE PRESET. `_mincost` printed
+"This is <label>: <note>." into its status line, which is the pattern the
+measurement above was made on; it now prints the label alone.
 """
 
 from .algebra_core import RATIONAL_JS
@@ -835,6 +854,29 @@ def _options(presets):
     return [(p["id"], p["label"]) for p in presets]
 
 
+def _expect(presets):
+    """{preset id: {kpi element id: the exact text the page prints}}.
+
+    A preset's `label` says which instance it is and no check here can read it;
+    `_mincost` used to print the selected preset's `note` into its status
+    banner, which put the prose in front of the reader without putting it in
+    front of a check -- and the measurement that settled this design is that
+    rendering a note does not lower its error rate. The note is gone. What
+    replaces it is this: the exact text each tile holds once the option is
+    selected, which scripts/labcheck.js reads off the BUILT page with
+    getElementById(kpi).textContent after dispatching the menu's own change
+    handler. Every figure was read from the running kit with
+    `node scripts/labcheck.js --observe <page>`. See scripts/mathpath/AGENTS.md.
+
+    Tiles are read with every OTHER control at the value the markup ships --
+    no augmenting path pushed yet on the maximum-flow mode, the directed matrix
+    rule, the crash activity the preset names -- so a claim that only appears
+    once the reader moves one of those cannot be pinned. Each is named in a
+    comment beside the preset that makes it.
+    """
+    return {p["id"]: dict(p.get("expect") or {}) for p in presets}
+
+
 # ---------------------------------------------------------------------------
 # L1 -- digraph: an arc is ordered, and conservation is local
 # ---------------------------------------------------------------------------
@@ -842,27 +884,39 @@ def _options(presets):
 _DG_PRESETS = [
     {
         "id": "twoway",
-        "label": "a lane each way, and a flow that works",
+        "label": "a lane each way between a and b",
         "spec": "s>a 5:2, a>b 4:2, b>a 3:5, a>t 3:1, b>t 4:3",
         "supply": "s:4, t:-4",
         "flow": "s>a 4, a>b 2, b>a 0, a>t 2, b>t 2",
-        "note": "a to b and b to a are two arcs with two capacities and two costs",
+        "expect": {
+            "dgCost": "20",
+            "dgAnti": "1 pair",
+            "dgVerdict": "yes",
+        },
     },
     {
         "id": "local",
-        "label": "balances in total, fails at two nodes",
+        "label": "the same network, one unit short on a to b",
         "spec": "s>a 5:2, a>b 4:2, b>a 3:5, a>t 3:1, b>t 4:3",
         "supply": "s:4, t:-4",
         "flow": "s>a 4, a>b 1, b>a 0, a>t 2, b>t 2",
-        "note": "the imbalances cancel across the network and the flow is still not a flow",
+        "expect": {
+            "dgViolated": "a, b",
+            "dgTotal": "0 \u2014 balanced",
+            "dgVerdict": "no",
+        },
     },
     {
         "id": "overcap",
-        "label": "conserved everywhere, over capacity twice",
+        "label": "the same network, five units pushed out of s",
         "spec": "s>a 5:2, a>b 4:2, b>a 3:5, a>t 3:1, b>t 4:3",
         "supply": "s:5, t:-5",
         "flow": "s>a 5, a>b 5, b>a 0, a>t 0, b>t 5",
-        "note": "every node balances and two arcs are asked to carry more than they can",
+        "expect": {
+            "dgViolated": "none",
+            "dgOver": "a\u2192b, b\u2192t",
+            "dgVerdict": "no",
+        },
     },
     {
         "id": "unbalanced",
@@ -870,7 +924,10 @@ _DG_PRESETS = [
         "spec": "s>a 5:2, a>b 4:2, b>a 3:5, a>t 3:1, b>t 4:3",
         "supply": "s:6, t:-4",
         "flow": "s>a 4, a>b 2, b>a 0, a>t 2, b>t 2",
-        "note": "adding the node equations up gives 2 = 0, so nothing can satisfy them",
+        "expect": {
+            "dgViolated": "s",
+            "dgTotal": "2 \u2014 no flow can exist",
+        },
     },
 ]
 
@@ -920,7 +977,7 @@ def _digraph(cfg):
     )
 
     script = _DIGRAPH_JS + r"""
-""" + _presets_js("DGP", _DG_PRESETS, ["spec", "supply", "flow", "note"]) + r"""
+""" + _presets_js("DGP", _DG_PRESETS, ["spec", "supply", "flow"]) + r"""
   var presetIn = document.getElementById('dgPreset');
   var specIn = document.getElementById('dgSpec'), supIn = document.getElementById('dgSupply');
   var flowIn = document.getElementById('dgFlow');
@@ -1084,6 +1141,7 @@ def _digraph(cfg):
             "spare capacity on each arc, and the cost. Nothing is stored.",
         ),
         script=script,
+        expect={"dgPreset": _expect(_DG_PRESETS)},
     )
 
 
@@ -1097,14 +1155,22 @@ _MC_PRESETS = [
         "label": "minimum-cost flow",
         "spec": "s>a 3:2, s>b 3:3, a>b 2:1, a>t 3:5, b>t 3:2",
         "supply": "s:4, t:-4",
-        "note": "four units from s to t, every arc bounded and priced",
+        "expect": {
+            "mcKind": "minimum-cost flow",
+            "mcShape": "4 rows by 5 columns",
+            "mcZ": "22",
+        },
     },
     {
         "id": "transport",
         "label": "the transportation problem",
         "spec": "S1>D1 *:4, S1>D2 *:6, S1>D3 *:9, S2>D1 *:5, S2>D2 *:3, S2>D3 *:8",
         "supply": "S1:20, S2:30, D1:-10, D2:-25, D3:-15",
-        "note": "sources on one side, sinks on the other, and no capacity anywhere",
+        "expect": {
+            "mcKind": "the transportation problem",
+            "mcShape": "5 rows by 6 columns",
+            "mcZ": "245",
+        },
     },
     {
         "id": "assignment",
@@ -1112,23 +1178,33 @@ _MC_PRESETS = [
         "spec": ("W1>J1 1:9, W1>J2 1:2, W1>J3 1:7, W2>J1 1:6, W2>J2 1:4, W2>J3 1:3, "
                  "W3>J1 1:5, W3>J2 1:8, W3>J3 1:1"),
         "supply": "W1:1, W2:1, W3:1, J1:-1, J2:-1, J3:-1",
-        "note": "transportation with every supply and every demand set to one",
+        "expect": {
+            "mcKind": "the assignment problem",
+            "mcZ": "9",
+            "mcUsed": "3 of 9",
+        },
     },
     {
         "id": "shortest",
         "label": "a shortest path",
         "spec": "s>a 1:4, s>b 1:2, b>a 1:1, a>t 1:3, b>t 1:7",
         "supply": "s:1, t:-1",
-        "note": "one unit from s to t: the cheapest way to move it is the cheapest path",
+        "expect": {
+            "mcKind": "a shortest path",
+            "mcZ": "6",
+            "mcUsed": "3 of 5",
+        },
     },
     {
         "id": "maxflow",
         "label": "a maximum flow",
         "spec": "s>a 3:0, s>b 2:0, a>b 2:0, a>t 2:0, b>t 3:0, t>s *:-1",
         "supply": "",
-        "note": ("every arc free, a return arc from t to s priced at minus one, and nothing supplied "
-                 "anywhere, so minimising the cost maximises the flow and the optimum is minus the "
-                 "flow value"),
+        "expect": {
+            "mcKind": "a maximum flow",
+            "mcZ": "-5",
+            "mcUsed": "6 of 6",
+        },
     },
 ]
 
@@ -1176,7 +1252,7 @@ def _mincost(cfg):
     )
 
     script = _MINCOST_JS + r"""
-""" + _presets_js("MCP", _MC_PRESETS, ["spec", "supply", "note", "label"]) + r"""
+""" + _presets_js("MCP", _MC_PRESETS, ["spec", "supply", "label"]) + r"""
   var caseIn = document.getElementById('mcCase');
   var specIn = document.getElementById('mcSpec'), supIn = document.getElementById('mcSupply');
   var plot = document.getElementById('mcPlot');
@@ -1294,8 +1370,7 @@ def _mincost(cfg):
       return;
     }
     status.innerHTML = '<strong>' + tone('Optimal cost ' + Rtext(solved.zOrig) + '.', 'cyan')
-      + '</strong> ' + (MCP[caseIn.value] ? 'This is ' + MCP[caseIn.value].label + ': '
-          + MCP[caseIn.value].note + '. ' : '')
+      + '</strong> ' + (MCP[caseIn.value] ? 'This is ' + MCP[caseIn.value].label + '. ' : '')
       + 'Nothing about the programme changed to get it &mdash; the matrix is still N, the constraint is '
       + 'still N x = b, and the objective is still c&#8242;x. '
       + (integral
@@ -1338,6 +1413,7 @@ def _mincost(cfg):
             "Switching the data set changes b, u and c and nothing else.",
         ),
         script=script,
+        expect={"mcCase": _expect(_MC_PRESETS)},
     )
 
 
@@ -1406,6 +1482,11 @@ _TU_PRESETS = [
         "rule": "directed",
         "rows": "1,2,3",
         "cols": "1,3,4",
+        "expect": {
+            "tuShape": "4 by 5",
+            "tuBad": "none, up to order 3",
+            "tuDenom": "1",
+        },
     },
     {
         "id": "triangle",
@@ -1415,6 +1496,11 @@ _TU_PRESETS = [
         "rule": "undirected",
         "rows": "1,2,3",
         "cols": "1,2,3",
+        "expect": {
+            "tuBad": "1 of them",
+            "tuCorner2": "fractional",
+            "tuDenom": "2",
+        },
     },
     {
         "id": "square",
@@ -1424,6 +1510,11 @@ _TU_PRESETS = [
         "rule": "undirected",
         "rows": "1,2,3,4",
         "cols": "1,2,3,4",
+        "expect": {
+            "tuShape": "4 by 4",
+            "tuBad": "none, up to order 3",
+            "tuCorner2": "every entry whole",
+        },
     },
 ]
 
@@ -1661,6 +1752,7 @@ def _tu(cfg):
             "rule that builds the matrix and the same drawing produces a different answer.",
         ),
         script=script,
+        expect={"tuCase": _expect(_TU_PRESETS)},
     )
 
 
@@ -1673,19 +1765,31 @@ _BF_PRESETS = [
         "id": "prices",
         "label": "four nodes, five arcs, every cost positive",
         "spec": "s>a 4, s>b 2, b>a 1, a>t 3, b>t 7",
-        "note": "the labels settle after two rounds and price every arc",
+        "expect": {
+            "bfRounds2": "2 of 4",
+            "bfValue": "6 = \u03c0(t) \u2212 \u03c0(s)",
+            "bfFeas": "yes",
+        },
     },
     {
         "id": "negative",
-        "label": "a negative arc, and no negative cycle",
+        "label": "five arcs, one of them negative",
         "spec": "s>a 4, s>b 2, a>b -3, b>t 2, a>t 6",
-        "note": "a negative cost is not a problem; a negative cycle is",
+        "expect": {
+            "bfValue": "3 = \u03c0(t) \u2212 \u03c0(s)",
+            "bfCycle": "no cycle",
+            "bfFeas": "yes",
+        },
     },
     {
         "id": "cycle",
-        "label": "a negative cycle: no potentials exist",
+        "label": "four arcs, three of them round a loop",
         "spec": "x>y 1, y>z -3, z>x 1, x>z 5",
-        "note": "adding the dual inequalities around the loop gives 0 ≤ −1",
+        "expect": {
+            "bfViol": "1",
+            "bfFeas": "no \u2014 none exist here",
+            "bfCycle": "-1",
+        },
     },
 ]
 
@@ -1732,7 +1836,7 @@ def _bellmanford(cfg):
     )
 
     script = _BELLMAN_JS + r"""
-""" + _presets_js("BFP", _BF_PRESETS, ["spec", "note", "label"]) + r"""
+""" + _presets_js("BFP", _BF_PRESETS, ["spec", "label"]) + r"""
   var presetIn = document.getElementById('bfPreset'), specIn = document.getElementById('bfSpec');
   var shiftIn = document.getElementById('bfShift');
   var plot = document.getElementById('bfPlot'), roundT = document.getElementById('bfRounds');
@@ -1878,6 +1982,7 @@ def _bellmanford(cfg):
             "costs you type. Costs may be negative.",
         ),
         script=script,
+        expect={"bfPreset": _expect(_BF_PRESETS)},
     )
 
 
@@ -1888,21 +1993,37 @@ def _bellmanford(cfg):
 _MF_PRESETS = [
     {
         "id": "twocuts",
-        "label": "five arcs, and two different minimum cuts",
+        "label": "four nodes, five arcs",
         "spec": "s>a 3, s>b 2, a>b 2, a>t 2, b>t 3",
-        "note": "the reachable-set cut is one of two of the same capacity",
+        # This mode ships with NO augmenting path pushed -- mfPath is at step 0
+        # -- so mfValue reads 0 for every preset here and pinning it would pin
+        # the same number four times over. What distinguishes the presets in the
+        # shipped state is the enumeration over cuts, which does not depend on
+        # the flow: mfCount and the selected cut. "The reachable set names the
+        # smallest cut" only becomes visible once the reader runs the flow out,
+        # and it is not pinned.
+        "expect": {
+            "mfCount": "2 of 4",
+            "mfOther": "5 at {s}",
+        },
     },
     {
         "id": "unique",
-        "label": "one minimum cut, and only one",
+        "label": "four nodes, four arcs",
         "spec": "s>a 2, s>b 5, a>t 5, b>t 3",
-        "note": "here the minimum cut really is unique",
+        "expect": {
+            "mfCount": "1 of 4",
+            "mfOther": "5 at {s, b}",
+        },
     },
     {
         "id": "wider",
         "label": "six nodes, a longer network",
         "spec": "s>a 4, s>b 3, a>c 3, a>b 2, b>d 4, c>t 3, d>t 4, c>d 1",
-        "note": "more cuts to compare, and the reachable set still names the smallest",
+        "expect": {
+            "mfCount": "4 of 16",
+            "mfOther": "7 at {s}",
+        },
     },
 ]
 
@@ -1955,7 +2076,7 @@ def _maxflow(cfg):
     )
 
     script = _MAXFLOW_JS + r"""
-""" + _presets_js("MFP", _MF_PRESETS, ["spec", "note", "label"]) + r"""
+""" + _presets_js("MFP", _MF_PRESETS, ["spec", "label"]) + r"""
   var presetIn = document.getElementById('mfPreset'), specIn = document.getElementById('mfSpec');
   var pathIn = document.getElementById('mfPath'), cutIn = document.getElementById('mfCut');
   var plot = document.getElementById('mfPlot'), resPlot = document.getElementById('mfRes');
@@ -2195,6 +2316,7 @@ def _maxflow(cfg):
             "than the output of a search you are asked to trust.",
         ),
         script=script,
+        expect={"mfPreset": _expect(_MF_PRESETS)},
     )
 
 
@@ -2207,19 +2329,30 @@ _MT_PRESETS = [
         "id": "three-two",
         "label": "three applicants, two jobs between them",
         "spec": "1-a, 1-b, 2-a, 2-b, 3-a, 3-b",
-        "note": "all three want the same two jobs",
+        "expect": {
+            "mtMatch": "2 of 3",
+            "mtS": "{1, 2, 3}, size 3",
+            "mtNS": "{a, b}, size 2",
+        },
     },
     {
         "id": "subset",
-        "label": "a deficient set that is not all of X",
+        "label": "four applicants: three share one job, the fourth has three",
         "spec": "1-a, 2-a, 3-a, 4-b, 4-c, 4-d",
-        "note": "three applicants share one job while a fourth has three of its own",
+        "expect": {
+            "mtMatch": "2 of 4",
+            "mtS": "{1, 2, 3}, size 3",
+            "mtNS": "{a}, size 1",
+        },
     },
     {
         "id": "perfect",
-        "label": "a perfect matching",
+        "label": "four applicants and four jobs, in a ring",
         "spec": "1-a, 1-b, 2-b, 2-c, 3-c, 3-d, 4-d, 4-a",
-        "note": "every applicant placed, and Hall's condition holds on every subset",
+        "expect": {
+            "mtMatch": "4 of 4",
+            "mtHall": "holds on every subset",
+        },
     },
 ]
 
@@ -2265,7 +2398,7 @@ def _matching(cfg):
     )
 
     script = _MATCHING_JS + r"""
-""" + _presets_js("MTP", _MT_PRESETS, ["spec", "note", "label"]) + r"""
+""" + _presets_js("MTP", _MT_PRESETS, ["spec", "label"]) + r"""
   var presetIn = document.getElementById('mtPreset'), specIn = document.getElementById('mtSpec');
   var plot = document.getElementById('mtPlot'), leftT = document.getElementById('mtLeft');
   var cutT = document.getElementById('mtCut'), status = document.getElementById('mtStatus');
@@ -2404,6 +2537,7 @@ def _matching(cfg):
             "cut is taken of the flow network drawn above, not asserted.",
         ),
         script=script,
+        expect={"mtPreset": _expect(_MT_PRESETS)},
     )
 
 
@@ -2414,25 +2548,41 @@ def _matching(cfg):
 _CP_PRESETS = [
     {
         "id": "nine",
-        "label": "nine activities, one critical path",
+        "label": "nine activities, A through I",
         "spec": ("A 3, B 2 after A, C 4 after A, G 5 after A, D 2 after B, E 3 after C, "
                  "H 2 after G, F 1 after D E, I 1 after F H"),
         "crash": "C",
-        "note": "shorten C by one and a second path draws level",
+        # cpStop is the tile this preset exists for: shortening C pays for one
+        # unit and then a second path draws level. The crash slider ships at 0,
+        # so cpGain reads "0 shorter, for 0 units cut" here and it is the STOP
+        # figure that carries the claim; the shortened project length itself is
+        # only visible once the reader moves the slider, so it is not pinned.
+        "expect": {
+            "cpLen": "12",
+            "cpPaths": "1",
+            "cpStop": "1 unit",
+        },
     },
     {
         "id": "twopaths",
-        "label": "two critical paths from the start",
+        "label": "six activities in two parallel chains",
         "spec": "A 3, B 2 after A, C 2 after A, D 2 after B, E 2 after C, F 1 after D E",
         "crash": "B",
-        "note": "shortening either one alone buys nothing at all",
+        "expect": {
+            "cpLen": "8",
+            "cpPaths": "2",
+            "cpStop": "0 units",
+        },
     },
     {
         "id": "cycle",
-        "label": "a precedence loop, and therefore no schedule",
+        "label": "three activities in a precedence loop",
         "spec": "A 3 after C, B 2 after A, C 4 after B",
         "crash": "A",
-        "note": "no order exists, so there is nothing to compute",
+        "expect": {
+            "cpLen": "\u2014",
+            "cpPaths": "\u2014",
+        },
     },
 ]
 
@@ -2481,7 +2631,7 @@ def _cpm(cfg):
     )
 
     script = _CPM_JS + r"""
-""" + _presets_js("CPP", _CP_PRESETS, ["spec", "crash", "note", "label"]) + r"""
+""" + _presets_js("CPP", _CP_PRESETS, ["spec", "crash", "label"]) + r"""
   var presetIn = document.getElementById('cpPreset'), specIn = document.getElementById('cpSpec');
   var actIn = document.getElementById('cpAct'), cutIn = document.getElementById('cpCut');
   var plot = document.getElementById('cpPlot'), tableT = document.getElementById('cpTable');
@@ -2647,6 +2797,7 @@ def _cpm(cfg):
             "crash table recomputes the whole project at each length rather than extrapolating.",
         ),
         script=script,
+        expect={"cpPreset": _expect(_CP_PRESETS)},
     )
 
 

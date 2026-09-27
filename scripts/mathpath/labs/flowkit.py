@@ -71,6 +71,27 @@ block.
 Nothing here rounds. Capacities, flows, bottlenecks, cut capacities, matching
 sizes and cover sizes are integers, and integer arithmetic at these sizes is
 exact in any representation.
+
+EVERY PRESET PINS WHAT IT PRINTS, AND NO PRESET CARRIES A NOTE ANY MORE.
+A preset used to carry two pieces of prose: a `label` in the <select> and a
+`note` about the outcome. Nothing in this repository could read either, and a
+sweep of fifteen kits found 57 of those strings false about the lab they
+described. Rendering does not help -- `dpkit` printed its selected note into
+the status banner and had a HIGHER correction rate than `graphkit`, which
+rendered none -- so the notes here are deleted rather than re-checked, and
+each preset now carries `expect`: {kpi element id: the exact text the page
+prints}. scripts/build_paths.py writes it to
+scripts/generated-expectations.json and scripts/labcheck.js selects the option
+on the BUILT page, dispatches the menu's own change handler and compares
+getElementById(id).textContent. Every figure below was read off the running
+kit with `node scripts/labcheck.js --observe <page>`. See `_expect` and
+scripts/mathpath/AGENTS.md.
+
+NOTHING HERE RENDERED A PRESET NOTE, so nothing in the markup changed when
+they went. The `built.note` in `_gadget`'s status line is NOT one: it comes
+back from `algo_core.gadgetBuild` and is one of three fixed sentences about
+the transformation that ran, chosen by `kind` rather than written per
+instance.
 """
 
 from .algo_core import COUNT_JS, DIGRAPH_JS, FLOW_JS, ORACLE_JS
@@ -537,6 +558,26 @@ def _options(presets):
     return [(p["id"], p["label"]) for p in presets]
 
 
+def _expect(presets):
+    """{preset id: {kpi element id: the exact text the page prints}}.
+
+    A preset's `label` says which network it is and no check here can read it.
+    Its `expect` says what the page PRINTS once it is selected, tile by tile,
+    and scripts/labcheck.js selects the option on the BUILT page, dispatches
+    the menu's own change handler and compares getElementById(kpi).textContent
+    against it. Every figure below was read off the running kit with
+    `node scripts/labcheck.js --observe <page>`, never out of the code that
+    computes it. See scripts/mathpath/AGENTS.md for the rule.
+
+    Tiles are read with every OTHER control at the value the markup ships --
+    the first-found rule, backward arcs off, the source and sink the preset
+    names -- so a claim that only appears after the reader moves one of those
+    cannot be pinned here. Those are named in a comment beside the preset that
+    makes them.
+    """
+    return {p["id"]: dict(p.get("expect") or {}) for p in presets}
+
+
 def _chosen(presets, cfg):
     want = str(cfg.get("preset", presets[0]["id"]))
     for p in presets:
@@ -569,35 +610,55 @@ _CERTIFICATE = (
 _AG_PRESETS = [
     {
         "id": "forwardonly",
-        "label": "four vertices, and a first push that has to be undone",
+        "label": "four vertices, five arcs, every capacity 1",
         "spec": "1>2 1, 1>3 1, 2>3 1, 2>4 1, 3>4 1",
         "source": "1", "sink": "4",
-        "note": "the first path taken goes through the middle, and without a backward arc there "
-                "is no second path at all",
+        # Half of this preset's point is pinnable and half is not. The tiles are
+        # read with agReverse at the value the markup ships (off), which is the
+        # half that shows the rule stopping at 1 below a maximum of 2. "Put the
+        # backward arcs in and the same rule reaches 2" is visible only after
+        # the reader moves that control, so it is not pinned.
+        "expect": {
+            "agValue": "1",
+            "agMax": "2",
+        },
     },
     {
         "id": "classic",
         "label": "six vertices, capacities from 4 to 20",
         "spec": "1>2 16, 1>3 13, 2>3 10, 3>2 4, 2>4 12, 3>5 14, 4>3 9, 5>4 7, 4>6 20, 5>6 4",
         "source": "1", "sink": "6",
-        "note": "2 to 3 and 3 to 2 are both here, each with its own capacity, which a matrix "
-                "could not hold",
+        "expect": {
+            "agValue": "20",
+            "agMax": "23",
+            "agRounds": "5, against 3 for the shortest-path rule with backward arcs",
+        },
     },
     {
         "id": "zigzag",
         "label": "one thin arc between two fat ones",
         "spec": "1>2 100, 1>3 100, 2>3 1, 2>4 100, 3>4 100",
         "source": "1", "sink": "4",
-        "note": "the shortest-path rule ignores the thin arc; the first-found rule walks into it "
-                "and pays for it",
+        # agRule ships at "dfs", the rule that walks into the thin arc, so that
+        # is what these tiles are about. "The shortest-path rule ignores it" is
+        # a claim about the OTHER value of that control and is not pinned; the
+        # comparison in agRounds is as close as the shipped state gets.
+        "expect": {
+            "agValue": "199",
+            "agMax": "200",
+            "agRounds": "3, against 2 for the shortest-path rule with backward arcs",
+        },
     },
     {
         "id": "parallel",
         "label": "two arcs between the same pair",
         "spec": "1>2 3, 1>2 4, 2>3 5",
         "source": "1", "sink": "3",
-        "note": "seven units of capacity between 1 and 2, held as two arcs, because the flow is "
-                "an array indexed by arc",
+        "expect": {
+            "agValue": "5",
+            "agMax": "5",
+            "agSat": "1 \u2192 2, 2 \u2192 3",
+        },
     },
 ]
 
@@ -648,7 +709,7 @@ def _augment(cfg):
         )
     )
     script = _BASE_JS + _CERTIFICATE + _presets_js(
-        "AGP", _AG_PRESETS, ["spec", "source", "sink", "note"]) + r"""
+        "AGP", _AG_PRESETS, ["spec", "source", "sink"]) + r"""
   var presetIn = document.getElementById('agPreset'), specIn = document.getElementById('agSpec');
   var srcIn = document.getElementById('agSource'), srcOut = document.getElementById('agSourceOut');
   var sinkIn = document.getElementById('agSink'), sinkOut = document.getElementById('agSinkOut');
@@ -823,6 +884,7 @@ def _augment(cfg):
             "the shortest-path rule reaches with backward arcs in place.",
         ),
         script=script,
+        expect={"agPreset": _expect(_AG_PRESETS)},
     )
 
 
@@ -833,33 +895,50 @@ def _augment(cfg):
 _MC_PRESETS = [
     {
         "id": "classic",
-        "label": "six vertices, and one cut of capacity 23",
+        "label": "six vertices and ten arcs, capacities from 4 to 20",
         "spec": "1>2 16, 1>3 13, 2>3 10, 3>2 4, 2>4 12, 3>5 14, 4>3 9, 5>4 7, 4>6 20, 5>6 4",
         "source": "1", "sink": "6",
-        "note": "three arcs leave the reachable set and their capacities add to the flow value",
+        "expect": {
+            "mcValue": "23",
+            "mcCap": "23 \u2014 equal",
+            "mcCount": "16, of which 1 tie at the smallest",
+        },
     },
     {
         "id": "saturated",
-        "label": "a full arc that is in no cut at all",
+        "label": "a path of three arcs beside a direct one",
         "spec": "1>2 1, 2>3 1, 3>4 5, 1>4 1",
         "source": "1", "sink": "4",
-        "note": "2 to 3 is full and deleting it does not separate anything: saturated is not the "
-                "same as being in a cut",
+        # mcSat is the tile this preset exists for: three arcs end up full and
+        # only two of them are in the cut, so "saturated" and "in the minimum
+        # cut" are shown to be different properties by a count rather than by a
+        # sentence. WHICH arc is the odd one out is drawn, not printed, so it
+        # cannot be pinned.
+        "expect": {
+            "mcValue": "2",
+            "mcSat": "3 full, 2 in the cut",
+        },
     },
     {
         "id": "manycuts",
-        "label": "a chain, where every arc is a minimum cut of its own",
+        "label": "a chain of three arcs, each of capacity 1",
         "spec": "1>2 1, 2>3 1, 3>4 1",
         "source": "1", "sink": "4",
-        "note": "three different sets all have capacity 1, so the minimum cut is not unique "
-                "either",
+        "expect": {
+            "mcValue": "1",
+            "mcCount": "4, of which 3 tie at the smallest",
+        },
     },
     {
         "id": "backwards",
-        "label": "an arc coming back into the set, which costs nothing",
+        "label": "five arcs, one of them pointing back from 3 to 2",
         "spec": "1>2 5, 2>3 5, 3>2 9, 3>4 5, 2>4 1",
         "source": "1", "sink": "4",
-        "note": "3 to 2 points back into the set and contributes nothing to the cut's capacity",
+        "expect": {
+            "mcValue": "5",
+            "mcCap": "5 \u2014 equal",
+            "mcSat": "2 full, 1 in the cut",
+        },
     },
 ]
 
@@ -906,7 +985,7 @@ def _mincut(cfg):
         )
     )
     script = _ORACLE_JS + _CERTIFICATE + _presets_js(
-        "MCP", _MC_PRESETS, ["spec", "source", "sink", "note"]) + r"""
+        "MCP", _MC_PRESETS, ["spec", "source", "sink"]) + r"""
   var presetIn = document.getElementById('mcPreset'), specIn = document.getElementById('mcSpec');
   var srcIn = document.getElementById('mcSource'), srcOut = document.getElementById('mcSourceOut');
   var sinkIn = document.getElementById('mcSink'), sinkOut = document.getElementById('mcSinkOut');
@@ -1110,6 +1189,7 @@ def _mincut(cfg):
             "is smaller is a fact about a list.",
         ),
         script=script,
+        expect={"mcPreset": _expect(_MC_PRESETS)},
     )
 
 
@@ -1120,28 +1200,41 @@ def _mincut(cfg):
 _MT_PRESETS = [
     {
         "id": "maximal",
-        "label": "a matching nothing can be added to, that is not maximum",
+        "label": "two on each side, three pairs",
         "left": "2", "right": "2", "pairs": "2-2, 1-2, 2-1",
-        "note": "taking pairs in order blocks both remaining ones, and a bigger matching exists",
+        "expect": {
+            "mtSize": "2 of 3 pairs",
+            "mtGreedy": "1 \u2014 maximal, not maximum",
+        },
     },
     {
         "id": "perfect",
-        "label": "three on each side, and a perfect matching",
+        "label": "three on each side, six pairs",
         "left": "3", "right": "3", "pairs": "1-1, 1-2, 2-2, 2-3, 3-1, 3-3",
-        "note": "every left vertex is matched, and the cover is the same size as the matching",
+        "expect": {
+            "mtSize": "3 of 6 pairs",
+            "mtCover": "3 \u2014 equal",
+            "mtHall": "holds: every left vertex is matched",
+        },
     },
     {
         "id": "hall",
         "label": "three on the left competing for two",
         "left": "3", "right": "2", "pairs": "1-1, 2-1, 3-1, 3-2",
-        "note": "two left vertices between them reach only one right vertex, which is the "
-                "deficiency Hall's condition names",
+        "expect": {
+            "mtSize": "2 of 4 pairs",
+            "mtHall": "fails at {1, 2}",
+        },
     },
     {
         "id": "star",
         "label": "one popular right vertex",
         "left": "4", "right": "4", "pairs": "1-1, 2-1, 3-1, 4-1, 4-4",
-        "note": "a cover of size two settles it: one vertex covers four of the five pairs",
+        "expect": {
+            "mtSize": "2 of 5 pairs",
+            "mtCover": "2 \u2014 equal",
+            "mtHall": "fails at {1, 2, 3}",
+        },
     },
 ]
 
@@ -1189,7 +1282,7 @@ def _matching(cfg):
         )
     )
     script = _ORACLE_JS + _CERTIFICATE + _presets_js(
-        "MTP", _MT_PRESETS, ["left", "right", "pairs", "note"]) + r"""
+        "MTP", _MT_PRESETS, ["left", "right", "pairs"]) + r"""
   var presetIn = document.getElementById('mtPreset');
   var leftIn = document.getElementById('mtLeft'), leftOut = document.getElementById('mtLeftOut');
   var rightIn = document.getElementById('mtRight'), rightOut = document.getElementById('mtRightOut');
@@ -1379,6 +1472,7 @@ def _matching(cfg):
             "nothing about flow, and with a greedy pass that stops too early.",
         ),
         script=script,
+        expect={"mtPreset": _expect(_MT_PRESETS)},
     )
 
 
@@ -1394,8 +1488,11 @@ _GD_PRESETS = [
         "spec": "1>2 5, 1>3 4, 2>4 3, 3>4 6, 2>3 2",
         "caps": "",
         "source": "1", "sink": "4",
-        "note": "with no vertex capped the transformed network must give exactly the original "
-                "answer, and that is the check",
+        "expect": {
+            "gdAfter": "8 and 9",
+            "gdValue": "9",
+            "gdCheck": "uncapped, and it gives the original answer",
+        },
     },
     {
         "id": "capped",
@@ -1404,17 +1501,22 @@ _GD_PRESETS = [
         "spec": "1>2 5, 1>3 4, 2>4 3, 3>4 6, 2>3 2",
         "caps": "3:2",
         "source": "1", "sink": "4",
-        "note": "capping what can pass THROUGH a vertex needs no new algorithm, only an arc",
+        "expect": {
+            "gdValue": "5",
+            "gdCheck": "capping cannot raise the answer, and it did not",
+        },
     },
     {
         "id": "disjoint",
-        "label": "every capacity one, so the flow counts separate routes",
+        "label": "six arcs, every capacity set to 1",
         "kind": "unit",
         "spec": "1>2 9, 1>3 9, 2>4 9, 3>4 9, 2>3 9, 1>4 9",
         "caps": "",
         "source": "1", "sink": "4",
-        "note": "the value is the number of routes sharing no arc, and the cut is the arcs you "
-                "must remove to stop all of them",
+        "expect": {
+            "gdValue": "3",
+            "gdCheck": "3 routes walked out of the flow, matching its value",
+        },
     },
     {
         "id": "many",
@@ -1423,8 +1525,11 @@ _GD_PRESETS = [
         "spec": "1>3 4, 2>3 3, 3>4 5, 3>5 4",
         "caps": "",
         "source": "1", "sink": "4",
-        "note": "everything with nothing coming in is a source and everything with nothing going "
-                "out is a sink, joined to one of each",
+        "expect": {
+            "gdBefore": "5 and 4",
+            "gdAfter": "7 and 8",
+            "gdValue": "7",
+        },
     },
 ]
 
@@ -1474,7 +1579,7 @@ def _gadget(cfg):
         )
     )
     script = _ORACLE_JS + _CERTIFICATE + _presets_js(
-        "GDP", _GD_PRESETS, ["kind", "spec", "caps", "source", "sink", "note"]) + r"""
+        "GDP", _GD_PRESETS, ["kind", "spec", "caps", "source", "sink"]) + r"""
   var presetIn = document.getElementById('gdPreset'), kindIn = document.getElementById('gdKind');
   var specIn = document.getElementById('gdSpec'), capsIn = document.getElementById('gdCaps');
   var srcIn = document.getElementById('gdSource'), srcOut = document.getElementById('gdSourceOut');
@@ -1736,6 +1841,7 @@ def _gadget(cfg):
             "gadget carries a check that its answer means what it claims.",
         ),
         script=script,
+        expect={"gdPreset": _expect(_GD_PRESETS)},
     )
 
 

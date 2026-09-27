@@ -78,6 +78,18 @@ WHERE THE DESIGN AND THE ENGINE DISAGREED, AND WHAT WAS DONE. Two places.
   of two; at m = 13 the step could share a factor and the probe sequence would
   not reach every slot. Offering a table size that silently breaks one of the
   three rules is the kind of defect a lesson cannot survive.
+
+EVERY PRESET PINS WHAT IT PRINTS. Each of the 21 presets carries `expect`:
+{kpi element id: the exact text the page prints}, one to three tiles, read off
+the running kit with `node scripts/labcheck.js --observe <page>` and never
+copied out of HASH_JS. scripts/labcheck.js selects the option on the BUILT page,
+dispatches the menu's change handler and compares the tile's textContent; a
+preset's `label` is prose no check can read, and a sweep of fifteen kits found
+57 such strings false. `expect` is stripped before the presets are embedded in
+the page -- see `_js_presets` -- because it is for the build and not for the
+reader. What is NOT pinned is named in a comment beside the preset: the two
+maximum-load rows on `balls` are quoted asymptotics, and hpKnuthU/hpKnuthS are
+the linear-probing clustering curve whatever rule is selected.
 """
 
 from .algebra_core import RATIONAL_JS
@@ -659,6 +671,41 @@ def _preset_index(cfg, presets, mode):
     )
 
 
+def _expect(presets):
+    """{preset key: {kpi element id: the exact text the page prints}}.
+
+    A preset's `label` is what the reader picks out of the menu and no check
+    here can read it: a sweep of fifteen kits found 57 preset strings false
+    about the lab they described. This is the part of the same claim a machine
+    can hold. scripts/build_paths.py writes it to
+    scripts/generated-expectations.json and scripts/labcheck.js selects the
+    option on the BUILT page, dispatches the menu's own change handler and
+    compares getElementById(kpi).textContent. Every figure was read off the
+    running kit with `node scripts/labcheck.js --observe <page>`.
+
+    Tiles are read with every OTHER control at the value the markup ships --
+    the division rule, the seeded key set, the hash rule and the seeds each
+    preset names -- so a claim that needs a second control moved is written as
+    a comment beside the preset instead of pinned as something weaker.
+
+    This kit serves two courses, and a preset's figures were confirmed to be
+    the same on both: no mode appears in both `data-structures` and
+    `randomised-algorithms`, and `--observe` over all seven pages shows no
+    tile whose value depends on which lesson embedded the mode.
+    """
+    return {p["key"]: dict(p.get("expect") or {}) for p in presets}
+
+
+def _js_presets(presets):
+    """The presets as the page's script sees them, WITHOUT `expect`.
+
+    The whole preset dict is embedded in the page by cfg_literal, so a key
+    added here for the build would otherwise ship to every reader. `expect` is
+    for scripts/labcheck.js and never for the browser.
+    """
+    return [{k: v for k, v in p.items() if k != "expect"} for p in presets]
+
+
 # Every mode needs the rationals, the counter convention, BigInt long division
 # for the decimals, the seeded stream and the engine. SERIES_JS and APPROX_JS
 # are added only by the modes that draw a curve or print a float, because the
@@ -674,11 +721,14 @@ _PLOT_FLOAT_JS = _CORE_JS + SERIES_JS + APPROX_JS
 
 CHAINING_PRESETS = [
     {"key": "eight-slots", "label": "twenty keys into eight slots, drawn at random",
-     "rule": "division", "keys": "seeded", "m": 8, "n": 20, "seed": 7},
-    {"key": "degenerate", "label": "every key a multiple of m, which is the worst case",
-     "rule": "division", "keys": "stride", "m": 8, "n": 20, "seed": 7},
+     "rule": "division", "keys": "seeded", "m": 8, "n": 20, "seed": 7,
+     "expect": {"hcAlpha": "5/2 = 2.500", "hcMean": "23/10 = 2.300", "hcLongest": "5"}},
+    {"key": "degenerate", "label": "every key a multiple of m",
+     "rule": "division", "keys": "stride", "m": 8, "n": 20, "seed": 7,
+     "expect": {"hcAlpha": "5/2 = 2.500", "hcMean": "21/2 = 10.500", "hcLongest": "20"}},
     {"key": "half-full", "label": "a table at half load",
-     "rule": "division", "keys": "seeded", "m": 16, "n": 8, "seed": 3},
+     "rule": "division", "keys": "seeded", "m": 16, "n": 8, "seed": 3,
+     "expect": {"hcAlpha": "1/2 = 0.500", "hcExpS": "79/64 = 1.234"}},
 ]
 
 CHAINING_SCRIPT = r"""
@@ -855,19 +905,28 @@ def _chaining(cfg):
             "the n and m you set. The mean beside them is measured by running all n searches. "
             "Choose the key set that is every multiple of m and the two part company.",
         ),
-        script=_CORE_JS + cfg_literal("PRESETS", CHAINING_PRESETS) + CHAINING_SCRIPT,
+        script=_CORE_JS + cfg_literal("PRESETS", _js_presets(CHAINING_PRESETS)) + CHAINING_SCRIPT,
+        expect={"hcPreset": _expect(CHAINING_PRESETS)},
     )
 
 
 # ============================================================== mode: probing
 
 PROBING_PRESETS = [
-    {"key": "linear-seventy", "label": "linear probing, a table at seven tenths",
-     "rule": "linear", "m": 32, "alpha": 70, "seed": 5},
+    {"key": "linear-seventy", "label": "linear probing, aiming at seven tenths",
+     "rule": "linear", "m": 32, "alpha": 70, "seed": 5,
+     "expect": {"hpLoad": "11/16 = 0.688", "hpMean": "5 = 5.000", "hpCluster": "12 slots"}},
     {"key": "clustered", "label": "linear probing, nearly full",
-     "rule": "linear", "m": 32, "alpha": 90, "seed": 5},
+     "rule": "linear", "m": 32, "alpha": 90, "seed": 5,
+     "expect": {"hpLoad": "7/8 = 0.875", "hpMean": "101/12 = 8.417", "hpCluster": "16 slots"}},
+    # hpKnuthU and hpKnuthS are knuthProbeApprox(alpha), which is the LINEAR-probing
+    # clustering curve, and knuthRow() is not told which rule ran: at this load the
+    # tile reads 5.62 under all three rules, beside a counted 5.000 for linear, 4.750
+    # for quadratic and 3.000 for double. Neither tile is pinned on this preset -- an
+    # expectation there would ratify a curve that is not about the algorithm that ran.
     {"key": "double", "label": "double hashing at the same load",
-     "rule": "double", "m": 32, "alpha": 70, "seed": 5},
+     "rule": "double", "m": 32, "alpha": 70, "seed": 5,
+     "expect": {"hpLoad": "11/16 = 0.688", "hpMean": "3 = 3.000", "hpCluster": "8 slots"}},
 ]
 
 PROBING_SCRIPT = r"""
@@ -1038,7 +1097,8 @@ def _probing(cfg):
             "Knuth's `½(1 + 1/(1−α)²)`, which is an approximation of the model rather than of the "
             "arithmetic, and above `α = 0.98` the panel refuses to quote it.",
         ),
-        script=_PLOT_JS + cfg_literal("PRESETS", PROBING_PRESETS) + PROBING_SCRIPT,
+        script=_PLOT_JS + cfg_literal("PRESETS", _js_presets(PROBING_PRESETS)) + PROBING_SCRIPT,
+        expect={"hpPreset": _expect(PROBING_PRESETS)},
     )
 
 
@@ -1046,11 +1106,14 @@ def _probing(cfg):
 
 RESIZE_PRESETS = [
     {"key": "hysteresis", "label": "double at 1, halve at a quarter",
-     "grow": "1/1", "shrink": "1/4", "pattern": "boundary", "ops": 40, "seed": 9},
+     "grow": "1/1", "shrink": "1/4", "pattern": "boundary", "ops": 40, "seed": 9,
+     "expect": {"hrTotal": "52", "hrBound": "120", "hrThrash": "none"}},
     {"key": "thrash", "label": "double at a half, halve at a half",
-     "grow": "1/2", "shrink": "1/2", "pattern": "boundary", "ops": 40, "seed": 9},
+     "grow": "1/2", "shrink": "1/2", "pattern": "boundary", "ops": 40, "seed": 9,
+     "expect": {"hrTotal": "495", "hrBound": "120", "hrThrash": "from operation 2"}},
     {"key": "growth-only", "label": "inserts only, to see the amortised line",
-     "grow": "1/1", "shrink": "1/4", "pattern": "grow", "ops": 40, "seed": 9},
+     "grow": "1/1", "shrink": "1/4", "pattern": "grow", "ops": 40, "seed": 9,
+     "expect": {"hrTotal": "100", "hrAmort": "5/2 = 2.500", "hrRehash": "4 of 40"}},
 ]
 
 RESIZE_SCRIPT = r"""
@@ -1211,7 +1274,8 @@ def _resize(cfg):
             "rehash moved. Set the grow and shrink thresholds to the same number, run the "
             "alternating pattern, and the amortised bound stops holding in front of you.",
         ),
-        script=_PLOT_JS + cfg_literal("PRESETS", RESIZE_PRESETS) + RESIZE_SCRIPT,
+        script=_PLOT_JS + cfg_literal("PRESETS", _js_presets(RESIZE_PRESETS)) + RESIZE_SCRIPT,
+        expect={"hrPreset": _expect(RESIZE_PRESETS)},
     )
 
 
@@ -1219,11 +1283,26 @@ def _resize(cfg):
 
 UNIVERSAL_PRESETS = [
     {"key": "p11-m4", "label": "p = 11, m = 4, the pair 3 and 7",
-     "p": 11, "m": 4, "x": 3, "y": 7},
+     "p": 11, "m": 4, "x": 3, "y": 7,
+     "expect": {
+                "huRate": "2/11 = 0.1818",
+                "huBound": "1/4 = 0.2500",
+                "huVerdict": "at most 1/m, as claimed"
+                }},
     {"key": "p7-m3", "label": "p = 7, m = 3, the pair 1 and 4",
-     "p": 7, "m": 3, "x": 1, "y": 4},
+     "p": 7, "m": 3, "x": 1, "y": 4,
+     "expect": {
+                "huTotal": "42 pairs (a, b)",
+                "huRate": "5/21 = 0.2381",
+                "huBound": "1/3 = 0.3333"
+                }},
     {"key": "p13-m5", "label": "p = 13, m = 5, the pair 2 and 9",
-     "p": 13, "m": 5, "x": 2, "y": 9},
+     "p": 13, "m": 5, "x": 2, "y": 9,
+     "expect": {
+                "huTotal": "156 pairs (a, b)",
+                "huRate": "11/78 = 0.1410",
+                "huBound": "1/5 = 0.2000"
+                }},
 ]
 
 UNIVERSAL_SCRIPT = r"""
@@ -1359,7 +1438,8 @@ def _universal(cfg):
             "grid enumerates every `(a, b)`, colouring the ones that collide. The fraction that "
             "results is exact, and it never exceeds `1/m` — which is what universality means.",
         ),
-        script=_CORE_JS + cfg_literal("PRESETS", UNIVERSAL_PRESETS) + UNIVERSAL_SCRIPT,
+        script=_CORE_JS + cfg_literal("PRESETS", _js_presets(UNIVERSAL_PRESETS)) + UNIVERSAL_SCRIPT,
+        expect={"huPreset": _expect(UNIVERSAL_PRESETS)},
     )
 
 
@@ -1367,11 +1447,17 @@ def _universal(cfg):
 
 BALLS_PRESETS = [
     {"key": "birthday", "label": "twenty-three keys into three hundred and sixty-five slots",
-     "n": 23, "m": 365, "seed": 4},
+     "n": 23, "m": 365, "seed": 4,
+     "expect": {"hbPairs": "253/365 = 0.693", "hbBirthday": "23 keys", "hbEmptyM": "343 of 365"}},
     {"key": "quarter-full", "label": "a table a quarter full",
-     "n": 32, "m": 128, "seed": 4},
+     "n": 32, "m": 128, "seed": 4,
+     "expect": {"hbPairs": "31/8 = 3.875", "hbEmpty": "99.589", "hbEmptyM": "99 of 128"}},
+    # hbStated1 and hbStated2 are asymptotics quoted from outside this library -- the
+    # panel says so -- so what is pinned here is the counted tallest bin beside the
+    # exact expectations, never the stated rows.
     {"key": "equal", "label": "as many keys as slots",
-     "n": 64, "m": 64, "seed": 4},
+     "n": 64, "m": 64, "seed": 4,
+     "expect": {"hbPairs": "63/2 = 31.500", "hbEmptyM": "19 of 64", "hbMaxLoad": "3"}},
 ]
 
 BALLS_SCRIPT = r"""
@@ -1534,7 +1620,8 @@ def _balls(cfg):
             "exact fractions, with one seeded throw beside them. The two maximum-load "
             "asymptotics are labelled: this library states them and proves neither.",
         ),
-        script=_FLOAT_JS + cfg_literal("PRESETS", BALLS_PRESETS) + BALLS_SCRIPT,
+        script=_FLOAT_JS + cfg_literal("PRESETS", _js_presets(BALLS_PRESETS)) + BALLS_SCRIPT,
+        expect={"hbPreset": _expect(BALLS_PRESETS)},
     )
 
 
@@ -1542,11 +1629,21 @@ def _balls(cfg):
 
 BLOOM_PRESETS = [
     {"key": "ten-bits", "label": "sixteen keys at ten bits each, seven hashes",
-     "n": 16, "bits": 10, "k": 7, "seed": 6},
+     "n": 16, "bits": 10, "k": 7, "seed": 6,
+     "expect": {
+                "hfExact": "0.008319",
+                "hfApprox": "0.008194 — approximate",
+                "hfKStar": "7 hashes"
+                }},
     {"key": "eight-bits", "label": "sixteen keys at eight bits each",
-     "n": 16, "bits": 8, "k": 6, "seed": 6},
+     "n": 16, "bits": 8, "k": 6, "seed": 6,
+     "expect": {"hfExact": "0.021920", "hfKStar": "6 hashes"}},
+    # "more hashes is worse" is a claim about the k slider, and a tile holds one k.
+    # What is pinned is the pair a reader can see without moving anything: the rate at
+    # the k this preset ships, and hfKStar, the best k found by scanning every one.
     {"key": "too-many", "label": "twelve bits a key and every hash you can afford",
-     "n": 12, "bits": 12, "k": 10, "seed": 6},
+     "n": 12, "bits": 12, "k": 10, "seed": 6,
+     "expect": {"hfExact": "0.003414", "hfKStar": "8 hashes"}},
 ]
 
 BLOOM_SCRIPT = r"""
@@ -1698,7 +1795,8 @@ def _bloom(cfg):
             "familiar `(1 − e^{−kn/m})^k` is printed beside it as the approximation it is. The "
             "gap between the two columns is the independent-hash assumption.",
         ),
-        script=_PLOT_FLOAT_JS + cfg_literal("PRESETS", BLOOM_PRESETS) + BLOOM_SCRIPT,
+        script=_PLOT_FLOAT_JS + cfg_literal("PRESETS", _js_presets(BLOOM_PRESETS)) + BLOOM_SCRIPT,
+        expect={"hfPreset": _expect(BLOOM_PRESETS)},
     )
 
 
@@ -1706,11 +1804,14 @@ def _bloom(cfg):
 
 COUNTMIN_PRESETS = [
     {"key": "heavy-hitter", "label": "one key forty times, two others three times and nine twice",
-     "kind": "heavy", "w": 8, "d": 3, "seed": 2},
+     "kind": "heavy", "w": 8, "d": 3, "seed": 2,
+     "expect": {"hmWorst": "2", "hmNever": "never below the truth", "hmSlack": "16 = 16.00"}},
     {"key": "uniform", "label": "ten keys, six times each",
-     "kind": "uniform", "w": 8, "d": 3, "seed": 2},
+     "kind": "uniform", "w": 8, "d": 3, "seed": 2,
+     "expect": {"hmLen": "60 updates", "hmWorst": "0", "hmNever": "never below the truth"}},
     {"key": "seeded", "label": "a seeded stream over twelve keys",
-     "kind": "seeded", "w": 12, "d": 4, "seed": 2},
+     "kind": "seeded", "w": 12, "d": 4, "seed": 2,
+     "expect": {"hmEps": "1/6 = 0.1667", "hmDelta": "1/16 = 0.06250", "hmWorst": "0"}},
 ]
 
 COUNTMIN_SCRIPT = r"""
@@ -1869,7 +1970,8 @@ def _countmin(cfg):
             "counters. Compare each estimate with the true count: the sketch is never below it, "
             "and the `(ε, δ)` the panel quotes are exact fractions of the `w` and `d` you chose.",
         ),
-        script=_CORE_JS + cfg_literal("PRESETS", COUNTMIN_PRESETS) + COUNTMIN_SCRIPT,
+        script=_CORE_JS + cfg_literal("PRESETS", _js_presets(COUNTMIN_PRESETS)) + COUNTMIN_SCRIPT,
+        expect={"hmPreset": _expect(COUNTMIN_PRESETS)},
     )
 
 

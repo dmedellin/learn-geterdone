@@ -64,6 +64,31 @@ The five modes, one lesson each.
   mdp       policy iteration: each policy evaluated by an exact linear solve,
             improved greedily, with value iteration shown converging to the
             answer the solve already has
+
+EVERY PRESET PINS WHAT IT PRINTS, AND NO PRESET CARRIES A NOTE ANY MORE.
+A preset used to carry two pieces of prose: a `label` in the <select> and a
+`note` about the outcome. Nothing in this repository could read either, and a
+sweep of fifteen kits found 57 of those strings false about the lab they
+described. Rendering does not help -- `dpkit` printed its selected note into
+the status banner and had a HIGHER correction rate than `graphkit`, which
+rendered none -- so the notes here are deleted rather than re-checked, and
+each preset now carries `expect`: {kpi element id: the exact text the page
+prints}. scripts/build_paths.py writes it to
+scripts/generated-expectations.json and scripts/labcheck.js selects the option
+on the BUILT page, dispatches the menu's own change handler and compares
+getElementById(id).textContent. Every figure below was read off the running
+kit with `node scripts/labcheck.js --observe <page>`. See `_expect` and
+scripts/mathpath/AGENTS.md.
+
+TWO THINGS SPECIFIC TO THIS KIT. CHAIN_PRESETS is one table behind THREE
+modes, so `expect` is keyed by mode: `weather` makes three different claims
+depending on whether the page is `chain`, `classify` or `steady`. And the
+tiles are written through two setters now, `setKpi` for text and
+`setKpiHtml` for a tone span -- before that split every tile on these five
+pages went through innerHTML, so every one of them read back EMPTY from
+textContent and not one could be pinned. The tiles that really are markup
+(mcSumK, mkIrredK, mkAperK, msUniqueK, maMissK) still cannot be, and the
+presets that would have wanted one say so in a comment.
 """
 
 import json
@@ -381,37 +406,132 @@ CHAIN_PRESETS = {
         "P": "1/2 1/2; 1/4 3/4",
         "names": "fine, wet",
         "start": "1 0",
+        "expect": {
+            "chain": {
+                "mcStatesK": "2",
+                "mcAfterK": "683/2048, 1365/2048",
+                "mcDenK": "4 digits",
+            },
+            "classify": {
+                "mkCountK": "1",
+                "mkPeriodK": "1",
+            },
+            "steady": {
+                "msPiK": "1/3, 2/3",
+                "msGapK": "1.110e-16",
+            },
+        },
     },
     "market": {
         "label": "Three brands, with switching in every direction",
         "P": "7/10 2/10 1/10; 3/10 5/10 2/10; 1/10 3/10 6/10",
         "names": "A, B, C",
         "start": "1 0 0",
+        "expect": {
+            "chain": {
+                "mcStatesK": "3",
+                "mcArcsK": "9 of 9 possible",
+                "mcDenK": "6 digits",
+            },
+            "classify": {
+                "mkCountK": "1",
+                "mkRecK": "1",
+                "mkPeriodK": "1",
+            },
+            "steady": {
+                "msPiK": "7/17, 11/34, 9/34",
+                "msPlacesK": "15",
+            },
+        },
     },
     "cycle": {
-        "label": "A 3-cycle: the system has an answer and the powers never settle",
+        "label": "A 3-cycle: every state steps to the next",
         "P": "0 1 0; 0 0 1; 1 0 0",
         "names": "1, 2, 3",
         "start": "1 0 0",
+        # The three claims this matrix carries, one per mode: on `chain` the
+        # distribution cycles and never settles (mcAfterK back at 1, 0, 0 after
+        # six steps); on `classify` it is irreducible with period 3; and on
+        # `steady` the SYSTEM has an answer, 1/3 each, while the power
+        # iteration agrees to 0 places -- which is the whole reason aperiodicity
+        # is a hypothesis of the convergence theorem. The irreducibility verdict
+        # itself is a tone span (mkIrredK) and cannot be pinned; mkPeriodK is
+        # the checkable half.
+        "expect": {
+            "chain": {
+                "mcArcsK": "3 of 9 possible",
+                "mcAfterK": "1, 0, 0",
+                "mcWideK": "1 digit",
+            },
+            "classify": {
+                "mkCountK": "1",
+                "mkPeriodK": "3",
+            },
+            "steady": {
+                "msPiK": "1/3, 1/3, 1/3",
+                "msGapK": "6.667e-1",
+                "msPlacesK": "0",
+            },
+        },
     },
     "leaky": {
         "label": "One state that can leave and never return",
         "P": "1/2 1/4 1/4; 0 3/4 1/4; 0 1/2 1/2",
         "names": "trial, kept, lapsed",
         "start": "1 0 0",
+        "expect": {
+            "chain": {
+                "mcArcsK": "7 of 9 possible",
+                "mcAfterK": "1/64, 2667/4096, 1365/4096",
+            },
+            "classify": {
+                "mkCountK": "2",
+                "mkTransK": "1",
+                "mkPeriodK": "per class: 1, 1",
+            },
+        },
     },
     "split": {
-        "label": "Two closed groups: no unique steady state at all",
+        "label": "Two closed groups of two states each",
         "P": "1/2 1/2 0 0; 1/2 1/2 0 0; 0 0 1/3 2/3; 0 0 1/4 3/4",
         "names": "a, b, c, d",
         "start": "1 0 0 0",
+        # On `steady` this is the preset that exists to have NO unique answer,
+        # and the two tiles that say so in words -- msPiK "not unique" and
+        # msUniqueK "no" -- are tone spans written through setKpiHtml, so a
+        # check reading textContent reads nothing from them. What is pinned is
+        # the em dash the other four tiles fall back to, which is the same
+        # refusal expressed in a channel a machine can read.
+        "expect": {
+            "classify": {
+                "mkCountK": "2",
+                "mkRecK": "2",
+                "mkTransK": "0",
+            },
+            "steady": {
+                "msResidK": "\u2014",
+                "msGapK": "\u2014",
+                "msPlacesK": "\u2014",
+            },
+        },
     },
     "five": {
-        "label": "Five states with denominator 20, where the powers outgrow a double",
+        "label": "Five states, every entry over 20",
         "P": ("4/20 4/20 4/20 4/20 4/20; 1/20 3/20 7/20 4/20 5/20; "
               "2/20 2/20 6/20 7/20 3/20; 9/20 1/20 1/20 4/20 5/20; 3/20 4/20 6/20 2/20 5/20"),
         "names": "1, 2, 3, 4, 5",
         "start": "1 0 0 0 0",
+        "expect": {
+            "chain": {
+                "mcStatesK": "5",
+                "mcWideK": "8 digits",
+                "mcDenK": "8 digits",
+            },
+            "steady": {
+                "msPiK": "7525/37913, 5222/37913, 8860/37913, 8090/37913, 8216/37913",
+                "msPlacesK": "15",
+            },
+        },
     },
 }
 
@@ -421,18 +541,38 @@ ABSORB_PRESETS = {
         "P": "1 0 0 0 0; 1/2 0 1/2 0 0; 0 1/2 0 1/2 0; 0 0 1/2 0 1/2; 0 0 0 0 1",
         "names": "0, 1, 2, 3, 4",
         "absorbing": "1 5",
+        "expect": {
+            "absorb": {
+                "maTransK": "3: 1, 2, 3",
+                "maAbsK": "2: 0, 4",
+                "maLongK": "4 from 2",
+            },
+        },
     },
     "drunk": {
         "label": "A biased walk: twice as likely to step up as down",
         "P": "1 0 0 0 0; 1/3 0 2/3 0 0; 0 1/3 0 2/3 0; 0 0 1/3 0 2/3; 0 0 0 0 1",
         "names": "0, 1, 2, 3, 4",
         "absorbing": "1 5",
+        "expect": {
+            "absorb": {
+                "maTransK": "3: 1, 2, 3",
+                "maLongK": "18/5 from 2",
+            },
+        },
     },
     "trial": {
         "label": "A trial with two ways out and two states you can go back to",
         "P": "1/2 1/4 1/8 1/8; 1/4 1/2 1/8 1/8; 0 0 1 0; 0 0 0 1",
         "names": "new, review, accepted, rejected",
         "absorbing": "3 4",
+        "expect": {
+            "absorb": {
+                "maTransK": "2: new, review",
+                "maAbsK": "2: accepted, rejected",
+                "maLongK": "4 from new",
+            },
+        },
     },
 }
 
@@ -448,6 +588,13 @@ MDP_PRESETS = {
         "r0": "1 3",
         "r1": "2 1",
         "names": "good, worn",
+        "expect": {
+            "mdp": {
+                "mdRoundsK": "2",
+                "mdPolicyK": "action 2 / action 1",
+                "mdValueK": "265/11, 285/11",
+            },
+        },
     },
     "stock": {
         "label": "Hold or restock, with a penalty for being empty",
@@ -456,8 +603,59 @@ MDP_PRESETS = {
         "r0": "4 1 -3",
         "r1": "1 0 -1",
         "names": "full, low, empty",
+        "expect": {
+            "mdp": {
+                "mdAllK": "8",
+                "mdPolicyK": "action 1 / action 2 / action 2",
+                "mdValueK": "1640/59, 1440/59, 1345/59",
+            },
+        },
     },
 }
+
+
+# WHICH PRESETS EACH MODE OFFERS, spelled once. `_select` builds the menu from
+# these tuples and `_expect` resolves the same tuples, so an <option> and its
+# checked figure cannot drift apart -- and three modes share CHAIN_PRESETS with
+# three different menus, which is exactly where that drift would have happened.
+CHAIN_MENU = {
+    "chain": ("weather", "market", "cycle", "leaky", "five"),
+    "classify": ("leaky", "cycle", "split", "weather", "market"),
+    "steady": ("market", "weather", "cycle", "split", "five"),
+}
+ABSORB_MENU = ("ruin", "drunk", "trial")
+MDP_MENU = ("machine", "stock")
+
+
+def _menu(presets, keys):
+    """[(preset id, its menu text)] in the order that mode offers them."""
+    return [(k, presets[k]["label"]) for k in keys]
+
+
+def _expect(presets, mode, keys):
+    """{preset id: {kpi element id: the exact text the page prints}}, for one mode.
+
+    A preset's `label` says which chain it is and no check in this repository
+    can read it. Its `expect` says what the page PRINTS once that option is
+    selected, and scripts/labcheck.js selects it on the BUILT page, dispatches
+    the menu's own change handler and compares getElementById(kpi).textContent.
+    Every figure was read off the running kit with
+    `node scripts/labcheck.js --observe <page>`, never out of the code that
+    computes it. See scripts/mathpath/AGENTS.md for the author rule.
+
+    THE EXPECTATION IS PER MODE, because CHAIN_PRESETS is one table behind
+    three of them: `weather` prints mcStatesK on `chain`, mkPeriodK on
+    `classify` and msPiK on `steady`, and those are three different claims
+    about one matrix.
+
+    ONLY A TILE WRITTEN THROUGH textContent CAN BE PINNED. The tiles that carry
+    a tone span -- mcSumK, mkIrredK, mkAperK, msUniqueK, maMissK, and msPiK and
+    msResidK on the branch where no unique steady state exists -- go through
+    `setKpiHtml`, and a check that reads textContent reads nothing from them.
+    They are named in the comment beside the preset that would otherwise have
+    pinned one.
+    """
+    return {k: dict((presets[k].get("expect") or {}).get(mode) or {}) for k in keys}
 
 
 # ---------------------------------------------------------------------------
@@ -542,7 +740,8 @@ def _banner(cid):
     return '      <div class="status-banner" id="%s" style="margin-top:12px;"></div>\n' % cid
 
 
-def _lab(cfg, *, title, subtitle, markup, controls, script, panel_title, panel_intro):
+def _lab(cfg, *, title, subtitle, markup, controls, script, panel_title, panel_intro,
+         expect=None):
     return Lab(
         title=title,
         subtitle=subtitle,
@@ -551,6 +750,7 @@ def _lab(cfg, *, title, subtitle, markup, controls, script, panel_title, panel_i
         script=script,
         panel_title=cfg.get("panel_title", panel_title),
         panel_intro=cfg.get("panel_intro", panel_intro),
+        expect=expect or {},
     )
 
 
@@ -571,7 +771,16 @@ _READ_JS = r"""
     if (parts.length !== count) { parts = []; for (var k = 0; k < count; k += 1) parts.push(String(k + 1)); }
     return parts;
   }
-  function setKpi(id, html) { document.getElementById(id).innerHTML = html; }
+  /* Two channels, because they are two different things. A tile holding a
+     figure is TEXT and goes through textContent: it is what every other
+     kit on this path writes, it is what scripts/labcheck.js reads when it
+     checks a preset's `expect` against the shipped page, and it cannot
+     carry an HTML entity by accident. A tile holding a tone span is
+     markup and says so at the call site. Before this split every tile
+     here went through innerHTML, so every one of them read back empty
+     from getElementById(id).textContent and none could be pinned. */
+  function setKpi(id, text) { document.getElementById(id).textContent = text; }
+  function setKpiHtml(id, html) { document.getElementById(id).innerHTML = html; }
 """
 
 
@@ -605,8 +814,7 @@ def _chain(cfg):
     )
     controls = (
         _select("mcPreset", "Worked example",
-                [(k, CHAIN_PRESETS[k]["label"]) for k in
-                 ("weather", "market", "cycle", "leaky", "five")], chosen)
+                _menu(CHAIN_PRESETS, CHAIN_MENU["chain"]), chosen)
         + _text("mcP", "Transition matrix &mdash; rows separated by &ldquo;;&rdquo;", here["P"])
         + _text("mcNames", "State names", here["names"])
         + _text("mcStart", "Starting distribution", here["start"])
@@ -645,7 +853,7 @@ def _chain(cfg):
   function blank(message) {
     graphEl.innerHTML = ''; distEl.innerHTML = ''; rowsEl.innerHTML = ''; powEl.innerHTML = '';
     ['mcStatesK', 'mcSumK', 'mcArcsK', 'mcWideK', 'mcAfterK', 'mcDenK'].forEach(function (id) {
-      setKpi(id, '&mdash;');
+      setKpi(id, '—');
     });
     statusEl.innerHTML = message;
   }
@@ -704,11 +912,14 @@ def _chain(cfg):
 
     var after = walk[walk.length - 1];
     setKpi('mcStatesK', String(n));
-    setKpi('mcSumK', '<span class="tone-green">all ' + n + ' &check;</span>');
+    setKpiHtml('mcSumK', '<span class="tone-green">all ' + n + ' &check;</span>');
     setKpi('mcArcsK', arcs + ' of ' + (n * n) + ' possible');
     setKpi('mcWideK', widest + ' digit' + (widest === 1 ? '' : 's'));
     setKpi('mcAfterK', after.map(function (v) { return Rshort(v, 4, 6); }).join(', '));
-    setKpi('mcDenK', String(den).length + ' digits');
+    /* `cycle`'s largest denominator is 1 and this read "1 digits". mcWideK
+       one line up already pluralised; this did not. */
+    setKpi('mcDenK', String(den).length + ' digit'
+      + (String(den).length === 1 ? '' : 's'));
 
     statusEl.innerHTML = '<strong>' + valid.why.charAt(0).toUpperCase() + valid.why.slice(1)
       + '.</strong> The support digraph above has ' + arcs + ' arc' + (arcs === 1 ? '' : 's')
@@ -749,6 +960,7 @@ def _chain(cfg):
         panel_intro="Every row is added up on this page before anything is computed from it: a matrix "
         "whose rows do not sum to one is refused rather than used. P&#8319; is exact repeated "
         "multiplication, which is why its entries can be wider than a decimal.",
+        expect={"mcPreset": _expect(CHAIN_PRESETS, "chain", CHAIN_MENU["chain"])},
     )
 
 
@@ -780,8 +992,7 @@ def _classify(cfg):
     )
     controls = (
         _select("mkPreset", "Worked example",
-                [(k, CHAIN_PRESETS[k]["label"]) for k in
-                 ("leaky", "cycle", "split", "weather", "market")], chosen)
+                _menu(CHAIN_PRESETS, CHAIN_MENU["classify"]), chosen)
         + _text("mkP", "Transition matrix", here["P"])
         + _text("mkNames", "State names", here["names"])
         + _kpis(
@@ -815,7 +1026,7 @@ def _classify(cfg):
   function blank(message) {
     graphEl.innerHTML = ''; classesEl.innerHTML = ''; reachEl.innerHTML = '';
     ['mkCountK', 'mkIrredK', 'mkRecK', 'mkTransK', 'mkPeriodK', 'mkAperK'].forEach(function (id) {
-      setKpi(id, '&mdash;');
+      setKpi(id, '—');
     });
     statusEl.innerHTML = message;
   }
@@ -883,12 +1094,12 @@ def _classify(cfg):
 
     var wholePeriod = cls.irreducible ? periods[0] : null;
     setKpi('mkCountK', String(cls.classes.length));
-    setKpi('mkIrredK', cls.irreducible ? '<span class="tone-green">yes</span>'
+    setKpiHtml('mkIrredK', cls.irreducible ? '<span class="tone-green">yes</span>'
       : '<span class="tone-red">no, ' + cls.classes.length + ' classes</span>');
     setKpi('mkRecK', String(recurrent));
     setKpi('mkTransK', String(transient));
     setKpi('mkPeriodK', wholePeriod === null ? 'per class: ' + periods.join(', ') : String(wholePeriod));
-    setKpi('mkAperK', wholePeriod === null ? '&mdash;'
+    setKpiHtml('mkAperK', wholePeriod === null ? '&mdash;'
       : (wholePeriod === 1 ? '<span class="tone-green">yes</span>'
          : '<span class="tone-red">no, period ' + wholePeriod + '</span>'));
 
@@ -943,6 +1154,7 @@ def _classify(cfg):
         panel_intro="Classes come from reachability on the support digraph, recurrence from whether any "
         "arc leaves a class, and the period from a gcd of cycle lengths. These are the two hypotheses "
         "the convergence theorem needs, and this page checks them.",
+        expect={"mkPreset": _expect(CHAIN_PRESETS, "classify", CHAIN_MENU["classify"])},
     )
 
 
@@ -974,8 +1186,7 @@ def _steady(cfg):
     )
     controls = (
         _select("msPreset", "Worked example",
-                [(k, CHAIN_PRESETS[k]["label"]) for k in
-                 ("market", "weather", "cycle", "split", "five")], chosen)
+                _menu(CHAIN_PRESETS, CHAIN_MENU["steady"]), chosen)
         + _text("msP", "Transition matrix", here["P"])
         + _text("msNames", "State names", here["names"])
         + _select("msDrop", "Balance equation to drop", [("auto", "the last one")], "auto")
@@ -1014,7 +1225,7 @@ def _steady(cfg):
   function blank(message) {
     sysEl.innerHTML = ''; convEl.innerHTML = ''; cmpEl.innerHTML = '';
     ['msPiK', 'msUniqueK', 'msResidK', 'msSumK', 'msGapK', 'msPlacesK'].forEach(function (id) {
-      setKpi(id, '&mdash;');
+      setKpi(id, '—');
     });
     statusEl.innerHTML = message;
   }
@@ -1056,10 +1267,10 @@ def _steady(cfg):
     if (!ss.unique) {
       convEl.innerHTML = '';
       cmpEl.innerHTML = '';
-      setKpi('msPiK', '<span class="tone-red">not unique</span>');
-      setKpi('msUniqueK', '<span class="tone-red">no</span>');
-      setKpi('msResidK', '&mdash;'); setKpi('msSumK', '&mdash;');
-      setKpi('msGapK', '&mdash;'); setKpi('msPlacesK', '&mdash;');
+      setKpiHtml('msPiK', '<span class="tone-red">not unique</span>');
+      setKpiHtml('msUniqueK', '<span class="tone-red">no</span>');
+      setKpi('msResidK', '—'); setKpi('msSumK', '—');
+      setKpi('msGapK', '—'); setKpi('msPlacesK', '—');
       statusEl.innerHTML = '<strong>This system has no unique solution, and the page says so rather '
         + 'than printing one of the infinitely many.</strong> The reduced matrix has rank ' + ss.rank
         + ' against ' + n + ' unknowns. That happens exactly when the chain is reducible with more than '
@@ -1101,10 +1312,11 @@ def _steady(cfg):
       + '</thead><tbody>' + rows.join('') + '</tbody>';
 
     setKpi('msPiK', pi.map(function (v) { return Rshort(v, 5, 7); }).join(', '));
-    setKpi('msUniqueK', '<span class="tone-green">yes, rank ' + ss.rank + '</span>');
-    setKpi('msResidK', chk.ok ? '<span class="tone-green">exactly 0</span>'
+    setKpiHtml('msUniqueK', '<span class="tone-green">yes, rank ' + ss.rank + '</span>');
+    setKpiHtml('msResidK', chk.ok ? '<span class="tone-green">exactly 0</span>'
       : '<span class="tone-red">' + Rtext(chk.residual) + '</span>');
-    setKpi('msSumK', Rtext(chk.sum) + (Requ(chk.sum, R1) ? ' <span class="tone-green">&check;</span>' : ''));
+    setKpiHtml('msSumK', Rtext(chk.sum)
+      + (Requ(chk.sum, R1) ? ' <span class="tone-green">&check;</span>' : ''));
     setKpi('msGapK', gap.gap === 0 ? '0 at double precision' : gap.gap.toExponential(3));
     setKpi('msPlacesK', gap.gap === 0 ? 'all of them' : String(gap.places));
 
@@ -1151,6 +1363,7 @@ def _steady(cfg):
         panel_intro="The system is built and reduced here in exact fractions. Beside it a floating-point "
         "power iteration runs for as many steps as you like, and the page prints how far short it is "
         "&mdash; on one preset, for ever.",
+        expect={"msPreset": _expect(CHAIN_PRESETS, "steady", CHAIN_MENU["steady"])},
     )
 
 
@@ -1183,7 +1396,7 @@ def _absorb(cfg):
     )
     controls = (
         _select("maPreset", "Worked example",
-                [(k, ABSORB_PRESETS[k]["label"]) for k in ("ruin", "drunk", "trial")], chosen)
+                _menu(ABSORB_PRESETS, ABSORB_MENU), chosen)
         + _text("maP", "Transition matrix", here["P"])
         + _text("maNames", "State names", here["names"])
         + _text("maAbs", "Absorbing states, by position", here["absorbing"])
@@ -1222,7 +1435,7 @@ def _absorb(cfg):
   function blank(message) {
     graphEl.innerHTML = ''; nEl.innerHTML = ''; rowsEl.innerHTML = ''; partEl.innerHTML = '';
     ['maTransK', 'maAbsK', 'maLongK', 'maMidK', 'maPartK', 'maMissK'].forEach(function (id) {
-      setKpi(id, '&mdash;');
+      setKpi(id, '—');
     });
     statusEl.innerHTML = message;
   }
@@ -1314,7 +1527,7 @@ def _absorb(cfg):
     setKpi('maLongK', Rtext(longest) + ' from ' + tNames[longAt]);
     setKpi('maMidK', Rtext(abs.t[mid]) + ' from ' + tNames[mid]);
     setKpi('maPartK', 'k = ' + k);
-    setKpi('maMissK', Rzero(worstMiss) ? '<span class="tone-green">nothing</span>'
+    setKpiHtml('maMissK', Rzero(worstMiss) ? '<span class="tone-green">nothing</span>'
       : Rshort(worstMiss, 6, 7) + ' at most');
 
     statusEl.innerHTML = '<strong>N is the sum of the powers of Q, and the slider is the proof rather '
@@ -1365,6 +1578,7 @@ def _absorb(cfg):
         panel_intro="The canonical blocks are extracted here from the matrix you typed. N is computed by "
         "exact elimination on [I &minus; Q | I], and the partial sums of the powers of Q are shown "
         "climbing towards it.",
+        expect={"maPreset": _expect(ABSORB_PRESETS, "absorb", ABSORB_MENU)},
     )
 
 
@@ -1394,7 +1608,7 @@ def _mdp(cfg):
     )
     controls = (
         _select("mdPreset", "Worked example",
-                [(k, MDP_PRESETS[k]["label"]) for k in ("machine", "stock")], chosen)
+                _menu(MDP_PRESETS, MDP_MENU), chosen)
         + _text("mdP0", "Transition matrix under action 1", here["P0"])
         + _text("mdP1", "Transition matrix under action 2", here["P1"])
         + _text("mdR0", "Reward per state under action 1", here["r0"])
@@ -1438,7 +1652,7 @@ def _mdp(cfg):
   function blank(message) {
     roundsEl.innerHTML = ''; qEl.innerHTML = ''; iterEl.innerHTML = '';
     ['mdRoundsK', 'mdPolicyK', 'mdValueK', 'mdAllK', 'mdVIK', 'mdGapK'].forEach(function (id) {
-      setKpi(id, '&mdash;');
+      setKpi(id, '—');
     });
     statusEl.innerHTML = message;
   }
@@ -1547,8 +1761,12 @@ def _mdp(cfg):
     setKpi('mdPolicyK', run.policy.map(function (a) { return acts[a]; }).join(' / '));
     setKpi('mdValueK', run.v.map(function (v) { return Rshort(v, 4, 7); }).join(', '));
     setKpi('mdAllK', String(total));
-    setKpi('mdVIK', vi ? vi.vT.map(function (v) { return Rshort(v, 4, 6); }).join(', ') : '&mdash;');
-    setKpi('mdGapK', vi ? vi.gap.map(function (v) { return Rshort(v, 5, 6); }).join(', ') : '&mdash;');
+    setKpi('mdVIK', vi ? vi.vT.map(function (v) { return Rshort(v, 4, 6); }).join(', ') : '—');
+    /* The tile is labelled "Still short by" and the status line below prints
+       Rabs of the same numbers. The tile printed them SIGNED, so it read
+       "still short by -7.06068"; the two now agree. */
+    setKpi('mdGapK',
+      vi ? vi.gap.map(function (v) { return Rshort(Rabs(v), 5, 6); }).join(', ') : '—');
 
     statusEl.innerHTML = '<strong>Policy iteration stopped after ' + run.iterations + ' round'
       + (run.iterations === 1 ? '' : 's') + ', and it stopped for a reason.</strong> '
@@ -1596,6 +1814,7 @@ def _mdp(cfg):
         panel_intro="Every policy is evaluated by solving v = r + &gamma;P&#7529;v exactly rather than by "
         "iterating it, which is what lets the page show value iteration converging TO something instead "
         "of stopping when it gets bored.",
+        expect={"mdPreset": _expect(MDP_PRESETS, "mdp", MDP_MENU)},
     )
 
 

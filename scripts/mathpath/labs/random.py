@@ -137,6 +137,20 @@ PRINTING: the fraction is printed too. simulate.py has three genuinely
 irrational printed quantities and labels each; this kit has none, because a
 standard error is never taken -- the exact variance is available, so Chebyshev
 is applied to it directly.
+
+EVERY PRESET PINS WHAT IT PRINTS, AND NO PRESET CARRIES A NOTE. Each of the 24
+presets here used to carry a `label` and a `note`, both prose about an outcome
+and neither readable by any check in this repository -- a sweep of fifteen kits
+found 57 of those strings false about the lab they described. The notes are
+deleted (they were embedded in every page as `SHP`/`CSP`/`KGP`/`WTP`/`MSP` data
+and never printed) and each preset now carries `expect`: {kpi element id: the
+exact text the page prints}, one to three tiles, read off the running kit with
+`node scripts/labcheck.js --observe <page>`. scripts/labcheck.js selects the
+option on the BUILT page, dispatches the menu's change handler and compares
+the tile. Of the three kinds of number above, the presets pin the EXACT ones
+and the BOUNDS; a measured mean is reproducible under the seeded generator but
+pinning it would check the seed slider's default rather than the lab's claim.
+See `_expect` below and scripts/mathpath/AGENTS.md for the rule.
 """
 
 from .algo_core import (COUNT_JS, DIGRAPH_JS, ORACLE_JS, RANDOM_JS, RFIXED_JS,
@@ -900,6 +914,34 @@ def _options(presets):
     return [(p["id"], p["label"]) for p in presets]
 
 
+def _expect(presets):
+    """{preset id: {kpi element id: the exact text the page prints}}.
+
+    A preset used to carry a `label` and a `note`, both prose about an outcome
+    and neither readable by any check here -- a sweep of fifteen kits found 57
+    of those strings false. The note is gone; what replaces it is this, and
+    scripts/labcheck.js selects the option on the BUILT page, dispatches the
+    menu's own change handler and compares getElementById(kpi).textContent
+    against it. Every figure below was read off the running kit with
+    `node scripts/labcheck.js --observe <page>`, never copied out of the code
+    that computes it.
+
+    THREE KINDS OF NUMBER, AND WHICH OF THEM IS PINNED. This kit prints exact
+    quantities, measurements over the seeds the slider names, and proved
+    bounds. All three are reproducible -- the generator is seeded -- but only
+    the first and the third are statements about the algorithm, so those are
+    what the presets pin. A measured mean is pinned nowhere here: it would
+    pass, and it would be pinning the seed slider's default rather than the
+    lab's claim.
+
+    A tile is read with every OTHER control at the value the markup ships --
+    120 seeds, 10 repetitions, 5 bases, the target 99/100 -- so a claim that
+    only appears once the reader moves one of those cannot be pinned. Those
+    are named in a comment beside the preset that makes them.
+    """
+    return {p["id"]: dict(p.get("expect") or {}) for p in presets}
+
+
 def _chosen(presets, cfg):
     want = str(cfg.get("preset", presets[0]["id"]))
     for p in presets:
@@ -935,27 +977,43 @@ _SH_PRESETS = [
         "id": "naive4",
         "label": "the naive swap at n = 4 — 256 tapes, 24 permutations",
         "n": "4", "kind": "naive",
-        "note": "256 does not divide by 24, so the tapes cannot split evenly however they fall",
+        "expect": {
+            "shTapes": "256",
+            "shDiv": "256 / 24 — remainder 16",
+            "shUniform": "no",
+        },
     },
     {
         "id": "fy4",
         "label": "Fisher–Yates at n = 4 — 24 tapes, 24 permutations",
         "n": "4", "kind": "fisheryates",
-        "note": "one tape per permutation, so every permutation has probability exactly 1/24",
+        "expect": {
+            "shTapes": "24",
+            "shUniform": "yes",
+            "shTV": "0, exactly",
+        },
     },
     {
         "id": "naive3",
-        "label": "the naive swap at n = 3 — the smallest case that fails",
+        "label": "the naive swap at n = 3 — 27 tapes, 6 permutations",
         "n": "3", "kind": "naive",
-        "note": "27 tapes over 6 permutations: three of them get 5 tapes and three get 4, "
-                "because 27 does not divide by 6",
+        "expect": {
+            "shDiv": "27 / 6 — remainder 3",
+            "shTop": "021 at 5/27",
+            "shBot": "210 at 4/27",
+        },
     },
     {
         "id": "naive5",
         "label": "the naive swap at n = 5 — 3125 tapes",
         "n": "5", "kind": "naive",
-        "note": "the spread widens with n rather than washing out, which is the opposite of the "
-                "intuition that more swaps mix better",
+        # "the spread widens with n" is a claim about two presets at once, and a tile
+        # holds one preset's figure. What is pinned is the pair: shTV here against
+        # shTV on naive4, 3157/37500 = 0.0842 against 25/384 = 0.0651.
+        "expect": {
+            "shTapes": "3125",
+            "shTV": "3157/37500 = 0.0842",
+        },
     },
 ]
 
@@ -1002,7 +1060,7 @@ def _shuffle(cfg):
         )
     )
     script = _BASE_JS + _REFUSAL_JS + _THREE_NUMBERS + _presets_js(
-        "SHP", _SH_PRESETS, ["n", "kind", "note"]) + r"""
+        "SHP", _SH_PRESETS, ["n", "kind"]) + r"""
   var presetIn = document.getElementById('shPreset');
   var nIn = document.getElementById('shN'), nOut = document.getElementById('shNOut');
   var kindIn = document.getElementById('shKind');
@@ -1145,6 +1203,7 @@ def _shuffle(cfg):
             "uniformity, and the counting argument below can refute it.",
         ),
         script=script,
+        expect={"shPreset": _expect(_SH_PRESETS)},
     )
 
 
@@ -1158,34 +1217,53 @@ _CS_PRESETS = [
         "id": "sorted8",
         "label": "already sorted, n = 8 — the input the fixed rule is worst on",
         "n": "8", "order": "sorted",
-        "note": "28 comparisons every time with the last element as pivot; 2369/140 in expectation "
-                "with a random one",
+        "expect": {
+            "csFixed": "28 comparisons, every time",
+            "csExact": "2369/140 = 16.921",
+            "csClosed": "2369/140 — agrees",
+        },
     },
     {
         "id": "reversed8",
         "label": "reversed, n = 8 — a different input, the same worst case",
         "n": "8", "order": "reversed",
-        "note": "the fixed rule pays 28 here too, which is the point: it is not one unlucky input",
+        "expect": {
+            "csFixed": "28 comparisons, every time",
+            "csExact": "2369/140 = 16.921",
+        },
     },
     {
         "id": "alternating8",
         "label": "high and low alternating, n = 8",
         "n": "8", "order": "alternating",
-        "note": "the fixed rule does better here, and the random rule's distribution has not moved "
-                "at all",
+        "expect": {
+            "csFixed": "16 comparisons, every time",
+            "csExact": "2369/140 = 16.921",
+        },
     },
     {
         "id": "small5",
         "label": "n = 5 — small enough to read every execution off the table",
         "n": "5", "order": "sorted",
-        "note": "120 input orders, five possible comparison counts from 6 to 10, and the whole "
-                "distribution fits on screen",
+        # The support -- five possible counts, 6 to 10 -- is the distribution table and
+        # the plot, and no tile holds it. csRange is the MEASURED range over the seeds,
+        # a different quantity that happens to coincide at this n, so pinning it here
+        # would look like the support and check the seed slider instead.
+        "expect": {
+            "csFixed": "10 comparisons, every time",
+            "csWorst": "10 = n(n − 1)/2",
+            "csExact": "37/5 = 7.400",
+        },
     },
     {
         "id": "sorted10",
-        "label": "already sorted, n = 10 — 45 against 30791/1260",
+        "label": "already sorted, n = 10",
         "n": "10", "order": "sorted",
-        "note": "the gap between the worst case and the expectation widens with n",
+        "expect": {
+            "csFixed": "45 comparisons, every time",
+            "csWorst": "45 = n(n − 1)/2",
+            "csExact": "30791/1260 = 24.437",
+        },
     },
 ]
 
@@ -1239,7 +1317,7 @@ def _costs(cfg):
         )
     )
     script = _COSTS_JS + _REFUSAL_JS + _THREE_NUMBERS + _presets_js(
-        "CSP", _CS_PRESETS, ["n", "order", "note"]) + r"""
+        "CSP", _CS_PRESETS, ["n", "order"]) + r"""
   var presetIn = document.getElementById('csPreset');
   var nIn = document.getElementById('csN'), nOut = document.getElementById('csNOut');
   var orderIn = document.getElementById('csOrder');
@@ -1424,6 +1502,7 @@ def _costs(cfg):
             "bound, so the slack in each is a number rather than a word.",
         ),
         script=script,
+        expect={"csPreset": _expect(_CS_PRESETS)},
     )
 
 
@@ -1435,36 +1514,59 @@ def _costs(cfg):
 _KG_PRESETS = [
     {
         "id": "barbell",
-        "label": "two triangles joined by two edges — three minimum cuts",
+        "label": "two triangles joined by two edges",
         "spec": "1-2, 1-3, 2-3, 4-5, 4-6, 5-6, 1-4, 2-5",
-        "note": "the cut the lesson is about is the pair of joining edges, and two other cuts of "
-                "the same size exist",
+        "expect": {
+            "kgMin": "2 edges",
+            "kgCount": "3",
+            "kgAny": "19/35 = 0.5429",
+        },
     },
     {
         "id": "cycle4",
-        "label": "a four-cycle — the bound is exactly met",
+        "label": "a four-cycle",
         "spec": "1-2, 2-3, 3-4, 4-1",
-        "note": "every minimum cut has probability exactly 2/(n(n−1)) = 1/6, and there are six of "
-                "them, so the algorithm never fails",
+        # "the bound is exactly met" is about each of the six cuts having probability
+        # exactly 1/6 = 2/(n(n − 1)), and the per-cut probabilities are rows of the cut
+        # table, not a KPI. What the tiles can say is that there are six of them and
+        # that the algorithm returns one of them every time.
+        "expect": {
+            "kgCount": "6",
+            "kgAny": "1",
+        },
     },
     {
         "id": "bridge",
-        "label": "two triangles joined by one edge — a unique minimum cut",
+        "label": "two triangles joined by one edge",
         "spec": "1-2, 1-3, 2-3, 4-5, 4-6, 5-6, 3-4",
-        "note": "one edge to survive every contraction, and it survives about three times in eight",
+        "expect": {
+            "kgMin": "1 edge",
+            "kgCount": "1",
+            "kgAny": "13/35 = 0.3714",
+        },
     },
     {
         "id": "parallel",
-        "label": "a parallel pair — multiplicity is what makes contraction work",
+        "label": "a parallel pair between 1 and 2, five vertices",
         "spec": "1-2, 1-2, 1-3, 2-3, 3-4, 4-5, 4-5, 3-5",
-        "note": "two edges between 1 and 2 make that pair twice as likely to be contracted, which "
-                "is exactly what keeps the small cut alive",
+        # The multiplicity claim -- the doubled 1-2 edge is what keeps the small cut
+        # alive -- is only visible after the reader deletes one of the two, which is a
+        # different instance. The tiles pin the instance this preset ships.
+        "expect": {
+            "kgSize": "5 vertices, 8 edges",
+            "kgCount": "2",
+            "kgAny": "19/35 = 0.5429",
+        },
     },
     {
         "id": "star",
         "label": "a hub with a heavy rim — seven vertices",
         "spec": "1-2, 1-3, 1-4, 1-5, 1-6, 1-7, 2-3, 3-4, 4-5, 5-6, 6-7, 7-2",
-        "note": "the minimum cut isolates a rim vertex, and there are six of those",
+        "expect": {
+            "kgSize": "7 vertices, 12 edges",
+            "kgCount": "6",
+            "kgAny": "503/770 = 0.6532",
+        },
     },
 ]
 
@@ -1519,7 +1621,7 @@ def _karger(cfg):
         )
     )
     script = _GRAPH_JS + _REFUSAL_JS + _THREE_NUMBERS + _presets_js(
-        "KGP", _KG_PRESETS, ["spec", "note"]) + r"""
+        "KGP", _KG_PRESETS, ["spec"]) + r"""
   var presetIn = document.getElementById('kgPreset'), specIn = document.getElementById('kgSpec');
   var seedsIn = document.getElementById('kgSeeds'), seedsOut = document.getElementById('kgSeedsOut');
   var repsIn = document.getElementById('kgReps'), repsOut = document.getElementById('kgRepsOut');
@@ -1679,6 +1781,7 @@ def _karger(cfg):
             "shows a failure has not been demonstrated.",
         ),
         script=script,
+        expect={"kgPreset": _expect(_KG_PRESETS)},
     )
 
 
@@ -1689,36 +1792,56 @@ def _karger(cfg):
 _WT_PRESETS = [
     {
         "id": "carmichael561",
-        "label": "561 — a Carmichael number, and the base that lies about it",
+        "label": "561 — a Carmichael number, traced at base 50",
         "n": "561", "base": "50",
-        "note": "every base coprime to 561 defeats the Fermat test; exactly eight of the 558 "
-                "defeat the strong test",
+        "expect": {
+            "wtWit": "550 = 275/279 = 0.9857",
+            "wtFermat": "0 of 318 — none, so Fermat is useless here",
+            "wtLiars": "8, smallest is 50",
+        },
     },
     {
         "id": "psp2047",
         "label": "2047 — a strong pseudoprime to base 2",
         "n": "2047", "base": "2",
-        "note": "the one base everybody tries is the one that lies here",
+        "expect": {
+            "wtWit": "1804 = 451/511 = 0.8826",
+            "wtThree": "yes",
+            "wtLiars": "240, smallest is 2",
+        },
     },
     {
         "id": "fermat341",
-        "label": "341 — the Fermat test is fooled by base 2 and the strong test is not",
+        "label": "341 — a Fermat pseudoprime to base 2",
         "n": "341", "base": "2",
-        "note": "2 to the 340 is 1 modulo 341, so Fermat says nothing; the squaring chain finds a "
-                "nontrivial square root of 1 and that is a proof of compositeness",
+        # "Fermat is fooled by base 2" is about ONE base; wtFermat counts witnesses over
+        # all 298 coprime bases and the base-2 row is in the comparison table. What is
+        # pinned instead is the strong test not being fooled: the smallest base that
+        # fails to testify is 4, so base 2 testifies.
+        "expect": {
+            "wtWit": "290 = 145/169 = 0.8580",
+            "wtLiars": "48, smallest is 4",
+        },
     },
     {
         "id": "carmichael1105",
         "label": "1105 — a second Carmichael number",
         "n": "1105", "base": "47",
-        "note": "766 coprime bases, none of them a Fermat witness, 28 strong liars",
+        "expect": {
+            "wtWhat": "1105 — composite, and a Carmichael number",
+            "wtFermat": "0 of 766 — none, so Fermat is useless here",
+            "wtLiars": "28, smallest is 47",
+        },
     },
     {
         "id": "prime97",
-        "label": "97 — a prime, so there is no witness at all",
+        "label": "97 — a prime",
         "n": "97", "base": "5",
-        "note": "the test can never be wrong in this direction: a prime has no witnesses, and "
-                "every chain reaches 1 or n−1",
+        "expect": {
+            "wtWit": "0 = 0",
+            "wtThree": "not applicable: n is prime",
+            "wtErr": "not applicable",
+        },
     },
 ]
 
@@ -1766,7 +1889,7 @@ def _witness(cfg):
         )
     )
     script = _BASE_JS + _REFUSAL_JS + _THREE_NUMBERS + _presets_js(
-        "WTP", _WT_PRESETS, ["n", "base", "note"]) + r"""
+        "WTP", _WT_PRESETS, ["n", "base"]) + r"""
   var presetIn = document.getElementById('wtPreset');
   var nIn = document.getElementById('wtN'), nOut = document.getElementById('wtNOut');
   var baseIn = document.getElementById('wtBase'), baseOut = document.getElementById('wtBaseOut');
@@ -1939,6 +2062,7 @@ def _witness(cfg):
             "number defeats it.",
         ),
         script=script,
+        expect={"wtPreset": _expect(_WT_PRESETS)},
     )
 
 
@@ -1949,38 +2073,55 @@ def _witness(cfg):
 _MS_PRESETS = [
     {
         "id": "four",
-        "label": "four clauses on three variables — the mean is exactly 7/2",
+        "label": "four clauses on three variables, each with three distinct variables",
         "cnf": "1 2 -3; -1 2 3; 1 -2 3; -1 -2 -3",
-        "note": "every clause has three distinct variables, so each is satisfied by 7 of its 8 "
-                "local assignments and the means add",
+        "expect": {
+            "msMean": "7/2 = 3.5000",
+            "msSeven": "7/2 — agrees",
+            "msBest": "4 of 4 — satisfiable",
+        },
     },
     {
         "id": "unsat",
-        "label": "all eight clauses on three variables — unsatisfiable, and the mean is still 7m/8",
+        "label": "all eight clauses on three variables",
         "cnf": "1 2 3; 1 2 -3; 1 -2 3; 1 -2 -3; -1 2 3; -1 2 -3; -1 -2 3; -1 -2 -3",
-        "note": "no assignment satisfies all eight, every assignment satisfies exactly seven, and "
-                "7m/8 = 7 is both the mean and the optimum",
+        "expect": {
+            "msMean": "7",
+            "msSeven": "7 — agrees",
+            "msBest": "7 of 8 — not satisfiable",
+        },
     },
     {
         "id": "repeat",
-        "label": "a clause that repeats a variable — the equality breaks",
+        "label": "a clause that repeats a variable",
         "cnf": "1 2 -3; -1 2 3; 1 1 2; -2 -3 -1",
-        "note": "x1 ∨ x1 ∨ x2 has two distinct variables, so it is satisfied by 3 of 4 and not by "
-                "7 of 8, and the mean drops below 7m/8",
+        "expect": {
+            "msMean": "27/8 = 3.3750",
+            "msSeven": "7/2 — DOES NOT agree",
+            "msRatio": "27/32 = 0.8438 (7/8 = 0.8750)",
+        },
     },
     {
         "id": "wide",
         "label": "eight clauses on five variables",
         "cnf": "1 2 -3; -1 3 4; 2 -4 5; -2 -3 -5; 1 -4 5; -1 2 -5; 3 4 -1; -3 -4 2",
-        "note": "32 assignments, a mean of 7, and an optimum of 8 — the gap between the average "
-                "and the best is what an algorithm has to close",
+        "expect": {
+            "msCount": "32",
+            "msMean": "7",
+            "msBest": "8 of 8 — satisfiable",
+        },
     },
     {
         "id": "trivial",
         "label": "one clause — the smallest case the argument applies to",
         "cnf": "1 2 3",
-        "note": "7 of the 8 assignments satisfy it, so the mean is 7/8 and the histogram has two "
-                "bars",
+        # msSize prints "3 variables, 1 clauses" here -- the tile does not singularise --
+        # so it is left unpinned rather than have an expectation ratify the wording.
+        "expect": {
+            "msCount": "8",
+            "msMean": "7/8 = 0.8750",
+            "msSeven": "7/8 — agrees",
+        },
     },
 ]
 
@@ -2027,7 +2168,7 @@ def _max3sat(cfg):
         )
     )
     script = _BASE_JS + _REFUSAL_JS + _THREE_NUMBERS + _presets_js(
-        "MSP", _MS_PRESETS, ["cnf", "note"]) + r"""
+        "MSP", _MS_PRESETS, ["cnf"]) + r"""
   var presetIn = document.getElementById('msPreset'), cnfIn = document.getElementById('msCnf');
   var seedsIn = document.getElementById('msSeeds'), seedsOut = document.getElementById('msSeedsOut');
   var plot = document.getElementById('msPlot');
@@ -2166,6 +2307,7 @@ def _max3sat(cfg):
             "clauses share variables, and is the step the 7m/8 argument actually needs.",
         ),
         script=script,
+        expect={"msPreset": _expect(_MS_PRESETS)},
     )
 
 

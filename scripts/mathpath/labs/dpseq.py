@@ -29,6 +29,23 @@ the page says the claim is unchecked rather than making it anyway.
   discount     value iteration against the exact fixed point (I - gP)^-1 r, the
                residual checked to zero, and the denominators growing on the way
 
+EVERY PRESET PINS WHAT IT PRINTS, AND NO PRESET CARRIES PROSE ANY MORE. Each
+of the 27 presets used to carry a `note`, and every mode here RENDERED the
+selected one into its side panel, after the words "On this example:". That is
+prose about an outcome, no check in this repository could read it, and a
+fifteen-kit sweep found 57 such strings false across the library. The notes are
+gone, the panel intros now end at the sentence before them, and the slot the
+note occupied holds `expect`: {kpi element id: the exact text the page prints}.
+scripts/labcheck.js selects the option on the BUILT page, dispatches the menu's
+own change handler and compares the tile's textContent.
+
+Writing them turned up one preset whose PAGE and whose NAME disagree:
+`secretary/hundred` asks for 100 candidates and the control is a range of
+3..60 that redraw() clamps to, so every reader sees n = 60. The expectations
+pin what the page prints and the comment beside them says what it would print
+at 100, so raising the cap fails this check instead of passing quietly. See
+`_expect` below and scripts/mathpath/AGENTS.md for the rule.
+
 WHAT THIS KIT DOES NOT CONTAIN.
 
   AN INFINITE-HORIZON POLICY ITERATION. `policyIterate` lives in or_core's
@@ -1125,6 +1142,25 @@ def _options(presets):
     return [(p["id"], p["label"]) for p in presets]
 
 
+def _expect(presets):
+    """{preset id: {kpi element id: the exact text the page prints}}.
+
+    A preset's `label` is prose about an instance and no check in this
+    repository can read it. This is the other half of the same claim, and it is
+    the half a machine can hold: what the page PRINTS once the preset is
+    selected. scripts/labcheck.js selects the option on the BUILT page,
+    dispatches the menu's own change handler and compares
+    getElementById(kpi).textContent with the string here. Every figure below
+    was read off the running kit with `node scripts/labcheck.js --observe
+    <page>`, never copied out of the code that computes it.
+
+    Tiles are read with every OTHER control at the value the markup ships, so a
+    claim that only becomes visible once another control moves cannot be pinned
+    here; those are named in a comment beside the preset that makes them.
+    """
+    return {p["id"]: dict(p.get("expect") or {}) for p in presets}
+
+
 def _choose(cfg, mode, presets, default):
     """The preset this lesson opens on, or a refusal.
 
@@ -1153,21 +1189,32 @@ _ST_PRESETS = [
         "label": "one optimal route, and a tie that is not on it",
         "stages": "A; B C; D E; F",
         "arcs": "A>B 2, A>C 4, B>D 7, B>E 4, C>D 3, C>E 2, D>F 1, E>F 4",
-        "note": "B's two continuations cost the same, and the cheapest route goes nowhere near B",
+        "expect": {
+            "stValue": "8",
+            "stRoutes": "1 of 4",
+            "stTies": "B",
+        },
     },
     {
         "id": "several",
         "label": "three routes, all optimal",
         "stages": "A; B C; D E; F",
         "arcs": "A>B 0, A>C 4, B>D 7, B>E 4, C>D 3, C>E 2, D>F 1, E>F 4",
-        "note": "one cost changed and the optimal policy stops being unique",
+        "expect": {
+            "stValue": "8",
+            "stRoutes": "3 of 4",
+            "stTies": "B, A",
+        },
     },
     {
         "id": "skip",
         "label": "an arc that skips a stage",
         "stages": "A; B C; D E; F",
         "arcs": "A>B 2, A>C 4, A>E 3, B>D 7, B>E 4, C>D 3, C>E 2, D>F 1, E>F 4",
-        "note": "the recursion handles a forward jump without being told about it",
+        "expect": {
+            "stValue": "7",
+            "stCount": "5",
+        },
     },
 ]
 
@@ -1214,7 +1261,7 @@ def _stages(cfg):
     )
 
     script = _MODE_JS["stages"] + r"""
-""" + _presets_js("STP", _ST_PRESETS, ["stages", "arcs", "note"]) + r"""
+""" + _presets_js("STP", _ST_PRESETS, ["stages", "arcs"]) + r"""
   var presetIn = document.getElementById('stPreset');
   var stagesIn = document.getElementById('stStages'), arcsIn = document.getElementById('stArcs');
   var dirIn = document.getElementById('stDir');
@@ -1363,10 +1410,10 @@ def _stages(cfg):
         panel_intro=cfg.get(
             "panel_intro",
             "The recursion runs from the last stage back; every path is then walked forwards and "
-            "priced independently, and nothing is shown unless the two agree. On this example: "
-            + chosen["note"] + ".",
+            "priced independently, and nothing is shown unless the two agree.",
         ),
         script=script,
+        expect={"stPreset": _expect(_ST_PRESETS)},
     )
 
 
@@ -1380,22 +1427,33 @@ _AL_PRESETS = [
         "label": "three activities with diminishing returns",
         "returns": "P 0 5 9 12 14; Q 0 4 8 11 13; R 0 6 9 11 12",
         "units": "4",
-        "note": "no extra unit is ever worth more than the last, and two different splits still "
-                "tie at 19",
+        # Two different splits reach 19 and the tile names the one the recursion took;
+        # the count of splits that tie is in the enumeration table, not in a tile.
+        "expect": {
+            "alBestV": "19",
+            "alForward": "19",
+            "alPick": "P=1, Q=2, R=1",
+        },
     },
     {
         "id": "lumpy",
         "label": "a return that jumps",
         "returns": "P 0 2 4 15 16; Q 0 6 8 9 10; R 0 3 7 8 9",
         "units": "4",
-        "note": "P is worthless until the third unit, which no marginal rule will find",
+        "expect": {
+            "alBestV": "21",
+            "alPick": "P=3, Q=1, R=0",
+        },
     },
     {
         "id": "twoway",
         "label": "two activities, so the table can be read across",
         "returns": "P 0 7 11 14 15; Q 0 5 10 13 16",
         "units": "4",
-        "note": "small enough to check the whole thing by hand against the enumeration",
+        "expect": {
+            "alBestV": "21",
+            "alCount": "15",
+        },
     },
 ]
 
@@ -1439,7 +1497,7 @@ def _allocation(cfg):
     )
 
     script = _MODE_JS["allocation"] + r"""
-""" + _presets_js("ALP", _AL_PRESETS, ["returns", "units", "note"]) + r"""
+""" + _presets_js("ALP", _AL_PRESETS, ["returns", "units"]) + r"""
   var presetIn = document.getElementById('alPreset'), retIn = document.getElementById('alReturns');
   var unitsIn = document.getElementById('alUnits');
   var net = document.getElementById('alNet');
@@ -1584,10 +1642,10 @@ def _allocation(cfg):
         panel_intro=cfg.get(
             "panel_intro",
             "The return table is turned into a staged network, solved backwards, and then checked "
-            "against every possible split enumerated directly from the table. On this example: "
-            + chosen["note"] + ".",
+            "against every possible split enumerated directly from the table.",
         ),
         script=script,
+        expect={"alPreset": _expect(_AL_PRESETS)},
     )
 
 
@@ -1602,8 +1660,13 @@ _LS_PRESETS = [
         "demand": "10 62 12 130 154 129",
         "K": "54",
         "h": "2",
-        "note": "the only periods that share an order are 2 and 3 — period 1 stands alone and "
-                "each of the three heavy late ones gets its own, five orders in all",
+        # Which periods share an order -- 2 and 3, and no others -- is the plan table;
+        # the number of orders it places is a tile.
+        "expect": {
+            "wwCost": "294",
+            "wwOrders1": "5",
+            "wwRepriced": "294 — agrees",
+        },
     },
     {
         "id": "flat",
@@ -1611,7 +1674,10 @@ _LS_PRESETS = [
         "demand": "40 40 40 40 40 40",
         "K": "90",
         "h": "1",
-        "note": "with demand flat the plan is a partition into equal blocks — until the charges move",
+        "expect": {
+            "wwCost": "390",
+            "wwOrders1": "3",
+        },
     },
     {
         "id": "spike",
@@ -1619,7 +1685,10 @@ _LS_PRESETS = [
         "demand": "8 6 200 7 9 5",
         "K": "60",
         "h": "3",
-        "note": "holding anything through period 3 is expensive, so the plan orders around it",
+        "expect": {
+            "wwCost": "234",
+            "wwOrders1": "3",
+        },
     },
 ]
 
@@ -1666,7 +1735,7 @@ def _lotsize(cfg):
     )
 
     script = _MODE_JS["lotsize"] + r"""
-""" + _presets_js("LSP", _LS_PRESETS, ["demand", "K", "h", "note"]) + r"""
+""" + _presets_js("LSP", _LS_PRESETS, ["demand", "K", "h"]) + r"""
   var presetIn = document.getElementById('wwPreset'), demIn = document.getElementById('wwDemandIn');
   var kIn = document.getElementById('wwK'), hIn = document.getElementById('wwH');
   var demSvg = document.getElementById('wwDemand'), ordSvg = document.getElementById('wwOrders');
@@ -1794,9 +1863,10 @@ def _lotsize(cfg):
             "panel_intro",
             "The recursion is over the period the last order was placed in; the plan it returns is "
             "then priced again from scratch, and the whole thing is checked against every order "
-            "pattern. On this example: " + chosen["note"] + ".",
+            "pattern.",
         ),
         script=script,
+        expect={"wwPreset": _expect(_LS_PRESETS)},
     )
 
 
@@ -1811,7 +1881,11 @@ _HE_PRESETS = [
         "demand": "10 62 12 130 154 129",
         "K": "54",
         "h": "2",
-        "note": "Silver-Meal happens to find the optimum here and least-unit-cost does not",
+        "expect": {
+            "heExact": "294",
+            "heSM": "294",
+            "heLUC": "600",
+        },
     },
     {
         "id": "both",
@@ -1819,7 +1893,13 @@ _HE_PRESETS = [
         "demand": "17 25 73 113 89",
         "K": "116",
         "h": "1",
-        "note": "Silver-Meal places three orders and pays 24 too much; least-unit-cost places two and pays 30",
+        # How many orders each heuristic places -- three and two -- is in the two
+        # traces; what each one gives away is a tile.
+        "expect": {
+            "heExact": "462",
+            "heGapSM": "24 (5.19%)",
+            "heGapLUC": "30 (6.49%)",
+        },
     },
     {
         "id": "agree",
@@ -1827,7 +1907,11 @@ _HE_PRESETS = [
         "demand": "30 30 30 30 30 30",
         "K": "80",
         "h": "1",
-        "note": "a flat instance is where a heuristic looks best, which is why it is not the test",
+        "expect": {
+            "heExact": "330",
+            "heSM": "330",
+            "heLUC": "330",
+        },
     },
 ]
 
@@ -1873,7 +1957,7 @@ def _heuristics(cfg):
     )
 
     script = _MODE_JS["heuristics"] + r"""
-""" + _presets_js("HEP", _HE_PRESETS, ["demand", "K", "h", "note"]) + r"""
+""" + _presets_js("HEP", _HE_PRESETS, ["demand", "K", "h"]) + r"""
   var presetIn = document.getElementById('hePreset'), demIn = document.getElementById('heDemandIn');
   var kIn = document.getElementById('heK'), hIn = document.getElementById('heH');
   var demSvg = document.getElementById('heDemand'), costSvg = document.getElementById('heCost');
@@ -2012,10 +2096,10 @@ def _heuristics(cfg):
         panel_intro=cfg.get(
             "panel_intro",
             "Each rule is traced interval by interval with the averages it was watching, and each "
-            "plan it produces is priced again from the demand rather than taken on trust. On this "
-            "example: " + chosen["note"] + ".",
+            "plan it produces is priced again from the demand rather than taken on trust.",
         ),
         script=script,
+        expect={"hePreset": _expect(_HE_PRESETS)},
     )
 
 
@@ -2033,9 +2117,13 @@ _SD_PRESETS = [
         "p1": "3/4 1/4; 1/2 1/2",
         "r": "1 3; 2 1",
         "T": "3",
-        "note": "acting pays more in the calm state and keeps you there, so it is taken in calm "
-                "at every step; in rough it pays 1 against holding's 3 and the better escape "
-                "never buys that back, so the policy is the same in all three periods",
+        # That the optimal policy is the same in all three periods is the policy table,
+        # row by row, and not a tile.
+        "expect": {
+            "sdV1": "53/8",
+            "sdB1": "53/8",
+            "sdCount": "64",
+        },
     },
     {
         "id": "absorb",
@@ -2046,7 +2134,10 @@ _SD_PRESETS = [
         "p1": "0 1; 0 1",
         "r": "3 0; 7 0",
         "T": "3",
-        "note": "keeping pays 3 a period and risks the machine; selling pays 7 once and then nothing ever",
+        "expect": {
+            "sdV1": "247/25",
+            "sdV2": "0",
+        },
     },
     {
         "id": "flip",
@@ -2057,7 +2148,14 @@ _SD_PRESETS = [
         "p1": "1 0; 3/4 1/4",
         "r": "0 1; 3 9",
         "T": "4",
-        "note": "growing pays almost nothing and builds; harvesting pays well and knocks you back",
+        # The act that changes with the horizon is read off the policy table; what the
+        # tiles hold is the value it achieves and how many policies were enumerated
+        # against it.
+        "expect": {
+            "sdV1": "33/2",
+            "sdV2": "45/2",
+            "sdCount": "256",
+        },
     },
 ]
 
@@ -2105,7 +2203,7 @@ def _stochastic(cfg):
     )
 
     script = _MODE_JS["stochastic"] + r"""
-""" + _presets_js("SDP", _SD_PRESETS, ["states", "acts", "p0", "p1", "r", "T", "note"]) + r"""
+""" + _presets_js("SDP", _SD_PRESETS, ["states", "acts", "p0", "p1", "r", "T"]) + r"""
   var presetIn = document.getElementById('sdPreset');
   var statesIn = document.getElementById('sdStates'), actsIn = document.getElementById('sdActs');
   var p0In = document.getElementById('sdP0'), p1In = document.getElementById('sdP1');
@@ -2265,9 +2363,10 @@ def _stochastic(cfg):
             "panel_intro",
             "Every deterministic policy is evaluated by pushing a probability distribution forward "
             "through it, and the recursion's own policy is evaluated the same way, so the table's "
-            "number has two independent witnesses. On this example: " + chosen["note"] + ".",
+            "number has two independent witnesses.",
         ),
         script=script,
+        expect={"sdPreset": _expect(_SD_PRESETS)},
     )
 
 
@@ -2284,7 +2383,11 @@ _TR_PRESETS = [
         "payoff": "100 -20; 0 0",
         "prior": "3/10 7/10",
         "lik": "4/5 1/4; 1/5 3/4",
-        "note": "the survey is right four times in five when things are good and three in four when they are not",
+        "expect": {
+            "trAct": "build",
+            "trEvpi": "14",
+            "trEvsi": "9/2",
+        },
     },
     {
         "id": "three",
@@ -2294,7 +2397,11 @@ _TR_PRESETS = [
         "payoff": "20 20 20; 0 40 45; -30 20 80",
         "prior": "1/4 1/2 1/4",
         "lik": "7/10 1/5 1/10; 3/10 4/5 9/10",
-        "note": "the middling act wins under the prior, and only a signal ever moves off it",
+        "expect": {
+            "trAct": "medium",
+            "trEvpi": "55/4",
+            "trEvsi": "7/8",
+        },
     },
     {
         "id": "useless",
@@ -2304,7 +2411,10 @@ _TR_PRESETS = [
         "payoff": "60 -40; 0 0",
         "prior": "1/2 1/2",
         "lik": "1/2 1/2; 1/2 1/2",
-        "note": "the likelihood is the same in both states, so the posterior is the prior and EVSI is zero",
+        "expect": {
+            "trEvsi": "0",
+            "trEvpi": "20",
+        },
     },
 ]
 
@@ -2355,7 +2465,7 @@ def _tree(cfg):
     )
 
     script = _MODE_JS["tree"] + r"""
-""" + _presets_js("TRP", _TR_PRESETS, ["acts", "states", "payoff", "prior", "lik", "note"]) + r"""
+""" + _presets_js("TRP", _TR_PRESETS, ["acts", "states", "payoff", "prior", "lik"]) + r"""
   var presetIn = document.getElementById('trPreset');
   var actsIn = document.getElementById('trActs'), statesIn = document.getElementById('trStates');
   var payIn = document.getElementById('trPay'), priorIn = document.getElementById('trPrior');
@@ -2528,10 +2638,10 @@ def _tree(cfg):
         panel_intro=cfg.get(
             "panel_intro",
             "The tree is built from the payoff table rather than typed, folded back node by node, and "
-            "checked against every mapping from what you see to what you do. On this example: "
-            + chosen["note"] + ".",
+            "checked against every mapping from what you see to what you do.",
         ),
         script=script,
+        expect={"trPreset": _expect(_TR_PRESETS)},
     )
 
 
@@ -2546,7 +2656,11 @@ _SP_PRESETS = [
         "pmf": "10:1/3, 20:1/3, 30:1/3",
         "T": "3",
         "c": "1",
-        "note": "the threshold falls as the deadline nears, and in the last period anything is taken",
+        "expect": {
+            "spValue": "71/3",
+            "spShape": "yes",
+            "spLast": "0",
+        },
     },
     {
         "id": "skew",
@@ -2554,7 +2668,10 @@ _SP_PRESETS = [
         "pmf": "8:3/5, 14:3/10, 40:1/10",
         "T": "4",
         "c": "1",
-        "note": "waiting is worth it only because of the tenth that pays 40",
+        "expect": {
+            "spValue": "4341/250",
+            "spCount": "4096",
+        },
     },
     {
         "id": "costly",
@@ -2562,7 +2679,10 @@ _SP_PRESETS = [
         "pmf": "10:1/2, 30:1/2",
         "T": "4",
         "c": "5",
-        "note": "at this cost the threshold barely moves, and waiting stops being worth anything",
+        "expect": {
+            "spValue": "155/8",
+            "spCount": "256",
+        },
     },
 ]
 
@@ -2606,7 +2726,7 @@ def _stopping(cfg):
     )
 
     script = _MODE_JS["stopping"] + r"""
-""" + _presets_js("SPP", _SP_PRESETS, ["pmf", "T", "c", "note"]) + r"""
+""" + _presets_js("SPP", _SP_PRESETS, ["pmf", "T", "c"]) + r"""
   var presetIn = document.getElementById('spPreset'), pmfIn = document.getElementById('spPmf');
   var tIn = document.getElementById('spT'), cIn = document.getElementById('spC');
   var plot = document.getElementById('spPlot');
@@ -2746,9 +2866,10 @@ def _stopping(cfg):
             "panel_intro",
             "The recursion gives a threshold per period; every possible accept-set in every period is "
             "then enumerated and evaluated, so the claim that the best rule is a threshold is a "
-            "measurement. On this example: " + chosen["note"] + ".",
+            "measurement.",
         ),
         script=script,
+        expect={"spPreset": _expect(_SP_PRESETS)},
     )
 
 
@@ -2761,19 +2882,37 @@ _SE_PRESETS = [
         "id": "small",
         "label": "four candidates, small enough to count by hand",
         "n": "4",
-        "note": "twenty-four orderings, and the whole table can be checked against them",
+        "expect": {
+            "seBestR": "1",
+            "seBestP": "11/24",
+            "seWalked": "24",
+        },
     },
     {
         "id": "seven",
         "label": "seven, the largest this page enumerates",
         "n": "7",
-        "note": "5040 orderings walked, and the closed form matches every entry",
+        "expect": {
+            "seBestR": "2",
+            "seBestP": "29/70",
+            "seWalked": "5040",
+        },
     },
     {
         "id": "hundred",
-        "label": "a hundred, where the limit starts to look like the answer",
+        "label": "sixty, where the limit starts to look like the answer",
         "n": "100",
-        "note": "look at 37 and take the next best, which succeeds 37.1% of the time",
+        # THIS PRESET ASKS FOR 100 AND THE PAGE RENDERS 60. The control below is a range
+        # 3..60 and redraw() clamps to it, so the figures pinned here are n = 60's:
+        # reject 22, win with probability 0.373210, against a limit of 60/e. At the n =
+        # 100 this preset names they would be 37 and 0.371043. Raise the cap rather than
+        # retuning the strings -- and when it is raised, these three expectations fail
+        # and point here.
+        "expect": {
+            "seBestR": "22",
+            "seBestP": "0.373210",
+            "seLimit": "22.0728 — rounded",
+        },
     },
 ]
 
@@ -2815,7 +2954,7 @@ def _secretary(cfg):
     )
 
     script = _MODE_JS["secretary"] + r"""
-""" + _presets_js("SEP", _SE_PRESETS, ["n", "note"]) + r"""
+""" + _presets_js("SEP", _SE_PRESETS, ["n"]) + r"""
   var presetIn = document.getElementById('sePreset'), nIn = document.getElementById('seN');
   var plot = document.getElementById('sePlot');
   var tableT = document.getElementById('seTable'), checkT = document.getElementById('seCheck');
@@ -2923,10 +3062,10 @@ def _secretary(cfg):
         panel_intro=cfg.get(
             "panel_intro",
             "Every probability here is an exact fraction, and for seven candidates or fewer each one "
-            "is checked by walking all n! orderings and counting. On this example: "
-            + chosen["note"] + ".",
+            "is checked by walking all n! orderings and counting.",
         ),
         script=script,
+        expect={"sePreset": _expect(_SE_PRESETS)},
     )
 
 
@@ -2941,8 +3080,11 @@ _DC_PRESETS = [
         "P": "1/2 1/2; 1/4 3/4",
         "r": "1 3",
         "gamma": "1/2",
-        "note": "the twelve iterations the slider opens on reach two decimal places and twenty "
-                "reach five, and no number of them ever arrives at 22/7 and 38/7",
+        "expect": {
+            "dcV1": "22/7",
+            "dcV2": "38/7",
+            "dcIterV": "3.14171782",
+        },
     },
     {
         "id": "patient",
@@ -2950,7 +3092,10 @@ _DC_PRESETS = [
         "P": "1/2 1/2; 1/4 3/4",
         "r": "1 3",
         "gamma": "9/10",
-        "note": "the closer the discount is to one, the slower the iteration and the larger the values",
+        "expect": {
+            "dcV1": "670/31",
+            "dcV2": "750/31",
+        },
     },
     {
         "id": "three",
@@ -2958,7 +3103,10 @@ _DC_PRESETS = [
         "P": "1/2 1/4 1/4; 0 2/3 1/3; 1/5 1/5 3/5",
         "r": "2 0 5",
         "gamma": "3/4",
-        "note": "the system is 3 by 3 and row reduction still solves it in one go",
+        "expect": {
+            "dcV1": "1508/163",
+            "dcV2": "1096/163",
+        },
     },
 ]
 
@@ -3005,7 +3153,7 @@ def _discount(cfg):
     )
 
     script = _MODE_JS["discount"] + r"""
-""" + _presets_js("DCP", _DC_PRESETS, ["P", "r", "gamma", "note"]) + r"""
+""" + _presets_js("DCP", _DC_PRESETS, ["P", "r", "gamma"]) + r"""
   var presetIn = document.getElementById('dcPreset'), pIn = document.getElementById('dcP');
   var rIn = document.getElementById('dcR'), gIn = document.getElementById('dcG');
   var tIn = document.getElementById('dcT');
@@ -3152,9 +3300,10 @@ def _discount(cfg):
             "panel_intro",
             "The fixed point is found by row reduction and then put back into the equation it "
             "solves, so the residual is shown rather than assumed; the iteration is drawn beside it "
-            "with the denominators it is accumulating. On this example: " + chosen["note"] + ".",
+            "with the denominators it is accumulating.",
         ),
         script=script,
+        expect={"dcPreset": _expect(_DC_PRESETS)},
     )
 
 

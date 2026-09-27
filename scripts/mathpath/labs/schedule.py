@@ -88,6 +88,28 @@ and a mode measured against thin prose is not measured:
 against the 62 KB ceiling. `crash` is the heaviest page in this Subject and the
 figure to re-derive first when anything here grows; the rest have 20 KB of room.
 Re-derive rather than trusting these -- they go stale as the engine grows.
+
+EVERY PRESET PINS WHAT IT PRINTS, AND NO PRESET CARRIES A NOTE ANY MORE.
+A preset used to carry two pieces of prose: a `label` in the <select> and a
+`note` about the outcome. Nothing in this repository could read either, and a
+sweep of fifteen kits found 57 of those strings false about the lab they
+described. Rendering does not help -- `dpkit` printed its selected note into
+the status banner and had a HIGHER correction rate than `graphkit`, which
+rendered none -- so the notes here are deleted rather than re-checked, and
+each preset now carries `expect`: {kpi element id: the exact text the page
+prints}. scripts/build_paths.py writes it to
+scripts/generated-expectations.json and scripts/labcheck.js selects the option
+on the BUILT page, dispatches the menu's own change handler and compares
+getElementById(id).textContent. Every figure below was read off the running
+kit with `node scripts/labcheck.js --observe <page>`. See `_expect` and
+scripts/mathpath/AGENTS.md.
+
+THE PANEL INTRO NO LONGER QUOTES THE PRESET. Each mode's default
+`panel_intro` ended "On this example: " + the note, so the deletion took
+that clause with it. #obRule on `objectives` turned out to be a SECOND
+preset menu -- its change handler rewrites #obSeq, which is how
+labcheck.js recognises one -- so it is declared too, as `_OB_RULES`, with
+its figures keyed by the preset the page ships on.
 """
 
 from .algebra_core import RATIONAL_JS
@@ -1071,6 +1093,31 @@ def _options(presets):
     return [(p["id"], p["label"]) for p in presets]
 
 
+def _expect(presets):
+    """{preset id: {kpi element id: the exact text the page prints}}.
+
+    A preset's `label` says which instance it is and no check in this
+    repository can read it. Its `expect` says what the page PRINTS once that
+    option is selected, tile by tile, and scripts/labcheck.js selects the
+    option on the BUILT page, dispatches the menu's own change handler and
+    compares getElementById(kpi).textContent against the string here. Every
+    figure was read off the running kit with
+    `node scripts/labcheck.js --observe <page>` rather than out of the code
+    that computes it. See scripts/mathpath/AGENTS.md for the author rule.
+
+    Tiles are read with every OTHER control at the value the markup ships --
+    the order the preset types into the box, swap position 1, the deadline and
+    the crash activity the preset names -- so a claim that only appears once
+    the reader moves one of those cannot be pinned. Each is named in a comment
+    beside the preset that makes it.
+
+    `spt` and `wspt` are one mode function over two preset tables, and both
+    menus are #exPreset: the expectation is per PAGE, so each of the two pages
+    declares its own table and no option is shared between them.
+    """
+    return {p["id"]: dict(p.get("expect") or {}) for p in presets}
+
+
 def _choose(cfg, mode, presets, default):
     """The preset this lesson opens on, or a refusal.
 
@@ -1096,26 +1143,105 @@ def _choose(cfg, mode, presets, default):
 _OB_PRESETS = [
     {
         "id": "mixed",
-        "label": "five jobs, and no order is best at everything",
+        "label": "five jobs, in the order they arrived",
         "jobs": "A 6:1:8, B 4:2:4, C 5:4:12, D 3:3:6, E 7:1:20",
         "seq": "A B C D E",
-        "note": "the order they arrived in, which is optimal for nothing at all",
+        "expect": {
+            "obSumC": "74",
+            "obSumWC": "165",
+            "obBestAt": "0 of 6",
+        },
     },
     {
         "id": "weights",
         "label": "a long job that everyone is waiting for",
         "jobs": "A 2:1:9, B 8:5:10, C 3:1:4, D 6:4:14",
         "seq": "A B C D",
-        "note": "B is the longest and the heaviest, and the two rules disagree about it",
+        "expect": {
+            "obSumC": "44",
+            "obSumWC": "141",
+        },
     },
     {
         "id": "tight",
-        "label": "due dates nothing can meet",
+        "label": "four jobs, seventeen hours of work, the last due date at 9",
         "jobs": "A 5:2:5, B 4:1:6, C 6:3:7, D 2:2:9",
         "seq": "A B C D",
-        "note": "seventeen hours of work against a last due date of nine",
+        "expect": {
+            "obSumT": "19",
+            "obLate": "3 of 4",
+            "obBestAt": "2 of 6",
+        },
     },
 ]
+
+
+# #obRule is a SECOND preset menu, by behaviour rather than by name: its change
+# handler rewrites #obSeq, which is what scripts/labcheck.js looks for, so it is
+# declared and every one of its options pins a tile. It is spelled as a table
+# for that reason -- the <option> list the reader sees and the figures the build
+# checks come from one place, and a seventh rule cannot be added without one.
+#
+# What each option pins is the objective that rule is FOR, beside the count of
+# objectives its order wins. The figures depend on the jobs, so they are keyed
+# by the preset the page ships on: #obRule is read with #obPreset at the value
+# the markup gave it. A new preset in _OB_PRESETS therefore needs a row in each
+# of these six dicts, and the page fails by name until it has one.
+_OB_RULES = [
+    {
+        "id": "KEEP", "label": "leave what is typed",
+        "expect": {
+            "mixed":   {"obSumC": "74", "obBestAt": "0 of 6"},
+            "weights": {"obSumC": "44", "obBestAt": "0 of 6"},
+            "tight":   {"obSumC": "46", "obBestAt": "2 of 6"},
+        },
+    },
+    {
+        "id": "SPT", "label": "shortest processing time first",
+        "expect": {
+            "mixed":   {"obSumC": "65", "obBestAt": "1 of 6"},
+            "weights": {"obSumC": "37", "obBestAt": "1 of 6"},
+            "tight":   {"obSumC": "36", "obBestAt": "2 of 6"},
+        },
+    },
+    {
+        "id": "WSPT", "label": "Smith's ratio p/w",
+        "expect": {
+            "mixed":   {"obSumWC": "108", "obBestAt": "1 of 6"},
+            "weights": {"obSumWC": "129", "obBestAt": "1 of 6"},
+            "tight":   {"obSumWC": "71", "obBestAt": "1 of 6"},
+        },
+    },
+    {
+        "id": "EDD", "label": "earliest due date first",
+        "expect": {
+            "mixed":   {"obLmax": "6", "obBestAt": "2 of 6"},
+            "weights": {"obLmax": "5", "obBestAt": "3 of 6"},
+            "tight":   {"obLmax": "8", "obBestAt": "2 of 6"},
+        },
+    },
+    {
+        "id": "WEIGHT", "label": "heaviest weight first",
+        "expect": {
+            "mixed":   {"obSumWC": "111", "obBestAt": "0 of 6"},
+            "weights": {"obSumWC": "131", "obBestAt": "0 of 6"},
+            "tight":   {"obSumWC": "83", "obBestAt": "0 of 6"},
+        },
+    },
+    {
+        "id": "LPT", "label": "longest processing time first",
+        "expect": {
+            "mixed":   {"obSumC": "85", "obBestAt": "0 of 6"},
+            "weights": {"obSumC": "58", "obBestAt": "0 of 6"},
+            "tight":   {"obSumC": "49", "obBestAt": "0 of 6"},
+        },
+    },
+]
+
+
+def _ob_rule_expect(chosen):
+    """_OB_RULES, resolved against the preset this page ships on."""
+    return {r["id"]: dict(r["expect"].get(chosen["id"]) or {}) for r in _OB_RULES}
 
 
 def _objectives(cfg):
@@ -1140,11 +1266,7 @@ def _objectives(cfg):
         _select("obPreset", "Worked example", _options(_OB_PRESETS), chosen["id"])
         + _text("obJobsIn", "Jobs, as name time:weight:due", chosen["jobs"])
         + _text("obSeq", "The order to run them in", chosen["seq"])
-        + _select("obRule", "Fill that order from a rule",
-                  [("KEEP", "leave what is typed"), ("SPT", "shortest processing time first"),
-                   ("WSPT", "Smith's ratio p/w"), ("EDD", "earliest due date first"),
-                   ("WEIGHT", "heaviest weight first"), ("LPT", "longest processing time first")],
-                  "KEEP")
+        + _select("obRule", "Fill that order from a rule", _options(_OB_RULES), "KEEP")
         + _kpis([
             ("Sum of completion times", "obSumC"),
             ("Weighted sum, sum wC", "obSumWC"),
@@ -1163,7 +1285,7 @@ def _objectives(cfg):
     )
 
     script = _MODE_JS["objectives"] + r"""
-""" + _presets_js("OBP", _OB_PRESETS, ["jobs", "seq", "note"]) + r"""
+""" + _presets_js("OBP", _OB_PRESETS, ["jobs", "seq"]) + r"""
   var presetIn = document.getElementById('obPreset');
   var jobsIn = document.getElementById('obJobsIn'), seqIn = document.getElementById('obSeq');
   var ruleIn = document.getElementById('obRule');
@@ -1295,9 +1417,11 @@ def _objectives(cfg):
             "panel_intro",
             "Each objective is computed from what you type, checked against a second route that "
             "shares no arithmetic with the first, and then compared with the best of every possible "
-            "order. On this example: " + chosen["note"] + ".",
+            "order.",
         ),
         script=script,
+        expect={"obPreset": _expect(_OB_PRESETS),
+                "obRule": _ob_rule_expect(chosen)},
     )
 
 
@@ -1315,24 +1439,39 @@ def _objectives(cfg):
 _SPT_PRESETS = [
     {
         "id": "worst",
-        "label": "the longest job first, which is the worst order there is",
+        "label": "five jobs, the nine-hour one first",
         "jobs": "A 9, B 2, C 6, D 3, E 5",
         "seq": "A C E D B",
-        "note": "every job waits behind the nine-hour one",
+        # "The worst order there is" was the old label and this mode never
+        # prints it: exBest is the BEST of every order (58), and there is no
+        # tile for the worst. What is pinned instead is the typed order's own
+        # score, the rule's, and the ten improving swaps between them -- which
+        # is the distance the old word was reaching for.
+        "expect": {
+            "exNow": "92",
+            "exRule": "58",
+            "exSteps": "10",
+        },
     },
     {
         "id": "near",
         "label": "one pair out of order",
         "jobs": "A 2, B 3, C 7, D 5, E 6",
         "seq": "A B C D E",
-        "note": "C and D are the only adjacent pair the rule disagrees with",
+        "expect": {
+            "exDelta": "+1 \u2014 worse",
+            "exSteps": "2",
+        },
     },
     {
         "id": "ties",
         "label": "two jobs the same length",
         "jobs": "A 4, B 4, C 1, D 7",
         "seq": "D A B C",
-        "note": "A and B tie, so the rule has to say what it does with a tie",
+        "expect": {
+            "exDelta": "-3 \u2014 better",
+            "exBest": "31 over 24 orders",
+        },
     },
 ]
 
@@ -1342,21 +1481,30 @@ _WSPT_PRESETS = [
         "label": "the heaviest job is also the longest",
         "jobs": "A 3:1, B 8:4, C 2:3, D 6:2",
         "seq": "A B C D",
-        "note": "heaviest first says B, the ratio says C, and only one of them is right",
+        "expect": {
+            "exDelta": "-4 \u2014 better",
+            "exRule": "97",
+        },
     },
     {
         "id": "shortest",
         "label": "the shortest job is nearly worthless",
         "jobs": "A 1:1, B 4:8, C 3:2, D 5:5",
         "seq": "A C D B",
-        "note": "shortest first puts A at the front and it is worth almost nothing",
+        "expect": {
+            "exNow": "158",
+            "exDelta": "+1 \u2014 worse",
+        },
     },
     {
         "id": "equal",
-        "label": "equal weights, so the ratio is the time again",
+        "label": "four jobs, every weight 2",
         "jobs": "A 5:2, B 3:2, C 8:2, D 2:2",
         "seq": "C A B D",
-        "note": "with every weight the same, Smith's rule collapses back to SPT",
+        "expect": {
+            "exDelta": "-6 \u2014 better",
+            "exRule": "70",
+        },
     },
 ]
 
@@ -1431,7 +1579,7 @@ def _exchange(cfg, mode):
     )
 
     script = _MODE_JS[mode] + r"""
-""" + _presets_js("EXP", spec["presets"], ["jobs", "seq", "note"]) + r"""
+""" + _presets_js("EXP", spec["presets"], ["jobs", "seq"]) + r"""
   var KEYS = """ + spec["keys"] + r""", LABELS = """ + spec["labels"] + r""";
   var OBJ = '""" + spec["obj"] + r"""', RULE = '""" + spec["rule"] + r"""';
   var RIVALS = """ + spec["rivals"] + r""";
@@ -1589,9 +1737,10 @@ def _exchange(cfg, mode):
             "panel_intro",
             "The swap is decomposed into the single quantity it moves, then checked against a full "
             "recomputation of both schedules; the walk down to the rule's own order is taken one "
-            "improving swap at a time. On this example: " + chosen["note"] + ".",
+            "improving swap at a time.",
         ),
         script=script,
+        expect={"exPreset": _expect(spec["presets"])},
     )
 
 
@@ -1610,25 +1759,39 @@ def _wspt(cfg):
 _EDD_PRESETS = [
     {
         "id": "loses",
-        "label": "EDD is optimal for L max and beaten on sum T",
+        "label": "five jobs, in earliest-due-date order",
         "jobs": "A 6:8, B 4:4, C 5:12, D 3:6, E 7:20",
         "seq": "B D A C E",
-        "note": "the same five jobs, and the two due-date objectives disagree about them",
+        "expect": {
+            "edWins": "2 of 4",
+            "edSumT": "17",
+            "edBestT": "16",
+        },
     },
     {
         "id": "onelate",
-        "label": "one job is hopeless and drags L max with it",
+        "label": "four jobs, one of them eight hours long and due at 9",
         "jobs": "A 3:4, B 2:3, C 8:9, D 4:30",
         "seq": "B A C D",
-        "note": "D is never late in any of the 24 orders, and which job decides L max splits "
-                "evenly between A, B and C — eight orders each",
+        "expect": {
+            "edWins": "4 of 4",
+            "edLmax": "4",
+        },
     },
     {
         "id": "slack",
-        "label": "least slack disagrees with earliest due date",
+        "label": "four jobs, due at 6, 10, 7 and 12",
         "jobs": "A 2:6, B 7:10, C 3:7, D 5:12",
         "seq": "A C B D",
-        "note": "d − p and d order these four differently",
+        # This preset exists because d - p and d order these four differently,
+        # and that comparison lives in the RULE menu on this mode, not in the
+        # shipped order. Tiles are read with the order the preset types, so
+        # what is pinned is that order's score; the disagreement is the
+        # reader's own experiment with the fill-from-a-rule control.
+        "expect": {
+            "edWins": "3 of 4",
+            "edLmax": "5",
+        },
     },
 ]
 
@@ -1676,7 +1839,7 @@ def _edd(cfg):
     )
 
     script = _MODE_JS["edd"] + r"""
-""" + _presets_js("EDP", _EDD_PRESETS, ["jobs", "seq", "note"]) + r"""
+""" + _presets_js("EDP", _EDD_PRESETS, ["jobs", "seq"]) + r"""
   var RULES = ['EDD', 'SLACK', 'SPT', 'FCFS'], SHOW = ['Lmax', 'Tmax', 'sumT', 'sumU'];
   var presetIn = document.getElementById('edPreset'), jobsIn = document.getElementById('edJobsIn');
   var ruleIn = document.getElementById('edRule'), posIn = document.getElementById('edPos');
@@ -1807,9 +1970,10 @@ def _edd(cfg):
         panel_intro=cfg.get(
             "panel_intro",
             "Each rule's order is audited as an order, scored on all four objectives, and compared "
-            "with the best of every possible order. On this example: " + chosen["note"] + ".",
+            "with the best of every possible order.",
         ),
         script=script,
+        expect={"edPreset": _expect(_EDD_PRESETS)},
     )
 
 
@@ -1820,23 +1984,31 @@ def _edd(cfg):
 _LATE_PRESETS = [
     {
         "id": "throws",
-        "label": "the job thrown out is not the job that was late",
+        "label": "the five jobs of the due-date lesson",
         "jobs": "A 6:8, B 4:4, C 5:12, D 3:6, E 7:20",
-        "note": "at the second step D makes the schedule late and B — accepted and on time a "
-                "step earlier — is the longest so far, so B is what gets thrown out; A is then "
-                "thrown out at the third step, the moment it joins",
+        "expect": {
+            "mhKept": "3: D, C, E",
+            "mhDrop": "B, A",
+            "mhEdd": "4",
+        },
     },
     {
         "id": "onebad",
         "label": "one enormous job and four small ones",
         "jobs": "A 12:14, B 2:5, C 3:7, D 2:9, E 4:13",
-        "note": "A fits only if nothing else does, which is exactly the trade the rule makes",
+        "expect": {
+            "mhLate": "1",
+            "mhDrop": "A",
+        },
     },
     {
         "id": "allfit",
-        "label": "everything fits, and nothing is discarded",
+        "label": "four jobs, due at 3, 7, 9 and 14",
         "jobs": "A 2:3, B 3:7, C 1:9, D 4:14",
-        "note": "a run with no discard at all, so the steps table shows the accepting half",
+        "expect": {
+            "mhLate": "0",
+            "mhDrop": "none",
+        },
     },
 ]
 
@@ -1881,7 +2053,7 @@ def _late(cfg):
     )
 
     script = _MODE_JS["late"] + r"""
-""" + _presets_js("MHP", _LATE_PRESETS, ["jobs", "note"]) + r"""
+""" + _presets_js("MHP", _LATE_PRESETS, ["jobs"]) + r"""
   var presetIn = document.getElementById('mhPreset'), jobsIn = document.getElementById('mhJobs');
   var stepIn = document.getElementById('mhStep');
   var plot = document.getElementById('mhPlot'), strip = document.getElementById('mhStrip');
@@ -2021,10 +2193,10 @@ def _late(cfg):
         panel_intro=cfg.get(
             "panel_intro",
             "Each step shows the accepted set, the clock it reaches, and what was discarded and why; "
-            "the count is then checked against the best of every order. On this example: "
-            + chosen["note"] + ".",
+            "the count is then checked against the best of every order.",
         ),
         script=script,
+        expect={"mhPreset": _expect(_LATE_PRESETS)},
     )
 
 
@@ -2038,21 +2210,33 @@ _FS_PRESETS = [
         "label": "five jobs through two machines",
         "jobs": "A 5:2, B 1:6, C 9:7, D 3:8, E 10:4",
         "seq": "A B C D E",
-        "note": "two of the five are quicker on the first machine and go to the front",
+        "expect": {
+            "fsJohn": "30",
+            "fsMine": "34",
+            "fsIdleJ": "3",
+        },
     },
     {
         "id": "starved",
-        "label": "the second machine waits at the start",
+        "label": "four jobs, the first eight hours on machine 1",
         "jobs": "A 8:1, B 7:2, C 6:9, D 2:5",
         "seq": "A B C D",
-        "note": "put a long first-machine job first and machine 2 stands idle for all of it",
+        "expect": {
+            "fsJohn": "24",
+            "fsIdleJ": "7",
+            "fsIdleM": "18",
+        },
     },
     {
         "id": "balanced",
         "label": "every job the same length on both",
         "jobs": "A 4:4, B 3:3, C 6:6, D 2:2",
         "seq": "C A B D",
-        "note": "no job is quicker on either machine, so the rule's first test is a tie throughout",
+        "expect": {
+            "fsJohn": "21",
+            "fsMine": "21",
+            "fsIdleJ": "6",
+        },
     },
 ]
 
@@ -2097,7 +2281,7 @@ def _flowshop(cfg):
     )
 
     script = _MODE_JS["flowshop"] + r"""
-""" + _presets_js("FSP", _FS_PRESETS, ["jobs", "seq", "note"]) + r"""
+""" + _presets_js("FSP", _FS_PRESETS, ["jobs", "seq"]) + r"""
   var presetIn = document.getElementById('fsPreset'), jobsIn = document.getElementById('fsJobs');
   var seqIn = document.getElementById('fsSeq');
   var plot = document.getElementById('fsPlot'), bestSvg = document.getElementById('fsBest');
@@ -2226,9 +2410,10 @@ def _flowshop(cfg):
             "panel_intro",
             "Both schedules are drawn and then read back — machine 1 without gaps, machine 2 never "
             "overlapping itself — and the makespan is taken from the picture before it is compared "
-            "with the best of every order. On this example: " + chosen["note"] + ".",
+            "with the best of every order.",
         ),
         script=script,
+        expect={"fsPreset": _expect(_FS_PRESETS)},
     )
 
 
@@ -2242,22 +2427,32 @@ _PAR_PRESETS = [
         "label": "the instance LPT gets wrong",
         "jobs": "A 7, B 6, C 5, D 4, E 4, F 4, G 4",
         "machines": "3",
-        "note": "LPT finishes at 13 where three machines can finish at 12",
+        "expect": {
+            "plMake": "13",
+            "plOpt": "12",
+            "plRatio": "13/12 \u2014 inside 4/3",
+        },
     },
     {
         "id": "onebig",
         "label": "one job longer than the average load",
         "jobs": "A 11, B 3, C 3, D 2, E 2",
         "machines": "3",
-        "note": "no schedule beats 11, and the average-load bound cannot see why",
+        "expect": {
+            "plOpt": "11",
+            "plBound": "11 \u2014 the longest job",
+        },
     },
     {
         "id": "even",
         "label": "work that divides exactly",
         "jobs": "A 4, B 4, C 4, D 4, E 4, F 4",
         "machines": "3",
-        "note": "the work divides exactly by the machines, so the average-load bound is 8 on "
-                "the nose and LPT reaches it — the optimum is known before any schedule is built",
+        "expect": {
+            "plMake": "8",
+            "plOpt": "8",
+            "plBound": "8 \u2014 the average",
+        },
     },
 ]
 
@@ -2305,7 +2500,7 @@ def _parallel(cfg):
     )
 
     script = _MODE_JS["parallel"] + r"""
-""" + _presets_js("PLP", _PAR_PRESETS, ["jobs", "machines", "note"]) + r"""
+""" + _presets_js("PLP", _PAR_PRESETS, ["jobs", "machines"]) + r"""
   var presetIn = document.getElementById('plPreset'), jobsIn = document.getElementById('plJobs');
   var mIn = document.getElementById('plM'), ruleIn = document.getElementById('plRule');
   var plot = document.getElementById('plPlot'), bestSvg = document.getElementById('plBest');
@@ -2444,9 +2639,10 @@ def _parallel(cfg):
             "panel_intro",
             "The heuristic places one job at a time; the loads are then added up again from the "
             "assignment alone, and the result is compared with every possible assignment and with "
-            "both lower bounds. On this example: " + chosen["note"] + ".",
+            "both lower bounds.",
         ),
         script=script,
+        expect={"plPreset": _expect(_PAR_PRESETS)},
     )
 
 
@@ -2459,19 +2655,29 @@ _JS_PRESETS = [
         "id": "two",
         "label": "two jobs, two machines, opposite routes",
         "ops": "J1 M1 3, J1 M2 2, J2 M2 4, J2 M1 1",
-        "note": "four orientations, one of which deadlocks",
+        "expect": {
+            "jsTotal": "2^2 = 4",
+            "jsDead": "1 of 4",
+        },
     },
     {
         "id": "three",
         "label": "three jobs sharing two machines",
         "ops": "J1 M1 2, J1 M2 3, J2 M2 2, J2 M1 4, J3 M1 3",
-        "note": "five operations, four disjunctive pairs, sixteen orientations",
+        "expect": {
+            "jsOps1": "5",
+            "jsTotal": "2^4 = 16",
+            "jsDead": "7 of 16",
+        },
     },
     {
         "id": "chain",
         "label": "one machine everything has to pass through",
         "ops": "J1 M1 4, J1 M2 2, J2 M1 3, J2 M2 5, J3 M1 2",
-        "note": "M1 carries three operations, so three of the pairs are on it alone",
+        "expect": {
+            "jsPairs": "4",
+            "jsDead": "4 of 16",
+        },
     },
 ]
 
@@ -2519,7 +2725,7 @@ def _jobshop(cfg):
     )
 
     script = _MODE_JS["jobshop"] + r"""
-""" + _presets_js("JSP", _JS_PRESETS, ["ops", "note"]) + r"""
+""" + _presets_js("JSP", _JS_PRESETS, ["ops"]) + r"""
   var presetIn = document.getElementById('jsPreset'), opsIn = document.getElementById('jsOpsIn');
   var pickIn = document.getElementById('jsPick'), showIn = document.getElementById('jsShow');
   var plot = document.getElementById('jsPlot'), bars = document.getElementById('jsBars');
@@ -2681,9 +2887,10 @@ def _jobshop(cfg):
             "panel_intro",
             "Every orientation is scored by the longest path through the network it makes, the "
             "deadlocks are counted rather than hidden, and the schedule drawn is read back before "
-            "any figure is printed. On this example: " + chosen["note"] + ".",
+            "any figure is printed.",
         ),
         script=script,
+        expect={"jsPreset": _expect(_JS_PRESETS)},
     )
 
 
@@ -2696,19 +2903,36 @@ _CR_PRESETS = [
         "id": "diamond",
         "label": "four activities, two parallel paths",
         "acts": "A 6:4:100:140, B 4:2:80:120 | A, C 5:3:60:90 | A, D 3:2:50:80 | B C",
-        "note": "shortening A helps until the two middle paths become critical together",
+        "expect": {
+            "crNormal": "14 days",
+            "crBill": "55",
+            "crConf": "4 of 4",
+        },
     },
     {
         "id": "series",
         "label": "a straight chain of three",
         "acts": "A 5:3:40:70, B 6:3:50:110 | A, C 4:2:30:70 | B",
-        "note": "one path, so the cheapest rate is bought first and the curve has three pieces",
+        "expect": {
+            "crNormal": "15 days",
+            "crBill": "50",
+            "crConf": "3 of 3",
+        },
     },
     {
         "id": "cheapfirst",
-        "label": "the cheapest activity to crash is not on the critical path",
+        "label": "four activities in two chains of two",
         "acts": "A 4:2:40:48, B 7:4:60:120 | A, C 2:1:20:24, D 5:3:40:70 | C",
-        "note": "A and C cost little to shorten and only one of the two chains decides the finish",
+        # Which activity is cheapest to crash, and whether it is on the
+        # critical chain, is a column of the pieces table rather than a tile,
+        # so it is not pinned. The bill, the total and the number of curve
+        # pieces re-solved from scratch are, and those are the figures the
+        # deadline slider moves.
+        "expect": {
+            "crBill": "28",
+            "crTotal": "188",
+            "crConf": "3 of 3",
+        },
     },
 ]
 
@@ -2755,7 +2979,7 @@ def _crash(cfg):
     )
 
     script = _MODE_JS["crash"] + r"""
-""" + _presets_js("CRP", _CR_PRESETS, ["acts", "note"]) + r"""
+""" + _presets_js("CRP", _CR_PRESETS, ["acts"]) + r"""
   var OPTS = { rule: 'bland', maxPivots: 400 };
   var presetIn = document.getElementById('crPreset'), actsIn = document.getElementById('crActs2');
   var cutIn = document.getElementById('crCut');
@@ -2897,10 +3121,10 @@ def _crash(cfg):
             "panel_intro",
             "The programme is solved exactly, the durations it buys are put back through a forward "
             "and a backward pass to confirm the deadline is really met, and every piece of the "
-            "time-cost curve is re-solved from scratch at its own endpoint. On this example: "
-            + chosen["note"] + ".",
+            "time-cost curve is re-solved from scratch at its own endpoint.",
         ),
         script=script,
+        expect={"crPreset": _expect(_CR_PRESETS)},
     )
 
 

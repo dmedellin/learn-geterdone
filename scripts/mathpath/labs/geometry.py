@@ -95,6 +95,19 @@ because its tie-break is the index order of the lexicographic sort. It is a boun
 mode labels it as one and checks it against `geoBoundaryBrute` rather than
 against the vertex set.
 
+EVERY PRESET PINS WHAT IT PRINTS, AND NO PRESET CARRIES PROSE ANY MORE. Each
+of the 41 presets used to carry a `note`, serialised into the page's JavaScript
+by `_presets_js` and then read by nothing -- this kit never rendered one -- and
+no check in this repository could read one either, which is how a fifteen-kit
+sweep found 57 preset strings false across the library. The notes are gone, and
+the slot they occupied holds `expect`: {kpi element id: the exact text the page
+prints}. scripts/labcheck.js selects the option on the BUILT page, dispatches
+the menu's own change handler and compares the tile's textContent.
+
+`kdtree` is the one mode no lesson declares, so no built page exercises it; its
+four presets carry expectations read the same way, off the mode rendered on its
+own. See `_expect` below and scripts/mathpath/AGENTS.md for the rule.
+
 THE MODES, and the figure each one is for:
 
   orient     the exact determinant, the same determinant by cofactors, the
@@ -619,6 +632,25 @@ def _options(presets):
     return [(p["id"], p["label"]) for p in presets]
 
 
+def _expect(presets):
+    """{preset id: {kpi element id: the exact text the page prints}}.
+
+    A preset's `label` is prose about an instance and no check in this
+    repository can read it. This is the other half of the same claim, and it is
+    the half a machine can hold: what the page PRINTS once the preset is
+    selected. scripts/labcheck.js selects the option on the BUILT page,
+    dispatches the menu's own change handler and compares
+    getElementById(kpi).textContent with the string here. Every figure below
+    was read off the running kit with `node scripts/labcheck.js --observe
+    <page>`, never copied out of the code that computes it.
+
+    Tiles are read with every OTHER control at the value the markup ships, so a
+    claim that only becomes visible once another control moves cannot be pinned
+    here; those are named in a comment beside the preset that makes them.
+    """
+    return {p["id"]: dict(p.get("expect") or {}) for p in presets}
+
+
 def _chosen(presets, cfg):
     want = str(cfg.get("preset", presets[0]["id"]))
     for p in presets:
@@ -652,31 +684,49 @@ _OR_PRESETS = [
         "id": "turn",
         "label": "an ordinary left turn, small coordinates",
         "spec": "0, 0; 4, 0; 2, 3",
-        "note": "nothing near the edge of anything: the double and the exact test agree",
+        "expect": {
+            "orExact": "12",
+            "orSign": "1 — left turn",
+            "orFSign": "1 — left turn",
+        },
     },
     {
         "id": "collinear",
         "label": "three points genuinely on one line",
         "spec": "0, 0; 3, 3; 7, 7",
-        "note": "the determinant is 0 and both tests say so, which is the case that is easy",
+        "expect": {
+            "orExact": "0",
+            "orSign": "0 — collinear",
+            "orFSign": "0 — collinear",
+        },
     },
     {
         "id": "needle",
         "label": "a right turn the double test calls collinear",
         "spec": "0, 0; 134217729, 134217728; 134217728, 134217727",
-        "note": "2^27 + 1 and 2^27: the exact determinant is −1 and the double reads 0",
+        "expect": {
+            "orSign": "-1 — right turn",
+            "orFloat": "0",
+            "orFSign": "0 — collinear",
+        },
     },
     {
         "id": "thin",
         "label": "the same shape one power of two lower down",
         "spec": "0, 0; 67108865, 67108864; 67108864, 67108863",
-        "note": "2^26: the last magnitude at which the double still gets the sign right",
+        "expect": {
+            "orSign": "-1 — right turn",
+            "orFSign": "-1 — right turn",
+        },
     },
     {
         "id": "area1",
-        "label": "a triangle of area one half, at readable size",
+        "label": "the smallest nonzero determinant, at readable size",
         "spec": "0, 0; 7, 3; 5, 2",
-        "note": "the smallest nonzero doubled area there is, and both tests find it",
+        "expect": {
+            "orExact": "-1",
+            "orSign": "-1 — right turn",
+        },
     },
 ]
 
@@ -716,7 +766,7 @@ def _orient(cfg):
             "double test stops agreeing.",
         )
     )
-    script = _BASE_JS + _ONE_INPUT + _presets_js("ORP", _OR_PRESETS, ["spec", "note"]) + r"""
+    script = _BASE_JS + _ONE_INPUT + _presets_js("ORP", _OR_PRESETS, ["spec"]) + r"""
   var presetIn = document.getElementById('orPreset'), specIn = document.getElementById('orSpec');
   var kIn = document.getElementById('orK'), kOut = document.getElementById('orKOut');
   var plot = document.getElementById('orPlot'), ways = document.getElementById('orWays');
@@ -846,6 +896,7 @@ def _orient(cfg):
             "agree. The third is the one that decides whether the rest of this course works.",
         ),
         script=script,
+        expect={"orPreset": _expect(_OR_PRESETS)},
     )
 
 
@@ -856,41 +907,62 @@ def _orient(cfg):
 _HU_PRESETS = [
     {
         "id": "general",
-        "label": "nine points whose four collinear triples are all interior",
+        "label": "nine points, the collinear triples all interior",
         "spec": "0, 0; 6, 0; 6, 6; 0, 6; 3, 3; 2, 1; 4, 5; 1, 4; 5, 2",
-        "note": "all four collinear triples run through the interior point (3, 3), so no "
-                "collinearity ever reaches the hull and both algorithms and both predicates "
-                "agree on the same four corners",
+        # The four collinear triples and the interior point (3, 3) they all run through
+        # are the reason this instance exists, and no tile counts them; what the tiles
+        # hold is the consequence -- all three routes on the same four corners.
+        "expect": {
+            "huH": "4",
+            "huFH": "4",
+            "huJH": "4",
+        },
     },
     {
         "id": "edges",
         "label": "a square with a point in the middle of each side",
         "spec": "0, 0; 2, 0; 4, 0; 4, 2; 4, 4; 2, 4; 0, 4; 0, 2; 2, 2",
-        "note": "four vertices, eight boundary points, and gift wrapping returns six",
+        "expect": {
+            "huH": "4",
+            "huB": "8",
+            "huJH": "6",
+        },
     },
     {
         "id": "segment",
         "label": "five points on one line: the hull is a segment",
         "spec": "0, 0; 1, 1; 2, 2; 3, 3; 4, 4",
-        "note": "the chain returns the two ends and gift wrapping returns all five",
+        "expect": {
+            "huH": "2",
+            "huJH": "5",
+        },
     },
     {
         "id": "duplicate",
         "label": "the same point typed more than once",
         "spec": "0, 0; 0, 0; 4, 0; 0, 4; 2, 2; 4, 0",
-        "note": "two duplicates removed before anything else happens, and counted",
+        "expect": {
+            "huN": "6 typed, 4 distinct",
+            "huDup": "2",
+        },
     },
     {
         "id": "needle",
         "label": "a triangle the double predicate flattens",
         "spec": "0, 0; 134217729, 134217728; 134217728, 134217727",
-        "note": "three vertices exactly, two in doubles: switch the predicate and watch one go",
+        "expect": {
+            "huH": "3",
+            "huFH": "2 — a vertex short",
+        },
     },
     {
         "id": "single",
         "label": "one point, typed twice",
         "spec": "3, 3; 3, 3",
-        "note": "the hull of one point is that point, which is the case the shipped chain drops",
+        "expect": {
+            "huN": "2 typed, 1 distinct",
+            "huH": "1",
+        },
     },
 ]
 
@@ -935,7 +1007,7 @@ def _hull(cfg):
             "point on one side.",
         )
     )
-    script = _HULL_JS + _ONE_INPUT + _presets_js("HUP", _HU_PRESETS, ["spec", "note"]) + r"""
+    script = _HULL_JS + _ONE_INPUT + _presets_js("HUP", _HU_PRESETS, ["spec"]) + r"""
   var presetIn = document.getElementById('huPreset'), specIn = document.getElementById('huSpec');
   var algoIn = document.getElementById('huAlgo'), predIn = document.getElementById('huPred');
   var plot = document.getElementById('huPlot'), table = document.getElementById('huPoints');
@@ -1084,6 +1156,7 @@ def _hull(cfg):
             "predicate to doubles on the last worked example and count the vertices again.",
         ),
         script=script,
+        expect={"huPreset": _expect(_HU_PRESETS)},
     )
 
 
@@ -1096,43 +1169,68 @@ _SG_PRESETS = [
         "id": "proper",
         "label": "an ordinary crossing, interiors only",
         "spec": "0, 0; 6, 6; 0, 6; 6, 0",
-        "note": "all four signs nonzero and opposite in pairs: the textbook case",
+        "expect": {
+            "sgProper": "yes",
+            "sgVerdict": "they meet",
+        },
     },
     {
         "id": "touch",
         "label": "one segment ends on the other",
         "spec": "0, 0; 6, 0; 3, 0; 3, 5",
-        "note": "a T-junction: one sign is zero, so the proper test says no and they do meet",
+        "expect": {
+            "sgProper": "no",
+            "sgTouch": "yes",
+            "sgVerdict": "they meet",
+        },
     },
     {
         "id": "overlap",
         "label": "collinear and overlapping",
         "spec": "0, 0; 6, 0; 4, 0; 10, 0",
-        "note": "all four signs are zero, and an implementation that stops there says no",
+        "expect": {
+            "sgProper": "no",
+            "sgBox": "yes",
+            "sgVerdict": "they meet",
+        },
     },
     {
         "id": "apart",
-        "label": "collinear, with a gap of 2 between the boxes",
+        "label": "collinear, with a gap between the boxes",
         "spec": "0, 0; 4, 0; 6, 0; 10, 0",
-        "note": "all four signs zero again, and this time they really do miss",
+        # The gap between the two boxes is 2, which is in the drawing and in the box row
+        # and in no tile; what a tile holds is that the boxes do not overlap at all.
+        "expect": {
+            "sgBox": "no",
+            "sgVerdict": "they miss",
+        },
     },
     {
         "id": "shared",
         "label": "a shared endpoint and nothing else",
         "spec": "0, 0; 4, 0; 4, 0; 4, 5",
-        "note": "the boundary case between meeting and not, and both tests must say yes",
+        "expect": {
+            "sgTouch": "yes",
+            "sgVerdict": "they meet",
+        },
     },
     {
         "id": "parallel",
         "label": "parallel, never meeting",
         "spec": "0, 0; 6, 0; 0, 2; 6, 2",
-        "note": "the determinant of the direction pair is zero and they are not collinear",
+        "expect": {
+            "sgBox": "no",
+            "sgVerdict": "they miss",
+        },
     },
     {
         "id": "point",
         "label": "a segment that is a single point",
         "spec": "3, 2; 3, 2; 0, 0; 6, 4",
-        "note": "a degenerate segment on the other one: both routes must still answer",
+        "expect": {
+            "sgVerdict": "they meet",
+            "sgOracle": "they meet",
+        },
     },
 ]
 
@@ -1168,7 +1266,7 @@ def _segments(cfg):
             "has to take over. The parametric route below never looks at a sign at all.",
         )
     )
-    script = _BASE_JS + _ONE_INPUT + _presets_js("SGP", _SG_PRESETS, ["spec", "note"]) + r"""
+    script = _BASE_JS + _ONE_INPUT + _presets_js("SGP", _SG_PRESETS, ["spec"]) + r"""
   var presetIn = document.getElementById('sgPreset'), specIn = document.getElementById('sgSpec');
   var plot = document.getElementById('sgPlot'), signs = document.getElementById('sgSigns');
   var status = document.getElementById('sgStatus');
@@ -1286,6 +1384,7 @@ def _segments(cfg):
             "of the seven are cases the four-sign test alone gets wrong.",
         ),
         script=script,
+        expect={"sgPreset": _expect(_SG_PRESETS)},
     )
 
 
@@ -1298,26 +1397,39 @@ _SW_PRESETS = [
         "id": "spread",
         "label": "six segments spread along the line",
         "spec": "0, 0; 3, 3; 1, 4; 4, 1; 6, 0; 9, 3; 7, 4; 10, 1; 12, 0; 15, 3; 13, 4; 16, 1",
-        "note": "three crossings, found in three tests where all pairs would be fifteen — the "
-                "sweep never compares the first pair with the last",
+        "expect": {
+            "swFound": "3",
+            "swTests": "3",
+            "swAll": "15",
+        },
     },
     {
         "id": "bundle",
         "label": "everything crossing everything",
         "spec": "0, 0; 8, 8; 0, 8; 8, 0; 0, 4; 8, 4; 4, 0; 4, 8",
-        "note": "the worst case: the status list holds all four at once and the sweep saves nothing",
+        "expect": {
+            "swFound": "6",
+            "swTests": "6",
+            "swAll": "6",
+        },
     },
     {
         "id": "chain",
         "label": "a staircase, each meeting only the next",
         "spec": "0, 0; 3, 1; 3, 1; 6, 2; 6, 2; 9, 3; 9, 3; 12, 4",
-        "note": "shared endpoints count as crossings, which is a decision and the page states it",
+        "expect": {
+            "swFound": "3",
+            "swTests": "3",
+        },
     },
     {
         "id": "none",
         "label": "six segments and no crossing at all",
         "spec": "0, 0; 2, 1; 3, 0; 5, 1; 6, 0; 8, 1; 0, 4; 2, 5; 3, 4; 5, 5; 6, 4; 8, 5",
-        "note": "the answer is empty and the work still is not, which is the honest figure",
+        "expect": {
+            "swFound": "0",
+            "swTests": "3",
+        },
     },
 ]
 
@@ -1354,7 +1466,7 @@ def _sweep(cfg):
             "test the brute force does.",
         )
     )
-    script = _BASE_JS + _ONE_INPUT + _presets_js("SWP", _SW_PRESETS, ["spec", "note"]) + r"""
+    script = _BASE_JS + _ONE_INPUT + _presets_js("SWP", _SW_PRESETS, ["spec"]) + r"""
   var presetIn = document.getElementById('swPreset'), specIn = document.getElementById('swSpec');
   var atIn = document.getElementById('swAt'), atOut = document.getElementById('swAtOut');
   var plot = document.getElementById('swPlot'), table = document.getElementById('swEvents');
@@ -1468,6 +1580,7 @@ def _sweep(cfg):
             "answer, and a different amount of work to reach it.",
         ),
         script=script,
+        expect={"swPreset": _expect(_SW_PRESETS)},
     )
 
 
@@ -1480,33 +1593,52 @@ _CL_PRESETS = [
         "id": "scatter",
         "label": "twelve points, one close pair",
         "spec": "2, 9; 5, 1; 8, 14; 11, 4; 14, 12; 17, 2; 20, 10; 23, 6; 26, 15; 29, 3; 12, 5; 13, 4",
-        "note": "the close pair at squared distance 2 turns up inside a single base case "
-                "rather than across a dividing line; the strip still makes five comparisons "
-                "and finds nothing closer, which is what makes that answer safe",
+        # Which level of the recursion finds the pair -- one base case, not the strip --
+        # is in the trace and not in a tile. The strip's own work is, and it is what
+        # makes the answer safe.
+        "expect": {
+            "clD2": "2",
+            "clPair": "(11, 4) (12, 5)",
+            "clStrip": "5 against 84",
+        },
     },
     {
         "id": "column",
         "label": "two columns either side of the split",
         "spec": "0, 0; 0, 3; 0, 6; 0, 9; 0, 12; 1, 1; 1, 4; 1, 7; 1, 10; 1, 13",
-        "note": "every point is in the strip, and the seven-neighbour rule is what caps the work",
+        "expect": {
+            "clStrip": "5 against 70",
+            "clDC": "13",
+        },
     },
     {
         "id": "grid",
         "label": "a regular grid: many pairs at the minimum",
         "spec": "0, 0; 4, 0; 8, 0; 0, 4; 4, 4; 8, 4; 0, 8; 4, 8; 8, 8",
-        "note": "twelve pairs tie at distance 4, so the answer is a value and not a pair",
+        # Twelve pairs tie at this distance, which is why the answer is reported as a
+        # value; the tile names one of them and the count of ties is not a tile.
+        "expect": {
+            "clD2": "16",
+            "clPair": "(0, 0) (0, 4)",
+        },
     },
     {
         "id": "duplicate",
         "label": "the same point twice: distance zero",
         "spec": "0, 0; 5, 5; 9, 2; 5, 5; 3, 8",
-        "note": "squared distance 0, which is exactly representable and needs no special case",
+        "expect": {
+            "clD2": "0 — two points coincide",
+            "clPair": "(5, 5) (5, 5)",
+        },
     },
     {
         "id": "pair",
         "label": "two points and nothing else",
         "spec": "0, 0; 3, 4",
-        "note": "the base case, where the recursion never happens",
+        "expect": {
+            "clDC": "1",
+            "clBrute": "1",
+        },
     },
 ]
 
@@ -1540,7 +1672,7 @@ def _closest(cfg):
             "compared with at most seven others — beside the number of comparisons actually made.",
         )
     )
-    script = _RATIO_JS + _ONE_INPUT + _presets_js("CLP", _CL_PRESETS, ["spec", "note"]) + r"""
+    script = _RATIO_JS + _ONE_INPUT + _presets_js("CLP", _CL_PRESETS, ["spec"]) + r"""
   var presetIn = document.getElementById('clPreset'), specIn = document.getElementById('clSpec');
   var plot = document.getElementById('clPlot'), levels = document.getElementById('clLevels');
   var status = document.getElementById('clStatus');
@@ -1655,6 +1787,7 @@ def _closest(cfg):
             "plausible number.",
         ),
         script=script,
+        expect={"clPreset": _expect(_CL_PRESETS)},
     )
 
 
@@ -1668,35 +1801,53 @@ _PG_PRESETS = [
         "label": "an L, so the shape is not convex",
         "spec": "0, 0; 6, 0; 6, 2; 2, 2; 2, 6; 0, 6",
         "query": "1, 5",
-        "note": "a point inside the arm the convex hull would have swallowed",
+        "expect": {
+            "pgArea": "20",
+            "pgCross": "1",
+            "pgIn": "inside",
+        },
     },
     {
         "id": "vertex",
         "label": "a triangle, with the ray aimed at a vertex",
         "spec": "0, 0; 8, 0; 4, 4",
         "query": "-2, 0",
-        "note": "the ray leaves along an edge and through two vertices at once",
+        "expect": {
+            "pgCross": "2",
+            "pgIn": "outside",
+        },
     },
     {
         "id": "comb",
         "label": "a comb: the ray crosses six times",
         "spec": "0, 0; 12, 0; 12, 6; 10, 6; 10, 2; 8, 2; 8, 6; 6, 6; 6, 2; 4, 2; 4, 6; 2, 6; 2, 2; 0, 2",
         "query": "-1, 4",
-        "note": "an even count outside and an odd one inside, on the same horizontal line",
+        "expect": {
+            "pgCross": "6",
+            "pgIn": "outside",
+        },
     },
     {
         "id": "clockwise",
         "label": "a square typed clockwise",
         "spec": "0, 0; 0, 5; 5, 5; 5, 0",
         "query": "2, 2",
-        "note": "the doubled area comes out negative, which is the orientation and not an error",
+        "expect": {
+            "pgA2": "-50",
+            "pgArea": "25",
+            "pgTurn": "clockwise",
+        },
     },
     {
         "id": "flat",
         "label": "a degenerate polygon of zero area",
         "spec": "0, 0; 3, 3; 6, 6",
         "query": "3, 3",
-        "note": "three collinear vertices: area 0, and no interior for a point to be in",
+        "expect": {
+            "pgA2": "0",
+            "pgTurn": "no orientation: the area is zero",
+            "pgIn": "on the boundary",
+        },
     },
 ]
 
@@ -1733,7 +1884,7 @@ def _polygon(cfg):
             "is the rule that makes a ray through a vertex count once rather than twice.",
         )
     )
-    script = _RATIO_JS + _ONE_INPUT + _presets_js("PGP", _PG_PRESETS, ["spec", "query", "note"]) + r"""
+    script = _RATIO_JS + _ONE_INPUT + _presets_js("PGP", _PG_PRESETS, ["spec", "query"]) + r"""
   var presetIn = document.getElementById('pgPreset'), specIn = document.getElementById('pgSpec');
   var queryIn = document.getElementById('pgQuery');
   var plot = document.getElementById('pgPlot'), edges = document.getElementById('pgEdges');
@@ -1859,6 +2010,7 @@ def _polygon(cfg):
             "claiming the two must agree.",
         ),
         script=script,
+        expect={"pgPreset": _expect(_PG_PRESETS)},
     )
 
 
@@ -1871,31 +2023,50 @@ _CA_PRESETS = [
         "id": "convex",
         "label": "eight points in convex position",
         "spec": "0, 3; 2, 0; 6, 0; 9, 3; 9, 7; 6, 10; 2, 10; 0, 7",
-        "note": "every point is a hull vertex, so the calipers walk all of them",
+        "expect": {
+            "caN": "8",
+            "caH": "8",
+        },
     },
     {
         "id": "cloud",
         "label": "sixteen points, four on the hull",
         "spec": "0, 0; 12, 0; 12, 9; 0, 9; 3, 2; 5, 4; 7, 3; 9, 5; 4, 6; 6, 7; 8, 6; 2, 5; 10, 2; 5, 1; 7, 8; 3, 7",
-        "note": "the diameter is a hull pair, so twelve interior points cost nothing",
+        "expect": {
+            "caN": "16",
+            "caH": "4",
+            "caD2": "225",
+        },
     },
     {
         "id": "thin",
         "label": "a long thin sliver",
         "spec": "0, 0; 40, 1; 20, 1; 10, 0; 30, 1",
-        "note": "the hull is a quadrilateral and the diameter is its long diagonal",
+        "expect": {
+            "caH": "4",
+            "caD2": "1601",
+        },
     },
     {
         "id": "segment",
         "label": "collinear points: the hull is a segment",
         "spec": "0, 0; 3, 3; 6, 6; 9, 9; 12, 12",
-        "note": "two hull vertices, and the diameter is the whole segment",
+        "expect": {
+            "caH": "2",
+            "caD2": "288",
+        },
     },
     {
         "id": "square",
         "label": "a square: two diagonals tie",
         "spec": "0, 0; 6, 0; 6, 6; 0, 6",
-        "note": "the squared diameter is 72 and two different pairs attain it",
+        # Which pairs attain the diameter -- both diagonals -- is in the drawing; the
+        # tile beside it counts the antipodal pairs the walk examined, which is not the
+        # same number and would not check the claim.
+        "expect": {
+            "caD2": "72",
+            "caBrute": "72",
+        },
     },
 ]
 
@@ -1932,7 +2103,7 @@ def _calipers(cfg):
             "the winner never rounds.",
         )
     )
-    script = _BASE_JS + _ONE_INPUT + _presets_js("CAP", _CA_PRESETS, ["spec", "note"]) + r"""
+    script = _BASE_JS + _ONE_INPUT + _presets_js("CAP", _CA_PRESETS, ["spec"]) + r"""
   var presetIn = document.getElementById('caPreset'), specIn = document.getElementById('caSpec');
   var plot = document.getElementById('caPlot'), table = document.getElementById('caPairs');
   var status = document.getElementById('caStatus');
@@ -2043,6 +2214,7 @@ def _calipers(cfg):
             "the wrong pairs returns a distance that is real and not the largest.",
         ),
         script=script,
+        expect={"caPreset": _expect(_CA_PRESETS)},
     )
 
 
@@ -2056,28 +2228,41 @@ _KD_PRESETS = [
         "label": "sixteen points, a small window",
         "spec": "1, 1; 3, 9; 5, 4; 7, 12; 9, 2; 11, 7; 13, 14; 15, 5; 2, 6; 4, 13; 6, 8; 8, 3; 10, 11; 12, 1; 14, 9; 16, 6",
         "rect": "0, 0, 6, 6",
-        "note": "three points found, and six nodes visited out of sixteen to find them",
+        "expect": {
+            "kdN": "16",
+            "kdFound": "3",
+            "kdVisited": "6",
+        },
     },
     {
         "id": "everything",
         "label": "a window that contains every point",
         "spec": "1, 1; 3, 9; 5, 4; 7, 12; 9, 2; 11, 7; 13, 14; 15, 5; 2, 6; 4, 13; 6, 8; 8, 3",
         "rect": "0, 0, 20, 20",
-        "note": "the query visits every node, because it has to report every point",
+        "expect": {
+            "kdVisited": "12",
+            "kdFrac": "1",
+        },
     },
     {
         "id": "empty",
         "label": "a window with nothing in it",
         "spec": "1, 1; 3, 9; 5, 4; 7, 12; 9, 2; 11, 7; 13, 14; 15, 5; 2, 6; 4, 13; 6, 8; 8, 3",
         "rect": "17, 17, 19, 19",
-        "note": "nothing found, and the visit count is the honest cost of finding out",
+        "expect": {
+            "kdFound": "0",
+            "kdVisited": "3",
+        },
     },
     {
         "id": "column",
         "label": "a tall thin window",
         "spec": "1, 1; 3, 9; 5, 4; 7, 12; 9, 2; 11, 7; 13, 14; 15, 5; 2, 6; 4, 13; 6, 8; 8, 3",
         "rect": "4, 0, 6, 20",
-        "note": "narrow in x and open in y: the x splits prune and the y splits do not",
+        "expect": {
+            "kdVisited": "6",
+            "kdFrac": "1/2",
+        },
     },
 ]
 
@@ -2115,7 +2300,7 @@ def _kdtree(cfg):
             "and the visit count rises to the number of nodes.",
         )
     )
-    script = _TREE_JS + _ONE_INPUT + _presets_js("KDP", _KD_PRESETS, ["spec", "rect", "note"]) + r"""
+    script = _TREE_JS + _ONE_INPUT + _presets_js("KDP", _KD_PRESETS, ["spec", "rect"]) + r"""
   var presetIn = document.getElementById('kdPreset'), specIn = document.getElementById('kdSpec');
   var rectIn = document.getElementById('kdRect');
   var plot = document.getElementById('kdPlot'), treeEl = document.getElementById('kdTree');
@@ -2235,6 +2420,7 @@ def _kdtree(cfg):
             "window visit every node — which is the figure beside the one the lesson proves.",
         ),
         script=script,
+        expect={"kdPreset": _expect(_KD_PRESETS)},
     )
 
 

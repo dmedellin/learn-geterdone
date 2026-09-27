@@ -97,6 +97,26 @@ Nothing on these pages rounds. Distances, weights, low-links, cut capacities
 and component counts are integers; the only floating-point arithmetic is the
 E log V column, which is a REFERENCE and is labelled as one, and no verdict is
 read off it.
+
+EVERY PRESET PINS WHAT IT PRINTS, AND NO PRESET CARRIES A NOTE ANY MORE.
+A preset used to carry two pieces of prose: a `label` in the <select> and a
+`note` about the outcome. Nothing in this repository could read either, and a
+sweep of fifteen kits found 57 of those strings false about the lab they
+described. Rendering does not help -- `dpkit` printed its selected note into
+the status banner and had a HIGHER correction rate than `graphkit`, which
+rendered none -- so the notes here are deleted rather than re-checked, and
+each preset now carries `expect`: {kpi element id: the exact text the page
+prints}. scripts/build_paths.py writes it to
+scripts/generated-expectations.json and scripts/labcheck.js selects the option
+on the BUILT page, dispatches the menu's own change handler and compares
+getElementById(id).textContent. Every figure below was read off the running
+kit with `node scripts/labcheck.js --observe <page>`. See `_expect` and
+scripts/mathpath/AGENTS.md.
+
+ONE FIGURE THE CONVERSION CONTRADICTED. `cutproperty/tie`'s note said the
+lightest crossing edge is in SOME minimum tree and not in every one. Both
+minimum trees of that graph hold it, the page prints "yes" in cpEvery, and
+that tile is now pinned.
 """
 
 from .algo_core import COUNT_JS, DIGRAPH_JS, GRAPHKIT_JS, ORACLE_JS
@@ -647,6 +667,27 @@ def _options(presets):
     return [(p["id"], p["label"]) for p in presets]
 
 
+def _expect(presets):
+    """{preset id: {kpi element id: the exact text the page prints}}.
+
+    A preset's `label` says which graph it is, and no check in this repository
+    can read it. Its `expect` says what the page PRINTS once that option is
+    selected, tile by tile: scripts/labcheck.js selects it on the BUILT page,
+    dispatches the menu's own change handler and compares
+    getElementById(kpi).textContent against the string here. Every figure was
+    read off the running kit with `node scripts/labcheck.js --observe <page>`,
+    never out of the code that computes it -- a figure copied from the source
+    only proves the source agrees with itself. See scripts/mathpath/AGENTS.md.
+
+    Tiles are read with every OTHER control at the value the markup ships --
+    the directed reading, the DFS drawing, the source and root the preset
+    names, shortest rather than longest -- so a claim that only appears once
+    the reader moves one of those cannot be pinned. Each is named in a comment
+    beside the preset that makes it.
+    """
+    return {p["id"]: dict(p.get("expect") or {}) for p in presets}
+
+
 def _chosen(presets, cfg):
     want = str(cfg.get("preset", presets[0]["id"]))
     for p in presets:
@@ -681,28 +722,46 @@ _DT_PRESETS = [
         "label": "one graph with all four edge classes on it",
         "spec": "1>2, 1>4, 2>5, 4>2, 5>4, 3>5, 3>6, 6>3",
         "root": "1",
-        "note": "four tree arcs, two back, one forward and one cross, from a single walk",
+        "expect": {
+            "dtBack": "2",
+            "dtFwd": "1",
+            "dtCross": "1",
+        },
     },
     {
         "id": "dag",
-        "label": "no back edge anywhere, so it is acyclic",
+        "label": "five arcs on four vertices, none of them closing a cycle",
         "spec": "1>2, 2>3, 1>3, 1>4, 4>3",
         "root": "1",
-        "note": "1 to 3 is a forward arc: it reaches a vertex already finished inside 1",
+        "expect": {
+            "dtBack": "0",
+            "dtFwd": "1",
+        },
     },
     {
         "id": "nested",
-        "label": "a long chain, so every interval nests inside the last",
+        "label": "a five-cycle with one extra arc back to 1",
         "spec": "1>2, 2>3, 3>4, 4>5, 5>1, 3>1",
         "root": "1",
-        "note": "the intervals are five nested brackets and both back arcs close them",
+        "expect": {
+            "dtBack": "2",
+            "dtNest": "10",
+        },
     },
     {
         "id": "diamond",
-        "label": "read it undirected and the forward arc stops existing",
+        "label": "a diamond: four arcs on four vertices",
         "spec": "1>2, 1>3, 2>4, 3>4",
         "root": "1",
-        "note": "switch the reading below: undirected leaves only tree and back edges",
+        # This preset exists for what happens when dtRead is moved to
+        # "undirected": the cross arc becomes a tree arc and the four classes
+        # fall to two. Tiles are read with dtRead at the value the markup ships
+        # (directed), so what is pinned is the directed reading it starts from.
+        "expect": {
+            "dtTree": "3",
+            "dtFwd": "0",
+            "dtCross": "1",
+        },
     },
 ]
 
@@ -748,7 +807,7 @@ def _dfstimes(cfg):
             "two of the four counts go to zero.",
         )
     )
-    script = _BASE_JS + _ONE_GRAPH + _presets_js("DTP", _DT_PRESETS, ["spec", "root", "note"]) + r"""
+    script = _BASE_JS + _ONE_GRAPH + _presets_js("DTP", _DT_PRESETS, ["spec", "root"]) + r"""
   var presetIn = document.getElementById('dtPreset'), specIn = document.getElementById('dtSpec');
   var rootIn = document.getElementById('dtRoot'), rootOut = document.getElementById('dtRootOut');
   var readIn = document.getElementById('dtRead'), showIn = document.getElementById('dtShow');
@@ -915,6 +974,7 @@ def _dfstimes(cfg):
             "not stated.",
         ),
         script=script,
+        expect={"dtPreset": _expect(_DT_PRESETS)},
     )
 
 
@@ -925,27 +985,40 @@ def _dfstimes(cfg):
 _TP_PRESETS = [
     {
         "id": "twoways",
-        "label": "a task graph whose order is not unique",
+        "label": "six tasks, two of them with nothing before them",
         "spec": "1>3, 2>3, 3>4, 3>5, 4>6, 5>6",
-        "note": "two independent starts and two independent middles, so the order is a choice",
+        "expect": {
+            "tpCount": "4",
+            "tpAgree": "different, both valid",
+        },
     },
     {
         "id": "chain",
-        "label": "a chain, where the order is forced",
+        "label": "a chain of five tasks",
         "spec": "1>2, 2>3, 3>4, 4>5",
-        "note": "one valid order in all, which is what uniqueness looks like as a number",
+        "expect": {
+            "tpCount": "1",
+            "tpAgree": "same order",
+        },
     },
     {
         "id": "diamond",
-        "label": "a diamond: exactly two orders",
+        "label": "a diamond of four tasks",
         "spec": "1>2, 1>3, 2>4, 3>4",
-        "note": "the two middles can go in either order and nothing else can move",
+        "expect": {
+            "tpCount": "2",
+            "tpAgree": "different, both valid",
+        },
     },
     {
         "id": "cycle",
-        "label": "a cycle, so no order exists at all",
+        "label": "four tasks, three of them in a cycle",
         "spec": "1>2, 2>3, 3>1, 3>4",
-        "note": "the walk finds a back arc and Kahn's queue empties early: two witnesses, one cause",
+        "expect": {
+            "tpCount": "0",
+            "tpPlaced": "0 of 4",
+            "tpBack": "3 \u2192 1",
+        },
     },
 ]
 
@@ -991,7 +1064,7 @@ def _topo(cfg):
             "count beside it is the same answer as a number.",
         )
     )
-    script = _ORACLE_BASE_JS + _ONE_GRAPH + _presets_js("TPP", _TP_PRESETS, ["spec", "note"]) + r"""
+    script = _ORACLE_BASE_JS + _ONE_GRAPH + _presets_js("TPP", _TP_PRESETS, ["spec"]) + r"""
   var presetIn = document.getElementById('tpPreset'), specIn = document.getElementById('tpSpec');
   var drawIn = document.getElementById('tpDraw');
   var plot = document.getElementById('tpPlot'), ring = document.getElementById('tpRing');
@@ -1138,6 +1211,7 @@ def _topo(cfg):
             "run slowly above the size it states.",
         ),
         script=script,
+        expect={"tpPreset": _expect(_TP_PRESETS)},
     )
 
 
@@ -1150,32 +1224,47 @@ _LL_PRESETS = [
         "id": "twoblocks",
         "label": "two triangles joined by one edge",
         "spec": "1-2, 2-3, 3-1, 3-4, 4-5, 5-6, 6-4",
-        "note": "one bridge, and both of its ends are cut vertices",
+        "expect": {
+            "llBridges": "3\u20134",
+            "llCuts": "3, 4",
+        },
     },
     {
         "id": "rootrule",
         "label": "the root, with two children and no back edge to help",
         "spec": "1-2, 1-3, 2-3, 1-4",
-        "note": "the root is a cut vertex here because the walk gave it two children",
+        "expect": {
+            "llBridges": "1\u20134",
+            "llCuts": "1",
+        },
     },
     {
         "id": "parallel",
         "label": "two edges between the same pair",
         "spec": "1-2, 1-2, 2-3",
-        "note": "a second edge between 1 and 2 stops that pair being a bridge, and a matrix "
-                "cannot hold the graph at all",
+        "expect": {
+            "llBridges": "2\u20133",
+            "llPar": "1",
+            "llAgree": "cannot be asked",
+        },
     },
     {
         "id": "cycle",
-        "label": "one cycle: nothing to cut",
+        "label": "one cycle on five vertices",
         "spec": "1-2, 2-3, 3-4, 4-5, 5-1",
-        "note": "every edge lies on a cycle, so no edge is a bridge and no vertex is a cut vertex",
+        "expect": {
+            "llBridges": "none",
+            "llCuts": "none",
+        },
     },
     {
         "id": "path",
-        "label": "a path: every interior edge is a bridge",
+        "label": "a path of five vertices",
         "spec": "1-2, 2-3, 3-4, 4-5",
-        "note": "four bridges and three cut vertices, and the two ends are neither",
+        "expect": {
+            "llBridges": "4\u20135, 3\u20134, 2\u20133, 1\u20132",
+            "llCuts": "2, 3, 4",
+        },
     },
 ]
 
@@ -1215,7 +1304,7 @@ def _lowlink(cfg):
             "being one.",
         )
     )
-    script = _CHECKED_JS + _ONE_GRAPH + _presets_js("LLP", _LL_PRESETS, ["spec", "note"]) + r"""
+    script = _CHECKED_JS + _ONE_GRAPH + _presets_js("LLP", _LL_PRESETS, ["spec"]) + r"""
   var presetIn = document.getElementById('llPreset'), specIn = document.getElementById('llSpec');
   var plot = document.getElementById('llPlot'), lowPlot = document.getElementById('llLow');
   var verts = document.getElementById('llVerts'), edgesT = document.getElementById('llEdges');
@@ -1394,6 +1483,7 @@ def _lowlink(cfg):
             "the two answers are compared in front of you.",
         ),
         script=script,
+        expect={"llPreset": _expect(_LL_PRESETS)},
     )
 
 
@@ -1404,30 +1494,42 @@ def _lowlink(cfg):
 _SC_PRESETS = [
     {
         "id": "three",
-        "label": "three components, one of them a single vertex",
+        "label": "a triangle, a second cycle below it, and a vertex off the end",
         "spec": "1>2, 2>3, 3>1, 3>4, 4>5, 5>6, 6>4, 5>7",
-        "note": "a triangle, another cycle below it, and a vertex nothing comes back from",
+        "expect": {
+            "scCount": "3",
+            "scBig": "3 vertices",
+            "scArcs": "2",
+        },
     },
     {
         "id": "onebig",
         "label": "one cycle through everything",
         "spec": "1>2, 2>3, 3>4, 4>1",
-        "note": "every vertex reaches every other, so there is one component and the "
-                "condensation is a single point",
+        "expect": {
+            "scCount": "1",
+            "scBig": "4 vertices",
+            "scArcs": "0",
+        },
     },
     {
         "id": "dag",
-        "label": "acyclic, so every vertex is its own component",
+        "label": "acyclic: four arcs on four vertices",
         "spec": "1>2, 2>3, 1>3, 3>4",
-        "note": "the condensation is the graph itself, which is the case the second pass has "
-                "nothing to do in",
+        "expect": {
+            "scCount": "4",
+            "scBig": "1 vertex",
+        },
     },
     {
         "id": "sourcefirst",
         "label": "a source component above a sink component",
         "spec": "1>2, 2>1, 2>3, 3>4, 4>3",
-        "note": "the latest finishing vertex is in the SOURCE component, which is why the "
-                "second pass runs on the reversed graph",
+        "expect": {
+            "scCount": "2",
+            "scArcs": "1",
+            "scWhere": "component 1, with 0 arcs into it",
+        },
     },
 ]
 
@@ -1469,7 +1571,7 @@ def _scc(cfg):
             "into it, which is the fact the method rests on.",
         )
     )
-    script = _BASE_JS + _ONE_GRAPH + _presets_js("SCP", _SC_PRESETS, ["spec", "note"]) + r"""
+    script = _BASE_JS + _ONE_GRAPH + _presets_js("SCP", _SC_PRESETS, ["spec"]) + r"""
   var presetIn = document.getElementById('scPreset'), specIn = document.getElementById('scSpec');
   var passIn = document.getElementById('scPass');
   var plot = document.getElementById('scPlot'), cond = document.getElementById('scCond');
@@ -1594,6 +1696,7 @@ def _scc(cfg):
             "condensation is built from the components and checked for a cycle.",
         ),
         script=script,
+        expect={"scPreset": _expect(_SC_PRESETS)},
     )
 
 
@@ -1604,33 +1707,51 @@ def _scc(cfg):
 _CP_PRESETS = [
     {
         "id": "distinct",
-        "label": "all weights different, so the minimum tree is unique",
+        "label": "seven edges on six vertices, all weights different",
         "spec": "1-2 4, 1-3 3, 2-3 2, 2-4 5, 3-4 7, 4-5 1, 5-6 6",
         "set": "1, 2, 3",
-        "note": "one minimum tree, and the lightest crossing edge is in it",
+        "expect": {
+            "cpCount": "2",
+            "cpMin": "1 at weight 17",
+            "cpEvery": "yes",
+        },
     },
     {
         "id": "tie",
         "label": "two crossing edges of equal weight",
         "spec": "1-2 2, 1-3 2, 2-4 3, 3-4 3, 2-3 5",
         "set": "1",
-        "note": "in SOME minimum tree, and not in every one: the two lemmas differ exactly here",
+        # The note deleted here said the lightest crossing edge is in SOME
+        # minimum tree and not in every one. It is in every one: there are two
+        # minimum trees at weight 7, {1-2, 1-3, 2-4} and {1-2, 1-3, 3-4}, and
+        # both hold 1-2. cpEvery is pinned at "yes" so that the day this
+        # instance changes, the page says so instead of a sentence beside it.
+        "expect": {
+            "cpCount": "2, 2 tied at the lightest",
+            "cpMin": "2 at weight 7",
+            "cpEvery": "yes",
+        },
     },
     {
         "id": "pervertex",
-        "label": "each vertex's own lightest edge is not a tree",
+        "label": "a path of six vertices, weights 1, 5, 1, 6, 1",
         "spec": "1-2 1, 2-3 5, 3-4 1, 4-5 6, 5-6 1",
         "set": "1, 2",
-        "note": "three lightest-per-vertex edges on six vertices: every one is in the tree and "
-                "together they are not one",
+        "expect": {
+            "cpCount": "1",
+            "cpTrees": "1 of 1 subsets tried",
+            "cpMin": "1 at weight 14",
+        },
     },
     {
         "id": "cycle",
         "label": "a cycle with one heaviest edge",
         "spec": "1-2 1, 2-3 2, 3-4 3, 4-1 9, 2-4 4",
         "set": "1, 2",
-        "note": "the heaviest edge on the cycle is in no minimum tree at all, which is the "
-                "second lemma",
+        "expect": {
+            "cpCount": "3",
+            "cpMin": "1 at weight 6",
+        },
     },
 ]
 
@@ -1672,7 +1793,7 @@ def _cutproperty(cfg):
             "list. Seven vertices is the limit and it is refused above that rather than run slowly.",
         )
     )
-    script = _ORACLE_BASE_JS + _ONE_GRAPH + _presets_js("CPP", _CP_PRESETS, ["spec", "set", "note"]) + r"""
+    script = _ORACLE_BASE_JS + _ONE_GRAPH + _presets_js("CPP", _CP_PRESETS, ["spec", "set"]) + r"""
   var presetIn = document.getElementById('cpPreset'), specIn = document.getElementById('cpSpec');
   var setIn = document.getElementById('cpSet');
   var plot = document.getElementById('cpPlot'), bars = document.getElementById('cpBars');
@@ -1846,6 +1967,7 @@ def _cutproperty(cfg):
             "trees is the answer to whether the tree is unique.",
         ),
         script=script,
+        expect={"cpPreset": _expect(_CP_PRESETS)},
     )
 
 
@@ -1856,33 +1978,56 @@ def _cutproperty(cfg):
 _PM_PRESETS = [
     {
         "id": "classic",
-        "label": "seven vertices, and a minimum tree that is unique anyway",
+        "label": "seven vertices, nine edges, weight 2 on two of them",
         "spec": "1-2 4, 1-3 3, 2-3 2, 2-4 5, 3-4 7, 4-5 1, 5-6 6, 5-7 8, 6-7 2",
         "start": "1",
-        "note": "the weight 2 appears twice, on 2\u20133 and 6\u20137, and the minimum tree is unique "
-                "all the same \u2014 19, reached by both algorithms \u2014 because the repeat is not on "
-                "a shared cycle",
+        # The minimum tree here IS unique at weight 19, and the repeated weight
+        # is not on a shared cycle -- but this mode counts no spanning trees, so
+        # uniqueness is not a tile and is not pinned. pmAgree is the closest the
+        # page comes: the heap method and the sorted method returned the same
+        # edges. The cut-property mode is where the count of minimum trees is
+        # printed, and that is where a uniqueness claim can be checked.
+        "expect": {
+            "pmWeight": "19",
+            "pmEdges": "6 of 6",
+            "pmAgree": "same weight, same edges",
+        },
     },
     {
         "id": "lazy",
         "label": "a graph that fills the heap with stale entries",
         "spec": "1-2 1, 1-3 1, 1-4 1, 2-3 9, 2-4 9, 3-4 9, 1-5 2, 2-5 3, 3-5 4",
         "start": "1",
-        "note": "every heavy edge is pushed and then popped with both ends already in the tree",
+        "expect": {
+            "pmWeight": "5",
+            "pmOps": "9 and 4",
+            "pmCmp": "18",
+        },
     },
     {
         "id": "tie",
-        "label": "ties, so the tree is one of several",
+        "label": "four edges, three of them of equal weight",
         "spec": "1-2 2, 1-3 2, 2-3 2, 3-4 1",
         "start": "1",
-        "note": "with equal weights the two algorithms may pick different edges of the same weight",
+        # Three minimum trees exist at weight 5, so the tree really is one of
+        # several -- and the two algorithms still return the SAME edges on this
+        # instance, which is what pmAgree is pinned at. The deleted note said
+        # they "may pick different edges"; here they do not, and a reader who
+        # takes the note for a prediction about the screen is misled by it.
+        "expect": {
+            "pmWeight": "5",
+            "pmAgree": "same weight, same edges",
+        },
     },
     {
         "id": "star",
-        "label": "a star, where the heap never holds more than a layer",
+        "label": "a star: five edges, all at vertex 1",
         "spec": "1-2 5, 1-3 4, 1-4 3, 1-5 2, 1-6 1",
         "start": "1",
-        "note": "every candidate is on the boundary at once and the heap empties in one sweep",
+        "expect": {
+            "pmWeight": "15",
+            "pmOps": "5 and 5",
+        },
     },
 ]
 
@@ -1924,7 +2069,7 @@ def _prim(cfg):
             "<span class=\"tt\">E log V</span> are what it costs.",
         )
     )
-    script = _LOG_JS + _ONE_GRAPH + _presets_js("PMP", _PM_PRESETS, ["spec", "start", "note"]) + r"""
+    script = _LOG_JS + _ONE_GRAPH + _presets_js("PMP", _PM_PRESETS, ["spec", "start"]) + r"""
   var presetIn = document.getElementById('pmPreset'), specIn = document.getElementById('pmSpec');
   var startIn = document.getElementById('pmStart'), startOut = document.getElementById('pmStartOut');
   var stepIn = document.getElementById('pmStep'), stepOut = document.getElementById('pmStepOut');
@@ -2086,6 +2231,7 @@ def _prim(cfg):
             "the two answers sit side by side.",
         ),
         script=script,
+        expect={"pmPreset": _expect(_PM_PRESETS)},
     )
 
 
@@ -2098,25 +2244,38 @@ _KR_PRESETS = [
         "id": "classic",
         "label": "seven vertices, nine edges, one weight repeated",
         "spec": "1-2 4, 1-3 3, 2-3 2, 2-4 5, 3-4 7, 4-5 1, 5-6 6, 5-7 8, 6-7 2",
-        "note": "three edges rejected, each by a find that returned the same root twice",
+        "expect": {
+            "krWeight": "19",
+            "krOps": "18 and 6",
+            "krReject": "3 of 9",
+        },
     },
     {
         "id": "chain",
-        "label": "unions in a line, so a find walks far",
+        "label": "six vertices in a line, and one edge closing it",
         "spec": "1-2 1, 2-3 2, 3-4 3, 4-5 4, 5-6 5, 1-6 9",
-        "note": "no rank rule and no compression here, so the last find walks the whole chain",
+        "expect": {
+            "krHops": "5",
+            "krReject": "1 of 6",
+        },
     },
     {
         "id": "manycycles",
-        "label": "a complete graph on five, so most edges are rejected",
+        "label": "a complete graph on five vertices",
         "spec": "1-2 1, 1-3 2, 1-4 3, 1-5 4, 2-3 5, 2-4 6, 2-5 7, 3-4 8, 3-5 9, 4-5 1",
-        "note": "ten edges, four taken: every rejection is the cycle property and not the algorithm",
+        "expect": {
+            "krReject": "6 of 10",
+            "krHops": "18",
+        },
     },
     {
         "id": "forest",
         "label": "a graph in two pieces",
         "spec": "1-2 1, 2-3 2, 4-5 3, 5-6 4",
-        "note": "it never spans, and the panel says so rather than reporting a tree",
+        "expect": {
+            "krWeight": "10 \u2014 a forest, not a tree",
+            "krEdges": "4 of 5",
+        },
     },
 ]
 
@@ -2157,7 +2316,7 @@ def _kruskal(cfg):
             "minimum tree wants it; the forest below is the state those finds walk.",
         )
     )
-    script = _CHECKED_JS + _ONE_GRAPH + _presets_js("KRP", _KR_PRESETS, ["spec", "note"]) + r"""
+    script = _CHECKED_JS + _ONE_GRAPH + _presets_js("KRP", _KR_PRESETS, ["spec"]) + r"""
   var presetIn = document.getElementById('krPreset'), specIn = document.getElementById('krSpec');
   var stepIn = document.getElementById('krStep'), stepOut = document.getElementById('krStepOut');
   var plot = document.getElementById('krPlot'), sets = document.getElementById('krSets');
@@ -2325,6 +2484,7 @@ def _kruskal(cfg):
             "walk, and the pointer hops are counted.",
         ),
         script=script,
+        expect={"krPreset": _expect(_KR_PRESETS)},
     )
 
 
@@ -2338,29 +2498,52 @@ _RX_PRESETS = [
         "label": "six vertices, nine edges, one weight repeated",
         "spec": "1-2 7, 1-3 9, 1-6 14, 2-3 10, 2-4 15, 3-4 11, 3-6 2, 4-5 6, 5-6 9",
         "source": "1",
-        "note": "the schedule changes how much work happens and not one distance",
+        # "The schedule changes the work and not one distance" is a statement
+        # about three values of rxSched, and tiles are read with it at the one
+        # the markup ships (heap). What is pinned is that shipped schedule's
+        # work and the distances it gets right; the invariance across the other
+        # two is the reader's own experiment, not a check.
+        "expect": {
+            "rxRelax": "18",
+            "rxExact": "all 6",
+            "rxAgree": "yes, every distance",
+        },
     },
     {
         "id": "stale",
         "label": "a graph that fills the heap with stale entries",
         "spec": "1-2 10, 1-3 9, 3-2 1, 3-4 8, 2-4 1, 1-4 30",
         "source": "1",
-        "note": "2 is pushed twice and the first entry is skipped when it comes out",
+        "expect": {
+            "rxRelax": "12",
+            "rxOps": "6 and 6",
+        },
     },
     {
         "id": "far",
-        "label": "a long chain, so the frontier is always one vertex",
+        "label": "a chain of seven vertices, every weight 1",
         "spec": "1-2 1, 2-3 1, 3-4 1, 4-5 1, 5-6 1, 6-7 1",
         "source": "1",
-        "note": "every schedule does the same thing here, which is what makes the dense case "
-                "interesting instead",
+        "expect": {
+            "rxRelax": "12",
+            "rxExact": "all 7",
+        },
     },
     {
         "id": "dense",
-        "label": "a complete graph on five, where scanning is the cheaper order",
+        "label": "a complete graph on five vertices, ten weighted edges",
         "spec": "1-2 3, 1-3 8, 1-4 2, 1-5 9, 2-3 4, 2-4 6, 2-5 5, 3-4 7, 3-5 1, 4-5 4",
         "source": "1",
-        "note": "ten edges on five vertices: the heap pays for structure the scan does without",
+        # "Scanning is cheaper than the heap here" compares two values of
+        # rxSched and cannot be pinned from the shipped one. rxRelax and
+        # rxBound are pinned instead: on this instance the work and the
+        # E log2 V reference meet exactly, which is the density the comparison
+        # is about.
+        "expect": {
+            "rxRelax": "20",
+            "rxBound": "20",
+            "rxExact": "all 5",
+        },
     },
 ]
 
@@ -2407,7 +2590,7 @@ def _relax(cfg):
             "different way &mdash; and the counts show what each order costs.",
         )
     )
-    script = _HEAP_JS + _ONE_GRAPH + _presets_js("RXP", _RX_PRESETS, ["spec", "source", "note"]) + r"""
+    script = _HEAP_JS + _ONE_GRAPH + _presets_js("RXP", _RX_PRESETS, ["spec", "source"]) + r"""
   var presetIn = document.getElementById('rxPreset'), specIn = document.getElementById('rxSpec');
   var srcIn = document.getElementById('rxSource'), srcOut = document.getElementById('rxSourceOut');
   var schedIn = document.getElementById('rxSched');
@@ -2606,6 +2789,7 @@ def _relax(cfg):
             "computed by a different algorithm entirely.",
         ),
         script=script,
+        expect={"rxPreset": _expect(_RX_PRESETS)},
     )
 
 
@@ -2616,31 +2800,44 @@ def _relax(cfg):
 _BF_PRESETS = [
     {
         "id": "negative",
-        "label": "negative arcs, and no negative cycle",
+        "label": "ten arcs, three of them negative",
         "spec": "1>2 6, 1>3 7, 2>3 8, 2>4 5, 2>5 -4, 3>4 -3, 3>5 9, 4>2 -2, 5>1 2, 5>4 7",
         "source": "1",
-        "note": "three negative arcs and every shortest path still exists, which is the point",
+        "expect": {
+            "bfRan": "3 of the 5 allowed",
+            "bfArcs": "4",
+            "bfCycle": "none",
+        },
     },
     {
         "id": "negcycle",
-        "label": "a negative cycle, certified",
+        "label": "four arcs, one of them \u22123, three of them a loop",
         "spec": "1>2 1, 2>3 -3, 3>4 1, 4>2 1",
         "source": "1",
-        "note": "something still improves in the last round, and the parent pointers close a loop",
+        "expect": {
+            "bfCycle": "2 \u2192 3 \u2192 4 \u2192 2",
+            "bfAgree": "not asked: no distances exist",
+        },
     },
     {
         "id": "worstorder",
         "label": "the arcs typed in the worst possible order",
         "spec": "5>6 1, 4>5 1, 3>4 1, 2>3 1, 1>2 1",
         "source": "1",
-        "note": "one label becomes final per round, so all of the rounds are needed",
+        "expect": {
+            "bfRan": "6 of the 6 allowed",
+            "bfRelax": "20",
+        },
     },
     {
         "id": "bestorder",
         "label": "the same chain, typed the other way round",
         "spec": "1>2 1, 2>3 1, 3>4 1, 4>5 1, 5>6 1",
         "source": "1",
-        "note": "one round settles everything and the next changes nothing, so it stops",
+        "expect": {
+            "bfRan": "2 of the 6 allowed",
+            "bfRelax": "10",
+        },
     },
 ]
 
@@ -2683,7 +2880,7 @@ def _bellmanford(cfg):
             "subject here; negative <em>cycles</em> are the thing that has no answer.",
         )
     )
-    script = _BASE_JS + _ONE_GRAPH + _presets_js("BFP", _BF_PRESETS, ["spec", "source", "note"]) + r"""
+    script = _BASE_JS + _ONE_GRAPH + _presets_js("BFP", _BF_PRESETS, ["spec", "source"]) + r"""
   var presetIn = document.getElementById('bfPreset'), specIn = document.getElementById('bfSpec');
   var srcIn = document.getElementById('bfSource'), srcOut = document.getElementById('bfSourceOut');
   var roundIn = document.getElementById('bfRound'), roundOut = document.getElementById('bfRoundOut');
@@ -2894,6 +3091,7 @@ def _bellmanford(cfg):
             "all-pairs matrix that never mentions a round.",
         ),
         script=script,
+        expect={"bfPreset": _expect(_BF_PRESETS)},
     )
 
 
@@ -2904,24 +3102,37 @@ def _bellmanford(cfg):
 _DS_PRESETS = [
     {
         "id": "project",
-        "label": "a small project, so the longest path is the critical one",
+        "label": "a small project: six vertices, seven arcs",
         "spec": "1>2 3, 1>3 2, 2>4 4, 3>4 1, 4>5 2, 3>5 7, 5>6 1",
         "source": "1",
-        "note": "the critical path is the longest one, and everything off it has slack",
+        # The critical path is the LONGEST one, and dsSign ships at "shortest",
+        # so the critical-path reading of this instance is not what these tiles
+        # hold. They hold the shortest-path pass: vertex 6 at 6 along
+        # 1 - 3 - 4 - 5 - 6. Move dsSign to see the project read the other way.
+        "expect": {
+            "dsValue": "vertex 6, at 6",
+            "dsPath": "1 \u2192 3 \u2192 4 \u2192 5 \u2192 6",
+            "dsTight": "1, 3, 4, 5, 6",
+        },
     },
     {
         "id": "settled",
-        "label": "a negative arc, where settling once goes wrong",
+        "label": "four arcs, one of them negative",
         "spec": "1>2 2, 1>3 3, 3>2 -2, 2>4 1",
         "source": "1",
-        "note": "nearest-first settles 2 at 2, relaxes 2 to 4 from it, and only then finds the "
-                "cheaper route into 2",
+        "expect": {
+            "dsValue": "vertex 3, at 3",
+            "dsDij": "no, and here is why",
+        },
     },
     {
         "id": "cyclic",
-        "label": "a cycle, where neither pass exists",
+        "label": "four arcs, three of them in a cycle",
         "spec": "1>2 3, 2>3 2, 3>1 1, 3>4 5",
-        "note": "negate the weights and the cycle is negative, which is why the trick needs a DAG",
+        "expect": {
+            "dsValue": "no order",
+            "dsRelax": "no order",
+        },
         "source": "1",
     },
     {
@@ -2929,7 +3140,10 @@ _DS_PRESETS = [
         "label": "two long parallel routes, nearly the same length",
         "spec": "1>2 5, 2>3 5, 3>6 5, 1>4 7, 4>5 4, 5>6 3, 1>6 2",
         "source": "1",
-        "note": "shortening the critical route by enough makes the other one critical instead",
+        "expect": {
+            "dsValue": "vertex 5, at 11",
+            "dsPath": "1 \u2192 4 \u2192 5",
+        },
     },
 ]
 
@@ -2974,7 +3188,7 @@ def _dagsp(cfg):
             "Try the cyclic example and read what the page refuses to answer.",
         )
     )
-    script = _BASE_JS + _ONE_GRAPH + _presets_js("DSP", _DS_PRESETS, ["spec", "source", "note"]) + r"""
+    script = _BASE_JS + _ONE_GRAPH + _presets_js("DSP", _DS_PRESETS, ["spec", "source"]) + r"""
   var presetIn = document.getElementById('dsPreset'), specIn = document.getElementById('dsSpec');
   var srcIn = document.getElementById('dsSource'), srcOut = document.getElementById('dsSourceOut');
   var signIn = document.getElementById('dsSign');
@@ -3210,6 +3424,7 @@ def _dagsp(cfg):
             "on a graph with a negative arc returns something different, printed beside them.",
         ),
         script=script,
+        expect={"dsPreset": _expect(_DS_PRESETS)},
     )
 
 
@@ -3223,30 +3438,40 @@ _FW_PRESETS = [
         "label": "a route that needs two interior vertices",
         "spec": "1>2 6, 2>4 9, 3>2 2, 4>3 8",
         "from": "1", "to": "3",
-        "note": "1 to 3 is 23 through 2 and 4, which only appears once both are allowed inside",
+        "expect": {
+            "fwDist": "23",
+            "fwPath": "1 \u2192 2 \u2192 4 \u2192 3",
+        },
     },
     {
         "id": "negative",
-        "label": "negative arcs, which the all-pairs matrix does not mind",
+        "label": "ten arcs, three of them negative",
         "spec": "1>2 6, 1>3 7, 2>3 8, 2>4 5, 2>5 -4, 3>4 -3, 3>5 9, 4>2 -2, 5>1 2, 5>4 7",
         "from": "1", "to": "5",
-        "note": "the same negative weights the rounds method handles, in one matrix",
+        "expect": {
+            "fwDist": "-2",
+            "fwWork": "125 for 125 cell visits",
+        },
     },
     {
         "id": "negcycle",
-        "label": "a negative cycle, visible on the diagonal",
+        "label": "five arcs, one of them \u22123, three of them a loop",
         "spec": "1>2 1, 2>3 -3, 3>4 1, 4>2 1, 1>4 7",
         "from": "1", "to": "3",
-        "note": "a diagonal entry goes below zero, which is a walk from a vertex back to itself "
-                "that costs less than nothing",
+        "expect": {
+            "fwNeg": "2, 3, 4",
+            "fwAgree": "not asked: a negative cycle",
+        },
     },
     {
         "id": "sparse",
-        "label": "sparse and wide, where the one-source method wins",
+        "label": "a chain of eight vertices, every weight 1",
         "spec": "1>2 1, 2>3 1, 3>4 1, 4>5 1, 5>6 1, 6>7 1, 7>8 1",
         "from": "1", "to": "8",
-        "note": "eight vertices and seven arcs: filling a whole matrix does far more work than "
-                "one pass per source",
+        "expect": {
+            "fwWork": "512 for 512 cell visits",
+            "fwAlt": "168 against 512",
+        },
     },
 ]
 
@@ -3289,7 +3514,7 @@ def _floyd(cfg):
             "right. Step k below and watch which cells move.",
         )
     )
-    script = _BASE_JS + _ONE_GRAPH + _presets_js("FWP", _FW_PRESETS, ["spec", "from", "to", "note"]) + r"""
+    script = _BASE_JS + _ONE_GRAPH + _presets_js("FWP", _FW_PRESETS, ["spec", "from", "to"]) + r"""
   var presetIn = document.getElementById('fwPreset'), specIn = document.getElementById('fwSpec');
   var kIn = document.getElementById('fwK'), kOut = document.getElementById('fwKOut');
   var fromIn = document.getElementById('fwFrom'), fromOut = document.getElementById('fwFromOut');
@@ -3491,6 +3716,7 @@ def _floyd(cfg):
             "method run from each source in turn.",
         ),
         script=script,
+        expect={"fwPreset": _expect(_FW_PRESETS)},
     )
 
 

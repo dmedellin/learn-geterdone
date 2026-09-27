@@ -71,6 +71,18 @@ The hashes are BigInt, which matters more than it looks: a lesson whose subject
 is that two windows collide cannot have the collision depend on the reader's
 machine. Every hash on the page is the same number everywhere.
 
+EVERY PRESET PINS WHAT IT PRINTS, AND NO PRESET CARRIES PROSE ANY MORE. Each
+of the 35 presets used to carry a `note`. This kit never rendered one: every
+note was serialised into the page's JavaScript by `_presets_js` and then read
+by nothing, so each page shipped its mode's five or six of them to every
+reader and displayed none. No check in this repository could read one either,
+which is how a fifteen-kit sweep found 57 preset strings false across the
+library. The notes are gone, and the slot they occupied holds `expect`:
+{kpi element id: the exact text the page prints}. scripts/labcheck.js selects
+the option on the BUILT page, dispatches the menu's own change handler and
+compares the tile's textContent. See `_expect` below and
+scripts/mathpath/AGENTS.md for the rule.
+
 THE MODES, and the figure each one is for:
 
   naive      comparisons per alignment, measured, against sigma/(sigma - 1) for
@@ -416,6 +428,25 @@ def _options(presets):
     return [(p["id"], p["label"]) for p in presets]
 
 
+def _expect(presets):
+    """{preset id: {kpi element id: the exact text the page prints}}.
+
+    A preset's `label` is prose about an instance and no check in this
+    repository can read it. This is the other half of the same claim, and it is
+    the half a machine can hold: what the page PRINTS once the preset is
+    selected. scripts/labcheck.js selects the option on the BUILT page,
+    dispatches the menu's own change handler and compares
+    getElementById(kpi).textContent with the string here. Every figure below
+    was read off the running kit with `node scripts/labcheck.js --observe
+    <page>`, never copied out of the code that computes it.
+
+    Tiles are read with every OTHER control at the value the markup ships, so a
+    claim that only becomes visible once another control moves cannot be pinned
+    here; those are named in a comment beside the preset that makes them.
+    """
+    return {p["id"]: dict(p.get("expect") or {}) for p in presets}
+
+
 def _chosen(presets, cfg):
     want = str(cfg.get("preset", presets[0]["id"]))
     for p in presets:
@@ -450,42 +481,63 @@ _NA_PRESETS = [
         "label": "ordinary prose, a pattern that occurs",
         "text": "the rain in spain stays mainly in the plain",
         "pattern": "ain",
-        "note": "most alignments die on the first character, so the count is barely above n",
+        "expect": {
+            "naAlign": "41",
+            "naComp": "50",
+            "naPer": "50/41 = 1.220",
+        },
     },
     {
         "id": "absent",
         "label": "a pattern that is not there, where naive wins",
         "text": "the rain in spain stays mainly in the plain",
         "pattern": "zebra",
-        "note": "one comparison per alignment and no match to verify: fewer than KMP makes",
+        "expect": {
+            "naComp": "39",
+            "naPer": "1 = 1.000",
+            "naKmp": "43",
+        },
     },
     {
         "id": "adversarial",
         "label": "the text built to reach the bound",
         "text": "aaaaaaaaaaaaaaaaaaaaaaaa",
         "pattern": "aaaab",
-        "note": "every alignment matches m − 1 characters and then fails: the bound, exactly",
+        "expect": {
+            "naComp": "100",
+            "naBound": "100",
+            "naPer": "5 = 5.000",
+        },
     },
     {
         "id": "dna",
         "label": "four letters, so mismatches come later",
         "text": "GATTACAGATTACCAGATTACAGGATTACAGATTAC",
         "pattern": "GATTACA",
-        "note": "a smaller alphabet means a longer run before the first mismatch",
+        "expect": {
+            "naPer": "11/6 = 1.833",
+            "naExp": "4/3 at sigma = 4",
+        },
     },
     {
         "id": "binary",
         "label": "two letters, the smallest useful alphabet",
         "text": "101100101101001011010010110100101101",
         "pattern": "10110",
-        "note": "sigma = 2 puts the expected comparisons per alignment at 2",
+        "expect": {
+            "naPer": "73/32 = 2.281",
+            "naExp": "2 at sigma = 2",
+        },
     },
     {
         "id": "periodic",
         "label": "a periodic text, without a single long run",
         "text": "abababababababababababab",
         "pattern": "abababb",
-        "note": "four comparisons per alignment out of a possible seven, and no match at all",
+        "expect": {
+            "naPer": "4 = 4.000",
+            "naHits": "0 and 0",
+        },
     },
 ]
 
@@ -530,7 +582,7 @@ def _naive(cfg):
             "is where the quadratic lives.",
         )
     )
-    script = _RATIO_JS + _ONE_TEXT + _presets_js("NAP", _NA_PRESETS, ["text", "pattern", "note"]) + r"""
+    script = _RATIO_JS + _ONE_TEXT + _presets_js("NAP", _NA_PRESETS, ["text", "pattern"]) + r"""
   var presetIn = document.getElementById('naPreset'), textIn = document.getElementById('naText');
   var patIn = document.getElementById('naPattern');
   var atIn = document.getElementById('naAt'), atOut = document.getElementById('naAtOut');
@@ -701,6 +753,7 @@ def _naive(cfg):
             "obviously wrong.",
         ),
         script=script,
+        expect={"naPreset": _expect(_NA_PRESETS)},
     )
 
 
@@ -714,38 +767,59 @@ _KM_PRESETS = [
         "label": "the standard example",
         "pattern": "ababaca",
         "text": "abababacaba ababacaab ababaca",
-        "note": "borders of lengths 0, 0, 1, 2, 3, 0, 1: the classic shape",
+        # The border lengths one by one -- 0, 0, 1, 2, 3, 0, 1 -- are the table under
+        # the drawing, not a tile. The longest of them is, and so is the inner-loop
+        # count.
+        "expect": {
+            "kmTop": "1 — a",
+            "kmInner": "2",
+        },
     },
     {
         "id": "aaaa",
         "label": "every prefix is a border of the next",
         "pattern": "aaaaa",
         "text": "aaaaaaaaaaaaaaaaaaaa",
-        "note": "fail[k] = k − 1 throughout, and the border chain has every length on it",
+        "expect": {
+            "kmTop": "4 — aaaa",
+            "kmInner": "0",
+        },
     },
     {
         "id": "abcabcabd",
         "label": "a long border that then collapses",
         "pattern": "abcabcabd",
         "text": "abcabcabcabcabdabcabcabd",
-        "note": "the border reaches 5 and the final d takes it to 0 in one step",
+        # That the border reaches 5 before the final d collapses it is a row of the
+        # failure table; what a tile holds is where it ends up.
+        "expect": {
+            "kmTop": "0 — the pattern has no border",
+            "kmInner": "2",
+        },
     },
     {
         "id": "aabaaab",
         "label": "where the inner loop actually iterates",
         "pattern": "aabaaab",
         "text": "aabaaabaaabaabaaab",
-        "note": "the inner loop runs at two different positions here, once at each, where "
-                "ababaca and abcabcabd take both of their iterations at a single position",
+        # Three presets total two inner iterations; this is the one that spreads them
+        # over two positions rather than taking both at one. The spread is per position,
+        # in the table, and only the total is a tile.
+        "expect": {
+            "kmInner": "2",
+            "kmTop": "3 — aab",
+        },
     },
     {
         "id": "abcdefg",
         "label": "no two characters alike: no borders at all",
         "pattern": "abcdefg",
         "text": "abcdefgabcdefh abcdefg",
-        "note": "fail[] is all zeros past the sentinel, so there is never anything to fall "
-                "back on — and KMP still makes 23 comparisons against naive's 34, because "
-                "its text pointer never goes back",
+        "expect": {
+            "kmTop": "0 — the pattern has no border",
+            "kmComp": "23",
+            "kmNaive": "34",
+        },
     },
 ]
 
@@ -787,7 +861,7 @@ def _kmp(cfg):
             "comparing two substrings, which is how you check a linear-time construction.",
         )
     )
-    script = _BASE_JS + _ONE_TEXT + _presets_js("KMP2", _KM_PRESETS, ["pattern", "text", "note"]) + r"""
+    script = _BASE_JS + _ONE_TEXT + _presets_js("KMP2", _KM_PRESETS, ["pattern", "text"]) + r"""
   var presetIn = document.getElementById('kmPreset'), patIn = document.getElementById('kmPattern');
   var textIn = document.getElementById('kmText');
   var atIn = document.getElementById('kmAt'), atOut = document.getElementById('kmAtOut');
@@ -914,6 +988,7 @@ def _kmp(cfg):
             "the fast construction is checked rather than trusted.",
         ),
         script=script,
+        expect={"kmPreset": _expect(_KM_PRESETS)},
     )
 
 
@@ -927,37 +1002,56 @@ _HO_PRESETS = [
         "label": "ordinary prose: most of the text is never looked at",
         "text": "the rain in spain stays mainly in the plain and never in the hills",
         "pattern": "mainly",
-        "note": "a six-character pattern jumps six at a time over letters it does not contain",
+        "expect": {
+            "hoAlign": "14",
+            "hoAll": "61",
+            "hoSkip": "52",
+        },
     },
     {
         "id": "dna",
         "label": "four letters, so shifts are shorter",
         "text": "GATTACAGATTACCAGATTACAGGATTACAGATTACAGGATTA",
         "pattern": "GATTACA",
-        "note": "every character of the text is in the pattern, so no shift is ever the full m",
+        # That no single shift is ever the full m is per alignment, in the trace; the
+        # average over all of them is the tile, and it is well under the pattern's
+        # seven.
+        "expect": {
+            "hoAvg": "19/7 = 2.71",
+            "hoAlign": "14",
+        },
     },
     {
         "id": "stuck",
         "label": "the text where every shift is 1",
         "text": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
         "pattern": "baaaa",
-        "note": "the last character always matches, the first never does: m comparisons, shift 1",
+        "expect": {
+            "hoAvg": "1 = 1.00",
+            "hoSkip": "0",
+            "hoComp": "130",
+        },
     },
     {
         "id": "rare",
         "label": "a pattern ending in a character the text barely holds",
         "text": "abcabcabcabcabcabcabcabcabcabcabcabcabcz",
         "pattern": "cccz",
-        "note": "the final z is absent from almost every window, so the shift is the full m",
+        "expect": {
+            "hoAvg": "40/13 = 3.08",
+            "hoAlign": "13",
+        },
     },
     {
         "id": "periodic",
         "label": "a periodic text, where the table repeats too",
         "text": "abababababababababababababababab",
         "pattern": "ababb",
-        "note": "the text has period 2 and the pattern is 5 long, so the character under the "
-                "last position is always a and every shift is 2 — fourteen alignments where "
-                "twenty-eight were possible, exactly half",
+        "expect": {
+            "hoAlign": "14",
+            "hoAll": "28",
+            "hoAvg": "2 = 2.00",
+        },
     },
 ]
 
@@ -999,7 +1093,7 @@ def _horspool(cfg):
             "matches and the shift is always 1.",
         )
     )
-    script = _RATIO_JS + _ONE_TEXT + _presets_js("HOP", _HO_PRESETS, ["text", "pattern", "note"]) + r"""
+    script = _RATIO_JS + _ONE_TEXT + _presets_js("HOP", _HO_PRESETS, ["text", "pattern"]) + r"""
   var presetIn = document.getElementById('hoPreset'), textIn = document.getElementById('hoText');
   var patIn = document.getElementById('hoPattern');
   var atIn = document.getElementById('hoAt'), atOut = document.getElementById('hoAtOut');
@@ -1150,6 +1244,7 @@ def _horspool(cfg):
             "because an algorithm whose whole idea is skipping can skip over an answer.",
         ),
         script=script,
+        expect={"hoPreset": _expect(_HO_PRESETS)},
     )
 
 
@@ -1165,7 +1260,10 @@ _RA_PRESETS = [
         "pattern": "ain",
         "base": "256",
         "mod": "41",
-        "note": "four real matches and three windows whose hash matches and whose text does not",
+        "expect": {
+            "raHits": "4 and 4",
+            "raSpur": "3",
+        },
     },
     {
         "id": "dna",
@@ -1174,16 +1272,27 @@ _RA_PRESETS = [
         "pattern": "GATTACA",
         "base": "4",
         "mod": "13",
-        "note": "a seven-character pattern and a two-digit modulus: collisions are not rare here",
+        "expect": {
+            "raSpur": "3",
+            "raWaste": "21",
+        },
     },
     {
         "id": "binary",
-        "label": "two letters, where a modulus of 7 beats 11, 13 and 17",
+        "label": "two letters, base 2, modulus 11",
         "text": "101100101101001011010010110100101101",
         "pattern": "10110",
         "base": "2",
         "mod": "11",
-        "note": "five real matches and four spurious ones, on thirty-two windows",
+        # A modulus of 7 is clean on this text where 11, 13 and 17 -- all larger -- are
+        # not, which is the preset's reason for existing and needs raMod moved to see.
+        # What the tiles hold with the markup's own modulus of 11 is the sweep's
+        # summary: six of the 46 primes under 200 collide, 17 the largest.
+        "expect": {
+            "raSpur": "4",
+            "raBad": "6 of 46",
+            "raLast": "17",
+        },
     },
     {
         "id": "abra",
@@ -1192,7 +1301,11 @@ _RA_PRESETS = [
         "pattern": "abra",
         "base": "256",
         "mod": "13",
-        "note": "six matches, four collisions, and every collision costs a full re-comparison",
+        "expect": {
+            "raHits": "6 and 6",
+            "raSpur": "4",
+            "raWaste": "16",
+        },
     },
     {
         "id": "clean",
@@ -1201,7 +1314,10 @@ _RA_PRESETS = [
         "pattern": "ain",
         "base": "256",
         "mod": "1000003",
-        "note": "no collision at all, which is a fact about this text and not a guarantee",
+        "expect": {
+            "raSpur": "0",
+            "raWaste": "0",
+        },
     },
 ]
 
@@ -1251,7 +1367,7 @@ def _rabin(cfg):
         )
     )
     script = _BASE_JS + _ONE_TEXT + _presets_js(
-        "RAP", _RA_PRESETS, ["text", "pattern", "base", "mod", "note"]) + r"""
+        "RAP", _RA_PRESETS, ["text", "pattern", "base", "mod"]) + r"""
   var presetIn = document.getElementById('raPreset'), textIn = document.getElementById('raText');
   var patIn = document.getElementById('raPattern'), baseIn = document.getElementById('raBase');
   var modIn = document.getElementById('raMod');
@@ -1397,6 +1513,7 @@ def _rabin(cfg):
             "text.",
         ),
         script=script,
+        expect={"raPreset": _expect(_RA_PRESETS)},
     )
 
 
@@ -1411,7 +1528,14 @@ _TR_PRESETS = [
         "words": "he, she, his, hers",
         "prefix": "h",
         "text": "ushers hers his she he",
-        "note": "she ends where he ends, so one position reports two patterns at once",
+        # That one position reports two patterns at once -- he inside she -- is a row of
+        # the hit list, not a tile. What the tiles hold is that the one pass finds
+        # exactly what the definition does.
+        "expect": {
+            "trMatch": "9",
+            "trTruth": "9",
+            "trNodes": "10",
+        },
     },
     {
         "id": "shared",
@@ -1419,7 +1543,11 @@ _TR_PRESETS = [
         "words": "interest, interesting, interior, internal, intern",
         "prefix": "inte",
         "text": "the internal interest in interning is interesting",
-        "note": "five words, and the trie holds the shared prefix once rather than five times",
+        "expect": {
+            "trN": "5",
+            "trNodes": "18",
+            "trChars": "41",
+        },
     },
     {
         "id": "disjoint",
@@ -1427,7 +1555,10 @@ _TR_PRESETS = [
         "words": "alpha, bravo, charlie, delta",
         "prefix": "b",
         "text": "alpha bravo charlie delta echo alphabravo",
-        "note": "no sharing at all, so the trie is four separate chains and saves nothing",
+        "expect": {
+            "trNodes": "23",
+            "trChars": "22",
+        },
     },
     {
         "id": "nested",
@@ -1435,9 +1566,10 @@ _TR_PRESETS = [
         "words": "a, ab, abc, abcd",
         "prefix": "ab",
         "text": "abcdabcab",
-        "note": "the four words nest as prefixes, so the trie is one chain of five nodes for "
-                "ten letters — and still only one report at any position, because two at once "
-                "takes one word being a SUFFIX of another, which is what he inside she does",
+        "expect": {
+            "trNodes": "5",
+            "trChars": "10",
+        },
     },
 ]
 
@@ -1481,7 +1613,7 @@ def _trie(cfg):
         )
     )
     script = _TREE_JS + _ONE_TEXT + _presets_js(
-        "TRP", _TR_PRESETS, ["words", "prefix", "text", "note"]) + r"""
+        "TRP", _TR_PRESETS, ["words", "prefix", "text"]) + r"""
   var presetIn = document.getElementById('trPreset');
   var wordsIn = document.getElementById('trWordList');
   var prefixIn = document.getElementById('trPrefix'), textIn = document.getElementById('trText');
@@ -1646,6 +1778,7 @@ def _trie(cfg):
             "checked word by word against scanning the text separately for each one.",
         ),
         script=script,
+        expect={"trPreset": _expect(_TR_PRESETS)},
     )
 
 
@@ -1658,31 +1791,47 @@ _SU_PRESETS = [
         "id": "banana",
         "label": "banana",
         "text": "banana",
-        "note": "six suffixes, two doubling rounds, and a longest repeat of ana",
+        "expect": {
+            "suRepeat": "3 — ana",
+            "suRoundsN": "2",
+        },
     },
     {
         "id": "mississippi",
         "label": "mississippi",
         "text": "mississippi",
-        "note": "the standard example: issi repeats, and the LCP array finds it in one pass",
+        "expect": {
+            "suRepeat": "4 — issi",
+            "suDistinct": "53",
+        },
     },
     {
         "id": "abracadabra",
         "label": "abracadabra",
         "text": "abracadabra",
-        "note": "abra occurs twice and is the longest repeated substring",
+        "expect": {
+            "suRepeat": "4 — abra",
+            "suDistinct": "54",
+        },
     },
     {
         "id": "distinct",
         "label": "no character repeated at all",
         "text": "abcdefgh",
-        "note": "every LCP is 0, so the number of distinct substrings is exactly n(n + 1)/2",
+        "expect": {
+            "suRepeat": "0 — nothing repeats",
+            "suDistinct": "36",
+            "suAll": "36",
+        },
     },
     {
         "id": "uniform",
         "label": "one letter, repeated",
         "text": "aaaaaaaa",
-        "note": "the other extreme: only n distinct substrings, and the LCP array is a staircase",
+        "expect": {
+            "suDistinct": "8",
+            "suAll": "36",
+        },
     },
 ]
 
@@ -1725,7 +1874,7 @@ def _suffix(cfg):
             "substrings is n(n + 1)/2 minus the sum of it.",
         )
     )
-    script = _BASE_JS + _ONE_TEXT + _presets_js("SUP", _SU_PRESETS, ["text", "note"]) + r"""
+    script = _BASE_JS + _ONE_TEXT + _presets_js("SUP", _SU_PRESETS, ["text"]) + r"""
   var presetIn = document.getElementById('suPreset'), textIn = document.getElementById('suText');
   var atIn = document.getElementById('suAt'), atOut = document.getElementById('suAtOut');
   var bars = document.getElementById('suBars'), rounds = document.getElementById('suRounds');
@@ -1853,6 +2002,7 @@ def _suffix(cfg):
             "the LCP array against comparing each adjacent pair character by character.",
         ),
         script=script,
+        expect={"suPreset": _expect(_SU_PRESETS)},
     )
 
 
@@ -1866,37 +2016,55 @@ _AU_PRESETS = [
         "label": "a pattern with a border, over three letters",
         "pattern": "ababc",
         "text": "abababcababcabababc",
-        "note": "state 4 on an a goes to 3, not to 0: the border is in the table",
+        # The cell this preset exists for -- state 4 on an a going to 3 rather than 0 --
+        # is in the transition table, not in a tile.
+        "expect": {
+            "auStates": "6",
+            "auCells": "18",
+        },
     },
     {
         "id": "aaab",
         "label": "a run of one letter",
         "pattern": "aaab",
         "text": "aaaaabaaabaaaab",
-        "note": "every a climbs one state and saturates at 3, because aaa is the longest "
-                "prefix of aaab that a run of a's can match — the pattern's own longest "
-                "border is 0",
+        # Where a run of a's saturates, 3, is a walk through the table rather than a
+        # tile.
+        "expect": {
+            "auStates": "5",
+            "auCells": "10",
+            "auRatio": "2/3 = 0.67",
+        },
     },
     {
         "id": "binary",
         "label": "two letters, so the table is narrow and tall",
         "pattern": "10110",
         "text": "101100101101001011010010110100101101",
-        "note": "sigma = 2 makes the table 2(m + 1) cells, the cheapest it can be",
+        "expect": {
+            "auSigma": "2",
+            "auCells": "12",
+        },
     },
     {
         "id": "distinct",
         "label": "no repeated character: every mismatch goes to 0",
         "pattern": "abcd",
         "text": "abcabcdabdabcd",
-        "note": "with no border anywhere, the table is the same as restarting from scratch",
+        "expect": {
+            "auSigma": "4",
+            "auCells": "20",
+        },
     },
     {
         "id": "wide",
         "label": "a larger alphabet, and the table grows with it",
         "pattern": "the",
         "text": "the theory of the theatre is the thing",
-        "note": "the run still takes exactly n steps; only the table got bigger",
+        "expect": {
+            "auSteps": "38 for n = 38",
+            "auCells": "52",
+        },
     },
 ]
 
@@ -1937,7 +2105,7 @@ def _automaton(cfg):
             "widen the alphabet and the table grows while the run does not move.",
         )
     )
-    script = _RATIO_JS + _ONE_TEXT + _presets_js("AUP", _AU_PRESETS, ["pattern", "text", "note"]) + r"""
+    script = _RATIO_JS + _ONE_TEXT + _presets_js("AUP", _AU_PRESETS, ["pattern", "text"]) + r"""
   var presetIn = document.getElementById('auPreset'), patIn = document.getElementById('auPattern');
   var textIn = document.getElementById('auText');
   var atIn = document.getElementById('auAt'), atOut = document.getElementById('auAtOut');
@@ -2069,6 +2237,7 @@ def _automaton(cfg):
             "else.",
         ),
         script=script,
+        expect={"auPreset": _expect(_AU_PRESETS)},
     )
 
 

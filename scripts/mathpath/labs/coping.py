@@ -137,6 +137,18 @@ mode yet: derandomisation belongs beside the randomised 7/8 argument in
 mode that would duplicate `branchbound`'s shape on a different problem. They
 are tested in mathcheck's algo_core section and they are on every page in this
 kit anyway, because COPING_JS is one block.
+
+EVERY PRESET PINS WHAT IT PRINTS, AND NO PRESET CARRIES A NOTE. Each of the 31
+presets used to carry a `label` and a `note`, both prose about an outcome and
+neither readable by any check here -- a sweep of fifteen kits found 57 of those
+strings false about the lab they described. The notes are deleted (they shipped
+as `BBP`/`VCP`/`TSP3`/`SCP`/`FPP`/`FTP` data on every page and were never
+printed, which is dead weight on the mode that has the least room for it) and
+each preset now carries `expect`: {kpi element id: the exact text the page
+prints}, one to three tiles read off the running kit with
+`node scripts/labcheck.js --observe <page>`. One tile needs care and `_expect`
+says so: bbFull is 2^n LEAVES sitting between two counts of NODES OPENED, so it
+is pinned only with both of its neighbours beside it.
 """
 
 from .algebra_core import RATIONAL_JS
@@ -682,6 +694,40 @@ def _options(presets):
     return [(p["id"], p["label"]) for p in presets]
 
 
+def _expect(presets):
+    """{preset id: {kpi element id: the exact text the page prints}}.
+
+    A preset used to carry a `label` and a `note` and neither could be checked
+    by anything in this repository -- a sweep of fifteen kits found 57 of
+    those strings false about the lab they described. The note is gone; this
+    is what replaces it. scripts/build_paths.py writes it to
+    scripts/generated-expectations.json and scripts/labcheck.js selects the
+    option on the BUILT page, dispatches the menu's own change handler and
+    compares getElementById(kpi).textContent. Every figure here was read off
+    the running kit with `node scripts/labcheck.js --observe <page>`.
+
+    WHAT A PRESET IN THIS KIT PINS. Every mode prints an algorithm's answer,
+    the optimum from an exhaustive search, and the ratio between them against
+    the ratio the theorem promises. A preset exists to put that ratio
+    somewhere particular -- at the promise, inside it, at 1, or outside it
+    with the hypothesis withdrawn -- so the ratio and the two numbers it is
+    made of are what it pins.
+
+    ONE TILE THAT IS NOT A NODE COUNT. `branchbound`'s bbFull is 2^n, the
+    LEAVES of the whole tree, and it sits between bbWith and bbWithout, which
+    count NODES OPENED. They are not comparable: on `useless` the search
+    without the bound opens 86 nodes in a tree of 64 leaves. bbFull is pinned
+    only beside both of its neighbours, so no expectation here can be read as
+    a claim that one is bigger than the other.
+
+    Tiles are read with every OTHER control at the value the markup ships --
+    the epsilon slider at a tenth, the k each preset names, the step slider at
+    1 -- so a claim that needs one of those moved is a comment beside the
+    preset rather than a weaker pin.
+    """
+    return {p["id"]: dict(p.get("expect") or {}) for p in presets}
+
+
 def _chosen(presets, cfg):
     want = str(cfg.get("preset", presets[0]["id"]))
     for p in presets:
@@ -716,39 +762,62 @@ _BOTH_HALVES = (
 _BB_PRESETS = [
     {
         "id": "five",
-        "label": "five items, capacity 10 — the bound cuts the tree by two thirds",
+        "label": "five items, capacity 10",
         "items": "3:5, 4:6, 5:8, 2:3, 6:9", "cap": "10",
-        "note": "fourteen nodes with the fractional bound against forty-four without it, and the "
-                "same answer",
+        "expect": {
+            "bbWith": "14",
+            "bbWithout": "44",
+            "bbOpt": "16 — from 32 subsets",
+        },
     },
     {
         "id": "tight",
         "label": "eight items whose weights nearly fill the sack",
         "items": "7:12, 8:14, 9:15, 6:10, 5:8, 4:7, 3:5, 2:3", "cap": "20",
-        "note": "the relaxation is close to the integer answer here, so almost every branch is "
-                "cut",
+        "expect": {
+            "bbWith": "27",
+            "bbWithout": "252",
+            "bbValue": "34",
         },
+    },
     {
         "id": "useless",
-        "label": "every item the same density — the bound barely separates branches",
+        "label": "every item at the same density",
         "items": "2:4, 3:6, 4:8, 5:10, 6:12, 7:14", "cap": "13",
-        "note": "the fractional optimum is 26 and the best prefix already reaches it, so the "
-                "bound rarely separates two branches: it cuts 86 nodes to 30, a factor of "
-                "under three against the forty-five the heavy-prize preset gets",
+        # 86 nodes cut to 30 is "a factor of under three", and the comparison is with
+        # the 135-to-3 the `gap` preset gets: a claim about two presets, checked as the
+        # pair of pins rather than as a sentence. bbFull is pinned here for the reason
+        # given on `small`.
+        "expect": {
+            "bbWith": "30",
+            "bbWithout": "86",
+            "bbFull": "64",
+        },
     },
     {
         "id": "small",
         "label": "four items — small enough to read the whole tree",
         "items": "2:3, 3:4, 4:5, 5:6", "cap": "7",
-        "note": "sixteen leaves, and every pruning decision fits in the table",
+        # bbFull is 2^n, the LEAVES of the whole tree; bbWith and bbWithout count NODES
+        # OPENED. It is pinned here and on `useless` only with both of them beside it,
+        # because the three read as one row and a node count next to a leaf count is
+        # the misreading this tile invites -- on `useless` the unbounded search opens
+        # 86 nodes in a tree of 64 leaves.
+        "expect": {
+            "bbFull": "16",
+            "bbWith": "12",
+            "bbWithout": "23",
+        },
     },
     {
         "id": "gap",
         "label": "one heavy prize and a lot of filler",
         "items": "9:30, 1:2, 1:2, 1:2, 1:2, 1:2, 1:2", "cap": "9",
-        "note": "the prize fills the sack on its own, so the fractional relaxation is 30 — the "
-                "integer optimum exactly — and the search closes in 3 nodes against 135 "
-                "without it: the mode's tightest bound rather than its loosest",
+        "expect": {
+            "bbWith": "3",
+            "bbWithout": "135",
+            "bbOpt": "30 — from 128 subsets",
+        },
     },
 ]
 
@@ -798,7 +867,7 @@ def _branchbound(cfg):
         )
     )
     script = _KNAPSACK_JS + _BOTH_HALVES + _presets_js(
-        "BBP", _BB_PRESETS, ["items", "cap", "note"]) + r"""
+        "BBP", _BB_PRESETS, ["items", "cap"]) + r"""
   var presetIn = document.getElementById('bbPreset'), itemsIn = document.getElementById('bbItems');
   var capIn = document.getElementById('bbCap'), capOut = document.getElementById('bbCapOut');
   var boundIn = document.getElementById('bbBound');
@@ -966,6 +1035,7 @@ def _branchbound(cfg):
             "the only way to know it did is to compute the optimum a third way.",
         ),
         script=script,
+        expect={"bbPreset": _expect(_BB_PRESETS)},
     )
 
 
@@ -976,44 +1046,63 @@ def _branchbound(cfg):
 _VC_PRESETS = [
     {
         "id": "matching",
-        "label": "a perfect matching — the ratio is exactly 2",
+        "label": "three disjoint edges",
         "spec": "1-2, 3-4, 5-6",
-        "note": "every matched edge needs one endpoint in the cover and the algorithm takes both",
+        "expect": {
+            "vcMatch": "3 edges",
+            "vcCover": "6 — {1, 2, 3, 4, 5, 6}",
+            "vcRatio": "2, against the promised 2",
+        },
     },
     {
         "id": "star",
-        "label": "a star — the hub alone covers everything",
+        "label": "a star — one hub, four leaves",
         "spec": "1-2, 1-3, 1-4, 1-5",
-        "note": "the matching finds one edge, the cover takes both its ends, and the optimum is "
-                "the hub alone",
+        "expect": {
+            "vcMatch": "1 edge",
+            "vcCover": "2 — {1, 2}",
+            "vcRatio": "2, against the promised 2",
+        },
     },
     {
         "id": "cycle5",
-        "label": "a five-cycle — the ratio lands strictly between 1 and 2",
+        "label": "a five-cycle",
         "spec": "1-2, 2-3, 3-4, 4-5, 5-1",
-        "note": "a maximal matching of two edges gives a cover of four against an optimum of "
-                "three, so the realised ratio is 4/3",
+        "expect": {
+            "vcMatch": "2 edges",
+            "vcCover": "4 — {1, 2, 3, 4}",
+            "vcRatio": "4/3 = 1.3333, against the promised 2",
+        },
     },
     {
         "id": "cycle6",
-        "label": "a six-cycle — three matched edges, and the ratio is 2 again",
+        "label": "a six-cycle",
         "spec": "1-2, 2-3, 3-4, 4-5, 5-6, 6-1",
-        "note": "an even cycle lets the greedy matching take every other edge, so the cover is "
-                "the whole graph against an optimum of three",
+        "expect": {
+            "vcMatch": "3 edges",
+            "vcCover": "6 — {1, 2, 3, 4, 5, 6}",
+            "vcRatio": "2, against the promised 2",
+        },
     },
     {
         "id": "path5",
         "label": "a path on five vertices",
         "spec": "1-2, 2-3, 3-4, 4-5",
-        "note": "the greedy matching takes the first and third edges, and the optimum takes two "
-                "interior vertices",
+        "expect": {
+            "vcCover": "4 — {1, 2, 3, 4}",
+            "vcOpt": "2 vertices",
+            "vcRatio": "2, against the promised 2",
+        },
     },
     {
         "id": "triangles",
-        "label": "two triangles — the matching can only take one edge from each",
+        "label": "two disjoint triangles",
         "spec": "1-2, 2-3, 3-1, 4-5, 5-6, 6-4",
-        "note": "a triangle needs two vertices covered and the algorithm takes exactly two, so "
-                "the ratio here is 1",
+        "expect": {
+            "vcMatch": "2 edges",
+            "vcCover": "4 — {1, 2, 4, 5}",
+            "vcRatio": "1, against the promised 2",
+        },
     },
 ]
 
@@ -1059,7 +1148,7 @@ def _vertexcover(cfg):
             "mentions the optimum itself.",
         )
     )
-    script = _BASE_JS + _BOTH_HALVES + _presets_js("VCP", _VC_PRESETS, ["spec", "note"]) + r"""
+    script = _BASE_JS + _BOTH_HALVES + _presets_js("VCP", _VC_PRESETS, ["spec"]) + r"""
   var presetIn = document.getElementById('vcPreset'), specIn = document.getElementById('vcSpec');
   var allIn = document.getElementById('vcAll'), allOut = document.getElementById('vcAllOut');
   var plot = document.getElementById('vcPlot'), ladder = document.getElementById('vcLadder');
@@ -1206,6 +1295,7 @@ def _vertexcover(cfg):
             "which turns &ldquo;the bound is tight&rdquo; from a word into an instance.",
         ),
         script=script,
+        expect={"vcPreset": _expect(_VC_PRESETS)},
     )
 
 
@@ -1216,38 +1306,60 @@ def _vertexcover(cfg):
 _TS_PRESETS = [
     {
         "id": "worst4",
-        "label": "the worst metric instance on four cities — ratio 10/7",
+        "label": "the worst metric instance on four cities",
         "spec": "1-2 2, 1-3 1, 1-4 3, 2-3 3, 2-4 2, 3-4 2",
-        "note": "found by enumerating every metric instance on four cities with distances up to "
-                "3, not chosen by hand",
+        # tsWorstRatio and tsWorstCase are a fixed sweep of every metric instance on
+        # FOUR cities with distances up to 3, and they do not move with the preset. On
+        # this one they are the claim: the ratio this instance realises equals the worst
+        # the sweep found, and the instance the sweep names is this preset's own spec.
+        "expect": {
+            "tsRatio": "10/7 = 1.4286, against the promised 2",
+            "tsWorstRatio": "10/7 over 482 metric instances",
+            "tsWorstCase": "1-2 2, 1-3 1, 1-4 3, 2-3 3, 2-4 2, 3-4 2",
+        },
     },
     {
         "id": "worst5",
-        "label": "the worst metric instance on five cities — ratio 8/5",
+        "label": "a five-city metric instance",
         "spec": "1-2 1, 1-3 1, 1-4 2, 1-5 1, 2-3 2, 2-4 1, 2-5 1, 3-4 1, 3-5 2, 4-5 1",
-        "note": "still well inside the promise of 2, which is the usual state of an approximation "
-                "guarantee",
+        # "the worst on five cities" is NOT checked here: the sweep behind tsWorstRatio
+        # enumerates four-city instances only, and 8/5 beating its 10/7 is the evidence
+        # that they are different questions. What is pinned is what this instance does.
+        "expect": {
+            "tsMst": "4 over 4 edges",
+            "tsOpt": "5",
+            "tsRatio": "8/5 = 1.6000, against the promised 2",
+        },
     },
     {
         "id": "easy",
-        "label": "a metric instance the heuristic gets exactly right",
+        "label": "four cities, distances 3 to 5",
         "spec": "1-2 3, 1-3 4, 1-4 5, 2-3 3, 2-4 4, 3-4 3",
-        "note": "a ratio of 1, which is common and is why one instance proves nothing about the "
-                "worst case",
+        "expect": {
+            "tsTour": "14 — 1-2-3-4",
+            "tsOpt": "14",
+            "tsRatio": "1, against the promised 2",
+        },
     },
     {
         "id": "broken",
         "label": "one distance raised until the triangle inequality breaks",
         "spec": "1-2 50, 1-3 1, 1-4 1, 2-3 1, 2-4 1, 3-4 1",
-        "note": "the shortcut step assumed a direct hop is no longer than going round, and here "
-                "the hop of 50 is twenty-five times the 2 that going round costs",
+        "expect": {
+            "tsSize": "4 cities — NOT metric",
+            "tsRatio": "53/4 = 13.2500, against the promised 2",
+            "tsWithin": "NO, and the instance is not metric, so the theorem never applied",
+        },
     },
     {
         "id": "grid",
         "label": "five cities on a line",
         "spec": "1-2 1, 1-3 2, 1-4 3, 1-5 4, 2-3 1, 2-4 2, 2-5 3, 3-4 1, 3-5 2, 4-5 1",
-        "note": "distances that come from positions are always metric, which is why the "
-                "hypothesis is usually free",
+        "expect": {
+            "tsSize": "5 cities — metric",
+            "tsTour": "8 — 1-2-3-4-5",
+            "tsRatio": "1, against the promised 2",
+        },
     },
 ]
 
@@ -1295,7 +1407,7 @@ def _tsp(cfg):
             "removes it.",
         )
     )
-    script = _TOUR_JS + _BOTH_HALVES + _presets_js("TSP3", _TS_PRESETS, ["spec", "note"]) + r"""
+    script = _TOUR_JS + _BOTH_HALVES + _presets_js("TSP3", _TS_PRESETS, ["spec"]) + r"""
   var presetIn = document.getElementById('tsPreset'), specIn = document.getElementById('tsSpec');
   var breakIn = document.getElementById('tsBreak'), breakOut = document.getElementById('tsBreakOut');
   var allIn = document.getElementById('tsAll'), allOut = document.getElementById('tsAllOut');
@@ -1471,6 +1583,7 @@ def _tsp(cfg):
             "of a size so the worst case is a number rather than an adjective.",
         ),
         script=script,
+        expect={"tsPreset": _expect(_TS_PRESETS)},
     )
 
 
@@ -1481,37 +1594,55 @@ def _tsp(cfg):
 _SC_PRESETS = [
     {
         "id": "trap",
-        "label": "seven elements where greedy takes three and two suffice",
+        "label": "seven elements, three sets",
         "sets": "3 4 5 6; 1 2 3; 4 5 6 7",
-        "note": "the biggest set is taken first and then neither of the two that cover everything "
-                "is whole any more",
+        "expect": {
+            "scGreedy": "3 — S1, S2, S3",
+            "scOpt": "2 sets",
+            "scRatio": "3/2 = 1.5000",
+        },
     },
     {
         "id": "trap10",
         "label": "ten elements, the same trap one size up",
         "sets": "4 5 6 7 8 9; 1 2 3 4 5; 6 7 8 9 10; 1 2 3; 10",
-        "note": "greedy takes the six first and then needs two more, against an optimum of two",
+        "expect": {
+            "scGreedy": "3 — S1, S2, S3",
+            "scOpt": "2 sets",
+            "scRatio": "3/2 = 1.5000",
+        },
     },
     {
         "id": "clean",
-        "label": "a partition — greedy has no choice to get wrong",
+        "label": "a partition into two sets",
         "sets": "1 2 3 4; 5 6 7 8",
-        "note": "the sets are disjoint and cover everything, so every cover is the whole family "
-                "and the ratio is 1",
+        "expect": {
+            "scGreedy": "2 — S1, S2",
+            "scRatio": "1",
+            "scCharges": "2 against 2 — equal",
+        },
     },
     {
         "id": "overlap",
-        "label": "heavy overlap — several optimal covers",
+        "label": "five triples on five elements, heavy overlap",
         "sets": "1 2 3; 2 3 4; 3 4 5; 4 5 1; 5 1 2",
-        "note": "five of the ten pairs cover all five elements and five do not — sets 1 and 2 "
-                "together miss element 5 — and greedy finds one of the five that work",
+        # "several optimal covers" is the cover table, not a tile -- scOpt holds the
+        # SIZE of the optimum, not how many attain it.
+        "expect": {
+            "scGreedy": "2 — S1, S3",
+            "scRatio": "1",
+            "scCharges": "2 against 2 — equal",
+        },
     },
     {
         "id": "singletons",
         "label": "one big set and the singletons under it",
         "sets": "1 2 3 4 5; 1; 2; 3; 4; 5",
-        "note": "greedy takes the big set and stops, which is the optimum — a reminder that the "
-                "logarithm is a worst case and not a description",
+        "expect": {
+            "scGreedy": "1 — S1",
+            "scRatio": "1",
+            "scBound": "137/60 = 2.2833",
+        },
     },
 ]
 
@@ -1558,7 +1689,7 @@ def _setcover(cfg):
             "optimum.",
         )
     )
-    script = _COVER_JS + _BOTH_HALVES + _presets_js("SCP", _SC_PRESETS, ["sets", "note"]) + r"""
+    script = _COVER_JS + _BOTH_HALVES + _presets_js("SCP", _SC_PRESETS, ["sets"]) + r"""
   var presetIn = document.getElementById('scPreset'), setsIn = document.getElementById('scSets');
   var stepIn = document.getElementById('scStep'), stepOut = document.getElementById('scStepOut');
   var plot = document.getElementById('scPlot'), ladder = document.getElementById('scLadder');
@@ -1707,6 +1838,7 @@ def _setcover(cfg):
             "logarithm, and the optimum is an exhaustive search over the subfamilies.",
         ),
         script=script,
+        expect={"scPreset": _expect(_SC_PRESETS)},
     )
 
 
@@ -1717,38 +1849,55 @@ def _setcover(cfg):
 _FP_PRESETS = [
     {
         "id": "big",
-        "label": "six items with large values — the scaling shrinks the table",
+        "label": "six items with large values",
         "items": "3:520, 4:610, 5:805, 2:311, 6:902, 4:455", "cap": "12",
-        "note": "the exact table has 3604 cells and the epsilon the slider opens on — a tenth "
-                "of the optimum, ten percent — buys one of 238",
+        "expect": {
+            "fpK": "451/30 = 15.0333",
+            "fpValue": "1935 — ratio 1",
+            "fpCells": "238 against 3604 — smaller",
+        },
     },
     {
         "id": "small",
-        "label": "five small values — the scaling makes the table BIGGER",
+        "label": "five small values",
         "items": "3:5, 4:6, 5:8, 2:3, 6:9", "cap": "10",
-        "note": "an FPTAS is an asymptotic device and on a tiny instance it costs more than it "
-                "saves, which the cell counts show",
+        "expect": {
+            "fpValue": "16 — ratio 1",
+            "fpCells": "171 against 32 — BIGGER, at this size",
+        },
     },
     {
         "id": "spread",
         "label": "one dominant value among small ones",
         "items": "5:900, 1:11, 2:19, 3:27, 4:38, 2:14", "cap": "9",
-        "note": "the scale factor is set by the LARGEST value, so a single big item coarsens "
-                "everything",
+        "expect": {
+            "fpK": "15 = 15.0000",
+            "fpLoss": "0 against 469/5",
+            "fpCells": "65 against 1010 — smaller",
+        },
     },
     {
         "id": "equal",
         "label": "every value the same",
         "items": "2:100, 3:100, 4:100, 5:100, 6:100", "cap": "11",
-        "note": "every value scales and floors to the same integer, so the scaled instance is "
-                "the original one relabelled and the realised loss is 0 at every epsilon — the "
-                "promise is not tight here and nothing can make it so",
+        # "the realised loss is 0 at every epsilon" needs the epsilon slider moved, and
+        # a tile is read at the tenth the markup ships. What is pinned is the scale
+        # factor, the value returned and the loss taken at that one epsilon.
+        "expect": {
+            "fpK": "2 = 2.0000",
+            "fpValue": "300 — ratio 1",
+            "fpLoss": "0 against 30",
+        },
     },
     {
         "id": "tight",
         "label": "eight items and a sack that nearly fits them",
         "items": "7:300, 8:355, 9:400, 6:260, 5:220, 4:180, 3:130, 2:90", "cap": "22",
-        "note": "the exact table is large and the scaled one is a fraction of it",
+        "expect": {
+            "fpValue": "975 — ratio 1",
+            "fpOpt": "975",
+            "fpCells": "388 against 1936 — smaller",
+        },
     },
 ]
 
@@ -1796,7 +1945,7 @@ def _fptas(cfg):
         )
     )
     script = _KNAPSACK_JS + _BOTH_HALVES + _presets_js(
-        "FPP", _FP_PRESETS, ["items", "cap", "note"]) + r"""
+        "FPP", _FP_PRESETS, ["items", "cap"]) + r"""
   var presetIn = document.getElementById('fpPreset'), itemsIn = document.getElementById('fpItems2');
   var capIn = document.getElementById('fpCap'), capOut = document.getElementById('fpCapOut');
   var epsIn = document.getElementById('fpEps'), epsOut = document.getElementById('fpEpsOut');
@@ -1948,6 +2097,7 @@ def _fptas(cfg):
             "when it reports the scaled total instead. Both columns are in the item table.",
         ),
         script=script,
+        expect={"fpPreset": _expect(_FP_PRESETS)},
     )
 
 
@@ -1958,37 +2108,56 @@ def _fptas(cfg):
 _FT_PRESETS = [
     {
         "id": "cycle6",
-        "label": "a six-cycle — a cover of 3 exists and 2 does not",
+        "label": "a six-cycle, k = 3",
         "spec": "1-2, 2-3, 3-4, 4-5, 5-6, 6-1", "k": "3",
-        "note": "the search tree is bounded by 2^(k+1) = 16 nodes and takes 9 here, against the "
-                "2^6 = 64 subsets an exhaustive search checks",
+        # "and 2 does not" is the k slider moved to 2, which is a different question
+        # than the one this page opens on. The tiles pin the search at the k the preset
+        # ships: 9 nodes against a bound of 16, and 2^k n against 2^n.
+        "expect": {
+            "ftNodes": "9",
+            "ftTree": "16 — not exceeded",
+            "ftWork": "48 against 64",
+        },
     },
     {
         "id": "star8",
-        "label": "a star on eight vertices — k = 1 settles it",
+        "label": "a star on eight vertices, k = 1",
         "spec": "1-2, 1-3, 1-4, 1-5, 1-6, 1-7, 1-8", "k": "1",
-        "note": "the hub covers everything, so a budget of one is enough however many leaves "
-                "there are",
+        "expect": {
+            "ftNodes": "3",
+            "ftTree": "4 — not exceeded",
+            "ftWork": "16 against 256",
+        },
     },
     {
         "id": "matching",
-        "label": "a perfect matching — k must reach the number of edges",
+        "label": "a perfect matching on eight vertices, k = 4",
         "spec": "1-2, 3-4, 5-6, 7-8", "k": "4",
-        "note": "every edge needs its own vertex, so the parameter is as large as it can be and "
-                "the method buys nothing",
+        "expect": {
+            "ftNodes": "9",
+            "ftTree": "32 — not exceeded",
+            "ftWork": "128 against 256",
+        },
     },
     {
         "id": "triangles",
-        "label": "two triangles — a cover of four",
+        "label": "two disjoint triangles, k = 4",
         "spec": "1-2, 2-3, 3-1, 4-5, 5-6, 6-4", "k": "4",
-        "note": "two vertices per triangle, and the branching finds it in a handful of nodes",
+        "expect": {
+            "ftNodes": "9",
+            "ftTree": "32 — not exceeded",
+            "ftWork": "96 against 64",
+        },
     },
     {
         "id": "path7",
         "label": "a path on seven vertices",
         "spec": "1-2, 2-3, 3-4, 4-5, 5-6, 6-7", "k": "3",
-        "note": "three interior vertices cover a path of six edges, and the tree never gets "
-                "deeper than three",
+        "expect": {
+            "ftNodes": "15",
+            "ftTree": "16 — not exceeded",
+            "ftWork": "56 against 128",
+        },
     },
 ]
 
@@ -2035,7 +2204,7 @@ def _fpt(cfg):
             "and not in <span class=\"tt\">n</span>.",
         )
     )
-    script = _BASE_JS + _BOTH_HALVES + _presets_js("FTP", _FT_PRESETS, ["spec", "k", "note"]) + r"""
+    script = _BASE_JS + _BOTH_HALVES + _presets_js("FTP", _FT_PRESETS, ["spec", "k"]) + r"""
   var presetIn = document.getElementById('ftPreset'), specIn = document.getElementById('ftSpec');
   var kIn = document.getElementById('ftK'), kOut = document.getElementById('ftKOut');
   var stepIn = document.getElementById('ftStep'), stepOut = document.getElementById('ftStepOut');
@@ -2189,6 +2358,7 @@ def _fpt(cfg):
             "stops being worth it.",
         ),
         script=script,
+        expect={"ftPreset": _expect(_FT_PRESETS)},
     )
 
 
