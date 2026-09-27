@@ -4292,7 +4292,20 @@ GEOM_JS = r"""
       events.push({ x: a[0], y: a[1], kind: 'start', seg: i });
       events.push({ x: b[0], y: b[1], kind: 'end', seg: i });
     });
-    events.sort(function (p, q) { return p.x - q.x || (p.kind === 'start' ? -1 : 1) || p.y - q.y; });
+    /* A COMPARATOR, not a wish. This read
+         p.x - q.x || (p.kind === 'start' ? -1 : 1) || p.y - q.y
+       whose middle term is ALWAYS truthy, so two things followed: the y
+       tie-break was dead code and could never run, and the comparator was
+       inconsistent -- for two starts at the same x it returned -1 for cmp(p,q)
+       AND -1 for cmp(q,p). "Starts before ends at equal x" is what the sweep's
+       correctness argument rests on, and it was resting on whatever the engine's
+       sort does with a comparator that contradicts itself. It happened to hold
+       on every shipped preset. Now it is a difference of ranks, which is
+       antisymmetric, and the y ordering behind it can actually be reached. */
+    var kindRank = function (e) { return e.kind === 'start' ? 0 : 1; };
+    events.sort(function (p, q) {
+      return p.x - q.x || kindRank(p) - kindRank(q) || p.y - q.y;
+    });
     var active = [], c = counter(), crossings = [], trace = [];
     events.forEach(function (e) {
       if (e.kind === 'start') {

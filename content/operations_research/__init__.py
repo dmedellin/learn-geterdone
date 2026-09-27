@@ -48,10 +48,10 @@ PATH = {
     "level": "Intermediate → Advanced",
     "level_note": 'algebra for the first three courses; discrete probability after that',
     "tagline": (
-        'Decisions with a number attached and a constraint in the way: what to make, what to ship, what to schedule, what to stock and when to stop &mdash; each written as a model, solved exactly, and then read back to find out what the answer cost and what would change it. Ten courses and 94 lessons are available.'
+        'Decisions with a number attached and a constraint in the way: what to make, what to ship, what to schedule, what to stock and when to stop &mdash; each written as a model, solved exactly, and then read back to find out what the answer cost and what would change it. Ten courses and 92 lessons are available.'
     ),
     "description": (
-        'The Operations Research Subject: ten courses in one order, from linear programming models and the simplex method through duality and sensitivity, networks, integer programming, scheduling, sequential decisions, inventory, Markov chains and queues, to simulation. Every solve on this path is exact arithmetic &mdash; tableaux in fractions, expectations as fractions, steady states from a linear system &mdash; and every lesson ends by asking what the model assumed. All ten courses and 94 lessons are available.'
+        'The Operations Research Subject: ten courses in one order, from linear programming models and the simplex method through duality and sensitivity, networks, integer programming, scheduling, sequential decisions, inventory, Markov chains and queues, to simulation. Every solve on this path is exact arithmetic &mdash; tableaux in fractions, expectations as fractions, steady states from a linear system &mdash; and every lesson ends by asking what the model assumed. All ten courses and 92 lessons are available.'
     ),
     "key": [
         "max cᵀx  s.t. Ax ≤ b, x ≥ 0    ⟷    min bᵀy  s.t. Aᵀy ≥ c, y ≥ 0",

@@ -47,10 +47,10 @@ PATH = {
     "level": "Advanced",
     "level_note": 'assumes Discrete Mathematics in full',
     "tagline": (
-        'The structures every program stands on, the algorithms that run on them, the proof that each is correct and its bound tight, and the six honest responses to a problem that has no fast algorithm. Every count on this path is produced by running the algorithm on the input in front of you. Nine courses and 109 lessons are available.'
+        'The structures every program stands on, the algorithms that run on them, the proof that each is correct and its bound tight, and the six honest responses to a problem that has no fast algorithm. Every count on this path is produced by running the algorithm on the input in front of you. Nine courses and 112 lessons are available.'
     ),
     "description": (
-        'The Algorithms Subject: nine courses in one order, from the data structures and their cost models through sorting and selection, graphs and flow, greedy methods and matroids, dynamic programming, strings, geometry, randomisation, and the NP line with everything that can honestly be done about it. Discrete Mathematics analysed algorithms; this path builds them, proves them, and measures them. Every lesson closes on a count the reader produces in the lab and a claim the lab cannot establish. All nine courses and 109 lessons are available.'
+        'The Algorithms Subject: nine courses in one order, from the data structures and their cost models through sorting and selection, graphs and flow, greedy methods and matroids, dynamic programming, strings, geometry, randomisation, and the NP line with everything that can honestly be done about it. Discrete Mathematics analysed algorithms; this path builds them, proves them, and measures them. Every lesson closes on a count the reader produces in the lab and a claim the lab cannot establish. All nine courses and 112 lessons are available.'
     ),
     "key": [
         "heap: parent ≤ children      ⟹  insert, extract-min in O(log n)",

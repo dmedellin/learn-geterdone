@@ -18,7 +18,7 @@ THE THREE THINGS THE COURSE TURNS ON, and where each is made visible:
     both the count and the bound are then linear in n and the only thing that
     separates one text from another is the constant, which is why that table's
     column is comparisons per character. The quadratic needs m to grow WITH n,
-    and the second table is the family that does it -- text a^(2m), pattern
+    and the second table is the family that does it -- text a^(2(m-1)), pattern
     a^(m-1)b -- where the count equals the bound in every row and the
     per-character column rises without limit while KMP's stays flat. Saying
     "quadratic" about the first table would have been false, and it was, until
@@ -614,7 +614,8 @@ def _naive(cfg):
         + (fk.counts.compares || 0) + '</td><td>' + (fh.counts.compares || 0) + '</td></tr>';
     }
     family.innerHTML = '<caption>The family the quadratic is about: the text is a run of a’s '
-      + 'of length 2m and the pattern is m − 1 of them followed by a b, so m grows WITH n. '
+      + 'of length 2(m − 1) and the pattern is m − 1 of them followed by a b, so m grows '
+      + 'WITH n. '
       + 'The count equals the bound in every row, the per-character column rises without '
       + 'limit, and KMP’s stays flat</caption><thead><tr><th>m</th><th>n = 2(m − 1)</th>'
       + '<th>naive</th><th>m(n − m + 1)</th><th>per character</th><th>KMP</th>'
@@ -1022,7 +1023,17 @@ def _horspool(cfg):
     atOut.textContent = at + ' of ' + run.trace.length;
     var step = run.trace[at - 1];
 
-    bars.innerHTML = skBars(run.trace.map(function (s) { return s.matchedFromRight + 1; }),
+    /* An alignment costs matchedFromRight + 1 when it FAILS -- the characters
+       that matched plus the one that did not -- and exactly m when it matches,
+       because there is no mismatching comparison to add. This plotted
+       matchedFromRight + 1 unconditionally, so every matching alignment drew a
+       bar of m + 1 ABOVE the dashed line whose own label says m is the most one
+       alignment can cost, and the bar heights summed to more than the
+       comparison total printed in the same panel. On the default text: heights
+       summing to 24 against a total of 22, with two bars over the line. */
+    bars.innerHTML = skBars(run.trace.map(function (s) {
+                              return s.matchedFromRight === m ? m : s.matchedFromRight + 1;
+                            }),
                             { bound: m, boundLabel: 'm = ' + m, mark: at - 1, width: 660 });
     strip.innerHTML = '<span class="tone-muted">text, matches marked:</span> '
       + skMarkup(t, res.hits, m, 0, 200)

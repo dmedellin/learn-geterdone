@@ -15392,6 +15392,23 @@ console.log('strings: every match position checked against a scan over every off
     eq(run.result.skipped, 52, 'having skipped 52 alignments outright');
     eq(run.result.skipped, run.trace.reduce((a, s) => a + s.shift - 1, 0),
        'and skipped is the sum of (shift - 1), which is what the average-shift KPI divides');
+    /* THE BAR CHART'S OWN ARITHMETIC. An alignment costs matchedFromRight + 1
+       when it fails and exactly m when it matches -- there is no mismatching
+       comparison to add. The chart plotted matchedFromRight + 1 for every
+       alignment, so a matching one drew a bar of m + 1 ABOVE the dashed line
+       whose label says m is the most one alignment can cost, and the heights
+       summed past the comparison total printed beside them. Asserted on every
+       preset of the mode, because one text with no match cannot see it. */
+    for (const pat of ['mainly', 'GATTACA', 'baaaa', 'ababb']) {
+      for (const txt of [t, 'a'.repeat(30), 'GATTACAGATTACA', 'abababababababab']) {
+        const r = horspoolRun(txt, pat), m = pat.length;
+        const bars = r.trace.map((st) => (st.matchedFromRight === m ? m : st.matchedFromRight + 1));
+        eq(bars.reduce((a, b) => a + b, 0), r.counts.compares,
+           'the Horspool bars sum to the comparisons the panel prints, on ' + pat + '/' + txt.slice(0, 8));
+        eq(bars.every((h) => h <= m), true,
+           'and no bar rises above the line labelled m = ' + m);
+      }
+    }
     /* The shift table is the last occurrence in the first m - 1 characters. */
     for (const p of ['mainly', 'GATTACA', 'baaaa', 'cccz', 'ababb']) {
       const table = horspoolRun('x'.repeat(40), p).result.table;
@@ -16029,6 +16046,35 @@ console.log('geometry: exact predicates, and the hull checked against the defini
       for (let i = 0; i < k; i += 1) S.push([[rnd(9) - 4, rnd(9) - 4], [rnd(9) - 4, rnd(9) - 4]]);
       eq(geoPairKeys(sweepEvents(S).result.crossings), geoPairKeys(geoSweepBrute(S)),
          'the sweep and every pair agree on a random set of segments');
+    }
+    /* THE EVENT ORDER, which the crossing set cannot see. The comparator used to
+       be `p.x - q.x || (p.kind === 'start' ? -1 : 1) || p.y - q.y`: its middle
+       term is always truthy, so the y tie-break was unreachable and the function
+       was inconsistent -- cmp(p,q) and cmp(q,p) both -1 for two starts at equal
+       x. "Starts before ends at the same x" is the sweep's correctness argument,
+       and it was resting on the engine's sort rather than on the comparator.
+       These two assertions are about the ORDER, not the answer, because every
+       crossing check above passed throughout. */
+    {
+      let bad = [];
+      for (let it = 0; it < 400; it += 1) {
+        const k = 2 + rnd(5), S = [];
+        for (let i = 0; i < k; i += 1) S.push([[rnd(5) - 2, rnd(5) - 2], [rnd(5) - 2, rnd(5) - 2]]);
+        const ev = sweepEvents(S).result.events;
+        // No fallback and no break: a check that silently stops when its input
+        // moves is a check that reports clean. This file has shipped that twice.
+        eq(Array.isArray(ev) && ev.length === 2 * k, true,
+           'sweepEvents exposes its event list, two per segment');
+        for (let i = 1; i < ev.length; i += 1) {
+          const a = ev[i - 1], b = ev[i];
+          if (a.x > b.x) bad.push('x out of order');
+          else if (a.x === b.x && a.kind === 'end' && b.kind === 'start') bad.push('an end before a start at x = ' + a.x);
+          else if (a.x === b.x && a.kind === b.kind && a.y > b.y) bad.push('y out of order at x = ' + a.x);
+        }
+      }
+      eq([...new Set(bad)].join(' | '), '',
+         'the event list is sorted by x, then starts before ends, then by y -- the ordering the '
+         + 'comparator claims and could not previously deliver');
     }
   }
 

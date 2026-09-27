@@ -997,7 +997,8 @@ def _hull(cfg):
         + '</td><td class="tt">' + geoPointText(s.point) + '</td><td>' + s.depth + '</td></tr>';
     });
     traceT.innerHTML = '<caption>The stack, step by step. A point is pushed once and popped at '
-      + 'most once, which is why the two chains together cost 2n stack operations and not more'
+      + 'most once. Each chain PUSHES every point once, so pushes alone is 2n and the two '
+      + 'chains together cost at most 4n stack operations'
       + (shown.trace.length > 26 ? ' (first 26 of ' + shown.trace.length + ')' : '')
       + '</caption><thead><tr><th>step</th><th>chain</th><th>action</th><th>point</th>'
       + '<th>stack depth</th></tr></thead><tbody>' + trows + '</tbody>';
@@ -1009,8 +1010,11 @@ def _hull(cfg):
       + (dbl.h === exact.h ? '' : ' — a vertex short');
     document.getElementById('huJH').textContent = wrap ? wrap.result.h : '—';
     document.getElementById('huB').textContent = bound.length;
+    /* pushes ALONE is 2n -- each of the two chains pushes every point once --
+       so the ceiling on pushes PLUS pops is 4n. This printed "against 2n" and
+       so contradicted itself on every hull page: 18 + 12 = 30 against 2n = 18. */
     document.getElementById('huStack').textContent = shown.pushes + ' + ' + shown.pops + ' = '
-      + (shown.pushes + shown.pops) + ' against 2n = ' + shown.bound;
+      + (shown.pushes + shown.pops) + ' against 4n = ' + (2 * shown.bound);
     document.getElementById('huWork').textContent = wrap
       ? (wrap.result.work + ' against ' + wrap.result.nlogn) : '—';
 
@@ -1035,8 +1039,11 @@ def _hull(cfg):
             + exact.h + ' and gift wrapping returns ' + (wrap ? wrap.result.h : '—')
             + '. Neither is a bug in arithmetic; they are different conventions about a collinear '
             + 'point, and only one of them is a convex polygon\u2019s vertex list. '
-          : 'No three of these points are collinear, so the boundary and the vertex set are the '
-            + 'same ' + exact.h + ' points and the two conventions cannot be told apart here. ')
+          : 'No point of this set lies BETWEEN two hull vertices, so the boundary and the vertex '
+            + 'set are the same ' + exact.h + ' points and the two conventions cannot be told '
+            + 'apart here. That is weaker than no three being collinear -- which this sentence '
+            + 'used to claim, and which is false on the opening preset, where four collinear '
+            + 'triples all pass through the interior point. ')
       + (dbl.h === exact.h
           ? 'Both predicates return the same hull at this magnitude. '
           : '<span class="tone-red">The double predicate returns ' + dbl.h + ' vertices against '
