@@ -39,13 +39,6 @@ note occupied holds `expect`: {kpi element id: the exact text the page prints}.
 scripts/labcheck.js selects the option on the BUILT page, dispatches the menu's
 own change handler and compares the tile's textContent.
 
-Writing them turned up one preset whose PAGE and whose NAME disagree:
-`secretary/hundred` asks for 100 candidates and the control is a range of
-3..60 that redraw() clamps to, so every reader sees n = 60. The expectations
-pin what the page prints and the comment beside them says what it would print
-at 100, so raising the cap fails this check instead of passing quietly. See
-`_expect` below and scripts/mathpath/AGENTS.md for the rule.
-
 WHAT THIS KIT DOES NOT CONTAIN.
 
   AN INFINITE-HORIZON POLICY ITERATION. `policyIterate` lives in or_core's
@@ -2900,18 +2893,18 @@ _SE_PRESETS = [
     },
     {
         "id": "hundred",
-        "label": "sixty, where the limit starts to look like the answer",
+        "label": "a hundred, the famous thirty-seven per cent",
         "n": "100",
-        # THIS PRESET ASKS FOR 100 AND THE PAGE RENDERS 60. The control below is a range
-        # 3..60 and redraw() clamps to it, so the figures pinned here are n = 60's:
-        # reject 22, win with probability 0.373210, against a limit of 60/e. At the n =
-        # 100 this preset names they would be 37 and 0.371043. Raise the cap rather than
-        # retuning the strings -- and when it is raised, these three expectations fail
-        # and point here.
+        # seBestR is the tile labelled "Reject this many first" and it holds the
+        # cutoff MINUS ONE. At 100 the cutoff is 38 and you reject 37; 37 is the
+        # famous number and 38 is not, and every sentence in the lesson compares
+        # n/e with the figure pinned here. seWalked is pinned because at this n
+        # the count is unaffordable and the page has to say so.
         "expect": {
-            "seBestR": "22",
-            "seBestP": "0.373210",
-            "seLimit": "22.0728 — rounded",
+            "seBestR": "37",
+            "seBestP": "0.371043",
+            "seLimit": "36.7879 — rounded",
+            "seWalked": "none — too many",
         },
     },
 ]
@@ -2935,7 +2928,7 @@ def _secretary(cfg):
     )
     controls = (
         _select("sePreset", "Worked example", _options(_SE_PRESETS), chosen["id"])
-        + _range("seN", "Candidates", 3, 60, int(chosen["n"]))
+        + _range("seN", "Candidates", 3, 100, int(chosen["n"]))
         + _kpis([
             ("Reject this many first", "seBestR"),
             ("Then you win with probability", "seBestP"),
@@ -2947,9 +2940,10 @@ def _secretary(cfg):
         + _hint(
             "seHint",
             "The exact probability is `((r−1)/n) · Σ 1/(i−1)` over `i` from `r` to `n`, and every "
-            "entry below is that fraction rather than a decimal. The `n/e` a textbook quotes is the "
-            "LIMIT of the best `r`, not the answer &mdash; it is printed here rounded and labelled, "
-            "beside the exact table that never needs it.",
+            "entry below is that fraction rather than a decimal. The `n/e` a textbook quotes is a "
+            "LIMIT, not the answer, and the figure to hold it against is the first tile &mdash; how "
+            "many you reject, which is `r − 1`. It is printed here rounded and labelled, beside the "
+            "exact table that never needs it.",
         )
     )
 
@@ -2961,7 +2955,7 @@ def _secretary(cfg):
   var status = document.getElementById('seStatus');
 
   function redraw() {
-    var n = Math.max(3, Math.min(60, Math.round(+nIn.value))), i;
+    var n = Math.max(3, Math.min(100, Math.round(+nIn.value))), i;
     document.getElementById('seNOut').textContent = String(n);
     var ex = secretaryExact(n);
     var brute = secretaryBrute(n, 7);
@@ -2973,25 +2967,39 @@ def _secretary(cfg):
     }
     var limit = Rmul(R(BigInt(n), 1n), invE());
 
+    /* THE DOTS ARE DROPPED ABOVE SIXTY. dpPlot draws each point at radius 2.6 in
+       a 520-unit box whose plot area is 460 wide, so the gap between points is
+       460/(n-1): 7.8 at n = 60, 4.6 at n = 100, against a dot 5.2 across. Past
+       sixty they are a band rather than points and by ninety they overlap
+       outright, and what they are there to say -- that P(r) exists only at whole
+       r -- is unreadable long before that. The best r is its own one-point
+       series so that the purple marker, which dpPlot draws inside the dot loop,
+       survives the dots being turned off. It is drawn last, so it is on top. */
     plot.innerHTML = dpPlot([
-      { name: 'exact P(r)', tone: 'cyan',
-        points: ex.probs.map(function (q) { return [R(BigInt(q.r), 1n), q.p]; }),
-        mark: function (k) { return ex.probs[k].r === ex.best; } }
+      { name: 'exact P(r)', tone: 'cyan', dots: n <= 60,
+        points: ex.probs.map(function (q) { return [R(BigInt(q.r), 1n), q.p]; }) }
     ].concat(brute.truncated ? [] : [{ name: 'counted over every ordering', tone: 'green', dash: true,
-        dots: false, points: brute.probs.map(function (q) { return [R(BigInt(q.r), 1n), q.p]; }) }]),
+        dots: false, points: brute.probs.map(function (q) { return [R(BigInt(q.r), 1n), q.p]; }) }])
+     .concat([{ tone: 'purple', line: false, points: [[R(BigInt(ex.best), 1n), ex.bestP]],
+        mark: function () { return true; } }]),
       { width: 520, height: 240, zero: true,
         caption: 'how many to reject first, against the chance of ending with the best' });
 
+    /* Every step-th row, the best, AND THE TWO ROWS EITHER SIDE OF IT. Those two
+       are the lesson's whole argument at large n: at n = 100 the best row is
+       0.371043 and its neighbours differ from it in the fifth decimal, and a
+       table that decimates them away leaves the reader taking that on trust. */
     var rows = '', step = Math.max(1, Math.ceil(n / 14));
     for (i = 0; i < ex.probs.length; i += 1) {
       var q = ex.probs[i];
-      if (q.r !== ex.best && (q.r - 1) % step !== 0 && q.r !== n) continue;
+      if (Math.abs(q.r - ex.best) > 1 && (q.r - 1) % step !== 0 && q.r !== n) continue;
       rows += tr([rowhead('r = ' + q.r), td(Rshort(q.p, 6, 20)), td(Rfixed(q.p, 6)),
                   td(q.r === ex.best ? tone('the best r', 'purple') : '')],
                  q.r === ex.best ? 'tone-purple' : null);
     }
     tableT.innerHTML = '<caption>The chance of success, exactly, for each number rejected first'
-      + (step > 1 ? ' (every ' + step + 'th row, and the best)' : '') + '</caption><thead>'
+      + (step > 1 ? ' (every ' + step + 'th row, the best, and the row either side of it)' : '')
+      + '</caption><thead>'
       + tr([th('r'), th('P(r), exactly'), th('as a decimal'), th('')]) + '</thead>'
       + '<tbody>' + rows + '</tbody>';
 
@@ -3037,9 +3045,10 @@ def _secretary(cfg):
           : 'Every entry was checked by playing the rule out on all ' + brute.total
             + ' orderings and counting the wins, which shares no arithmetic with the harmonic sum. ')
       + 'The <span class="tone-amber">n/e</span> a textbook quotes is ' + Rfixed(limit, 4)
-      + ' here, and it is the LIMIT of the best r rather than the answer: at n = ' + n
-      + ' the best r is ' + ex.best + ', and 1/e is irrational so that figure is rounded and this is '
-      + 'the only rounded number on the page.';
+      + ' here, and it is a LIMIT rather than the answer. The figure to hold it against is how many '
+      + 'you reject, which at n = ' + n + ' is ' + (ex.best - 1) + ' — read off the table above, '
+      + 'never off the constant. 1/e is irrational, so that figure is rounded and it is the only '
+      + 'rounded number on the page.';
   }
 
   function apply() {

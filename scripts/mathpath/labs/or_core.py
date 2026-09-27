@@ -2918,8 +2918,14 @@ DPSEQ_JS = r"""
   function secretaryExact(n) {
     var probs = [], r, best = 1, bestP = R(1n, BigInt(n));
     probs.push({ r: 1, p: bestP });
+    /* The tail is H(n-1) - H(r-2), and rebuilding both harmonic numbers on
+       every row makes the table quadratic in n -- at the slider's top setting
+       that was most of a redraw, 72 ms of it. It is carried instead: the tail
+       at r = 2 IS H(n-1), and each step up drops exactly one term. Same
+       rationals, same order, one harmonic() call for the whole table. */
+    var sum = harmonic(n - 1, 1);
     for (r = 2; r <= n; r += 1) {
-      var sum = Rsub(harmonic(n - 1, 1), harmonic(r - 2, 1));
+      if (r > 2) sum = Rsub(sum, R(1n, BigInt(r - 2)));
       var p = Rmul(R(BigInt(r - 1), BigInt(n)), sum);
       probs.push({ r: r, p: p });
       if (Rcmp(p, bestP) > 0) { bestP = p; best = r; }

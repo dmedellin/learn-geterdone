@@ -15009,8 +15009,9 @@ console.log('operations research: the sequential-decisions kit, and every policy
        'and twenty terms already agree with thirty to eighteen places, so every digit this kit prints '
        + 'of it is stable — the next term of the series is 1/21!, which is below the last of them');
     eq(Rfixed(Rmul(ri(100), invE()), 4) + ' against ' + secretaryExact(100).best, '36.7879 against 38',
-       'at n = 100 the n/e a textbook quotes is 36.7879 and the exact best r is 38 -- the limit is not '
-       + 'the answer, and only one of them is a fraction');
+       'at n = 100 the n/e a textbook quotes is 36.7879 and the exact cutoff r is 38 -- the page holds '
+       + 'the limit against the number REJECTED, which is r - 1 = 37, and the limit is not the answer '
+       + 'against either of them');
     eq(Rfixed(secretaryExact(100).bestP, 6), '0.371043', 'succeeding 37.1043% of the time');
     eq(Rshort(secretaryExact(100).bestP, 6, 20), '0.371043',
        'and Rshort prints that as a decimal, because the exact form runs to forty digits');
@@ -18665,25 +18666,47 @@ console.log('lab presets: every corrected preset string against the number it st
       eq(placesAt(20), 5, 'and twenty reach five');
     }
 
-    /* secretary/hundred: the preset asks for 100 candidates and the control is a
-       range that clamps to 60, which is a control bug and not a prose one. The
-       note that described n = 100 is gone and the preset's expectations pin what
-       the page PRINTS at 60; this assertion keeps the mismatch itself recorded,
-       so the day the cap is raised both it and those expectations fail. */
+    /* secretary/hundred: the preset asks for 100 candidates and the control now
+       reaches them. THE OFF-BY-ONE IS THE WHOLE POINT OF THIS BLOCK.
+       secretaryExact returns `best` = the CUTOFF r, the first candidate the rule
+       would accept, and the tile is labelled "Reject this many first" and holds
+       r - 1. At n = 100 the cutoff is 38 and the number rejected is 37 -- and 37
+       is the figure the rule is famous for, so a lesson that quotes `best` there
+       is off by one. Every sentence on the page compares n/e with the number
+       REJECTED, and the list below is what that convention costs: eighteen of the
+       ninety-eight settings the slider reaches, which is the lesson's harder
+       rehearsal walked here rather than asserted. */
     {
       const src = pySrc('dpseq');
       const m = /_range\("seN", "Candidates", 3, (\d+), int\(chosen\["n"\]\)\)/.exec(src);
       eq(m !== null, true, 'secretary: the candidate control is still a range');
       const cap = parseInt(m[1], 10);
       const n = parseInt(P('_SE_PRESETS', 'hundred', 'n'), 10);
-      const atN = secretaryExact(n), atCap = secretaryExact(Math.min(n, cap));
-      /* what the page prints, against what the preset's own n would print */
-      eq(n > cap, true, 'and the preset asks for more candidates than the control allows: '
-         + n + ' against ' + cap + ' -- so the page renders at ' + cap
-         + ' (best r ' + atCap.best + ', P ' + Rfixed(atCap.bestP, 6)
-         + ') and the note describes n = ' + n + ' (best r ' + atN.best
-         + ', P ' + Rfixed(atN.bestP, 6) + '). RAISE THE CAP rather than retuning the '
-         + 'strings, and re-read the expectations on that preset when you do.');
+      eq(n <= cap, true, 'secretary/hundred: the control reaches the ' + n + ' candidates the '
+         + 'preset names (the cap is ' + cap + '), so the reader sees the instance it asks for');
+      eq(new RegExp('Math\\.max\\(3, Math\\.min\\(' + cap + ', Math\\.round').test(src), true,
+         'and redraw() clamps to that same cap -- a second, lower one is how the preset came '
+         + 'to ask for 100 while every reader saw 60');
+      const atN = secretaryExact(n);
+      eq(atN.best, 38, 'secretary/hundred: the CUTOFF r at n = 100 is 38');
+      eq(atN.best - 1, 37, 'so the tile holds 37, the number rejected -- which is the famous figure, '
+         + 'and the cutoff is not');
+      eq(Rfixed(atN.bestP, 6), '0.371043', 'and the rule wins with probability 0.371043');
+      eq(Rfixed(Rmul(R(BigInt(n), 1n), invE()), 4), '36.7879', 'against a rounded limit of 36.7879');
+      const at = (r) => Rfixed(atN.probs[r - 1].p, 6);
+      eq([at(37), at(38), at(39)].join(' '), '0.371015 0.371043 0.370801',
+         'and its neighbours differ from it in the FIFTH decimal, which is why the exact table '
+         + 'decides between them and the constant cannot');
+      /* the walk: where does round(n/e) stop being the number you reject? */
+      const off = [];
+      for (let k = 3; k <= cap; k += 1) {
+        const lim = Radd(Rmul(R(BigInt(k), 1n), invE()), R(1n, 2n));
+        if (Number(lim.n / lim.d) !== secretaryExact(k).best - 1) off.push(k);
+      }
+      eq(cap - 3 + 1, 98, 'the slider reaches 98 settings');
+      eq(off.join(','), '7,10,15,18,26,29,34,37,45,48,56,64,67,75,83,86,94,97',
+         'and the rounded limit is NOT the number you reject at exactly these eighteen of them');
+      eq(off.length, 18, 'eighteen, which is what the lesson sends a reader to find');
     }
   }
 
