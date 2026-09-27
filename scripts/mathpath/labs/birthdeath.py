@@ -45,8 +45,9 @@ for e^x, so nothing cancels and the result is correct to a rounding of the
 double; the page states the method, prints the exact binomial beside it, and
 prints the difference between them. Everything else in this kit is exact
 rational arithmetic, and a truncated chain's pi has denominators that outgrow a
-double quickly: at lambda = 19/20, mu = 1 and sixty states the normaliser is
-already hundreds of digits.
+double quickly: at lambda = 19/20, mu = 1 and sixty states pi_0 is a fraction
+of 79 digits over 80, and at ninety states its denominator runs to 119. Those
+are measured, not estimated, and scripts/mathcheck.js pins the first of them.
 
 WHAT THIS KIT DOES NOT SAY. `birthDeath` truncates: the reader chooses how many
 states, and the chain is finite. For a genuinely infinite queue that is an
@@ -740,7 +741,7 @@ def _cut(cfg):
         markup=markup,
         controls=controls,
         script=script,
-        panel_title="Type any rates you like &mdash; they do not have to be constant",
+        panel_title="Type any rates you like — they do not have to be constant",
         panel_intro="The cut equations build &pi; as a product of ratios. Beside them the full balance "
         "system is solved by exact elimination, and the page compares the two distributions fraction by "
         "fraction rather than to a tolerance.",
@@ -897,9 +898,14 @@ def _mm1(cfg):
             + Rtext(Rsub(lam, mu)) + ' per unit time. The finite chain above still has a distribution '
             + '&mdash; it cannot grow past state ' + N + ' &mdash; but it is the distribution of a '
             + 'DIFFERENT model, one with a buffer, and mode <em>finite</em> is where that model belongs.')
-      + ' Everything in the left-hand column is exact: &pi;&#8320; on a ninety-state chain at &rho; = '
-      + '19/20 has a denominator of hundreds of digits, and it is carried as a fraction rather than '
-      + 'rounded into a double.';
+      + ' Everything in the left-hand column is exact: on this chain &pi;&#8320; is a fraction of '
+      + String(bd.pi[0].n).length + ' digit' + (String(bd.pi[0].n).length === 1 ? '' : 's') + ' over '
+      + String(bd.pi[0].d).length + ', carried whole rather than rounded into a double '
+      + (String(bd.pi[0].d).length > 16
+          ? '&mdash; which a double could not hold, so a decimal implementation would be storing the '
+            + 'nearest number it had and calling it &pi;&#8320;.'
+          : '&mdash; small enough here that a double would have coped, which is not something a page '
+            + 'can know before it computes the number.');
   }
 
   presetS.addEventListener('change', function () {
@@ -1064,8 +1070,18 @@ def _mms(cfg):
             + ', because &rho; = ' + Rtext(rho) + ' is at least 1 and the untruncated queue has no '
             + 'distribution. ')
       + 'On average ' + Rshort(busy, 4, 6) + ' of the ' + s + ' servers '
-      + (Rcmp(busy, R1) <= 0 ? 'is' : 'are') + ' busy, which is a&rsquo;s worth of work whatever s is: '
-      + 'adding a server does not reduce the work, it reduces the waiting.';
+      + (Rcmp(busy, R1) <= 0 ? 'is' : 'are') + ' busy. '
+      + (Rcmp(rho, R1) < 0
+          ? '<strong>That is the offered load a = ' + Rtext(a) + ', and it stays the offered load '
+            + 'however many servers there are</strong> &mdash; every arriving customer is eventually '
+            + 'served, so the work done per unit time equals the work arriving. Adding a server does not '
+            + 'reduce the work; it reduces the waiting.'
+          : '<span class="tone-amber">It is NOT the offered load a = ' + Rtext(a) + ' here</span>, and '
+            + 'that is the point of the comparison: at &rho; &ge; 1 the servers cannot keep up, so they '
+            + 'are busy essentially all the time and the work they finish is ' + Rtext(Rmul(R(BigInt(s), 1n), mu))
+            + ' per unit time rather than the ' + Rtext(a) + ' arriving. The difference piles up in the '
+            + 'queue, and only the truncation at state ' + N + ' stops it growing without bound. '
+            + '&ldquo;Busy servers equals offered load&rdquo; is a statement about a queue that settles.');
   }
 
   presetS.addEventListener('change', function () {
@@ -1257,7 +1273,7 @@ def _finite(cfg):
     return _lab(
         cfg,
         title="A queue with a wall, and the rate that actually gets in",
-        subtitle="blocking, the admitted rate, and the division Little&rsquo;s Law really asks for",
+        subtitle="blocking, the admitted rate, and the division Little’s Law really asks for",
         markup=markup,
         controls=controls,
         script=script,
@@ -1433,8 +1449,9 @@ def _poisson(cfg):
         controls=controls,
         script=script,
         panel_title="Slide the number of opportunities and watch the limit arrive",
-        panel_intro="The exact column is a binomial in rational arithmetic with denominators of hundreds "
-        "of digits. The column beside it is the Poisson limit, which cannot be exact because "
+        panel_intro="The exact column is a binomial in rational arithmetic, with denominators running to "
+        "sixty-five digits on the default view and past a thousand at the top of the slider. The column "
+        "beside it is the Poisson limit, which cannot be exact because "
         "e<sup>&minus;&lambda;</sup> is irrational, and the page prints the difference.",
     )
 

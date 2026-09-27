@@ -49,13 +49,17 @@ WHAT THIS KIT DOES NOT CONTAIN.
 BLOCKS PER MODE. or_core's docstring puts this kit's engine share at 6.1 KB
 gzipped, which is the smallest on the path, so the selection here is modest:
 only `discount` needs the matrix block, only `secretary` needs the harmonic
-sum, and only three modes draw a plot. Measured as whole pages by
-scripts/build_paths.py, page frame included:
+sum, and only five modes draw a plot. Measured as whole pages -- rendered by
+scripts/mathpath/render.py, frame and prose included, and taking the WORST of
+the nine Integer Programming lessons' prose bodies for each mode, because this
+course is not authored yet and a mode measured against thin prose is not
+measured:
 
-    lotsize 32.4 KB   stopping 32.5   heuristics 32.7   secretary 32.8
-    tree 33.1   allocation 33.5   stages 33.6   stochastic 33.7   discount 35.7
+    allocation 38.7 KB   stages 39.0   lotsize 39.7   heuristics 39.9
+    tree 41.0   secretary 41.1   stopping 41.2   stochastic 41.3   discount 42.6
 
-against the 62 KB ceiling.
+against the 62 KB ceiling, so every mode here has at least 19 KB of room.
+Re-derive rather than trusting these -- they go stale as the engine grows.
 """
 
 from .algebra_core import RATIONAL_JS
@@ -1790,11 +1794,11 @@ _HE_PRESETS = [
     },
     {
         "id": "both",
-        "label": "both of them miss",
-        "demand": "20 5 90 4 85 6 70",
-        "K": "70",
-        "h": "2",
-        "note": "each rule stops its interval one period early, for different reasons",
+        "label": "both of them miss, and by different amounts",
+        "demand": "17 25 73 113 89",
+        "K": "116",
+        "h": "1",
+        "note": "Silver-Meal places three orders and pays 24 too much; least-unit-cost places two and pays 30",
     },
     {
         "id": "agree",
@@ -2012,25 +2016,25 @@ _SD_PRESETS = [
     },
     {
         "id": "absorb",
-        "label": "an action that cannot be undone",
-        "states": "open shut",
-        "acts": "wait close",
-        "p0": "2/3 1/3; 0 1",
+        "label": "an action that ends the game",
+        "states": "owned sold",
+        "acts": "keep sell",
+        "p0": "4/5 1/5; 0 1",
         "p1": "0 1; 0 1",
-        "r": "4 0; 1 0",
+        "r": "3 0; 7 0",
         "T": "3",
-        "note": "closing pays 1 now and nothing ever again, so when to take it is the whole question",
+        "note": "keeping pays 3 a period and risks the machine; selling pays 7 once and then nothing ever",
     },
     {
         "id": "flip",
         "label": "the best action changes with how long is left",
-        "states": "low high",
-        "acts": "steady invest",
-        "p0": "3/4 1/4; 1/4 3/4",
-        "p1": "1/4 3/4; 1/10 9/10",
-        "r": "3 5; 0 2",
+        "states": "small large",
+        "acts": "grow harvest",
+        "p0": "1/4 3/4; 0 1",
+        "p1": "1 0; 3/4 1/4",
+        "r": "0 1; 3 9",
         "T": "4",
-        "note": "investing costs now and pays later, so it stops being worth it near the end",
+        "note": "growing pays almost nothing and builds; harvesting pays well and knocks you back",
     },
 ]
 
@@ -2506,3 +2510,669 @@ def _tree(cfg):
         ),
         script=script,
     )
+
+
+# ---------------------------------------------------------------------------
+# L7 -- stopping: the threshold, and every rule it is competing with
+# ---------------------------------------------------------------------------
+
+_SP_PRESETS = [
+    {
+        "id": "three",
+        "label": "three offers, equally likely, and a cost to carry on",
+        "pmf": "10:1/3, 20:1/3, 30:1/3",
+        "T": "3",
+        "c": "1",
+        "note": "the threshold falls as the deadline nears, and in the last period anything is taken",
+    },
+    {
+        "id": "skew",
+        "label": "a rare high offer",
+        "pmf": "8:3/5, 14:3/10, 40:1/10",
+        "T": "4",
+        "c": "1",
+        "note": "waiting is worth it only because of the tenth that pays 40",
+    },
+    {
+        "id": "costly",
+        "label": "searching is expensive",
+        "pmf": "10:1/2, 30:1/2",
+        "T": "4",
+        "c": "5",
+        "note": "at this cost the threshold barely moves, and waiting stops being worth anything",
+    },
+]
+
+
+def _stopping(cfg):
+    chosen = _choose(cfg, "stopping", _SP_PRESETS, "three")
+
+    markup = (
+        _toolbar(
+            "When to stop looking",
+            "the threshold is what carrying on is worth, and it falls as the chances run out",
+            [("cyan", "the threshold"), ("green", "an offer this period would accept"),
+             ("purple", "the best rule of any shape"), ("amber", "the cost of one more look")],
+        )
+        + _stage(_svg("spPlot", "0 0 520 230",
+                      "The threshold against how many periods are left."))
+        + _table("spRows")
+        + _table("spRules")
+        + _banner("spStatus")
+    )
+    controls = (
+        _select("spPreset", "Worked example", _options(_SP_PRESETS), chosen["id"])
+        + _text("spPmf", "The offers, as value:probability", chosen["pmf"])
+        + _range("spT", "Periods you have", 1, 4, int(chosen["T"]))
+        + _range("spC", "What one more look costs", 0, 6, int(chosen["c"]))
+        + _kpis([
+            ("The whole search is worth", "spValue"),
+            ("The best rule of any shape", "spBest"),
+            ("Do the two agree?", "spAgree"),
+            ("Accept-sets there are", "spCount"),
+            ("Is the best rule a threshold?", "spShape"),
+            ("The threshold with one period left", "spLast"),
+        ])
+        + _hint(
+            "spHint",
+            "That the best rule is a threshold is a claim about its SHAPE, and it is usually asserted. "
+            "Here it is measured: every way of choosing which offers to accept in each period is "
+            "enumerated and evaluated, and the winner is then tested for whether accepting an offer "
+            "implies accepting every larger one.",
+        )
+    )
+
+    script = _MODE_JS["stopping"] + r"""
+""" + _presets_js("SPP", _SP_PRESETS, ["pmf", "T", "c", "note"]) + r"""
+  var presetIn = document.getElementById('spPreset'), pmfIn = document.getElementById('spPmf');
+  var tIn = document.getElementById('spT'), cIn = document.getElementById('spC');
+  var plot = document.getElementById('spPlot');
+  var rowsT = document.getElementById('spRows'), rulesT = document.getElementById('spRules');
+  var status = document.getElementById('spStatus');
+  var KPIS = ['spValue', 'spBest', 'spAgree', 'spCount', 'spShape', 'spLast'];
+
+  function blank(why) {
+    plot.innerHTML = ''; rowsT.innerHTML = ''; rulesT.innerHTML = '';
+    for (var i = 0; i < KPIS.length; i += 1) document.getElementById(KPIS[i]).textContent = '—';
+    status.innerHTML = '<span class="tone-red">' + why + '.</span> An offer is a value, a colon and a '
+      + 'probability, and the probabilities have to add to 1.';
+  }
+
+  function redraw() {
+    var pp = parsePmf(pmfIn.value);
+    if (pp.bad) { blank(pp.bad); return; }
+    var pmf = pp.pmf, i, k, t;
+    if (pmf.length > 4) { blank('that is ' + pmf.length + ' offers, and this lab enumerates at most 4'); return; }
+    var T = Math.max(1, Math.min(4, Math.round(+tIn.value)));
+    var c = R(BigInt(Math.round(+cIn.value)), 1n);
+    document.getElementById('spTOut').textContent = String(T);
+    document.getElementById('spCOut').textContent = Rtext(c);
+
+    var st = stopThresholds(pmf, T, c);
+    var sets = thresholdSets(pmf, st.rows);
+    var mine = ruleValue(pmf, sets, c);
+    var brute = everyStoppingRule(pmf, T, c);
+    var agree = !brute.truncated && Requ(st.value, brute.best);
+    if (!Requ(mine, st.value)) {
+      blank('the accept-sets the thresholds describe are worth ' + Rtext(mine)
+            + ' and the recursion says ' + Rtext(st.value));
+      return;
+    }
+
+    plot.innerHTML = dpPlot([{ name: 'threshold', tone: 'cyan',
+        points: st.rows.map(function (q) { return [R(BigInt(q.left), 1n), q.threshold]; }) },
+      { name: 'worth carrying on', tone: 'purple', dash: true,
+        points: st.rows.map(function (q) { return [R(BigInt(q.left), 1n), q.continuation]; }) }],
+      { width: 520, height: 230, zero: true,
+        caption: 'periods left, against the offer you would need to see to stop' });
+
+    var rows = '';
+    for (i = 0; i < st.rows.length; i += 1) {
+      var r = st.rows[i];
+      rows += tr([rowhead(r.left + ' left'), td(Rtext(r.threshold)),
+                  td(r.accept.length ? r.accept.map(Rtext).join(', ') : 'nothing'),
+                  td(Rtext(r.continuation)), tdl(r.why)]);
+    }
+    rowsT.innerHTML = '<caption>The threshold, period by period</caption><thead>'
+      + tr([th('periods left'), th('accept above'), th('which offers that is'),
+            th('worth carrying on'), th('why')]) + '</thead><tbody>' + rows + '</tbody>';
+
+    var srows = '';
+    var describe = function (ss) {
+      var out = [];
+      for (t = ss.length - 1; t >= 0; t -= 1) {
+        var take = [];
+        for (k = 0; k < pmf.length; k += 1) if (ss[t][k]) take.push(Rtext(pmf[k][0]));
+        out.push((t + 1) + ' left: ' + (take.length ? take.join(' ') : 'nothing'));
+      }
+      return out.join(' &nbsp;|&nbsp; ');
+    };
+    srows += tr([rowhead('the threshold rule'), td(Rtext(mine)), tdl(describe(sets))], 'tone-cyan');
+    if (!brute.truncated) {
+      srows += tr([rowhead('the best of every accept-set'), td(Rtext(brute.best)),
+                   tdl(describe(brute.sets))], 'tone-purple');
+      srows += tr([rowhead('is that a threshold rule?'),
+                   td(brute.threshold ? tone('yes', 'green') : tone('no', 'red')),
+                   tdl(brute.threshold
+                       ? 'accepting an offer implies accepting every larger one, in every period — '
+                         + 'which is the shape the recursion assumed, measured rather than asserted'
+                       : 'the best rule accepts an offer and rejects a larger one, which would make '
+                         + 'the threshold form wrong here')],
+                  brute.threshold ? 'tone-green' : 'tone-red');
+    } else {
+      srows += tr([rowhead('every accept-set'), td('not enumerated'), tdl(brute.why)]);
+    }
+    rulesT.innerHTML = '<caption>The rule the recursion found, against every rule there is</caption>'
+      + '<thead>' + tr([th('rule'), th('worth'), th('what it does')]) + '</thead>'
+      + '<tbody>' + srows + '</tbody>';
+
+    document.getElementById('spValue').textContent = Rtext(st.value);
+    document.getElementById('spBest').textContent = brute.truncated ? 'not enumerated' : Rtext(brute.best);
+    document.getElementById('spAgree').textContent = brute.truncated ? 'not checked' : (agree ? 'yes' : 'NO');
+    document.getElementById('spCount').textContent = brute.truncated ? brute.why : String(brute.count);
+    document.getElementById('spShape').textContent = brute.truncated ? 'not checked'
+      : (brute.threshold ? 'yes' : 'NO');
+    document.getElementById('spLast').textContent = Rtext(st.rows[st.rows.length - 1].threshold);
+
+    if (!brute.truncated && !agree) {
+      status.innerHTML = '<strong>' + tone('The recursion is beaten by a rule it did not consider.', 'red')
+        + '</strong> It reaches ' + Rtext(st.value) + ' and the best accept-set is worth '
+        + Rtext(brute.best) + '.';
+      return;
+    }
+    var falls = Rcmp(st.rows[0].threshold, st.rows[st.rows.length - 1].threshold) > 0;
+    status.innerHTML = '<strong>The whole search is worth ' + tone(Rtext(st.value), 'green')
+      + '</strong> with ' + T + ' period' + plural(T, '', 's') + ' and a look costing ' + Rtext(c)
+      + '. The threshold ' + (falls ? tone('falls', 'cyan') + ' as the deadline nears — '
+          + st.rows.map(function (q) { return Rtext(q.threshold); }).join(', then ')
+          + ' — because there is less left to wait for'
+        : 'does not fall here, which is worth looking at: with a cost this high, carrying on is worth '
+          + 'so little that the rule barely changes')
+      + '. With one period left the threshold is '
+      + tone(Rtext(st.rows[st.rows.length - 1].threshold), 'cyan')
+      + ', so any offer at all is taken — there is nothing to carry on to. '
+      + (brute.truncated ? brute.why + '. '
+          : 'All ' + brute.count + ' ways of choosing which offers to accept in which period were '
+            + 'evaluated, and the threshold rule is the best of them. '
+            + (brute.threshold
+                ? 'The winner is a threshold rule, which the recursion assumed and this measured.'
+                : tone('The winner is NOT a threshold rule, which would break the recursion.', 'red')));
+  }
+
+  function apply() {
+    var p = SPP[presetIn.value];
+    if (!p) return;
+    pmfIn.value = p.pmf; tIn.value = p.T; cIn.value = p.c;
+    redraw();
+  }
+""" + _fill_js("SPP", [("pmfIn", "pmf")]) + r"""
+  presetIn.addEventListener('change', apply);
+  pmfIn.addEventListener('input', redraw);
+  tIn.addEventListener('input', redraw);
+  cIn.addEventListener('input', redraw);
+  redraw();
+  window.redrawLab = redraw;
+"""
+    return Lab(
+        title="When to stop looking",
+        subtitle="The threshold is the value of carrying on, and its shape is measured rather than assumed",
+        markup=markup,
+        controls=controls,
+        panel_title=cfg.get("panel_title", "Set the offers and the search cost, and watch the rule change"),
+        panel_intro=cfg.get(
+            "panel_intro",
+            "The recursion gives a threshold per period; every possible accept-set in every period is "
+            "then enumerated and evaluated, so the claim that the best rule is a threshold is a "
+            "measurement. On this example: " + chosen["note"] + ".",
+        ),
+        script=script,
+    )
+
+
+# ---------------------------------------------------------------------------
+# L8 -- secretary: the exact table, and the rule played out on every ordering
+# ---------------------------------------------------------------------------
+
+_SE_PRESETS = [
+    {
+        "id": "small",
+        "label": "four candidates, small enough to count by hand",
+        "n": "4",
+        "note": "twenty-four orderings, and the whole table can be checked against them",
+    },
+    {
+        "id": "seven",
+        "label": "seven, the largest this page enumerates",
+        "n": "7",
+        "note": "5040 orderings walked, and the closed form matches every entry",
+    },
+    {
+        "id": "hundred",
+        "label": "a hundred, where the limit starts to look like the answer",
+        "n": "100",
+        "note": "look at 37 and take the next best, which succeeds 37.1% of the time",
+    },
+]
+
+
+def _secretary(cfg):
+    chosen = _choose(cfg, "secretary", _SE_PRESETS, "small")
+
+    markup = (
+        _toolbar(
+            "Look, then leap",
+            "reject the first r − 1 whatever they are, then take the first one better than all of them",
+            [("cyan", "the chance of success at each r"), ("purple", "the best r"),
+             ("green", "the same figure, counted over every ordering"), ("amber", "the n/e limit")],
+        )
+        + _stage(_svg("sePlot", "0 0 520 240",
+                      "The probability of ending with the best candidate, against how many are rejected first."))
+        + _table("seTable")
+        + _table("seCheck")
+        + _banner("seStatus")
+    )
+    controls = (
+        _select("sePreset", "Worked example", _options(_SE_PRESETS), chosen["id"])
+        + _range("seN", "Candidates", 3, 60, int(chosen["n"]))
+        + _kpis([
+            ("Reject this many first", "seBestR"),
+            ("Then you win with probability", "seBestP"),
+            ("As a decimal", "seBestD"),
+            ("n / e, rounded", "seLimit"),
+            ("Orderings walked as a check", "seWalked"),
+            ("Does the closed form match?", "seAgree"),
+        ])
+        + _hint(
+            "seHint",
+            "The exact probability is `((r−1)/n) · Σ 1/(i−1)` over `i` from `r` to `n`, and every "
+            "entry below is that fraction rather than a decimal. The `n/e` a textbook quotes is the "
+            "LIMIT of the best `r`, not the answer &mdash; it is printed here rounded and labelled, "
+            "beside the exact table that never needs it.",
+        )
+    )
+
+    script = _MODE_JS["secretary"] + r"""
+""" + _presets_js("SEP", _SE_PRESETS, ["n", "note"]) + r"""
+  var presetIn = document.getElementById('sePreset'), nIn = document.getElementById('seN');
+  var plot = document.getElementById('sePlot');
+  var tableT = document.getElementById('seTable'), checkT = document.getElementById('seCheck');
+  var status = document.getElementById('seStatus');
+
+  function redraw() {
+    var n = Math.max(3, Math.min(60, Math.round(+nIn.value))), i;
+    document.getElementById('seNOut').textContent = String(n);
+    var ex = secretaryExact(n);
+    var brute = secretaryBrute(n, 7);
+    var agree = true, mismatch = null;
+    if (!brute.truncated) {
+      for (i = 0; i < ex.probs.length; i += 1) {
+        if (!Requ(ex.probs[i].p, brute.probs[i].p)) { agree = false; mismatch = ex.probs[i].r; }
+      }
+    }
+    var limit = Rmul(R(BigInt(n), 1n), invE());
+
+    plot.innerHTML = dpPlot([
+      { name: 'exact P(r)', tone: 'cyan',
+        points: ex.probs.map(function (q) { return [R(BigInt(q.r), 1n), q.p]; }),
+        mark: function (k) { return ex.probs[k].r === ex.best; } }
+    ].concat(brute.truncated ? [] : [{ name: 'counted over every ordering', tone: 'green', dash: true,
+        dots: false, points: brute.probs.map(function (q) { return [R(BigInt(q.r), 1n), q.p]; }) }]),
+      { width: 520, height: 240, zero: true,
+        caption: 'how many to reject first, against the chance of ending with the best' });
+
+    var rows = '', step = Math.max(1, Math.ceil(n / 14));
+    for (i = 0; i < ex.probs.length; i += 1) {
+      var q = ex.probs[i];
+      if (q.r !== ex.best && (q.r - 1) % step !== 0 && q.r !== n) continue;
+      rows += tr([rowhead('r = ' + q.r), td(Rshort(q.p, 6, 20)), td(Rfixed(q.p, 6)),
+                  td(q.r === ex.best ? tone('the best r', 'purple') : '')],
+                 q.r === ex.best ? 'tone-purple' : null);
+    }
+    tableT.innerHTML = '<caption>The chance of success, exactly, for each number rejected first'
+      + (step > 1 ? ' (every ' + step + 'th row, and the best)' : '') + '</caption><thead>'
+      + tr([th('r'), th('P(r), exactly'), th('as a decimal'), th('')]) + '</thead>'
+      + '<tbody>' + rows + '</tbody>';
+
+    var crows = '';
+    if (brute.truncated) {
+      crows += tr([tdl('At n = ' + n + ' there are too many orderings to walk, so the table above is '
+        + 'the closed form alone. Drop to 7 or fewer and every entry is checked by counting.',
+        'small-copy').replace('<td', '<td colspan="4"')]);
+    } else {
+      for (i = 0; i < ex.probs.length; i += 1) {
+        crows += tr([rowhead('r = ' + ex.probs[i].r), td(Rshort(ex.probs[i].p, 6, 20)),
+                     td(brute.counts[ex.probs[i].r] + ' of ' + brute.total),
+                     td(Requ(ex.probs[i].p, brute.probs[i].p) ? tone('the same', 'green')
+                        : tone('DIFFERENT', 'red'))],
+                    Requ(ex.probs[i].p, brute.probs[i].p) ? null : 'tone-red');
+      }
+    }
+    checkT.innerHTML = '<caption>The closed form against the count'
+      + (brute.truncated ? '' : ', over all ' + brute.total + ' orderings') + '</caption><thead>'
+      + tr([th('r'), th('the harmonic sum'), th('orderings it wins'), th('verdict')]) + '</thead>'
+      + '<tbody>' + crows + '</tbody>';
+
+    document.getElementById('seBestR').textContent = String(ex.best - 1);
+    document.getElementById('seBestP').textContent = Rshort(ex.bestP, 6, 20);
+    document.getElementById('seBestD').textContent = Rfixed(ex.bestP, 6);
+    document.getElementById('seLimit').textContent = Rfixed(limit, 4) + ' — rounded';
+    document.getElementById('seWalked').textContent = brute.truncated ? 'none — too many' : String(brute.total);
+    document.getElementById('seAgree').textContent = brute.truncated ? 'not checked' : (agree ? 'yes' : 'NO');
+
+    if (!agree) {
+      status.innerHTML = '<strong>' + tone('The closed form and the count disagree at r = ' + mismatch
+        + '.', 'red') + '</strong> Neither is shown as an answer.';
+      return;
+    }
+    status.innerHTML = '<strong>Reject the first ' + tone(String(ex.best - 1), 'purple')
+      + ' and then take the first one better than all of them.</strong> That wins with probability '
+      + tone(Rshort(ex.bestP, 6, 20), 'purple') + ', which is ' + Rfixed(ex.bestP, 6)
+      + ' — an exact fraction, printed as a decimal once it runs past twenty digits, '
+      + 'not a simulation. '
+      + (brute.truncated
+          ? 'At n = ' + n + ' there are too many orderings to walk; drop to seven or fewer and every '
+            + 'entry of the table above is checked by playing the rule out on all of them. '
+          : 'Every entry was checked by playing the rule out on all ' + brute.total
+            + ' orderings and counting the wins, which shares no arithmetic with the harmonic sum. ')
+      + 'The <span class="tone-amber">n/e</span> a textbook quotes is ' + Rfixed(limit, 4)
+      + ' here, and it is the LIMIT of the best r rather than the answer: at n = ' + n
+      + ' the best r is ' + ex.best + ', and 1/e is irrational so that figure is rounded and this is '
+      + 'the only rounded number on the page.';
+  }
+
+  function apply() {
+    var p = SEP[presetIn.value];
+    if (!p) return;
+    nIn.value = p.n;
+    redraw();
+  }
+  presetIn.addEventListener('change', apply);
+  nIn.addEventListener('input', redraw);
+  redraw();
+  window.redrawLab = redraw;
+"""
+    return Lab(
+        title="Look, then leap",
+        subtitle="An exact harmonic sum, checked by playing the rule out on every ordering",
+        markup=markup,
+        controls=controls,
+        panel_title=cfg.get("panel_title", "Choose how many to reject, and see what it costs you"),
+        panel_intro=cfg.get(
+            "panel_intro",
+            "Every probability here is an exact fraction, and for seven candidates or fewer each one "
+            "is checked by walking all n! orderings and counting. On this example: "
+            + chosen["note"] + ".",
+        ),
+        script=script,
+    )
+
+
+# ---------------------------------------------------------------------------
+# L9 -- discount: value iteration, and the fixed point it is approaching
+# ---------------------------------------------------------------------------
+
+_DC_PRESETS = [
+    {
+        "id": "two",
+        "label": "two states, and a discount of a half",
+        "P": "1/2 1/2; 1/4 3/4",
+        "r": "1 3",
+        "gamma": "1/2",
+        "note": "twenty iterations reach the fixed point to five places, and never arrive",
+    },
+    {
+        "id": "patient",
+        "label": "a discount of nine tenths",
+        "P": "1/2 1/2; 1/4 3/4",
+        "r": "1 3",
+        "gamma": "9/10",
+        "note": "the closer the discount is to one, the slower the iteration and the larger the values",
+    },
+    {
+        "id": "three",
+        "label": "three states",
+        "P": "1/2 1/4 1/4; 0 2/3 1/3; 1/5 1/5 3/5",
+        "r": "2 0 5",
+        "gamma": "3/4",
+        "note": "the system is 3 by 3 and row reduction still solves it in one go",
+    },
+]
+
+
+def _discount(cfg):
+    chosen = _choose(cfg, "discount", _DC_PRESETS, "two")
+
+    markup = (
+        _toolbar(
+            "Value iteration, and the fixed point under it",
+            "the iteration approaches the answer; row reduction lands on it",
+            [("cyan", "the first state"), ("purple", "the second"),
+             ("green", "the exact fixed point"), ("amber", "the gap still left")],
+        )
+        + _stage(_svg("dcPlot", "0 0 520 240",
+                      "Each state's value at each iteration, against the exact fixed point."))
+        + _table("dcIter")
+        + _table("dcFixed")
+        + _banner("dcStatus")
+    )
+    controls = (
+        _select("dcPreset", "Worked example", _options(_DC_PRESETS), chosen["id"])
+        + _text("dcP", "Where each state goes, row per state", chosen["P"])
+        + _text("dcR", "What each state pays", chosen["r"])
+        + _select("dcG", "The discount",
+                  [("1/2", "a half"), ("2/3", "two thirds"), ("3/4", "three quarters"),
+                   ("9/10", "nine tenths"), ("99/100", "ninety-nine hundredths")], chosen["gamma"])
+        + _range("dcT", "Iterations", 1, 24, 12)
+        + _kpis([
+            ("The fixed point, state 1", "dcV1"),
+            ("The fixed point, state 2", "dcV2"),
+            ("After the iterations shown", "dcIterV"),
+            ("The gap still left", "dcGap"),
+            ("Does r + gPv = v exactly?", "dcResidual"),
+            ("Digits in the last denominator", "dcDigits"),
+        ])
+        + _hint(
+            "dcHint",
+            "`v = r + gPv` is a linear system, so it has an exact solution and row reduction finds "
+            "it: `(I − gP)v = r`. Value iteration is the other way round &mdash; start at zero and "
+            "apply the map &mdash; and it never arrives, which is visible in the denominators: each "
+            "step multiplies by one more power of the discount's denominator.",
+        )
+    )
+
+    script = _MODE_JS["discount"] + r"""
+""" + _presets_js("DCP", _DC_PRESETS, ["P", "r", "gamma", "note"]) + r"""
+  var presetIn = document.getElementById('dcPreset'), pIn = document.getElementById('dcP');
+  var rIn = document.getElementById('dcR'), gIn = document.getElementById('dcG');
+  var tIn = document.getElementById('dcT');
+  var plot = document.getElementById('dcPlot');
+  var iterT = document.getElementById('dcIter'), fixT = document.getElementById('dcFixed');
+  var status = document.getElementById('dcStatus');
+  var KPIS = ['dcV1', 'dcV2', 'dcIterV', 'dcGap', 'dcResidual', 'dcDigits'];
+
+  function blank(why) {
+    plot.innerHTML = ''; iterT.innerHTML = ''; fixT.innerHTML = '';
+    for (var i = 0; i < KPIS.length; i += 1) document.getElementById(KPIS[i]).textContent = '—';
+    status.innerHTML = '<span class="tone-red">' + why + '.</span> Each row of the transition table '
+      + 'says where one state goes, and it has to add to 1.';
+  }
+
+  function redraw() {
+    var pm = parseMatrixRows(pIn.value, null, null);
+    if (pm.bad) { blank(pm.bad); return; }
+    var P = pm.rows, n = P.length, i, j, k;
+    if (n < 2 || n > 4) { blank('this lab takes between two and four states'); return; }
+    for (i = 0; i < n; i += 1) {
+      if (P[i].length !== n) { blank('row ' + (i + 1) + ' has ' + P[i].length + ' entries and there are ' + n + ' states'); return; }
+      var total = R0;
+      for (j = 0; j < n; j += 1) {
+        if (Rsign(P[i][j]) < 0) { blank('row ' + (i + 1) + ' has a negative probability in it'); return; }
+        total = Radd(total, P[i][j]);
+      }
+      if (!Requ(total, R1)) { blank('row ' + (i + 1) + ' adds to ' + Rtext(total) + ' rather than 1'); return; }
+    }
+    var r = parseRow(rIn.value);
+    if (r === null || r.length !== n) { blank('there needs to be one reward for each of the ' + n + ' states'); return; }
+    var gamma = Rread(gIn.value);
+    if (gamma === null) { blank('that is not a discount'); return; }
+    var T = Math.max(1, Math.min(24, Math.round(+tIn.value)));
+    document.getElementById('dcTOut').textContent = String(T);
+
+    var dv = discountedValue(P, r, gamma, T);
+    if (dv.singular) { blank('I − gP is singular at this discount, so there is no fixed point to find'); return; }
+
+    /* the residual: the fixed point put back into the equation it solves */
+    var residual = [], exact = true;
+    for (i = 0; i < n; i += 1) {
+      var s = r[i];
+      for (j = 0; j < n; j += 1) s = Radd(s, Rmul(gamma, Rmul(P[i][j], dv.v[j])));
+      var res = Rsub(s, dv.v[i]);
+      residual.push(res);
+      if (!Rzero(res)) exact = false;
+    }
+
+    var series = [], tones = ['cyan', 'purple', 'blue', 'amber'];
+    for (i = 0; i < n; i += 1) {
+      series.push({ name: 'state ' + (i + 1), tone: tones[i % tones.length],
+                    points: dv.iterations.map(function (v, q) { return [R(BigInt(q), 1n), v[i]]; }) });
+      series.push({ name: '', tone: 'green', dash: true, dots: false,
+                    points: [[R0, dv.v[i]], [R(BigInt(T), 1n), dv.v[i]]] });
+    }
+    plot.innerHTML = dpPlot(series, { width: 520, height: 240, zero: true,
+      caption: 'iterations, against the value of each state — the dashed lines are the fixed point' });
+
+    var rows = '', step = Math.max(1, Math.ceil(T / 10));
+    for (k = 0; k <= T; k += 1) {
+      if (k % step !== 0 && k !== T) continue;
+      var cells = [rowhead('v' + k)];
+      for (i = 0; i < n; i += 1) cells.push(td(Rshort(dv.iterations[k][i], 6, 12)));
+      cells.push(td(String(String(dv.iterations[k][0].d).length)));
+      var gapHere = Rsub(dv.iterations[k][0], dv.v[0]);
+      cells.push(td(Rzero(gapHere) ? tone('exactly there', 'green') : Rfixed(Rabs(gapHere), 8)));
+      rows += tr(cells, k === T ? 'tone-cyan' : null);
+    }
+    var head = [th('iteration')];
+    for (i = 0; i < n; i += 1) head.push(th('state ' + (i + 1)));
+    head.push(th('digits in the denominator'));
+    head.push(th('gap at state 1'));
+    iterT.innerHTML = '<caption>Value iteration from zero, and what it costs to carry the exact value</caption>'
+      + '<thead>' + tr(head) + '</thead><tbody>' + rows + '</tbody>';
+
+    var frows = '';
+    for (i = 0; i < n; i += 1) {
+      var eq = [];
+      for (j = 0; j < n; j += 1) {
+        eq.push(Rtext(Rsub(i === j ? R1 : R0, Rmul(gamma, P[i][j]))) + '·v' + (j + 1));
+      }
+      frows += tr([rowhead('state ' + (i + 1)), tdl(eq.join(' + ') + ' = ' + Rtext(r[i])),
+                   td(Rtext(dv.v[i])), td(Rfixed(dv.v[i], 6)),
+                   td(Rzero(residual[i]) ? tone('0', 'green') : tone(Rtext(residual[i]), 'red'))],
+                  Rzero(residual[i]) ? null : 'tone-red');
+    }
+    fixT.innerHTML = '<caption>(I − gP)v = r, solved by row reduction in ' + dv.ops.length
+      + ' operations</caption><thead>'
+      + tr([th('row'), th('the equation'), th('v, exactly'), th('as a decimal'),
+            th('r + gPv − v')]) + '</thead><tbody>' + frows + '</tbody>';
+
+    document.getElementById('dcV1').textContent = Rtext(dv.v[0]);
+    document.getElementById('dcV2').textContent = Rtext(dv.v[1]);
+    document.getElementById('dcIterV').textContent = Rfixed(dv.vT[0], 8);
+    document.getElementById('dcGap').textContent = Rzero(dv.gap[0]) ? '0 — exactly there'
+      : Rfixed(Rabs(dv.gap[0]), 10);
+    document.getElementById('dcResidual').textContent = exact ? 'yes — every entry is exactly zero' : 'NO';
+    document.getElementById('dcDigits').textContent = String(String(dv.iterations[T][0].d).length)
+      + ' (it started at ' + String(dv.iterations[0][0].d).length + ')';
+
+    if (!exact) {
+      status.innerHTML = '<strong>' + tone('The fixed point does not satisfy its own equation.', 'red')
+        + '</strong> r + gPv − v comes to ' + residual.map(Rtext).join(', ')
+        + ' rather than zero, so nothing here is an answer.';
+      return;
+    }
+    var grew = String(dv.iterations[T][0].d).length - String(dv.iterations[0][0].d).length;
+    status.innerHTML = '<strong>The exact values are ' + tone(dv.v.map(Rtext).join(' and '), 'green')
+      + '</strong>, found by row reduction on (I − gP)v = r and then put straight back into that '
+      + 'equation: r + gPv − v is exactly zero in every row, which is a check a decimal could not '
+      + 'make. Value iteration from zero reaches ' + tone(Rfixed(dv.vT[0], 8), 'cyan')
+      + ' after ' + T + ' step' + plural(T, '', 's') + ', leaving '
+      + (Rzero(dv.gap[0]) ? 'nothing' : tone(Rfixed(Rabs(dv.gap[0]), 10), 'amber')) + ' to go — and it '
+      + 'never arrives, because each step multiplies by one more power of the discount. That is '
+      + 'visible rather than asserted: the denominator has grown by '
+      + tone(grew + ' digit' + plural(grew, '', 's'), 'purple') + ' over those ' + T
+      + ' steps. A float would have hidden both facts — the exactness of the fixed point and the cost '
+      + 'of getting near it — behind the same fifteen digits.';
+  }
+
+  function apply() {
+    var p = DCP[presetIn.value];
+    if (!p) return;
+    pIn.value = p.P; rIn.value = p.r; gIn.value = p.gamma;
+    redraw();
+  }
+""" + _fill_js("DCP", [("pIn", "P"), ("rIn", "r")]) + r"""
+  presetIn.addEventListener('change', apply);
+  gIn.addEventListener('change', redraw);
+  pIn.addEventListener('input', redraw);
+  rIn.addEventListener('input', redraw);
+  tIn.addEventListener('input', redraw);
+  redraw();
+  window.redrawLab = redraw;
+"""
+    return Lab(
+        title="Value iteration, and the fixed point under it",
+        subtitle="One method approaches the answer and the other lands on it; both are exact here",
+        markup=markup,
+        controls=controls,
+        panel_title=cfg.get("panel_title", "Iterate, and solve, and watch the gap between them"),
+        panel_intro=cfg.get(
+            "panel_intro",
+            "The fixed point is found by row reduction and then put back into the equation it "
+            "solves, so the residual is shown rather than assumed; the iteration is drawn beside it "
+            "with the denominators it is accumulating. On this example: " + chosen["note"] + ".",
+        ),
+        script=script,
+    )
+
+
+# ---------------------------------------------------------------------------
+# The dispatch. `policy iteration` is deliberately absent: it belongs to course
+# 9, where a chain has already been defined, and `discount` shows as much of
+# the infinite horizon as a course with no chains behind it can honestly claim.
+# ---------------------------------------------------------------------------
+
+_MODES = {
+    "stages": _stages,
+    "allocation": _allocation,
+    "lotsize": _lotsize,
+    "heuristics": _heuristics,
+    "stochastic": _stochastic,
+    "tree": _tree,
+    "stopping": _stopping,
+    "secretary": _secretary,
+    "discount": _discount,
+}
+
+MODES = tuple(sorted(_MODES))
+
+
+def dpseq_lab(cfg):
+    """Course 7's kit. `cfg["mode"]` chooses the lesson.
+
+    An unknown mode raises, and so does an unknown preset. The raise is the
+    contract rather than defensiveness: a kit that fell back to a default would
+    render a finished-looking page carrying another lesson's widget, or the
+    right lesson's widget opened on someone else's worked example. Both pass
+    every markup assertion in the suite and both pass labcheck, because the lab
+    builds and draws; the reader is simply shown the wrong arithmetic under the
+    right title.
+    """
+    mode = (cfg or {}).get("mode")
+    if mode not in _MODES:
+        raise ValueError(
+            "dpseq_lab: unknown mode %r; the nine modes of the sequential-decisions course are %s"
+            % (mode, ", ".join(MODES))
+        )
+    return _MODES[mode](cfg or {})
+
+
+__all__ = ["dpseq_lab", "MODES", "DPKIT_JS", "DPPLOT_JS", "DPPOL_JS", "DPTREE_JS", "DPSTOP_JS"]

@@ -6,8 +6,9 @@ optimal" would be asserting the theorem; these pages swap two neighbouring
 jobs, print the exact quantity the swap moved, and then check the claim against
 every one of the n! orders.
 
-  objectives  one sequence, eight objectives at once, each with the exhaustive
-              optimum beside it -- a schedule is never simply good
+  objectives  one sequence, six objectives at once, each with the exhaustive
+              optimum beside it, and the makespan that never moves at all --
+              a schedule is never simply good
   spt         shortest processing time, and the exchange that proves it: swap
               neighbours and sum C moves by p_b - p_a and by nothing else
   wspt        Smith's ratio p/w, the same exchange weighted, and the rival
@@ -68,23 +69,29 @@ WHAT IS DELIBERATELY ABSENT.
 
 BLOCKS PER MODE, because the measured ceiling is 62 KB gzipped (AGENTS.md,
 "A note on page weight"). or_core's docstring puts this kit's engine share at
-27.2 KB -- that figure is the blocks WITHOUT `NET_JS`, and `SCHED_JS`'s own
-dependency note one page further down says `jobShopAll` needs it; with it the
-same concatenation measures 32.7 KB. Only two modes call into `NET_JS` and only
-one solves a linear programme, so the kit selects per mode rather than paying
-either figure nine times.
+27.2 KB. That figure is not reproducible as stated and it is worth knowing
+which way it is wrong before planning around it: the blocks `SCHED_JS`'s own
+dependency note names, concatenated and gzipped, measure 26.6 KB WITHOUT
+`NET_JS` and 32.2 KB with it -- and the same note says `jobShopAll` needs
+`NET_JS`. Only two modes here call into it and only one solves a linear
+programme, so the kit selects per mode rather than paying either figure nine
+times.
 
-Measured as whole pages by scripts/build_paths.py, page frame included:
+Measured as whole pages -- rendered by scripts/mathpath/render.py, frame and
+prose included, and taking the WORST of the nine Integer Programming lessons'
+prose bodies for each mode, because the scheduling course is not authored yet
+and a mode measured against thin prose is not measured:
 
-    objectives 33.7 KB   spt 33.2   wspt 33.4   edd 33.4   late 33.3
-    flowshop 33.2   parallel 33.6   jobshop 38.6   crash 55.2
+    flowshop 41.0 KB   objectives 41.0   parallel 41.2   edd 41.2   late 41.2
+    spt 41.6   wspt 41.7   jobshop 43.0   crash 58.9
 
 against the 62 KB ceiling. `crash` is the heaviest page in this Subject and the
-figure to re-derive first when anything here grows; the rest have room.
+figure to re-derive first when anything here grows; the rest have 20 KB of room.
+Re-derive rather than trusting these -- they go stale as the engine grows.
 """
 
 from .algebra_core import RATIONAL_JS
-from .algebra_systems import FORMAT_JS, MATRIX_JS
+from .algebra_systems import FORMAT_JS
 from .common import Lab
 from .or_core import (DUAL_JS, NET_JS, ORFMT_JS, PHASE_JS, RANGE_JS, SCHED_JS,
                       TABLEAU_JS)
@@ -95,6 +102,141 @@ from .or_core import (DUAL_JS, NET_JS, ORFMT_JS, PHASE_JS, RANGE_JS, SCHED_JS,
 # touches the document, and the drawing functions take data and return a
 # string.
 # ---------------------------------------------------------------------------
+
+SCHEDDRAW_JS = r"""
+  /* ============================================ reading, and the time axis
+
+     The three things every mode here needs and nothing else does not: the
+     clause splitter every parser starts from, and ONE Gantt renderer.  A
+     machine, a flow-shop stage, a parallel processor and a project activity
+     are all a track, so nothing below draws its own time axis -- and the
+     crashing mode, which is the heaviest page in this Subject, takes this
+     block without taking the job arithmetic it does not use. */
+
+  function schedClauses(text) {
+    var parts = String(text).split(/[,;\n]+/), out = [], i;
+    for (i = 0; i < parts.length; i += 1) {
+      var s = parts[i].trim();
+      if (s) out.push(s);
+    }
+    return out;
+  }
+
+  /* ============================================================== drawing
+
+     ONE GANTT FOR SIX MODES.  `tracks` is [{name, bars}], a bar is
+     {label, start, end, tone, sub, dash, faint}, and `opts.marks` are dashed
+     verticals with a caption -- which is how a due date, a deadline or a
+     lower bound appears.  A machine, a flow-shop stage and a parallel
+     processor are all a track, so nothing below draws its own time axis. */
+  function schedXY(v) { return Math.round(v * 10) / 10; }
+
+  function schedGantt(tracks, opts) {
+    opts = opts || {};
+    var width = opts.width || 660, height = opts.height || 220;
+    var left = opts.left === undefined ? 54 : opts.left, right = width - 14;
+    var topPad = 24, axis = height - 28, s = '', i, b;
+    var span = opts.span;
+    if (!span) {
+      span = R0;
+      for (i = 0; i < tracks.length; i += 1) {
+        for (b = 0; b < tracks[i].bars.length; b += 1) {
+          if (Rcmp(tracks[i].bars[b].end, span) > 0) span = tracks[i].bars[b].end;
+        }
+      }
+      if (opts.marks) {
+        for (i = 0; i < opts.marks.length; i += 1) {
+          if (Rcmp(opts.marks[i].at, span) > 0) span = opts.marks[i].at;
+        }
+      }
+    }
+    var total = Rnum(span);
+    if (!(total > 0)) total = 1;
+    var X = function (v) { return left + (right - left) * (Rnum(v) / total); };
+    var lanes = Math.max(1, tracks.length);
+    var lane = Math.max(16, Math.min(44, (axis - topPad - 6) / lanes));
+    var barH = Math.max(11, lane - 12);
+
+    s += '<line x1="' + schedXY(left) + '" y1="' + schedXY(axis) + '" x2="' + schedXY(right)
+      + '" y2="' + schedXY(axis) + '" stroke="var(--line-strong)" stroke-width="1" />';
+    var ticks = opts.ticks || [];
+    for (i = 0; i < ticks.length; i += 1) {
+      var tx = X(ticks[i]);
+      s += '<line x1="' + schedXY(tx) + '" y1="' + schedXY(axis) + '" x2="' + schedXY(tx)
+        + '" y2="' + schedXY(axis + 5) + '" stroke="var(--line-strong)" stroke-width="1" />'
+        + '<text x="' + schedXY(tx) + '" y="' + schedXY(axis + 17) + '" text-anchor="middle" '
+        + 'font-size="10" fill="var(--muted)">' + Rtext(ticks[i]) + '</text>';
+    }
+    for (i = 0; opts.marks && i < opts.marks.length; i += 1) {
+      var mk = opts.marks[i], mx = X(mk.at), mt = mk.tone || 'amber';
+      s += '<line x1="' + schedXY(mx) + '" y1="' + schedXY(topPad - 8) + '" x2="' + schedXY(mx)
+        + '" y2="' + schedXY(axis) + '" stroke="var(--' + mt
+        + ')" stroke-width="1.3" stroke-dasharray="3 3" />'
+        + '<text x="' + schedXY(mx) + '" y="' + schedXY(topPad - 12) + '" text-anchor="middle" '
+        + 'font-size="9" fill="var(--' + mt + ')">' + mk.label + '</text>';
+    }
+    for (i = 0; i < tracks.length; i += 1) {
+      var y = topPad + i * lane;
+      s += '<text x="' + schedXY(left - 8) + '" y="' + schedXY(y + barH / 2 + 4)
+        + '" text-anchor="end" font-size="11" font-weight="600" fill="var(--muted)">'
+        + tracks[i].name + '</text>';
+      for (b = 0; b < tracks[i].bars.length; b += 1) {
+        var bar = tracks[i].bars[b], x0 = X(bar.start), x1 = X(bar.end);
+        var w = Math.max(2, x1 - x0), tone = bar.tone || 'cyan';
+        s += '<rect x="' + schedXY(x0) + '" y="' + schedXY(y) + '" width="' + schedXY(w)
+          + '" height="' + schedXY(barH) + '" rx="3" fill="var(--' + tone + ')" fill-opacity="'
+          + (bar.faint ? '0.14' : '0.3') + '" stroke="var(--' + tone + ')" stroke-width="'
+          + (bar.wide ? 2.2 : 1.2) + '"' + (bar.dash ? ' stroke-dasharray="4 3"' : '') + ' />';
+        if (bar.label && w > 13) {
+          s += '<text x="' + schedXY((x0 + x1) / 2) + '" y="' + schedXY(y + barH / 2 + 4)
+            + '" text-anchor="middle" font-size="10" font-weight="700" fill="var(--' + tone + ')">'
+            + bar.label + '</text>';
+        }
+        if (bar.sub) {
+          s += '<text x="' + schedXY(x1) + '" y="' + schedXY(y + barH + 10) + '" text-anchor="middle" '
+            + 'font-size="9" fill="var(--muted)">' + bar.sub + '</text>';
+        }
+      }
+    }
+    if (opts.caption) {
+      s += '<text x="' + schedXY(width / 2) + '" y="' + schedXY(height - 6) + '" text-anchor="middle" '
+        + 'font-size="10" fill="var(--muted)">' + opts.caption + '</text>';
+    }
+    return s;
+  }
+
+  /* Whole numbers along the axis, at most nine of them, so a strip that runs
+     to 40 does not print forty labels. */
+  /* A mode that does not ask for a weight or a due date still has to hand
+     `seqObjectives` a complete job, because the lateness figures are computed
+     whether or not the page prints them.  Filling them in once, here, is the
+     alternative to nine modes each remembering to -- and a job whose due date
+     was never given has d = 0, so its lateness IS its completion time, which
+     is a true statement rather than a placeholder.  */
+  function fillJobs(jobs, w, d) {
+    var k;
+    for (k = 0; k < jobs.length; k += 1) {
+      if (jobs[k].w === undefined) jobs[k].w = w === undefined ? R1 : w;
+      if (jobs[k].d === undefined) jobs[k].d = d === undefined ? R0 : d;
+    }
+    return jobs;
+  }
+
+  /* The ids of a sequence, which is what a reader reads and types. */
+  function seqText(seq, jobs) {
+    var out = [], k;
+    for (k = 0; k < seq.length; k += 1) out.push(jobs[seq[k]].id);
+    return out.join(' ');
+  }
+
+  function schedTicks(span) {
+    var top = Math.ceil(Rnum(span)), step = Math.max(1, Math.ceil(top / 8)), out = [], v;
+    for (v = 0; v <= top; v += step) out.push(R(BigInt(v), 1n));
+    return out;
+  }
+
+"""
+
 
 SCHEDKIT_JS = r"""
 
@@ -107,15 +249,6 @@ SCHEDKIT_JS = r"""
 
   var SCHEDJOBS = 8;      /* ids a table and a Gantt strip can hold */
   var SCHEDPERM = 7;      /* jobs the page enumerates: 7! = 5040 orders */
-
-  function schedClauses(text) {
-    var parts = String(text).split(/[,;\n]+/), out = [], i;
-    for (i = 0; i < parts.length; i += 1) {
-      var s = parts[i].trim();
-      if (s) out.push(s);
-    }
-    return out;
-  }
 
   /* One clause is a name, a space, then the fields colon separated:
        A 6:1:8      six hours of work, weight 1, due at 8
@@ -379,89 +512,6 @@ SCHEDKIT_JS = r"""
              objectives: seqObjectives(cur, jobs) };
   }
 
-  /* ============================================================== drawing
-
-     ONE GANTT FOR SIX MODES.  `tracks` is [{name, bars}], a bar is
-     {label, start, end, tone, sub, dash, faint}, and `opts.marks` are dashed
-     verticals with a caption -- which is how a due date, a deadline or a
-     lower bound appears.  A machine, a flow-shop stage and a parallel
-     processor are all a track, so nothing below draws its own time axis. */
-  function schedXY(v) { return Math.round(v * 10) / 10; }
-
-  function schedGantt(tracks, opts) {
-    opts = opts || {};
-    var width = opts.width || 660, height = opts.height || 220;
-    var left = opts.left === undefined ? 54 : opts.left, right = width - 14;
-    var topPad = 24, axis = height - 28, s = '', i, b;
-    var span = opts.span;
-    if (!span) {
-      span = R0;
-      for (i = 0; i < tracks.length; i += 1) {
-        for (b = 0; b < tracks[i].bars.length; b += 1) {
-          if (Rcmp(tracks[i].bars[b].end, span) > 0) span = tracks[i].bars[b].end;
-        }
-      }
-      if (opts.marks) {
-        for (i = 0; i < opts.marks.length; i += 1) {
-          if (Rcmp(opts.marks[i].at, span) > 0) span = opts.marks[i].at;
-        }
-      }
-    }
-    var total = Rnum(span);
-    if (!(total > 0)) total = 1;
-    var X = function (v) { return left + (right - left) * (Rnum(v) / total); };
-    var lanes = Math.max(1, tracks.length);
-    var lane = Math.max(16, Math.min(44, (axis - topPad - 6) / lanes));
-    var barH = Math.max(11, lane - 12);
-
-    s += '<line x1="' + schedXY(left) + '" y1="' + schedXY(axis) + '" x2="' + schedXY(right)
-      + '" y2="' + schedXY(axis) + '" stroke="var(--line-strong)" stroke-width="1" />';
-    var ticks = opts.ticks || [];
-    for (i = 0; i < ticks.length; i += 1) {
-      var tx = X(ticks[i]);
-      s += '<line x1="' + schedXY(tx) + '" y1="' + schedXY(axis) + '" x2="' + schedXY(tx)
-        + '" y2="' + schedXY(axis + 5) + '" stroke="var(--line-strong)" stroke-width="1" />'
-        + '<text x="' + schedXY(tx) + '" y="' + schedXY(axis + 17) + '" text-anchor="middle" '
-        + 'font-size="10" fill="var(--muted)">' + Rtext(ticks[i]) + '</text>';
-    }
-    for (i = 0; opts.marks && i < opts.marks.length; i += 1) {
-      var mk = opts.marks[i], mx = X(mk.at), mt = mk.tone || 'amber';
-      s += '<line x1="' + schedXY(mx) + '" y1="' + schedXY(topPad - 8) + '" x2="' + schedXY(mx)
-        + '" y2="' + schedXY(axis) + '" stroke="var(--' + mt
-        + ')" stroke-width="1.3" stroke-dasharray="3 3" />'
-        + '<text x="' + schedXY(mx) + '" y="' + schedXY(topPad - 12) + '" text-anchor="middle" '
-        + 'font-size="9" fill="var(--' + mt + ')">' + mk.label + '</text>';
-    }
-    for (i = 0; i < tracks.length; i += 1) {
-      var y = topPad + i * lane;
-      s += '<text x="' + schedXY(left - 8) + '" y="' + schedXY(y + barH / 2 + 4)
-        + '" text-anchor="end" font-size="11" font-weight="600" fill="var(--muted)">'
-        + tracks[i].name + '</text>';
-      for (b = 0; b < tracks[i].bars.length; b += 1) {
-        var bar = tracks[i].bars[b], x0 = X(bar.start), x1 = X(bar.end);
-        var w = Math.max(2, x1 - x0), tone = bar.tone || 'cyan';
-        s += '<rect x="' + schedXY(x0) + '" y="' + schedXY(y) + '" width="' + schedXY(w)
-          + '" height="' + schedXY(barH) + '" rx="3" fill="var(--' + tone + ')" fill-opacity="'
-          + (bar.faint ? '0.14' : '0.3') + '" stroke="var(--' + tone + ')" stroke-width="'
-          + (bar.wide ? 2.2 : 1.2) + '"' + (bar.dash ? ' stroke-dasharray="4 3"' : '') + ' />';
-        if (bar.label && w > 13) {
-          s += '<text x="' + schedXY((x0 + x1) / 2) + '" y="' + schedXY(y + barH / 2 + 4)
-            + '" text-anchor="middle" font-size="10" font-weight="700" fill="var(--' + tone + ')">'
-            + bar.label + '</text>';
-        }
-        if (bar.sub) {
-          s += '<text x="' + schedXY(x1) + '" y="' + schedXY(y + barH + 10) + '" text-anchor="middle" '
-            + 'font-size="9" fill="var(--muted)">' + bar.sub + '</text>';
-        }
-      }
-    }
-    if (opts.caption) {
-      s += '<text x="' + schedXY(width / 2) + '" y="' + schedXY(height - 6) + '" text-anchor="middle" '
-        + 'font-size="10" fill="var(--muted)">' + opts.caption + '</text>';
-    }
-    return s;
-  }
-
   /* The bars a sequence makes on one machine, with the due date carried on
      each so the strip and the table cannot drift apart. */
   function seqBars(seq, jobs, obj, opts) {
@@ -484,36 +534,6 @@ SCHEDKIT_JS = r"""
       if (j.d !== undefined) marks.push({ at: j.d, label: 'd' + j.id, tone: 'amber' });
     }
     return marks;
-  }
-
-  /* Whole numbers along the axis, at most nine of them, so a strip that runs
-     to 40 does not print forty labels. */
-  /* A mode that does not ask for a weight or a due date still has to hand
-     `seqObjectives` a complete job, because the lateness figures are computed
-     whether or not the page prints them.  Filling them in once, here, is the
-     alternative to nine modes each remembering to -- and a job whose due date
-     was never given has d = 0, so its lateness IS its completion time, which
-     is a true statement rather than a placeholder.  */
-  function fillJobs(jobs, w, d) {
-    var k;
-    for (k = 0; k < jobs.length; k += 1) {
-      if (jobs[k].w === undefined) jobs[k].w = w === undefined ? R1 : w;
-      if (jobs[k].d === undefined) jobs[k].d = d === undefined ? R0 : d;
-    }
-    return jobs;
-  }
-
-  /* The ids of a sequence, which is what a reader reads and types. */
-  function seqText(seq, jobs) {
-    var out = [], k;
-    for (k = 0; k < seq.length; k += 1) out.push(jobs[seq[k]].id);
-    return out.join(' ');
-  }
-
-  function schedTicks(span) {
-    var top = Math.ceil(Rnum(span)), step = Math.max(1, Math.ceil(top / 8)), out = [], v;
-    for (v = 0; v <= top; v += step) out.push(R(BigInt(v), 1n));
-    return out;
   }
 
   /* ================================================ the two-machine flow shop
@@ -894,14 +914,35 @@ SCHEDCRASH_JS = r"""
 # `crash` adds the whole simplex and the ranging block, because the exact
 # time-cost curve is rhsCurve on the deadline row rather than a scan. NET_JS's
 # `submatrixDet` is the only thing in it that needs MATRIX_JS and no mode here
-# calls it, so `jobshop` does not pay for the matrix block; `crash` does,
-# because DUAL_JS does.
+# calls it, so `jobshop` does not pay for the matrix block.
+#
+# NEITHER DOES `crash`, AND THAT IS WORTH STATING because or_core's own
+# dependency note would have you believe otherwise: it says DUAL_JS needs
+# algebra_systems.MATRIX_JS, and that is true of `basisInverse`, which reaches
+# Mrref. `crash` never calls it. Walking the call graph from the four entry
+# points this mode actually uses -- crashModel, lpSolve, rhsCurve and cpmPasses
+# -- reaches nothing in MATRIX_JS at all, so the block is not shipped, and 3.2
+# KB gzipped is a tenth of this page's engine. A block that is present but
+# unused costs bytes; one that is called but absent throws on the first redraw,
+# which scripts/labcheck.js catches on every published page and which
+# scripts/mathcheck.js catches here, because it evaluates exactly this
+# concatenation.
+#
+# WHY THE DRAWING IS ITS OWN BLOCK. `crash` measured 65.0 KB gzipped as a whole
+# page on a real OR lesson's prose -- over the 62 KB ceiling, and the only mode
+# here that was. It calls three things in the kit's own arithmetic (the clause
+# splitter, the Gantt and the axis ticks) and none of the job machinery, so the
+# job machinery moved out from under it: SCHEDDRAW_JS is what every mode draws
+# with, SCHEDKIT_JS is the one-machine arithmetic, and `crash` and `jobshop`
+# take the first without the second. That alone took the page to 58.9 KB. It is
+# the cut AGENTS.md's page-weight note calls for -- a smaller lab -- and it is
+# the figure to re-derive first when anything here grows.
 # ---------------------------------------------------------------------------
 
-_ONE = RATIONAL_JS + FORMAT_JS + ORFMT_JS + SCHED_JS + SCHEDKIT_JS
-_SHOP = RATIONAL_JS + FORMAT_JS + ORFMT_JS + NET_JS + SCHED_JS + SCHEDKIT_JS + SCHEDSHOP_JS
-_CRASH = (RATIONAL_JS + FORMAT_JS + MATRIX_JS + ORFMT_JS + TABLEAU_JS + PHASE_JS + DUAL_JS
-          + RANGE_JS + NET_JS + SCHED_JS + SCHEDKIT_JS + SCHEDCRASH_JS)
+_ONE = RATIONAL_JS + FORMAT_JS + ORFMT_JS + SCHED_JS + SCHEDDRAW_JS + SCHEDKIT_JS
+_SHOP = RATIONAL_JS + FORMAT_JS + ORFMT_JS + NET_JS + SCHED_JS + SCHEDDRAW_JS + SCHEDSHOP_JS
+_CRASH = (RATIONAL_JS + FORMAT_JS + ORFMT_JS + TABLEAU_JS + PHASE_JS + DUAL_JS
+          + RANGE_JS + NET_JS + SCHED_JS + SCHEDDRAW_JS + SCHEDCRASH_JS)
 
 _MODE_JS = {
     "objectives": _ONE,
@@ -1330,8 +1371,7 @@ _EXCHANGE = {
         "rule": "SPT",
         "rivals": "['LPT', 'FCFS']",
         "title": "Shortest processing time, and the exchange that proves it",
-        "subtitle": "Swap two neighbours and the sum of completion times moves by p_b &minus; p_a, and by nothing else",
-        "quantity": "p<sub>b</sub> &minus; p<sub>a</sub>",
+        "subtitle": "Swap two neighbours and the sum of completion times moves by p_b − p_a, and by nothing else",
         "compares": "the two processing times",
         "legend": [("cyan", "the order you typed"), ("green", "after the swap, if it improves"),
                    ("red", "after the swap, if it does not"), ("purple", "the rule's own order")],
@@ -1346,8 +1386,7 @@ _EXCHANGE = {
         "rule": "WSPT",
         "rivals": "['WEIGHT', 'SPT', 'FCFS']",
         "title": "Smith's rule, and the same exchange with weights on",
-        "subtitle": "The swap moves sum wC by w_a p_b &minus; w_b p_a, which is negative exactly when p_a/w_a &gt; p_b/w_b",
-        "quantity": "w<sub>a</sub>p<sub>b</sub> &minus; w<sub>b</sub>p<sub>a</sub>",
+        "subtitle": "The swap moves sum wC by w_a p_b − w_b p_a, which is negative exactly when p_a/w_a > p_b/w_b",
         "compares": "the two ratios p/w",
         "legend": [("cyan", "the order you typed"), ("green", "after the swap, if it improves"),
                    ("red", "after the swap, if it does not"), ("purple", "the rule's own order")],
@@ -2824,10 +2863,12 @@ def _crash(cfg):
       + tone(check.critical.join(', '), 'red') + ' critical along '
       + check.paths.length + ' path' + plural(check.paths.length, '', 's') + '. '
       + 'The curve has ' + tone(cc.pieces.length + ' piece' + plural(cc.pieces.length, '', 's'), 'purple')
-      + ' and it steepens from left to right: ' + cc.pieces.map(function (q) { return Rtext(Rneg(q.slope)); })
-        .join(', then ') + ' a day. It bends where the set of critical paths changes, because after '
-      + 'that point a day has to be bought on two paths at once. Each piece was re-solved from '
-      + 'scratch at its own left endpoint and ' + cc.confirmed + ' of ' + cc.checked + ' agreed.';
+      + ', and every day you take off the finish costs at least as much as the last one did: reading '
+      + 'from the loosest deadline inwards, '
+      + cc.pieces.map(function (q) { return Rtext(Rneg(q.slope)); }).reverse().join(' a day, then ')
+      + ' a day. It bends where the set of critical paths changes, because after that point a day has '
+      + 'to be bought on two paths at once. Each piece was re-solved from scratch at its own left '
+      + 'endpoint and ' + cc.confirmed + ' of ' + cc.checked + ' agreed.';
   }
 
   function apply() {
@@ -2901,4 +2942,5 @@ def schedule_lab(cfg):
     return _MODES[mode](cfg or {})
 
 
-__all__ = ["schedule_lab", "MODES", "SCHEDKIT_JS", "SCHEDSHOP_JS", "SCHEDCRASH_JS"]
+__all__ = ["schedule_lab", "MODES", "SCHEDDRAW_JS", "SCHEDKIT_JS", "SCHEDSHOP_JS",
+           "SCHEDCRASH_JS"]

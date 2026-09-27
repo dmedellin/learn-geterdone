@@ -1320,6 +1320,11 @@ def _discount(cfg):
       + 'bill plus a surd, and surdValueCmp settles same-radicand pairs by one squaring and '
       + 'different-radicand pairs by rational brackets refined until they separate &mdash; no decimal '
       + 'is compared with another decimal anywhere in it. '
+      + (res.candidates.some(function (c) { return c.cost.s.k !== 1n && !Rzero(c.cost.s.q); })
+          ? '<span class="tone-amber">At least one candidate&rsquo;s cost is irrational</span>, because it '
+            + 'carries that band&rsquo;s EOQ cost sqrt(2KDh): the decimal printed beside it in the table is '
+            + roundedNote(4) + '. The comparison above did not use those decimals. '
+          : 'Every candidate&rsquo;s cost is rational on this instance, so nothing above is rounded. ')
       + (scan === null ? ''
          : 'As a check the page also prices every whole quantity from 1 to ' + hiQ + ': the cheapest is '
            + scan.Q + '. ' + (agree

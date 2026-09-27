@@ -28,10 +28,12 @@ come out of the comparison and all three are computed on the page.
     still has a unique solution, (1/3, 1/3, 1/3), and P^n never converges to
     anything at all: it returns to the identity every third step, for ever. The
     page shows both, side by side. That is the whole argument in one preset.
-  * On a REDUCIBLE chain -- the `absorbing2` preset -- the system is rank
-    deficient and there is no unique steady state. `steadyState` reports
-    `unique: false` and the page says so rather than printing one of the
-    infinitely many answers as though it were the answer.
+  * On a REDUCIBLE chain with two recurrent classes -- the `split` preset --
+    the system is rank deficient and there is no unique steady state.
+    `steadyState` reports `unique: false` and the page says so rather than
+    printing one of the infinitely many answers as though it were the answer.
+    With only ONE recurrent class -- the `leaky` preset -- it is unique again,
+    and it puts exactly zero on every transient state.
 
 WHAT IS STATED AND NOT PROVED, AND WHERE IT SAYS SO. The path's footer names
 three results it states without proof, and one of them is this kit's: the
@@ -931,7 +933,7 @@ def _classify(cfg):
     return _lab(
         cfg,
         title="Which states does the chain keep coming back to",
-        subtitle="communicating classes, recurrence, and the period &mdash; the hypotheses, computed",
+        subtitle="communicating classes, recurrence, and the period — the hypotheses, computed",
         markup=markup,
         controls=controls,
         script=script,
@@ -1139,7 +1141,7 @@ def _steady(cfg):
     return _lab(
         cfg,
         title="The steady state is solved for, not waited for",
-        subtitle="n dependent equations, one replaced by &sum;&pi; = 1, and an iteration that cannot match it",
+        subtitle="n dependent equations, one replaced by Σπ = 1, and an iteration that cannot match it",
         markup=markup,
         controls=controls,
         script=script,

@@ -115,6 +115,23 @@ kit adds is the second and third routes, and the checks on what comes back:
                       and it takes the table as an argument and returns a
                       string, which is what makes it testable at all.
 
+TWO OBSERVATIONS ABOUT ROUTINES THIS KIT DOES NOT OWN, recorded here because
+both cost time to rediscover:
+
+  * `heldKarp` and `tspBrute` return a tour as an OPEN list of n cities
+    beginning at 0. The leg home is counted in the length and is NOT in the
+    list, so re-measuring the list as written gives a tour one leg short --
+    which looks like an off-by-one in the DP rather than a convention. This
+    kit's `tourLength` closes the cycle, `tourValid` checks the list is a
+    permutation starting at 0, and scripts/mathcheck.js asserts the convention
+    directly so it cannot change quietly.
+  * `dpFill`'s `get` returns null for a cell outside the table AND for a cell
+    inside it that has not been filled yet, and `null + 3` is `3`. That is not
+    a defect -- it is what makes the `chain` mode's wrong fill order produce a
+    finished table with a wrong number rather than a crash -- but any new
+    recurrence has to know it, because a recurrence that reads too early will
+    not tell you.
+
 THE MODES, and the lesson each belongs to:
 
   memo      the same recursion three ways, and the call counts that separate
@@ -130,12 +147,15 @@ THE MODES, and the lesson each belongs to:
   game      won and lost positions, and the period a reader is asked to find
   tsp       2^n subsets against (n-1)! tours, both as exact integers
 
-PAGE WEIGHT. One core for the kit, concatenated once, as `heap.py` does. Every
-mode carries about 54 KB of raw JavaScript before its own script, which lands
-near 42 KB gzipped for a whole page against a measured ceiling of 62 KB
-(AGENTS.md). The two modes that draw no series pay about 1.5 KB gzipped for
-SERIES_JS they do not use, which is the price of a kit that cannot call a
-function its page turned out not to carry.
+PAGE WEIGHT, MEASURED RATHER THAN ESTIMATED. One core for the kit,
+concatenated once, as `heap.py` does. It is 66.2 KB raw and 19.9 KB gzipped,
+and a rendered lesson page runs from 39.4 KB gzipped (`game`) to 40.4 KB
+(`memo`) against a measured ceiling of 62 KB (AGENTS.md).
+
+TREEDRAW_JS is used by `tree` alone and SERIES_JS by `memo` alone, so the other
+seven modes carry 9.1 KB raw -- 2.9 KB gzipped -- of drawing code they never
+call. That is the price of a kit that cannot call a function its page turned
+out not to carry, and at 40 KB against 62 it is worth paying.
 """
 
 from .algebra_core import RATIONAL_JS
@@ -1034,8 +1054,13 @@ def _memo(cfg):
       cellText: function (v) { return dpUnreachable(v) ? '·' : String(v); }
     });
 
+    /* The curve stops at 16 whatever the amount is. It is redrawn on every
+       keystroke and the unmemoised arm is re-run at every x, so plotting to 26
+       is a few million calls per redraw for a picture that already makes its
+       point. The KPI above is the full amount; this is the shape. */
     var xs = [], naiveCalls = [], memoCalls = [], curve = [];
-    for (var n = 1; n <= amount; n += 1) {
+    var top = Math.min(amount, 16);
+    for (var n = 1; n <= top; n += 1) {
       xs.push(n);
       memoCalls.push(memoMinCoins(coins, n).counts.calls);
       var run = null;
@@ -1172,7 +1197,7 @@ def _knapsack(cfg):
         )
         + _stage(_svg("knGrid", "0 0 660 220",
                       "The table, one row per item and one column per capacity.")
-                 + _svg("knRow", "0 0 660 80",
+                 + _svg("knOneRow", "0 0 660 80",
                         "The same problem in one row, filled forward and backward."))
         + _table("knPath")
         + _banner("knStatus")
@@ -1205,7 +1230,7 @@ def _knapsack(cfg):
   var capIn = document.getElementById('knCap');
   var rowIn = document.getElementById('knRow'), rowOut = document.getElementById('knRowOut');
   var colIn = document.getElementById('knCol'), colOut = document.getElementById('knColOut');
-  var grid = document.getElementById('knGrid'), rowPlot = document.getElementById('knRow');
+  var grid = document.getElementById('knGrid'), rowPlot = document.getElementById('knOneRow');
   var pathT = document.getElementById('knPath'), status = document.getElementById('knStatus');
   var KPIS = ['knValue', 'knBrute', 'knCheck', 'knCells', 'knBack', 'knFwd'];
 
@@ -2557,7 +2582,8 @@ _TS_PRESETS = [
         "label": "six cities, where the counts pull apart",
         "spec": "0 4 7 3 9 5; 4 0 6 8 2 7; 7 6 0 5 8 3; 3 8 5 0 6 4; 9 2 8 6 0 5; 5 7 3 4 5 0",
         "note": "2304 units of work for the table against 120 tours for brute force — the "
-                "table LOSES at this size, and does not overtake until about twelve cities",
+                "table LOSES at this size, and n squared 2 to the n does not drop below "
+                "n minus 1 factorial until ten cities",
     },
     {
         "id": "trap",

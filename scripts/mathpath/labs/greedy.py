@@ -131,12 +131,21 @@ THE MODES, and the lesson each belongs to:
   caching     FIFO, LRU and farthest-in-future against the true offline
               optimum, and Belady's anomaly swept
 
-PAGE WEIGHT. The core is concatenated once for the kit rather than once per
-mode, which is what `heap.py` does and for the same reason: a mode that built
-its own core would eventually call a function its page turned out not to carry.
-`caching` pays about 4 KB gzipped for blocks it does not use, against a
-measured ceiling of 62 KB and a heaviest page in this kit well under half of
-it.
+PAGE WEIGHT, MEASURED RATHER THAN ESTIMATED. The core is concatenated once for
+the kit rather than once per mode, which is what `heap.py` does and for the
+same reason: a mode that built its own core would eventually call a function
+its page turned out not to carry. The core is 71.4 KB raw and 21.0 KB gzipped,
+and a rendered lesson page runs from 40.4 KB gzipped (`partition`) to 41.8 KB
+(`matroid`) against this repository's measured ceiling of 62 KB (AGENTS.md).
+
+The cost of the one-core choice is real here and is written down rather than
+waved at. `caching` uses nothing at all from TREEDRAW_JS or GREEDY_JS, and
+carries 19.1 KB raw -- 5.3 KB gzipped, an eighth of its page -- of them anyway.
+That is accepted rather than optimised, because the page still lands at 40.8 KB
+against 62 and because splitting the core is exactly the change that lets a
+mode call a function its page does not have. If the ceiling ever binds,
+`caching` is the first mode to give a core of its own: TREEDRAW_JS is used by
+`huffman` alone, and GREEDY_JS by every mode except `caching`.
 """
 
 from .algebra_core import RATIONAL_JS
@@ -815,7 +824,9 @@ GKIT_JS = r"""
   function matchSvg(matchA, n, opts) {
     opts = opts || {};
     var w = opts.width === undefined ? 300 : opts.width;
-    var step = opts.step === undefined ? 30 : opts.step;
+    var h = opts.height === undefined ? 190 : opts.height;
+    var step = opts.step === undefined
+      ? Math.min(30, Math.max(14, (h - 34) / Math.max(1, n - 1))) : opts.step;
     var lx = 56, rx = w - 56, s = '', i;
     for (i = 0; i < n; i += 1) {
       var y = 20 + i * step;
@@ -1251,8 +1262,8 @@ def _partition(cfg):
         + _text("ptSpec", "Intervals, written start-finish", chosen["spec"])
         + _select("ptOrder", "Consider the intervals in order of",
                   [("start", "start time"), ("finish", "finish time")], "start")
-        + _kpis([("Intervals", "ptN"), ("Rooms greedy used", "ptRooms"),
-                 ("Depth: most alive at once", "ptDepth"),
+        + _kpis([("Intervals", "ptN"), ("Rooms greedy used", "ptUsed"),
+                 ("Depth: most alive at once", "ptNeeded"),
                  ("Every room conflict-free", "ptValid"),
                  ("Rooms = depth", "ptOptimal"),
                  ("Certificate at t =", "ptAt")])
@@ -1271,7 +1282,7 @@ def _partition(cfg):
   var orderIn = document.getElementById('ptOrder');
   var plot = document.getElementById('ptPlot'), depthPlot = document.getElementById('ptDepth');
   var roomsT = document.getElementById('ptRooms'), status = document.getElementById('ptStatus');
-  var KPIS = ['ptN', 'ptRooms', 'ptDepth', 'ptValid', 'ptOptimal', 'ptAt'];
+  var KPIS = ['ptN', 'ptUsed', 'ptNeeded', 'ptValid', 'ptOptimal', 'ptAt'];
 
   function blank(why) {
     plot.innerHTML = ''; depthPlot.innerHTML = ''; roomsT.innerHTML = '';
@@ -1290,8 +1301,8 @@ def _partition(cfg):
     var pairwise = mutuallyOverlapping(live);
 
     document.getElementById('ptN').textContent = String(items.length);
-    document.getElementById('ptRooms').textContent = String(run.result.used);
-    document.getElementById('ptDepth').textContent = String(run.result.depth);
+    document.getElementById('ptUsed').textContent = String(run.result.used);
+    document.getElementById('ptNeeded').textContent = String(run.result.depth);
     document.getElementById('ptValid').textContent = valid.ok ? 'yes' : 'NO';
     document.getElementById('ptOptimal').textContent = run.result.optimal ? 'yes' : 'no';
     document.getElementById('ptAt').textContent = run.result.at === null ? '—' : String(run.result.at);
@@ -1904,7 +1915,11 @@ def _matroid(cfg):
       if (!m) { bad = 'an edge is written 1-2; "' + t + '" is not'; return; }
       var a = parseInt(m[1], 10) - 1, b = parseInt(m[2], 10) - 1;
       if (a === b) { bad = 'a loop is in no forest and no matching'; return; }
-      if (edges.length >= 8) { bad = 'at most 8 edges, because all 2^n subsets are listed'; return; }
+      if (edges.length >= 6) {
+        bad = 'at most 6 edges: every subset is listed and then every ORDERED PAIR of the '
+            + 'family is tested, which is quadratic in a family that is itself exponential';
+        return;
+      }
       top = Math.max(top, a + 1, b + 1);
       edges.push([a, b]);
     });
@@ -1958,6 +1973,15 @@ def _matroid(cfg):
     var kind = p ? p.kind : 'uniform';
     var fam = build(kind, specIn.value);
     if (fam.bad) { blank(fam.bad); return; }
+    /* One guard for all four families rather than three: everything below
+       enumerates 2^n subsets and then every ordered pair of what survives, and
+       independenceEnumerate throws above ten. Refusing here, by name, is the
+       difference between a panel that says why and a panel that is blank. */
+    if (fam.ground.length > 6) {
+      blank('this mode lists every subset and then tests every ordered pair of the family, so '
+            + 'it takes at most 6 elements and was given ' + fam.ground.length);
+      return;
+    }
     var wr = readInts(wIn.value);
     if (wr.bad) { blank(wr.bad); return; }
     var weights = wr.values;
