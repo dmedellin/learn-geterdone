@@ -455,7 +455,8 @@ LESSONS = [
                          "direction would report the wrong claim here rather than the wrong "
                          "number, which is the harder failure to notice.")),
             ("p", "This one inequality reappears twice more on this path wearing different "
-                  "nouns. In Network Optimisation it is the statement that any cut's capacity "
+                  "nouns. In Networks: Flows, Paths and Assignments it is the statement that any cut's "
+                  "capacity "
                   "bounds any flow, with the cut playing the part of the prices. In Integer "
                   "Programming it is the optimality gap that lets a search stop early, with the "
                   "relaxation's value playing the part of `bᵀy`. Both of those are this chain, "
@@ -609,7 +610,7 @@ LESSONS = [
                      "produces each link, split a gap into its two parts, and state the "
                      "conclusion as a bracket or as a proof of optimality &mdash; without ever "
                      "saying the optimum is near the middle number."),
-        "note": 'This inequality is the one result on the course that gets reused under other names. Network Optimisation states it as “any cut\'s capacity bounds any flow”; Integer Programming states it as the optimality gap that lets a search prune a subtree without exploring it. Both are this chain with different nouns, and both cite this lesson rather than reproving it.',
+        "note": 'This inequality is the one result on the course that gets reused under other names. Networks: Flows, Paths and Assignments states it as “any cut\'s capacity bounds any flow”; Integer Programming states it as the optimality gap that lets a search prune a subtree without exploring it. Both are this chain with different nouns, and both cite this lesson rather than reproving it.',
     },
     # ---------------------------------------------------------------- 03
     {

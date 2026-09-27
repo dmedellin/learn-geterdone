@@ -23,7 +23,7 @@ COURSE = {
         "branch on x = v fractional:  x ≤ ⌊v⌋  or  x ≥ ⌈v⌉;  re-solve by dual simplex",
         "gap = bound − incumbent;  the gap is what is proved",
     ],
-    "assumes_short": "Linear Programming Models through Network Optimisation; truth tables, and the vocabulary of hardness",
+    "assumes_short": "Linear Programming Models through Networks: Flows, Paths and Assignments; truth tables, and the vocabulary of hardness",
     "assumes_long": (
         "linear programming models, the simplex method, duality and sensitivity "
         "analysis — the dual simplex in particular — and network optimisation, for "
