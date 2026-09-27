@@ -17,8 +17,16 @@ is exactly the 369 pages it has been.
 | Subject | state |
 |---|---|
 | System Design | **complete** — 10 courses, 114 lessons, 10 lab kits, all gates passing. Ready to wire. |
-| Algorithms | `algo_core.py` written (21 blocks). 14 kits and 109 lessons to go. |
-| Operations Research | `or_core.py` written — an exact simplex, 13 blocks. 12 kits and 94 lessons to go. |
+| Algorithms | **complete** — 9 courses, 112 lessons. Ready to wire. |
+| Operations Research | **complete** — 10 courses, 92 lessons. Ready to wire. |
+
+74 lab modes are registered. The two new Subjects are **inert**: neither is in
+`GENERATED_PATHS`, so `site/` is still exactly the pages it has been, and
+wiring either one is the ~24-declaration-site process System Design went
+through. Before you wire, note that `tests/test_site_invariants.py` now checks a
+Subject's tagline against its own course and lesson counts — those sentences are
+written when a Subject is scaffolded, before a lesson exists, and both of these
+advertised the wrong number until the day they were finished.
 
 A course module still being authored exports `COURSE = None`, which
 `content/<subject>/__init__.py` filters out. That is the state most of them are
