@@ -25,13 +25,18 @@ COURSE = {
         "optimum from an exhaustive search, the realised ratio and the promise, on one axis."
     ),
     "key": [
-        "A ≤p B        hardness flows from A to B, tractability the other way",
-        "a certificate is checked in polynomial time; finding one is a different question",
+        "A ≤p B   hardness flows from A to B,",
+        "         tractability the other way",
+        "checking a certificate is polynomial;",
+        "finding one is a different question",
         "",
-        "|cover| = 2|M| ≤ 2·OPT       a ratio is proved against a LOWER BOUND, not the optimum",
-        "MST ≤ OPT ≤ tour ≤ 2·MST     four computed numbers, and the chain IS the proof",
+        "|cover| = 2|M| ≤ 2·OPT: proved against a",
+        "   LOWER BOUND, not against the optimum",
+        "MST ≤ OPT ≤ tour ≤ 2·MST",
+        "   four numbers, and the chain IS the proof",
         "",
-        "a count on one input is not a bound, and nor is a count on every input of one size",
+        "a count on one input is not a bound,",
+        "nor is a count on every input of a size",
     ],
     "assumes_short": "Reductions as definitions, greedy and dynamic programming, flow and matching",
     "assumes_long": (

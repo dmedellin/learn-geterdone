@@ -25,10 +25,14 @@ COURSE = {
         "wrong."
     ),
     "key": [
-        "optimal substructure   an optimum contains an optimum of the part",
-        "overlapping subproblems   22 089 calls, 18 distinct arguments",
-        "a table, an ORDER, a recurrence   -   the order is the part that fails silently",
-        "an unwritten cell reads as nothing, and nothing plus a number is a number",
+        "optimal substructure",
+        "an optimum contains an optimum of the part",
+        "overlapping subproblems",
+        "22 089 calls, 18 distinct arguments",
+        "a table, an ORDER, a recurrence",
+        "the order is the part that fails silently",
+        "an unwritten cell reads as nothing, and",
+        "nothing plus a number is a number",
         "n²2ⁿ beats (n−1)! only from ten cities up",
     ],
     "assumes_short": "Greedy and the exchange argument, induction, recurrences",
