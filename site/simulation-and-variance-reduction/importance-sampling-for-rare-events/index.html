@@ -1,0 +1,2718 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Importance Sampling for Rare Events | Lesson | Simulation and Variance Reduction | Operations Research | Learn · geterdone.io</title>
+  <meta name="description" content="Direct simulation of an event with probability 1/1024 spends almost every draw learning nothing. Importance sampling draws from a different distribution q under which the event is common and weights each draw by the likelihood ratio p/q, which keeps the estimator unbiased. The whole question is what the reweighting does to the variance: a good q divides it by about 123, a bad one multiplies it by about 9546, and a q with a hole where the event lives gives no estimator at all." />
+  <link rel="canonical" href="https://learn.geterdone.io/simulation-and-variance-reduction/importance-sampling-for-rare-events/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="Importance Sampling for Rare Events | Lesson | Simulation and Variance Reduction | Operations Research | Learn · geterdone.io" />
+  <meta property="og:description" content="Direct simulation of an event with probability 1/1024 spends almost every draw learning nothing. Importance sampling draws from a different distribution q under which the event is common and weights each draw by the likelihood ratio p/q, which keeps the estimator unbiased. The whole question is what the reweighting does to the variance: a good q divides it by about 123, a bad one multiplies it by about 9546, and a q with a hole where the event lives gives no estimator at all." />
+  <meta property="og:url" content="https://learn.geterdone.io/simulation-and-variance-reduction/importance-sampling-for-rare-events/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Importance Sampling for Rare Events | Lesson | Simulation and Variance Reduction | Operations Research | Learn · geterdone.io" />
+  <meta name="twitter:description" content="Direct simulation of an event with probability 1/1024 spends almost every draw learning nothing. Importance sampling draws from a different distribution q under which the event is common and weights each draw by the likelihood ratio p/q, which keeps the estimator unbiased. The whole question is what the reweighting does to the variance: a good q divides it by about 123, a bad one multiplies it by about 9546, and a q with a hole where the event lives gives no estimator at all." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/simulation-and-variance-reduction/importance-sampling-for-rare-events/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    @media (max-width: 920px) {
+      body[data-page-kind="supplemental"] [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/operations-research/">Operations Research</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Simulation and Variance Reduction</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">Importance Sampling for Rare Events</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The importance sampling for rare events is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Simulation and Variance Reduction &middot; Sampling somewhere else</span>
+        <h1>Importance Sampling for Rare Events</h1>
+        <p>Direct simulation of an event with probability <span class="math">1/1024</span> spends almost every draw learning nothing. Importance sampling draws from a different distribution <span class="math">q</span> under which the event is common and weights each draw by the likelihood ratio <span class="math">p/q</span>, which keeps the estimator unbiased. The whole question is what the reweighting does to the variance: a good <span class="math">q</span> divides it by about <span class="math">123</span>, a bad one multiplies it by about <span class="math">9546</span>, and a <span class="math">q</span> with a hole where the event lives gives no estimator at all.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">E_p[h(X)] = E_q[h(X)·p(X)/q(X)]        provided q &gt; 0 wherever p·h is
+the weight p/q is the likelihood ratio, and it is where the variance lives
+ten fair coins, all heads:  probability exactly 1/1024,  Var = p(1 − p) = 1023/1048576
+q with P(head) = 4/5:   variance DIVIDED by 32505856/264153 ≈ 123.0569
+q with P(head) = 1/5:   variance MULTIPLIED by 295928/31 ≈ 9546.0645
+q with the event removed:  refused — there is no estimator, and that is the answer</div>
+        <div class="float-label" style="right:16px;bottom:16px;">One identity, one weight, and three things it can do</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>Three ideas. The first is the identity, the second is the condition that decides whether there is an estimator at all, and the third is where all the risk in the method is concentrated.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Reweighting is an identity, not an approximation</h3><p><span class="math">E_p[h] = Σ h(x)p(x) = Σ h(x)(p(x)/q(x))q(x) = E_q[h·p/q]</span>, which is multiplying and dividing by the same thing. So the reweighted estimator is unbiased for the same number as the direct one, exactly, for every valid <span class="math">q</span>. The estimate is not where the difference between a good <span class="math">q</span> and a bad one lives.</p></article><article class="card concept-card"><div class="icon">2</div><h3>The support condition is the only condition, and it is absolute</h3><p><span class="math">q</span> must put positive mass everywhere <span class="math">p·h</span> does. If it does not, the likelihood ratio is undefined exactly where the event lives, and an implementation that quietly skips that outcome returns a number that is biased low with nothing on the page to reveal it. There is no partial credit: either the identity holds or there is no estimator.</p></article><article class="card concept-card"><div class="icon">3</div><h3>All the risk is in the weight</h3><p>A draw that misses the event contributes nothing whatever its weight; a draw that hits contributes its whole weight. So the variance is decided by how large the weight is on the outcomes that matter, and a <span class="math">q</span> that makes the event rarer makes that weight enormous. The method can therefore be catastrophically worse than doing nothing, with no symptom except the variance figure.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>Sample where the event is, then weight it back</h2></div><p>The identity that makes the reweighting legitimate, the condition it needs, and the three orders of magnitude between a good choice and a bad one.</p></div>
+      <article class="card card-pad prose"><p>Direct simulation of a rare event is an arithmetic problem before it is anything else. To see an event of probability <span class="math">1/1024</span> even ten times takes about ten thousand draws, and to estimate it to within ten per cent takes on the order of a hundred thousand. Nine hundred and ninety-nine draws in a thousand return a zero and teach nothing, and the arithmetic gets worse in exact proportion as the event gets more interesting.</p><div class="defbox"><span class="label">Definition &middot; Importance sampling</span><p>To estimate <span class="math">E_p[h(X)]</span>, draw <span class="math">X₁, …, Xₙ</span> from a different distribution <span class="math">q</span> and report the average of <span class="math">h(Xᵢ)·p(Xᵢ)/q(Xᵢ)</span>. The factor <span class="math">p/q</span> is the <strong>likelihood ratio</strong> or <strong>importance weight</strong>. <span class="math">q</span> is the <strong>proposal</strong>.</p></div><div class="thm"><span class="label">Theorem &middot; The reweighted estimator is unbiased</span><p>If <span class="math">q(x) &gt; 0</span> whenever <span class="math">p(x)h(x) ≠ 0</span>, then <span class="math">E_q[h(X)p(X)/q(X)] = E_p[h(X)]</span>. The estimator is therefore unbiased for the same quantity as direct simulation, for every proposal satisfying that condition and for no other.</p></div><div class="proof"><p><span class="math">E_q[h·p/q] = Σ_x q(x)·h(x)p(x)/q(x)</span>, summed over the <span class="math">x</span> with <span class="math">q(x) &gt; 0</span>.</p><p>The <span class="math">q(x)</span> cancels, leaving <span class="math">Σ h(x)p(x)</span> over those same <span class="math">x</span>. By the support condition every <span class="math">x</span> with <span class="math">h(x)p(x) ≠ 0</span> is among them, so the sum is <span class="math">Σ_x h(x)p(x) = E_p[h]</span>.</p><p>The cancellation is also the proof that the condition cannot be relaxed: an <span class="math">x</span> with <span class="math">p(x)h(x) ≠ 0</span> and <span class="math">q(x) = 0</span> is a term present in the target sum and absent from the reweighted one, so the estimator is short by exactly that term.</p><p><span class="qed">&#9633;</span></p></div><h3>The event, and the three proposals</h3><p>The event on this page is ten fair coins all landing heads. Its probability under <span class="math">p</span> is exactly <span class="math">1/1024</span>, which is what makes the comparison a measurement rather than a demonstration: both estimators are aiming at a number already known, so any difference between them must be variance. Direct sampling has per-draw variance <span class="math">p(1 − p) = 1023/1048576</span>.</p><div class="example"><span class="label">Example &middot; A coin weighted toward heads</span><p>Take <span class="math">q</span> to be ten coins with <span class="math">P(head) = 4/5</span>. Under <span class="math">q</span> the event has probability <span class="math">1048576/9765625</span>, about <span class="math">0.1074</span> &mdash; roughly one draw in nine rather than one in a thousand &mdash; and the weight on it is <span class="math">9765625/1073741824</span>, about <span class="math">0.0091</span>. The per-draw variance becomes <span class="math">8717049/1099511627776</span>, about <span class="math">0.0000079</span>, which is the original variance divided by <span class="math">32505856/264153 ≈ 123.0569</span>.</p></div><div class="example"><span class="label">Example &middot; The same coin, weighted the wrong way</span><p>Take <span class="math">P(head) = 1/5</span> instead. The event now has probability <span class="math">1/9765625</span> under <span class="math">q</span> &mdash; about a hundred times rarer than it already was &mdash; and the weight on it is <span class="math">9765625/1024</span>, about <span class="math">9537</span>. One draw in ten million contributes nine thousand five hundred, and the per-draw variance is <span class="math">1220703/131072</span>, about <span class="math">9.31</span>: the original variance multiplied by <span class="math">295928/31 ≈ 9546.0645</span>.</p></div><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">  event: ten heads.   p = 1/1024 exactly.
+
+  proposal            q(event)          weight p/q       per-draw variance
+  direct, P(H) = 1/2   1/1024            1                1023/1048576
+  good,   P(H) = 4/5   ≈ 0.1073742       ≈ 0.0090949      ≈ 0.0000079281
+  bad,    P(H) = 1/5   ≈ 0.0000001024    ≈ 9536.743       ≈ 9.313
+
+  good:  variance DIVIDED   by 32505856/264153 ≈ 123.0569
+  bad:   variance MULTIPLIED by   295928/31    ≈ 9546.0645
+
+  same estimator, same unbiasedness, four orders of magnitude apart</div><h3>What the runs look like, which is not what the variances look like</h3><p>Two thousand draws under the good proposal hit the event two hundred and fifteen times and estimate <span class="math">0.00097771</span> against the exact <span class="math">0.00097656</span>. Two thousand draws under the fair coin hit it once and estimate <span class="math">1/2000 = 0.0005</span>. Two thousand draws under the bad proposal hit it <em>not at all</em> and estimate exactly <span class="math">0</span> &mdash; not near the answer, at zero, with a perfectly ordinary-looking trace and nothing on the page to suggest anything went wrong except the variance figure.</p><p>That is the failure this lesson leads with. A bad proposal looks fine on a short run because all of the damage is in the spread and none of it is in the picture: the estimate is stable at zero, the running average is a flat line, and the estimator is still unbiased. What is wrong is that one draw in ten million would have carried the entire estimate, and this run did not get it.</p><h3>The proposal that is refused</h3><div class="example"><span class="label">Example &middot; A perfectly good distribution that cannot be used</span><p>Take the good proposal and remove its mass on ten heads, redistributing it over the other outcomes. The result is a genuine probability distribution &mdash; its entries are positive where they are present and they sum to <span class="math">1</span> &mdash; and the panel refuses it. <span class="math">p</span> puts <span class="math">1/1024</span> on the event and <span class="math">q</span> puts nothing there, so the likelihood ratio is undefined exactly where the estimator needs it.</p></div><p>The refusal is the interesting behaviour. An implementation that skipped the undefined outcome would return a number, and the number would be biased low by precisely the term it dropped &mdash; which here is the whole of the answer, so it would return zero, every time, with a variance of zero to go with it. A confident, reproducible, perfectly stable wrong answer is the worst thing a simulation can produce, and the only defence is a support check that refuses rather than degrades.</p><p>Note what the condition is not about. It is not about <span class="math">q</span> being close to <span class="math">p</span>, and it is not about making the event common; those decide the variance, which is a question of how good the estimator is. The support condition decides whether there is an estimator, which is a prior question with a yes-or-no answer.</p></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Importance sampling for rare events</h2></div><p>Sample where the event is, weight each draw by p/q, and watch what happens to the variance</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Sample where the event is, then weight it back</strong><span>the likelihood ratio p/q per outcome, and what the reweighting does to the variance</span></div>
+        <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the running estimate</span><span class="tone-green"><i class="legend-swatch"></i>the exact probability</span><span class="tone-amber"><i class="legend-swatch"></i>the variance under a good q</span><span class="tone-red"><i class="legend-swatch"></i>under a bad one</span></div>
+      </div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="imRun" viewBox="0 0 660 240" role="img" aria-label="The running importance-sampling estimate against the exact probability of the event."></svg></div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="imBars" viewBox="0 0 660 150" role="img" aria-label="The per-draw variance under direct sampling and under each choice of q, drawn to scale."></svg></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="imTable"></table></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="imDraws"></table></div>
+      <div class="status-banner" id="imStatus" style="margin-top:12px;"></div>
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>Choose the proposal, and read the variance column rather than the estimate</h3>
+          <p>The event is ten fair coins all landing heads, a probability of exactly <span class="math">1/1024</span>, so both estimators are aiming at a number already known and any difference between them is variance. Read the <span class="math">p/q</span> column of the first table and then the bar chart. Switch to <span class="math">P(head) = 1/5</span> and watch two thousand draws return exactly zero with a flat, confident trace; then switch to the proposal with the event removed and read the refusal.</p>
+        <div class="field">
+          <label for="imQ">The distribution sampled from</label>
+          <select id="imQ"><option value="good" selected>P(head) = 4/5 — a good q</option><option value="bad">P(head) = 1/5 — a bad q</option><option value="crude">P(head) = 1/2 — direct simulation</option><option value="hole">P(head) = 4/5 with the event removed</option></select>
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="imDrawCount">Draws</label><span class="range-value" id="imDrawCountOut">2000</span></div>
+          <input id="imDrawCount" type="range" min="200" max="4000" step="200" value="2000" />
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="imSeed">Seed</label><span class="range-value" id="imSeedOut">1</span></div>
+          <input id="imSeed" type="range" min="0" max="40" step="1" value="1" />
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Exact probability</span><strong id="imTheta">&mdash;</strong></div>
+          <div class="kpi"><span>Per-draw variance, direct</span><strong id="imVarP">&mdash;</strong></div>
+          <div class="kpi"><span>Per-draw variance, this q</span><strong id="imVarQ">&mdash;</strong></div>
+          <div class="kpi"><span>The ratio between them</span><strong id="imRatio">&mdash;</strong></div>
+          <div class="kpi"><span>Draws that hit the event</span><strong id="imHits">&mdash;</strong></div>
+          <div class="kpi"><span>This run's estimate</span><strong id="imEst">&mdash;</strong></div>
+        </div>
+        <p class="small-copy" id="imHint" style="margin:0;">Both estimators are unbiased for the same exact probability, so the estimate column is not where the difference lives. Read the variance column: the whole question is what the reweighting did to the spread, and it can collapse or explode.</p>
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Estimating a rare event</h2></div><p>Five steps, and the third is the one that separates a hard problem from an impossible report.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Check whether direct simulation is affordable at all</h3><p>To see an event of probability <span class="math">θ</span> about <span class="math">m</span> times takes roughly <span class="math">m/θ</span> draws. At <span class="math">θ = 1/1024</span> and <span class="math">m = 10</span> that is ten thousand; at <span class="math">θ = 10⁻⁶</span> it is ten million, and the arithmetic decides the question before any cleverness is needed.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Choose a proposal that makes the event common, and write it down</h3><p>Tilting a parameter &mdash; a coin's bias, an arrival rate, a service time &mdash; is the usual move. The proposal has to be something you can both sample from and evaluate, because the weight needs <span class="math">q(x)</span> for every drawn <span class="math">x</span>.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Verify the support condition before anything else</h3><p><span class="math">q(x) > 0</span> wherever <span class="math">p(x)h(x) ≠ 0</span>. This is a yes-or-no question about the two distributions and it is answered before a single draw is taken. A proposal that fails it is not a worse estimator; it is not an estimator.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Weight every draw by p/q, including the ones that miss</h3><p>A draw that misses the event contributes <span class="math">0 × weight = 0</span>, and it still counts in the denominator. Averaging only the hits estimates a conditional expectation, which is a different and much larger number.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Compare the variances, not the estimates</h3><p>Both estimators are unbiased, so the estimates will be near each other when both are working and the comparison tells you nothing. The per-draw variance under <span class="math">p</span> against the per-draw variance under <span class="math">q</span> is the entire result, and a proposal whose ratio is below one has made the problem worse.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>Weights, support and which column to read</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>Ten heads, three proposals, and one refusal</h3><p>The event is ten fair coins all landing heads. Its probability is exactly <span class="math">1/1024</span>, so nothing below is an approximation of an unknown: every figure is a fraction, and the two estimators are being compared on a quantity they both already agree about.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">p, the fair coin      P(10 heads) = 1/1024
+                      per-draw variance p(1 − p) = 1023/1048576
+
+q, P(head) = 4/5      q(10 heads) = 1048576/9765625   ≈ 0.1073742
+                      weight p/q  = 9765625/1073741824 ≈ 0.0090949
+                      variance    = 8717049/1099511627776
+                                  ≈ 0.0000079281
+                      ratio p-variance / q-variance
+                                  = 32505856/264153 ≈ 123.0569
+
+q, P(head) = 1/5      q(10 heads) = 1/9765625        ≈ 0.0000001024
+                      weight p/q  = 9765625/1024     ≈ 9536.743
+                      variance    = 1220703/131072   ≈ 9.313
+                      MULTIPLIED by 295928/31        ≈ 9546.0645
+
+q, P(head) = 1/2      weight exactly 1, ratio exactly 1
+                      direct simulation written as importance sampling
+
+q = the good coin with its mass on ten heads removed      REFUSED
+
+two thousand draws each, same seed
+   good      215 hits    estimate 0.00097771    exact 0.00097656
+   fair        1 hit     estimate 0.0005
+   bad         0 hits    estimate 0</div><p>The fair-coin row is worth keeping because it shows the method contains direct simulation as a special case: set <span class="math">q = p</span>, every weight is exactly <span class="math">1</span>, and the ratio of variances is exactly <span class="math">1</span>. Importance sampling is not a different estimator, it is the same estimator with a parameter, and the parameter is the proposal.</p><p>The bad row is the one to be frightened of. Its estimate is <span class="math">0</span> and its trace is a flat line at zero, which is the most stable-looking output on the page, and the estimator is still unbiased: in expectation, over enough runs, those one-in-ten-million draws carrying a weight of nine thousand five hundred would bring the average back to <span class="math">1/1024</span>. The expectation is right and no run will ever show it.</p><p>For a faded rehearsal, drag the draw count from <span class="math">2000</span> to <span class="math">4000</span> under the bad proposal. The supplied first move is that the per-draw variance does not change at all &mdash; it is a property of <span class="math">p</span>, <span class="math">q</span> and the event, not of the run &mdash; so the variance of the average falls by exactly half. Say how many draws it would take for that average to have a standard error smaller than <span class="math">1/1024</span> itself, and then say what that number means about the proposal.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Oversampling the interesting region and forgetting to weight</strong><span>The result is an estimate of the probability under the proposal, reported as one under the target. On this page that is <span class="math">0.107</span> in place of <span class="math">0.00098</span>, and the run looks healthier than the correct one because the event keeps occurring. It is not an inaccurate estimate of the right thing; it is an accurate estimate of the wrong thing.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Judging a proposal by the estimate it produced</strong><span>Every valid proposal is unbiased for the same number, so the estimate cannot distinguish them. The good and the bad proposals here differ by four orders of magnitude in variance and both are aiming at <span class="math">1/1024</span>. The variance column is the result and the estimate column is a formality.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Assuming importance sampling can only help</strong><span>It multiplied the variance by about <span class="math">9546</span> on the measured bad proposal, from the same estimator with the same guarantees. Choosing <span class="math">q</span> is a real decision with a real downside, and the only protection is to compute the two variances and divide rather than to trust that moving the sampling distribution toward the event was the right instinct.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when the first thing you compute for a proposal is its variance, and the first thing you check is its support.</strong><p>You should be able to derive the reweighting identity and see in the derivation why the support condition cannot be relaxed, choose a tilted proposal for a rare event and compute its likelihood ratios, state the per-draw variance under both the target and the proposal as exact fractions and divide them, recognise a zero-hit run as a variance symptom rather than as convergence, and refuse a proposal with a hole in its support rather than patching it.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> That is the whole of the method, and the last of these courses. Every other course here proves its answer: a tableau is optimal, a corner is whole, a schedule is best by an exchange argument, a steady state is the solution of a linear system. This one runs the model instead, and hands back an estimate with an interval around it &mdash; which is the honest report when nothing else is available, and never as good as a proof. Both hazards are still in force and they compound: the optimum of the wrong model is exactly, confidently, provably wrong, and here the output carries sampling noise on top of that, so a simulation of the wrong model is wrong in a way that more runs make look more convincing. The last thing to take from this path is the habit of asking what the model left out, and the second-to-last is the habit of printing the width beside the number.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../control-variates/" rel="prev"><span>Lesson</span><strong>Control Variates</strong></a>
+      <a class="lesson-link next" href="../"><span>Course</span><strong>Simulation and Variance Reduction</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="simulation-and-variance-reduction/importance-sampling-for-rare-events" data-lesson-title="Importance Sampling for Rare Events" data-course-title="Simulation and Variance Reduction">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Simulation and Variance Reduction.</strong> Every draw, count, frequency, sample mean, sample variance, covariance, coverage count, transient expectation and variance ratio on this course is an exact fraction, because the stream is integers and the sampled values are rational: a sample mean over two hundred draws prints as <span class="math">413/200</span> and a coverage as <span class="math">40</span> of <span class="math">40</span>. Three quantities here are not rational in general &mdash; the standard error <span class="math">√(s²/n)</span>, the Chebyshev half-width <span class="math">k·SE</span> built on it, and <span class="math">ρ</span> &mdash; and each is carried as an exact surd and printed with its decimal labelled <em>rounded</em>; where the radicand happens to be a perfect square the exact form is a fraction and nothing is rounded at all. Every other decimal on these pages says &ldquo;exact, shown to <span class="math">N</span> places&rdquo; instead, and the distinction is load-bearing rather than fussy: a reader who has seen the word used loosely cannot tell which three figures really are approximate. Note that <span class="math">ρ²</span> is a ratio of exact rationals even where <span class="math">ρ</span> is not, which is why the reduction factor <span class="math">1 − ρ²</span> needs no rounding and is the figure this course reports. What none of this can do is make a run into a proof: every answer here arrives with an error bar, and the model it came from is still only as true as what it left out.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure on this path is computed in your browser from the model the lesson states, and a solution proved optimal is optimal for the model you wrote down rather than for the situation it came from &mdash; each lesson names what the model left out.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "A proposal <span class=\"math\">q<\/span> makes the rare event ten times <em>rarer<\/em> than it was under <span class=\"math\">p<\/span>. What happens to the estimator?", "a": ["It becomes biased, since the event is under-represented", "It stays unbiased, and its variance rises sharply", "It stays unbiased, and its variance is unchanged", "It fails the support condition and must be refused"], "c": 1, "why": "Unbiasedness needs only the support condition, which a rarer-but-positive event satisfies. What changes is that the whole estimate now rests on a huge weight attached to an outcome almost nothing draws, which is exactly the measured case: the variance goes up by a factor of about <span class=\"math\">9546<\/span>."}, {"q": "A run of two thousand draws under a bad proposal returns exactly <span class=\"math\">0<\/span> with a perfectly flat trace. What does that indicate?", "a": ["A bug, since an unbiased estimator cannot return zero", "That the event is impossible under <span class=\"math\">q<\/span>", "That not one draw hit the event, which is what a huge variance looks like from inside a single run", "That the run has converged to the answer"], "c": 2, "why": "Zero hits gives an estimate of exactly zero, and it is the characteristic appearance of a high-variance importance sampler: all of the damage is in the spread and none of it is in the picture. The event is not impossible under this <span class=\"math\">q<\/span>, merely a hundred times rarer than it already was."}, {"q": "Why does the panel refuse a proposal that removes all mass from the event, even though it is a valid probability distribution?", "a": ["Because the weights would be too large to compute", "Because <span class=\"math\">p/q<\/span> is undefined exactly where the event lives, so there is no unbiased estimator to run", "Because the probabilities no longer sum to one", "Because the event would then never be drawn, which would slow the run down"], "c": 1, "why": "The support condition fails at the one outcome that contributes. An implementation that skipped it would return a number biased low by exactly the term it dropped &mdash; here, by the whole answer &mdash; with a variance of zero to make it look reliable. Refusing is the only honest behaviour."}, {"q": "Someone reports that oversampling the interesting region gave a much higher estimate of the event's probability. What has gone wrong?", "a": ["Nothing: sampling where the event is naturally finds it more often", "The weights were not applied, so what was reported is the probability under <span class=\"math\">q<\/span> rather than under <span class=\"math\">p<\/span>", "The proposal violated the support condition", "The sample size was too small for the estimate to be reliable"], "c": 1, "why": "Without the factor <span class=\"math\">p/q<\/span> the average of the indicator estimates <span class=\"math\">q(event)<\/span>, not <span class=\"math\">p(event)<\/span> &mdash; here about <span class=\"math\">0.107<\/span> instead of <span class=\"math\">0.00098<\/span>, a hundred times too large. The reweighting is not an optional refinement; it is the whole of what makes the draws relevant to the original question."}];
+
+  (function () {
+
+  /* Exact rational arithmetic over BigInt.
+
+     Every number a lesson calls "the answer" lives in this type. BigInt rather
+     than Number because a few steps of elimination on a 3x3 system produces
+     numerators that leave the exact-integer range of a double, and a solution
+     that is silently wrong in the last digits is worse than no solution. */
+  function bgcd(a, b) {
+    if (a < 0n) a = -a;
+    if (b < 0n) b = -b;
+    while (b) { var t = a % b; a = b; b = t; }
+    return a;
+  }
+  function R(n, d) {
+    if (d === undefined) d = 1n;
+    n = BigInt(n); d = BigInt(d);
+    if (d === 0n) throw new Error('division by zero');
+    if (d < 0n) { n = -n; d = -d; }
+    var g = bgcd(n, d) || 1n;
+    return { n: n / g, d: d / g };
+  }
+  var R0 = R(0n), R1 = R(1n);
+  function Radd(a, b) { return R(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function Rsub(a, b) { return R(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function Rmul(a, b) { return R(a.n * b.n, a.d * b.d); }
+  function Rdiv(a, b) { return R(a.n * b.d, a.d * b.n); }
+  function Rneg(a) { return R(-a.n, a.d); }
+  function Rabs(a) { return a.n < 0n ? Rneg(a) : a; }
+  function Rinv(a) { return R(a.d, a.n); }
+  function Rzero(a) { return a.n === 0n; }
+  function Rsign(a) { return a.n === 0n ? 0 : (a.n < 0n ? -1 : 1); }
+  function Requ(a, b) { return a.n === b.n && a.d === b.d; }
+  function Rcmp(a, b) { var l = a.n * b.d, r = b.n * a.d; return l < r ? -1 : (l > r ? 1 : 0); }
+  function Rint(a) { return a.d === 1n; }
+  function Rpow(a, k) {
+    var out = R1, base = a, e = k < 0 ? -k : k;
+    while (e > 0) { if (e & 1) out = Rmul(out, base); base = Rmul(base, base); e >>= 1; }
+    return k < 0 ? Rinv(out) : out;
+  }
+  /* The reader's form: "3", "-7/4". Never "3/1", never "0/5". */
+  function Rtext(a) { return a.d === 1n ? String(a.n) : a.n + '/' + a.d; }
+  /* Parenthesised when it would otherwise glue onto a neighbouring symbol. */
+  function Rterm(a) { return (a.n < 0n || a.d !== 1n) ? '(' + Rtext(a) + ')' : Rtext(a); }
+  function Rnum(a) { return Number(a.n) / Number(a.d); }
+  /* A decimal, for the one place a lesson asks for one. Exact when it can be.
+
+     BigInt long division rather than Number(n)/Number(d).toFixed(). The old
+     form had two faults and the second is the one that shows.
+
+     It returned NaN. Past roughly 300 digits both halves of the quotient are
+     Infinity and Infinity/Infinity is NaN, so a page printed NaN to a reader.
+     A Bloom filter's exact rate at m = 1000, n = 100, k = 7 has a 2101-digit
+     denominator, and Karger's contraction probability has the same shape.
+
+     And it rounded exact ties the wrong way. -399/40 is exactly -9.975; the
+     nearest double is fractionally smaller in magnitude, so toFixed(2) gave
+     -9.97 where half away from zero is -9.98. 160 of 144,180 rationals over
+     the small-integer range disagreed, every one of them an exact tie.
+
+     Half away from zero, computed on the exact value: the doubling, the +1
+     and the halving are the rounding, done in integers. */
+  function Rdec(a, places) {
+    if (places === undefined) places = 6;
+    if (Rint(a)) return String(a.n);
+    var neg = a.n < 0n, num = neg ? -a.n : a.n;
+    var scale = 10n ** BigInt(places);
+    var q = (num * scale * 2n / a.d + 1n) / 2n;
+    var s = q.toString();
+    while (s.length <= places) s = '0' + s;
+    var out = (neg ? '-' : '') + s.slice(0, s.length - places)
+      + (places > 0 ? '.' + s.slice(s.length - places) : '');
+    return out.indexOf('.') >= 0 ? out.replace(/0+$/, '').replace(/\.$/, '') : out;
+  }
+  function Rparse(text) {
+    var s = String(text).trim();
+    var m = /^([+-]?\d+)\s*\/\s*(\d+)$/.exec(s);
+    /* A zero denominator is not a number this function can read, so it comes
+       back null like every other unreadable string. It used to reach R(), which
+       THROWS -- and a throw out of a parser is not a refusal, it is a dead
+       page: the lab's redraw stops, the panel keeps the last good figures, and
+       nothing tells the reader why. Typing 1/0 into the availability chain on
+       a published page did exactly that. Callers all handle null already;
+       every one of them was written to. */
+    if (m) return m[2] === '0' || /^0+$/.test(m[2]) ? null : R(BigInt(m[1]), BigInt(m[2]));
+    m = /^([+-]?\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]));
+    m = /^([+-]?)(\d*)\.(\d+)$/.exec(s);
+    if (m) {
+      var whole = m[2] || '0', frac = m[3];
+      var num = BigInt(whole + frac), den = 10n ** BigInt(frac.length);
+      return R(m[1] === '-' ? -num : num, den);
+    }
+    return null;
+  }
+  /* Is this rational a perfect square? Needed wherever a lesson must decide
+     between an exact answer and a radical one -- sqrt(4/9) is 2/3 and belongs
+     on the page as 2/3, while sqrt(2) must stay sqrt(2). */
+  function bisqrt(n) {
+    if (n < 0n) return null;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x * x === n ? x : null;
+  }
+  function Rsqrt(a) {
+    if (a.n < 0n) return null;
+    var p = bisqrt(a.n), q = bisqrt(a.d);
+    return (p === null || q === null) ? null : R(p, q);
+  }
+
+  /* Printing a rational this path can actually produce.
+
+     algebra_core's Rdec and Rnum both go through Number, and this path
+     produces rationals Number cannot hold: P^12 on a five-state chain with
+     denominator-20 entries has entries of 15 digits over 16 (measured), and
+     (19/20)^400 is 512 digits over 521, of which Number() makes NaN.  So
+     decimals here are long division in BigInt.  queue.py already solved this for the System
+     Design queueing course; this is that solution lifted, not a fourteenth
+     one, so the two courses print the same number the same way. */
+
+  /* Decimal by BigInt long division, rounded half up at the last digit. */
+  function Rfixed(a, places) {
+    if (places === undefined) places = 3;
+    var neg = a.n < 0n, n = neg ? -a.n : a.n, d = a.d;
+    var scale = 10n ** BigInt(places);
+    var q = (2n * n * scale + d) / (2n * d);          /* round half up */
+    var whole = q / scale, frac = (q % scale).toString();
+    while (frac.length < places) frac = '0' + frac;
+    var body = places > 0 ? whole + '.' + frac : String(whole);
+    return (neg ? '-' : '') + body;
+  }
+
+  /* The exact fraction when a reader can read it, a decimal when the exact
+     form has run to twenty digits.  Both are the same number; only one of them
+     is evidence.  The cut is on DIGITS, not on magnitude, so it is the same
+     rule on every page of the Subject. */
+  function Rshort(a, places, digits) {
+    if (digits === undefined) digits = 9;
+    var wide = String(a.n < 0n ? -a.n : a.n).length > digits || String(a.d).length > digits;
+    return wide ? Rfixed(a, places === undefined ? 4 : places) : Rtext(a);
+  }
+  function Rpct(a, places) {
+    return Rfixed(Rmul(a, R(100n, 1n)), places === undefined ? 2 : places) + '%';
+  }
+
+  /* The fractional part a - floor(a), EXACT -- which is what makes a Gomory
+     cut a cut and not an approximation of one.  The floor is computed inline
+     rather than by calling Rfloor, because sysdesign_core.RCEIL_JS declares
+     that name and a kit concatenating both blocks would hold two of it. */
+  function Rfrac(a) {
+    var q = a.n / a.d;
+    if (a.n < 0n && q * a.d !== a.n) q -= 1n;
+    return Rsub(a, R(q, 1n));
+  }
+
+  /* Floor of the integer square root of a BigInt.  algebra_core's bisqrt
+     returns null for a non-square, which is right for deciding exactness and
+     useless for printing one: this never returns null. */
+  function bifloor(n) {
+    if (n < 0n) return 0n;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x;
+  }
+
+  /* THE ONE FUNCTION IN THIS MODULE THAT ROUNDS.  A surd {q, k} means
+     q*sqrt(k) and is exact; its decimal is not, and an EOQ of 40*sqrt(3) is
+     read off a page as 69.28 whatever we would prefer.  The digits come from
+     bifloor(q.n^2 * k * 10^(2p)) = floor(q.n * 10^p * sqrt k), computed with
+     three guard places and then rounded once, so the printed last digit is the
+     correctly rounded one.  Every lesson that calls this says it is rounded. */
+  function surdDec(s, places) {
+    if (places === undefined) places = 4;
+    var p = places + 3;
+    var neg = Rsign(s.q) < 0, n = neg ? -s.q.n : s.q.n;
+    var floored = bifloor(n * n * s.k * 10n ** BigInt(2 * p));
+    var v = R(floored, s.q.d * 10n ** BigInt(p));
+    return Rfixed(neg ? Rneg(v) : v, places);
+  }
+
+  /* ============================================================== printing
+
+     Reader text reaches innerHTML and this course's readers type < and > all
+     day, so it is escaped once, at the boundary.  Written here rather than
+     borrowed from algebra_systems.FORMAT_JS because taking that block for six
+     one-line helpers would put 1.3 KB gzipped on all nine pages of this course
+     to save forty lines on one of them. */
+  function simEsc(t) {
+    return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+  function simTd(t, cls) { return '<td' + (cls ? ' class="' + cls + '"' : '') + '>' + t + '</td>'; }
+  function simTdl(t, cls) { return '<td style="text-align:left;"' + (cls ? ' class="' + cls + '"' : '') + '>' + t + '</td>'; }
+  function simTh(t) { return '<th>' + t + '</th>'; }
+  function simTr(cells, cls) { return '<tr' + (cls ? ' class="' + cls + '"' : '') + '>' + cells.join('') + '</tr>'; }
+  function simHead(cells) { return '<thead>' + simTr(cells.map(simTh)) + '</thead>'; }
+  function simChip(t, kind) { return '<span class="chip' + (kind ? ' ' + kind : '') + '">' + t + '</span>'; }
+  function simTick(ok) { return simChip(ok ? 'holds' : 'fails', ok ? 'ok' : 'no'); }
+
+  /* A rational as a fraction when a reader can read it and a labelled decimal
+     when the exact form has run to twenty digits.  Rshort makes that cut on
+     DIGITS; this only adds the word, because an unlabelled decimal on a page
+     that promises exactness is the one thing worse than a fraction nobody can
+     read. */
+  function simNum(a, places) {
+    if (a === null || a === undefined) return '&mdash;';
+    var exact = Rtext(a);
+    if (exact.length <= 19) return exact;
+    /* "shown to N places" rather than "rounded": these numbers ARE exact -- a
+       ratio of two whole numbers -- and only their printed form is cut short.
+       "(rounded)" is reserved for the three quantities on this course that are
+       genuinely irrational, and saying it of a rational is the kind of small
+       untruth that makes a reader distrust the ones that are true. */
+    var pl = places === undefined ? 5 : places;
+    return Rfixed(a, pl) + ' (exact, shown to ' + pl + ' places)';
+  }
+  /* Reader input that might be nonsense.  A bad value becomes a sentence in the
+     status banner rather than an exception. */
+  function simReadInt(text, lo, hi) {
+    var s = String(text).trim();
+    if (!/^[0-9]+$/.test(s)) return null;
+    var v = BigInt(s);
+    if (v < BigInt(lo) || v > BigInt(hi)) return null;
+    return v;
+  }
+
+  /* ========================================================= pixels, and only
+
+     Nothing downstream reads these back: an exact rational becomes an x or a y
+     here, and every number that is REPORTED stays on the exact side. */
+  function simPx(r) { return Number(r.n) / Number(r.d); }
+  function simAt(v, lo, hi, a, b) { return a + (v - lo) * (b - a) / (hi - lo || 1); }
+  function simEl(tag, attrs, inner) {
+    var s = '<' + tag, k;
+    for (k in attrs) {
+      if (Object.prototype.hasOwnProperty.call(attrs, k) && attrs[k] !== null && attrs[k] !== undefined) {
+        s += ' ' + k + '="' + attrs[k] + '"';
+      }
+    }
+    return inner === undefined ? s + ' />' : s + '>' + inner + '</' + tag + '>';
+  }
+  function simLabel(x, y, text, tone, anchor, size) {
+    return simEl('text', { x: x, y: y, 'font-size': size || 10, 'text-anchor': anchor || 'start',
+                           fill: 'var(--' + (tone || 'muted') + ')' }, text);
+  }
+
+  /* ==================================================== THE STREAM, ONCE
+
+     MINSTD: a = 16807, c = 0, m = 2^31 - 1, prime.  The module docstring says
+     why this kit does not use a power-of-two modulus; the short version is that
+     this kit REDUCES, and the low bits of a power-of-two modulus are a cycle
+     rather than a sample.
+
+     The seed never becomes the state.  An LCG's k-th value is affine in its
+     seed, so seeds 1, 2, 3 produce three points on a straight line rather than
+     three samples of anything, and six of these nine modes ask the reader to
+     reseed.  The finaliser is splitmix64 -- multiply, xor-shift, multiply,
+     xor-shift -- which is nonlinear over the integers and breaks the affinity. */
+  function simMultiplier() { return 16807; }
+  function simModulus() { return 2147483647; }
+  function simSeedState(seed) {
+    var mask = 0xFFFFFFFFFFFFFFFFn;
+    var x = (BigInt(seed) + 1n) * 0x9E3779B97F4A7C15n & mask;
+    x = ((x ^ (x >> 30n)) * 0xBF58476D1CE4E5B9n) & mask;
+    x = ((x ^ (x >> 27n)) * 0x94D049BB133111EBn) & mask;
+    x = x ^ (x >> 31n);
+    return Number(x % BigInt(simModulus() - 1)) + 1;      /* never the fixed point 0 */
+  }
+  function simStream(seed, count) {
+    return lcgStream(simMultiplier(), 0, simModulus(), simSeedState(seed), count);
+  }
+  /* Uniform rationals in (0, 1), exact fractions over the modulus.  The modulus
+     is odd, so U is never exactly 1/2 and no comparison in this kit has to
+     decide a tie it cannot decide. */
+  function simUniform(seed, count) {
+    var m = BigInt(simModulus());
+    return simStream(seed, count).map(function (x) { return R(BigInt(x), m); });
+  }
+  /* Inverse-transform sampling over a whole seeded run.
+
+     This is the SAME rule sampleFromPmf applies -- the first value whose
+     cumulative probability reaches U -- carried out on the integers the stream
+     produces rather than on the fraction x/m.  U < F(k) is x d < n m when
+     F(k) = n/d, and that comparison is exact in whole numbers and allocates
+     nothing, where the rational form builds a fraction and runs a gcd per draw
+     per candidate.  Measured: a mode that draws forty thousand values went from
+     nine hundred milliseconds to a hundred and forty, which is the difference
+     between a slider and a stall.
+
+     THE TWO PATHS ARE HELD TOGETHER RATHER THAN TRUSTED.  Every row this kit
+     PRINTS is sampleFromPmf's own answer, and scripts/mathcheck.js requires the
+     two to agree draw for draw over a full run on every table the kit ships --
+     because a fast path that disagreed with the definition would quietly be a
+     different lesson.  Doubles are used only where both sides of the comparison
+     are integers inside their exact range; past that the same comparison runs in
+     BigInt, and `safe` is where that is decided rather than assumed. */
+  function simDraws(pairs, seed, count) {
+    var M = simModulus(), Mb = BigInt(M), raw = simStream(seed, count);
+    var cum = simCumulative(pairs), i, j, k;
+    var LIMIT = 9007199254740991;
+    var safe = true, bigN = [], bigD = [], numN = [], numD = [];
+    for (i = 0; i < cum.length; i += 1) {
+      bigN.push(cum[i].hi.n); bigD.push(cum[i].hi.d);
+      numN.push(Number(cum[i].hi.n)); numD.push(Number(cum[i].hi.d));
+      if (Number(cum[i].hi.d) * M > LIMIT) safe = false;
+    }
+    var last = cum.length - 1, out = [];
+    for (j = 0; j < count; j += 1) {
+      var v = cum[last].value;
+      if (safe) {
+        for (k = 0; k < cum.length; k += 1) {
+          if (raw[j] * numD[k] < numN[k] * M) { v = cum[k].value; break; }
+        }
+      } else {
+        var xb = BigInt(raw[j]);
+        for (k = 0; k < cum.length; k += 1) {
+          if (xb * bigD[k] < bigN[k] * Mb) { v = cum[k].value; break; }
+        }
+      }
+      out.push(v);
+    }
+    return out;
+  }
+  /* The empirical frequency of every value of a pmf, as an exact fraction of
+     the number of draws, beside the theoretical probability. */
+  function simFrequencies(pairs, draws) {
+    var counts = {}, i, out = [], n = draws.length;
+    for (i = 0; i < draws.length; i += 1) {
+      var key = Rtext(draws[i]);
+      counts[key] = (counts[key] || 0) + 1;
+    }
+    for (i = 0; i < pairs.length; i += 1) {
+      var c = counts[Rtext(pairs[i][0])] || 0;
+      out.push({ value: pairs[i][0], count: c, p: pairs[i][1],
+                 empirical: n ? R(BigInt(c), BigInt(n)) : R0,
+                 expected: Rmul(pairs[i][1], R(BigInt(n), 1n)) });
+    }
+    return out;
+  }
+  /* The exact mean and variance OF A PMF -- the numbers every estimate on this
+     course is measured against, and the reason it is a measurement rather than
+     a demonstration. */
+  function simPmfMean(pairs) {
+    var m = R0, i;
+    for (i = 0; i < pairs.length; i += 1) m = Radd(m, Rmul(pairs[i][0], pairs[i][1]));
+    return m;
+  }
+  function simPmfVar(pairs) {
+    var m = simPmfMean(pairs), v = R0, i;
+    for (i = 0; i < pairs.length; i += 1) {
+      var d = Rsub(pairs[i][0], m);
+      v = Radd(v, Rmul(pairs[i][1], Rmul(d, d)));
+    }
+    return v;
+  }
+  /* The cumulative table.  It is not a helper: it IS the sampler, and the first
+     lesson's whole claim is that there is nothing else in the box. */
+  function simCumulative(pairs) {
+    var cum = R0, out = [], i;
+    for (i = 0; i < pairs.length; i += 1) {
+      var lo = cum;
+      cum = Radd(cum, pairs[i][1]);
+      out.push({ value: pairs[i][0], p: pairs[i][1], lo: lo, hi: cum });
+    }
+    return out;
+  }
+  /* The running mean after each draw, which is what a reader watches settle --
+     and, the lesson's misconception, what a slow process ALSO looks like. */
+  function simRunningMean(xs) {
+    var s = R0, out = [], i;
+    for (i = 0; i < xs.length; i += 1) {
+      s = Radd(s, xs[i]);
+      out.push(Rdiv(s, R(BigInt(i + 1), 1n)));
+    }
+    return out;
+  }
+
+  /* Simulation output analysis, exactly.
+
+     A simulation's numbers come from a SEEDED stream, so they are data and not
+     noise, and every statistic of them is a ratio of integers.  Keeping them
+     that way is what lets a page say "these two estimators have variances in
+     the ratio 47/3" rather than showing two decimals a reader cannot check.
+
+     Streams are NOT new and nothing here re-implements one: lcgStream,
+     streamUniform and sampleFromPmf all ship in sysdesign_core.STREAM_JS, and
+     inverse-transform sampling is the simulation course's own first lesson.
+     number.py's lcgRun is a CYCLE DETECTOR and is the wrong tool, but its
+     hullDobell(a, c, m) is the right one for the full-period certificate the
+     lesson prints beside the stream. */
+
+  function sampleMean(xs) {
+    if (!xs.length) return null;
+    var s = R0, k;
+    for (k = 0; k < xs.length; k += 1) s = Radd(s, xs[k]);
+    return Rdiv(s, R(BigInt(xs.length), 1n));
+  }
+  /* n - 1 in the denominator, and the lesson says why: the sample mean is
+     already fitted to the data, so one degree of freedom has been spent. */
+  function sampleVar(xs) {
+    var n = xs.length;
+    if (n < 2) return null;
+    var m = sampleMean(xs), s = R0, k;
+    for (k = 0; k < n; k += 1) { var d = Rsub(xs[k], m); s = Radd(s, Rmul(d, d)); }
+    return Rdiv(s, R(BigInt(n - 1), 1n));
+  }
+  function sampleCov(xs, ys) {
+    var n = xs.length;
+    if (n < 2 || ys.length !== n) return null;
+    var mx = sampleMean(xs), my = sampleMean(ys), s = R0, k;
+    for (k = 0; k < n; k += 1) s = Radd(s, Rmul(Rsub(xs[k], mx), Rsub(ys[k], my)));
+    return Rdiv(s, R(BigInt(n - 1), 1n));
+  }
+  /* RHO SQUARED, NOT RHO.  rho is a covariance over a product of two square
+     roots and is irrational at almost any data; rho^2 is a ratio of rationals
+     and is the number every variance-reduction claim is actually about.  Only
+     rho^2 is ever printed on this path. */
+  function rhoSquared(xs, ys) {
+    var c = sampleCov(xs, ys), vx = sampleVar(xs), vy = sampleVar(ys);
+    if (c === null || Rzero(vx) || Rzero(vy)) return null;
+    return Rdiv(Rmul(c, c), Rmul(vx, vy));
+  }
+
+  /* Chebyshev coverage, counted by comparing SQUARES.
+
+     (xbar - mu)^2 >= k^2 * var  is the same statement as |xbar - mu| >= k*sd,
+     and the first one takes no square root, so the count is exact.  The bound
+     it is measured against is 1 - 1/k^2, also exact. */
+  function chebyshevCover(reps, mu, k, variance) {
+    var kk = Rmul(k, k), thresh = Rmul(kk, variance), rows = [], inside = 0, j;
+    for (j = 0; j < reps.length; j += 1) {
+      var d = Rsub(reps[j], mu), dd = Rmul(d, d), out = Rcmp(dd, thresh) >= 0;
+      if (!out) inside += 1;
+      rows.push({ rep: j, value: reps[j], squared: dd, outside: out,
+                  why: Rtext(dd) + (out ? ' &gt;= ' : ' &lt; ') + Rtext(thresh) });
+    }
+    return { rows: rows, inside: inside, outside: reps.length - inside,
+             coverage: Rdiv(R(BigInt(inside), 1n), R(BigInt(reps.length), 1n)),
+             bound: Rsub(R1, Rinv(kk)), threshold: thresh,
+             holds: Rcmp(Rdiv(R(BigInt(inside), 1n), R(BigInt(reps.length), 1n)), Rsub(R1, Rinv(kk))) >= 0 };
+  }
+
+  /* A single-server FIFO event calendar, as a list of per-event snapshots.
+
+     The calendar is the lesson, not the averages: a reader who has watched the
+     next-event clock JUMP over the idle time understands why a simulation is
+     not a loop over seconds, and a reader shown only the mean wait does not. */
+  function desRun(arrivals, services) {
+    var n = arrivals.length, i;
+    var starts = [], departs = [], free = R0;
+    for (i = 0; i < n; i += 1) {
+      var s = Rcmp(arrivals[i], free) > 0 ? arrivals[i] : free;
+      starts.push(s); free = Radd(s, services[i]); departs.push(free);
+    }
+    var evs = [];
+    for (i = 0; i < n; i += 1) {
+      evs.push({ t: arrivals[i], kind: 'arrival', who: i });
+      evs.push({ t: departs[i], kind: 'departure', who: i });
+    }
+    evs.sort(function (a, b) {
+      var c = Rcmp(a.t, b.t);
+      if (c !== 0) return c;
+      if (a.kind !== b.kind) return a.kind === 'departure' ? -1 : 1;
+      return a.who - b.who;
+    });
+    var inSystem = 0, events = [];
+    for (i = 0; i < evs.length; i += 1) {
+      inSystem += evs[i].kind === 'arrival' ? 1 : -1;
+      events.push({ t: evs[i].t, kind: evs[i].kind, who: evs[i].who, inSystem: inSystem,
+                    calendarAfter: evs.slice(i + 1).map(function (e) {
+                      return { t: e.t, kind: e.kind, who: e.who }; }) });
+    }
+    var waits = [], sojourn = [];
+    for (i = 0; i < n; i += 1) {
+      waits.push(Rsub(starts[i], arrivals[i]));
+      sojourn.push(Rsub(departs[i], arrivals[i]));
+    }
+    var busy = R0;
+    for (i = 0; i < n; i += 1) busy = Radd(busy, services[i]);
+    return { events: events, starts: starts, departs: departs, waits: waits,
+             sojourn: sojourn, meanWait: sampleMean(waits), meanSojourn: sampleMean(sojourn),
+             busy: busy, horizon: departs.length ? departs[n - 1] : R0,
+             utilisation: departs.length && !Rzero(departs[n - 1]) ? Rdiv(busy, departs[n - 1]) : null };
+  }
+
+  /* Warm-up discard and batch means.  The discard is the honest half: an
+     average over a run that started empty is an average of a system that was
+     never in steady state, and the fix is to throw the beginning away and SAY
+     how much. */
+  function batchMeans(xs, w, b) {
+    var kept = xs.slice(w), size = Math.floor(kept.length / b), out = [], k;
+    if (size < 1) return { discarded: w, batches: [], means: [], size: 0,
+                           why: 'after discarding ' + w + ' observations there are not enough left for ' + b + ' batches' };
+    var batches = [];
+    for (k = 0; k < b; k += 1) {
+      var part = kept.slice(k * size, (k + 1) * size);
+      batches.push(part); out.push(sampleMean(part));
+    }
+    return { discarded: w, kept: kept, batches: batches, means: out, size: size,
+             grand: sampleMean(out), variance: sampleVar(out),
+             naive: sampleMean(xs),
+             why: 'the first ' + w + ' observations are thrown away and the rest split into '
+               + b + ' batches of ' + size + '; a batch mean is much closer to independent than an observation is' };
+  }
+
+  /* The control-variate variance as an EXACT QUADRATIC in b.
+
+     Var(X - b(C - mu_C)) = Var X - 2b Cov(X,C) + b^2 Var C, and b* = Cov/Var C
+     is its vertex.  Returning the quadratic rather than only its minimum is
+     what lets a reader drag b and watch the parabola, which is the mode. */
+  function controlB(xs, cs) {
+    var vx = sampleVar(xs), vc = sampleVar(cs), cov = sampleCov(xs, cs);
+    if (vx === null || vc === null || Rzero(vc)) return { quadratic: null, bStar: null, varAt: null };
+    var quad = [vx, Rneg(Rmul(R(2n, 1n), cov)), vc];     /* c0 + c1 b + c2 b^2 */
+    var bStar = Rdiv(cov, vc);
+    return { quadratic: quad, bStar: bStar, varAt: controlVarAt(quad, bStar),
+             varRaw: vx, cov: cov, varC: vc, rho2: rhoSquared(xs, cs),
+             reduction: Rzero(vx) ? null : Rdiv(Rsub(vx, controlVarAt(quad, bStar)), vx) };
+  }
+  function controlVarAt(quad, b) {
+    return Radd(quad[0], Radd(Rmul(quad[1], b), Rmul(quad[2], Rmul(b, b))));
+  }
+
+  /* Importance sampling, with the refusal that makes it honest.
+
+     The likelihood ratio p/q is undefined wherever q puts no mass and p does,
+     and an estimator that quietly skips those outcomes is biased in a way no
+     variance figure reveals.  So this REFUSES rather than returning a number.
+
+     `p` and `q` are [value, rational] pairs over the same values, in the same
+     order; `indicator` is a function of the value. */
+  function importanceRun(p, q, indicator) {
+    var k, rows = [], theta = R0, second = R0, refuse = null;
+    for (k = 0; k < p.length; k += 1) {
+      if (Rzero(q[k][1]) && !Rzero(p[k][1])) {
+        refuse = { value: p[k][0],
+                   why: 'q puts no mass on ' + Rtext(p[k][0]) + ' and p puts ' + Rtext(p[k][1])
+                     + ' there; the likelihood ratio is undefined and an estimator that skips the outcome is biased, so there is no answer to give' };
+        break;
+      }
+    }
+    if (refuse) return { refused: true, why: refuse.why, at: refuse.value, rows: [],
+                         estimate: null, varCrude: null, varIS: null, ratio: null };
+    for (k = 0; k < p.length; k += 1) {
+      var ind = indicator(p[k][0]) ? R1 : R0;
+      var w = Rzero(q[k][1]) ? R0 : Rdiv(p[k][1], q[k][1]);
+      theta = Radd(theta, Rmul(p[k][1], ind));
+      if (!Rzero(ind)) second = Radd(second, Rmul(q[k][1], Rmul(Rmul(w, w), ind)));
+      rows.push({ value: p[k][0], p: p[k][1], q: q[k][1], w: w, indicator: !Rzero(ind),
+                  contribution: Rmul(q[k][1], Rmul(w, ind)) });
+    }
+    var varCrude = Rmul(theta, Rsub(R1, theta));
+    var varIS = Rsub(second, Rmul(theta, theta));
+    return { refused: false, rows: rows, estimate: theta,
+             varCrude: varCrude, varIS: varIS,
+             ratio: Rzero(varIS) ? null : Rdiv(varCrude, varIS),
+             why: 'both estimators are unbiased for ' + Rtext(theta)
+               + '; the whole difference is the variance' };
+  }
+
+  /* A seeded stream. number.py's lcgRun detects the cycle of a generator, which
+     is a different job; a lab that samples needs the values in order and needs
+     the same values every time the page is opened, or a reader cannot check
+     what they were told. */
+  function lcgStream(a, c, m, seed, count) {
+    /* BigInt, not Number. A typical multiplier times a typical state exceeds
+       2^53 on the SECOND step, and a double silently rounds it -- the stream
+       then looks reproducible, because it is reproducibly wrong. */
+    var A = BigInt(a), C = BigInt(c), M = BigInt(m);
+    var out = [], x = ((BigInt(seed) % M) + M) % M;
+    for (var i = 0; i < count; i += 1) { x = (A * x + C) % M; out.push(Number(x)); }
+    return out;
+  }
+  /* Uniform rationals in [0, 1) from that stream. */
+  function streamUniform(a, c, m, seed, count) {
+    return lcgStream(a, c, m, seed, count).map(function (x) {
+      return R(BigInt(x), BigInt(m));
+    });
+  }
+  /* Inverse-transform sampling from a pmf given as [value, rational] pairs. */
+  function sampleFromPmf(pairs, u) {
+    var cum = R(0n, 1n);
+    for (var i = 0; i < pairs.length; i += 1) {
+      cum = Radd(cum, pairs[i][1]);
+      if (Rcmp(u, cum) < 0) return pairs[i][0];
+    }
+    return pairs[pairs.length - 1][0];
+  }
+
+  /* Discrete distributions as [value, probability] pairs with rational
+     probabilities. Convolution is the sum of two independent draws, which is
+     how a latency budget adds a serial chain and how periodic review covers
+     R+L periods of demand. Exact, so a 12-step convolution is still a fraction. */
+  function pmfNormalise(pairs) {
+    var total = R(0n, 1n), i;
+    for (i = 0; i < pairs.length; i += 1) total = Radd(total, pairs[i][1]);
+    if (Rzero(total)) return pairs.slice();
+    var out = [];
+    for (i = 0; i < pairs.length; i += 1) out.push([pairs[i][0], Rdiv(pairs[i][1], total)]);
+    return out;
+  }
+  function pmfConvolve(a, b) {
+    var acc = {}, i, j;
+    for (i = 0; i < a.length; i += 1) {
+      for (j = 0; j < b.length; j += 1) {
+        var v = a[i][0] + b[j][0], p = Rmul(a[i][1], b[j][1]);
+        acc[v] = acc[v] ? Radd(acc[v], p) : p;
+      }
+    }
+    var keys = Object.keys(acc).map(Number).sort(function (x, y) { return x - y; });
+    return keys.map(function (v) { return [v, acc[v]]; });
+  }
+  function pmfMean(pairs) {
+    var m = R(0n, 1n);
+    for (var i = 0; i < pairs.length; i += 1) {
+      m = Radd(m, Rmul(R(BigInt(pairs[i][0]), 1n), pairs[i][1]));
+    }
+    return m;
+  }
+  /* P(X > t): the tail a stale-read or a timeout lesson asks for. */
+  function pmfTail(pairs, t) {
+    var s = R(0n, 1n);
+    for (var i = 0; i < pairs.length; i += 1) if (pairs[i][0] > t) s = Radd(s, pairs[i][1]);
+    return s;
+  }
+  /* The pmf of the maximum of k independent copies -- the fan-out lesson's
+     whole point: P(max <= t) = F(t)^k, so the tail is what k does to it. */
+  function pmfMax(pairs, k) {
+    var sorted = pairs.slice().sort(function (x, y) { return x[0] - y[0]; });
+    var out = [], cum = R(0n, 1n), prev = R(0n, 1n);
+    for (var i = 0; i < sorted.length; i += 1) {
+      cum = Radd(cum, sorted[i][1]);
+      var here = Rpow(cum, k);
+      out.push([sorted[i][0], Rsub(here, prev)]);
+      prev = here;
+    }
+    return out;
+  }
+
+  /* The rare event, as an exact table.
+
+     Ten fair coins all landing heads is a probability of 1/1024: near enough to
+     one in a thousand to be the case importance sampling exists for, and known
+     exactly, which is what makes the variance comparison a measurement.  The
+     distribution of the number of heads under a coin with P(head) = theta is a
+     binomial table, exact for rational theta, and the likelihood ratio p/q is a
+     ratio of two of its entries.
+
+     The binomial coefficient is computed by the multiply-then-divide recurrence
+     in BigInt: C(n, k) = C(n, k-1) (n - k + 1)/k is an integer at every step, so
+     nothing rounds and nothing overflows. */
+  function simBinomCoeff(n, k) {
+    var r = 1n, i;
+    for (i = 0; i < k; i += 1) r = r * BigInt(n - i) / BigInt(i + 1);
+    return r;
+  }
+  function simBinomPmf(n, theta) {
+    var out = [], k, one = Rsub(R1, theta);
+    for (k = 0; k <= n; k += 1) {
+      out.push([R(BigInt(k), 1n),
+                Rmul(R(simBinomCoeff(n, k), 1n), Rmul(Rpow(theta, k), Rpow(one, n - k)))]);
+    }
+    return out;
+  }
+  /* A q with a HOLE, for the refusal.  The mass at the target is deleted and the
+     rest renormalised, so q is a perfectly good distribution that simply never
+     produces the outcome p cares about -- which is the one case importanceRun
+     will not answer, because an estimator that skips the outcome is biased in a
+     way no variance figure reveals. */
+  function simHoledPmf(pairs, at) {
+    var kept = [], i;
+    for (i = 0; i < pairs.length; i += 1) {
+      kept.push([pairs[i][0], Rcmp(pairs[i][0], at) === 0 ? R0 : pairs[i][1]]);
+    }
+    return pmfNormalise(kept);
+  }
+  /* One RUN under q: each draw's weight, the running weighted estimate, and the
+     count of draws that hit the event.  The estimate is exact -- a sum of
+     rational weights over an integer count -- and the point of running it is
+     that a bad q's estimate wanders near the right answer for a long time while
+     all the damage sits in the spread. */
+  function simImportanceRun(p, q, at, seed, count) {
+    var draws = simDraws(q, seed, count), rows = [], sum = R0, hits = 0, i;
+    var pw = {}, qw = {};
+    for (i = 0; i < p.length; i += 1) pw[Rtext(p[i][0])] = p[i][1];
+    for (i = 0; i < q.length; i += 1) qw[Rtext(q[i][0])] = q[i][1];
+    for (i = 0; i < draws.length; i += 1) {
+      var key = Rtext(draws[i]), qi = qw[key], pi = pw[key];
+      var w = (qi === undefined || Rzero(qi)) ? R0 : Rdiv(pi, qi);
+      var hit = Rcmp(draws[i], at) === 0;
+      if (hit) { hits += 1; sum = Radd(sum, w); }
+      rows.push({ draw: draws[i], w: w, hit: hit });
+      if (i < draws.length) rows[i].running = Rdiv(sum, R(BigInt(i + 1), 1n));
+    }
+    return { rows: rows, hits: hits, estimate: Rdiv(sum, R(BigInt(count), 1n)), draws: draws };
+  }
+
+  /* THE SHARED FIGURE: several series, a band, a shaded span, rules and marks,
+     with exact values turned into pixels at the last moment.  Six modes draw on
+     it -- a running mean with a narrowing ribbon, replication means inside a
+     Chebyshev band, an occupancy trace with its transient shaded, a variance
+     parabola with its vertex, a weight trace -- so the shapes are declared here
+     once and nothing closes over a document element. */
+  function simPlot(spec) {
+    var w = spec.width || 660, h = spec.height || 230;
+    var L = spec.left || 48, Rm = 14, T = 14, B = 28, i, k;
+    var xs = [], ys = [];
+    for (i = 0; i < (spec.series || []).length; i += 1) {
+      for (k = 0; k < spec.series[i].pts.length; k += 1) {
+        xs.push(spec.series[i].pts[k][0]); ys.push(spec.series[i].pts[k][1]);
+      }
+    }
+    for (i = 0; i < (spec.bands || []).length; i += 1) {
+      for (k = 0; k < spec.bands[i].pts.length; k += 1) {
+        xs.push(spec.bands[i].pts[k][0]);
+        ys.push(spec.bands[i].pts[k][1]); ys.push(spec.bands[i].pts[k][2]);
+      }
+    }
+    for (i = 0; i < (spec.rules || []).length; i += 1) ys.push(spec.rules[i].y);
+    for (i = 0; i < (spec.marks || []).length; i += 1) { xs.push(spec.marks[i].x); ys.push(spec.marks[i].y); }
+    if (!xs.length) return { svg: simLabel(L, h / 2, 'nothing to draw yet', 'muted'), height: h };
+    var x0 = spec.x0 !== undefined ? spec.x0 : Math.min.apply(null, xs);
+    var x1 = spec.x1 !== undefined ? spec.x1 : Math.max.apply(null, xs);
+    var y0 = spec.y0 !== undefined ? spec.y0 : Math.min.apply(null, ys);
+    var y1 = spec.y1 !== undefined ? spec.y1 : Math.max.apply(null, ys);
+    if (!(x1 > x0)) x1 = x0 + 1;
+    if (!(y1 > y0)) y1 = y0 + 1;
+    var pad = (y1 - y0) * 0.06;
+    y0 -= pad; y1 += pad;
+    var px = function (v) { return simAt(v, x0, x1, L, w - Rm); };
+    var py = function (v) { return simAt(v, y0, y1, h - B, T); };
+    var s = '';
+    /* The shaded span goes down first: it is a region of the x axis (a warm-up
+       discarded, a batch), and everything else has to read on top of it. */
+    for (i = 0; i < (spec.spans || []).length; i += 1) {
+      var sp = spec.spans[i];
+      s += simEl('rect', { x: px(sp.x0), y: T, width: Math.max(0.5, px(sp.x1) - px(sp.x0)), height: h - B - T,
+                           fill: 'var(--' + (sp.tone || 'amber') + ')', 'fill-opacity': sp.opacity || '0.13' });
+      if (sp.label) s += simLabel(px(sp.x0) + 4, T + 11, sp.label, sp.tone || 'amber', 'start', 9);
+    }
+    for (i = 0; i < 4; i += 1) {
+      var gy = y0 + ((y1 - y0) * i) / 3;
+      s += simEl('line', { x1: L, y1: py(gy), x2: w - Rm, y2: py(gy), stroke: 'var(--line)', 'stroke-width': 0.6 });
+      s += simLabel(L - 5, py(gy) + 3, (spec.fmtY ? spec.fmtY(gy) : gy.toFixed(2)), 'muted', 'end', 9);
+    }
+    s += simEl('line', { x1: L, y1: h - B, x2: w - Rm, y2: h - B, stroke: 'var(--line-strong)', 'stroke-width': 1 })
+       + simEl('line', { x1: L, y1: T, x2: L, y2: h - B, stroke: 'var(--line-strong)', 'stroke-width': 1 });
+    /* The band: a ribbon between two y values at each x, as one polygon, so a
+       +-SE ribbon narrowing with n reads as a shape and not as two lines. */
+    for (i = 0; i < (spec.bands || []).length; i += 1) {
+      var bd = spec.bands[i], up = [], down = [];
+      for (k = 0; k < bd.pts.length; k += 1) {
+        up.push(px(bd.pts[k][0]) + ',' + py(bd.pts[k][2]));
+        down.push(px(bd.pts[k][0]) + ',' + py(bd.pts[k][1]));
+      }
+      down.reverse();
+      s += simEl('polygon', { points: up.concat(down).join(' '), fill: 'var(--' + (bd.tone || 'cyan') + ')',
+                              'fill-opacity': bd.opacity || '0.15' });
+    }
+    for (i = 0; i < (spec.rules || []).length; i += 1) {
+      var ru = spec.rules[i];
+      s += simEl('line', { x1: L, y1: py(ru.y), x2: w - Rm, y2: py(ru.y), stroke: 'var(--' + (ru.tone || 'green') + ')',
+                           'stroke-width': 1.3, 'stroke-dasharray': ru.solid ? null : '6 4' });
+      if (ru.label) s += simLabel(w - Rm - 2, py(ru.y) - 4, ru.label, ru.tone || 'green', 'end', 9.5);
+    }
+    for (i = 0; i < (spec.series || []).length; i += 1) {
+      var ser = spec.series[i], pts = ser.pts, d = '';
+      for (k = 0; k < pts.length; k += 1) {
+        if (k === 0) d += 'M' + px(pts[k][0]) + ' ' + py(pts[k][1]);
+        else if (ser.step) d += 'L' + px(pts[k][0]) + ' ' + py(pts[k - 1][1]) + 'L' + px(pts[k][0]) + ' ' + py(pts[k][1]);
+        else d += 'L' + px(pts[k][0]) + ' ' + py(pts[k][1]);
+      }
+      s += simEl('path', { d: d, fill: 'none', stroke: 'var(--' + ser.tone + ')',
+                           'stroke-width': ser.thin ? 1 : 1.8, 'stroke-dasharray': ser.dashed ? '5 3' : null });
+      if (ser.dots) {
+        for (k = 0; k < pts.length; k += 1) {
+          s += simEl('circle', { cx: px(pts[k][0]), cy: py(pts[k][1]), r: ser.r || 2.6,
+                                 fill: 'var(--' + ser.tone + ')' });
+        }
+      }
+      if (ser.label && pts.length) {
+        s += simLabel(px(pts[pts.length - 1][0]) - 2, py(pts[pts.length - 1][1]) - 6, ser.label, ser.tone, 'end', 9.5);
+      }
+    }
+    for (i = 0; i < (spec.marks || []).length; i += 1) {
+      var mk = spec.marks[i];
+      s += simEl('circle', { cx: px(mk.x), cy: py(mk.y), r: mk.r || 4, fill: 'var(--' + (mk.tone || 'purple') + ')',
+                             'fill-opacity': mk.hollow ? '0.25' : '1',
+                             stroke: 'var(--' + (mk.tone || 'purple') + ')', 'stroke-width': 1.2 });
+      if (mk.label) s += simLabel(px(mk.x) + 7, py(mk.y) - 6, mk.label, mk.tone || 'purple', 'start', 9.5);
+    }
+    for (i = 0; i < (spec.drops || []).length; i += 1) {
+      var dr = spec.drops[i];
+      s += simEl('line', { x1: px(dr.x), y1: T, x2: px(dr.x), y2: h - B, stroke: 'var(--' + (dr.tone || 'amber') + ')',
+                           'stroke-width': 1, 'stroke-dasharray': '3 3' });
+      if (dr.label) s += simLabel(px(dr.x) + 3, T + 10, dr.label, dr.tone || 'amber', 'start', 9);
+    }
+    s += simLabel(L, h - 8, (spec.fmtX ? spec.fmtX(x0) : String(x0)), 'muted', 'start', 9);
+    s += simLabel(w - Rm, h - 8, spec.xLabel || '', 'text', 'end', 10);
+    return { svg: s, height: h, x0: x0, x1: x1, y0: y0, y1: y1 };
+  }
+
+  /* THE SHARED BARS: two or three variances whose ORDER is the lesson, drawn so
+     that "this one is a quarter of that one" is visible rather than read out of
+     a table. */
+  function simBars(items, spec) {
+    var w = (spec || {}).width || 660, rowH = 30, L = (spec || {}).left || 168, Rm = 108, i;
+    var top = null;
+    for (i = 0; i < items.length; i += 1) {
+      var v = Math.abs(simPx(items[i].value));
+      if (top === null || v > top) top = v;
+    }
+    if (!top) top = 1;
+    var s = '';
+    for (i = 0; i < items.length; i += 1) {
+      var y = 8 + i * rowH, len = (Math.abs(simPx(items[i].value)) / top) * (w - L - Rm);
+      s += simLabel(L - 8, y + 14, items[i].label, items[i].tone, 'end', 10);
+      s += simEl('rect', { x: L, y: y + 4, width: Math.max(1, len), height: 14, rx: 2,
+                           fill: 'var(--' + items[i].tone + ')', 'fill-opacity': '0.75' });
+      s += simLabel(L + len + 6, y + 15, items[i].text || simNum(items[i].value, 4), items[i].tone, 'start', 10);
+    }
+    return { svg: s, height: 14 + items.length * rowH };
+  }
+  var QCHOICES = {"good": ["a coin weighted toward heads, P(head) = 4/5 \u2014 the event becomes common and the weights stay small", [4, 5], false], "bad": ["a coin weighted away from heads, P(head) = 1/5 \u2014 the event becomes rarer still and the one weight that matters becomes enormous", [1, 5], false], "crude": ["the fair coin itself, P(head) = 1/2 \u2014 every weight is exactly 1, which is direct simulation written as importance sampling", [1, 2], false], "hole": ["the same coin weighted toward heads, but with all of its mass on ten heads removed \u2014 a perfectly good distribution that can never produce the event", [4, 5], true]};
+
+  var qSel = document.getElementById('imQ'), drawS = document.getElementById('imDrawCount');
+  var seedS = document.getElementById('imSeed');
+  var runSvg = document.getElementById('imRun'), barsSvg = document.getElementById('imBars');
+  var table = document.getElementById('imTable'), drawTable = document.getElementById('imDraws');
+  var status = document.getElementById('imStatus');
+
+  var COINS = 10;
+
+  function qOf(key) {
+    var spec = QCHOICES[key], theta = R(BigInt(spec[1][0]), BigInt(spec[1][1]));
+    var pmf = simBinomPmf(COINS, theta);
+    return spec[2] ? simHoledPmf(pmf, R(BigInt(COINS), 1n)) : pmf;
+  }
+
+  function redraw() {
+    var key = qSel.value, count = +drawS.value, seed = +seedS.value;
+    document.getElementById('imDrawCountOut').textContent = count;
+    document.getElementById('imSeedOut').textContent = seed;
+
+    var p = simBinomPmf(COINS, R(1n, 2n)), q = qOf(key), at = R(BigInt(COINS), 1n);
+    var indicator = function (x) { return Rcmp(x, at) === 0; };
+    var res = importanceRun(p, q, indicator);
+    var good = importanceRun(p, qOf('good'), indicator);
+    var bad = importanceRun(p, qOf('bad'), indicator);
+
+    var rows = '', i;
+    for (i = 0; i < p.length; i += 1) {
+      var qi = q[i][1], w = Rzero(qi) ? null : Rdiv(p[i][1], qi);
+      rows += simTr([simTd(Rtext(p[i][0])), simTd(Rshort(p[i][1], 6)), simTd(Rshort(qi, 6)),
+                     simTd(w === null ? 'undefined' : Rshort(w, 6)),
+                     simTd(indicator(p[i][0]) ? simChip('the event', 'hi') : '')],
+                    indicator(p[i][0]) ? 'focus' : null);
+    }
+    table.innerHTML = '<caption>The two tables side by side, with the likelihood ratio p/q per outcome. '
+      + 'The row that matters is the last one; every other row contributes nothing to this estimate and '
+      + 'is where direct simulation spends all of its draws.</caption>'
+      + simHead(['heads', 'p', 'q', 'p / q', ''])
+      + '<tbody>' + rows + '</tbody>';
+
+    if (res.refused) {
+      runSvg.innerHTML = simLabel(20, 40, 'there is no estimator here, and that is the answer', 'red');
+      barsSvg.innerHTML = simBars([
+        { label: 'direct sampling from p', value: good.varCrude, tone: 'green', text: Rshort(good.varCrude, 10) },
+        { label: 'a good q, P(head) = 4/5', value: good.varIS, tone: 'amber', text: Rshort(good.varIS, 10) },
+        { label: 'a bad q, P(head) = 1/5', value: bad.varIS, tone: 'red', text: Rshort(bad.varIS, 10) }
+      ], { width: 660 }).svg;
+      drawTable.innerHTML = '';
+      document.getElementById('imTheta').textContent = Rtext(good.estimate);
+      document.getElementById('imVarP').textContent = Rshort(good.varCrude, 10);
+      document.getElementById('imVarQ').textContent = 'refused';
+      document.getElementById('imRatio').textContent = 'refused';
+      document.getElementById('imHits').textContent = '0, and it never will';
+      document.getElementById('imEst').textContent = 'there is none';
+      status.innerHTML = '<strong>Refused.</strong> ' + simEsc(res.why)
+        + '<br />This q is a perfectly good distribution — its probabilities are positive and they sum to '
+        + 'one — and it is still unusable, because the likelihood ratio p/q is undefined exactly where the '
+        + 'event lives. An implementation that quietly skipped that outcome would return a number, and the '
+        + 'number would be biased low with no variance figure anywhere showing it. Unbiasedness holds for '
+        + 'EVERY q that is positive wherever p is, and for no other.'
+        + '<br />That is the one condition on q. It is not a condition about being close to p, or about '
+        + 'making the event common; those change the variance. This one decides whether there is an '
+        + 'estimator at all.';
+      return;
+    }
+
+    var run = simImportanceRun(p, q, at, seed + 1, count);
+    var pts = [], every = Math.max(1, Math.floor(count / 240));
+    for (i = 0; i < run.rows.length; i += 1) {
+      if (i % every !== 0 && i !== run.rows.length - 1) continue;
+      pts.push([i + 1, simPx(run.rows[i].running)]);
+    }
+    runSvg.innerHTML = simPlot({
+      width: 660, height: 240, series: [{ pts: pts, tone: 'cyan', thin: true }],
+      rules: [{ y: simPx(res.estimate), tone: 'green', solid: true, label: 'exact ' + Rtext(res.estimate) }],
+      xLabel: 'draws', y0: 0
+    }).svg;
+
+    barsSvg.innerHTML = simBars([
+      { label: 'direct sampling from p', value: res.varCrude, tone: 'green', text: Rshort(res.varCrude, 10) },
+      { label: 'a good q, P(head) = 4/5', value: good.varIS, tone: 'amber', text: Rshort(good.varIS, 10) },
+      { label: 'a bad q, P(head) = 1/5', value: bad.varIS, tone: 'red', text: Rshort(bad.varIS, 10) }
+    ], { width: 660 }).svg;
+
+    var drows = '', shownHits = 0;
+    for (i = 0; i < run.rows.length && drows.split('<tr>').length <= 10; i += 1) {
+      if (i >= 6 && !run.rows[i].hit) continue;
+      if (run.rows[i].hit) shownHits += 1;
+      drows += simTr([simTd(String(i + 1)), simTd(Rtext(run.rows[i].draw)),
+                      simTd(Rshort(run.rows[i].w, 6)),
+                      simTd(run.rows[i].hit ? simChip('hit', 'ok') : ''),
+                      simTd(Rshort(run.rows[i].running, 8))],
+                     run.rows[i].hit ? 'focus' : null);
+    }
+    drawTable.innerHTML = '<caption>The first draws, and then every draw that hit the event. A draw that '
+      + 'misses contributes nothing whatever its weight; a draw that hits contributes its whole weight, '
+      + 'which is why one enormous weight is the entire variance of a bad q.</caption>'
+      + simHead(['draw', 'heads', 'weight p / q', '', 'running estimate'])
+      + '<tbody>' + (drows || simTr([simTdl('no draw in this run hit the event')])) + '</tbody>';
+
+    document.getElementById('imTheta').textContent = Rtext(res.estimate);
+    /* These variances span four orders of magnitude, so six decimal places
+       prints the small one as 0.000008 -- which is the number the whole lesson
+       turns on, reduced to one significant figure. Ten places carries four
+       significant figures at 1e-6 and still reads at 9.3. */
+    document.getElementById('imVarP').textContent = Rshort(res.varCrude, 10);
+    document.getElementById('imVarQ').textContent = Rshort(res.varIS, 10);
+    document.getElementById('imRatio').textContent = res.ratio === null ? '—' : Rfixed(res.ratio, 4);
+    document.getElementById('imHits').textContent = run.hits + ' of ' + count;
+    document.getElementById('imEst').textContent = Rshort(run.estimate, 8);
+
+    var helps = res.ratio !== null && Rcmp(res.ratio, R1) > 0;
+    var qHit = q[COINS][1];
+    status.innerHTML = 'The event is ten heads, so its probability under the fair coin is exactly <strong>'
+      + Rtext(res.estimate) + '</strong> — known, which is what makes this a measurement. Direct sampling '
+      + 'has per-draw variance p(1 − p) = <strong>' + Rshort(res.varCrude, 10) + '</strong>. Under this q '
+      + 'the event occurs with probability ' + Rshort(qHit, 6) + ', the weight on it is '
+      + Rshort(Rdiv(p[COINS][1], qHit), 6) + ', and the per-draw variance is <strong>'
+      + Rshort(res.varIS, 10) + '</strong>'
+      + (res.ratio === null ? '.' : ' — the variance is '
+          + (helps ? 'DIVIDED by <strong>' + Rtext(res.ratio) + '</strong> ≈ ' + Rfixed(res.ratio, 4)
+                   : 'MULTIPLIED by <strong>' + Rtext(Rinv(res.ratio)) + '</strong> ≈ ' + Rfixed(Rinv(res.ratio), 4))
+          + '.')
+      + ' Both are exact fractions, and both estimators are unbiased for the same number: the estimate is '
+      + 'not where the difference is.'
+      + '<br />This run of ' + count + ' draws hit the event ' + run.hits + ' time'
+      + (run.hits === 1 ? '' : 's') + ' and came out at ' + Rshort(run.estimate, 8) + '. '
+      + (run.hits === 0
+          ? 'Not one hit, so the estimate is exactly zero — not near the answer, AT zero, with nothing on '
+            + 'the page to suggest anything went wrong except the variance figure. That is the failure mode '
+            + 'this lesson leads with: a bad q looks fine on a short run because all of the damage is in '
+            + 'the spread and none of it is in the picture.'
+          : run.hits < 4
+            ? 'A handful of hits over thousands of draws is what a rare event looks like when you sample '
+              + 'the wrong distribution: almost every run is wasted, and the estimate is decided by two or '
+              + 'three of them.'
+            : 'Enough hits for the estimate to have something to stand on, which is the entire purpose of '
+              + 'moving the sampling distribution.')
+      + '<br />The two failures to avoid. Oversampling the interesting region and forgetting to weight is '
+      + 'not an estimator of anything — it is an estimate of a probability under q, reported as one under '
+      + 'p. And importance sampling most certainly can hurt: the bad q on the bar chart above is four '
+      + 'orders of magnitude worse than direct sampling, from the same estimator, with the same '
+      + 'unbiasedness. Same method, same event, and the choice of q is the whole difference.';
+  }
+
+  qSel.addEventListener('change', redraw);
+  [drawS, seedS].forEach(function (el) { el.addEventListener('input', redraw); });
+  redraw();
+  window.redrawLab = redraw;
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "simulation-and-variance-reduction/importance-sampling-for-rare-events";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+  </script>
+</body>
+</html>

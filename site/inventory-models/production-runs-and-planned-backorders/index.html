@@ -1,0 +1,2944 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Production Runs and Planned Backorders | Lesson | Inventory Models | Operations Research | Learn · geterdone.io</title>
+  <meta name="description" content="Replenishment is rarely instantaneous and shortages are not always a failure. If stock is produced at a finite rate P while demand D continues, it builds only at P − D, so the effective holding rate is scaled by 1 − D/P. If a backorder costs π per unit per unit time, carrying a unit short is cheaper than carrying it in stock and the holding rate is divided again by (h + π)/π. Those are the only two changes: the economic production quantity and the backorder model are one formula with two switches." />
+  <link rel="canonical" href="https://learn.geterdone.io/inventory-models/production-runs-and-planned-backorders/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="Production Runs and Planned Backorders | Lesson | Inventory Models | Operations Research | Learn · geterdone.io" />
+  <meta property="og:description" content="Replenishment is rarely instantaneous and shortages are not always a failure. If stock is produced at a finite rate P while demand D continues, it builds only at P − D, so the effective holding rate is scaled by 1 − D/P. If a backorder costs π per unit per unit time, carrying a unit short is cheaper than carrying it in stock and the holding rate is divided again by (h + π)/π. Those are the only two changes: the economic production quantity and the backorder model are one formula with two switches." />
+  <meta property="og:url" content="https://learn.geterdone.io/inventory-models/production-runs-and-planned-backorders/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Production Runs and Planned Backorders | Lesson | Inventory Models | Operations Research | Learn · geterdone.io" />
+  <meta name="twitter:description" content="Replenishment is rarely instantaneous and shortages are not always a failure. If stock is produced at a finite rate P while demand D continues, it builds only at P − D, so the effective holding rate is scaled by 1 − D/P. If a backorder costs π per unit per unit time, carrying a unit short is cheaper than carrying it in stock and the holding rate is divided again by (h + π)/π. Those are the only two changes: the economic production quantity and the backorder model are one formula with two switches." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/inventory-models/production-runs-and-planned-backorders/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    @media (max-width: 920px) {
+      body[data-page-kind="supplemental"] [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/operations-research/">Operations Research</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Inventory Models</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">Production Runs and Planned Backorders</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The a run that takes time, and a shortage you planned is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Inventory Models &middot; What changes the cycle</span>
+        <h1>Production Runs and Planned Backorders</h1>
+        <p>Replenishment is rarely instantaneous and shortages are not always a failure. If stock is produced at a finite rate <span class="math">P</span> while demand <span class="math">D</span> continues, it builds only at <span class="math">P − D</span>, so the effective holding rate is scaled by <span class="math">1 − D/P</span>. If a backorder costs <span class="math">π</span> per unit per unit time, carrying a unit short is cheaper than carrying it in stock and the holding rate is divided again by <span class="math">(h + π)/π</span>. Those are the only two changes: the economic production quantity and the backorder model are one formula with two switches.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">finite production rate:   effective holding rate  h·(1 − D/P)
+planned backorders:       divide again by (h + π)/π
+Q* = √( 2KD / (h(1 − D/P)) · (h + π)/π )      both switches, one expression
+at a fixed Q the best backorder level is b = (1 − D/P)·Q·h/(h + π), a rational
+K = 100, D = 1200, h = 6, P = 2400, π = 6:  factors 1/2 and 2, Q* = 400, C* = 600
+each switch alone multiplies Q* by √2:  200 → 200√2 ≈ 282.843 → 400</div>
+        <div class="float-label" style="right:16px;bottom:16px;">Two corrections to one holding rate, and what each does to the answer</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>Three ideas, and the third is the one that decides whether this model has an answer at all.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Stock builds at the difference between the rates, not at the production rate</h3><p>While the machine runs, demand keeps drawing stock away, so the level climbs at <span class="math">P − D</span> rather than at <span class="math">P</span>. The run lasts <span class="math">Q/P</span> of the cycle and the peak reached is <span class="math">(1 − D/P)·Q</span>, not <span class="math">Q</span>. Average stock is half that peak, so every holding term in the plain model is multiplied by <span class="math">1 − D/P</span> &mdash; a factor between zero and one that is the whole of the production correction.</p></article><article class="card concept-card"><div class="icon">2</div><h3>A planned shortage is a cheaper place to keep a unit</h3><p>If stock costs <span class="math">h</span> to hold and a backorder costs <span class="math">π</span>, the cycle splits into a part spent in stock and a part spent short, and the model chooses the split. The arithmetic comes out as a second scaling of the holding rate, by <span class="math">π/(h + π)</span>, which is smaller than one whenever backorders are penalised at all. A big <span class="math">π</span> makes shortages expensive and the factor approaches one; the model stops planning them and becomes the previous one.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Zero penalty is not a small penalty, and a slow machine is not a small machine</h3><p>With <span class="math">π = 0</span> every unit backordered is free, so the cheapest plan is to backorder everything forever and there is no finite answer &mdash; the panel says the model has run out rather than printing a number. With <span class="math">P ≤ D</span> the factor <span class="math">1 − D/P</span> is zero or negative, the machine can never build stock, and there is no cycle to optimise. Both are refusals rather than edge cases, and both are informative.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>One sawtooth, two switches</h2></div><p>What a finite production rate does to the picture, what a planned shortage does to it, and why the two combine into a single formula.</p></div>
+      <article class="card card-pad prose"><p>The plain model draws a vertical rise: a batch of <span class="math">Q</span> appears and the level falls in a straight line to zero. Two of its assumptions are worth removing, and they turn out to change the same thing.</p><div class="defbox"><span class="label">Definition &middot; The economic production quantity</span><p>Stock is produced at a constant rate <span class="math">P > D</span> while demand continues at <span class="math">D</span>. The level therefore climbs at <span class="math">P − D</span> for the <span class="math">Q/P</span> of the cycle in which the machine runs, peaks at <span class="math">(1 − D/P)·Q</span>, and then falls at <span class="math">D</span>.</p><p>Average stock over the cycle is half that peak, so the holding cost is <span class="math">h·(1 − D/P)·Q/2</span>. Everything else is unchanged, which means the answer is the plain economic order quantity computed with a holding rate of <span class="math">h·(1 − D/P)</span>.</p></div><div class="defbox"><span class="label">Definition &middot; Planned backorders</span><p>Shortages are permitted and cost <span class="math">π</span> per unit per unit time backordered. A cycle now spends part of its time with stock on hand and part of it short by up to <span class="math">b</span>, the planned <strong>backorder level</strong>.</p><p>At a fixed order quantity the cost is a quadratic in <span class="math">b</span> whose minimum is at <span class="math">b = (1 − D/P)·Q·h/(h + π)</span>, and minimising over <span class="math">Q</span> as well divides the effective holding rate by a further <span class="math">(h + π)/π</span>.</p></div><p>So there is one formula and it has two switches. Set <span class="math">P</span> to infinity and the first factor is one; set <span class="math">π</span> to infinity and the second is one; do both and it is the plain economic order quantity. The panel puts all four readings in one table, each produced by the same function with different arguments, so that they are visibly one result rather than four to memorise.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">K = 100,   D = 1200,   h = 6,   P = 2400,   π = 6
+
+   1 − D/P = 1/2            (h + π)/π = 2
+
+  model                                 1−D/P  (h+π)/π    Q*        C*
+
+  plain EOQ (P infinite, no shortages)     1       1      200      1200
+  production quantity (finite P)          1/2      1    200√2      600√2
+                                                       ≈ 282.843  ≈ 848.528
+  EOQ with backorders (P infinite)         1       2    200√2      600√2
+                                                       ≈ 282.843  ≈ 848.528
+  both at once                            1/2      2      400       600</div><p>The two middle rows are the same pair of numbers, and that is not a typing error. Each switch on its own multiplies the effective holding rate by <span class="math">1/2</span> here, and the answer depends on the holding rate alone: halving it multiplies <span class="math">Q*</span> by <span class="math">√2</span> and divides <span class="math">C*</span> by <span class="math">√2</span>. Applying both quarters the rate, so <span class="math">Q*</span> doubles to <span class="math">400</span> and <span class="math">C*</span> halves to <span class="math">600</span>. A finite machine and a tolerated shortage are, on this instance, interchangeable.</p><p>On this instance <span class="math">Q* = 400</span> and <span class="math">C* = 600</span> are rational and every digit of them is exact. The two middle rows are not: <span class="math">200√2</span> and <span class="math">600√2</span> are irrational, and the table prints them as surds with <span class="math">282.843</span> and <span class="math">848.528</span> beside them, rounded to three places. Change the production rate to <span class="math">12000</span> and the penalty to <span class="math">3</span> and the headline pair becomes irrational too &mdash; <span class="math">(200/3)√30</span> and <span class="math">120√30</span> &mdash; at which point the panel tags them and prints the sentence naming the rounding.</p><h3>The backorder level, at a quantity you chose</h3><p>The panel prints the best backorder level at the run size YOU set, not at <span class="math">Q*</span>. That is deliberate. At a fixed rational <span class="math">Q</span> the cost is a quadratic in <span class="math">b</span> with rational coefficients, so its vertex <span class="math">b = (1 − D/P)·Q·h/(h + π)</span> is a rational number and can be printed exactly. At an irrational <span class="math">Q*</span> the same expression is irrational, and printing a rounded backorder level beside an exact run size would be mixing two kinds of number in one sentence.</p><div class="example"><span class="label">Example &middot; Four hundred units a run, and a hundred of them owed</span><p>At <span class="math">Q = 400</span> on the worked instance the best backorder level is <span class="math">(1/2)(400)(6)/12 = 100</span>, and the cost there is <span class="math">600</span> per unit time &mdash; which is also <span class="math">C*</span>, because <span class="math">400</span> happens to be <span class="math">Q*</span> on this instance.</p><p>Move <span class="math">b</span> either side and the cost rises: <span class="math">99</span> and <span class="math">101</span> both cost <span class="math">60003/100</span>, three hundredths more, and <span class="math">b = 0</span> &mdash; refusing to plan any shortage at all &mdash; costs <span class="math">900</span>. Refusing to be short costs half as much again as planning it, because a backordered unit is not occupying a warehouse.</p></div><h3>Where the model refuses</h3><div class="example"><span class="label">Example &middot; A machine that cannot keep up</span><p>Set <span class="math">P = 1200</span> against <span class="math">D = 1200</span>. The factor <span class="math">1 − D/P</span> is zero, the stock level never rises, and the panel reports that there is no cycle to optimise rather than dividing by zero and printing something.</p><p>This is a modelling statement, not an arithmetic one. A machine that cannot outpace demand does not have a run size problem; it has a capacity problem, and the answer is to raise <span class="math">P</span>, not to choose <span class="math">Q</span> more carefully.</p></div><div class="example"><span class="label">Example &middot; A shortage that costs nothing</span><p>Set <span class="math">π = 0</span>. Every unit backordered is free, so the cheapest policy is to hold no stock at all and owe everybody forever. There is no finite optimum, and the panel says the model has run out.</p><p>The useful reading is that <span class="math">π</span> is not a nuisance parameter to leave at zero. It is the price of a promise, and a model with no price on a broken promise will always recommend breaking it.</p></div><p>Both refusals share a shape with the negative discriminant of the sibling lesson &ldquo;The Order Quantity as a Discriminant&rdquo;: the arithmetic is not failing, the model is reporting that the question has no answer as posed. Those are the most useful outputs an inventory model produces, because they are the ones a spreadsheet silently converts into a plausible number.</p><p>What is still assumed is the thing the rest of the course removes. Demand is constant and known. Everything so far &mdash; the quantity, the discount, the run, the planned shortage &mdash; has been a decision made against a rate that never varies. The remaining lessons put a probability distribution where that rate was, and the question changes from &ldquo;how much&rdquo; to &ldquo;how much, given that you do not know&rdquo;.</p></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>A run that takes time, and a shortage you planned</h2></div><p>the production quantity and the backorder model are the same formula with two switches</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>One sawtooth, two switches</strong><span>a finite production rate tilts the rise; a backorder penalty drops the whole shape below zero</span></div>
+        <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>stock on hand</span><span class="tone-red"><i class="legend-swatch"></i>backordered</span><span class="tone-green"><i class="legend-swatch"></i>the cost at the best backorder level</span><span class="tone-amber"><i class="legend-swatch"></i>the optimal run size</span></div>
+      </div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="ieSaw" viewBox="0 0 660 180" role="img" aria-label="Stock over three production cycles: it builds while the machine runs, drains afterwards, and dips below zero by the planned backorder level."></svg></div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="ieProfile" viewBox="0 0 660 200" role="img" aria-label="Cost per unit time against run size, with the backorder level already at its best for each run size."></svg></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="ieGrid"></table></div>
+      <div class="status-banner" id="ieStatus" style="margin-top:12px;"></div>
+
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>Turn each effect on and watch the sawtooth change shape</h3>
+          <p>The top picture is stock over three cycles: a finite production rate tilts the rise, and a planned shortage drops the whole shape below the axis. Beneath it is the cost against run size, with the backorder level already at its best for each one. The table is four models produced by one function with different switches, and the backorder level is reported at the run size you set &mdash; where the answer is rational and exact.</p>
+        <div class="field">
+          <label for="iePreset">Worked example</label>
+          <select id="iePreset"><option value="machine" selected>A machine producing at twice demand, backorders penalised at h</option><option value="fast">A fast line: production barely constrains the cycle</option><option value="tight">Production only a fifth above demand</option></select>
+        </div>
+        <div class="field">
+          <label for="ieK">Setup cost K, per run</label>
+          <input id="ieK" type="text" value="100" inputmode="text" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="ieD">Demand D</label>
+          <input id="ieD" type="text" value="1200" inputmode="text" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="ieH">Holding cost h</label>
+          <input id="ieH" type="text" value="6" inputmode="text" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="ieP">Production rate P (blank for instantaneous)</label>
+          <input id="ieP" type="text" value="2400" inputmode="text" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="iePi">Backorder penalty &pi; (0 for none allowed)</label>
+          <input id="iePi" type="text" value="6" inputmode="text" autocomplete="off">
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="ieQ">Run size Q to price</label><span class="range-value" id="ieQOut">400</span></div>
+          <input id="ieQ" type="range" min="20" max="1200" step="10" value="400" />
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Factor 1 &minus; D/P</span><strong id="ieFK">&mdash;</strong></div>
+          <div class="kpi"><span>Backlog factor (h+&pi;)/&pi;</span><strong id="ieBK">&mdash;</strong></div>
+          <div class="kpi"><span>Q* exactly</span><strong id="ieQK">&mdash;</strong></div>
+          <div class="kpi"><span>Q* rounded</span><strong id="ieQdecK">&mdash;</strong></div>
+          <div class="kpi"><span>Best b at your Q</span><strong id="ieBestK">&mdash;</strong></div>
+          <div class="kpi"><span>Cost there</span><strong id="ieCostK">&mdash;</strong></div>
+        </div>
+        <p class="small-copy" id="ieHint" style="margin:0;">Set P far above D and the tilt disappears: the run becomes instantaneous and the model is the plain EOQ. Set &pi; to zero and the shape lifts back above the axis. Both named models &mdash; the economic production quantity, and the EOQ with planned backorders &mdash; are readings of the one formula, not separate results to memorise.</p>
+
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Setting a run size and a backorder level</h2></div><p>Four steps, and the first is the one that decides whether the other three are worth doing.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Check that P exceeds D before anything else</h3><p><span class="math">1 − D/P</span> must be positive. If it is not, there is no cycle and no run size: the machine cannot build stock and the model has nothing to say. This is one comparison and it costs nothing, and it is the same discipline as adding the supplies before solving a network.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Scale the holding rate once for each effect that applies</h3><p>Multiply <span class="math">h</span> by <span class="math">1 − D/P</span> if production takes time. Multiply again by <span class="math">π/(h + π)</span> if shortages are allowed and penalised. Then run the plain economic order quantity on the scaled rate &mdash; there is no second formula to learn.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Take the root last, and keep it as a surd</h3><p><span class="math">Q* = √(2KD/h_effective)</span> and <span class="math">C* = √(2KD·h_effective)</span>. Whether they come out rational depends on the data, and the model does not care; what matters is that a rounded decimal is never fed into the next step.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Compute the backorder level at the quantity you will actually run</h3><p><span class="math">b = (1 − D/P)·Q·h/(h + π)</span> at a rational <span class="math">Q</span> is a rational number. Verify it is the vertex by pricing <span class="math">b − 1</span> and <span class="math">b + 1</span>: both must cost more, and if they do not the arithmetic is wrong.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Say what you have promised about shortages</h3><p>A planned backorder level is a commitment to run out, on purpose, by a stated amount. It is defensible when <span class="math">π</span> is a real cost that somebody has agreed to; it is not defensible when <span class="math">π</span> was set to make the answer come out, and no amount of correct arithmetic afterwards fixes that.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>Rates, factors and refusals</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>One instance, four readings, and the cost of refusing to be short</h3><p><span class="math">K = 100</span>, <span class="math">D = 1200</span>, <span class="math">h = 6</span>, <span class="math">P = 2400</span>, <span class="math">π = 6</span>. The two correction factors are <span class="math">1 − D/P = 1/2</span> and <span class="math">(h + π)/π = 2</span>, and every figure below is the panel's own.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">effective holding rate:   h × (1 − D/P) ÷ ((h + π)/π) = 6 × 1/2 ÷ 2 = 3/2
+
+  Q* = √(2KD / (3/2)) = √(240000/(3/2)) = √160000 = 400      exactly
+  C* = √(2KD × 3/2)   = √360000                   = 600      exactly
+
+the four readings of the one formula:
+
+  switches off        Q* = 200         C* = 1200
+  production only     Q* = 200√2       C* = 600√2     ≈ 282.843 / 848.528
+  backorders only     Q* = 200√2       C* = 600√2     ≈ 282.843 / 848.528
+  both                Q* = 400         C* = 600
+
+at Q = 400, choosing the backorder level:
+
+  b* = (1 − D/P)·Q·h/(h + π) = (1/2)(400)(6)/12 = 100      cost 600
+  b  =  99                                                cost 60003/100
+  b  = 101                                                cost 60003/100
+  b  =   0    (refuse to be short at all)                 cost 900</div><p>The last block is the argument for the model rather than a detail of it. Refusing to plan any shortage costs <span class="math">900</span> where planning one costs <span class="math">600</span> &mdash; half as much again &mdash; and the reason is that a unit owed costs <span class="math">π = 6</span> while a unit held costs <span class="math">h = 6</span> and the owed unit is not sitting in a warehouse. When <span class="math">π</span> is genuinely equal to <span class="math">h</span>, refusing to backorder is simply choosing the more expensive of two identical storage options.</p><p>The two middle rows being identical is the fact worth taking away. <span class="math">1/2</span> and <span class="math">2</span> act on the same quantity &mdash; the effective holding rate &mdash; so a machine running at twice demand and a backorder penalty equal to the holding rate are the same correction wearing different words. That is why one formula covers both, and why an account that teaches them as two results with two derivations is teaching one result twice.</p><p>For a rehearsal, set <span class="math">P = 1440</span> and <span class="math">π = 12</span>, keeping the rest. The supplied first move is that the factors become <span class="math">1 − D/P = 1/6</span> and <span class="math">(h + π)/π = 3/2</span>. Work out the effective holding rate, predict <span class="math">Q*</span> and <span class="math">C*</span>, and then say &mdash; before the panel does &mdash; whether the backorder level at <span class="math">Q = 400</span> comes out rational.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Using the raw holding rate with a finite production rate</strong><span>Stock builds at <span class="math">P − D</span>, so the peak is <span class="math">(1 − D/P)·Q</span> and the holding bill is scaled accordingly. Forgetting the factor reports a run size that is too small by <span class="math">√(1/(1 − D/P))</span> and a cost that is too large by the same factor &mdash; on the worked instance, <span class="math">200</span> where the answer is <span class="math">282.84</span>, which is a plausible-looking number and completely wrong.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating a planned shortage as a failure to be avoided</strong><span>When <span class="math">π</span> is a real, agreed cost, planning to be short is an economic choice like any other: on the worked instance it saves a third of the total cost. The failure to avoid is an <em>unplanned</em> shortage, which this model does not describe at all &mdash; that is what the safety-stock lessons later in this course are for.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Reading a refusal as a bug</strong><span><span class="math">1 − D/P ≤ 0</span> and <span class="math">π = 0</span> both produce a panel that declines to print an answer. Neither is a numerical problem. One says the machine cannot meet demand and the other says nothing has been charged for a broken promise, and in both cases the fix is to the model rather than to the arithmetic.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when a production rate and a shortage penalty read as two adjustments to one holding rate.</strong><p>You should be able to derive the factor <span class="math">1 − D/P</span> from the geometry of the sawtooth, state what <span class="math">π</span> buys and why it divides the holding rate by <span class="math">(h + π)/π</span>, produce all four models from one expression, compute the optimal backorder level at a given run size and verify it is a minimum, and say precisely what the model reports when <span class="math">P ≤ D</span> or <span class="math">π = 0</span>.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Every lesson so far has known the demand rate exactly. The rest of the course does not. The next one is the smallest possible version of that change: a single order, a single season, a demand that is a random variable, and no second chance to correct the decision.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../all-units-price-breaks/" rel="prev"><span>Lesson</span><strong>All-Units Price Breaks</strong></a>
+      <a class="lesson-link next" href="../the-newsvendor-and-the-critical-ratio/" rel="next"><span>Lesson</span><strong>The Newsvendor and the Critical Ratio</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="inventory-models/production-runs-and-planned-backorders" data-lesson-title="Production Runs and Planned Backorders" data-course-title="Inventory Models">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Inventory Models.</strong> Every cost, probability, convolution, expected shortage and service level on this course is an exact fraction, and the distributions are rational so nothing in the second half of the course rounds at all: <span class="math">11/16</span> is printed as <span class="math">68.75%</span> and <span class="math">63/64</span> as <span class="math">98.44%</span>, which are exact fractions shown to two places rather than approximations. Two quantities here are genuinely irrational &mdash; the economic order quantity <span class="math">√(2KD/h)</span> and its cost <span class="math">√(2KDh)</span>, together with the band ends and candidate totals built on them &mdash; and they are carried as exact surds from end to end, with one function doing all the rounding and one sentence naming it: four decimal places, from the exact surd, by integer square root with three guard digits, printed beside the surd rather than instead of it. Where the data make the radicand a perfect square the answer is a whole number and the panel says so, which is why <span class="math">200</span> and <span class="math">20√30</span> are both shown as what they are. Comparisons between costs are settled on the exact forms and never on two decimals, because two decimals that differ in the fourth place are not evidence about the numbers behind them. What none of this can do is check a demand distribution, a holding rate or a shortage penalty against the situation it was taken from.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure on this path is computed in your browser from the model the lesson states, and a solution proved optimal is optimal for the model you wrote down rather than for the situation it came from &mdash; each lesson names what the model left out.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "Production runs at <span class=\"math\">P = 2400<\/span> against demand <span class=\"math\">D = 1200<\/span>. What is the peak stock level on a run of <span class=\"math\">Q<\/span>?", "a": ["<span class=\"math\">Q<\/span>", "<span class=\"math\">Q/2<\/span>", "<span class=\"math\">(1 \u2212 D/P)\u00b7Q = Q/2<\/span>, reached at the end of the run", "<span class=\"math\">P \u2212 D<\/span> times the cycle length"], "c": 2, "why": "Demand keeps drawing stock while the machine runs, so the level climbs at <span class=\"math\">P \u2212 D<\/span> for the <span class=\"math\">Q/P<\/span> of the cycle spent producing, reaching <span class=\"math\">(1 \u2212 D/P)\u00b7Q<\/span>. Here that is <span class=\"math\">Q/2<\/span> &mdash; numerically the same as the average stock in the plain model, which is a coincidence of this instance and not the same quantity. The peak is <span class=\"math\">Q<\/span> only when the run is instantaneous."}, {"q": "The backorder penalty <span class=\"math\">\u03c0<\/span> is set to zero. What does the model say?", "a": ["That backorders should be zero, since they cost nothing to avoid", "That the optimum is the plain economic order quantity", "That there is no finite optimum, because backordering everything is free", "That <span class=\"math\">\u03c0 = 0<\/span> is the same as <span class=\"math\">\u03c0<\/span> very large"], "c": 2, "why": "A free shortage makes the cheapest policy an unbounded one: hold nothing, owe everyone. The panel reports that the model has run out rather than printing a number. A very large <span class=\"math\">\u03c0<\/span> is the opposite extreme &mdash; it drives the second factor towards one and recovers the model with no shortages, which is the answer a reader often means when they type a zero."}, {"q": "On the worked instance, why do the production-only and backorders-only rows give identical answers?", "a": ["Because the panel computes them with the same function", "Because both corrections scale the effective holding rate by <span class=\"math\">1/2<\/span> here, and the answer depends on that rate alone", "Because <span class=\"math\">P = 2400<\/span> is twice <span class=\"math\">D<\/span> and <span class=\"math\">\u03c0 = 6<\/span> equals <span class=\"math\">h<\/span>, which is always the same model", "Because the two effects cancel"], "c": 1, "why": "<span class=\"math\">1 \u2212 D/P = 1/2<\/span> and <span class=\"math\">\u03c0/(h + \u03c0) = 1/2<\/span> on this data, and the economic order quantity depends on <span class=\"math\">K<\/span>, <span class=\"math\">D<\/span> and the effective holding rate and on nothing else. Sharing a function is how the panel computes them, not why they agree; and the coincidence is a property of these numbers, not a general identity between the two models."}, {"q": "Why does the panel report the best backorder level at the run size you choose rather than at <span class=\"math\">Q*<\/span>?", "a": ["Because <span class=\"math\">Q*<\/span> is not always the best run size", "Because at a rational <span class=\"math\">Q<\/span> the answer is rational and exact, while at an irrational <span class=\"math\">Q*<\/span> it is a surd", "Because the backorder level does not depend on <span class=\"math\">Q<\/span>", "Because the slider only accepts whole numbers"], "c": 1, "why": "<span class=\"math\">b = (1 \u2212 D/P)\u00b7Q\u00b7h/(h + \u03c0)<\/span> is linear in <span class=\"math\">Q<\/span>, so a rational <span class=\"math\">Q<\/span> gives a rational <span class=\"math\">b<\/span> that can be printed with every digit exact. At an irrational optimum the same expression is irrational, and a page that printed a rounded backorder level beside an exact run size would be mixing two kinds of number without saying so."}];
+
+  (function () {
+
+  /* Exact rational arithmetic over BigInt.
+
+     Every number a lesson calls "the answer" lives in this type. BigInt rather
+     than Number because a few steps of elimination on a 3x3 system produces
+     numerators that leave the exact-integer range of a double, and a solution
+     that is silently wrong in the last digits is worse than no solution. */
+  function bgcd(a, b) {
+    if (a < 0n) a = -a;
+    if (b < 0n) b = -b;
+    while (b) { var t = a % b; a = b; b = t; }
+    return a;
+  }
+  function R(n, d) {
+    if (d === undefined) d = 1n;
+    n = BigInt(n); d = BigInt(d);
+    if (d === 0n) throw new Error('division by zero');
+    if (d < 0n) { n = -n; d = -d; }
+    var g = bgcd(n, d) || 1n;
+    return { n: n / g, d: d / g };
+  }
+  var R0 = R(0n), R1 = R(1n);
+  function Radd(a, b) { return R(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function Rsub(a, b) { return R(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function Rmul(a, b) { return R(a.n * b.n, a.d * b.d); }
+  function Rdiv(a, b) { return R(a.n * b.d, a.d * b.n); }
+  function Rneg(a) { return R(-a.n, a.d); }
+  function Rabs(a) { return a.n < 0n ? Rneg(a) : a; }
+  function Rinv(a) { return R(a.d, a.n); }
+  function Rzero(a) { return a.n === 0n; }
+  function Rsign(a) { return a.n === 0n ? 0 : (a.n < 0n ? -1 : 1); }
+  function Requ(a, b) { return a.n === b.n && a.d === b.d; }
+  function Rcmp(a, b) { var l = a.n * b.d, r = b.n * a.d; return l < r ? -1 : (l > r ? 1 : 0); }
+  function Rint(a) { return a.d === 1n; }
+  function Rpow(a, k) {
+    var out = R1, base = a, e = k < 0 ? -k : k;
+    while (e > 0) { if (e & 1) out = Rmul(out, base); base = Rmul(base, base); e >>= 1; }
+    return k < 0 ? Rinv(out) : out;
+  }
+  /* The reader's form: "3", "-7/4". Never "3/1", never "0/5". */
+  function Rtext(a) { return a.d === 1n ? String(a.n) : a.n + '/' + a.d; }
+  /* Parenthesised when it would otherwise glue onto a neighbouring symbol. */
+  function Rterm(a) { return (a.n < 0n || a.d !== 1n) ? '(' + Rtext(a) + ')' : Rtext(a); }
+  function Rnum(a) { return Number(a.n) / Number(a.d); }
+  /* A decimal, for the one place a lesson asks for one. Exact when it can be.
+
+     BigInt long division rather than Number(n)/Number(d).toFixed(). The old
+     form had two faults and the second is the one that shows.
+
+     It returned NaN. Past roughly 300 digits both halves of the quotient are
+     Infinity and Infinity/Infinity is NaN, so a page printed NaN to a reader.
+     A Bloom filter's exact rate at m = 1000, n = 100, k = 7 has a 2101-digit
+     denominator, and Karger's contraction probability has the same shape.
+
+     And it rounded exact ties the wrong way. -399/40 is exactly -9.975; the
+     nearest double is fractionally smaller in magnitude, so toFixed(2) gave
+     -9.97 where half away from zero is -9.98. 160 of 144,180 rationals over
+     the small-integer range disagreed, every one of them an exact tie.
+
+     Half away from zero, computed on the exact value: the doubling, the +1
+     and the halving are the rounding, done in integers. */
+  function Rdec(a, places) {
+    if (places === undefined) places = 6;
+    if (Rint(a)) return String(a.n);
+    var neg = a.n < 0n, num = neg ? -a.n : a.n;
+    var scale = 10n ** BigInt(places);
+    var q = (num * scale * 2n / a.d + 1n) / 2n;
+    var s = q.toString();
+    while (s.length <= places) s = '0' + s;
+    var out = (neg ? '-' : '') + s.slice(0, s.length - places)
+      + (places > 0 ? '.' + s.slice(s.length - places) : '');
+    return out.indexOf('.') >= 0 ? out.replace(/0+$/, '').replace(/\.$/, '') : out;
+  }
+  function Rparse(text) {
+    var s = String(text).trim();
+    var m = /^([+-]?\d+)\s*\/\s*(\d+)$/.exec(s);
+    /* A zero denominator is not a number this function can read, so it comes
+       back null like every other unreadable string. It used to reach R(), which
+       THROWS -- and a throw out of a parser is not a refusal, it is a dead
+       page: the lab's redraw stops, the panel keeps the last good figures, and
+       nothing tells the reader why. Typing 1/0 into the availability chain on
+       a published page did exactly that. Callers all handle null already;
+       every one of them was written to. */
+    if (m) return m[2] === '0' || /^0+$/.test(m[2]) ? null : R(BigInt(m[1]), BigInt(m[2]));
+    m = /^([+-]?\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]));
+    m = /^([+-]?)(\d*)\.(\d+)$/.exec(s);
+    if (m) {
+      var whole = m[2] || '0', frac = m[3];
+      var num = BigInt(whole + frac), den = 10n ** BigInt(frac.length);
+      return R(m[1] === '-' ? -num : num, den);
+    }
+    return null;
+  }
+  /* Is this rational a perfect square? Needed wherever a lesson must decide
+     between an exact answer and a radical one -- sqrt(4/9) is 2/3 and belongs
+     on the page as 2/3, while sqrt(2) must stay sqrt(2). */
+  function bisqrt(n) {
+    if (n < 0n) return null;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x * x === n ? x : null;
+  }
+  function Rsqrt(a) {
+    if (a.n < 0n) return null;
+    var p = bisqrt(a.n), q = bisqrt(a.d);
+    return (p === null || q === null) ? null : R(p, q);
+  }
+
+  /* Exact irrational answers.
+
+     sqrt(D) for a rational D is either rational or irrational, and the second
+     case is not a failure -- it is the answer. A lesson that solves
+     x^2 - 2x - 4 = 0 wants "1 +- sqrt(5)", not "3.2360679...", so the roots of
+     every quadratic on this path are carried as  p + q*sqrt(k)  with p and q
+     exact rationals and k a squarefree integer. */
+  function bsqrtsimp(n) {
+    /* n = s^2 * k with k squarefree; returns [s, k]. */
+    var s = 1n, k = n, f = 2n;
+    while (f * f <= k) {
+      while (k % (f * f) === 0n) { k /= f * f; s *= f; }
+      f += 1n;
+      if (f > 100000n) break;   /* lesson-sized radicands */
+    }
+    return [s, k];
+  }
+  /* sqrt(a) for a rational a >= 0, as { q, k } meaning q * sqrt(k). k === 1n
+     exactly when the root is rational. */
+  function Rsurd(a) {
+    if (a.n < 0n) return null;
+    if (a.n === 0n) return { q: R0, k: 1n };
+    /* sqrt(p/d) = sqrt(p*d)/d */
+    var pair = bsqrtsimp(a.n * a.d);
+    return { q: R(pair[0], a.d), k: pair[1] };
+  }
+  function surdtext(s) {
+    if (s.k === 1n) return Rtext(s.q);
+    if (Requ(s.q, R1)) return 'sqrt(' + s.k + ')';
+    return Rterm(s.q) + 'sqrt(' + s.k + ')';
+  }
+  /* "p +- q sqrt(k)", the form a reader is expected to write down. */
+  function pmtext(p, s, imaginary) {
+    var unit = imaginary ? 'i' : '';
+    if (s.k === 1n && Rzero(s.q)) return Rtext(p);
+    var mag = surdtext(s);
+    if (s.k !== 1n && Requ(Rabs(s.q), R1)) mag = 'sqrt(' + s.k + ')';
+    else if (s.k !== 1n) mag = Rterm(Rabs(s.q)) + 'sqrt(' + s.k + ')';
+    else mag = Rtext(Rabs(s.q));
+    var right = unit ? (mag === '1' ? 'i' : mag + 'i') : mag;
+    if (Rzero(p)) return '+-' + right;
+    return Rtext(p) + ' +- ' + right;
+  }
+  /* The exact roots of ax^2 + bx + c, whatever the discriminant does.
+     Returns { disc, kind, p, s, roots } where each root is p +- s (times i when
+     the discriminant is negative), and `roots` holds the rational ones only. */
+  function quadroots(a, b, c) {
+    var disc = Rsub(Rmul(b, b), Rmul(R(4n), Rmul(a, c)));
+    var p = Rdiv(Rneg(b), Rmul(R(2n), a));
+    var sign = Rsign(disc);
+    var mag = Rsurd(sign < 0 ? Rneg(disc) : disc);
+    var s = { q: Rdiv(mag.q, Rabs(Rmul(R(2n), a))), k: mag.k };
+    var kind = sign < 0 ? 'complex' : (sign === 0 ? 'double' : (s.k === 1n ? 'rational' : 'irrational'));
+    var roots = [];
+    if (kind === 'double') roots = [p];
+    else if (kind === 'rational') roots = [Radd(p, s.q), Rsub(p, s.q)].sort(Rcmp);
+    return { disc: disc, kind: kind, p: p, s: s, roots: roots };
+  }
+
+  function td(t, cls) { return '<td' + (cls ? ' class="' + cls + '"' : '') + '>' + t + '</td>'; }
+  function tdl(t, cls) {
+    return '<td style="text-align:left;"' + (cls ? ' class="' + cls + '"' : '') + '>' + t + '</td>';
+  }
+  function th(t) { return '<th>' + t + '</th>'; }
+  function rowhead(t) { return '<th class="rowhead">' + t + '</th>'; }
+  function tr(cells, cls) { return '<tr' + (cls ? ' class="' + cls + '"' : '') + '>' + cells.join('') + '</tr>'; }
+  function table(caption, heads, rows) {
+    var head = (heads && heads.length)
+      ? '<thead>' + tr(heads.map(function (h) { return th(h); })) + '</thead>' : '';
+    return '<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>' + caption + '</caption>'
+      + head + '<tbody>' + rows.join('') + '</tbody></table></div>';
+  }
+  /* The two-column "what was done / what it produced" table. The exemplar's
+     trace layout, kept identical so a reader moving between courses is reading
+     the same page furniture. */
+  function steps(caption, pairs) {
+    return table(caption, [], pairs.map(function (p) { return tr([rowhead(p[0]), tdl(p[1])]); }));
+  }
+  function chip(t, kind) { return '<span class="chip' + (kind ? ' ' + kind : '') + '">' + t + '</span>'; }
+  /* " + 3" or " - 7": a bare number as a continuation. Everything on this page
+     that writes "something + <number>" goes through it, because "a(n-1) + -7"
+     is not a thing a reader writes and not a thing a marker accepts. */
+  function plusnum(r) { return (Rsign(r) < 0 ? ' - ' : ' + ') + Rtext(Rabs(r)); }
+  function tone(t, kind) { return '<span class="tone-' + kind + '">' + t + '</span>'; }
+  function plural(n, one, many) { return n === 1 ? one : many; }
+  /* Reader text goes into innerHTML, and on this course the reader types < and
+     > all day. Escaped once, at the boundary, rather than trusted: "x + 2y <= 8"
+     written raw would lose everything from the < to the next > -- which is the
+     end of the cell -- and the page would quietly drop the reader's own words. */
+  function esc(t) {
+    return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  /* Rparse throws on a zero denominator, and 1/0 is a thing a reader types.
+     Every read of reader input goes through this, so a bad fraction becomes a
+     sentence in the status banner rather than an exception. */
+  function Rread(text) {
+    try { return Rparse(String(text).trim()); } catch (err) { return null; }
+  }
+  /* The one rounding this file performs, and it is never used to decide
+     anything -- only to sit beside an exact value that a reader may want to
+     place on a number line. Every caller labels it as a rounding. */
+  function approx(r, places) {
+    var v = Rnum(r);
+    if (!isFinite(v)) return 'not a real number';
+    return v.toFixed(places === undefined ? 4 : places);
+  }
+  /* The least common multiple of two rationals: lcm of the numerators over the
+     gcd of the denominators. For two integers this is the schoolbook lcm, which
+     is what the elimination mode needs; for 1/2 and 1/4 it is 1/2, which is
+     what keeps that mode from inventing multipliers with four-digit numerators
+     the moment a coefficient stops being whole. */
+  function Rlcm(a, b) {
+    if (Rzero(a) || Rzero(b)) return R0;
+    var an = a.n < 0n ? -a.n : a.n, bn = b.n < 0n ? -b.n : b.n;
+    return R(an / bgcd(an, bn) * bn, bgcd(a.d, b.d));
+  }
+
+  /* Discrete distributions as [value, probability] pairs with rational
+     probabilities. Convolution is the sum of two independent draws, which is
+     how a latency budget adds a serial chain and how periodic review covers
+     R+L periods of demand. Exact, so a 12-step convolution is still a fraction. */
+  function pmfNormalise(pairs) {
+    var total = R(0n, 1n), i;
+    for (i = 0; i < pairs.length; i += 1) total = Radd(total, pairs[i][1]);
+    if (Rzero(total)) return pairs.slice();
+    var out = [];
+    for (i = 0; i < pairs.length; i += 1) out.push([pairs[i][0], Rdiv(pairs[i][1], total)]);
+    return out;
+  }
+  function pmfConvolve(a, b) {
+    var acc = {}, i, j;
+    for (i = 0; i < a.length; i += 1) {
+      for (j = 0; j < b.length; j += 1) {
+        var v = a[i][0] + b[j][0], p = Rmul(a[i][1], b[j][1]);
+        acc[v] = acc[v] ? Radd(acc[v], p) : p;
+      }
+    }
+    var keys = Object.keys(acc).map(Number).sort(function (x, y) { return x - y; });
+    return keys.map(function (v) { return [v, acc[v]]; });
+  }
+  function pmfMean(pairs) {
+    var m = R(0n, 1n);
+    for (var i = 0; i < pairs.length; i += 1) {
+      m = Radd(m, Rmul(R(BigInt(pairs[i][0]), 1n), pairs[i][1]));
+    }
+    return m;
+  }
+  /* P(X > t): the tail a stale-read or a timeout lesson asks for. */
+  function pmfTail(pairs, t) {
+    var s = R(0n, 1n);
+    for (var i = 0; i < pairs.length; i += 1) if (pairs[i][0] > t) s = Radd(s, pairs[i][1]);
+    return s;
+  }
+  /* The pmf of the maximum of k independent copies -- the fan-out lesson's
+     whole point: P(max <= t) = F(t)^k, so the tail is what k does to it. */
+  function pmfMax(pairs, k) {
+    var sorted = pairs.slice().sort(function (x, y) { return x[0] - y[0]; });
+    var out = [], cum = R(0n, 1n), prev = R(0n, 1n);
+    for (var i = 0; i < sorted.length; i += 1) {
+      cum = Radd(cum, sorted[i][1]);
+      var here = Rpow(cum, k);
+      out.push([sorted[i][0], Rsub(here, prev)]);
+      prev = here;
+    }
+    return out;
+  }
+
+  /* Printing a rational this path can actually produce.
+
+     algebra_core's Rdec and Rnum both go through Number, and this path
+     produces rationals Number cannot hold: P^12 on a five-state chain with
+     denominator-20 entries has entries of 15 digits over 16 (measured), and
+     (19/20)^400 is 512 digits over 521, of which Number() makes NaN.  So
+     decimals here are long division in BigInt.  queue.py already solved this for the System
+     Design queueing course; this is that solution lifted, not a fourteenth
+     one, so the two courses print the same number the same way. */
+
+  /* Decimal by BigInt long division, rounded half up at the last digit. */
+  function Rfixed(a, places) {
+    if (places === undefined) places = 3;
+    var neg = a.n < 0n, n = neg ? -a.n : a.n, d = a.d;
+    var scale = 10n ** BigInt(places);
+    var q = (2n * n * scale + d) / (2n * d);          /* round half up */
+    var whole = q / scale, frac = (q % scale).toString();
+    while (frac.length < places) frac = '0' + frac;
+    var body = places > 0 ? whole + '.' + frac : String(whole);
+    return (neg ? '-' : '') + body;
+  }
+
+  /* The exact fraction when a reader can read it, a decimal when the exact
+     form has run to twenty digits.  Both are the same number; only one of them
+     is evidence.  The cut is on DIGITS, not on magnitude, so it is the same
+     rule on every page of the Subject. */
+  function Rshort(a, places, digits) {
+    if (digits === undefined) digits = 9;
+    var wide = String(a.n < 0n ? -a.n : a.n).length > digits || String(a.d).length > digits;
+    return wide ? Rfixed(a, places === undefined ? 4 : places) : Rtext(a);
+  }
+  function Rpct(a, places) {
+    return Rfixed(Rmul(a, R(100n, 1n)), places === undefined ? 2 : places) + '%';
+  }
+
+  /* The fractional part a - floor(a), EXACT -- which is what makes a Gomory
+     cut a cut and not an approximation of one.  The floor is computed inline
+     rather than by calling Rfloor, because sysdesign_core.RCEIL_JS declares
+     that name and a kit concatenating both blocks would hold two of it. */
+  function Rfrac(a) {
+    var q = a.n / a.d;
+    if (a.n < 0n && q * a.d !== a.n) q -= 1n;
+    return Rsub(a, R(q, 1n));
+  }
+
+  /* Floor of the integer square root of a BigInt.  algebra_core's bisqrt
+     returns null for a non-square, which is right for deciding exactness and
+     useless for printing one: this never returns null. */
+  function bifloor(n) {
+    if (n < 0n) return 0n;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x;
+  }
+
+  /* THE ONE FUNCTION IN THIS MODULE THAT ROUNDS.  A surd {q, k} means
+     q*sqrt(k) and is exact; its decimal is not, and an EOQ of 40*sqrt(3) is
+     read off a page as 69.28 whatever we would prefer.  The digits come from
+     bifloor(q.n^2 * k * 10^(2p)) = floor(q.n * 10^p * sqrt k), computed with
+     three guard places and then rounded once, so the printed last digit is the
+     correctly rounded one.  Every lesson that calls this says it is rounded. */
+  function surdDec(s, places) {
+    if (places === undefined) places = 4;
+    var p = places + 3;
+    var neg = Rsign(s.q) < 0, n = neg ? -s.q.n : s.q.n;
+    var floored = bifloor(n * n * s.k * 10n ** BigInt(2 * p));
+    var v = R(floored, s.q.d * 10n ** BigInt(p));
+    return Rfixed(neg ? Rneg(v) : v, places);
+  }
+
+  /* Inventory.  Needs algebra_core.SURD_JS (Rsurd, quadroots -- both already
+     ship) and sysdesign_core.PMF_JS (pmfConvolve) above it.
+
+     THE ECONOMIC ORDER QUANTITY IS A SQUARE ROOT AND THIS MODULE KEEPS IT AS
+     ONE.  sqrt(2KD/h) for rational data is either rational or irrational, and
+     the second case is the answer, not a failure: a page that prints
+     282.842712474619 has replaced a fact a reader can check with a decimal
+     they cannot.  The surd is carried as {q, k} meaning q*sqrt(k), every cost
+     comparison below is exact, and only surdDec rounds -- at the point of
+     printing, where the page says so. */
+
+  /* Q* = sqrt(2KD/h) and the cost at it, C* = sqrt(2KDh).  Both exact. */
+  function eoq(K, D, h) {
+    var two = R(2n, 1n);
+    return { Qsurd: Rsurd(Rdiv(Rmul(two, Rmul(K, D)), h)),
+             costSurd: Rsurd(Rmul(two, Rmul(K, Rmul(D, h)))),
+             K: K, D: D, h: h };
+  }
+  /* The cost at ANY rational Q, which is what makes the curve drawable and the
+     "the EOQ is flat near its minimum" claim checkable. */
+  function eoqCostAt(Q, K, D, h) {
+    if (Rzero(Q)) return null;
+    return Radd(Rdiv(Rmul(K, D), Q), Rdiv(Rmul(h, Q), R(2n, 1n)));
+  }
+  /* THE EOQ BY DISCRIMINANT.  "Is there a Q costing at most T" is
+     hQ^2/2 - TQ + KD = 0, and its two roots are the ends of the interval that
+     does.  They MERGE exactly when the discriminant is zero, that is at
+     T = sqrt(2hKD) -- which is C*, derived rather than asserted.  The roots
+     come from quadroots, which ships in algebra_core.SURD_JS. */
+  function eoqDiscriminant(K, D, h, T) {
+    var a = Rdiv(h, R(2n, 1n)), qr = quadroots(a, Rneg(T), Rmul(K, D));
+    var star = eoq(K, D, h);
+    return { disc: qr.disc, kind: qr.kind, roots: qr, target: T,
+             merge: star.costSurd, atMinimum: Rzero(qr.disc),
+             feasible: Rsign(qr.disc) >= 0,
+             why: Rsign(qr.disc) < 0
+               ? 'the discriminant is ' + Rtext(qr.disc) + ' &lt; 0: no order quantity costs as little as ' + Rtext(T)
+               : (Rzero(qr.disc)
+                  ? 'the discriminant is exactly 0, so the two roots have merged: ' + Rtext(T)
+                    + ' is the minimum cost and the single Q that achieves it is the EOQ'
+                  : 'the discriminant is ' + Rtext(qr.disc)
+                    + ' &gt; 0, so an interval of order quantities costs at most ' + Rtext(T)) };
+  }
+  /* The robustness ratio: ordering t times the EOQ costs (t + 1/t)/2 times the
+     minimum, whatever K, D and h were.  Exact at every rational t, and the
+     reason a 20% error in Q costs under 2%. */
+  function eoqRatio(t) {
+    if (Rzero(t)) return null;
+    return Rdiv(Radd(t, Rinv(t)), R(2n, 1n));
+  }
+
+  /* ---- comparing surd-valued costs, exactly --------------------------- */
+
+  /* A cost of the form  r + q*sqrt(k)  -- a purchase bill plus an EOQ cost --
+     compared without rounding.  Same radicand: one squaring settles it.
+     Different radicands: both sides are BRACKETED by rationals from bifloor at
+     growing precision until the brackets separate, which is a proof and not an
+     approximation; identical numbers never separate and come back equal. */
+  function surdValue(r, s) { return { r: r, s: s || { q: R0, k: 1n } }; }
+  function surdBounds(v, p) {
+    var scale = 10n ** BigInt(p);
+    var lo = bifloor(v.s.k * scale * scale), hi = lo + 1n;
+    var a = Rmul(v.s.q, R(lo, scale)), b = Rmul(v.s.q, R(hi, scale));
+    var low = Rcmp(a, b) < 0 ? a : b, high = Rcmp(a, b) < 0 ? b : a;
+    return [Radd(v.r, low), Radd(v.r, high)];
+  }
+  function surdValueCmp(A, Bv) {
+    if (A.s.k === Bv.s.k) {
+      var d = Rsub(A.r, Bv.r), e = Rsub(Bv.s.q, A.s.q);   /* sign of d - e sqrt(k) */
+      if (Rzero(e)) return Rsign(d);
+      var sd = Rsign(d), se = Rsign(e);
+      if (sd >= 0 && se < 0) return (sd === 0 && se === 0) ? 0 : 1;
+      if (sd <= 0 && se > 0) return -1;
+      var l = Rmul(d, d), rr = Rmul(Rmul(e, e), R(A.s.k, 1n));
+      var c = Rcmp(l, rr);
+      return sd > 0 ? c : -c;
+    }
+    for (var p = 6; p <= 60; p += 12) {
+      var a = surdBounds(A, p), b = surdBounds(Bv, p);
+      if (Rcmp(a[0], b[1]) > 0) return 1;
+      if (Rcmp(a[1], b[0]) < 0) return -1;
+    }
+    return 0;
+  }
+
+  /* All-units quantity discounts.  For each price band, the EOQ computed with
+     THAT band's holding rate; when it falls inside the band it is a candidate,
+     and when it does not, the band's own lower boundary is.  The curve is
+     DISCONTINUOUS at every break -- the total cost drops as the price does --
+     which is why the cheapest candidate is not the one with the smallest EOQ.
+
+     `breaks` is [{from, price, h}], lowest `from` first; h defaults to the
+     given h.  Costs are (purchase + ordering + holding) per unit time. */
+  function discountCandidates(breaks, K, D, h) {
+    var out = [], i;
+    for (i = 0; i < breaks.length; i += 1) {
+      var band = breaks[i], hb = band.h || h;
+      var e = eoq(K, D, hb), q = e.Qsurd;
+      var hiEdge = i + 1 < breaks.length ? breaks[i + 1].from : null;
+      /* Is q inside [from, hiEdge)?  q is a surd: compare squares. */
+      var qsq = Rmul(Rmul(q.q, q.q), R(q.k, 1n));
+      var aboveFrom = Rcmp(qsq, Rmul(band.from, band.from)) >= 0;
+      var belowTop = hiEdge === null || Rcmp(qsq, Rmul(hiEdge, hiEdge)) < 0;
+      var buy = Rmul(D, band.price);
+      var entry;
+      if (aboveFrom && belowTop) {
+        entry = { band: i, price: band.price, at: 'the EOQ', Qsurd: q, Q: null,
+                  cost: surdValue(buy, e.costSurd), valid: true,
+                  why: 'the EOQ for this price sits inside the band, so it is the band\'s best quantity' };
+      } else {
+        var Q = aboveFrom ? (hiEdge === null ? band.from : Rsub(hiEdge, R1)) : band.from;
+        entry = { band: i, price: band.price, at: 'the band edge', Qsurd: null, Q: Q,
+                  cost: surdValue(Radd(buy, eoqCostAt(Q, K, D, hb)), { q: R0, k: 1n }),
+                  valid: true,
+                  why: aboveFrom
+                    ? 'the EOQ for this price is above the band, so the band\'s best quantity is its top'
+                    : 'the EOQ for this price is below the band, so the band\'s best quantity is its floor of ' + Rtext(band.from) };
+      }
+      entry.from = band.from; entry.to = hiEdge;
+      out.push(entry);
+    }
+    var best = null;
+    for (i = 0; i < out.length; i += 1) {
+      if (!out[i].valid) continue;
+      if (best === null || surdValueCmp(out[i].cost, out[best].cost) < 0) best = i;
+    }
+    return { candidates: out, best: best, bestCost: best === null ? null : out[best].cost };
+  }
+
+  /* The economic PRODUCTION quantity, with planned backorders.
+
+     Stock builds at P - D while producing and falls at D after, so the average
+     on hand is scaled by f = 1 - D/P; backorders at cost pi per unit per time
+     shift the sawtooth below zero.  Cost per unit time at any rational Q and
+     backorder level b:
+         KD/Q + h(fQ - b)^2 / (2fQ) + pi b^2 / (2fQ)
+     With P infinite (f = 1) it IS the EOQ with backorders, and with b = 0 it
+     IS the EPQ -- one formula, and the two named models are readings of it. */
+  function epqCostAt(Q, b, K, D, h, P, pi) {
+    if (Rzero(Q)) return null;
+    var f = P === null ? R1 : Rsub(R1, Rdiv(D, P));
+    if (Rsign(f) <= 0) return null;
+    var fQ = Rmul(f, Q), two = R(2n, 1n);
+    var on = Rsub(fQ, b);
+    return Radd(Rdiv(Rmul(K, D), Q),
+                Radd(Rdiv(Rmul(h, Rmul(on, on)), Rmul(two, fQ)),
+                     Rzero(b) ? R0 : Rdiv(Rmul(pi, Rmul(b, b)), Rmul(two, fQ))));
+  }
+  function epqCost(K, D, h, P, b, pi) {
+    var f = P === null ? R1 : Rsub(R1, Rdiv(D, P)), two = R(2n, 1n);
+    if (Rsign(f) <= 0) {
+      return { factor: f, feasible: false, Qsurd: null, costSurd: null,
+               why: 'demand is at least the production rate, so the machine can never build stock and there is no cycle' };
+    }
+    var backlog = (pi && !Rzero(pi)) ? Rdiv(Radd(h, pi), pi) : R1;
+    var Qstar = Rsurd(Rmul(Rdiv(Rmul(two, Rmul(K, D)), Rmul(h, f)), backlog));
+    var Cstar = Rsurd(Rdiv(Rmul(two, Rmul(K, Rmul(D, Rmul(h, f)))), backlog));
+    return { factor: f, feasible: true, Qsurd: Qstar, costSurd: Cstar,
+             backlogFactor: backlog, bStar: Rmul(Rmul(f, Qstar.q), Rdiv(h, Radd(h, backlog === R1 ? h : pi))),
+             why: 'the holding rate is scaled by 1 - D/P = ' + Rtext(f)
+               + (pi && !Rzero(pi) ? ' and divided again by (h + pi)/pi = ' + Rtext(backlog)
+                  + ', because a backorder is cheaper to carry than a unit of stock' : '') };
+  }
+
+  /* The newsvendor, by the critical ratio and by the whole cost curve.
+
+     Q* is the smallest Q whose CDF reaches cu/(cu + co), and the expected cost
+     at EVERY Q is tabulated beside it so the reader sees that the crossing is
+     the minimum rather than being told.
+
+     A pmf here is [integer value, rational probability] pairs, the same shape
+     pmfConvolve produces, so newsvendor, reorderPoint and baseStock all read
+     the same distribution. */
+  function newsvendor(pmf, cu, co) {
+    var ratio = Rdiv(cu, Radd(cu, co)), cum = R0, rows = [], k, j, star = null;
+    for (k = 0; k < pmf.length; k += 1) {
+      cum = Radd(cum, pmf[k][1]);
+      var over = R0, under = R0, Q = pmf[k][0];
+      for (j = 0; j < pmf.length; j += 1) {
+        var d = pmf[j][0];
+        if (d < Q) over = Radd(over, Rmul(pmf[j][1], R(BigInt(Q - d), 1n)));
+        else under = Radd(under, Rmul(pmf[j][1], R(BigInt(d - Q), 1n)));
+      }
+      var cost = Radd(Rmul(co, over), Rmul(cu, under));
+      rows.push({ Q: Q, p: pmf[k][1], cdf: cum, cost: cost,
+                  overage: over, underage: under, reaches: Rcmp(cum, ratio) >= 0 });
+      if (star === null && Rcmp(cum, ratio) >= 0) star = k;
+    }
+    var best = 0;
+    for (k = 1; k < rows.length; k += 1) if (Rcmp(rows[k].cost, rows[best].cost) < 0) best = k;
+    return { ratio: ratio, rows: rows, Q: star === null ? null : rows[star].Q,
+             index: star, cheapest: rows[best].Q, cost: star === null ? null : rows[star].cost,
+             agrees: star !== null && Requ(rows[star].cost, rows[best].cost),
+             why: 'the critical ratio is ' + Rtext(ratio) + ' and the CDF first reaches it at Q = '
+               + (star === null ? '(never)' : rows[star].Q) };
+  }
+
+  /* The reorder point: the expected shortage per cycle, exact.
+
+     `pmf` is the demand in ONE period; the lead-time demand is the L-fold
+     convolution of it, by pmfConvolve, which is the same function the latency
+     course adds a serial chain with. */
+  function reorderPoint(pmf, L, r) {
+    var lead = pmf, k;
+    for (k = 1; k < L; k += 1) lead = pmfConvolve(lead, pmf);
+    var shortage = R0, service = R0, rows = [], demand = R0;
+    for (k = 0; k < lead.length; k += 1) {
+      var x = lead[k][0], p = lead[k][1];
+      demand = Radd(demand, Rmul(R(BigInt(x), 1n), p));
+      if (x > r) shortage = Radd(shortage, Rmul(p, R(BigInt(x - r), 1n)));
+      else service = Radd(service, p);
+      rows.push({ x: x, p: p, short: x > r ? x - r : 0 });
+    }
+    return { lead: lead, shortage: shortage, cycleService: service, rows: rows,
+             r: r, meanDemand: demand, safety: Rsub(R(BigInt(r), 1n), demand),
+             why: 'over ' + L + ' period(s) the expected demand is ' + Rtext(demand)
+               + ', so a reorder point of ' + r + ' carries ' + Rtext(Rsub(R(BigInt(r), 1n), demand))
+               + ' of safety stock and still runs short ' + Rtext(shortage) + ' units a cycle on average' };
+  }
+
+  /* Periodic review: the base-stock level covers R + L periods of demand,
+     because an order placed now is the last one that can arrive before the
+     NEXT order does.  The convolution is pmfConvolve, R + L times. */
+  function baseStock(pmf, R_, L, alpha) {
+    var lead = pmf, k;
+    for (k = 1; k < R_ + L; k += 1) lead = pmfConvolve(lead, pmf);
+    var cum = R0, rows = [], S = null, mean = R0;
+    for (k = 0; k < lead.length; k += 1) {
+      cum = Radd(cum, lead[k][1]);
+      mean = Radd(mean, Rmul(R(BigInt(lead[k][0]), 1n), lead[k][1]));
+      rows.push({ x: lead[k][0], p: lead[k][1], cdf: cum });
+      if (S === null && alpha !== undefined && Rcmp(cum, alpha) >= 0) S = lead[k][0];
+    }
+    return { demand: lead, rows: rows, periods: R_ + L, S: S, alpha: alpha === undefined ? null : alpha,
+             mean: mean,
+             why: 'the order placed now covers ' + (R_ + L) + ' periods -- ' + R_
+               + ' until the next review plus ' + L + ' of lead time -- so it is that convolution that has to be quantiled, not one period\'s' };
+  }
+
+  /* ------------------------------------------------------------- reading in
+
+     Every number a reader types goes through FORMAT_JS's Rread, so "7/2" is
+     exact and "banana" is null rather than NaN. `invPositive` is the guard the
+     models need: K, D, h and P are rates and quantities, and a zero or negative
+     one is not a small model, it is no model. */
+  function invRead(text) { return Rread(text); }
+  function invPositive(text) {
+    var v = Rread(text);
+    return (v === null || Rsign(v) <= 0) ? null : v;
+  }
+  function invNonNegative(text) {
+    var v = Rread(text);
+    return (v === null || Rsign(v) < 0) ? null : v;
+  }
+  /* A rational as a plain number, for coordinates only. Rnum goes through
+     Number and this path produces rationals Number cannot hold, so the decimal
+     comes from Rfixed's BigInt long division and is parsed back. Nothing
+     downstream of a coordinate is arithmetic. */
+  function pxOf(r) { return parseFloat(Rfixed(r, 6)); }
+
+  /* -------------------------------------------------- the EOQ, split in two
+
+     The two halves of the cost are the lesson: ordering falls like KD/Q and
+     holding rises like hQ/2, so the total has a minimum where neither term is
+     small. Split rather than summed, because the crossing IS the optimum and a
+     reader should see the two lines meet. */
+  function eoqSplit(Q, K, D, h) {
+    if (Rzero(Q)) return null;
+    var order = Rdiv(Rmul(K, D), Q), hold = Rdiv(Rmul(h, Q), R(2n, 1n));
+    return { Q: Q, order: order, hold: hold, total: Radd(order, hold),
+             crossing: Requ(order, hold) };
+  }
+  /* The curve on a rational grid. `n` samples across [lo, hi], every one an
+     exact rational, so the drawn shape and the printed table are the same
+     numbers. */
+  function eoqCurve(K, D, h, lo, hi, n) {
+    var out = [], i, span = Rsub(hi, lo);
+    for (i = 0; i <= n; i += 1) {
+      var Q = Radd(lo, Rmul(span, R(BigInt(i), BigInt(n))));
+      var pt = eoqSplit(Q, K, D, h);
+      if (pt !== null) out.push(pt);
+    }
+    return out;
+  }
+
+  /* THE FLATNESS BAND, BY THE SECOND DISCRIMINANT.
+
+     C(t Q*) / C* = (t + 1/t)/2 exactly, for every rational t and whatever K, D
+     and h were -- that is `eoqRatio` in or_core. So "costs at most (1 + e)
+     times the minimum" is
+
+         (t + 1/t)/2 <= 1 + e   <=>   t^2 - 2(1 + e) t + 1 <= 0
+
+     and the ends of the band are the roots of a quadratic with RATIONAL
+     coefficients: (1 + e) +- sqrt(e(2 + e)). No calculus, no sampling, and the
+     answer is a surd rather than a pair of decimals. */
+  function eoqBand(e) {
+    if (Rsign(e) < 0) return null;
+    var one = R(1n, 1n), two = R(2n, 1n);
+    var qr = quadroots(one, Rneg(Rmul(two, Radd(one, e))), one);
+    /* THE ENDS ARE SURDS, not rationals, and they are carried as such. Writing
+       p +- s.q here and calling it the answer would drop the sqrt(s.k) -- which
+       is exactly the defect this kit reports in or_core's `bStar`, and it is
+       easier to commit than to notice: at e = 1/100 the wrong form gives a band
+       of [1.00, 1.02] and the right one [0.8682, 1.1518]. */
+    return { disc: qr.disc, p: qr.p, s: qr.s, kind: qr.kind, tolerance: e,
+             lo: surdValue(qr.p, { q: Rneg(qr.s.q), k: qr.s.k }),
+             hi: surdValue(qr.p, { q: qr.s.q, k: qr.s.k }),
+             exact: qr.s.k === 1n,
+             why: 'the band is the interval where t^2 - 2(1 + ' + Rtext(e) + ')t + 1 <= 0, whose '
+               + 'discriminant is ' + Rtext(qr.disc) + ' -- so the ends are ' + Rtext(qr.p)
+               + ' +- sqrt(' + Rtext(Rmul(e, Radd(two, e))) + '), and not one of K, D or h appears in it' };
+  }
+
+  /* ---- rational brackets, for the products that are not one surd ---------
+
+     t_+ times Q* is (a + b sqrt(m)) times (c sqrt(k)), which has TWO radicands
+     and is therefore not a surd this module can carry. Rather than pretend, the
+     page brackets each factor by rationals from `surdBounds` at a stated
+     precision and multiplies the brackets. The printed decimal is the midpoint
+     of a bracket whose width is under 10^-14 of the value, so every digit shown
+     is a digit of the true number -- which is a proof about the printing, not a
+     hope about it. */
+  function bndOf(v, p) { return surdBounds(v, p === undefined ? 16 : p); }
+  function bndMul(a, b) {
+    /* both intervals strictly positive, which every caller here checks */
+    return [Rmul(a[0], b[0]), Rmul(a[1], b[1])];
+  }
+  function bndScale(a, r) {
+    return Rsign(r) >= 0 ? [Rmul(a[0], r), Rmul(a[1], r)] : [Rmul(a[1], r), Rmul(a[0], r)];
+  }
+  function bndFrom(r, a) { return [Rsub(r, a[1]), Rsub(r, a[0])]; }
+  function bndDec(a, places) {
+    return Rfixed(Rdiv(Radd(a[0], a[1]), R(2n, 1n)), places === undefined ? 4 : places);
+  }
+  function bndWidth(a) { return Rsub(a[1], a[0]); }
+
+  /* The same band expressed in order quantities: t times the EOQ. */
+  function eoqBandQ(K, D, h, e) {
+    var band = eoqBand(e);
+    if (band === null) return null;
+    var star = eoq(K, D, h), q = star.Qsurd;
+    if (Rzero(q.q)) return null;
+    var qb = bndOf(surdValue(R0, q));
+    var loB = bndOf(band.lo), hiB = bndOf(band.hi);
+    var one = R(1n, 1n), hundred = R(100n, 1n);
+    return { band: band, Qsurd: q, loT: loB, hiT: hiB,
+             loBand: bndMul(loB, qb), hiBand: bndMul(hiB, qb),
+             loValue: bndDec(bndMul(loB, qb), 4), hiValue: bndDec(bndMul(hiB, qb), 4),
+             belowPct: bndDec(bndScale(bndFrom(one, loB), hundred), 1),
+             abovePct: bndDec(bndScale([Rsub(hiB[0], one), Rsub(hiB[1], one)], hundred), 1),
+             star: surdDec(q, 4), exactEnds: band.exact,
+             why: band.exact
+               ? 'the ends of the band are rational multiples of the EOQ'
+               : 'the ends of the band are ' + Rtext(band.s.q) + ' sqrt(' + band.s.k + ') either side of '
+                 + Rtext(band.p) + ' times the EOQ, so both are printed from a rational bracket' };
+  }
+  /* Comparing a rational cost at a rational Q with the IRRATIONAL minimum,
+     exactly. surdValueCmp does not round: this is the function that lets the
+     page say "this Q costs strictly more than the minimum" as a fact. */
+  function eoqAbove(Q, K, D, h) {
+    var here = eoqCostAt(Q, K, D, h);
+    if (here === null) return null;
+    var star = eoq(K, D, h);
+    var cmp = surdValueCmp(surdValue(here, { q: R0, k: 1n }), surdValue(R0, star.costSurd));
+    return { at: here, cmp: cmp, star: star.costSurd,
+             why: cmp > 0 ? 'costs strictly more than the minimum, proved by comparing squares rather than decimals'
+                 : (cmp === 0 ? 'costs exactly the minimum, so this Q is the EOQ and the EOQ is rational here'
+                    : 'costs LESS than the minimum, which cannot happen and means the arithmetic is wrong') };
+  }
+  /* The cheapest WHOLE order quantity in [lo, hi], by looking at every one of
+     them. The formula gives a real number and a warehouse orders an integer, so
+     the page shows the scan beside the surd and the reader sees that rounding
+     the surd to the nearer whole number is the answer -- which is a claim, and
+     this is the check of it. */
+  function eoqWholeScan(K, D, h, lo, hi) {
+    var best = null, bestQ = 0, q;
+    for (q = lo; q <= hi; q += 1) {
+      var c = eoqCostAt(R(BigInt(q), 1n), K, D, h);
+      if (c === null) continue;
+      if (best === null || Rcmp(c, best) < 0) { best = c; bestQ = q; }
+    }
+    if (best === null) return null;
+    return { Q: bestQ, cost: best, scanned: hi - lo + 1,
+             why: 'every whole quantity from ' + lo + ' to ' + hi + ' was priced; the cheapest is '
+               + bestQ + ' at ' + Rtext(best) };
+  }
+
+  /* --------------------------------------------- the sawtooth, as a polyline
+
+     Stock arrives in a batch of Q and drains at D. The average on hand is Q/2
+     BECAUSE the sawtooth is straight, which is the model's one real assumption
+     and the drawing is where a reader can see it. Returns points in cycle
+     units: x in [0, cycles], y in stock. */
+  function sawPoints(Q, D, cycles) {
+    var pts = [], c;
+    if (Rzero(Q) || Rzero(D)) return pts;
+    for (c = 0; c < cycles; c += 1) {
+      pts.push([c, pxOf(Q)]);
+      pts.push([c + 1, 0]);
+    }
+    return pts;
+  }
+  /* The production sawtooth: stock builds at P - D for the first fraction D/P
+     of the cycle, then drains at D; with planned backorders the whole shape
+     drops by b. One polyline, four corners a cycle, and with P infinite and
+     b = 0 it IS the plain sawtooth -- the two named models are readings of one
+     picture, which is the lesson. */
+  function epqPoints(Q, b, D, P, cycles) {
+    var pts = [], c;
+    if (Rzero(Q) || Rzero(D)) return pts;
+    var f = P === null ? R1 : Rsub(R1, Rdiv(D, P));
+    if (Rsign(f) <= 0) return pts;
+    var peak = pxOf(Rsub(Rmul(f, Q), b)), low = -pxOf(b);
+    /* the fraction of a cycle spent producing is D/P, or zero when P is
+       infinite; the peak is reached at the end of it */
+    var up = P === null ? 0 : pxOf(Rdiv(D, P));
+    var riseFrom = low, riseTo = peak;
+    for (c = 0; c < cycles; c += 1) {
+      pts.push([c, riseFrom]);
+      pts.push([c + up, riseTo]);
+      pts.push([c + 1, low]);
+    }
+    return pts;
+  }
+
+  /* -------------------------------------------------- all-units price breaks
+
+     The total cost is DISCONTINUOUS at every break, because the whole order is
+     repriced and not just the units above the break. `bandOf` is the step
+     function that makes it so, and drawing the curve band by band rather than
+     as one polyline is the only honest way to draw it: a line joining the two
+     sides of a break asserts costs that no quantity has. */
+  function bandOf(breaks, Q) {
+    var at = -1, i;
+    for (i = 0; i < breaks.length; i += 1) if (Rcmp(Q, breaks[i].from) >= 0) at = i;
+    return at;
+  }
+  function allUnitsCostAt(breaks, K, D, h, Q) {
+    var at = bandOf(breaks, Q);
+    if (at < 0 || Rzero(Q)) return null;
+    var band = breaks[at], hb = band.h || h;
+    var cycle = eoqCostAt(Q, K, D, hb);
+    if (cycle === null) return null;
+    return { band: at, price: band.price, buy: Rmul(D, band.price),
+             cycle: cycle, total: Radd(Rmul(D, band.price), cycle) };
+  }
+  /* One polyline per band, so the jumps stay jumps. */
+  function discountCurve(breaks, K, D, h, lo, hi, n) {
+    var series = [], i, j;
+    for (i = 0; i < breaks.length; i += 1) {
+      var from = Rcmp(breaks[i].from, lo) > 0 ? breaks[i].from : lo;
+      var to = i + 1 < breaks.length ? breaks[i + 1].from : hi;
+      if (Rcmp(to, hi) > 0) to = hi;
+      if (Rcmp(from, to) >= 0) continue;
+      var pts = [], span = Rsub(to, from);
+      for (j = 0; j <= n; j += 1) {
+        var Q = Radd(from, Rmul(span, R(BigInt(j), BigInt(n))));
+        var c = allUnitsCostAt(breaks, K, D, h, Q);
+        /* the top end of a band belongs to the NEXT band, so it is priced here
+           at this band's price to draw the open end of the segment */
+        if (c === null) continue;
+        var hb = breaks[i].h || h, cyc = eoqCostAt(Q, K, D, hb);
+        pts.push([pxOf(Q), pxOf(Radd(Rmul(D, breaks[i].price), cyc))]);
+      }
+      series.push({ band: i, pts: pts, price: breaks[i].price });
+    }
+    return series;
+  }
+  /* Every whole quantity in range, priced under the all-units rule. This is the
+     page's own check on `discountCandidates`: one candidate per band is a CLAIM
+     that the cheapest quantity is either a band's EOQ or a band's floor, and a
+     scan of the range is what makes it a checked claim rather than a rule. */
+  function discountScan(breaks, K, D, h, lo, hi) {
+    var best = null, bestQ = 0, q;
+    for (q = lo; q <= hi; q += 1) {
+      var c = allUnitsCostAt(breaks, K, D, h, R(BigInt(q), 1n));
+      if (c === null) continue;
+      if (best === null || Rcmp(c.total, best) < 0) { best = c.total; bestQ = q; }
+    }
+    return best === null ? null : { Q: bestQ, cost: best, scanned: hi - lo + 1 };
+  }
+
+  /* ----------------------------------------------- production and backorders
+
+     At a FIXED rational Q the best backorder level is rational and it is
+     b = f Q h / (h + pi) -- a quadratic in b with rational coefficients, whose
+     vertex is that ratio. So this kit prints a number it can carry exactly,
+     rather than reading or_core's `bStar`, which multiplies the RATIONAL FACTOR
+     of an irrational Q* and is short by sqrt(k) whenever the run size is
+     irrational. */
+  function epqBestB(Q, K, D, h, P, pi) {
+    var f = P === null ? R1 : Rsub(R1, Rdiv(D, P));
+    if (Rsign(f) <= 0 || Rzero(Q)) return null;
+    if (pi === null || Rzero(pi)) {
+      return { b: R0, f: f, feasible: false,
+               why: 'with no backorder penalty the model has no finite optimum -- every unit backordered '
+                 + 'is free, so b = 0 is shown and the panel says the model has run out' };
+    }
+    var b = Rdiv(Rmul(Rmul(f, Q), h), Radd(h, pi));
+    return { b: b, f: f, feasible: true,
+             cost: epqCostAt(Q, b, K, D, h, P, pi),
+             why: 'at Q = ' + Rtext(Q) + ' the cost is a quadratic in b whose vertex is f Q h / (h + pi) = '
+               + Rtext(b) };
+  }
+  /* The cost profile against Q, with b already at its best for each Q. The
+     minimum of THIS curve is the surd or_core's epqCost returns, and the page
+     draws them together so the reader sees the surd sitting at the bottom of a
+     curve computed without it. */
+  function epqProfile(K, D, h, P, pi, lo, hi, n) {
+    var out = [], i, span = Rsub(hi, lo);
+    for (i = 0; i <= n; i += 1) {
+      var Q = Radd(lo, Rmul(span, R(BigInt(i), BigInt(n))));
+      var best = epqBestB(Q, K, D, h, P, pi);
+      if (best === null) continue;
+      var b = best.feasible ? best.b : R0;
+      var c = epqCostAt(Q, b, K, D, h, P, pi);
+      if (c === null) continue;
+      out.push({ Q: Q, b: b, cost: c });
+    }
+    return out;
+  }
+
+  /* --------------------------------------------------------- the newsvendor
+
+     or_core's `newsvendor` tabulates the cost at every Q IN THE SUPPORT of the
+     demand distribution, which is where the answer is. It is not where a reader
+     looks first: they try 0, they try one more than the largest demand, and
+     they want to know those are worse. `nvWiden` prices every whole Q in a
+     window, support or not, so "the crossing is the minimum" is a statement
+     about the whole line and not about five of its points. */
+  function nvCostAt(pmf, cu, co, Q) {
+    var over = R0, under = R0, j;
+    for (j = 0; j < pmf.length; j += 1) {
+      var d = pmf[j][0];
+      if (d < Q) over = Radd(over, Rmul(pmf[j][1], R(BigInt(Q - d), 1n)));
+      else under = Radd(under, Rmul(pmf[j][1], R(BigInt(d - Q), 1n)));
+    }
+    return { Q: Q, over: over, under: under, cost: Radd(Rmul(co, over), Rmul(cu, under)) };
+  }
+  function nvWiden(pmf, cu, co, lo, hi) {
+    var rows = [], q, best = null;
+    for (q = lo; q <= hi; q += 1) {
+      var row = nvCostAt(pmf, cu, co, q);
+      rows.push(row);
+      if (best === null || Rcmp(row.cost, rows[best].cost) < 0) best = rows.length - 1;
+    }
+    return { rows: rows, best: best, Q: rows.length ? rows[best].Q : null };
+  }
+
+  /* ------------------------------------------- service, and the other service
+
+     CYCLE SERVICE is the probability a cycle ends without a stockout. FILL RATE
+     is the fraction of DEMAND met from stock. They are different numbers and
+     readers quote whichever they met first: at a reorder point that runs 3/8 of
+     a unit short per cycle on an order of 100, cycle service might be 7/8 while
+     the fill rate is 1 - (3/8)/100 = 0.99625. Both are printed, side by side,
+     with their definitions, because a service level without its definition is
+     not a number. */
+  function serviceRows(pmf, L, lo, hi) {
+    var out = [], r;
+    for (r = lo; r <= hi; r += 1) out.push(reorderPoint(pmf, L, r));
+    return out;
+  }
+  function fillRate(pmf, L, r, Q) {
+    if (Rzero(Q)) return null;
+    var rp = reorderPoint(pmf, L, r);
+    return { fill: Rsub(R1, Rdiv(rp.shortage, Q)), cycle: rp.cycleService,
+             shortage: rp.shortage, safety: rp.safety,
+             why: 'cycle service is P(no stockout in a cycle) = ' + Rtext(rp.cycleService)
+               + '; the fill rate is the fraction of demand met from stock, 1 - (' + Rtext(rp.shortage)
+               + ')/' + Rtext(Q) + ' = ' + Rtext(Rsub(R1, Rdiv(rp.shortage, Q)))
+               + ' -- the same policy, two different service levels' };
+  }
+  /* The smallest reorder point that reaches a cycle-service target. Monotone in
+     r, so the first that clears it is the answer; -1 when none in range does. */
+  function smallestReorder(pmf, L, alpha, limit) {
+    var r;
+    for (r = 0; r <= limit; r += 1) {
+      if (Rcmp(reorderPoint(pmf, L, r).cycleService, alpha) >= 0) return r;
+    }
+    return -1;
+  }
+
+  /* ------------------------------------------------------- drawing, as text
+
+     Three functions, each returning a string of SVG. Nothing here touches an
+     element, so scripts/mathcheck.js asserts on the drawing itself rather than
+     on a description of it -- the reason the rest of this path writes its
+     renderers this way. */
+  function plotFrame(series, box) {
+    var x0 = null, x1 = null, y0 = 0, y1 = null, s, p;
+    for (s = 0; s < series.length; s += 1) {
+      for (p = 0; p < series[s].pts.length; p += 1) {
+        var pt = series[s].pts[p];
+        if (x0 === null || pt[0] < x0) x0 = pt[0];
+        if (x1 === null || pt[0] > x1) x1 = pt[0];
+        if (pt[1] < y0) y0 = pt[1];
+        if (y1 === null || pt[1] > y1) y1 = pt[1];
+      }
+    }
+    if (x0 === null) return null;
+    if (x1 === x0) x1 = x0 + 1;
+    if (y1 === null || y1 === y0) y1 = y0 + 1;
+    var L = box.left === undefined ? 52 : box.left, Rr = box.right === undefined ? 14 : box.right;
+    var T = box.top === undefined ? 12 : box.top, B = box.bottom === undefined ? 26 : box.bottom;
+    var w = box.w - L - Rr, hgt = box.h - T - B;
+    return { x0: x0, x1: x1, y0: y0, y1: y1, L: L, T: T, w: w, h: hgt,
+             sx: function (v) { return L + w * (v - x0) / (x1 - x0); },
+             sy: function (v) { return T + hgt - hgt * (v - y0) / (y1 - y0); } };
+  }
+  function plotSvg(series, box, opts) {
+    opts = opts || {};
+    var f = plotFrame(series, box);
+    if (f === null) return '<text x="14" y="24" font-size="11" fill="var(--muted)">nothing to draw</text>';
+    var out = '<line x1="' + f.L + '" y1="' + (f.T + f.h) + '" x2="' + (f.L + f.w) + '" y2="' + (f.T + f.h)
+      + '" stroke="var(--line-strong)" />'
+      + '<line x1="' + f.L + '" y1="' + f.T + '" x2="' + f.L + '" y2="' + (f.T + f.h)
+      + '" stroke="var(--line-strong)" />';
+    if (f.y0 < 0) {
+      out += '<line x1="' + f.L + '" y1="' + f.sy(0) + '" x2="' + (f.L + f.w) + '" y2="' + f.sy(0)
+        + '" stroke="var(--line)" stroke-dasharray="3 3" />';
+    }
+    var s, p;
+    for (s = 0; s < series.length; s += 1) {
+      var sr = series[s], d = '';
+      for (p = 0; p < sr.pts.length; p += 1) {
+        d += (p ? ' L ' : 'M ') + f.sx(sr.pts[p][0]).toFixed(2) + ' ' + f.sy(sr.pts[p][1]).toFixed(2);
+      }
+      if (!d) continue;
+      out += '<path d="' + d + '" fill="none" stroke="var(--' + (sr.tone || 'cyan') + ')" stroke-width="'
+        + (sr.width || 2) + '"' + (sr.dash ? ' stroke-dasharray="' + sr.dash + '"' : '') + ' />';
+    }
+    var marks = opts.marks || [];
+    for (s = 0; s < marks.length; s += 1) {
+      var m = marks[s];
+      if (m.kind === 'v') {
+        out += '<line x1="' + f.sx(m.at).toFixed(2) + '" y1="' + f.T + '" x2="' + f.sx(m.at).toFixed(2)
+          + '" y2="' + (f.T + f.h) + '" stroke="var(--' + (m.tone || 'amber')
+          + ')" stroke-width="1.5" stroke-dasharray="4 3" />';
+      } else {
+        out += '<circle cx="' + f.sx(m.at).toFixed(2) + '" cy="' + f.sy(m.y).toFixed(2)
+          + '" r="4" fill="var(--' + (m.tone || 'amber') + ')" />';
+      }
+      if (m.label) {
+        out += '<text x="' + Math.min(f.L + f.w - 4, f.sx(m.at) + 5).toFixed(2) + '" y="'
+          + (m.kind === 'v' ? f.T + 12 : f.sy(m.y) - 8).toFixed(2)
+          + '" font-size="10" fill="var(--' + (m.tone || 'amber') + ')">' + m.label + '</text>';
+      }
+    }
+    if (opts.bandFrom !== undefined && opts.bandTo !== undefined) {
+      var bx = f.sx(opts.bandFrom), bw = f.sx(opts.bandTo) - bx;
+      out = '<rect x="' + bx.toFixed(2) + '" y="' + f.T + '" width="' + bw.toFixed(2) + '" height="' + f.h
+        + '" fill="var(--green)" opacity="0.12" />' + out;
+    }
+    out += '<text x="' + f.L + '" y="' + (box.h - 8) + '" font-size="10" fill="var(--muted)">'
+      + (opts.xlo === undefined ? f.x0 : opts.xlo) + '</text>'
+      + '<text x="' + (f.L + f.w) + '" y="' + (box.h - 8) + '" font-size="10" fill="var(--muted)" '
+      + 'text-anchor="end">' + (opts.xhi === undefined ? f.x1 : opts.xhi) + '</text>'
+      + '<text x="4" y="' + (f.T + 9) + '" font-size="10" fill="var(--muted)">'
+      + (opts.yhi === undefined ? '' : opts.yhi) + '</text>'
+      + '<text x="4" y="' + (f.T + f.h) + '" font-size="10" fill="var(--muted)">'
+      + (opts.ylo === undefined ? '' : opts.ylo) + '</text>';
+    if (opts.xlabel) {
+      out += '<text x="' + (f.L + f.w / 2) + '" y="' + (box.h - 8) + '" font-size="10" fill="var(--muted)" '
+        + 'text-anchor="middle">' + opts.xlabel + '</text>';
+    }
+    return out;
+  }
+  /* A pmf as bars, with a marker at one value. Used by three modes, which is
+     why it is one function and not three. */
+  function barsSvg(pairs, box, opts) {
+    opts = opts || {};
+    if (!pairs.length) return '<text x="14" y="24" font-size="11" fill="var(--muted)">no distribution</text>';
+    var L = 40, T = 12, B = 26, w = box.w - L - 14, hgt = box.h - T - B;
+    var top = R0, i;
+    for (i = 0; i < pairs.length; i += 1) if (Rcmp(pairs[i][1], top) > 0) top = pairs[i][1];
+    var peak = pxOf(top) || 1;
+    var slot = w / pairs.length, out = '';
+    out += '<line x1="' + L + '" y1="' + (T + hgt) + '" x2="' + (L + w) + '" y2="' + (T + hgt)
+      + '" stroke="var(--line-strong)" />';
+    for (i = 0; i < pairs.length; i += 1) {
+      var bh = hgt * pxOf(pairs[i][1]) / peak;
+      var tone = 'cyan';
+      if (opts.markAt !== undefined && pairs[i][0] === opts.markAt) tone = 'amber';
+      else if (opts.shortAbove !== undefined && pairs[i][0] > opts.shortAbove) tone = 'red';
+      out += '<rect x="' + (L + i * slot + 1.5).toFixed(2) + '" y="' + (T + hgt - bh).toFixed(2)
+        + '" width="' + Math.max(1, slot - 3).toFixed(2) + '" height="' + bh.toFixed(2)
+        + '" rx="2" fill="var(--' + tone + ')" opacity="0.85" />';
+      if (pairs.length <= 24) {
+        out += '<text x="' + (L + i * slot + slot / 2).toFixed(2) + '" y="' + (T + hgt + 13)
+          + '" font-size="9" fill="var(--muted)" text-anchor="middle">' + pairs[i][0] + '</text>';
+      }
+    }
+    if (opts.markAt !== undefined) {
+      var at = -1;
+      for (i = 0; i < pairs.length; i += 1) if (pairs[i][0] === opts.markAt) at = i;
+      if (at >= 0) {
+        out += '<line x1="' + (L + at * slot + slot / 2).toFixed(2) + '" y1="' + T + '" x2="'
+          + (L + at * slot + slot / 2).toFixed(2) + '" y2="' + (T + hgt)
+          + '" stroke="var(--amber)" stroke-width="1.5" stroke-dasharray="4 3" />'
+          + '<text x="' + (L + at * slot + slot / 2 + 5).toFixed(2) + '" y="' + (T + 11)
+          + '" font-size="10" fill="var(--amber)">' + (opts.markLabel || '') + '</text>';
+      }
+    }
+    out += '<text x="4" y="' + (T + 9) + '" font-size="10" fill="var(--muted)">' + Rshort(top) + '</text>'
+      + '<text x="4" y="' + (T + hgt) + '" font-size="10" fill="var(--muted)">0</text>';
+    return out;
+  }
+  /* The sentence that has to sit beside every rounded figure on this kit's
+     pages. One function, so it cannot be worded two ways or forgotten in one
+     place -- and mathcheck asserts that each mode that prints a surd calls it. */
+  function roundedNote(places) {
+    return 'rounded to ' + places + ' decimal places from the exact surd, by integer square root with '
+      + 'three guard digits &mdash; the surd itself is exact and is printed beside it';
+  }
+  var PRESETS = {"machine": {"label": "A machine producing at twice demand, backorders penalised at h", "K": "100", "D": "1200", "h": "6", "P": "2400", "pi": "6"}, "fast": {"label": "A fast line: production barely constrains the cycle", "K": "100", "D": "1200", "h": "6", "P": "12000", "pi": "3"}, "tight": {"label": "Production only a fifth above demand", "K": "100", "D": "1200", "h": "6", "P": "1440", "pi": "12"}};
+
+  var presetS = document.getElementById('iePreset');
+  var kIn = document.getElementById('ieK');
+  var dIn = document.getElementById('ieD');
+  var hIn = document.getElementById('ieH');
+  var pIn = document.getElementById('ieP');
+  var piIn = document.getElementById('iePi');
+  var qS = document.getElementById('ieQ');
+  var sawEl = document.getElementById('ieSaw');
+  var profEl = document.getElementById('ieProfile');
+  var gridEl = document.getElementById('ieGrid');
+  var statusEl = document.getElementById('ieStatus');
+
+  function setKpi(id, html) { document.getElementById(id).innerHTML = html; }
+  function blank(message) {
+    sawEl.innerHTML = ''; profEl.innerHTML = ''; gridEl.innerHTML = '';
+    ['ieFK', 'ieBK', 'ieQK', 'ieQdecK', 'ieBestK', 'ieCostK'].forEach(function (id) { setKpi(id, '&mdash;'); });
+    statusEl.innerHTML = message;
+  }
+
+  function redraw() {
+    var K = invPositive(kIn.value), D = invPositive(dIn.value), h = invPositive(hIn.value);
+    var Ptext = String(pIn.value).trim();
+    var P = Ptext === '' ? null : invPositive(Ptext);
+    var pi = invNonNegative(piIn.value);
+    if (K === null || D === null || h === null || pi === null || (Ptext !== '' && P === null)) {
+      blank('K, D and h must be positive; the backorder penalty may be zero but not negative; and the '
+        + 'production rate is either blank &mdash; meaning a run finishes instantly &mdash; or positive.');
+      return;
+    }
+    var star = epqCost(K, D, h, P, null, pi);
+    if (!star.feasible) {
+      blank('<strong>' + star.why.charAt(0).toUpperCase() + star.why.slice(1) + '.</strong> '
+        + 'The factor 1 &minus; D/P is ' + Rtext(star.factor) + ', which is not positive: at this '
+        + 'production rate the machine cannot keep up with demand, so there is no cycle to optimise and '
+        + 'no run size to choose. Raise P above D = ' + Rtext(D) + '.');
+      return;
+    }
+    var Qs = star.Qsurd;
+    var qTop = Math.max(40, Math.round(parseFloat(surdDec(Qs, 2)) * 2.4));
+    qS.max = String(qTop);
+    var Q = R(BigInt(Math.max(1, Math.min(qTop, +qS.value || 1))), 1n);
+    document.getElementById('ieQOut').textContent = Rtext(Q);
+    var best = epqBestB(Q, K, D, h, P, pi);
+    var b = best.feasible ? best.b : R0;
+
+    sawEl.innerHTML = plotSvg([{ tone: Rzero(b) ? 'cyan' : 'red', pts: epqPoints(Q, b, D, P, 3), width: 2.2 }],
+      { w: 660, h: 180 }, {
+        marks: [{ kind: 'v', at: 1, tone: 'muted', label: 'one cycle' }],
+        xlo: '0', xhi: '3 cycles', ylo: Rzero(b) ? '0' : '-' + Rshort(b),
+        yhi: Rshort(Rsub(Rmul(star.factor, Q), b)),
+        xlabel: 'time, in cycles of length Q/D = ' + Rshort(Rdiv(Q, D))
+      });
+
+    var prof = epqProfile(K, D, h, P, pi, R(BigInt(Math.max(1, Math.round(qTop / 30))), 1n),
+                          R(BigInt(qTop), 1n), 70);
+    var pts = prof.map(function (row) { return [pxOf(row.Q), pxOf(row.cost)]; });
+    var starX = parseFloat(surdDec(Qs, 4)), starY = parseFloat(surdDec(star.costSurd, 4));
+    profEl.innerHTML = plotSvg([{ tone: 'green', pts: pts, width: 2.2 }], { w: 660, h: 200 }, {
+      marks: [{ kind: 'p', at: starX, y: starY, tone: 'amber', label: 'Q*' },
+              { kind: 'v', at: pxOf(Q), tone: 'red', label: 'your Q' }],
+      xlo: '', xhi: String(qTop), ylo: '0', yhi: 'cost per unit time', xlabel: 'run size Q'
+    });
+
+    /* The two named models as ROWS of one table, both computed by the same
+       function with different arguments. */
+    var rows = [];
+    var plain = epqCost(K, D, h, null, null, R0);
+    var epqOnly = epqCost(K, D, h, P, null, R0);
+    var backOnly = epqCost(K, D, h, null, null, pi);
+    [['the plain EOQ (P infinite, no backorders)', plain],
+     ['the production quantity (finite P, no backorders)', epqOnly],
+     ['the EOQ with backorders (P infinite)', backOnly],
+     ['both at once, which is this page', star]].forEach(function (pair) {
+      var m = pair[1];
+      rows.push(tr([rowhead(pair[0]),
+        td(m.feasible ? Rtext(m.factor) : '&mdash;'),
+        td(m.feasible ? Rtext(m.backlogFactor) : '&mdash;'),
+        td(m.feasible ? (m.Qsurd.k === 1n ? Rtext(m.Qsurd.q) : surdtext(m.Qsurd) + ' &asymp; ' + surdDec(m.Qsurd, 3))
+           : 'no cycle'),
+        td(m.feasible ? (m.costSurd.k === 1n ? Rtext(m.costSurd.q)
+            : surdtext(m.costSurd) + ' &asymp; ' + surdDec(m.costSurd, 3)) : '&mdash;')]));
+    });
+    gridEl.innerHTML = '<caption>Four models, one formula: each row is the same function with a '
+      + 'different pair of switches</caption><thead>'
+      + tr([th('model'), th('1 &minus; D/P'), th('(h+&pi;)/&pi;'), th('Q*'), th('C*')])
+      + '</thead><tbody>' + rows.join('') + '</tbody>';
+
+    setKpi('ieFK', Rtext(star.factor));
+    setKpi('ieBK', Rzero(pi) ? '&mdash; (no backorders)' : Rtext(star.backlogFactor));
+    setKpi('ieQK', Qs.k === 1n ? Rtext(Qs.q) + ' <span class="tone-green">exact</span>' : surdtext(Qs));
+    setKpi('ieQdecK', Qs.k === 1n ? '&mdash;' : surdDec(Qs, 4));
+    setKpi('ieBestK', best.feasible ? Rtext(best.b) : '0 <span class="tone-amber">no penalty</span>');
+    setKpi('ieCostK', Rshort(epqCostAt(Q, b, K, D, h, P, pi)));
+
+    statusEl.innerHTML = '<strong>' + star.why.charAt(0).toUpperCase() + star.why.slice(1) + '.</strong> '
+      + 'At the run size you picked, Q = ' + Rtext(Q) + ', the best number to leave backordered is '
+      + (best.feasible ? 'f&middot;Q&middot;h/(h+&pi;) = ' + Rtext(best.b)
+         : '0, because with no penalty the model has no finite answer')
+      + ', and the cost there is ' + Rshort(epqCostAt(Q, b, K, D, h, P, pi)) + ' per unit time. '
+      + 'The optimum over all run sizes is Q* = '
+      + (Qs.k === 1n ? Rtext(Qs.q) : surdtext(Qs)) + ' costing '
+      + (star.costSurd.k === 1n ? Rtext(star.costSurd.q) : surdtext(star.costSurd)) + '. '
+      + (Qs.k === 1n && star.costSurd.k === 1n
+          ? 'Both are rational on this instance.'
+          : '<span class="tone-amber">At least one of those is irrational</span>, so the decimals beside '
+            + 'them are ' + roundedNote(4) + '.')
+      + ' <strong>This page prints the optimal backorder level at a fixed rational Q rather than at Q*</strong>, '
+      + 'because at a rational Q the answer is rational and exact, while at an irrational Q* it is a '
+      + 'surd &mdash; and a page that printed a rounded b beside an exact Q* would be mixing the two.';
+  }
+
+  presetS.addEventListener('change', function () {
+    var p = PRESETS[presetS.value];
+    if (!p) return;
+    kIn.value = p.K; dIn.value = p.D; hIn.value = p.h; pIn.value = p.P; piIn.value = p.pi;
+    redraw();
+  });
+  [kIn, dIn, hIn, pIn, piIn, qS].forEach(function (el) { el.addEventListener('input', redraw); });
+  redraw();
+  window.redrawLab = redraw;
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "inventory-models/production-runs-and-planned-backorders";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+  </script>
+</body>
+</html>

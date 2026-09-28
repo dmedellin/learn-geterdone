@@ -644,7 +644,7 @@ LESSONS = [
             "P(r) = ((r-1)/n) x sum of 1/(i-1) for i from r to n,    and P(1) = 1/n",
             "n = 4:  P = 1/4, 11/24, 5/12, 1/4     so reject 1, and win 11 times in 24",
             "checked by playing the rule out on all 24 orderings:  6, 11, 10, 6 wins",
-            "n/e = 1.4715 here, and it is the LIMIT of the best r, rounded, not the answer",
+            "n = 100: reject 37 and win 0.371043;  n/e = 36.7879, a LIMIT and not the answer",
         ],
         "key_label": "The rule, its exact probability, and the limit kept in its place",
         "concepts_intro": (
@@ -666,10 +666,11 @@ LESSONS = [
              "means the best one goes past unclaimed. `P(r)` is that trade written out."),
             ("An exact table, and a limit that is not the answer",
              "`P(r)` is a rational number for every `r`, so the whole table can be written in "
-             "fractions and the best `r` read off it. The familiar `n/e` is the limiting "
-             "position of that best `r` as `n` grows; at small `n` it is not even an integer, "
-             "and this course has not built the asymptotics that make it a limit. So it appears "
-             "on the page rounded and labelled, beside a table that never needed it."),
+             "fractions and the best `r` read off it. The familiar `n/e` is where that best `r` "
+             "sits in the limit as `n` grows, and the page holds it against how many you reject, "
+             "which is `r − 1` and is usually the whole number it rounds to. At small `n` it is not even "
+             "an integer, and this course has not built the asymptotics that make it a limit. So "
+             "it appears on the page rounded and labelled, beside a table that never needed it."),
         ],
         "read_title": "One rule, one harmonic sum, and every ordering counted",
         "read_intro": "What the rule is, where its probability comes from, and the brute-force count that checks every entry.",
@@ -716,7 +717,7 @@ LESSONS = [
                 "   r = 3    wins 10 of 24   = 5/12       the same",
                 "   r = 4    wins  6 of 24   = 1/4        the same",
                 "",
-                "   n/e = 1.4715, rounded -- the LIMIT of the best r, not the best r",
+                "   n/e = 1.4715 -- a LIMIT, held against the 1 you reject, not the best r",
             ]),
             ("p", "Four candidates and a success rate of 11 in 24, which is a little over 45 per "
                   "cent, from a rule that throws the first candidate away unseen. That is the "
@@ -741,12 +742,22 @@ LESSONS = [
                          "a page that printed decimals would be unable to say which rule was "
                          "better. That is what the exact table is for.")),
             ("h3", "The limit, and where it belongs"),
-            ("p", "Push the candidate slider to its highest setting, sixty, and the table is too "
-                  "long to print in full so the lab shows every few rows and the best one. The "
-                  "best `r` is 23 &mdash; reject 22 &mdash; and it succeeds with probability "
-                  "about 0.373210. Meanwhile `n/e` is 22.0728, printed rounded because `1/e` is "
-                  "irrational. The two are close and they are not the same, and at `n = 4` they "
-                  "are 2 against 1.4715, which is not close at all."),
+            ("p", "Push the candidate slider to its highest setting, a hundred, and the table "
+                  "is too long to print in full, so the lab shows every eighth row, the best one "
+                  "and the row either side of it. You reject 37, then take the first record, and "
+                  "that succeeds with probability 0.371043. Meanwhile `n/e` is 36.7879, printed "
+                  "rounded because `1/e` is irrational &mdash; and rounded to a whole number it "
+                  "is 37, which is exactly how many you reject."),
+            ("p", "That looks like the constant giving the answer, so it is worth being exact "
+                  "about what it gave. `n/e` said to look near 37. It did not say that rejecting "
+                  "37 beats rejecting 36 or 38; only the table does, and it says so by very "
+                  "little. Those are the rows `r = 37`, `r = 38` and `r = 39` &mdash; the rule&rsquo;s "
+                  "parameter is one more than the number it rejects &mdash; and the lab prints "
+                  "them at 0.371015, 0.371043 and 0.370801. The winner and `r = 37` agree to "
+                  "four decimal places and part in the fifth. Nor is the rounding "
+                  "dependable: walk the slider across all 98 settings it reaches and `n/e` "
+                  "rounded is the number you reject at 80 of them and one too many at the "
+                  "other 18."),
             ("p", "This is the only rounded number anywhere on the course and the page labels it. "
                   "The reason to keep it is that `n/e` is what a reader will meet everywhere "
                   "else, and meeting it here as a limit sitting beside an exact table is the "
@@ -818,7 +829,7 @@ LESSONS = [
                 "   6, 11, 10, 6  out of 24  -- every entry matches the closed form",
                 "",
                 "   best r = 2:  reject 1, then take the first candidate better than it",
-                "   n/e = 1.4715  (rounded)   -- the limit, and here it is not even near 2",
+                "   n/e = 1.4715  -- the limit; hold it against the 1 you reject, not the 2",
                 "",
                 "n = 7",
                 "",
@@ -827,8 +838,11 @@ LESSONS = [
                 "   P(r)    1/7   7/20  29/70 57/140 37/105  11/42    1/7",
                 "   dec.  0.1429 0.3500 0.4143 0.4071 0.3524 0.2619 0.1429",
                 "",
-                "   best r = 3, winning 29/70;  r = 4 is 57/140, and to two places both are 0.41",
-                "   n/e = 2.5752 (rounded)",
+                "   best r = 3 -- reject 2 -- winning 29/70;  r = 4 is 57/140,",
+                "   and to two places both are 0.41, so only the fractions decide",
+                "",
+                "   n/e = 2.5752 (rounded), which is 3 -- and you reject 2.  Seven is one of",
+                "   the 18 settings where the rounded limit is one too many",
             ],
             "after": [
                 "The `n = 7` row of decimals is the argument for exact arithmetic in one line. "
@@ -842,10 +856,12 @@ LESSONS = [
                 "case with a genuine decision in it, and doing it by hand is the fastest way to "
                 "understand what the rule actually does on a permutation.",
                 "The harder rehearsal: move the slider from three candidates upwards one at a "
-                "time and record where the best `r` increases. It does not increase every time, "
-                "and the positions at which it does are not evenly spaced. Compare that sequence "
-                "with `n/e` rounded, and you will see both how good the approximation is and "
-                "exactly where it is wrong.",
+                "time and write down, at each setting, how many the lab says to reject beside "
+                "`n/e` rounded. The two agree at 80 of the 98 settings the slider reaches and "
+                "part at 18 of them &mdash; 7, 10, 15, 18, 26, 29, 34, 37, 45, 48, 56, 64, 67, "
+                "75, 83, 86, 94 and 97 &mdash; and at every one of those the rounded constant "
+                "is one too many. Finding the first four of them by hand takes a few minutes "
+                "and settles what the constant is worth better than any sentence here can.",
             ],
         },
         "quiz_title": "Ranks, prefixes and an exact table",
@@ -875,10 +891,12 @@ LESSONS = [
                    "The number of candidates you should interview before deciding, exactly",
                    "An approximation to the harmonic sum"],
              "c": 1,
-             "why": "At `n = 4` it is 1.4715 while the best `r` is 2; at `n = 7` it is 2.5752 "
-                    "while the best `r` is 3. It describes how the answer behaves for large `n`, "
-                    "the asymptotic argument for it is not built on this path, and the exact "
-                    "table never needs it."},
+             "why": "Hold it against the number you reject, which is what the first tile "
+                    "shows. At `n = 7` it is 2.5752 and you reject 2 &mdash; rounded, the "
+                    "constant says 3, one too many. At `n = 100` it is 36.7879 and you reject "
+                    "37, where it rounds to the answer. It describes how the answer behaves for "
+                    "large `n`, the asymptotic argument for it is not built on this path, and "
+                    "the exact table never needs it."},
             {"q": "The closed form and the brute-force count are run side by side up to seven candidates. Why is that a real check rather than a restatement?",
              "a": ["Because the count is faster",
                    "Because one sums reciprocals and the other loops over orderings comparing integers &mdash; no arithmetic in common",
@@ -899,10 +917,13 @@ LESSONS = [
              "doing the work, and it is the one to check against a real situation, where "
              "arrivals are often anything but exchangeable."),
             ("Reading `n/e` as the rule",
-             "It is the limit of the optimal `r`, and the exact table is the answer. At four "
-             "candidates the limit says 1.4715 and the best `r` is 2; at sixty it says 22.0728 "
-             "and the best is 23. Quoting the constant as though it were the recipe also quietly "
-             "imports an asymptotic argument that has not been made anywhere on this path."),
+             "It is a limit, and the exact table is the answer. Hold it against the number you "
+             "reject: at seven candidates it is 2.5752, which rounds to 3, and you reject 2. At "
+             "a hundred it is 36.7879 and you reject 37, which looks like the constant answering "
+             "the question &mdash; but it is the table that says 37 beats 36 and 38, by a margin "
+             "that first appears in the fifth decimal place. Quoting the constant as though it "
+             "were the recipe also quietly imports an asymptotic argument that has not been made "
+             "anywhere on this path."),
             ("Forgetting how harsh the objective is",
              "Success means ending with the very best candidate. Ending with the second best "
              "counts exactly the same as ending with the worst or with nobody at all, which is "

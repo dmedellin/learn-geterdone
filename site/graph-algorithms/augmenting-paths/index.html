@@ -1,0 +1,2786 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Augmenting Paths | Lesson | Graph Algorithms | Algorithms | Learn · geterdone.io</title>
+  <meta name="description" content="A flow is an assignment of a number to every arc that respects capacities and conserves at every interior vertex. Raise its value by finding a path from source to sink with spare capacity and pushing the bottleneck along it. The whole subject turns on one detail: the path may also run backwards along an arc that already carries flow, and without that the method stops below the maximum." />
+  <link rel="canonical" href="https://learn.geterdone.io/graph-algorithms/augmenting-paths/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="Augmenting Paths | Lesson | Graph Algorithms | Algorithms | Learn · geterdone.io" />
+  <meta property="og:description" content="A flow is an assignment of a number to every arc that respects capacities and conserves at every interior vertex. Raise its value by finding a path from source to sink with spare capacity and pushing the bottleneck along it. The whole subject turns on one detail: the path may also run backwards along an arc that already carries flow, and without that the method stops below the maximum." />
+  <meta property="og:url" content="https://learn.geterdone.io/graph-algorithms/augmenting-paths/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Augmenting Paths | Lesson | Graph Algorithms | Algorithms | Learn · geterdone.io" />
+  <meta name="twitter:description" content="A flow is an assignment of a number to every arc that respects capacities and conserves at every interior vertex. Raise its value by finding a path from source to sink with spare capacity and pushing the bottleneck along it. The whole subject turns on one detail: the path may also run backwards along an arc that already carries flow, and without that the method stops below the maximum." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/graph-algorithms/augmenting-paths/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    @media (max-width: 920px) {
+      body[data-page-kind="supplemental"] [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/algorithms/">Algorithms</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Graph Algorithms</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">Augmenting Paths</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The maximum flow by augmenting paths is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Graph Algorithms &middot; Flow and matching</span>
+        <h1>Augmenting Paths</h1>
+        <p>A flow is an assignment of a number to every arc that respects capacities and conserves at every interior vertex. Raise its value by finding a path from source to sink with spare capacity and pushing the bottleneck along it. The whole subject turns on one detail: the path may also run backwards along an arc that already carries flow, and without that the method stops below the maximum.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">capacity constraint  0 &lt;= f(a) &lt;= c(a)        on every arc
+conservation         in = out                 at every vertex but s and t
+residual network     forward spare c - f, and backward f
+augment              push the bottleneck along a path from s to t
+maximal is not maximum: no path left under a restricted rule is not the same thing</div>
+        <div class="float-label" style="right:16px;bottom:16px;">What a flow is, and the one arc that is easy to leave out</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>The hard idea is the backward arc. The definition and the residual network exist to make it expressible.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>A flow is two constraints, and both are checkable</h3><p>Every arc carries a number between 0 and its capacity, and at every vertex other than the source and the sink the total in equals the total out. The value of the flow is what leaves the source. The lab checks both constraints on whatever it produces and reports a verdict per vertex, so &ldquo;this is a flow&rdquo; is a measured statement rather than an assumption.</p></article><article class="card concept-card"><div class="icon">2</div><h3>The residual network is where the search happens</h3><p>For each arc carrying <span class="math">f</span> out of a capacity <span class="math">c</span>, the residual network holds a forward arc of capacity <span class="math">c - f</span>, meaning how much more can be pushed, and a backward arc of capacity <span class="math">f</span>, meaning how much of the existing flow can be taken back. A path from source to sink in that network is an augmenting path, and the bottleneck is the smallest residual capacity on it.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Undoing an earlier choice is not an optimisation</h3><p>On the lab's opening network the first-found rule takes a path through the middle arc, pushes 1, and then cannot find a second path at all &mdash; the value stops at 1. With backward arcs available the same rule finds a second path that runs backwards along the middle arc, and reaches 2. The stuck flow is a perfectly legal flow; it is maximal, in that nothing can be added to it under that restriction, and it is not maximum.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>What a flow is, and the one arc the search must have</h2></div><p>The two constraints, the residual network, the augmenting step, the failure without backward arcs, and what the path rule costs.</p></div>
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Flow, and its value</span><p>Given a digraph with a non-negative capacity <span class="math">c(a)</span> on every arc, a source <span class="math">s</span> and a sink <span class="math">t</span>, a <strong>flow</strong> assigns to each arc a number <span class="math">f(a)</span> with <span class="math">0 &le; f(a) &le; c(a)</span>, such that at every vertex other than <span class="math">s</span> and <span class="math">t</span> the total on incoming arcs equals the total on outgoing ones. Its <strong>value</strong> is the net amount leaving <span class="math">s</span>.</p></div><div class="defbox"><span class="label">Definition &middot; The residual network</span><p>For a flow <span class="math">f</span>, the <strong>residual network</strong> has, for each arc <span class="math">a</span> from <span class="math">u</span> to <span class="math">v</span>, a forward arc from <span class="math">u</span> to <span class="math">v</span> of capacity <span class="math">c(a) - f(a)</span> and a backward arc from <span class="math">v</span> to <span class="math">u</span> of capacity <span class="math">f(a)</span>. Arcs of residual capacity 0 are omitted. An <strong>augmenting path</strong> is any path from <span class="math">s</span> to <span class="math">t</span> in it, and its <strong>bottleneck</strong> is the least residual capacity along it.</p></div><p>Pushing the bottleneck along an augmenting path &mdash; adding it on each forward arc and subtracting it on each backward one &mdash; produces a flow again, whose value is higher by the bottleneck. Capacities hold because the bottleneck was the minimum, and conservation holds because each interior vertex of the path gains the same amount on one side as the other.</p><h3>The method</h3><ol><li>Start with zero on every arc.</li><li>Build the residual network and look for a path from <span class="math">s</span> to <span class="math">t</span> in it.</li><li>If there is one, push its bottleneck along it and repeat.</li><li>If there is not, stop.</li></ol><div class="example"><span class="label">Example &middot; Four vertices, and a first push that has to be undone</span><p>The lab opens on <span class="math">1>2 1, 1>3 1, 2>3 1, 2>4 1, 3>4 1</span> with source 1 and sink 4, and with backward arcs switched OFF. The first-found rule takes the three-arc path <span class="math">1>2, 2>3, 3>4</span>, pushes its bottleneck of 1, and then finds nothing: the search reaches only vertices 1 and 3, although the arc <span class="math">1>3</span> still has spare capacity. The value stops at 1. Switch the backward arcs on and the same rule finds <span class="math">1>3</span>, then backwards along <span class="math">2>3</span>, then <span class="math">2>4</span>, pushes 1 more, and reaches 2.</p></div><p>Look at what the second path does. It sends a new unit from 1 to 3, cancels the unit that was going 2 to 3, and sends that one on to 4 instead. The net effect is two units arriving at the sink by two disjoint routes, and it was reachable only by rewriting a decision the first path had made. That is why the backward arc is part of the algorithm and not a refinement of it.</p><p>The stuck flow is worth naming precisely. It satisfies both constraints &mdash; the lab confirms conservation at every interior vertex &mdash; and no more can be pushed without taking something back. It is MAXIMAL. The maximum is 2. Two words that differ by three letters and by the whole content of this module.</p><h3>The rule that chooses the path is a second question</h3><p>The failure above was exhibited with a RULE rather than with a hand-picked path, and that matters: it is a claim about what an implementation does, not about what an adversary could do. On the same network the shortest-path rule happens never to take the middle arc, so it reaches 2 even with backward arcs off. That does not rescue the forward-only method, it just means this network does not defeat that particular rule.</p><div class="example"><span class="label">Example &middot; One thin arc between two fat ones</span><p>On <span class="math">1>2 100, 1>3 100, 2>3 1, 2>4 100, 3>4 100</span> both rules reach the maximum of 200, and they take different numbers of steps to do it. The shortest-path rule augments twice, by 100 each time. The first-found rule augments four times, by 1, then 99, then 1, then 99: it walks into the thin arc, pays for it with a backward arc later, and does it twice.</p></div><p>That is the case the choice of rule is usually justified by, and the lab lets you watch it rather than describing it. The shortest-path rule &mdash; always take an augmenting path with the fewest arcs &mdash; is the one the kit's own maximum-flow routine uses, and its augmentation count on this network is the one the panel reports.</p><p>On the six-vertex network with capacities from 4 to 20, the shortest-path rule reaches 23 in three augmentations, pushing 12, then 4, then 7. Three numbers that add to the answer, and the third path is four arcs long where the first two were three &mdash; the rule takes the shortest available, and what is available changes as the residual network does.</p><p>Measured against proved, and this lesson is where the two are furthest apart. Three augmentations reaching 23 is a measurement. That 23 cannot be beaten is not something any number of augmentations can establish, because stopping means only that this search found no path. &ldquo;Max Flow and Min Cut&rdquo; supplies the missing half, and it is the one place on this course where the algorithm hands back its own proof.</p></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Maximum flow by augmenting paths</h2></div><p>The residual network carries the flow already sent, so a later path can take it back</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Augmenting paths in the residual network</strong><span>a backward arc carries the flow already sent, so a later path can take it back</span></div>
+        <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>on this augmenting path</span><span class="tone-purple"><i class="legend-swatch"></i>a backward arc</span><span class="tone-red"><i class="legend-swatch"></i>saturated, no residual left</span></div>
+      </div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="agPlot" viewBox="0 0 660 300" role="img" aria-label="The network, each arc labelled with the flow it carries out of its capacity."></svg><svg id="agRes" viewBox="0 0 660 300" role="img" aria-label="The residual network at this step, each arc labelled with what is left on it, and the augmenting path drawn heavy."></svg></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="agSteps"></table></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="agFlow"></table></div>
+      <div class="status-banner" id="agStatus" style="margin-top:12px;"></div>
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>Type the network, then switch the backward arcs off</h3>
+          <p>Each augmentation is one row: the path through the residual network, the bottleneck pushed along it, and the value afterwards. The result is checked against the maximum the shortest-path rule reaches with backward arcs in place, so a run that stops early is shown stopping early rather than reported as finished.</p>
+        <div class="field">
+          <label for="agPreset">Worked example</label>
+          <select id="agPreset"><option value="forwardonly" selected>four vertices, five arcs, every capacity 1</option><option value="classic">six vertices, capacities from 4 to 20</option><option value="zigzag">one thin arc between two fat ones</option><option value="parallel">two arcs between the same pair</option></select>
+        </div>
+        <div class="field">
+          <label for="agSpec">Arcs with capacities, as tail&gt;head c</label>
+          <input id="agSpec" type="text" value="" inputmode="text" autocomplete="off" placeholder="1 to 2 1, 1 to 3 1, 2 to 3 1, 2 to 4 1, 3 to 4 1">
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="agSource">Source</label><span class="range-value" id="agSourceOut">1</span></div>
+          <input id="agSource" type="range" min="1" max="10" step="1" value="1" />
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="agSink">Sink</label><span class="range-value" id="agSinkOut">4</span></div>
+          <input id="agSink" type="range" min="1" max="10" step="1" value="4" />
+        </div>
+        <div class="field">
+          <label for="agRule">Choose each augmenting path by</label>
+          <select id="agRule"><option value="dfs" selected>the first one a search finds</option><option value="bfs">the shortest one, in arcs</option></select>
+        </div>
+        <div class="field">
+          <label for="agReverse">Backward arcs in the residual network</label>
+          <select id="agReverse"><option value="off" selected>leave them out</option><option value="on">put them in</option></select>
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="agStep">Augmentation</label><span class="range-value" id="agStepOut">1</span></div>
+          <input id="agStep" type="range" min="1" max="40" step="1" value="1" />
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Value this rule reaches</span><strong id="agValue">&mdash;</strong></div>
+          <div class="kpi"><span>The true maximum</span><strong id="agMax">&mdash;</strong></div>
+          <div class="kpi"><span>Augmentations used</span><strong id="agRounds">&mdash;</strong></div>
+          <div class="kpi"><span>Bottleneck pushed at this step</span><strong id="agBottle">&mdash;</strong></div>
+          <div class="kpi"><span>Is the result a flow at all</span><strong id="agLegal">&mdash;</strong></div>
+          <div class="kpi"><span>Arcs saturated at the end</span><strong id="agSat">&mdash;</strong></div>
+        </div>
+        <p class="small-copy" id="agHint" style="margin:0;">An arc is <span class="tt">1&gt;2 16</span>: tail, head, capacity. The residual network holds a forward arc wherever capacity is left and a backward arc wherever flow has been sent; pushing along a backward arc <em>reduces</em> the flow on the arc it came from. Switch the backward arcs off and take the first path a search finds, and the algorithm stops below the maximum &mdash; that is the whole reason they are there.</p>
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Augmenting by hand</h2></div><p>Build the residual network first; the search is then an ordinary reachability question.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Draw the residual network, both directions</h3><p>For every arc write its spare capacity forwards and its current flow backwards, and omit anything at 0. Doing the search on the original network with the flow in your head is where the backward arcs get lost, and losing them does not look like an error &mdash; it looks like being finished.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Take the bottleneck, and take it everywhere on the path</h3><p>The amount pushed is the smallest residual capacity on the path, added on forward arcs and subtracted on backward ones. Pushing different amounts on different arcs breaks conservation, and pushing more than the minimum breaks a capacity.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Check that what you have is still a flow</h3><p>Both constraints, every arc and every interior vertex. It is <span class="math">Θ(V + E)</span> and it catches a sign error on a backward arc immediately, which is the mistake that otherwise survives until the final value is compared with something.</p></article><article class="card concept-card"><div class="icon">4</div><h3>When no path is left, do not conclude anything yet</h3><p>&ldquo;My search found no path&rdquo; and &ldquo;no augmenting path exists&rdquo; are the same statement only if the search was on the full residual network. The lab's opening preset is the case where they differ, and the honest report at this point is a value plus the rule that produced it.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>Flows, residuals, and stopping</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>The same four-vertex network, with and without the backward arc</h3><p>The network is <span class="math">1>2 1, 1>3 1, 2>3 1, 2>4 1, 3>4 1</span>, every capacity 1, source 1 and sink 4. The rule is first-found, which takes arcs in the order they were typed.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">backward arcs OFF
+  path      1&gt;2   2&gt;3   3&gt;4       bottleneck 1     value 1
+  residual  1&gt;2 full, 2&gt;3 full, 3&gt;4 full, 1&gt;3 spare 1, 2&gt;4 spare 1
+  search    from 1 reaches 3 through 1&gt;3, and 3&gt;4 is full: stop
+  reachable {1, 3}                                  value stays 1
+  is it a flow?  yes: conserved at 2 and at 3, inside every capacity
+
+backward arcs ON, same rule, same network
+  path 1    1&gt;2   2&gt;3   3&gt;4       bottleneck 1     value 1
+  path 2    1&gt;3   3&gt;2 backwards   2&gt;4   bottleneck 1     value 2
+  reachable afterwards  {1}                          no path exists
+
+what the second path did
+  new unit  1 -&gt; 3 ,  cancel the unit 2 -&gt; 3 ,  send that one 2 -&gt; 4
+  net       1 -&gt; 2 -&gt; 4  and  1 -&gt; 3 -&gt; 4        two disjoint routes, value 2
+
+the shortest-path rule, backward arcs OFF
+  path 1    1&gt;2   2&gt;4                            value 1
+  path 2    1&gt;3   3&gt;4                            value 2</div><p>The forward-only run ends with the source's own arcs not both full: <span class="math">1>3</span> still has its whole unit of spare capacity. That is the signature of being stuck rather than finished, and it is visible without knowing the answer &mdash; a maximum flow in this network would have to saturate one side of every cut, and the source's two arcs are a cut.</p><p>The last three lines are the reason the failure was demonstrated with a rule. The shortest-path rule never enters the middle arc here, so it does not need to undo anything on this particular network. A reader who saw only that rule would conclude the backward arcs are optional, and on a slightly larger network they would be wrong.</p><p>For a faded rehearsal, raise the capacity of <span class="math">2>3</span> from 1 to 5 and predict what the first-found rule does with backward arcs off. The supplied first move is this: the first path is still <span class="math">1>2, 2>3, 3>4</span> and its bottleneck is still 1, because <span class="math">1>2</span> and <span class="math">3>4</span> are unchanged. Say whether the run still stops at 1, and then say what happens if you raise <span class="math">1>2</span> to 5 as well.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Searching the original network instead of the residual one</strong><span>The arcs with spare capacity are only half of what is available, and the half that is missing is the one that makes the method correct. The symptom is a run that terminates cleanly with a legal flow below the maximum, which is the hardest kind of wrong answer to notice: nothing crashes and every constraint holds.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Reading a failed search as a proof that no path exists</strong><span>They are the same statement only when the search covered the full residual network and the graph is the one you think it is. The lab's opening preset separates them deliberately, and the separation is the reason the certificate in &ldquo;Max Flow and Min Cut&rdquo; matters: it is what turns a failed search into a proof.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Concluding the backward arcs are unnecessary because one rule managed without them</strong><span>The shortest-path rule reaches the maximum on the opening preset with backward arcs off, which is a fact about that network and that rule. Change the network and it stops being true. A demonstration that a restriction sometimes does no harm is not an argument that the restriction is safe.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can augment by hand, including backwards, and say what stopping does and does not prove.</strong><p>You should be able to build a residual network from a flow, find a path in it, push the bottleneck with the right sign on each arc, verify both constraints afterwards, and say precisely why a run that finds no further path has not yet established that its value is the maximum.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> &ldquo;Max Flow and Min Cut&rdquo; closes that gap, and it closes it completely. When the search fails, the set of vertices it reached is itself a cut, and the total capacity of the arcs leaving that set equals the value of the flow &mdash; which means the algorithm hands back a proof of its own optimality rather than needing one.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../shortest-and-longest-paths-in-a-dag/" rel="prev"><span>Lesson</span><strong>Shortest and Longest Paths in a DAG</strong></a>
+      <a class="lesson-link next" href="../max-flow-and-min-cut/" rel="next"><span>Lesson</span><strong>Max Flow and Min Cut</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="graph-algorithms/augmenting-paths" data-lesson-title="Augmenting Paths" data-course-title="Graph Algorithms">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Graph Algorithms.</strong> Every count on this course is produced by running the algorithm on the graph you typed. Distances, weights, low-links, cut capacities, matching sizes and component counts are integers, and no page here rounds anything. Three claims are checked against an independently written implementation from another Subject &mdash; bridges against delete-and-recount, the minimum tree against a second method, and the distances against a Dijkstra that knows nothing about this representation &mdash; and where a reader's graph has two edges between the same pair, that check declines rather than answering about a different graph. Four more are checked against a complete enumeration at a cap the page states: every spanning tree, every topological order, every cut, every subset of the pairs. Two columns are labelled for reference and carry no verdict: <span class="math">E</span> times the integer part of <span class="math">log₂ V</span>, on the two pages that print it.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every count is measured by running the algorithm on the input shown, and a count on one input is not a bound.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "A run stops with no augmenting path and a value of 1, on a network whose maximum is 2. What was wrong?", "a": ["The flow violated conservation", "The search was run without backward arcs, so it could not undo an earlier push", "The bottleneck was computed as the maximum rather than the minimum", "The sink was unreachable from the source in the original network"], "c": 1, "why": "The flow is legal &mdash; conserved and within every capacity &mdash; and the sink is certainly reachable. What is missing is the residual arc that lets a later path cancel part of an earlier one. That is the lab's opening preset, and the flow it reaches is maximal rather than maximum."}, {"q": "An augmenting path uses a backward arc. What does pushing along it do to that arc's flow?", "a": ["Increases it by the bottleneck", "Decreases it by the bottleneck", "Sets it to zero", "Leaves it alone; backward arcs are only for the search"], "c": 1, "why": "A backward residual arc represents flow that can be taken back, so pushing along it subtracts the bottleneck from the original arc. Conservation still holds at both of its ends because the path enters and leaves each interior vertex once. Leaving the arc alone would break conservation immediately."}, {"q": "On one network the first-found rule augments four times and the shortest-path rule twice, both reaching 200. What does that measure?", "a": ["That the first-found rule is incorrect", "That the two rules reach the same value at different costs, on this network", "That the maximum flow depends on the rule", "That the shortest-path rule is <span class=\"math\">O(VE)<\/span> and the other is not"], "c": 1, "why": "Both are correct and both reach 200; the difference is four augmentations against two, with bottlenecks of 1, 99, 1, 99 against 100, 100. That is a measurement on one network. A general bound on the number of augmentations is a separate argument that this page does not make."}, {"q": "What distinguishes a maximal flow from a maximum one?", "a": ["Nothing: the words are synonyms", "A maximal flow saturates every arc; a maximum one need not", "A maximal flow admits no further augmentation under the rule in use; a maximum one has the greatest possible value", "A maximum flow is unique and a maximal one is not"], "c": 2, "why": "Maximal is a local property &mdash; nothing more can be added the way you are adding &mdash; and maximum is a global one. The lab's opening preset exhibits a maximal flow of value 1 where the maximum is 2, and neither flow saturates every arc."}];
+
+  (function () {
+
+  /* The one shape. See the module docstring: a routine that RUNS an algorithm
+     returns { result, counts, trace }, and this is the only place that object
+     is spelled, so a kit cannot invent a second convention by accident. */
+  function runOf(result, counts, trace) {
+    return { result: result, counts: counts || {}, trace: trace || [] };
+  }
+  /* A counter with a fixed vocabulary. bump() on an unknown key still works --
+     refusing would turn a panel into a crash -- but the vocabulary is what the
+     panels are laid out from, so a new key is a decision, not a typo. */
+  var COUNT_KEYS = ['compares', 'swaps', 'moves', 'probes', 'hops', 'finds',
+    'unions', 'pushes', 'pops', 'relaxations', 'nodes', 'calls', 'reads',
+    'writes', 'cells', 'rounds'];
+  function counter() {
+    var c = {};
+    for (var i = 0; i < COUNT_KEYS.length; i += 1) c[COUNT_KEYS[i]] = 0;
+    return c;
+  }
+  /* Drop the keys that stayed zero: a panel showing "swaps 0" for an algorithm
+     that cannot swap is noise, and the reader cannot tell it from a bug. */
+  function usedCounts(c) {
+    var out = {};
+    Object.keys(c).forEach(function (k) { if (c[k]) out[k] = c[k]; });
+    return out;
+  }
+
+  /* THE REPRESENTATION, and why it is an arc LIST and not a matrix.
+
+     `GRAPH_JS` is a symmetric 0/1 matrix whose weight is a function of the
+     endpoints. Four courses here need something it cannot express, and each of
+     the four is a different failure of the same choice:
+
+       direction    link(M,i,j) writes M[i][j] AND M[j][i]; edges() scans i<j.
+                    A tree edge and a back edge are the same entry, so DFS edge
+                    classification, topological order and SCCs have nothing to
+                    read.
+       sign         w(i,j) = ((7i+13j) mod 9) + 1 is never negative and never
+                    the reader's. Bellman-Ford's whole subject is the weight
+                    the reader makes negative.
+       capacity     there is no second number on an edge at all.
+       multiplicity a matrix holds one entry per pair, and a flow network holds
+                    u->v and v->u at once, a gadget's vertex split produces two
+                    arcs between the same pair, and a residual graph is built
+                    by pairing each arc with its reverse.
+
+     So: an ARC LIST with an index built on demand. An arc is
+     { u, v, w, cap } and its id is its position in G.arcs. Identity is the
+     point -- the residual network names an arc's reverse by id, which a triple
+     [i, j, w] cannot do once two arcs share endpoints -- and the honest E that
+     every "operations against E log V" panel prints is G.arcs.length.
+
+     G = { n, directed, arcs: [{u, v, w, cap}] }. `directed: false` means each
+     arc is traversable both ways but STORED ONCE, so |E| is arcs.length and
+     Kruskal iterates arcs rather than half a matrix.
+
+     WEIGHTS ARE NUMBERS, NOT BIGINT, AND THAT IS EXACT. Every weight is an
+     integer the reader typed and every distance is a sum of at most n of them:
+     at this path's caps (n <= 16, |w| <= 9999) no quantity here exceeds 160000,
+     which a double holds exactly, and integer addition of exactly-held integers
+     is exact. BigInt would buy nothing and would make the unreachable sentinel
+     awkward -- which is `null`, not Infinity, because `Infinity + w` compares
+     as reachable and that defect is how a Bellman-Ford lab reports a path
+     through a vertex it never reached.
+
+     An arc id is stable for the life of the graph. dgRemove is the one
+     exception and it says so; nothing that keeps ids across a call (flow,
+     residual, augmenting) ever edits. */
+
+  function dgNew(n, directed) {
+    return { n: n, directed: directed === undefined ? true : !!directed, arcs: [] };
+  }
+  function dgAdd(G, u, v, w, cap) {
+    G.arcs.push({ u: u, v: v, w: w === undefined ? 1 : w, cap: cap === undefined ? 0 : cap });
+    return G.arcs.length - 1;
+  }
+  function dgSetWeight(G, id, w) { G.arcs[id].w = w; return G; }
+  function dgSetCap(G, id, cap) { G.arcs[id].cap = cap; return G; }
+  /* Splices, so ids after `id` shift down by one. The only mutator that does. */
+  function dgRemove(G, id) { G.arcs.splice(id, 1); return G; }
+  function dgCopy(G) {
+    return { n: G.n, directed: G.directed,
+             arcs: G.arcs.map(function (a) { return { u: a.u, v: a.v, w: a.w, cap: a.cap }; }) };
+  }
+
+  /* out[v] and inn[v] are arrays of arc ids. On an undirected graph an arc is
+     in both lists of both endpoints, which is what "traversable both ways,
+     stored once" means. */
+  function dgIndex(G) {
+    var out = [], inn = [], i;
+    for (i = 0; i < G.n; i += 1) { out.push([]); inn.push([]); }
+    for (i = 0; i < G.arcs.length; i += 1) {
+      var a = G.arcs[i];
+      out[a.u].push(i); inn[a.v].push(i);
+      if (!G.directed) { out[a.v].push(i); inn[a.u].push(i); }
+    }
+    return { out: out, inn: inn };
+  }
+  /* The endpoint reached from `from` along arc id. */
+  function dgOther(G, id, from) {
+    var a = G.arcs[id];
+    return a.u === from ? a.v : a.u;
+  }
+  /* Neighbours as {id, to, w, cap, forward}, in arc order -- deterministic, so
+     two readers at the same graph see the same traversal. */
+  function dgOut(G, v, idx) {
+    idx = idx || dgIndex(G);
+    return idx.out[v].map(function (id) {
+      var a = G.arcs[id];
+      return { id: id, to: dgOther(G, id, v), w: a.w, cap: a.cap, forward: a.u === v };
+    });
+  }
+  function dgOutdeg(G, v, idx) { return (idx || dgIndex(G)).out[v].length; }
+  function dgIndeg(G, v, idx) { return (idx || dgIndex(G)).inn[v].length; }
+  function dgFind(G, u, v) {
+    for (var i = 0; i < G.arcs.length; i += 1) {
+      var a = G.arcs[i];
+      if (a.u === u && a.v === v) return i;
+      if (!G.directed && a.u === v && a.v === u) return i;
+    }
+    return -1;
+  }
+  /* Every arc flipped: Kosaraju's second pass, and nothing else. */
+  function dgReverse(G) {
+    var H = dgNew(G.n, G.directed);
+    G.arcs.forEach(function (a) { dgAdd(H, a.v, a.u, a.w, a.cap); });
+    return H;
+  }
+  /* The weight matrix Floyd-Warshall fills: null off the graph, 0 on the
+     diagonal, the LIGHTEST arc where several run between the same pair. */
+  function dgWeightMatrix(G) {
+    var W = [], i, j;
+    for (i = 0; i < G.n; i += 1) { W.push([]); for (j = 0; j < G.n; j += 1) W[i].push(i === j ? 0 : null); }
+    G.arcs.forEach(function (a) {
+      if (W[a.u][a.v] === null || a.w < W[a.u][a.v]) W[a.u][a.v] = a.w;
+      if (!G.directed && (W[a.v][a.u] === null || a.w < W[a.v][a.u])) W[a.v][a.u] = a.w;
+    });
+    return W;
+  }
+  /* THE ADAPTER, both ways.
+
+     dgFromMatrix reads a GRAPH_JS adjacency matrix -- any of its eight presets,
+     or a lesson's own example through PRESETS.lesson -- into this
+     representation, so a lesson can open on a graph the reader already met in
+     Discrete Mathematics. `wfn(i, j)` is GRAPH_JS's `weight` when the formula
+     weights are wanted and the reader's own function when they are not.
+     `directed: true` orients each edge i -> j with i < j, which is the
+     orientation the DFS-classification lesson opens on.
+
+     dgToMatrix goes the other way, and exists for exactly one reason: it hands
+     a graph built here to GRAPH_JS's brute-force routines, so `cuts()`,
+     `kruskal()`, `dijkstra()` and `hamilton()` can answer the same question by
+     a different route and the two answers can be asserted equal. */
+  function dgFromMatrix(M, n, wfn, directed) {
+    var G = dgNew(n, directed), i, j;
+    for (i = 0; i < n; i += 1) for (j = i + 1; j < n; j += 1) {
+      if (M[i][j]) dgAdd(G, i, j, wfn ? wfn(i, j) : 1, 0);
+    }
+    return G;
+  }
+  function dgToMatrix(G) {
+    var M = [], i, j;
+    for (i = 0; i < G.n; i += 1) { M.push([]); for (j = 0; j < G.n; j += 1) M[i].push(0); }
+    G.arcs.forEach(function (a) { if (a.u !== a.v) { M[a.u][a.v] = 1; M[a.v][a.u] = 1; } });
+    return M;
+  }
+  /* A lesson's worked example, in the 1-BASED labels the prose uses, exactly as
+     GRAPH_JS.lessonFrom takes them: [u, v] or [u, v, w] or [u, v, w, cap]. */
+  function dgFromLesson(n, list, directed) {
+    var G = dgNew(n, directed);
+    (list || []).forEach(function (e) {
+      dgAdd(G, e[0] - 1, e[1] - 1, e.length > 2 ? e[2] : 1, e.length > 3 ? e[3] : 0);
+    });
+    return G;
+  }
+  /* Undirected components, by arc traversal. Used by the spanning-tree oracle
+     and by every "is it still connected" question. */
+  function dgComponents(G, skipArc) {
+    var idx = dgIndex(G), seen = new Array(G.n).fill(false), comps = [], s;
+    for (s = 0; s < G.n; s += 1) {
+      if (seen[s]) continue;
+      var stack = [s], comp = [];
+      seen[s] = true;
+      while (stack.length) {
+        var v = stack.pop();
+        comp.push(v);
+        idx.out[v].concat(idx.inn[v]).forEach(function (id) {
+          if (skipArc !== undefined && id === skipArc) return;
+          var u = dgOther(G, id, v);
+          if (!seen[u]) { seen[u] = true; stack.push(u); }
+        });
+      }
+      comps.push(comp.sort(function (a, b) { return a - b; }));
+    }
+    return comps;
+  }
+
+  /* ------------------------------------------------------- the drawing.
+
+     GRAPH_JS's renderer is `positions`, `draw` and `paintMatrix` inside
+     `graph_lab`, closed over the gPlot and gMatrix elements. Six modes across
+     two kits here draw a graph, so this is the single largest piece of shared
+     UI the Subject needs, and it is built the way SERIES_JS is: the function
+     that makes the markup takes a graph and returns a string, and the function
+     that installs it takes the element first.
+
+     Two things the undirected renderer never had to do. An arc needs an
+     ARROWHEAD, placed at the node's rim rather than its centre, or the reader
+     cannot see which way a back edge points. And ANTIPARALLEL arcs -- which a
+     residual network has at every augmentation -- must both be visible, so
+     when u->v and v->u both exist each is bowed to its own side. Drawn
+     straight they would lie on top of each other and the reverse arc, which is
+     the entire idea of the residual network, would be invisible. */
+  var DG_R = 17;
+  function dgLayout(n, opts) {
+    opts = opts || {};
+    var cx = opts.cx === undefined ? 230 : opts.cx, cy = opts.cy === undefined ? 150 : opts.cy;
+    var rad = opts.radius === undefined ? 105 : opts.radius, pts = [];
+    for (var i = 0; i < n; i += 1) {
+      var ang = -Math.PI / 2 + (2 * Math.PI * i) / n;
+      pts.push([cx + rad * Math.cos(ang), cy + rad * Math.sin(ang)]);
+    }
+    return pts;
+  }
+  /* Left column / right column, for a bipartite matching or a flow network
+     where source and sink belong at the ends. */
+  function dgLayered(n, layers, opts) {
+    opts = opts || {};
+    var w = opts.width === undefined ? 460 : opts.width, h = opts.height === undefined ? 280 : opts.height;
+    var cols = [], pts = new Array(n), i;
+    layers.forEach(function (L, k) { cols[k] = L; });
+    cols.forEach(function (L, k) {
+      L.forEach(function (v, j) {
+        pts[v] = [30 + (cols.length === 1 ? w / 2 : (k / (cols.length - 1)) * (w - 60)),
+                  30 + (L.length === 1 ? (h - 60) / 2 : (j / (L.length - 1)) * (h - 60))];
+      });
+    });
+    for (i = 0; i < n; i += 1) if (!pts[i]) pts[i] = [30, 30];
+    return pts;
+  }
+  var DG_PALETTE = ['var(--cyan)', 'var(--purple)', 'var(--amber)', 'var(--green)',
+                    'var(--red)', 'var(--blue)'];
+
+  function dgArrow(x1, y1, x2, y2, colour) {
+    var dx = x2 - x1, dy = y2 - y1, len = Math.sqrt(dx * dx + dy * dy) || 1;
+    var ux = dx / len, uy = dy / len;
+    var tipx = x2 - ux * DG_R, tipy = y2 - uy * DG_R;
+    var bx = tipx - ux * 9, by = tipy - uy * 9;
+    return '<polygon points="' + tipx.toFixed(1) + ',' + tipy.toFixed(1) + ' '
+      + (bx - uy * 4.2).toFixed(1) + ',' + (by + ux * 4.2).toFixed(1) + ' '
+      + (bx + uy * 4.2).toFixed(1) + ',' + (by - ux * 4.2).toFixed(1)
+      + '" fill="' + colour + '" />';
+  }
+
+  /* opts: { points, highlight: [arc ids], colours: [per vertex], labels,
+             label: 'w' | 'cap' | 'flow' | 'none', flow: [per arc] } */
+  function dgSvg(G, opts) {
+    opts = opts || {};
+    var pts = opts.points || dgLayout(G.n, opts);
+    var hi = {};
+    (opts.highlight || []).forEach(function (id) { hi[id] = true; });
+    var mode = opts.label === undefined ? (G.arcs.some(function (a) { return a.cap; }) ? 'cap' : 'w') : opts.label;
+    var pairs = {}, s = '';
+    G.arcs.forEach(function (a) { pairs[a.u + '>' + a.v] = true; });
+    G.arcs.forEach(function (a, id) {
+      var p = pts[a.u], q = pts[a.v];
+      var on = hi[id], colour = on ? 'var(--cyan)' : 'var(--line-strong)';
+      /* bow when the reverse arc exists too, so neither hides the other */
+      var bow = G.directed && pairs[a.v + '>' + a.u] ? 1 : 0;
+      var mx = (p[0] + q[0]) / 2, my = (p[1] + q[1]) / 2;
+      if (bow) {
+        var dx = q[0] - p[0], dy = q[1] - p[1], L = Math.sqrt(dx * dx + dy * dy) || 1;
+        mx -= (dy / L) * 22; my += (dx / L) * 22;
+        s += '<path d="M' + p[0].toFixed(1) + ' ' + p[1].toFixed(1) + ' Q' + mx.toFixed(1) + ' '
+          + my.toFixed(1) + ' ' + q[0].toFixed(1) + ' ' + q[1].toFixed(1) + '" fill="none" stroke="'
+          + colour + '" stroke-width="' + (on ? 3.4 : 1.8) + '" />';
+      } else {
+        s += '<line x1="' + p[0].toFixed(1) + '" y1="' + p[1].toFixed(1) + '" x2="' + q[0].toFixed(1)
+          + '" y2="' + q[1].toFixed(1) + '" stroke="' + colour + '" stroke-width="'
+          + (on ? 3.4 : 1.8) + '" />';
+      }
+      if (G.directed) {
+        var fromx = bow ? mx : p[0], fromy = bow ? my : p[1];
+        s += dgArrow(fromx, fromy, q[0], q[1], colour);
+      }
+      if (mode !== 'none') {
+        var text = mode === 'cap' ? String(a.cap)
+          : mode === 'flow' ? ((opts.flow ? opts.flow[id] : 0) + '/' + a.cap)
+          : String(a.w);
+        var lx = bow ? (p[0] + 2 * mx + q[0]) / 4 : mx, ly = bow ? (p[1] + 2 * my + q[1]) / 4 : my;
+        s += '<circle cx="' + lx.toFixed(1) + '" cy="' + ly.toFixed(1)
+          + '" r="' + (text.length > 3 ? 12 : 9) + '" fill="var(--panel-solid)" stroke="var(--line)" />';
+        s += '<text x="' + lx.toFixed(1) + '" y="' + (ly + 4).toFixed(1)
+          + '" text-anchor="middle" font-size="10" font-weight="700" fill="'
+          + (on ? 'var(--cyan)' : 'var(--muted)') + '">' + text + '</text>';
+      }
+    });
+    for (var i = 0; i < G.n; i += 1) {
+      var c = opts.colours && opts.colours[i] !== undefined && opts.colours[i] !== -1
+        ? DG_PALETTE[opts.colours[i] % DG_PALETTE.length] : 'var(--panel-3)';
+      s += '<circle cx="' + pts[i][0].toFixed(1) + '" cy="' + pts[i][1].toFixed(1) + '" r="' + DG_R
+        + '" fill="' + c + '" stroke="var(--line-strong)" stroke-width="2" />';
+      var label = opts.labels && opts.labels[i] !== undefined ? opts.labels[i] : (i + 1);
+      s += '<text x="' + pts[i][0].toFixed(1) + '" y="' + (pts[i][1] + 5).toFixed(1)
+        + '" text-anchor="middle" font-size="13" font-weight="800" fill="'
+        + (opts.colours && opts.colours[i] !== undefined && opts.colours[i] !== -1
+            ? 'var(--on-accent)' : 'var(--text)') + '">' + label + '</text>';
+    }
+    return s;
+  }
+  function drawGraph(el, G, opts) {
+    var s = dgSvg(G, opts);
+    if (el) el.innerHTML = s;
+    return s;
+  }
+
+  /* A matrix as a table, for the adjacency, the Floyd tables and the DP grids.
+     cell(i, j, v) may return a string, so a lesson can put its own mark in a
+     cell without a second painter. */
+  function matrixHtml(M, opts) {
+    opts = opts || {};
+    var head = opts.cols || M[0].map(function (_, j) { return j + 1; });
+    var side = opts.rows || M.map(function (_, i) { return i + 1; });
+    var h = (opts.caption ? '<caption>' + opts.caption + '</caption>' : '') + '<thead><tr><th></th>';
+    head.forEach(function (c) { h += '<th>' + c + '</th>'; });
+    h += '</tr></thead><tbody>';
+    M.forEach(function (row, i) {
+      h += '<tr><th class="rowhead">' + side[i] + '</th>';
+      row.forEach(function (v, j) {
+        var text = opts.cell ? opts.cell(i, j, v) : (v === null ? '&mdash;' : String(v));
+        h += '<td class="' + (opts.on && opts.on(i, j, v) ? 'on' : '') + '" data-i="' + i
+          + '" data-j="' + j + '">' + text + '</td>';
+      });
+      h += '</tr>';
+    });
+    return h + '</tbody>';
+  }
+  function paintMatrix(el, M, opts) {
+    var h = matrixHtml(M, opts);
+    if (el) el.innerHTML = h;
+    return h;
+  }
+
+  /* Maximum flow on a DIGRAPH_JS network. A flow is an array parallel to
+     G.arcs, so `f[id]` is the flow on arc id -- which is why the
+     representation had to carry arc identity: a residual network has an arc in
+     each direction between the same pair, and a triple [u, v, w] cannot say
+     which original arc a reverse arc undoes.
+
+     THE REVERSE ARC IS THE SUBJECT. Every residual arc here records the arc it
+     came from and whether it is the forward or the backward one, and
+     `maxflow(G, s, t, { reverse: false })` builds the residual network WITHOUT
+     the backward arcs, which is the failure the lesson wants on screen: the
+     forward-only search gets stuck at a flow that is not maximum, and the
+     reader sees that undoing an earlier choice is not an optimisation but the
+     reason the algorithm is correct. */
+
+  function zeroFlow(G) { return new Array(G.arcs.length).fill(0); }
+
+  /* The residual network as a graph in its own right, so every routine that
+     takes a graph works on it. Each residual arc carries { from, forward }. */
+  function residual(G, f, opts) {
+    opts = opts || {};
+    var Rg = dgNew(G.n, true), meta = [];
+    G.arcs.forEach(function (a, id) {
+      var left = a.cap - f[id];
+      if (left > 0) { dgAdd(Rg, a.u, a.v, a.w, left); meta.push({ from: id, forward: true, residual: left }); }
+      if (opts.reverse !== false && f[id] > 0) {
+        dgAdd(Rg, a.v, a.u, -a.w, f[id]);
+        meta.push({ from: id, forward: false, residual: f[id] });
+      }
+    });
+    return { graph: Rg, meta: meta };
+  }
+  /* The SHORTEST augmenting path, in arcs -- Edmonds-Karp, so the number of
+     augmentations is bounded by VE/2 and the mode can print it. */
+  function bfsPath(res, s, t) {
+    var G = res.graph, idx = dgIndex(G), prev = new Array(G.n).fill(-1);
+    var seen = new Array(G.n).fill(false), queue = [s], order = [];
+    seen[s] = true;
+    while (queue.length) {
+      var v = queue.shift();
+      order.push(v);
+      if (v === t) break;
+      idx.out[v].forEach(function (id) {
+        var u = G.arcs[id].v;
+        if (seen[u] || G.arcs[id].cap <= 0) return;
+        seen[u] = true; prev[u] = id; queue.push(u);
+      });
+    }
+    if (!seen[t]) return { path: null, reachable: order };
+    var path = [], at = t;
+    while (at !== s) { path.push(prev[at]); at = G.arcs[prev[at]].u; }
+    return { path: path.reverse(), reachable: order };
+  }
+  /* Push the bottleneck along one residual path, forward arcs up and backward
+     arcs DOWN -- which is the line that makes the algorithm correct. */
+  function augment(G, f, res, path) {
+    var bottleneck = null;
+    path.forEach(function (rid) {
+      var left = res.graph.arcs[rid].cap;
+      if (bottleneck === null || left < bottleneck) bottleneck = left;
+    });
+    var out = f.slice();
+    path.forEach(function (rid) {
+      var m = res.meta[rid];
+      out[m.from] += m.forward ? bottleneck : -bottleneck;
+    });
+    return { flow: out, bottleneck: bottleneck };
+  }
+  function flowValue(G, f, s) {
+    var v = 0;
+    G.arcs.forEach(function (a, id) {
+      if (a.u === s) v += f[id];
+      if (a.v === s) v -= f[id];
+    });
+    return v;
+  }
+  function maxflow(G, s, t, opts) {
+    opts = opts || {};
+    var f = zeroFlow(G), c = counter(), trace = [], guard = 0;
+    while (guard < 10000) {
+      guard += 1;
+      var res = residual(G, f, opts);
+      var found = bfsPath(res, s, t);
+      if (!found.path) {
+        trace.push({ at: trace.length, done: true, reachable: found.reachable });
+        break;
+      }
+      var a = augment(G, f, res, found.path);
+      f = a.flow;
+      c.rounds += 1;
+      trace.push({ at: trace.length, path: found.path.map(function (rid) {
+                     return { u: res.graph.arcs[rid].u, v: res.graph.arcs[rid].v,
+                              forward: res.meta[rid].forward };
+                   }), bottleneck: a.bottleneck, value: flowValue(G, f, s) });
+    }
+    var conserved = true;
+    for (var v = 0; v < G.n; v += 1) {
+      if (v === s || v === t) continue;
+      var net = 0;
+      G.arcs.forEach(function (arc, id) {
+        if (arc.u === v) net -= f[id];
+        if (arc.v === v) net += f[id];
+      });
+      if (net !== 0) conserved = false;
+    }
+    return runOf({ flow: f, value: flowValue(G, f, s), conserved: conserved,
+                   augmentations: c.rounds, residual: residual(G, f, opts) },
+                 usedCounts(c), trace);
+  }
+  /* The minimum cut, read off the final residual network: everything reachable
+     from s. The panel's check is that its capacity EQUALS the flow value, which
+     is the theorem, and that every crossing arc is saturated -- and the mode
+     also shows a set of saturated arcs that is not a cut, because "saturated"
+     and "a cut" are different properties and conflating them is the
+     misconception. */
+  function minCutFrom(G, f, s) {
+    var res = residual(G, f), idx = dgIndex(res.graph);
+    var seen = new Array(G.n).fill(false), stack = [s];
+    seen[s] = true;
+    while (stack.length) {
+      var v = stack.pop();
+      idx.out[v].forEach(function (id) {
+        var u = res.graph.arcs[id].v;
+        if (!seen[u] && res.graph.arcs[id].cap > 0) { seen[u] = true; stack.push(u); }
+      });
+    }
+    var S = [], T = [], arcs = [], capacity = 0;
+    for (var i = 0; i < G.n; i += 1) (seen[i] ? S : T).push(i);
+    G.arcs.forEach(function (a, id) {
+      if (seen[a.u] && !seen[a.v]) { arcs.push({ id: id, u: a.u, v: a.v, cap: a.cap, flow: f[id] }); capacity += a.cap; }
+    });
+    return { S: S, T: T, arcs: arcs, capacity: capacity,
+             allSaturated: arcs.every(function (e) { return e.flow === e.cap; }) };
+  }
+
+  /* Bipartite matching as a flow: a unit-capacity arc from the source to every
+     left vertex, from every left vertex to each of its right neighbours, and
+     from every right vertex to the sink. The matching is the saturated middle
+     layer, and the cut read back is a vertex cover of the same size -- which is
+     Konig's theorem, on the page as two numbers that agree. */
+  function matchingNetwork(left, right, pairs) {
+    var n = left + right + 2, s = left + right, t = s + 1;
+    var G = dgNew(n, true), middle = [];
+    for (var i = 0; i < left; i += 1) dgAdd(G, s, i, 0, 1);
+    pairs.forEach(function (p) { middle.push(dgAdd(G, p[0], left + p[1], 0, 1)); });
+    for (var j = 0; j < right; j += 1) dgAdd(G, left + j, t, 0, 1);
+    return { graph: G, s: s, t: t, left: left, right: right, middle: middle };
+  }
+  function matchingFrom(net, f) {
+    var out = [];
+    net.middle.forEach(function (id) {
+      if (f[id] > 0) out.push({ left: net.graph.arcs[id].u, right: net.graph.arcs[id].v - net.left });
+    });
+    return out;
+  }
+  /* Konig: from the minimum cut, the cover is (left vertices NOT reachable)
+     together with (right vertices reachable). */
+  function konigCover(net, f) {
+    var cut = minCutFrom(net.graph, f, net.s), inS = {};
+    cut.S.forEach(function (v) { inS[v] = true; });
+    var cover = [];
+    for (var i = 0; i < net.left; i += 1) if (!inS[i]) cover.push({ side: 'left', v: i });
+    for (var j = 0; j < net.right; j += 1) if (inS[net.left + j]) cover.push({ side: 'right', v: j });
+    return { cover: cover, size: cover.length, cut: cut };
+  }
+
+  /* The three transformations course 3 asks the reader to build, each returning
+     the new network beside the correspondence that makes the answer readable
+     back on the original.
+       'split'       a vertex capacity becomes an arc from v_in to v_out
+       'unit'        every capacity set to 1, for a disjoint-paths question
+       'supersource' several sources and sinks become one of each */
+  function gadgetBuild(kind, spec) {
+    if (kind === 'split') {
+      var n = spec.graph.n, G = dgNew(2 * n, true), map = [];
+      for (var v = 0; v < n; v += 1) {
+        map.push({ v: v, inV: v, outV: n + v });
+        dgAdd(G, v, n + v, 0, spec.vertexCap[v] === undefined ? Infinity : spec.vertexCap[v]);
+      }
+      spec.graph.arcs.forEach(function (a) { dgAdd(G, n + a.u, a.v, a.w, a.cap); });
+      return { graph: G, map: map, s: spec.s, t: n + spec.t,
+               note: 'each vertex became an in-copy and an out-copy joined by its capacity' };
+    }
+    if (kind === 'unit') {
+      var U = dgCopy(spec.graph);
+      U.arcs.forEach(function (a) { a.cap = 1; });
+      return { graph: U, s: spec.s, t: spec.t,
+               note: 'every capacity is 1, so the flow value counts arc-disjoint paths' };
+    }
+    if (kind === 'supersource') {
+      var H = dgCopy(spec.graph), S = H.n, T = H.n + 1;
+      H.n += 2;
+      spec.sources.forEach(function (v) { dgAdd(H, S, v, 0, spec.sourceCap ? spec.sourceCap[v] : Infinity); });
+      spec.sinks.forEach(function (v) { dgAdd(H, v, T, 0, spec.sinkCap ? spec.sinkCap[v] : Infinity); });
+      return { graph: H, s: S, t: T,
+               note: 'one super-source and one super-sink, so a many-to-many flow is a single s-t flow' };
+    }
+    throw new Error('unknown gadget: ' + kind);
+  }
+
+  /* ------------------------------------------------------ what a reader types
+
+     A network clause is `u>v c`: an arc from u to v of capacity c, 1-based,
+     because that is what the prose uses. There is no cost field anywhere in
+     this kit: the cheapest flow of a given value is a linear programme and this
+     course does not develop the algorithm for it, so a cost column here would
+     be a control with nothing behind it. */
+  var FK_MAXN = 10;
+  var FK_MAXARCS = 22;
+
+  function fkClauses(text) {
+    var parts = String(text).split(/[,;\n]+/), out = [], i;
+    for (i = 0; i < parts.length; i += 1) {
+      var s = parts[i].trim();
+      if (s) out.push(s);
+    }
+    return out;
+  }
+  function fkParse(text, maxN) {
+    maxN = maxN === undefined ? FK_MAXN : maxN;
+    var cl = fkClauses(text), raw = [], n = 0, i;
+    if (!cl.length) return { bad: 'write at least one arc' };
+    if (cl.length > FK_MAXARCS) return { bad: 'that is more than ' + FK_MAXARCS + ' arcs' };
+    for (i = 0; i < cl.length; i += 1) {
+      var m = /^(\d+)\s*(?:>|to)\s*(\d+)(?:[\s:]+(\d+))?$/.exec(cl[i]);
+      if (!m) return { bad: 'cannot read "' + cl[i] + '"' };
+      var u = parseInt(m[1], 10), v = parseInt(m[2], 10);
+      var c = m[3] === undefined ? 1 : parseInt(m[3], 10);
+      if (u < 1 || v < 1) return { bad: 'labels start at 1, and "' + cl[i] + '" does not' };
+      if (u > maxN || v > maxN) return { bad: 'label ' + Math.max(u, v) + ' is past ' + maxN };
+      if (u === v) return { bad: 'a loop at ' + u + ' carries flow nowhere' };
+      if (c < 0 || c > 999) return { bad: 'keep the capacity between 0 and 999' };
+      raw.push([u, v, c]);
+      if (u > n) n = u;
+      if (v > n) n = v;
+    }
+    if (n < 2) return { bad: 'a network needs a source and a sink' };
+    var G = dgNew(n, true);
+    for (i = 0; i < raw.length; i += 1) dgAdd(G, raw[i][0] - 1, raw[i][1] - 1, 0, raw[i][2]);
+    return { G: G, n: n };
+  }
+  /* Bipartite pairs, as the reader writes them: `1-2` is left 1 to right 2. */
+  function fkParsePairs(text, left, right) {
+    var cl = fkClauses(text), out = [], seen = {}, i;
+    if (!cl.length) return { bad: 'write at least one pair' };
+    for (i = 0; i < cl.length; i += 1) {
+      var m = /^(\d+)\s*(?:-|to)\s*(\d+)$/.exec(cl[i]);
+      if (!m) return { bad: 'cannot read "' + cl[i] + '" as a pair' };
+      var a = parseInt(m[1], 10), b = parseInt(m[2], 10);
+      if (a < 1 || a > left) return { bad: 'there is no ' + a + ' on the left' };
+      if (b < 1 || b > right) return { bad: 'there is no ' + b + ' on the right' };
+      var k = a + '-' + b;
+      if (!seen[k]) { seen[k] = true; out.push([a - 1, b - 1]); }
+    }
+    return { pairs: out };
+  }
+  function fkLabel(v) { return v + 1; }
+  function fkNames(list) {
+    return (list || []).map(function (v) { return v + 1; }).join(', ');
+  }
+  function fkArcName(a) { return (a.u + 1) + ' → ' + (a.v + 1); }
+  function fkPlural(n, one, many) { return n === 1 ? one : many; }
+  /* Every capacity added up: the finite stand-in for "no bound" that a gadget
+     needs. It is never binding -- no cut can exceed it -- and unlike Infinity
+     it cannot become a bottleneck of Infinity and hang the augmentation loop. */
+  function fkTotalCap(G) {
+    return G.arcs.reduce(function (t, a) { return t + a.cap; }, 0);
+  }
+
+  /* --------------------------------------------- the OTHER way to pick a path
+
+     `bfsPath` takes the shortest augmenting path, which is Edmonds-Karp and
+     bounds the number of augmentations. This takes the FIRST path a depth-first
+     search finds, which is the naive choice, and it is here for two reasons.
+
+     It is how the forward-only failure is exhibited without a hand-picked path.
+     On the four-vertex network the shortest path never goes through the middle
+     arc, so a breadth-first search cannot get stuck; a depth-first one takes the
+     middle arc immediately, and with backward arcs switched off it is then stuck
+     one unit below the maximum. The failure is produced by a rule, not by a
+     path typed into a preset, so it survives the reader editing the network.
+
+     And it is how the cost of the CHOICE is measured: the same network, the same
+     algorithm, two path rules, two counts of augmentations. */
+  function fkDfsPath(res, s, t) {
+    var G = res.graph, idx = dgIndex(G), n = G.n;
+    var seen = new Array(n).fill(false), prev = new Array(n).fill(-1), order = [];
+    var found = false;
+    (function walk(v) {
+      if (found) return;
+      seen[v] = true; order.push(v);
+      if (v === t) { found = true; return; }
+      for (var k = 0; k < idx.out[v].length; k += 1) {
+        var id = idx.out[v][k], u = G.arcs[id].v;
+        if (seen[u] || G.arcs[id].cap <= 0) continue;
+        prev[u] = id;
+        walk(u);
+        if (found) return;
+      }
+    })(s);
+    if (!found) return { path: null, reachable: order };
+    var path = [], at = t;
+    while (at !== s) { path.push(prev[at]); at = G.arcs[prev[at]].u; }
+    return { path: path.reverse(), reachable: order };
+  }
+  function fkFindPath(res, s, t, rule) {
+    return rule === 'dfs' ? fkDfsPath(res, s, t) : bfsPath(res, s, t);
+  }
+  /* The augmentation replayed step by step, so the panel can stand at any one of
+     them: `residual`, `fkFindPath` and `augment` are called exactly as maxflow
+     calls them, and the state before each push is kept rather than recomputed. */
+  function fkAugmentations(G, s, t, opts) {
+    opts = opts || {};
+    var f = zeroFlow(G), steps = [], guard = 0;
+    while (guard < 400) {
+      guard += 1;
+      var res = residual(G, f, opts);
+      var found = fkFindPath(res, s, t, opts.rule);
+      if (!found.path) {
+        steps.push({ flow: f.slice(), residual: res, path: null, reachable: found.reachable,
+                     value: flowValue(G, f, s) });
+        break;
+      }
+      var a = augment(G, f, res, found.path);
+      steps.push({ flow: f.slice(), residual: res, path: found.path, bottleneck: a.bottleneck,
+                   after: a.flow.slice(), value: flowValue(G, f, s),
+                   valueAfter: flowValue(G, a.flow, s) });
+      f = a.flow;
+    }
+    return { steps: steps, flow: f, value: flowValue(G, f, s),
+             augmentations: steps.filter(function (x) { return x.path; }).length };
+  }
+  /* A step index a control hands in, clamped into a list that may have got
+     shorter since it was set -- which is what makes a second redraw safe. */
+  function fkStep(want, length) {
+    if (!length) return 0;
+    var k = parseInt(want, 10);
+    if (!isFinite(k) || k < 0) k = 0;
+    return Math.min(k, length - 1);
+  }
+
+  /* ---------------------------------------------- is this thing even a flow
+
+     Conservation at every interior vertex and every arc inside its capacity,
+     checked separately, because they fail separately and a reader who is told
+     only "not a flow" has learned nothing. */
+  function fkCheckFlow(G, f, s, t) {
+    var overfull = [], negative = [], violated = [], rows = [], v;
+    G.arcs.forEach(function (a, id) {
+      if (f[id] > a.cap) overfull.push(id);
+      if (f[id] < 0) negative.push(id);
+    });
+    for (v = 0; v < G.n; v += 1) {
+      var out = 0, into = 0;
+      G.arcs.forEach(function (a, id) {
+        if (a.u === v) out += f[id];
+        if (a.v === v) into += f[id];
+      });
+      var net = out - into, want = (v === s || v === t) ? null : 0;
+      rows.push({ v: v, out: out, into: into, net: net, want: want,
+                  ok: want === null || net === 0 });
+      if (want !== null && net !== 0) violated.push(v);
+    }
+    return { rows: rows, violated: violated, overfull: overfull, negative: negative,
+             ok: !violated.length && !overfull.length && !negative.length };
+  }
+
+  /* ------------------------------------------------------ every cut, listed
+
+     A cut is a set containing the source and not the sink; its capacity is the
+     total capacity of the arcs leaving the set, and arcs coming back in
+     contribute NOTHING -- which is the line readers most often get wrong and
+     the reason this is written out rather than inferred from the flow.
+
+     The theorem is then two numbers the page computed by different routes: the
+     value the augmenting-path algorithm reached, and the smallest capacity in
+     this list. Ten vertices is 256 sets, which is instant; above that it is
+     refused through oracleCap rather than run slowly. */
+  function cutCapacity(G, inS) {
+    var cap = 0;
+    G.arcs.forEach(function (a) { if (inS[a.u] && !inS[a.v]) cap += a.cap; });
+    return cap;
+  }
+  function cutBack(G, inS) {
+    var cap = 0;
+    G.arcs.forEach(function (a) { if (!inS[a.u] && inS[a.v]) cap += a.cap; });
+    return cap;
+  }
+  function minCutBrute(G, s, t, cap) {
+    cap = cap === undefined ? 10 : cap;
+    oracleCap('minCutBrute', G.n, cap);
+    var best = null, bestSets = [], examined = 0, all = [];
+    forEachSubset(G.n, function (mask) {
+      if (!(mask & (1 << s))) return;
+      if (mask & (1 << t)) return;
+      examined += 1;
+      var inS = [], i;
+      for (i = 0; i < G.n; i += 1) inS.push(!!(mask & (1 << i)));
+      var c = cutCapacity(G, inS);
+      all.push({ mask: mask, S: maskMembers(mask, G.n), capacity: c, back: cutBack(G, inS) });
+      if (best === null || c < best) { best = c; bestSets = [mask]; }
+      else if (c === best) bestSets.push(mask);
+    });
+    return runOf({ capacity: best, minimal: bestSets, cuts: all, count: examined },
+                 { nodes: examined }, []);
+  }
+  /* Is the given set one of the smallest? The algorithm returns ONE cut and the
+     enumeration finds all of them, so this is the honest comparison: not "the
+     same set" but "a set of the same, smallest, capacity". */
+  function cutIsMinimum(brute, S) {
+    var mask = 0;
+    S.forEach(function (v) { mask |= (1 << v); });
+    return brute.result.minimal.indexOf(mask) !== -1;
+  }
+
+  /* --------------------------------- saturated is not the same as being a cut
+
+     The misconception has a shape: take the saturated arcs, delete them, and
+     see whether the sink is still reachable. Where it is, that set of arcs is
+     not a cut however full every one of them is. */
+  function saturatedArcs(G, f) {
+    var out = [];
+    G.arcs.forEach(function (a, id) { if (a.cap > 0 && f[id] === a.cap) out.push(id); });
+    return out;
+  }
+  function reachesWithout(G, skip, s, t) {
+    var block = {};
+    (skip || []).forEach(function (id) { block[id] = true; });
+    var idx = dgIndex(G), seen = new Array(G.n).fill(false), stack = [s], order = [];
+    seen[s] = true;
+    while (stack.length) {
+      var v = stack.pop();
+      order.push(v);
+      idx.out[v].forEach(function (id) {
+        if (block[id]) return;
+        var u = G.arcs[id].v;
+        if (!seen[u]) { seen[u] = true; stack.push(u); }
+      });
+    }
+    return { reaches: seen[t], seen: seen, order: order };
+  }
+
+  /* ------------------------------------------------- matching, three answers
+
+     greedyMatching takes the pairs in the order typed and keeps any whose ends
+     are both free. That is a MAXIMAL matching -- nothing can be added to it --
+     and the misconception is that maximal means maximum. matchingBrute
+     maximises over every subset of the pairs through ORACLE_JS's bruteOptimal,
+     which has never heard of a flow network. The flow is the third answer, and
+     all three are printed. */
+  function greedyMatching(pairs) {
+    var usedL = {}, usedR = {}, out = [];
+    pairs.forEach(function (p, id) {
+      if (usedL[p[0]] || usedR[p[1]]) return;
+      usedL[p[0]] = true; usedR[p[1]] = true;
+      out.push({ id: id, left: p[0], right: p[1] });
+    });
+    return out;
+  }
+  function matchingBrute(pairs, cap) {
+    cap = cap === undefined ? 16 : cap;
+    return bruteOptimal(pairs, function (members) {
+      var usedL = {}, usedR = {}, i;
+      for (i = 0; i < members.length; i += 1) {
+        var p = pairs[members[i]];
+        if (usedL[p[0]] || usedR[p[1]]) return null;
+        usedL[p[0]] = true; usedR[p[1]] = true;
+      }
+      return members.length;
+    }, cap);
+  }
+  /* Hall's condition, read off the cut: the source side's left vertices are a
+     set S, and the right vertices they can reach are N(S). When the matching is
+     imperfect the cut exhibits an S with |N(S)| smaller than |S|, which is the
+     deficiency, and this returns the set rather than the inequality. */
+  function hallDeficient(net, f, pairs) {
+    var cut = minCutFrom(net.graph, f, net.s), inS = {};
+    cut.S.forEach(function (v) { inS[v] = true; });
+    var S = [], i;
+    for (i = 0; i < net.left; i += 1) if (inS[i]) S.push(i);
+    var nb = {};
+    pairs.forEach(function (p) { if (inS[p[0]]) nb[p[1]] = true; });
+    var N = Object.keys(nb).map(function (k) { return parseInt(k, 10); })
+      .sort(function (a, b) { return a - b; });
+    return { S: S, neighbours: N, deficient: N.length < S.length,
+             deficiency: S.length - N.length, cut: cut };
+  }
+
+  /* ------------------------------------------- the gadgets, with finite bounds
+
+     gadgetBuild leaves an uncapped arc at Infinity, which is right as a
+     statement and wrong as a number: a bottleneck of Infinity never terminates.
+     Every uncapped arc here is therefore given the total capacity of the
+     original network, which no cut can exceed and which is therefore never
+     binding -- the same statement, in a number the arithmetic can hold. */
+  function fkVertexCaps(G, spec) {
+    var total = fkTotalCap(G) + 1, caps = [], v;
+    for (v = 0; v < G.n; v += 1) {
+      caps.push(spec && spec[v] !== undefined && spec[v] !== null ? spec[v] : total);
+    }
+    return caps;
+  }
+  /* Arc-disjoint paths, counted by walking the unit flow rather than read off
+     its value: take a unit out of the source, follow saturated arcs to the
+     sink, and remove them. The count must equal the flow value, and where it
+     does the paths themselves can be printed. */
+  function unitPaths(G, f, s, t) {
+    var left = f.slice(), idx = dgIndex(G), paths = [], guard = 0;
+    while (guard < 200) {
+      guard += 1;
+      var path = [s], at = s, moved = true;
+      while (at !== t && moved) {
+        moved = false;
+        for (var k = 0; k < idx.out[at].length; k += 1) {
+          var id = idx.out[at][k];
+          if (left[id] <= 0) continue;
+          left[id] -= 1;
+          at = G.arcs[id].v;
+          path.push(at);
+          moved = true;
+          break;
+        }
+      }
+      if (at !== t) break;
+      paths.push(path);
+    }
+    return paths;
+  }
+  /* Every number below came from running the algorithm on the network on
+     screen. What makes this course different from the rest of the path is
+     that the answer arrives with its own proof: a cut of the same capacity
+     as the flow's value. Where a page prints that equality it has computed
+     both sides separately, and where it prints a claim about every network
+     it enumerates the whole space at a cap it states. */
+  var AGP = {
+    'forwardonly': { spec: '1>2 1, 1>3 1, 2>3 1, 2>4 1, 3>4 1', source: '1', sink: '4' },
+    'classic': { spec: '1>2 16, 1>3 13, 2>3 10, 3>2 4, 2>4 12, 3>5 14, 4>3 9, 5>4 7, 4>6 20, 5>6 4', source: '1', sink: '6' },
+    'zigzag': { spec: '1>2 100, 1>3 100, 2>3 1, 2>4 100, 3>4 100', source: '1', sink: '4' },
+    'parallel': { spec: '1>2 3, 1>2 4, 2>3 5', source: '1', sink: '3' }
+  };
+
+  var presetIn = document.getElementById('agPreset'), specIn = document.getElementById('agSpec');
+  var srcIn = document.getElementById('agSource'), srcOut = document.getElementById('agSourceOut');
+  var sinkIn = document.getElementById('agSink'), sinkOut = document.getElementById('agSinkOut');
+  var ruleIn = document.getElementById('agRule'), revIn = document.getElementById('agReverse');
+  var stepIn = document.getElementById('agStep'), stepOut = document.getElementById('agStepOut');
+  var plot = document.getElementById('agPlot'), resPlot = document.getElementById('agRes');
+  var stepsT = document.getElementById('agSteps'), flowT = document.getElementById('agFlow');
+  var status = document.getElementById('agStatus');
+  var KPIS = ['agValue', 'agMax', 'agRounds', 'agBottle', 'agLegal', 'agSat'];
+
+  function blank(why) {
+    plot.innerHTML = ''; resPlot.innerHTML = ''; stepsT.innerHTML = ''; flowT.innerHTML = '';
+    for (var i = 0; i < KPIS.length; i += 1) document.getElementById(KPIS[i]).textContent = '—';
+    status.innerHTML = '<span class="tone-red">' + why + '.</span> An arc is '
+      + '<span class="tt">1&gt;2 16</span>: a tail, a head and a capacity.';
+  }
+
+  function redraw() {
+    var parsed = fkParse(specIn.value);
+    if (parsed.bad) { blank(parsed.bad); return; }
+    var G = parsed.G, n = parsed.n;
+    srcIn.max = n; sinkIn.max = n;
+    var s = fkStep(parseInt(srcIn.value, 10) - 1, n);
+    var t = fkStep(parseInt(sinkIn.value, 10) - 1, n);
+    srcOut.textContent = String(s + 1);
+    sinkOut.textContent = String(t + 1);
+    if (s === t) { blank('the source and the sink are the same vertex'); return; }
+
+    var opts = { rule: ruleIn.value, reverse: revIn.value === 'on' };
+    var play = fkAugmentations(G, s, t, opts);
+    var best = maxflow(G, s, t);
+    stepIn.max = Math.max(1, play.steps.length);
+    var k = fkStep(parseInt(stepIn.value, 10) - 1, play.steps.length);
+    stepOut.textContent = (k + 1) + ' of ' + play.steps.length;
+    var here = play.steps[k];
+
+    var legal = fkCheckFlow(G, play.flow, s, t);
+    var sat = saturatedArcs(G, play.flow);
+
+    var colours = [], v;
+    for (v = 0; v < n; v += 1) colours.push(v === s ? 3 : (v === t ? 4 : -1));
+    plot.innerHTML = dgSvg(G, { points: dgLayout(n, { cx: 330, cy: 150, radius: 118 }),
+                                label: 'flow', flow: here.flow,
+                                highlight: here.path
+                                  ? here.path.map(function (rid) { return here.residual.meta[rid].from; })
+                                  : sat,
+                                colours: colours });
+    var RG = here.residual.graph;
+    resPlot.innerHTML = RG.arcs.length
+      ? dgSvg(RG, { points: dgLayout(n, { cx: 330, cy: 150, radius: 118 }), label: 'cap',
+                    highlight: here.path || [], colours: colours })
+      : '<text x="24" y="150" font-size="12" fill="var(--muted)">the residual network is empty: '
+        + 'every arc is full and none carries anything back</text>';
+
+    var rows = '';
+    play.steps.forEach(function (st, i) {
+      if (!st.path) {
+        rows += '<tr class="' + (i === k ? 'tone-cyan' : '') + '"><th class="rowhead">'
+          + (i + 1) + '</th><td>no path left</td><td>—</td><td>' + st.value + '</td><td>'
+          + 'the search reached ' + fkNames(st.reachable) + ' and stopped</td></tr>';
+        return;
+      }
+      var names = st.path.map(function (rid) {
+        var meta = st.residual.meta[rid], a = st.residual.graph.arcs[rid];
+        return (a.u + 1) + (meta.forward ? ' → ' : ' ⇠ ') + (a.v + 1);
+      }).join(', ');
+      rows += '<tr class="' + (i === k ? 'tone-cyan' : '') + '"><th class="rowhead">' + (i + 1)
+        + '</th><td>' + names + '</td><td>' + st.bottleneck + '</td><td>' + st.valueAfter
+        + '</td><td>' + (st.path.some(function (rid) { return !st.residual.meta[rid].forward; })
+            ? '<span class="tone-purple">uses a backward arc, undoing an earlier push</span>'
+            : 'forward arcs only') + '</td></tr>';
+    });
+    stepsT.innerHTML = '<caption>Every augmentation: the path in the residual network, the '
+      + 'bottleneck pushed along it, and the value afterwards</caption><thead><tr><th>step</th>'
+      + '<th>path</th><th>bottleneck</th><th>value after</th><th>what it used</th></tr></thead>'
+      + '<tbody>' + rows + '</tbody>';
+
+    var frows = '';
+    G.arcs.forEach(function (a, id) {
+      frows += '<tr' + (play.flow[id] === a.cap && a.cap > 0 ? ' class="tone-red"' : '')
+        + '><th class="rowhead">' + fkArcName(a) + '</th><td>' + here.flow[id] + '</td><td>'
+        + play.flow[id] + '</td><td>' + a.cap + '</td><td>' + (a.cap - play.flow[id]) + '</td><td>'
+        + (play.flow[id] === a.cap && a.cap > 0 ? 'full'
+            : play.flow[id] === 0 ? 'empty' : 'part full') + '</td></tr>';
+    });
+    flowT.innerHTML = '<caption>Every arc, at this step and at the end &mdash; the flow is an '
+      + 'array with one entry per arc, which is why two arcs between one pair are two '
+      + 'numbers</caption><thead><tr><th>arc</th><th>flow here</th><th>flow at the end</th>'
+      + '<th>capacity</th><th>spare</th><th>state</th></tr></thead><tbody>' + frows + '</tbody>';
+
+    document.getElementById('agValue').textContent = play.value;
+    document.getElementById('agMax').textContent = best.result.value;
+    document.getElementById('agRounds').textContent = play.augmentations + ', against '
+      + best.result.augmentations + ' for the shortest-path rule with backward arcs';
+    document.getElementById('agBottle').textContent = here.path ? here.bottleneck : 'none left';
+    document.getElementById('agLegal').textContent = legal.ok
+      ? 'yes: conserved and inside every capacity'
+      : (legal.violated.length ? 'no, conservation fails at ' + fkNames(legal.violated)
+          : 'no, an arc is over capacity');
+    document.getElementById('agSat').textContent = sat.length
+      ? sat.map(function (id) { return fkArcName(G.arcs[id]); }).join(', ') : 'none';
+
+    var stuck = play.value < best.result.value;
+    var last = play.steps[play.steps.length - 1];
+    var usedBack = play.steps.some(function (st) {
+      return st.path && st.path.some(function (rid) { return !st.residual.meta[rid].forward; });
+    });
+    status.innerHTML = '<strong>Value ' + play.value + ' after ' + play.augmentations
+      + ' augmentation' + fkPlural(play.augmentations, '', 's') + '</strong>'
+      + (stuck
+          ? ', and the true maximum is <span class="tone-red">' + best.result.value + '</span>. '
+            + 'This run is <span class="tone-red">stuck below it</span>. '
+          : ', which is the maximum. ')
+      + (revIn.value === 'off'
+          ? 'Backward arcs are switched off, so the residual network holds only spare capacity and '
+            + 'nothing that carries flow back. '
+            + (stuck
+                ? 'The search now reaches only ' + fkNames(last.reachable) + ' and there is no path '
+                  + 'to the sink &mdash; yet no arc out of the source is full, so nothing about the '
+                  + 'capacities has stopped it. What has stopped it is a choice made earlier that '
+                  + 'cannot be taken back. Switch the backward arcs on and watch the same rule '
+                  + 'finish.'
+                : 'On this network and with this rule it happened to reach the maximum anyway, '
+                  + 'which is luck: switch the path rule to the first one found and try again.')
+          : 'Backward arcs are in, and '
+            + (usedBack
+                ? '<span class="tone-purple">at least one augmentation used one</span> &mdash; that '
+                  + 'push reduced the flow on an arc an earlier push had loaded. Undoing a choice is '
+                  + 'not an optimisation here; it is the reason the algorithm is correct. '
+                : 'no augmentation needed one on this network, so try the four-vertex example with '
+                  + 'the first-found rule. ')
+            + 'The search finally reached ' + fkNames(last.reachable) + ' and no further, and that '
+            + 'set is a cut whose capacity equals the value. ')
+      + 'The flow was checked rather than assumed: conservation at every interior vertex and every '
+      + 'arc against its capacity, and it is <span class="' + (legal.ok ? 'tone-green">a flow'
+          : 'tone-red">not a flow, which would be a defect') + '</span>. '
+      + 'Vocabulary, once, because another subject uses it for the same objects: this is a residual '
+      + '<em>network</em>, those are backward <em>arcs</em>, an <em>arc</em> is a directed edge and '
+      + 'the circles are <em>nodes</em>.';
+  }
+
+  function apply() {
+    var p = AGP[presetIn.value];
+    if (!p) return;
+    specIn.value = p.spec; srcIn.value = p.source; sinkIn.value = p.sink; stepIn.value = '1';
+    redraw();
+  }
+  var START = AGP[presetIn.value];
+  if (START && !specIn.value) {
+    specIn.value = START.spec; srcIn.value = START.source; sinkIn.value = START.sink;
+  }
+  presetIn.addEventListener('change', apply);
+  specIn.addEventListener('input', redraw);
+  srcIn.addEventListener('input', redraw);
+  sinkIn.addEventListener('input', redraw);
+  ruleIn.addEventListener('change', redraw);
+  revIn.addEventListener('change', redraw);
+  stepIn.addEventListener('input', redraw);
+  redraw();
+  window.redrawLab = redraw;
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "graph-algorithms/augmenting-paths";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+  </script>
+</body>
+</html>

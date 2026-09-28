@@ -331,7 +331,7 @@ LESSONS = [
             ("A state is a claim that two situations can be finished identically",
              "Saying &ldquo;the state is the number of units left&rdquo; asserts that any two "
              "histories leaving the same number unspent have exactly the same future open to "
-             "them. Here that is true, because the activities still to come do not care which of "
+             "them. Here that is true, because the activities that remain do not care which of "
              "the earlier ones took what. If the return of a later activity depended on an "
              "earlier choice, the claim would be false and the table would be answering a "
              "different question &mdash; correctly, and about the wrong problem."),

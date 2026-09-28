@@ -3,70 +3,114 @@
 Read this before changing anything. It is the contract between whoever (human or
 agent) edits this repository and the platform that will eventually serve it.
 
-## 0. Work in progress: three Subjects are present and none of them is live
+## 0. Nothing is inert any more: all six Subjects publish
 
 `content/system_design/`, `content/algorithms/` and `content/operations_research/`
-are in the tree. **None of them publishes a single page, and that is deliberate.**
-
-A generated path becomes real only by joining `GENERATED_PATHS` in
-`scripts/build_paths.py`, and none of the three has. Until one does: no page is
-built, no URL declaration moves, `tests/content_preservation.json` does not walk
-the package, and every count in section 1 below is still correct. The live site
-is exactly the 369 pages it has been.
+were in the tree for months publishing nothing. All three are now in
+`GENERATED_PATHS` and all three are live.
 
 | Subject | state |
 |---|---|
-| System Design | **complete** — 10 courses, 114 lessons, 10 lab kits, all gates passing. Ready to wire. |
-| Algorithms | **complete** — 9 courses, 112 lessons. Ready to wire. |
-| Operations Research | **complete** — 10 courses, 92 lessons. Ready to wire. |
+| System Design | **published** — 10 courses, 114 lessons, wired 2026-09-25 (369 pages became 494) |
+| Algorithms | **published** — 9 courses, 112 lessons, wired 2026-09-27 |
+| Operations Research | **published** — 10 courses, 92 lessons, wired 2026-09-27 (494 pages became 719) |
 
-74 lab modes are registered. The two new Subjects are **inert**: neither is in
-`GENERATED_PATHS`, so `site/` is still exactly the pages it has been, and
-wiring either one is the ~24-declaration-site process System Design went
-through. Before you wire, note that `tests/test_site_invariants.py` now checks a
-Subject's tagline against its own course and lesson counts — those sentences are
-written when a Subject is scaffolded, before a lesson exists, and both of these
-advertised the wrong number until the day they were finished.
+74 lab modes are registered and all fifteen kits in
+`build_paths.KITS_WITH_EXPECTATIONS` now serve published pages: `node
+scripts/labcheck.js --generated` executes 587 generated pages, 124 of them with
+pinned figures, and compares 1,357 tile strings against what the page prints.
+Before the last two Subjects were wired it said "0 with pinned figures" — those
+expectations were written, verified against scratch renders, and then fired
+against nothing.
+
+**Wiring a Subject is not a flag flip**, and the next person to do one should
+plan for about two dozen declaration sites rather than the four the URL rule in
+section 1 names. The list, taken from the two commits that wired System Design
+and the one that wired these two:
+
+- `scripts/build_paths.py` (the switch), and then `scripts/generated-pages.txt`
+  and `scripts/generated-expectations.json`, which the build rewrites;
+- `scripts/smoke.py`, `scripts/canvas_sources.js`;
+- `release/contract.json`, `release/contract.example.json` — **both**, the suite
+  checks them together — and `release/contract.schema.json`, which pins every
+  check id by name and carries a `minItems` that must equal the pin count;
+- `Containerfile.release` and `.github/workflows/ci.yml`, whose page
+  enumerations are backslash-continued shell word lists (see below);
+- `tests/test_site_invariants.py`, `tests/content_preservation.json`,
+  `tests/test_review_remediation.py`, `tests/test_public_copy.py`,
+  `tests/test_course_ui.py`, `tests/test_canvas_contract.py`,
+  `tests/test_browser_source.py`, `tests/test_responsive_ui.py`,
+  `tests/test_generation4.py`, `tests/test_generation5_catalog.py`,
+  `tests/browser_acceptance.js`, `tests/browser_contrast.js`,
+  `tests/browser_interactions.js`;
+- `site/index.html`, which is hand-authored and needs a subject card and one
+  entry per course in its inline search array — that array builds TEXT NODES, so
+  an HTML entity written into it reaches the reader as its own characters;
+- `site/progress/index.html` and `site/oauth2/spa/callback/index.html`, which
+  embed the library inventory: re-run `scripts/build_auth_pages.py`;
+- and this section, section 1, and `README.md`'s URL layout.
+
+Five things that have each cost a day:
+
+1. `content_errors` in `tests/test_review_remediation.py` builds its inventory
+   *from* `GENERATED_PATHS` and compares with a SYMMETRIC DIFFERENCE, so joining
+   that tuple makes every `.py` file in the package mandatory in
+   `tests/content_preservation.json` — no partial option, no warning, and one
+   opaque failure line naming all of them. Generate those entries with
+   `/usr/bin/python3`; the fingerprint is Python-version sensitive.
+2. `test_public_copy` requires a `<subject>_semantic_copy` block per generated
+   Subject, whose expected strings are RENDERED text and not source: derive them
+   from the built page rather than reimplementing the renderer's escaping.
+3. `Containerfile.release`'s enumeration is a backslash-continued list. Ten
+   missing trailing backslashes once produced `unknown instruction: done;`, and
+   the root cause was reading the shipped block through a width-truncating pipe
+   that chopped the backslash. Never inspect that file through `cut -c1-N`.
+4. `ci.yml`'s enumeration is also a backslash-continued `for` loop. A YAML
+   comment spliced into it is valid YAML and broken bash: the logical line ends
+   at the comment and the `for` never reaches its `do`. Do not put a comment
+   inside a continued list. `bash -n` every `run:` block before pushing.
+5. A release-contract check id is capped at 72 characters by
+   `release/contract.schema.json` and by a test. `algebra-course6-lesson-`
+   `quadratic-equations-and-the-zero-product-property` is exactly 72. The check
+   id prefixes are short for that reason: `math`, `algebra`, `sysdesign`,
+   `algo`, `or`.
+
+`tests/test_site_invariants.py` checks a Subject's tagline and description
+against its own course and lesson counts. Those sentences are written when a
+Subject is scaffolded, before a lesson exists, and both of these advertised the
+wrong number until the day they were finished.
 
 A course module still being authored exports `COURSE = None`, which
-`content/<subject>/__init__.py` filters out. That is the state most of them are
-in, and it is visible in the source rather than hidden by omission.
+`content/<subject>/__init__.py` filters out. No course is in that state today.
 
-**Before wiring any of them**, read the two things that will otherwise cost you a
-day: section 1's note on what adding a Subject actually touches (it is about two
-dozen files, not the four the URL rule names), and `content_errors` in
-`tests/test_review_remediation.py`, which builds its inventory *from*
-`GENERATED_PATHS` and compares with a symmetric difference — so joining that
-tuple makes every `.py` file in the package mandatory in the preservation
-contract, with no partial option and no warning.
-
-Half-finished lab kits for the other two Subjects are parked, unverified, on
-the `wip/or-and-algorithms-kits` branch. Nothing on `main` depends on them.
+Half-finished lab kits for the last two Subjects were parked, unverified, on
+the `wip/or-and-algorithms-kits` branch; they were recovered and are now in
+`scripts/mathpath/labs/`. Nothing on `main` depends on that branch.
 
 Seven further Subjects have been proposed and none is scheduled:
 [docs/FUTURE-SUBJECTS.md](docs/FUTURE-SUBJECTS.md) records them with the only
 question that decides whether each can be built the way this library builds
 things — what does the reader compute? For one of them the answer is "nothing",
-and that is written down rather than engineered around. **Do not start a seventh
-Subject while two are half-built.**
+and that is written down rather than engineered around.
 
 ## 1. What this repository is
 
 An educational static site published as **Learn** at `https://learn.geterdone.io`:
 
 The site is a subject-agnostic LIBRARY OF PATHS. A path is an ordered sequence of
-courses on one subject. There are three: **Trading** (8 courses, 118 lessons,
+courses on one subject. There are six: **Trading** (8 courses, 118 lessons,
 hand-authored and normalized at intake), **Discrete Mathematics** (8 courses, 106
-lessons, GENERATED from `content/discrete_math/`) and **Algebra** (9 courses, 112
-lessons, GENERATED from `content/algebra/`). 25 courses and 336 lessons in all.
-The published URL space:
+lessons), **Algebra** (9 courses, 112 lessons), **System Design** (10 courses,
+114 lessons), **Algorithms** (9 courses, 112 lessons) and **Operations Research**
+(10 courses, 92 lessons) — the last five GENERATED from `content/<subject>/`.
+54 courses and 654 lessons in all. The published URL space:
 
 | URL | Served from |
 | --- | --- |
 | `learn.geterdone.io/` | `site/index.html` — the site index: the paths, plus course search |
-| `learn.geterdone.io/paths/<subject>/` | `site/paths/<subject>/index.html` — one page per path: `trading`, `discrete-math`, `algebra` |
-| `learn.geterdone.io/<course>/` | `site/<course>/index.html` — one of the 25 course homes |
-| `learn.geterdone.io/<course>/<lesson>/` | `site/<course>/<lesson>/index.html` — one of the 336 lessons |
+| `learn.geterdone.io/paths/<subject>/` | `site/paths/<subject>/index.html` — one page per path: `trading`, `discrete-math`, `algebra`, `system-design`, `algorithms`, `operations-research` |
+| `learn.geterdone.io/<course>/` | `site/<course>/index.html` — one of the 54 course homes |
+| `learn.geterdone.io/<course>/<lesson>/` | `site/<course>/<lesson>/index.html` — one of the 654 lessons |
 
 The site index and the path pages are SHARED CHROME: they must not assume the
 subject is trading — not in copy, not in a footer, not in metadata. Only course
@@ -77,20 +121,21 @@ it separately rather than classifying pages by URL shape.
 `site/` is the document root. Whatever `site/` contains is exactly what `/` serves;
 an extra directory level in `site/` becomes an extra path segment in the public URL.
 
-The full 369-page map (plus eight published JSON assets) is in
-[README.md](README.md#url-layout), and it is enforced in four places that must
+The full 719-page map (plus eight published JSON assets) is in
+[README.md](README.md#url-layout), and it is enforced in five places that must
 agree: `REQUIRED_PAGES` in `tests/test_site_invariants.py`, `scripts/smoke.py`,
-`acceptance.checks` in `release/contract.json`, the "Published URL space is
-complete" step in `.github/workflows/ci.yml`, and the publish guard in
-`Containerfile.release`.
+`acceptance.checks` in `release/contract.json` (and in
+`release/contract.example.json`, which the suite checks beside it), the
+"Published URL space is complete" step in `.github/workflows/ci.yml`, and the
+publish guard in `Containerfile.release`.
 
-(It was five until `.github/workflows/pages.yml` was removed. That workflow was
+(It was six until `.github/workflows/pages.yml` was removed. That workflow was
 a second delivery path to GitHub Pages, it was never how production is served,
 and it failed on every push to main because Pages was never enabled on the
 repository. Production is the Hetzner container platform and always was.)
 
-Those four govern WHICH URLS EXIST. **Adding or removing a whole Subject is a
-bigger change than that**, and the four are not the whole of it: roughly two
+Those five govern WHICH URLS EXIST. **Adding or removing a whole Subject is a
+bigger change than that**, and the five are not the whole of it: roughly two
 dozen files carry a hardcoded count of pages, lessons, courses or Subjects, and
 several of the per-path constants in `tests/test_site_invariants.py` and
 `scripts/smoke.py` are patterns to extend rather than numbers to bump. Find them
@@ -123,7 +168,7 @@ The apex `geterdone.io` is a **separate, live GitHub Pages site that this reposi
 does not control**. Do not deploy to it, reconfigure it, or write anything that
 implies we own its records. Linking to it is fine; changing it is out of scope.
 
-## 1a. One path is authored, two are generated
+## 1a. One path is authored, five are generated
 
 The paths are built in opposite directions and must be edited differently.
 
@@ -131,14 +176,15 @@ The paths are built in opposite directions and must be edited differently.
 the library's conventions by `scripts/intake_course.py`. Its pages are the source
 of truth. Edit them directly.
 
-**Discrete Mathematics** and **Algebra** are generated. `content/discrete_math/`
-and `content/algebra/` hold them as data — one Python module per course, with the
-lessons as dicts — and `scripts/build_paths.py` renders every page from
-`scripts/mathpath/` (one stylesheet, one chrome renderer, one lab kit). **Never
+**Discrete Mathematics**, **Algebra**, **System Design**, **Algorithms** and
+**Operations Research** are generated. `content/<subject>/` holds each of them as
+data — one Python module per course, with the lessons as dicts — and
+`scripts/build_paths.py` renders all 587 of their pages from `scripts/mathpath/`
+(one stylesheet, one chrome renderer, one lab kit per subject area). **Never
 edit a page under one of those course slugs by hand**: the next build reverts it,
 so the change appears to work and then vanishes.
 
-    python3 scripts/build_paths.py                     # rebuild both
+    python3 scripts/build_paths.py                     # rebuild all five
     python3 scripts/build_paths.py --check             # fail if any page is stale
     node scripts/mathcheck.js                          # check the arithmetic itself
     node scripts/labcheck.js --generated               # execute every lab
@@ -455,7 +501,7 @@ small the diff looks.
 | agent | tier | Claude | Codex | owns | why this tier |
 | --- | --- | --- | --- | --- | --- |
 | `site-architect` | deep | opus | `-p deep` | URL space, cross-path design, retirements | one decision reshapes five declarations and the public URL space |
-| `chrome-renderer` | deep | opus | `-p deep` | `scripts/mathpath/{chrome,theme,render,progress,feedback}.py` | one edit lands on all 336 lessons at once |
+| `chrome-renderer` | deep | opus | `-p deep` | `scripts/mathpath/{chrome,theme,render,progress,feedback}.py` | one edit lands on all 654 lessons at once |
 | `lab-arithmetic` | deep | opus | `-p deep` | `scripts/mathpath/labs/`, `scripts/mathcheck.js` | exact rational arithmetic; a wrong answer is invisible to every other check |
 | `invariants` | deep | opus | `-p deep` | `tests/test_site_invariants.py` | a test that is wrong passes, and keeps passing |
 | `release-safety` | safety | opus | `-p safety` | `release/`, `Containerfile.release`, `.github/workflows/`, `deploy/` | irreversible and expensive; **read-only** |

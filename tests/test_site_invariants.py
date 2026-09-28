@@ -424,6 +424,8 @@ MATH_COURSES = (
 # test_declared_url_space_is_the_index_the_path_pages_and_the_course_trees.
 ALGEBRA_PATH_PAGE = "/paths/algebra/"
 SYSDESIGN_PATH_PAGE = "/paths/system-design/"
+ALGO_PATH_PAGE = "/paths/algorithms/"
+OR_PATH_PAGE = "/paths/operations-research/"
 
 ALGEBRA_COURSE_1_HOME = "/algebra-foundations/"
 ALGEBRA_COURSE_1_LESSONS = (
@@ -641,7 +643,239 @@ SYSDESIGN_COURSES = (
 SYSDESIGN_PATH_COURSE_COUNT = 10
 SYSDESIGN_UPCOMING_COURSES = ()
 
-ALL_COURSES = COURSES + MATH_COURSES + ALGEBRA_COURSES + SYSDESIGN_COURSES
+# The Algorithms path: nine courses, all published. Generated from
+# content/algorithms/ so these cannot disagree with what is built.
+ALGO_COURSE_1_HOME = "/data-structures/"
+ALGO_COURSE_1_LESSONS = (
+    "arrays-linked-lists-and-the-cost-model",
+    "stacks-queues-and-the-two-stack-queue",
+    "priority-queues-and-binary-heaps", "building-a-heap-in-linear-time",
+    "hashing-with-chaining", "open-addressing-and-linear-probing",
+    "resizing-and-the-load-factor", "binary-search-trees",
+    "the-shape-problem-and-random-bsts", "rotations-and-the-avl-invariant",
+    "avl-insertion", "augmenting-a-tree", "union-find", "choosing-a-structure"
+)
+ALGO_COURSE_2_HOME = "/sorting-and-selection/"
+ALGO_COURSE_2_LESSONS = (
+    "what-a-sort-must-promise", "partitioning", "quicksort-and-its-worst-case",
+    "randomised-quicksort", "heapsort", "counting-sort", "radix-sort",
+    "bucket-sort-and-average-case-claims", "quickselect", "median-of-medians",
+    "adversary-arguments", "k-way-merge-and-external-sorting"
+)
+ALGO_COURSE_3_HOME = "/graph-algorithms/"
+ALGO_COURSE_3_LESSONS = (
+    "depth-first-search-and-the-timestamps", "topological-order",
+    "bridges-and-cut-vertices", "strongly-connected-components",
+    "the-cut-property", "kruskals-algorithm", "prims-algorithm",
+    "relaxation-and-dijkstras-schedule", "negative-weights-and-bellman-ford",
+    "shortest-and-longest-paths-in-a-dag", "augmenting-paths",
+    "max-flow-and-min-cut", "bipartite-matching"
+)
+ALGO_COURSE_4_HOME = "/greedy-and-matroids/"
+ALGO_COURSE_4_LESSONS = (
+    "greedy-rules-and-the-optimum", "the-exchange-argument",
+    "interval-partitioning-and-the-depth", "huffman-codes",
+    "why-huffman-is-optimal", "independence-systems-and-matroids",
+    "greedy-for-every-weighting", "stable-matching-and-who-it-favours",
+    "caching-and-the-offline-bound", "fractional-and-0-1-knapsack"
+)
+ALGO_COURSE_5_HOME = "/dynamic-programming/"
+ALGO_COURSE_5_LESSONS = (
+    "where-the-greedy-choice-fails", "overlapping-subproblems-and-the-memo",
+    "the-fill-order-is-part-of-the-algorithm",
+    "every-bracketing-and-the-one-the-table-found",
+    "the-knapsack-table-and-what-each-cell-reads",
+    "one-row-and-the-direction-of-the-loop",
+    "edit-distance-and-performing-the-script",
+    "the-tails-array-is-not-the-subsequence",
+    "combinations-or-ordered-sequences", "dynamic-programming-on-a-tree",
+    "won-and-lost-positions", "subsets-as-a-table-and-where-it-loses"
+)
+ALGO_COURSE_6_HOME = "/strings-and-pattern-matching/"
+ALGO_COURSE_6_LESSONS = (
+    "naive-matching-and-the-two-numbers", "where-the-simple-algorithm-wins",
+    "the-text-built-to-reach-the-bound", "borders-and-the-failure-function",
+    "the-amortised-bound-as-a-count", "the-matcher-as-a-machine",
+    "shifting-by-more-than-one", "the-text-where-nothing-is-skipped",
+    "a-rolling-hash-and-its-collisions", "choosing-a-modulus",
+    "one-pass-for-every-word", "the-suffix-array-and-what-it-answers"
+)
+ALGO_COURSE_7_HOME = "/geometric-algorithms/"
+ALGO_COURSE_7_LESSONS = (
+    "the-orientation-test", "the-magnitude-where-doubles-lose-the-sign",
+    "the-vertex-a-rounded-determinant-deletes",
+    "the-convex-hull-and-its-definition",
+    "three-answers-on-a-square-with-midpoints", "the-two-furthest-points",
+    "do-two-segments-meet", "four-zero-signs-and-two-different-answers",
+    "the-sweep-line-and-the-work-it-does-not-save",
+    "the-doubled-area-and-what-its-sign-carries",
+    "inside-by-parity-and-by-winding", "the-closest-pair-and-the-strip"
+)
+ALGO_COURSE_8_HOME = "/randomised-algorithms/"
+ALGO_COURSE_8_LESSONS = (
+    "uniform-sampling-and-the-shuffle-that-is-not",
+    "the-cost-is-a-distribution", "from-an-expectation-to-a-probability",
+    "balls-in-bins-and-the-birthday-bound", "universal-hashing",
+    "the-probabilistic-method", "where-the-7m-8-argument-stops",
+    "kargers-contraction", "repetition-and-the-probability-it-buys",
+    "witnesses-liars-and-one-sided-error", "treaps", "skip-lists",
+    "bloom-filters", "the-count-min-sketch"
+)
+ALGO_COURSE_9_HOME = "/intractability-and-approximation/"
+ALGO_COURSE_9_LESSONS = (
+    "decision-search-and-the-certificate", "a-reduction-is-a-construction",
+    "what-the-solution-map-preserves", "one-structure-three-problems",
+    "numbers-as-gadgets", "circuits-tours-and-the-chain",
+    "a-bound-the-search-can-see", "parameterising-the-budget",
+    "twice-a-matching", "the-hypothesis-doing-the-work",
+    "charging-every-element", "accuracy-by-the-epsilon",
+    "what-a-measurement-settles"
+)
+
+ALGO_COURSES = (
+    ("Data Structures", ALGO_COURSE_1_HOME, ALGO_COURSE_1_LESSONS),
+    ("Sorting and Selection", ALGO_COURSE_2_HOME, ALGO_COURSE_2_LESSONS),
+    ("Graph Algorithms", ALGO_COURSE_3_HOME, ALGO_COURSE_3_LESSONS),
+    ("Greedy Algorithms and Matroids",
+     ALGO_COURSE_4_HOME, ALGO_COURSE_4_LESSONS),
+    ("Dynamic Programming and Optimal Substructure",
+     ALGO_COURSE_5_HOME, ALGO_COURSE_5_LESSONS),
+    ("Strings and Pattern Matching",
+     ALGO_COURSE_6_HOME, ALGO_COURSE_6_LESSONS),
+    ("Geometric Algorithms", ALGO_COURSE_7_HOME, ALGO_COURSE_7_LESSONS),
+    ("Randomised Algorithms", ALGO_COURSE_8_HOME, ALGO_COURSE_8_LESSONS),
+    ("Intractability and Approximation",
+     ALGO_COURSE_9_HOME, ALGO_COURSE_9_LESSONS),
+)
+
+ALGO_PATH_COURSE_COUNT = 9
+ALGO_UPCOMING_COURSES = ()
+
+# The Operations Research path: ten courses, all published. Generated from
+# content/operations_research/ so these cannot disagree with what is built.
+OR_COURSE_1_HOME = "/linear-programming-models/"
+OR_COURSE_1_LESSONS = (
+    "decision-variables-objective-and-constraints",
+    "product-mix-and-resource-constraints",
+    "covering-diet-and-minimisation-models", "blending-and-ratio-constraints",
+    "multiperiod-planning-and-balance-constraints",
+    "reformulations-that-keep-linearity",
+    "goal-programming-and-deviation-variables",
+    "standard-form-slack-and-surplus", "basic-solutions-and-corners",
+    "convexity-and-why-a-local-optimum-is-global"
+)
+OR_COURSE_2_HOME = "/the-simplex-method/"
+OR_COURSE_2_LESSONS = (
+    "adjacent-corners-and-the-simplex-idea", "the-simplex-tableau",
+    "the-ratio-test", "reduced-costs-and-the-optimality-test",
+    "artificial-variables-and-two-phase-simplex",
+    "unbounded-and-alternative-optima-in-the-tableau",
+    "degeneracy-cycling-and-blands-rule", "the-tableau-as-a-matrix-product",
+    "termination-and-the-klee-minty-cube"
+)
+OR_COURSE_3_HOME = "/duality-and-sensitivity-analysis/"
+OR_COURSE_3_LESSONS = (
+    "the-dual-problem", "weak-duality-and-certificates-of-optimality",
+    "strong-duality-from-the-final-tableau", "complementary-slackness",
+    "shadow-prices-and-right-hand-side-ranging",
+    "objective-coefficient-ranging-and-reduced-costs",
+    "pricing-a-new-activity-and-adding-a-constraint",
+    "the-dual-simplex-method", "parametric-objectives-and-the-pareto-front",
+    "zero-sum-games-and-the-minimax-theorem"
+)
+OR_COURSE_4_HOME = "/networks-flows-paths-and-assignments/"
+OR_COURSE_4_LESSONS = (
+    "arcs-capacities-and-conservation", "the-minimum-cost-flow-programme",
+    "the-transportation-problem", "potentials-and-the-stepping-stone-cycle",
+    "total-unimodularity-and-integer-corners", "the-assignment-problem",
+    "project-networks-and-the-critical-path",
+    "shortest-paths-and-node-potentials", "maximum-flow-and-minimum-cut",
+    "bipartite-matching-and-halls-condition"
+)
+OR_COURSE_5_HOME = "/integer-programming/"
+OR_COURSE_5_LESSONS = (
+    "when-rounding-fails-the-lp-relaxation",
+    "binary-variables-and-logical-constraints",
+    "the-knapsack-and-set-covering-models",
+    "fixed-charges-facility-location-and-big-m",
+    "either-or-constraints-and-disjunctions", "branch-and-bound",
+    "incumbents-bounds-and-the-optimality-gap",
+    "cutting-planes-and-gomory-cuts", "the-travelling-salesman-problem"
+)
+OR_COURSE_6_HOME = "/scheduling/"
+OR_COURSE_6_LESSONS = (
+    "one-machine-and-six-objectives",
+    "shortest-processing-time-and-the-adjacent-exchange",
+    "smiths-rule-and-weighted-completion-time",
+    "earliest-due-date-and-maximum-lateness",
+    "minimising-the-number-of-late-jobs",
+    "two-machines-in-series-and-johnsons-rule",
+    "machines-in-parallel-and-the-lpt-bound",
+    "the-job-shop-and-disjunctive-orientations",
+    "crashing-a-project-and-the-time-cost-curve"
+)
+OR_COURSE_7_HOME = "/dynamic-programming-and-sequential-decisions/"
+OR_COURSE_7_LESSONS = (
+    "filling-the-table-from-the-end", "the-state-is-what-is-left",
+    "wagner-whitin-and-the-order-intervals", "silver-meal-and-least-unit-cost",
+    "the-stochastic-recursion", "folding-a-decision-tree-back",
+    "thresholds-and-when-to-stop-looking", "the-secretary-problem-exactly",
+    "value-iteration-and-the-fixed-point"
+)
+OR_COURSE_8_HOME = "/inventory-models/"
+OR_COURSE_8_LESSONS = (
+    "the-economic-order-quantity", "the-order-quantity-as-a-discriminant",
+    "all-units-price-breaks", "production-runs-and-planned-backorders",
+    "the-newsvendor-and-the-critical-ratio",
+    "reorder-points-and-two-service-levels",
+    "periodic-review-and-the-base-stock-level"
+)
+OR_COURSE_9_HOME = "/markov-chains-decisions-and-queues/"
+OR_COURSE_9_LESSONS = (
+    "transition-matrices-and-the-support-digraph",
+    "communicating-classes-recurrence-and-period",
+    "the-steady-state-as-a-linear-system",
+    "absorbing-states-and-the-fundamental-matrix",
+    "markov-decision-processes-and-policy-iteration",
+    "the-cut-equation-and-every-queue-from-it",
+    "the-mm1-chain-and-the-cost-of-truncation",
+    "more-servers-and-erlang-c-read-off-pi",
+    "finite-buffers-blocking-and-the-admitted-rate",
+    "the-poisson-limit-and-where-exactness-stops"
+)
+OR_COURSE_10_HOME = "/simulation-and-variance-reduction/"
+OR_COURSE_10_LESSONS = (
+    "random-numbers-and-inverse-transform-sampling",
+    "monte-carlo-and-the-standard-error", "how-sure-chebyshevs-bound",
+    "discrete-event-simulation-of-a-queue",
+    "warm-up-and-the-initial-transient", "common-random-numbers",
+    "antithetic-variates", "control-variates",
+    "importance-sampling-for-rare-events"
+)
+
+OR_COURSES = (
+    ("Linear Programming Models", OR_COURSE_1_HOME, OR_COURSE_1_LESSONS),
+    ("The Simplex Method", OR_COURSE_2_HOME, OR_COURSE_2_LESSONS),
+    ("Duality and Sensitivity Analysis",
+     OR_COURSE_3_HOME, OR_COURSE_3_LESSONS),
+    ("Networks: Flows, Paths and Assignments",
+     OR_COURSE_4_HOME, OR_COURSE_4_LESSONS),
+    ("Integer Programming", OR_COURSE_5_HOME, OR_COURSE_5_LESSONS),
+    ("Scheduling", OR_COURSE_6_HOME, OR_COURSE_6_LESSONS),
+    ("Dynamic Programming and Sequential Decisions",
+     OR_COURSE_7_HOME, OR_COURSE_7_LESSONS),
+    ("Inventory Models", OR_COURSE_8_HOME, OR_COURSE_8_LESSONS),
+    ("Markov Chains, Decisions and Queues",
+     OR_COURSE_9_HOME, OR_COURSE_9_LESSONS),
+    ("Simulation and Variance Reduction",
+     OR_COURSE_10_HOME, OR_COURSE_10_LESSONS),
+)
+
+OR_PATH_COURSE_COUNT = 10
+OR_UPCOMING_COURSES = ()
+
+ALL_COURSES = (COURSES + MATH_COURSES + ALGEBRA_COURSES + SYSDESIGN_COURSES
+               + ALGO_COURSES + OR_COURSES)
 
 # The trading path is EIGHT courses long and all eight are published. This tuple
 # is EMPTY, and that is the finished state rather than an oversight: an entry
@@ -760,7 +994,7 @@ def source_of(url):
 # are published pages like any other, so every whole-tree invariant applies to
 # them -- but the per-course invariants do not, because neither is a course.
 SHARED_CHROME_PAGES = (SITE_INDEX, PATH_PAGE, MATH_PATH_PAGE, ALGEBRA_PATH_PAGE,
-                       SYSDESIGN_PATH_PAGE)
+                       SYSDESIGN_PATH_PAGE, ALGO_PATH_PAGE, OR_PATH_PAGE)
 
 # Every path, as one row: the subject name, its page, its courses and the
 # length it claims. Each per-path invariant below iterates THIS, so a third
@@ -773,6 +1007,10 @@ PATHS = (
      ALGEBRA_UPCOMING_COURSES),
     ("System Design", SYSDESIGN_PATH_PAGE, SYSDESIGN_COURSES,
      SYSDESIGN_PATH_COURSE_COUNT, SYSDESIGN_UPCOMING_COURSES),
+    ("Algorithms", ALGO_PATH_PAGE, ALGO_COURSES, ALGO_PATH_COURSE_COUNT,
+     ALGO_UPCOMING_COURSES),
+    ("Operations Research", OR_PATH_PAGE, OR_COURSES, OR_PATH_COURSE_COUNT,
+     OR_UPCOMING_COURSES),
 )
 
 PATH_PAGES = tuple(page for _t, page, _c, _n, _u in PATHS)
@@ -941,6 +1179,17 @@ ALGEBRA_DISCLAIMER_RE = re.compile(
 # rather than on the promise.
 SYSDESIGN_DISCLAIMER_RE = re.compile(
     r"(?i)only as true as its assumptions")
+# Algorithms promises the reader that every count on the page was produced by
+# running the algorithm on the input shown -- and warns that a count is one
+# measurement, not the bound the course spends nine courses proving.
+ALGO_DISCLAIMER_RE = re.compile(
+    r"(?i)a count on one input is not a bound")
+# Operations Research promises an exact solve and warns that the optimum is the
+# model's, not the situation's. Deliberately apostrophe-free and stopping short
+# of the em dash: the rendered clause writes "&mdash;", and a regex spanning
+# that entity would pass or fail on the escaping rather than on the promise.
+OR_DISCLAIMER_RE = re.compile(
+    r"(?i)optimal for the model you wrote down")
 
 # Which sentence each path's course pages must carry. A path is a KEY here, so
 # adding one without deciding what it promises its reader fails immediately
@@ -951,6 +1200,9 @@ PATH_MATERIAL_DISCLAIMER = {
     ALGEBRA_PATH_PAGE: ("the a-step-is-not-a-rule disclaimer", ALGEBRA_DISCLAIMER_RE),
     SYSDESIGN_PATH_PAGE: ("the only-as-true-as-its-assumptions disclaimer",
                           SYSDESIGN_DISCLAIMER_RE),
+    ALGO_PATH_PAGE: ("the a-count-is-not-a-bound disclaimer", ALGO_DISCLAIMER_RE),
+    OR_PATH_PAGE: ("the optimal-for-the-model-you-wrote-down disclaimer",
+                   OR_DISCLAIMER_RE),
 }
 
 # The notice a REAL-DATA page carries instead. Each phrase is asserted
@@ -1250,8 +1502,18 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             + len(SYSDESIGN_COURSES)
             + sum(len(slugs) for _t, _h, slugs in SYSDESIGN_COURSES)
         )
+        algo_tree = (
+            1  # the algorithms path page
+            + len(ALGO_COURSES)
+            + sum(len(slugs) for _t, _h, slugs in ALGO_COURSES)
+        )
+        or_tree = (
+            1  # the operations research path page
+            + len(OR_COURSES)
+            + sum(len(slugs) for _t, _h, slugs in OR_COURSES)
+        )
         course_tree = (1 + trading_tree + math_tree + algebra_tree
-                       + sysdesign_tree)  # 1 for the index
+                       + sysdesign_tree + algo_tree + or_tree)  # 1 for the index
         self.assertEqual(
             127,
             trading_tree,
@@ -1277,9 +1539,21 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "+ 11 + 10 = 125 pages, got %d" % sysdesign_tree,
         )
         self.assertEqual(
-            490,
+            122,
+            algo_tree,
+            "the algorithms path is 1 + 9 + 14 + 12 + 13 + 10 + 12 + 12 + 12 + 14 "
+            "+ 13 = 122 pages, got %d" % algo_tree,
+        )
+        self.assertEqual(
+            103,
+            or_tree,
+            "the operations research path is 1 + 10 + 10 + 9 + 10 + 10 + 9 + 9 + 9 "
+            "+ 7 + 10 + 9 = 103 pages, got %d" % or_tree,
+        )
+        self.assertEqual(
+            715,
             course_tree,
-            "the site index plus all four path trees is 490 pages, got %d" % course_tree,
+            "the site index plus all six path trees is 715 pages, got %d" % course_tree,
         )
         self.assertEqual(
             2,
@@ -1290,9 +1564,9 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
         # network sweeps treat them differently.
         expected = course_tree + len(REAL_DATA_PAGES) + len(AUTH_PAGES)
         self.assertEqual(
-            494,
+            719,
             expected,
-            "490 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 494, "
+            "715 course-tree pages, the 2 capstone pages and the 2 sign-in pages is 719, "
             "got %d" % expected,
         )
         self.assertEqual(
@@ -1502,6 +1776,8 @@ class TestDeclaredUrlSpaceAgrees(unittest.TestCase):
             "algebra": getattr(smoke, "ALGEBRA_COURSES", ()),
             "discrete_math": getattr(smoke, "MATH_COURSES", ()),
             "system_design": getattr(smoke, "SYSDESIGN_COURSES", ()),
+            "algorithms": getattr(smoke, "ALGO_COURSES", ()),
+            "operations_research": getattr(smoke, "OR_COURSES", ()),
         }
         for package, courses in declared.items():
             if not courses:
@@ -1914,9 +2190,9 @@ class TestContent(SiteFixture):
         ]
         self.assertTrue(course_pages, "no course page found under %s" % SITE_ROOT)
         self.assertEqual(
-            485,
+            708,
             len(course_pages),
-            "thirty-five course homes and 450 lessons carry a material "
+            "fifty-four course homes and 654 lessons carry a material "
             "disclaimer; found %d pages, so a page has been added or removed "
             "without being declared" % len(course_pages),
         )
@@ -2907,7 +3183,7 @@ class TestCourseContext(SiteFixture):
                     self.assertIn(title, copy)
                     self.assertIn('<span data-ui="page-kind">Course</span>', doc.text)
                     self.assertNotRegex(copy, r"(?i)\bcourse\s+\d|\bpath\b")
-        self.assertEqual(35, checked, "every published course must be checked")
+        self.assertEqual(54, checked, "every published course must be checked")
 
     def test_course_pager_points_at_the_adjacent_course_homes(self):
         by_url = {served_path(doc.path): doc for doc in self.documents}

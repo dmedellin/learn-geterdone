@@ -1,0 +1,3387 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Where the Greedy Choice Fails | Lesson | Dynamic Programming and Optimal Substructure | Algorithms | Learn · geterdone.io</title>
+  <meta name="description" content="Greedy Algorithms and Matroids proved a rule correct by exchange wherever the structure allowed it. Change the coins to 1, 3 and 4 and the largest-first rule returns three coins for an amount of six where two suffice. What replaces the rule is not a better rule: it is a recurrence that tries every first coin and keeps the best, and everything on this course is the cost of evaluating one." />
+  <link rel="canonical" href="https://learn.geterdone.io/dynamic-programming/where-the-greedy-choice-fails/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="Where the Greedy Choice Fails | Lesson | Dynamic Programming and Optimal Substructure | Algorithms | Learn · geterdone.io" />
+  <meta property="og:description" content="Greedy Algorithms and Matroids proved a rule correct by exchange wherever the structure allowed it. Change the coins to 1, 3 and 4 and the largest-first rule returns three coins for an amount of six where two suffice. What replaces the rule is not a better rule: it is a recurrence that tries every first coin and keeps the best, and everything on this course is the cost of evaluating one." />
+  <meta property="og:url" content="https://learn.geterdone.io/dynamic-programming/where-the-greedy-choice-fails/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Where the Greedy Choice Fails | Lesson | Dynamic Programming and Optimal Substructure | Algorithms | Learn · geterdone.io" />
+  <meta name="twitter:description" content="Greedy Algorithms and Matroids proved a rule correct by exchange wherever the structure allowed it. Change the coins to 1, 3 and 4 and the largest-first rule returns three coins for an amount of six where two suffice. What replaces the rule is not a better rule: it is a recurrence that tries every first coin and keeps the best, and everything on this course is the cost of evaluating one." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/dynamic-programming/where-the-greedy-choice-fails/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    @media (max-width: 920px) {
+      body[data-page-kind="supplemental"] [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/algorithms/">Algorithms</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Dynamic Programming and Optimal Substructure</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">Where the Greedy Choice Fails</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The one recurrence, three costs, one answer is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Dynamic Programming and Optimal Substructure &middot; A table, an order, a recurrence</span>
+        <h1>Where the Greedy Choice Fails</h1>
+        <p>Greedy Algorithms and Matroids proved a rule correct by exchange wherever the structure allowed it. Change the coins to 1, 3 and 4 and the largest-first rule returns three coins for an amount of six where two suffice. What replaces the rule is not a better rule: it is a recurrence that tries every first coin and keeps the best, and everything on this course is the cost of evaluating one.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">f(0) = 0        f(a) = 1 + min over coins c ≤ a of f(a − c)
+
+coins 1, 3, 4 and an amount of 6
+  largest coin first    4 + 1 + 1     three coins
+  the recurrence        3 + 3         two coins
+
+one failing instance refutes a rule; a hundred passing ones refute nothing</div>
+        <div class="float-label" style="right:16px;bottom:16px;">One recurrence, and the six-unit instance the greedy rule gets wrong</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>One hard idea: optimal substructure, which is the property that licenses the recurrence and is a proof obligation rather than a hope. The other two are about what a failing instance does and does not establish.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>A greedy rule commits to a first choice; a recurrence does not</h3><p>Largest-first takes the 4, and is then solving for 2 with nothing better than a 1 available: <span class="math">4 + 1 + 1</span>, three coins, and it never reconsiders. The recurrence asks <span class="math">f(6) = 1 + min(f(5), f(3), f(2))</span>, which is every legal first coin at once, and <span class="math">f(3) = 1</span> gives <span class="math">f(6) = 2</span>. The difference is not cleverness. It is that one of them discards the alternatives before it knows what they cost.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Optimal substructure is what licenses the recurrence</h3><p>If some fewest-coin way of making <span class="math">a</span> begins with coin <span class="math">c</span>, then what remains is a fewest-coin way of making <span class="math">a − c</span> &mdash; because a cheaper way of making <span class="math">a − c</span> could be substituted in and would give a cheaper way of making <span class="math">a</span>, contradicting the first. That substitution argument is the whole justification for reading <span class="math">f(a)</span> off smaller values of <span class="math">f</span>, and a problem without it cannot be written as a recurrence over subproblems at all.</p></article><article class="card concept-card"><div class="icon">3</div><h3>A failing instance refutes a rule; passing instances establish nothing</h3><p>Six units from 1, 3 and 4 settles the question of whether largest-first is correct for every coin system: it is not, and one counterexample is enough. Now switch the lab to 1, 2 and 5 and the same rule is optimal at every amount you will type. That is a fact about that coin system, established by trial for the amounts you tried, and it is not a proof about the system, let alone about the rule.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>The recurrence, the property it needs, and what the counterexample settles</h2></div><p>The problem, the instance where greed fails, the substitution argument, and the three routes the lab runs.</p></div>
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; The fewest-coins problem</span><p>Given a set of coin denominations and an amount <span class="math">a</span>, find the smallest number of coins, each denomination usable any number of times, that add to exactly <span class="math">a</span>. If no multiset of the coins adds to <span class="math">a</span> the answer is that the amount cannot be made, which is a result and not a failure.</p></div><p>Two things are being separated here, and conflating them is the reason this lesson comes first. A <strong>rule</strong> says what to do next: take the largest coin that fits. A <strong>recurrence</strong> says what the answer is in terms of smaller answers, and commits to nothing. Greedy Algorithms and Matroids is about the conditions under which a rule can be proved correct; this course is about what to do when it cannot.</p><div class="example"><span class="label">Example &middot; Six units from 1, 3 and 4</span><p>Largest-first takes 4, leaving 2, then 1, leaving 1, then 1: <span class="math">4 + 1 + 1</span>, three coins. The lab reports the answer as 2 and the coins it uses as <span class="math">3 + 3</span>, re-added on the panel to 6. Both are legal ways to pay. Only one of them is fewest, and the rule does not find it on this input.</p></div><p>Notice how little it took. The coin system is three denominations and the amount is six; nothing here is adversarially large. A reader who has just spent a course proving greedy rules correct by exchange should read this as the boundary being drawn rather than as a trick, because the exchange argument that works for the fractional problem really does fail here, and the lesson after next is where that failure is made explicit on a second problem.</p><div class="defbox"><span class="label">Definition &middot; Optimal substructure</span><p>A problem has <strong>optimal substructure</strong> when an optimal solution to it contains, as a part, an optimal solution to a smaller instance of the same problem. The phrase names a proof obligation: you show that a better solution to the part could be cut in, which is what makes the recurrence a statement about optima rather than about some solutions.</p></div><div class="thm"><span class="label">Theorem &middot; The coin recurrence is correct</span><p>Let <span class="math">f(a)</span> be the fewest coins that add to <span class="math">a</span>, with <span class="math">f(0) = 0</span> and <span class="math">f(a)</span> undefined when no multiset adds to <span class="math">a</span>. Then for every <span class="math">a &gt; 0</span> that can be made, <span class="math">f(a) = 1 + min of f(a − c)</span> over all coins <span class="math">c ≤ a</span> for which <span class="math">a − c</span> can be made.</p></div><div class="proof"><p>Both directions. Any multiset of coins adding to <span class="math">a</span> has a first coin <span class="math">c</span>, and removing it leaves a multiset adding to <span class="math">a − c</span> with one fewer coin; so <span class="math">f(a) ≥ 1 + f(a − c)</span> for that <span class="math">c</span>, and therefore <span class="math">f(a) ≥ 1 + min of f(a − c)</span>.</p><p>For the other direction, take the <span class="math">c</span> attaining the minimum and a cheapest multiset for <span class="math">a − c</span>; adding one <span class="math">c</span> to it gives a multiset adding to <span class="math">a</span> of size <span class="math">1 + f(a − c)</span>, so <span class="math">f(a) ≤ 1 + min of f(a − c)</span>. The two inequalities give equality, and the substitution in the second half is the optimal-substructure argument doing its work.</p><p><span class="qed">&#9633;</span></p></div><h3>What the rule needed, and the recurrence does not</h3><p>The exchange argument behind a greedy rule needs more than optimal substructure: it needs the <em>greedy choice property</em>, that some optimal solution agrees with the rule on the first step. With coins 1, 3 and 4 at an amount of six there is no optimal solution containing a 4, so that property is simply false, and the exchange has nothing to exchange into. Optimal substructure survives untouched &mdash; which is precisely why the recurrence still works when the rule does not.</p><p>This is the split the Subject's ordering is built on. Greedy needs both properties and pays <span class="math">O(n log n)</span>; dynamic programming needs only the first and pays for it in table cells. Neither is stronger than the other; they assume different things, and the assumption is the thing to check.</p><h3>Three routes, and three costs that are not the point until they agree</h3><p>The lab runs the same definition three ways: as a recursion with no memory, as the same recursion writing each answer down the first time, and as a table filled bottom-up. On this instance the three answers are all 2, and the costs are 24 calls, 14 calls, and 28 cells. The panel prints the ratio as an exact fraction &mdash; <span class="math">12/7</span>, about 1.7 times fewer calls &mdash; and says explicitly that the comparison is worth nothing unless the answers match, which is why they are checked before they are counted.</p><p>Read those three numbers carefully, because they do not say what a reader expects. The table fills 28 cells; the memo-free recursion makes 24 calls. On this input the exponential method does <em>less</em> work than the polynomial one. The proved bounds are unchanged &mdash; the table is <span class="math">Θ(nk)</span> cells for <span class="math">n</span> denominations and amount <span class="math">k</span>, and the plain recursion is exponential in <span class="math">k</span> &mdash; and the next lesson moves the amount to eighteen, where the same two routes cost 22 089 calls and 76 cells. A count at one size cannot order two growth rates, and this page is the smallest instance on the course where it visibly gets the order wrong.</p></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>One recurrence, three costs, one answer</h2></div><p>The same definition run without a memo, with one, and as a table</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>The same recurrence, three times</strong><span>no memo, a memo, and a table — one answer, three costs</span></div>
+        <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the cell being computed</span><span class="tone-amber"><i class="legend-swatch"></i>the cells it read</span><span class="tone-purple"><i class="legend-swatch"></i>the coins the answer uses</span></div>
+      </div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="mmGrid" viewBox="0 0 660 180" role="img" aria-label="The table, one row per coin type and one column per amount."></svg><svg id="mmPlot" viewBox="0 0 520 220" role="img" aria-label="Calls made by the plain recursion and by the memoised one, against the amount."></svg></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="mmRoutes"></table></div>
+      <div class="status-banner" id="mmStatus" style="margin-top:12px;"></div>
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>Choose a coin system that defeats the greedy rule</h3>
+          <p>The panel loads coins 1, 3 and 4 at an amount of six, where largest-first pays three coins and two are enough. Switch to 1, 2 and 5 and the rule becomes optimal at every amount you try, which is worth doing precisely because it proves nothing.</p>
+        <div class="field">
+          <label for="mmPreset">Coins and amount</label>
+          <select id="mmPreset"><option value="canonical">coins 1, 2, 5 and an amount of 18</option><option value="awkward" selected>coins 1, 3, 4 — where taking the largest first is wrong</option><option value="sparse">coins 4, 7 and an amount of 17</option><option value="wide">five coin types, amount 20</option></select>
+        </div>
+        <div class="field">
+          <label for="mmCoins">Coin denominations</label>
+          <input id="mmCoins" type="text" value="1 3 4" inputmode="text" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="mmAmount">Amount to make</label>
+          <input id="mmAmount" type="text" value="6" inputmode="text" autocomplete="off">
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="mmCell">Explain the cell at column</label><span class="range-value" id="mmCellOut">0</span></div>
+          <input id="mmCell" type="range" min="0" max="26" step="1" value="0" />
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Fewest coins</span><strong id="mmBest">&mdash;</strong></div>
+          <div class="kpi"><span>Calls, no memo</span><strong id="mmNaive">&mdash;</strong></div>
+          <div class="kpi"><span>Calls, with a memo</span><strong id="mmMemo">&mdash;</strong></div>
+          <div class="kpi"><span>Calls saved, as a fraction</span><strong id="mmSaved">&mdash;</strong></div>
+          <div class="kpi"><span>Cells the table fills</span><strong id="mmCells">&mdash;</strong></div>
+          <div class="kpi"><span>All three agree</span><strong id="mmAgree">&mdash;</strong></div>
+        </div>
+        <p class="small-copy" id="mmHint" style="margin:0;">The recurrence is the whole lesson: <em>the fewest coins for n is one more than the fewest for n minus some coin</em>. Run it as written and the same subproblem is solved thousands of times. Write each answer down the first time and it is solved once. Fill the answers bottom-up and there is no recursion at all. The three costs are wildly different and the three answers are the same number.</p>
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Deciding whether a rule is available before reaching for a table</h2></div><p>The recurrence is cheap to write and expensive to evaluate, so it is worth one honest attempt to avoid it.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>State the recurrence before you state a rule</h3><p>Write what the answer is in terms of smaller answers, with every legal first choice in the minimum. That expression is correct or it is not, independently of how you intend to evaluate it, and it is the thing the rest of the work has to agree with.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Discharge optimal substructure by substitution</h3><p>Assume an optimal solution whose part is not optimal, cut the better part in, and derive a contradiction. If the substitution does not go through &mdash; because the part interacts with the rest &mdash; the recurrence is not licensed and no amount of filling a table will repair it.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Try to break the greedy rule, not to confirm it</h3><p>Spend the effort on a counterexample. Small denominations that are not multiples of one another are where they live: 1, 3, 4 breaks largest-first at six, and 1, 3, 4 is the smallest system this library knows of that does. Confirmations cost the same and buy nothing.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Count all three routes on your own input</h3><p>Run the recursion, the memo and the table on the instance you actually have. The ordering between them changes with size, and the only way to know which is cheaper at your size is the counter, not the complexity class.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Make the answers agree before comparing the costs</h3><p>Three costs are interesting only when the three answers are one answer. The lab prints a verdict for that first and says so in the banner; a cost comparison between a right method and a wrong one is not a comparison.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>Rules, recurrences, and what one instance settles</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>The table for coins 1, 3, 4 at an amount of six</h3><p>One row per coin type added to the system, one column per amount from zero up. Each row answers the same question the row above it answered, with one more denomination available. A dot is an amount that cannot be made with the coins so far.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">amount            0    1    2    3    4    5    6
+
+no coins          0    ·    ·    ·    ·    ·    ·
+with 1            0    1    2    3    4    5    6
+with 1, 3         0    1    2    1    2    3    2
+with 1, 3, 4      0    1    2    1    1    2    2
+
+the last cell reads two others:
+  skip the 4:   the cell above it, which is 2
+  take a 4:     the cell two columns left in its OWN row, plus one,
+                which is 2 + 1 = 3
+so the answer is 2, and the coins are 3 + 3
+
+largest coin first would have paid   4 + 1 + 1   =   three coins</div><p>The row for 1, 3 already contains the answer: <span class="math">f(3) = 1</span>, so <span class="math">f(6) = 2</span> by taking two threes, and adding the 4 to the system changes nothing at the amount asked about. That is worth noticing, because the greedy rule's whole mistake was to use the 4 &mdash; the denomination that turns out to be irrelevant at six is the one it reaches for first.</p><p>Move the highlighted cell along the range control and the lab repaints the cells that cell read, in amber. That list is not a description of the recurrence written out beside it; it is recorded by the reads the recurrence itself performed, so it cannot disagree with what the code did. Two cells for every cell in the bottom row, here.</p><p>For a faded rehearsal, keep the coins and set the amount to 11 before running it. The supplied first move: largest-first pays <span class="math">4 + 4 + 3</span>, which is three coins. Decide whether the recurrence can do better, then check &mdash; and notice that being right about this one tells you nothing about twelve.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading a greedy failure as a verdict on greedy</strong><span>The failure here is of one rule on one coin system. Greedy Algorithms and Matroids proves several rules correct, and the matroid theorem says exactly when the pattern is available. What this instance shows is that availability has to be checked per problem, not that the technique is unsound.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Treating optimal substructure as obvious</strong><span>It is a property that genuinely fails: the longest <em>simple</em> path between two vertices does not decompose this way, because the two halves can be optimal separately and share a vertex, and the join is then not a simple path at all. The substitution argument is what distinguishes the cases, and skipping it is how a confident recurrence for a problem that has no recurrence gets written.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking the smaller count at one size for the better method</strong><span>The panel prints 24 calls against 28 cells and the exponential route wins. A reader who stops there has measured a case and stated a class. Move the amount and the two numbers cross; the bound is what says which side of the crossing you are eventually on, and the counter is what says which side you are on now.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can say what a counterexample to a rule does and does not settle.</strong><p>You should be able to write the recurrence for a problem, discharge optimal substructure by substitution, name the extra property a greedy rule would need, and read a cost comparison without turning it into a statement about growth.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> The recurrence is correct and, run as written, it is unusable: the next lesson moves the amount from six to eighteen and watches the same code make 22 089 calls to answer a question with eighteen distinct parts to it.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link next" href="../overlapping-subproblems-and-the-memo/" rel="next"><span>Lesson</span><strong>Overlapping Subproblems and the Memo</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="dynamic-programming/where-the-greedy-choice-fails" data-lesson-title="Where the Greedy Choice Fails" data-course-title="Dynamic Programming and Optimal Substructure">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Dynamic Programming and Optimal Substructure.</strong> Every count on this course is produced by running the algorithm on the input you typed. Call counts, cell counts, reads, comparisons, table entries and distances are exact integers; the two ratios that are printed as ratios &mdash; the calls a memo saves and Held-Karp's work against brute force's &mdash; are exact fractions, with a decimal beside them at a stated number of places for reading. Counts of ways are arbitrary-precision integers and are never converted: the number of ordered ways to make 100 from 1, 2 and 5 has twenty-three digits, and a page holding it as a double would print a number that is merely close. Every table on this course is checked against at least one route that contains no table &mdash; an exhaustive enumeration at a cap the page states, a memo-free recursion, or a re-costing of the object that came back &mdash; and where an exhaustive check is refused for being too large, the page says so rather than reporting a number with nothing behind it. The two work figures on the travelling-salesman page are the expressions <span class="math">n²2ⁿ</span> and <span class="math">(n−1)!</span> evaluated at the number of cities on screen; they are bounds printed as integers, not measurements, and the page says which of the figures beside them are measured.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every count is measured by running the algorithm on the input shown, and a count on one input is not a bound.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "With coins 1, 3 and 4, largest-first pays three coins for an amount of six and the recurrence finds two. What has been established?", "a": ["That largest-first is not correct for every coin system", "That largest-first is wrong whenever the amount is six", "That no greedy rule can be correct for any coin system", "That dynamic programming is faster than greedy on this input"], "c": 0, "why": "A single counterexample refutes a universal claim and nothing more. It says nothing about other amounts &mdash; largest-first is optimal at five and at seven in this same system &mdash; and nothing about other rules or other systems. It is also not a claim about cost: on this instance the memo-free recursion makes 24 calls where the table fills 28 cells."}, {"q": "Which property does the recurrence <span class=\"math\">f(a) = 1 + min of f(a \u2212 c)<\/span> need in order to be correct?", "a": ["The greedy choice property: some optimum starts with the largest coin", "Optimal substructure: an optimal solution contains an optimal solution to the remaining amount", "That the denominations are multiples of one another", "That every amount below <span class=\"math\">a<\/span> can be made"], "c": 1, "why": "Optimal substructure is exactly what the proof's second half uses: a cheaper way of making <span class=\"math\">a \u2212 c<\/span> could be substituted in. The greedy choice property is the extra thing a rule needs and this instance does not have. Neither divisibility nor reachability of every smaller amount is required &mdash; the coins 4 and 7 make most small amounts impossible and the recurrence still answers correctly."}, {"q": "Switching the lab to coins 1, 2 and 5, largest-first returns the fewest coins at every amount you try. What does that establish about that coin system?", "a": ["That largest-first is optimal for that system, since no counterexample exists", "That the recurrence is unnecessary for that system", "Nothing on its own: those are the amounts you tried, and a rule is proved from its structure", "That 1, 2 and 5 are pairwise coprime, which is what makes greed work"], "c": 2, "why": "The asymmetry is the lesson. A violation settles the question outright; agreement on a finite set of amounts is evidence about those amounts. Largest-first genuinely is optimal for 1, 2 and 5, but that is a theorem about that system's structure, not something the lab established. The coprimality answer is also false as stated: 1, 3 and 4 are pairwise coprime and the rule fails on them."}, {"q": "On this instance the memo-free recursion makes 24 calls and the table fills 28 cells. Which conclusion is supported?", "a": ["The memo-free recursion has the better growth rate", "The table is the wrong method for the fewest-coins problem", "The two methods are within a constant factor of each other", "Neither method's growth is settled by this: it is one amount, and the ordering reverses as the amount grows"], "c": 3, "why": "A count is evidence about the input it was taken on. The table is <span class=\"math\">\u0398(nk)<\/span> and the plain recursion is exponential in the amount, and at an amount of eighteen the same two routes cost 76 cells and 22 089 calls. A constant factor is a claim about all sizes and cannot be read off one, either."}];
+
+  (function () {
+
+  /* Exact rational arithmetic over BigInt.
+
+     Every number a lesson calls "the answer" lives in this type. BigInt rather
+     than Number because a few steps of elimination on a 3x3 system produces
+     numerators that leave the exact-integer range of a double, and a solution
+     that is silently wrong in the last digits is worse than no solution. */
+  function bgcd(a, b) {
+    if (a < 0n) a = -a;
+    if (b < 0n) b = -b;
+    while (b) { var t = a % b; a = b; b = t; }
+    return a;
+  }
+  function R(n, d) {
+    if (d === undefined) d = 1n;
+    n = BigInt(n); d = BigInt(d);
+    if (d === 0n) throw new Error('division by zero');
+    if (d < 0n) { n = -n; d = -d; }
+    var g = bgcd(n, d) || 1n;
+    return { n: n / g, d: d / g };
+  }
+  var R0 = R(0n), R1 = R(1n);
+  function Radd(a, b) { return R(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function Rsub(a, b) { return R(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function Rmul(a, b) { return R(a.n * b.n, a.d * b.d); }
+  function Rdiv(a, b) { return R(a.n * b.d, a.d * b.n); }
+  function Rneg(a) { return R(-a.n, a.d); }
+  function Rabs(a) { return a.n < 0n ? Rneg(a) : a; }
+  function Rinv(a) { return R(a.d, a.n); }
+  function Rzero(a) { return a.n === 0n; }
+  function Rsign(a) { return a.n === 0n ? 0 : (a.n < 0n ? -1 : 1); }
+  function Requ(a, b) { return a.n === b.n && a.d === b.d; }
+  function Rcmp(a, b) { var l = a.n * b.d, r = b.n * a.d; return l < r ? -1 : (l > r ? 1 : 0); }
+  function Rint(a) { return a.d === 1n; }
+  function Rpow(a, k) {
+    var out = R1, base = a, e = k < 0 ? -k : k;
+    while (e > 0) { if (e & 1) out = Rmul(out, base); base = Rmul(base, base); e >>= 1; }
+    return k < 0 ? Rinv(out) : out;
+  }
+  /* The reader's form: "3", "-7/4". Never "3/1", never "0/5". */
+  function Rtext(a) { return a.d === 1n ? String(a.n) : a.n + '/' + a.d; }
+  /* Parenthesised when it would otherwise glue onto a neighbouring symbol. */
+  function Rterm(a) { return (a.n < 0n || a.d !== 1n) ? '(' + Rtext(a) + ')' : Rtext(a); }
+  function Rnum(a) { return Number(a.n) / Number(a.d); }
+  /* A decimal, for the one place a lesson asks for one. Exact when it can be.
+
+     BigInt long division rather than Number(n)/Number(d).toFixed(). The old
+     form had two faults and the second is the one that shows.
+
+     It returned NaN. Past roughly 300 digits both halves of the quotient are
+     Infinity and Infinity/Infinity is NaN, so a page printed NaN to a reader.
+     A Bloom filter's exact rate at m = 1000, n = 100, k = 7 has a 2101-digit
+     denominator, and Karger's contraction probability has the same shape.
+
+     And it rounded exact ties the wrong way. -399/40 is exactly -9.975; the
+     nearest double is fractionally smaller in magnitude, so toFixed(2) gave
+     -9.97 where half away from zero is -9.98. 160 of 144,180 rationals over
+     the small-integer range disagreed, every one of them an exact tie.
+
+     Half away from zero, computed on the exact value: the doubling, the +1
+     and the halving are the rounding, done in integers. */
+  function Rdec(a, places) {
+    if (places === undefined) places = 6;
+    if (Rint(a)) return String(a.n);
+    var neg = a.n < 0n, num = neg ? -a.n : a.n;
+    var scale = 10n ** BigInt(places);
+    var q = (num * scale * 2n / a.d + 1n) / 2n;
+    var s = q.toString();
+    while (s.length <= places) s = '0' + s;
+    var out = (neg ? '-' : '') + s.slice(0, s.length - places)
+      + (places > 0 ? '.' + s.slice(s.length - places) : '');
+    return out.indexOf('.') >= 0 ? out.replace(/0+$/, '').replace(/\.$/, '') : out;
+  }
+  function Rparse(text) {
+    var s = String(text).trim();
+    var m = /^([+-]?\d+)\s*\/\s*(\d+)$/.exec(s);
+    /* A zero denominator is not a number this function can read, so it comes
+       back null like every other unreadable string. It used to reach R(), which
+       THROWS -- and a throw out of a parser is not a refusal, it is a dead
+       page: the lab's redraw stops, the panel keeps the last good figures, and
+       nothing tells the reader why. Typing 1/0 into the availability chain on
+       a published page did exactly that. Callers all handle null already;
+       every one of them was written to. */
+    if (m) return m[2] === '0' || /^0+$/.test(m[2]) ? null : R(BigInt(m[1]), BigInt(m[2]));
+    m = /^([+-]?\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]));
+    m = /^([+-]?)(\d*)\.(\d+)$/.exec(s);
+    if (m) {
+      var whole = m[2] || '0', frac = m[3];
+      var num = BigInt(whole + frac), den = 10n ** BigInt(frac.length);
+      return R(m[1] === '-' ? -num : num, den);
+    }
+    return null;
+  }
+  /* Is this rational a perfect square? Needed wherever a lesson must decide
+     between an exact answer and a radical one -- sqrt(4/9) is 2/3 and belongs
+     on the page as 2/3, while sqrt(2) must stay sqrt(2). */
+  function bisqrt(n) {
+    if (n < 0n) return null;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x * x === n ? x : null;
+  }
+  function Rsqrt(a) {
+    if (a.n < 0n) return null;
+    var p = bisqrt(a.n), q = bisqrt(a.d);
+    return (p === null || q === null) ? null : R(p, q);
+  }
+
+  /* The one shape. See the module docstring: a routine that RUNS an algorithm
+     returns { result, counts, trace }, and this is the only place that object
+     is spelled, so a kit cannot invent a second convention by accident. */
+  function runOf(result, counts, trace) {
+    return { result: result, counts: counts || {}, trace: trace || [] };
+  }
+  /* A counter with a fixed vocabulary. bump() on an unknown key still works --
+     refusing would turn a panel into a crash -- but the vocabulary is what the
+     panels are laid out from, so a new key is a decision, not a typo. */
+  var COUNT_KEYS = ['compares', 'swaps', 'moves', 'probes', 'hops', 'finds',
+    'unions', 'pushes', 'pops', 'relaxations', 'nodes', 'calls', 'reads',
+    'writes', 'cells', 'rounds'];
+  function counter() {
+    var c = {};
+    for (var i = 0; i < COUNT_KEYS.length; i += 1) c[COUNT_KEYS[i]] = 0;
+    return c;
+  }
+  /* Drop the keys that stayed zero: a panel showing "swaps 0" for an algorithm
+     that cannot swap is noise, and the reader cannot tell it from a bug. */
+  function usedCounts(c) {
+    var out = {};
+    Object.keys(c).forEach(function (k) { if (c[k]) out[k] = c[k]; });
+    return out;
+  }
+
+  /* A rational as a decimal string, by BigInt long division.
+
+     algebra_core's Rdec goes through Rnum, which is Number(a.n) / Number(a.d),
+     and several quantities on this path do not survive that: the exact Bloom
+     rate at m = 1000, n = 100, k = 7 is a fraction whose denominator is
+     1000^700, so both halves become Infinity and the page prints NaN. Karger's
+     exact success probability and the all-distinct product in ballsExact have
+     the same shape. So the decimal is produced by dividing the BigInts, which
+     works at any size, and it ROUNDS HALF UP at the last place kept -- the only
+     rounding in this block, and it is a rounding of the PRINTING, not of the
+     number: Rtext still gives the exact fraction and the lesson prints both
+     where the fraction is short enough to read.
+
+     The System Design kits each carry their own copy of this function. This is
+     the Algorithms path's one copy, and it is deliberately the same name and
+     the same behaviour, so a reader moving between subjects reads one format. */
+  function Rfixed(a, places) {
+    if (places === undefined) places = 3;
+    var neg = a.n < 0n, n = neg ? -a.n : a.n, d = a.d;
+    var scale = 10n ** BigInt(places);
+    var q = (2n * n * scale + d) / (2n * d);
+    var whole = q / scale, frac = (q % scale).toString();
+    while (frac.length < places) frac = '0' + frac;
+    var body = places > 0 ? whole + '.' + frac : String(whole);
+    return (neg ? '-' : '') + body;
+  }
+  function Rpct(a, places) {
+    return Rfixed(Rmul(a, R(100n, 1n)), places === undefined ? 2 : places) + '%';
+  }
+  /* A rational too small to read as a decimal, as "1 in N" -- which is how a
+     false-positive rate and a failure probability are quoted in practice. */
+  function RoneIn(a) {
+    if (Rzero(a)) return 'never';
+    var inv = Rinv(a);
+    return '1 in ' + Rfixed(inv, inv.d === 1n ? 0 : 1);
+  }
+
+  /* Counting is done in BigInt. 21! already exceeds what a double can hold
+     exactly, so a lab that used ordinary numbers would start printing
+     confidently wrong totals somewhere around n = 21 with nothing to mark the
+     boundary. Every count below is exact for every n the controls allow. */
+  function fact(n) { var r = 1n; for (var i = 2n; i <= BigInt(n); i += 1n) r *= i; return r; }
+  function perm(n, r) {
+    if (r > n || r < 0) return 0n;
+    var out = 1n;
+    for (var i = 0; i < r; i += 1) out *= BigInt(n - i);
+    return out;
+  }
+  function comb(n, r) {
+    if (r < 0 || r > n) return 0n;
+    r = Math.min(r, n - r);
+    var num = 1n, den = 1n;
+    for (var i = 0; i < r; i += 1) { num *= BigInt(n - i); den *= BigInt(i + 1); }
+    return num / den;
+  }
+  function group(x) { return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+
+  /* Brute force, with the instance cap as a parameter and a REFUSAL above it.
+
+     Nearly every mode in courses 4, 9 and the reduction course compares an
+     algorithm against the true optimum, and the true optimum is an exhaustive
+     search. A silent slow path is the wrong shape for that: at n = 22 a subset
+     enumeration is forty seconds of a frozen tab, and the reader's conclusion
+     is that the lesson is broken rather than that the instance is too big --
+     which is itself the lesson of the course. So every routine here throws, the
+     kit catches, and the panel says how big an instance it can answer for.
+
+     Only the oracles MORE THAN ONE kit needs live here; a single-kit oracle
+     lives in its own block and calls `oracleCap`, so the refusal is spelled
+     once and a kit does not ship eight enumerations to use one.
+
+         bruteOptimal            subsets, cap 16     greedy, coping
+         knapsackBrute           items,   cap 12     greedy, coping
+         tspBrute                cities,  cap 8      reduction, coping
+         satBrute                vars,    cap 16     reduction, coping
+         independentSetBrute     vertices,cap 16     reduction, coping
+         vertexCoverBrute        vertices,cap 16     reduction, coping
+         hamiltonBrute           vertices,cap 8      reduction
+
+     The caps are the design's, and they are not arbitrary: 2^16 = 65 536
+     assignments and 8! = 40 320 tours are each a few milliseconds, and the next
+     step up is a second. */
+  function oracleCap(what, size, cap) {
+    if (size > cap) {
+      throw new Error(what + ': ' + size + ' exceeds the exhaustive cap of ' + cap);
+    }
+    return size;
+  }
+  /* Every subset of {0..n-1} as a bitmask, in increasing mask order so the
+     first optimum found is the lexicographically smallest -- a tie broken the
+     same way twice is a tie a reader can reproduce. */
+  function forEachSubset(n, fn) {
+    var total = 1 << n;
+    for (var mask = 0; mask < total; mask += 1) fn(mask);
+  }
+  function maskMembers(mask, n) {
+    var out = [];
+    for (var i = 0; i < n; i += 1) if (mask & (1 << i)) out.push(i);
+    return out;
+  }
+  function popcount(mask) { var c = 0; while (mask) { mask &= mask - 1; c += 1; } return c; }
+
+  /* The generic one: `objective(members)` returns null for an infeasible set
+     and a number to MAXIMISE otherwise. Counts the subsets examined, because
+     "2^n of them" is the figure the panel prints beside the greedy run's n. */
+  function bruteOptimal(items, objective, cap) {
+    cap = cap === undefined ? 16 : cap;
+    oracleCap('bruteOptimal', items.length, cap);
+    var best = null, bestSet = [], examined = 0, feasible = 0;
+    forEachSubset(items.length, function (mask) {
+      var members = maskMembers(mask, items.length);
+      examined += 1;
+      var v = objective(members);
+      if (v === null || v === undefined) return;
+      feasible += 1;
+      if (best === null || v > best) { best = v; bestSet = members; }
+    });
+    return runOf({ value: best, members: bestSet },
+                 { nodes: examined, calls: feasible }, []);
+  }
+
+  /* 0/1 knapsack, exactly. items are { w, v }. */
+  function knapsackBrute(items, W, cap) {
+    cap = cap === undefined ? 12 : cap;
+    oracleCap('knapsackBrute', items.length, cap);
+    var best = 0, bestSet = [], examined = 0;
+    forEachSubset(items.length, function (mask) {
+      var members = maskMembers(mask, items.length), wt = 0, val = 0;
+      examined += 1;
+      for (var i = 0; i < members.length; i += 1) { wt += items[members[i]].w; val += items[members[i]].v; }
+      if (wt <= W && val > best) { best = val; bestSet = members; }
+    });
+    return runOf({ value: best, members: bestSet }, { nodes: examined }, []);
+  }
+
+  /* The shortest tour visiting every city once and returning to 0. D may be
+     asymmetric; nothing here assumes the triangle inequality, which is what
+     lets `coping.tsp` break its own 2-approximation on a non-metric instance. */
+  function tspBrute(D, budget, cap) {
+    cap = cap === undefined ? 8 : cap;
+    var n = D.length;
+    oracleCap('tspBrute', n, cap);
+    var best = null, bestTour = null, examined = 0;
+    var used = new Array(n).fill(false), tour = [0];
+    used[0] = true;
+    (function walk(at, len) {
+      if (tour.length === n) {
+        examined += 1;
+        var total = len + D[at][0];
+        if (best === null || total < best) { best = total; bestTour = tour.slice(); }
+        return;
+      }
+      for (var v = 1; v < n; v += 1) {
+        if (used[v]) continue;
+        used[v] = true; tour.push(v);
+        walk(v, len + D[at][v]);
+        tour.pop(); used[v] = false;
+      }
+    })(0, 0);
+    return runOf({ length: best, tour: bestTour,
+                   withinBudget: budget === undefined ? null : (best !== null && best <= budget) },
+                 { nodes: examined }, []);
+  }
+
+  /* CNF: { n, clauses: [[lit, ...]] }, a literal being a signed 1-based
+     variable index -- 3 is x3, -3 is NOT x3. An assignment is an array of
+     booleans indexed from 0. */
+  function satEval(formula, assign) {
+    var sat = 0;
+    for (var c = 0; c < formula.clauses.length; c += 1) {
+      var cl = formula.clauses[c], ok = false;
+      for (var k = 0; k < cl.length; k += 1) {
+        var lit = cl[k], v = assign[Math.abs(lit) - 1];
+        if (lit > 0 ? v : !v) { ok = true; break; }
+      }
+      if (ok) sat += 1;
+    }
+    return sat;
+  }
+  function maskAssign(mask, n) {
+    var a = [];
+    for (var i = 0; i < n; i += 1) a.push(!!(mask & (1 << i)));
+    return a;
+  }
+  function satBrute(formula, cap) {
+    cap = cap === undefined ? 16 : cap;
+    oracleCap('satBrute', formula.n, cap);
+    var models = [], examined = 0, first = null;
+    forEachSubset(formula.n, function (mask) {
+      examined += 1;
+      var a = maskAssign(mask, formula.n);
+      if (satEval(formula, a) === formula.clauses.length) {
+        models.push(mask);
+        if (first === null) first = a;
+      }
+    });
+    return runOf({ satisfiable: models.length > 0, model: first, models: models.length },
+                 { nodes: examined }, []);
+  }
+
+  /* Independent sets and vertex covers on a DIGRAPH_JS graph, read
+     undirected -- both problems ignore direction, and the reduction course
+     needs them to agree with each other on the same instance, which is the
+     complement identity |S| + |C| = V it is there to show. */
+  function dgAdjacency(G) {
+    var adj = [], i;
+    for (i = 0; i < G.n; i += 1) adj.push(new Array(G.n).fill(false));
+    G.arcs.forEach(function (a) { if (a.u !== a.v) { adj[a.u][a.v] = true; adj[a.v][a.u] = true; } });
+    return adj;
+  }
+  function independentSetBrute(G, k, cap) {
+    cap = cap === undefined ? 16 : cap;
+    oracleCap('independentSetBrute', G.n, cap);
+    var adj = dgAdjacency(G), best = [], examined = 0, atK = null;
+    forEachSubset(G.n, function (mask) {
+      examined += 1;
+      var m = maskMembers(mask, G.n), ok = true, i, j;
+      for (i = 0; ok && i < m.length; i += 1)
+        for (j = i + 1; j < m.length; j += 1) if (adj[m[i]][m[j]]) { ok = false; break; }
+      if (!ok) return;
+      if (m.length > best.length) best = m;
+      if (k !== undefined && m.length >= k && atK === null) atK = m;
+    });
+    return runOf({ size: best.length, members: best, atLeastK: atK },
+                 { nodes: examined }, []);
+  }
+  /* The largest set of MUTUALLY ADJACENT vertices -- written separately rather
+     than as "an independent set in the complement", because the point of the
+     complement lesson is that those two answers agree, and a check in which one
+     routine is defined as the other checks nothing. GRAPH_JS.cliqueNumber()
+     answers the same question a third way, and mathcheck asserts all three. */
+  function cliqueBrute(G, cap) {
+    cap = cap === undefined ? 16 : cap;
+    oracleCap('cliqueBrute', G.n, cap);
+    var adj = dgAdjacency(G), best = [], examined = 0;
+    forEachSubset(G.n, function (mask) {
+      examined += 1;
+      var m = maskMembers(mask, G.n);
+      if (m.length <= best.length) return;
+      var ok = true, i, j;
+      for (i = 0; ok && i < m.length; i += 1)
+        for (j = i + 1; j < m.length; j += 1) if (!adj[m[i]][m[j]]) { ok = false; break; }
+      if (ok) best = m;
+    });
+    return runOf({ size: best.length, members: best }, { nodes: examined }, []);
+  }
+  function vertexCoverBrute(G, cap) {
+    cap = cap === undefined ? 16 : cap;
+    oracleCap('vertexCoverBrute', G.n, cap);
+    var adj = dgAdjacency(G), best = null, examined = 0;
+    forEachSubset(G.n, function (mask) {
+      examined += 1;
+      if (best !== null && popcount(mask) >= best.length) return;
+      var m = maskMembers(mask, G.n), inSet = new Array(G.n).fill(false), ok = true;
+      m.forEach(function (v) { inSet[v] = true; });
+      for (var i = 0; ok && i < G.arcs.length; i += 1) {
+        var a = G.arcs[i];
+        if (a.u !== a.v && !inSet[a.u] && !inSet[a.v]) ok = false;
+      }
+      if (ok && (best === null || m.length < best.length)) best = m;
+    });
+    return runOf({ size: best ? best.length : 0, members: best || [] }, { nodes: examined }, []);
+  }
+
+  /* A Hamilton path and circuit on a digraph, by exhaustive search -- the
+     directed case GRAPH_JS.hamilton cannot answer. On an undirected graph the
+     two must agree, and mathcheck asserts that they do. */
+  function hamiltonBrute(G, cap) {
+    cap = cap === undefined ? 8 : cap;
+    oracleCap('hamiltonBrute', G.n, cap);
+    var adj = [], i;
+    for (i = 0; i < G.n; i += 1) adj.push(new Array(G.n).fill(false));
+    G.arcs.forEach(function (a) {
+      adj[a.u][a.v] = true;
+      if (!G.directed) adj[a.v][a.u] = true;
+    });
+    var path = null, circuit = null, examined = 0;
+    var used = new Array(G.n).fill(false), cur = [];
+    (function walk() {
+      if (cur.length === G.n) {
+        examined += 1;
+        if (!path) path = cur.slice();
+        if (adj[cur[cur.length - 1]][cur[0]] && !circuit) circuit = cur.slice();
+        return;
+      }
+      for (var v = 0; v < G.n; v += 1) {
+        if (used[v]) continue;
+        if (cur.length && !adj[cur[cur.length - 1]][v]) continue;
+        used[v] = true; cur.push(v);
+        walk();
+        cur.pop(); used[v] = false;
+        if (path && circuit) return;
+      }
+    })();
+    return runOf({ path: path, circuit: circuit }, { nodes: examined }, []);
+  }
+
+  /* A tree renderer, shared for the same reason the graph one is: six kinds of
+     tree are drawn on this path -- search trees, AVL and treaps, Huffman codes,
+     tries, DP subproblem trees, branch-and-bound search trees -- and every one
+     of them was about to be a helper closed over its own lab's element.
+
+     It is generic over the node type: `kids(node)` returns the children (nulls
+     included, so a BST's missing left child still leaves a gap where it
+     belongs) and `label(node)` returns what goes in the circle. x is the
+     in-order position, y is the depth, which is the layout that makes a search
+     tree's in-order sequence readable straight off the drawing. */
+  function treeLayout(root, kids, label, opts) {
+    opts = opts || {};
+    var nodes = [], links = [], next = 0, maxDepth = 0;
+    (function place(node, depth, parent) {
+      if (!node) { next += opts.gaps === false ? 0 : 0.5; return null; }
+      var children = kids(node) || [];
+      var left = children.length ? place(children[0], depth + 1, null) : null;
+      var me = { node: node, label: label(node), depth: depth, order: next, id: nodes.length };
+      next += 1;
+      nodes.push(me);
+      if (left) links.push({ from: me.id, to: left.id, side: 0 });
+      for (var k = 1; k < children.length; k += 1) {
+        var c = place(children[k], depth + 1, null);
+        if (c) links.push({ from: me.id, to: c.id, side: k });
+      }
+      if (depth > maxDepth) maxDepth = depth;
+      return me;
+    })(root, 0, null);
+    var w = opts.width === undefined ? 460 : opts.width;
+    var h = opts.height === undefined ? 210 : opts.height;
+    var cols = Math.max(1, next - 1), rows = Math.max(1, maxDepth);
+    nodes.forEach(function (n) {
+      n.x = 26 + (n.order / cols) * (w - 52);
+      n.y = 22 + (n.depth / rows) * (h - 44);
+    });
+    return { nodes: nodes, links: links, depth: maxDepth, count: nodes.length };
+  }
+  function treeSvg(layout, opts) {
+    opts = opts || {};
+    var hi = {};
+    (opts.highlight || []).forEach(function (i) { hi[i] = true; });
+    var s = '', r = opts.radius === undefined ? 14 : opts.radius;
+    layout.links.forEach(function (l) {
+      var a = layout.nodes[l.from], b = layout.nodes[l.to];
+      s += '<line x1="' + a.x.toFixed(1) + '" y1="' + a.y.toFixed(1) + '" x2="' + b.x.toFixed(1)
+        + '" y2="' + b.y.toFixed(1) + '" stroke="'
+        + (hi[l.to] ? 'var(--cyan)' : 'var(--line-strong)') + '" stroke-width="'
+        + (hi[l.to] ? 3 : 1.6) + '" />';
+    });
+    layout.nodes.forEach(function (n) {
+      var fill = opts.fill ? opts.fill(n) : (hi[n.id] ? 'var(--cyan)' : 'var(--panel-3)');
+      s += '<circle cx="' + n.x.toFixed(1) + '" cy="' + n.y.toFixed(1) + '" r="' + r
+        + '" fill="' + fill + '" stroke="var(--line-strong)" stroke-width="1.8" />';
+      s += '<text x="' + n.x.toFixed(1) + '" y="' + (n.y + 4).toFixed(1)
+        + '" text-anchor="middle" font-size="11" font-weight="800" fill="'
+        + (hi[n.id] ? 'var(--on-accent)' : 'var(--text)') + '">' + n.label + '</text>';
+      if (opts.note) {
+        var note = opts.note(n);
+        if (note) s += '<text x="' + n.x.toFixed(1) + '" y="' + (n.y - r - 4).toFixed(1)
+          + '" text-anchor="middle" font-size="9" fill="var(--muted)">' + note + '</text>';
+      }
+    });
+    return s;
+  }
+  function drawTree(el, root, kids, label, opts) {
+    var s = treeSvg(treeLayout(root, kids, label, opts), opts);
+    if (el) el.innerHTML = s;
+    return s;
+  }
+
+  /* Measured against predicted, drawn.
+
+     This is `drawSeries` from algorithms.py, lifted out of `algorithm_lab` and
+     given the element as an argument. The original assigned to `plot`, an
+     element it had closed over, so it could not be called from another lab, and
+     could not be called from a test at all. Here the function that BUILDS the
+     markup and the function that installs it are separate: seriesSvg returns a
+     string and touches nothing, drawSeries hands that string to an element.
+     Every assertion mathcheck makes about a drawing is an assertion about the
+     string.
+
+     A series is { label, values, colour, dashed, points }. `dashed` is for a
+     predicted bound and `points` marks the measured samples, because the whole
+     figure on this path is one measured curve against one predicted one, and
+     two solid lines of different colours do not say which is which.
+
+     The geometry is the shipped one -- x from 26 to 496, baseline at 200, 180
+     tall -- so a page that swaps this in for the old helper draws the same
+     picture. */
+  var SERIES_BOX = { left: 26, right: 496, base: 200, top: 14 };
+
+  function seriesMax(series) {
+    var m = 0;
+    series.forEach(function (s) {
+      s.values.forEach(function (v) { if (isFinite(v) && v > m) m = v; });
+    });
+    return m > 0 ? m : 1;
+  }
+
+  /* The scale, returned as functions so a kit can place its own annotations on
+     the same axes rather than guessing at them. */
+  function seriesScale(series, xs, opts) {
+    opts = opts || {};
+    var box = opts.box || SERIES_BOX;
+    var maxY = opts.maxY || seriesMax(series);
+    var log = !!opts.log;
+    var span = box.base - box.top;
+    return {
+      box: box, maxY: maxY, log: log, n: xs.length,
+      x: function (i) {
+        return box.left + (i / Math.max(1, xs.length - 1)) * (box.right - box.left);
+      },
+      y: function (v) {
+        if (!isFinite(v)) return box.top - 8;          /* off the top, deliberately */
+        if (log) {
+          var lv = Math.log10(Math.max(v, 1)), lm = Math.log10(Math.max(maxY, 10));
+          return box.base - (lv / lm) * span;
+        }
+        return box.base - (v / maxY) * span;
+      }
+    };
+  }
+
+  function seriesPath(sc, values) {
+    return values.map(function (v, i) {
+      return (i ? 'L' : 'M') + sc.x(i).toFixed(1) + ' ' + sc.y(v).toFixed(1);
+    }).join(' ');
+  }
+
+  /* Endpoint labels, separated so two curves that end close together are both
+     readable. Lifted with the shipped helper's logic intact: sort by where the
+     curve ends, push each down to clear the one above, then pull the tail back
+     up so the last one stays inside the box. */
+  function seriesLabelRows(series, sc) {
+    var rows = series.map(function (ser, i) {
+      var last = ser.values[ser.values.length - 1];
+      return { series: ser, order: i,
+               baseline: Math.max(20, Math.min(sc.box.base - 12, sc.y(last) - 6)) };
+    }).sort(function (a, b) { return a.baseline - b.baseline || a.order - b.order; });
+    rows.forEach(function (r, i) {
+      if (i) r.baseline = Math.max(r.baseline, rows[i - 1].baseline + 18);
+    });
+    for (var i = rows.length - 1; i >= 0; i -= 1) {
+      rows[i].baseline = Math.min(rows[i].baseline,
+        i === rows.length - 1 ? sc.box.base - 12 : rows[i + 1].baseline - 18);
+    }
+    return rows;
+  }
+
+  function seriesSvg(series, xs, opts) {
+    opts = opts || {};
+    var sc = seriesScale(series, xs, opts), b = sc.box;
+    var s = '<line x1="' + b.left + '" y1="' + b.base + '" x2="' + (b.right + 4) + '" y2="' + b.base
+          + '" stroke="var(--line-strong)" />'
+          + '<line x1="' + b.left + '" y1="' + b.top + '" x2="' + b.left + '" y2="' + b.base
+          + '" stroke="var(--line-strong)" />';
+    series.forEach(function (ser) {
+      s += '<path d="' + seriesPath(sc, ser.values) + '" fill="none" stroke="' + ser.colour
+        + '" stroke-width="' + (ser.dashed ? 2 : 2.4) + '" opacity="0.9"'
+        + (ser.dashed ? ' stroke-dasharray="6 4"' : '') + ' />';
+      if (ser.points) {
+        ser.values.forEach(function (v, i) {
+          if (!isFinite(v)) return;
+          s += '<circle cx="' + sc.x(i).toFixed(1) + '" cy="' + sc.y(v).toFixed(1)
+            + '" r="2.6" fill="' + ser.colour + '" />';
+        });
+      }
+    });
+    seriesLabelRows(series, sc).forEach(function (row) {
+      s += '<text x="' + (sc.x(xs.length - 1) - 6).toFixed(1) + '" y="' + row.baseline.toFixed(1)
+        + '" text-anchor="end" font-size="12" font-weight="700" fill="' + row.series.colour
+        + '">' + row.series.label + '</text>';
+    });
+    var tag = opts.xlabel === undefined ? 'n' : opts.xlabel;
+    s += '<text x="' + b.left + '" y="' + (b.base + 16) + '" font-size="12" fill="var(--muted)">'
+      + tag + ' = ' + xs[0] + '</text>';
+    s += '<text x="' + (b.right + 4) + '" y="' + (b.base + 16)
+      + '" text-anchor="end" font-size="12" fill="var(--muted)">' + tag + ' = ' + xs[xs.length - 1] + '</text>';
+    if (sc.log) s += '<text x="' + (b.left + 4) + '" y="' + (b.top + 10)
+      + '" font-size="12" fill="var(--muted)">log scale</text>';
+    return s;
+  }
+
+  /* The element is the FIRST argument and may be null, which is what makes the
+     helper shared. Returns the markup either way. */
+  function drawSeries(el, series, xs, opts) {
+    var s = seriesSvg(series, xs, opts);
+    if (el) el.innerHTML = s;
+    return s;
+  }
+
+  /* Sample a predicted curve on the same x values as a measured one. The curve
+     is a drawing: it is evaluated at double precision and nothing is decided
+     from it. */
+  function predicted(xs, f) { return xs.map(function (n) { return f(n); }); }
+
+  /* One table-stepping grammar for twelve modes.
+
+     A dynamic program is a table, a fill ORDER and a recurrence, and the thing
+     readers get wrong is never the recurrence -- it is which cells a cell reads
+     and whether they are filled yet. So dpFill records, for every cell, the
+     cells it READ while it was being computed, and the mode paints them. That
+     dependency list is not a description of the recurrence written by hand; it
+     is collected by the `get` the recurrence itself calls, so it cannot
+     disagree with what the code did.
+
+     spec = {
+       rows, cols,          the table's shape
+       base(i, j)           a value for cells that have one, else undefined
+       cell(i, j, get)      the recurrence; returns a value or { v, from }
+       order                'rowmajor' | 'colmajor' | 'bylength'
+     }
+     'bylength' fills by j - i ascending, which is the interval order matrix
+     chain needs and the order a row-major fill gets wrong. */
+  function dpOrder(spec) {
+    var out = [], i, j;
+    if (spec.order === 'colmajor') {
+      for (j = 0; j < spec.cols; j += 1) for (i = 0; i < spec.rows; i += 1) out.push([i, j]);
+    } else if (spec.order === 'bylength') {
+      for (var len = 0; len < spec.cols; len += 1) {
+        for (i = 0; i + len < spec.rows; i += 1) out.push([i, i + len]);
+      }
+    } else {
+      for (i = 0; i < spec.rows; i += 1) for (j = 0; j < spec.cols; j += 1) out.push([i, j]);
+    }
+    return out;
+  }
+  function dpFill(spec) {
+    var c = counter(), table = [], deps = [], from = [], i, j;
+    for (i = 0; i < spec.rows; i += 1) {
+      table.push(new Array(spec.cols).fill(null));
+      deps.push([]); from.push([]);
+      for (j = 0; j < spec.cols; j += 1) { deps[i].push([]); from[i].push(null); }
+    }
+    var order = dpOrder(spec), reads = [];
+    order.forEach(function (rc) {
+      var r = rc[0], k = rc[1];
+      reads = [];
+      function get(a, b) {
+        c.reads += 1;
+        reads.push([a, b]);
+        if (a < 0 || b < 0 || a >= spec.rows || b >= spec.cols) return null;
+        return table[a][b];
+      }
+      var base = spec.base ? spec.base(r, k) : undefined;
+      var v = base === undefined ? spec.cell(r, k, get) : base;
+      if (v !== null && typeof v === 'object' && v.v !== undefined) {
+        from[r][k] = v.from === undefined ? null : v.from;
+        v = v.v;
+      }
+      table[r][k] = v;
+      deps[r][k] = reads.slice();
+      c.cells += 1;
+      c.writes += 1;
+    });
+    return runOf({ table: table, deps: deps, from: from, order: order },
+                 usedCounts(c), []);
+  }
+  /* Walk `from` back from a cell. The tie-break is a parameter because the mode
+     shows two different optimal answers reached by two tie-breaks, which is the
+     point that an optimum need not be unique. */
+  function reconstruct(filled, start, tieBreak) {
+    var path = [start], at = start, guard = 0;
+    while (guard < filled.table.length * filled.table[0].length + 4) {
+      guard += 1;
+      var f = filled.from[at[0]][at[1]];
+      if (!f) break;
+      var next = Array.isArray(f[0]) ? (tieBreak === 'last' ? f[f.length - 1] : f[0]) : f;
+      if (!next) break;
+      path.push(next);
+      at = next;
+    }
+    return path;
+  }
+
+  /* Longest increasing subsequence, both ways, because the mode shows them
+     side by side: the n^2 table and the tails array.
+
+     THE BINARY SEARCH IS WRITTEN OUT HERE AND NOT REUSED, and the design said
+     it would be. `ALGO_JS.binarySearch(a, target)` returns the NUMBER OF
+     COMPARISONS an exact-match search made and nothing else -- no index, and
+     no answer at all when the target is absent. The tails array needs the
+     insertion POSITION of a value that is not there, which is a different
+     function, so it is the six lines below, with its comparisons counted where
+     they happen. The same is true of dpkit's p(j).
+
+     The tails array is NOT the subsequence: it has the right LENGTH and
+     usually the wrong contents, which is the misconception, so the
+     subsequence comes from predecessors. */
+  function lisTails(a) {
+    var c = counter(), tails = [], idx = [], prev = new Array(a.length).fill(-1), steps = [];
+    a.forEach(function (x, i) {
+      var lo = 0, hi = tails.length;
+      while (lo < hi) {
+        var mid = (lo + hi) >> 1;
+        c.compares += 1;
+        if (tails[mid] < x) lo = mid + 1; else hi = mid;
+      }
+      if (lo > 0) prev[i] = idx[lo - 1];
+      tails[lo] = x; idx[lo] = i;
+      steps.push({ at: i, value: x, position: lo, tails: tails.slice() });
+    });
+    var out = [], at = tails.length ? idx[tails.length - 1] : -1;
+    while (at !== -1) { out.push(a[at]); at = prev[at]; }
+    out.reverse();
+    return runOf({ length: tails.length, tails: tails, subsequence: out },
+                 usedCounts(c), steps);
+  }
+
+  /* Weighted independent set on a TREE, by one postorder pass: for each node,
+     the best with it and the best without it. Checked against brute force over
+     every subset, which is this kit's one capped oracle. */
+  function treeDp(tree, w) {
+    var c = counter(), withV = {}, without = {}, order = [];
+    (function post(v, parent) {
+      c.calls += 1;
+      var a = w[v], b = 0;
+      (tree[v] || []).forEach(function (u) {
+        if (u === parent) return;
+        post(u, v);
+        a += without[u];
+        b += Math.max(withV[u], without[u]);
+        c.reads += 2;
+      });
+      withV[v] = a; without[v] = b;
+      order.push(v);
+    })(0, -1);
+    var chosen = [];
+    (function pick(v, parent, allowed) {
+      var take = allowed && withV[v] >= without[v];
+      if (take) chosen.push(v);
+      (tree[v] || []).forEach(function (u) { if (u !== parent) pick(u, v, !take); });
+    })(0, -1, true);
+    return runOf({ value: Math.max(withV[0], without[0]), withV: withV, without: without,
+                   order: order, chosen: chosen.sort(function (a, b) { return a - b; }) },
+                 usedCounts(c), []);
+  }
+  function misBrute(tree, w, cap) {
+    cap = cap === undefined ? 16 : cap;
+    oracleCap('misBrute', w.length, cap);
+    var edges = [];
+    Object.keys(tree).forEach(function (v) {
+      (tree[v] || []).forEach(function (u) { if (Number(v) < u) edges.push([Number(v), u]); });
+    });
+    var best = 0, bestSet = [], examined = 0;
+    forEachSubset(w.length, function (mask) {
+      examined += 1;
+      var ok = edges.every(function (e) { return !((mask >> e[0]) & 1) || !((mask >> e[1]) & 1); });
+      if (!ok) return;
+      var m = maskMembers(mask, w.length);
+      var v = m.reduce(function (t, x) { return t + w[x]; }, 0);
+      if (v > best) { best = v; bestSet = m; }
+    });
+    return runOf({ value: best, members: bestSet }, { nodes: examined }, []);
+  }
+
+  /* Counting, where the ORDER OF THE LOOPS is the answer: items outside counts
+     combinations, amounts outside counts ordered sequences, and readers write
+     the second while meaning the first. Both are computed, and the objects
+     themselves are listed for small amounts so the difference is visible and
+     not merely numeric. */
+  function countWays(coins, amount, order) {
+    var c = counter(), i, v;
+    var dp = new Array(amount + 1).fill(0n);
+    dp[0] = 1n;
+    var rows = [];
+    if (order === 'permutations') {
+      for (v = 1; v <= amount; v += 1) {
+        coins.forEach(function (coin) { if (coin <= v) { dp[v] += dp[v - coin]; c.reads += 1; } });
+      }
+    } else {
+      coins.forEach(function (coin) {
+        for (v = coin; v <= amount; v += 1) { dp[v] += dp[v - coin]; c.reads += 1; }
+        rows.push({ coin: coin, row: dp.slice() });
+      });
+    }
+    return runOf({ count: dp[amount], table: dp, rows: rows, order: order || 'combinations' },
+                 usedCounts(c), rows);
+  }
+  function listCombinations(coins, amount, cap) {
+    cap = cap === undefined ? 40 : cap;
+    oracleCap('listCombinations', amount, cap);
+    var out = [];
+    (function pick(i, left, acc) {
+      if (left === 0) { out.push(acc.slice()); return; }
+      if (i >= coins.length || left < 0) return;
+      pick(i + 1, left, acc);
+      acc.push(coins[i]);
+      pick(i, left - coins[i], acc);
+      acc.pop();
+    })(0, amount, []);
+    return out;
+  }
+  /* The unbounded knapsack in ONE ROW, and the direction that makes it
+     unbounded: forward reuses the item within the same row, backward does not.
+     Both are run, which is the mode. */
+  function oneRow(items, W, direction) {
+    var row = new Array(W + 1).fill(0), c = counter(), snapshots = [];
+    items.forEach(function (it) {
+      if (direction === 'backward') {
+        for (var w = W; w >= it.w; w -= 1) { c.reads += 1; row[w] = Math.max(row[w], row[w - it.w] + it.v); }
+      } else {
+        for (var w2 = it.w; w2 <= W; w2 += 1) { c.reads += 1; row[w2] = Math.max(row[w2], row[w2 - it.w] + it.v); }
+      }
+      snapshots.push({ item: it, row: row.slice() });
+    });
+    return runOf({ value: row[W], row: row, direction: direction || 'forward' },
+                 usedCounts(c), snapshots);
+  }
+
+  /* Combinatorial game positions: a position is LOSING exactly when every move
+     leads to a winning one. `moves` is a function from a position to its
+     options, and the labels are computed over the reachable set, so the period
+     a reader is asked to spot is a fact about the table rather than a claim. */
+  function gameLabels(moves, positions) {
+    var label = {}, c = counter();
+    positions.forEach(function (p) {
+      var opts = moves(p);
+      c.calls += 1;
+      label[p] = opts.some(function (q) { return label[q] === 'L'; }) ? 'W' : 'L';
+      if (!opts.length) label[p] = 'L';
+    });
+    var losing = positions.filter(function (p) { return label[p] === 'L'; });
+    var period = null;
+    for (var k = 1; k <= positions.length && period === null; k += 1) {
+      var ok = positions.every(function (p, i) {
+        return i + k >= positions.length || label[positions[i]] === label[positions[i + k]];
+      });
+      if (ok && losing.length) period = k;
+    }
+    return runOf({ label: label, losing: losing, period: period }, usedCounts(c), []);
+  }
+
+  /* Held-Karp: the exact TSP by subsets, and the reason the mode exists is the
+     comparison it prints -- n^2 2^n against (n-1)!, both as BigInts, with the
+     brute-force tour count beside them. */
+  function heldKarp(D) {
+    var n = D.length, c = counter(), full = 1 << (n - 1);
+    var dp = [], parent = [], mask, j;
+    for (mask = 0; mask < full; mask += 1) {
+      dp.push(new Array(n - 1).fill(null));
+      parent.push(new Array(n - 1).fill(-1));
+    }
+    for (j = 0; j < n - 1; j += 1) dp[1 << j][j] = D[0][j + 1];
+    var bySize = [];
+    for (mask = 1; mask < full; mask += 1) {
+      for (j = 0; j < n - 1; j += 1) {
+        if (!(mask & (1 << j)) || dp[mask][j] === null) continue;
+        for (var k = 0; k < n - 1; k += 1) {
+          if (mask & (1 << k)) continue;
+          var next = mask | (1 << k), cand = dp[mask][j] + D[j + 1][k + 1];
+          c.reads += 1;
+          if (dp[next][k] === null || cand < dp[next][k]) { dp[next][k] = cand; parent[next][k] = j; }
+        }
+      }
+      bySize.push({ mask: mask, size: popcount(mask), row: dp[mask].slice() });
+    }
+    var best = null, last = -1;
+    for (j = 0; j < n - 1; j += 1) {
+      if (dp[full - 1][j] === null) continue;
+      var total = dp[full - 1][j] + D[j + 1][0];
+      if (best === null || total < best) { best = total; last = j; }
+    }
+    var tour = [], mask2 = full - 1, at = last;
+    while (at !== -1) { tour.push(at + 1); var p = parent[mask2][at]; mask2 ^= (1 << at); at = p; }
+    tour.push(0); tour.reverse();
+    var N = BigInt(n);
+    return runOf({ length: best, tour: tour, table: bySize,
+                   heldKarpWork: N * N * (2n ** N), bruteWork: fact(n - 1) },
+                 usedCounts(c), bySize);
+  }
+
+  /* A cell that has no answer yet. Not Infinity: dpFill stores what the
+     recurrence returns and a panel has to print it, and "1000000000" read as
+     "no way to do it" is a caption, while Infinity read through a table
+     renderer is a special case in five places. Every comparison below is
+     against this constant. */
+  var DP_NONE = 1000000000;
+  function dpUnreachable(v) { return v === null || v >= DP_NONE; }
+
+  /* ================================================== what a reader types */
+  function dpParseNums(text, cap, lo, hi) {
+    cap = cap === undefined ? 14 : cap;
+    var out = [], bad = null;
+    String(text).split(/[\s,]+/).forEach(function (t) {
+      if (!t || bad) return;
+      var v = parseInt(t, 10);
+      if (!isFinite(v) || String(v) !== t) { bad = '"' + t + '" is not a whole number'; return; }
+      if (lo !== undefined && v < lo) { bad = t + ' is below ' + lo; return; }
+      if (hi !== undefined && v > hi) { bad = t + ' is above ' + hi; return; }
+      if (out.length >= cap) { bad = 'at most ' + cap + ' numbers here'; return; }
+      out.push(v);
+    });
+    if (!bad && !out.length) bad = 'no numbers were read';
+    return { values: out, bad: bad };
+  }
+  function dpParseItems(text, cap) {
+    cap = cap === undefined ? 8 : cap;
+    var out = [], bad = null;
+    String(text).split(',').forEach(function (piece) {
+      var t = piece.replace(/\s+/g, '');
+      if (!t || bad) return;
+      var m = /^(\d+)\/(\d+)$/.exec(t);
+      if (!m) { bad = 'an item is written weight/value, as 3/4; "' + t + '" is not'; return; }
+      var w = parseInt(m[1], 10), v = parseInt(m[2], 10);
+      if (w <= 0) { bad = 'an item of weight 0 would be taken for nothing'; return; }
+      if (out.length >= cap) { bad = 'at most ' + cap + ' items, because every subset is tried'; return; }
+      out.push({ w: w, v: v, label: String.fromCharCode(65 + out.length) });
+    });
+    if (!bad && !out.length) bad = 'no items were read';
+    return { items: out, bad: bad };
+  }
+  /* A word, restricted to letters, because the table is drawn with one column
+     per character and a space is a column a reader cannot see. */
+  function dpParseWord(text, cap) {
+    cap = cap === undefined ? 10 : cap;
+    var t = String(text).replace(/\s+/g, '');
+    if (!/^[A-Za-z]*$/.test(t)) return { word: null, bad: 'letters only, so every column is visible' };
+    if (t.length > cap) return { word: null, bad: 'at most ' + cap + ' letters, or the table leaves the page' };
+    return { word: t, bad: null };
+  }
+  /* An edge list, `1-2, 1-3`, read as a TREE: n - 1 edges over n vertices,
+     connected and acyclic. Anything else is refused, because the one-pass DP
+     is a fact about trees and a graph with a cycle would produce a number. */
+  function dpParseTree(text, cap) {
+    cap = cap === undefined ? 12 : cap;
+    var edges = [], bad = null, top = 0;
+    String(text).split(',').forEach(function (piece) {
+      var t = piece.replace(/\s+/g, '');
+      if (!t || bad) return;
+      var m = /^(\d+)-(\d+)$/.exec(t);
+      if (!m) { bad = 'an edge is written 1-2; "' + t + '" is not'; return; }
+      var a = parseInt(m[1], 10) - 1, b = parseInt(m[2], 10) - 1;
+      if (a === b) { bad = 'a vertex cannot be joined to itself'; return; }
+      if (a < 0 || b < 0) { bad = 'vertices are numbered from 1'; return; }
+      top = Math.max(top, a + 1, b + 1);
+      if (top > cap) { bad = 'at most ' + cap + ' vertices, because every subset is tried'; return; }
+      edges.push([a, b]);
+    });
+    if (bad) return { bad: bad };
+    if (!edges.length) return { bad: 'no edges were read' };
+    var n = top;
+    if (edges.length !== n - 1) {
+      return { bad: 'a tree on ' + n + ' vertices has ' + (n - 1) + ' edges, and ' + edges.length + ' were given' };
+    }
+    var p = [], i;
+    for (i = 0; i < n; i += 1) p.push(i);
+    function find(a) { while (p[a] !== a) { p[a] = p[p[a]]; a = p[a]; } return a; }
+    for (i = 0; i < edges.length; i += 1) {
+      var ra = find(edges[i][0]), rb = find(edges[i][1]);
+      if (ra === rb) return { bad: 'these edges contain a cycle, so they are not a tree' };
+      p[ra] = rb;
+    }
+    var root = find(0);
+    for (i = 0; i < n; i += 1) if (find(i) !== root) return { bad: 'vertex ' + (i + 1) + ' is not connected to vertex 1' };
+    return { tree: treeFromEdges(edges, n), edges: edges, n: n, bad: null };
+  }
+  function treeFromEdges(edges, n) {
+    var tree = {}, i;
+    for (i = 0; i < n; i += 1) tree[i] = [];
+    edges.forEach(function (e) { tree[e[0]].push(e[1]); tree[e[1]].push(e[0]); });
+    return tree;
+  }
+  /* A square distance matrix, rows separated by semicolons. Asymmetric is
+     allowed and nothing here assumes the triangle inequality. */
+  function dpParseMatrix(text, cap) {
+    cap = cap === undefined ? 8 : cap;
+    var rows = [], bad = null;
+    String(text).split(';').forEach(function (piece) {
+      var t = piece.trim();
+      if (!t || bad) return;
+      var r = dpParseNums(t, 12, 0, 999);
+      if (r.bad) { bad = r.bad; return; }
+      rows.push(r.values);
+    });
+    if (bad) return { bad: bad };
+    if (rows.length < 3) return { bad: 'at least three cities' };
+    if (rows.length > cap) return { bad: 'at most ' + cap + ' cities, because every tour is tried' };
+    for (var i = 0; i < rows.length; i += 1) {
+      if (rows[i].length !== rows.length) {
+        return { bad: 'row ' + (i + 1) + ' has ' + rows[i].length + ' entries and the matrix has ' + rows.length + ' rows' };
+      }
+    }
+    return { D: rows, bad: null };
+  }
+
+  /* ============================================ memo: one recursion, three ways
+
+     Minimum coins to make an amount. The recursion is f(0) = 0 and
+     f(a) = 1 + min over coins of f(a - c), which is the shortest possible
+     statement of optimal substructure, and it is run three times: with no
+     memo, with one, and as a table. The three answers must agree; the three
+     costs do not. */
+  function naiveMinCoins(coins, amount, cap) {
+    cap = cap === undefined ? 26 : cap;
+    oracleCap('naiveMinCoins', amount, cap);
+    var c = counter();
+    function f(left) {
+      c.calls += 1;
+      if (left === 0) return 0;
+      var best = DP_NONE;
+      for (var i = 0; i < coins.length; i += 1) {
+        if (coins[i] > left) continue;
+        var v = f(left - coins[i]);
+        if (v + 1 < best) best = v + 1;
+      }
+      return best;
+    }
+    var out = f(amount);
+    return runOf({ coins: dpUnreachable(out) ? null : out }, usedCounts(c), []);
+  }
+  function memoMinCoins(coins, amount) {
+    var c = counter(), memo = {};
+    function f(left) {
+      c.calls += 1;
+      if (left === 0) return 0;
+      if (memo[left] !== undefined) { c.reads += 1; return memo[left]; }
+      var best = DP_NONE;
+      for (var i = 0; i < coins.length; i += 1) {
+        if (coins[i] > left) continue;
+        var v = f(left - coins[i]);
+        if (v + 1 < best) best = v + 1;
+      }
+      memo[left] = best;
+      c.writes += 1;
+      return best;
+    }
+    var out = f(amount);
+    return runOf({ coins: dpUnreachable(out) ? null : out, distinct: Object.keys(memo).length },
+                 usedCounts(c), []);
+  }
+  /* The same thing as a table, so the dependency painting has something to
+     paint: one row per coin type, one column per amount. */
+  function minCoinTable(coins, amount) {
+    return dpFill({
+      rows: coins.length + 1, cols: amount + 1, order: 'rowmajor',
+      base: function (i, j) {
+        if (i === 0) return j === 0 ? 0 : DP_NONE;
+        return undefined;
+      },
+      cell: function (i, j, get) {
+        var skip = get(i - 1, j), best = skip, from = [i - 1, j];
+        if (coins[i - 1] <= j) {
+          var take = get(i, j - coins[i - 1]);
+          if (take + 1 < best) { best = take + 1; from = [i, j - coins[i - 1]]; }
+        }
+        return { v: best, from: from };
+      }
+    });
+  }
+  /* The coins the table says to use, walked back through `from`. */
+  function minCoinPicks(filled, coins, amount) {
+    var at = [coins.length, amount], out = [], guard = 0;
+    while (guard < 4 * (amount + coins.length + 4)) {
+      guard += 1;
+      var f = filled.result.from[at[0]][at[1]];
+      if (!f) break;
+      if (f[0] === at[0]) out.push(coins[at[0] - 1]);
+      at = f;
+      if (at[1] === 0 && at[0] === 0) break;
+    }
+    return out.sort(function (a, b) { return b - a; });
+  }
+
+  /* ============================================================== knapsack */
+  function knapTable(items, W) {
+    return dpFill({
+      rows: items.length + 1, cols: W + 1, order: 'rowmajor',
+      base: function (i, j) { return i === 0 ? 0 : undefined; },
+      cell: function (i, j, get) {
+        var skip = get(i - 1, j);
+        if (items[i - 1].w > j) return { v: skip, from: [i - 1, j] };
+        var take = items[i - 1].v + get(i - 1, j - items[i - 1].w);
+        return take > skip ? { v: take, from: [i - 1, j - items[i - 1].w] }
+                           : { v: skip, from: [i - 1, j] };
+      }
+    });
+  }
+  /* The ITEMS, not the cells. `reconstruct` returns a path of coordinates,
+     which is the right primitive and is not an answer: an item was taken
+     exactly where the path's row drops AND its column moves. */
+  function reconstructPicks(filled, items, W) {
+    var path = reconstruct(filled.result, [items.length, W]), picks = [];
+    for (var k = 0; k + 1 < path.length; k += 1) {
+      var a = path[k], b = path[k + 1];
+      if (a[0] - b[0] === 1 && a[1] !== b[1]) picks.push(a[0] - 1);
+    }
+    return { picks: picks.sort(function (x, y) { return x - y; }), path: path };
+  }
+  /* Re-weigh and re-value. A reconstruction that returns the wrong items
+     returns a perfectly plausible list, and only re-costing it catches that. */
+  function packCheck(items, picks, W, claimed) {
+    var w = 0, v = 0;
+    picks.forEach(function (i) { w += items[i].w; v += items[i].v; });
+    return { weight: w, value: v, fits: w <= W, matches: v === claimed,
+             ok: w <= W && v === claimed };
+  }
+
+  /* ========================================================= edit distance */
+  function editTable(a, b) {
+    return dpFill({
+      rows: a.length + 1, cols: b.length + 1, order: 'rowmajor',
+      base: function (i, j) {
+        if (i === 0) return j;
+        if (j === 0) return i;
+        return undefined;
+      },
+      cell: function (i, j, get) {
+        var same = a.charAt(i - 1) === b.charAt(j - 1);
+        var sub = get(i - 1, j - 1) + (same ? 0 : 1);
+        var del = get(i - 1, j) + 1;
+        var ins = get(i, j - 1) + 1;
+        var best = sub, from = [i - 1, j - 1];
+        if (del < best) { best = del; from = [i - 1, j]; }
+        if (ins < best) { best = ins; from = [i, j - 1]; }
+        return { v: best, from: from };
+      }
+    });
+  }
+  /* The script, as operations on the first string. Walked back from the last
+     cell and then reversed, so it reads in the order it would be performed. */
+  function editScript(filled, a, b) {
+    var i = a.length, j = b.length, out = [], guard = 0;
+    while ((i > 0 || j > 0) && guard < (a.length + b.length + 4) * 2) {
+      guard += 1;
+      var f = filled.result.from[i][j];
+      if (!f) {
+        if (i > 0 && j === 0) { out.push({ op: 'delete', ch: a.charAt(i - 1), at: i }); i -= 1; continue; }
+        if (j > 0 && i === 0) { out.push({ op: 'insert', ch: b.charAt(j - 1), at: j }); j -= 1; continue; }
+        break;
+      }
+      if (f[0] === i - 1 && f[1] === j - 1) {
+        if (a.charAt(i - 1) === b.charAt(j - 1)) out.push({ op: 'keep', ch: a.charAt(i - 1), at: i });
+        else out.push({ op: 'substitute', from: a.charAt(i - 1), to: b.charAt(j - 1), at: i });
+        i -= 1; j -= 1;
+      } else if (f[0] === i - 1) {
+        out.push({ op: 'delete', ch: a.charAt(i - 1), at: i });
+        i -= 1;
+      } else {
+        out.push({ op: 'insert', ch: b.charAt(j - 1), at: j });
+        j -= 1;
+      }
+    }
+    out.reverse();
+    return out;
+  }
+  /* PERFORM the script. Every operation names the character it acts on and
+     this refuses if that character is not there, so a script of the right
+     LENGTH and the wrong content cannot pass -- which is the failure a
+     reconstruction actually has. */
+  function applyScript(a, script) {
+    var out = '', i = 0;
+    for (var k = 0; k < script.length; k += 1) {
+      var op = script[k];
+      if (op.op === 'keep') {
+        if (a.charAt(i) !== op.ch) return null;
+        out += a.charAt(i); i += 1;
+      } else if (op.op === 'substitute') {
+        if (a.charAt(i) !== op.from) return null;
+        out += op.to; i += 1;
+      } else if (op.op === 'delete') {
+        if (a.charAt(i) !== op.ch) return null;
+        i += 1;
+      } else if (op.op === 'insert') {
+        out += op.ch;
+      } else {
+        return null;
+      }
+    }
+    return i === a.length ? out : null;
+  }
+  function editCost(script) {
+    var n = 0;
+    script.forEach(function (op) { if (op.op !== 'keep') n += 1; });
+    return n;
+  }
+  /* The same distance with no table at all, so the table is checked against
+     something rather than against itself. Exponential, hence the cap. */
+  function editNaive(a, b, cap) {
+    cap = cap === undefined ? 8 : cap;
+    oracleCap('editNaive', Math.max(a.length, b.length), cap);
+    var c = counter();
+    function f(i, j) {
+      c.calls += 1;
+      if (i === 0) return j;
+      if (j === 0) return i;
+      var same = a.charAt(i - 1) === b.charAt(j - 1);
+      var best = f(i - 1, j - 1) + (same ? 0 : 1);
+      var del = f(i - 1, j) + 1, ins = f(i, j - 1) + 1;
+      if (del < best) best = del;
+      if (ins < best) best = ins;
+      return best;
+    }
+    return runOf({ distance: f(a.length, b.length) }, usedCounts(c), []);
+  }
+
+  /* ========================================================== matrix chain */
+  function chainTable(dims, order) {
+    var n = dims.length - 1;
+    return dpFill({
+      rows: n, cols: n, order: order || 'bylength',
+      base: function (i, j) { return i === j ? 0 : (i > j ? 0 : undefined); },
+      cell: function (i, j, get) {
+        var best = null, at = null;
+        for (var k = i; k < j; k += 1) {
+          var left = get(i, k), right = get(k + 1, j);
+          var v = left + right + dims[i] * dims[k + 1] * dims[j + 1];
+          if (best === null || v < best) { best = v; at = [i, k]; }
+        }
+        return { v: best, from: at };
+      }
+    });
+  }
+  /* Every way of bracketing the product, by a recursion with no table at all.
+     Catalan(n-1) of them: 42 at six matrices, 429 at eight, which is the cap. */
+  function everyParenthesisation(dims, cap) {
+    cap = cap === undefined ? 8 : cap;
+    var n = dims.length - 1;
+    oracleCap('everyParenthesisation', n, cap);
+    var count = 0, best = null, bestTree = null;
+    function walk(i, j) {
+      if (i === j) return [{ leaf: i, cost: 0 }];
+      var out = [];
+      for (var k = i; k < j; k += 1) {
+        var lefts = walk(i, k), rights = walk(k + 1, j);
+        for (var p = 0; p < lefts.length; p += 1) {
+          for (var q = 0; q < rights.length; q += 1) {
+            out.push({ l: lefts[p], r: rights[q], split: k,
+                       cost: lefts[p].cost + rights[q].cost + dims[i] * dims[k + 1] * dims[j + 1] });
+          }
+        }
+      }
+      return out;
+    }
+    var all = walk(0, n - 1), worst = null;
+    all.forEach(function (t) {
+      count += 1;
+      if (best === null || t.cost < best) { best = t.cost; bestTree = t; }
+      if (worst === null || t.cost > worst) worst = t.cost;
+    });
+    return { cost: best, worstCost: worst, count: count, tree: bestTree };
+  }
+  /* The reconstruction as a tree, and its cost re-derived from the dimensions
+     alone -- so the table's number and the tree's cost are two computations
+     rather than one number printed twice. */
+  function chainSplitTree(filled, i, j) {
+    if (i === j) return { leaf: i };
+    var f = filled.result.from[i][j];
+    var k = f ? f[1] : i;
+    return { split: k, l: chainSplitTree(filled, i, k), r: chainSplitTree(filled, k + 1, j) };
+  }
+  function parenCost(tree, dims) {
+    if (tree.leaf !== undefined) return { cost: 0, lo: tree.leaf, hi: tree.leaf };
+    var L = parenCost(tree.l, dims), Rt = parenCost(tree.r, dims);
+    return { cost: L.cost + Rt.cost + dims[L.lo] * dims[L.hi + 1] * dims[Rt.hi + 1],
+             lo: L.lo, hi: Rt.hi };
+  }
+  function parenText(tree) {
+    if (tree.leaf !== undefined) return 'A' + (tree.leaf + 1);
+    return '(' + parenText(tree.l) + parenText(tree.r) + ')';
+  }
+
+  /* ==================================================================== lis */
+  function lisTable(a) {
+    var c = counter(), best = new Array(a.length).fill(1), prev = new Array(a.length).fill(-1);
+    var i, j, top = 0, at = -1;
+    for (i = 0; i < a.length; i += 1) {
+      for (j = 0; j < i; j += 1) {
+        c.compares += 1;
+        if (a[j] < a[i] && best[j] + 1 > best[i]) { best[i] = best[j] + 1; prev[i] = j; }
+      }
+      if (best[i] > top) { top = best[i]; at = i; }
+    }
+    var out = [];
+    while (at !== -1) { out.push(a[at]); at = prev[at]; }
+    out.reverse();
+    return runOf({ length: top, table: best, prev: prev, subsequence: out }, usedCounts(c), []);
+  }
+  function lisBrute(a, cap) {
+    cap = cap === undefined ? 16 : cap;
+    oracleCap('lisBrute', a.length, cap);
+    var best = 0, bestSet = [], examined = 0;
+    forEachSubset(a.length, function (mask) {
+      examined += 1;
+      var m = maskMembers(mask, a.length), ok = true;
+      for (var i = 1; i < m.length; i += 1) if (a[m[i - 1]] >= a[m[i]]) { ok = false; break; }
+      if (ok && m.length > best) { best = m.length; bestSet = m; }
+    });
+    return runOf({ length: best, subsequence: bestSet.map(function (i) { return a[i]; }) },
+                 { nodes: examined }, []);
+  }
+  function isIncreasingRun(s) {
+    for (var i = 1; i < s.length; i += 1) if (s[i - 1] >= s[i]) return false;
+    return true;
+  }
+  function isSubsequenceOf(sub, a) {
+    var i = 0;
+    for (var k = 0; k < a.length && i < sub.length; k += 1) if (a[k] === sub[i]) i += 1;
+    return i === sub.length;
+  }
+
+  /* ================================================================= coins
+
+     The counting recursion, with no table, in BigInt. Combinations: coin
+     types in a fixed order, so each multiset is reached once. Sequences: any
+     coin at any step, so the orderings are counted separately. Both are the
+     recurrences the DP loops implement, run without the loops. */
+  function countBrute(coins, amount, order, cap) {
+    /* Two caps, because the two recursions cost wildly different amounts. The
+       combination recursion visits about one node per combination and there are
+       hundreds of those; the sequence recursion visits one per SEQUENCE and
+       there are 2 x 10^18 of them at an amount of 80. A single cap would
+       either refuse a check that is free or accept one that freezes the tab. */
+    if (cap === undefined) cap = order === 'permutations' ? 26 : 120;
+    oracleCap('countBrute', amount, cap);
+    var nodes = 0;
+    function budget() {
+      nodes += 1;
+      if (nodes > 2000000) throw new Error('countBrute: more than 2 million recursive calls');
+    }
+    if (order === 'permutations') {
+      var seq = function (left) {
+        budget();
+        if (left === 0) return 1n;
+        var t = 0n;
+        for (var i = 0; i < coins.length; i += 1) if (coins[i] <= left) t += seq(left - coins[i]);
+        return t;
+      };
+      return seq(amount);
+    }
+    var comb = function (i, left) {
+      budget();
+      if (left === 0) return 1n;
+      if (i >= coins.length) return 0n;
+      var t = comb(i + 1, left);
+      if (coins[i] <= left) t += comb(i, left - coins[i]);
+      return t;
+    };
+    return comb(0, amount);
+  }
+
+  /* ================================================================== tree */
+  function isIndependentSet(edges, set) {
+    var inSet = {};
+    set.forEach(function (v) { inSet[v] = true; });
+    for (var i = 0; i < edges.length; i += 1) {
+      if (inSet[edges[i][0]] && inSet[edges[i][1]]) return false;
+    }
+    return true;
+  }
+  function setWeight(w, set) {
+    var t = 0;
+    set.forEach(function (v) { t += w[v]; });
+    return t;
+  }
+  /* The rooted tree as something TREEDRAW_JS can lay out: children are the
+     neighbours other than the parent, and a node is wrapped so that vertex 0
+     is not read as a missing child. */
+  function rootedNodes(tree, root) {
+    var seen = {};
+    function build(v, parent) {
+      seen[v] = true;
+      var kids = (tree[v] || []).filter(function (u) { return u !== parent; })
+                                .map(function (u) { return build(u, v); });
+      return { v: v, kids: kids };
+    }
+    return build(root === undefined ? 0 : root, -1);
+  }
+  function rootedKids(nd) { return nd.kids; }
+
+  /* ================================================================== game
+
+     Win and lose with no table: a position is winning when some move reaches a
+     losing one. Memo-free, so gameLabels' table is checked against a second
+     computation rather than displayed and believed. */
+  function gameBrute(moveSet, p, cap) {
+    cap = cap === undefined ? 24 : cap;
+    oracleCap('gameBrute', p, cap);
+    function win(at) {
+      for (var i = 0; i < moveSet.length; i += 1) {
+        if (moveSet[i] <= at && !win(at - moveSet[i])) return true;
+      }
+      return false;
+    }
+    return win(p) ? 'W' : 'L';
+  }
+
+  /* =================================================================== tsp
+
+     A NOTE ON WHAT heldKarp AND tspBrute RETURN, because it is not obvious
+     and getting it wrong is how a tour gets re-measured one leg short. Both
+     return the tour as an OPEN list of n cities beginning at 0 -- the leg back
+     to 0 is counted in the length and is not in the list. So the checks below
+     treat the list as a cycle: it must be a permutation of the cities starting
+     at 0, and its length is the n - 1 legs plus the return. */
+  function tourValid(tour, n) {
+    if (!tour || tour.length !== n) return false;
+    if (tour[0] !== 0) return false;
+    var seen = {};
+    for (var i = 0; i < n; i += 1) {
+      if (tour[i] < 0 || tour[i] >= n || seen[tour[i]]) return false;
+      seen[tour[i]] = true;
+    }
+    return true;
+  }
+  function tourLength(D, tour) {
+    if (!tour || !tour.length) return 0;
+    var t = 0;
+    for (var i = 0; i + 1 < tour.length; i += 1) t += D[tour[i]][tour[i + 1]];
+    return t + D[tour[tour.length - 1]][tour[0]];
+  }
+
+  /* ============================================================== drawings */
+  function dpGridSvg(table, opts) {
+    opts = opts || {};
+    var rows = table.length, cols = rows ? table[0].length : 0;
+    var w = opts.width === undefined ? 660 : opts.width;
+    var left = opts.left === undefined ? 40 : opts.left;
+    var top = opts.top === undefined ? 24 : opts.top;
+    var cw = Math.max(13, Math.min(44, Math.floor((w - left - 10) / Math.max(1, cols))));
+    var ch = opts.cellH === undefined ? 21 : opts.cellH;
+    var shown = Math.min(cols, Math.floor((w - left - 10) / cw));
+    var hi = {}, dep = {}, path = {};
+    (opts.highlight || []).forEach(function (c) { hi[c[0] + ',' + c[1]] = true; });
+    (opts.deps || []).forEach(function (c) { dep[c[0] + ',' + c[1]] = true; });
+    (opts.path || []).forEach(function (c) { path[c[0] + ',' + c[1]] = true; });
+    var s = '', i, j;
+    for (j = 0; j < shown; j += 1) {
+      s += '<text x="' + (left + j * cw + cw / 2).toFixed(1) + '" y="' + (top - 6)
+        + '" text-anchor="middle" font-size="9" fill="var(--muted)">'
+        + (opts.colLabel ? opts.colLabel(j) : j) + '</text>';
+    }
+    for (i = 0; i < rows; i += 1) {
+      s += '<text x="' + (left - 6) + '" y="' + (top + i * ch + ch - 6)
+        + '" text-anchor="end" font-size="9" fill="var(--muted)">'
+        + (opts.rowLabel ? opts.rowLabel(i) : i) + '</text>';
+      for (j = 0; j < shown; j += 1) {
+        var key = i + ',' + j, v = table[i][j];
+        var fill = hi[key] ? 'var(--cyan)' : (dep[key] ? 'var(--amber)'
+                   : (path[key] ? 'var(--purple)' : 'var(--panel-3)'));
+        var ink = (hi[key] || dep[key] || path[key]) ? 'var(--on-accent)' : 'var(--text)';
+        var text = v === null ? '·' : (opts.cellText ? opts.cellText(v, i, j) : String(v));
+        s += '<rect x="' + (left + j * cw) + '" y="' + (top + i * ch) + '" width="' + (cw - 2)
+          + '" height="' + (ch - 2) + '" rx="2" fill="' + fill
+          + '" stroke="var(--line-strong)" stroke-width="0.9" />'
+          + '<text x="' + (left + j * cw + (cw - 2) / 2).toFixed(1) + '" y="'
+          + (top + i * ch + ch - 8) + '" text-anchor="middle" font-size="9" fill="' + ink
+          + '">' + text + '</text>';
+      }
+    }
+    if (shown < cols) {
+      s += '<text x="' + (left + shown * cw + 4) + '" y="' + (top + 12)
+        + '" font-size="9" fill="var(--muted)">' + (cols - shown) + ' more columns</text>';
+    }
+    return s;
+  }
+  function drawDpGrid(el, table, opts) {
+    var s = dpGridSvg(table, opts);
+    if (el) el.innerHTML = s;
+    return s;
+  }
+  function tourSvg(tour, n, opts) {
+    opts = opts || {};
+    var w = opts.width === undefined ? 300 : opts.width;
+    var h = opts.height === undefined ? 200 : opts.height;
+    var cx = w / 2, cy = h / 2, rad = Math.min(cx, cy) - 26, pts = [], i;
+    for (i = 0; i < n; i += 1) {
+      var ang = -Math.PI / 2 + (2 * Math.PI * i) / Math.max(1, n);
+      pts.push({ x: cx + rad * Math.cos(ang), y: cy + rad * Math.sin(ang) });
+    }
+    var s = '';
+    for (i = 0; tour && i + 1 < tour.length; i += 1) {
+      var a = pts[tour[i]], b = pts[tour[i + 1]];
+      if (!a || !b) continue;
+      s += '<line x1="' + a.x.toFixed(1) + '" y1="' + a.y.toFixed(1) + '" x2="' + b.x.toFixed(1)
+        + '" y2="' + b.y.toFixed(1) + '" stroke="var(--cyan)" stroke-width="2.4" />';
+    }
+    pts.forEach(function (p, v) {
+      s += '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="12" fill="'
+        + (v === 0 ? 'var(--purple)' : 'var(--panel-3)')
+        + '" stroke="var(--line-strong)" stroke-width="1.6" />'
+        + '<text x="' + p.x.toFixed(1) + '" y="' + (p.y + 4).toFixed(1)
+        + '" text-anchor="middle" font-size="11" font-weight="800" fill="'
+        + (v === 0 ? 'var(--on-accent)' : 'var(--text)') + '">' + (v + 1) + '</text>';
+    });
+    return s;
+  }
+  /* A filled table is the easiest thing in this course to get confidently
+     wrong: a recurrence that reads one cell too early still finishes, and
+     the result looks exactly like an answer. So no number below is read
+     off the table alone. Every one of them is computed a second time by a
+     route that has no table -- an exhaustive search, a memo-free
+     recursion, or a re-costing of the answer that came back -- and where
+     the two disagree the panel prints both. */
+  var MMP = {
+    'canonical': { coins: '1 2 5', amount: '18' },
+    'awkward': { coins: '1 3 4', amount: '6' },
+    'sparse': { coins: '4 7', amount: '17' },
+    'wide': { coins: '1 2 5 10 20', amount: '20' }
+  };
+
+  var presetIn = document.getElementById('mmPreset'), coinsIn = document.getElementById('mmCoins');
+  var amtIn = document.getElementById('mmAmount');
+  var cellIn = document.getElementById('mmCell'), cellOut = document.getElementById('mmCellOut');
+  var grid = document.getElementById('mmGrid'), plot = document.getElementById('mmPlot');
+  var routesT = document.getElementById('mmRoutes'), status = document.getElementById('mmStatus');
+  var KPIS = ['mmBest', 'mmNaive', 'mmMemo', 'mmSaved', 'mmCells', 'mmAgree'];
+
+  function blank(why) {
+    grid.innerHTML = ''; plot.innerHTML = ''; routesT.innerHTML = '';
+    for (var i = 0; i < KPIS.length; i += 1) document.getElementById(KPIS[i]).textContent = '—';
+    status.innerHTML = '<span class="tone-red">' + why + '.</span>';
+  }
+
+  function redraw() {
+    var cr = dpParseNums(coinsIn.value, 6, 1, 50);
+    if (cr.bad) { blank('the coins: ' + cr.bad); return; }
+    var coins = cr.values.slice().sort(function (a, b) { return a - b; });
+    var amount = parseInt(amtIn.value, 10);
+    if (!isFinite(amount) || amount < 0 || amount > 26) {
+      blank('the amount is a whole number between 0 and 26'); return;
+    }
+
+    var table = minCoinTable(coins, amount);
+    var memo = memoMinCoins(coins, amount);
+    var naive = null, why = '';
+    try { naive = naiveMinCoins(coins, amount); } catch (err) { why = String(err.message); }
+    var tableAnswer = table.result.table[coins.length][amount];
+    var best = dpUnreachable(tableAnswer) ? null : tableAnswer;
+    var picks = best === null ? [] : minCoinPicks(table, coins, amount);
+    var agree = memo.result.coins === best
+      && (naive === null || naive.result.coins === best);
+
+    cellIn.max = amount;
+    var col = Math.max(0, Math.min(amount, parseInt(cellIn.value, 10)));
+    cellOut.textContent = String(col);
+    var row = coins.length;
+    var deps = table.result.deps[row][col] || [];
+
+    document.getElementById('mmBest').textContent = best === null ? 'cannot be made' : String(best);
+    document.getElementById('mmNaive').textContent = naive ? String(naive.counts.calls) : 'refused';
+    document.getElementById('mmMemo').textContent = String(memo.counts.calls);
+    var saved = naive
+      ? R(BigInt(naive.counts.calls), BigInt(Math.max(1, memo.counts.calls))) : null;
+    document.getElementById('mmSaved').textContent = saved
+      ? Rtext(saved) + ' = ' + Rfixed(saved, 1) + ' times fewer' : '—';
+    document.getElementById('mmCells').textContent = String(table.counts.cells);
+    document.getElementById('mmAgree').textContent = agree ? 'yes' : 'NO';
+
+    grid.innerHTML = dpGridSvg(table.result.table, {
+      highlight: [[row, col]], deps: deps,
+      rowLabel: function (i) { return i === 0 ? 'none' : String(coins[i - 1]); },
+      cellText: function (v) { return dpUnreachable(v) ? '·' : String(v); }
+    });
+
+    /* The curve stops at 16 whatever the amount is. It is redrawn on every
+       keystroke and the unmemoised arm is re-run at every x, so plotting to 26
+       is a few million calls per redraw for a picture that already makes its
+       point. The KPI above is the full amount; this is the shape. */
+    var xs = [], naiveCalls = [], memoCalls = [], curve = [];
+    var top = Math.min(amount, 16);
+    for (var n = 1; n <= top; n += 1) {
+      xs.push(n);
+      memoCalls.push(memoMinCoins(coins, n).counts.calls);
+      var run = null;
+      try { run = naiveMinCoins(coins, n); } catch (e2) { run = null; }
+      naiveCalls.push(run ? run.counts.calls : NaN);
+      curve.push(Math.pow(2, n / 2));
+    }
+    plot.innerHTML = xs.length > 1 ? seriesSvg([
+      { label: 'no memo', values: naiveCalls, colour: 'var(--red)', points: true },
+      { label: 'with a memo', values: memoCalls, colour: 'var(--cyan)', points: true },
+      { label: '2^(n/2)', values: curve, colour: 'var(--muted)', dashed: true }
+    ], xs, { xlabel: 'amount', log: true, box: { left: 26, right: 470, base: 190, top: 14 } }) : '';
+
+    var rows = '';
+    rows += '<tr><th class="rowhead">recursion, no memo</th><td>'
+      + (naive ? (naive.result.coins === null ? 'cannot be made' : naive.result.coins) : '—')
+      + '</td><td>' + (naive ? naive.counts.calls + ' calls' : 'refused: ' + why) + '</td></tr>';
+    rows += '<tr><th class="rowhead">recursion, with a memo</th><td>'
+      + (memo.result.coins === null ? 'cannot be made' : memo.result.coins) + '</td><td>'
+      + memo.counts.calls + ' calls, ' + memo.result.distinct + ' distinct subproblems</td></tr>';
+    rows += '<tr class="tone-cyan"><th class="rowhead">the table, bottom-up</th><td>'
+      + (best === null ? 'cannot be made' : best) + '</td><td>' + table.counts.cells
+      + ' cells, ' + table.counts.reads + ' reads, no recursion at all</td></tr>';
+    if (picks.length) {
+      rows += '<tr class="tone-purple"><th class="rowhead">the coins it uses</th><td>'
+        + picks.join(' + ') + ' = '
+        + picks.reduce(function (t, x) { return t + x; }, 0) + '</td><td>'
+        + (picks.length === best && picks.reduce(function (t, x) { return t + x; }, 0) === amount
+            ? 'that is ' + picks.length + ' coins adding to ' + amount + ', re-added here'
+            : '<span class="tone-red">the reconstruction does not add up</span>') + '</td></tr>';
+    }
+    routesT.innerHTML = '<thead><tr><th>route</th><th>answer</th><th>what it cost</th>'
+      + '</tr></thead><tbody>' + rows + '</tbody>';
+
+    status.innerHTML = 'Making ' + amount + ' from {' + coins.join(', ') + '} needs <strong>'
+      + (best === null ? 'no number of these coins' : best + ' coin' + (best === 1 ? '' : 's'))
+      + '</strong>. ' + (naive
+          ? 'The plain recursion reached that in <strong>' + naive.counts.calls
+            + '</strong> calls; with a memo it took <strong>' + memo.counts.calls
+            + '</strong>, which is ' + Rtext(saved) + ' times fewer, and the memo holds only '
+            + memo.result.distinct + ' distinct subproblems — that number is the whole reason '
+            + 'a memo works, and it is small because the recursion keeps asking the same '
+            + 'questions.'
+          : '<span class="tone-amber">The unmemoised run was refused: ' + why + '.</span>')
+      + ' The table fills ' + table.counts.cells + ' cells in a fixed order and recurses not at '
+      + 'all. ' + (agree
+          ? 'All three agree on the answer, which is what makes the cost comparison worth '
+            + 'anything.'
+          : '<span class="tone-red">The three do not agree</span>, so one of them is wrong and '
+            + 'the page says so rather than showing the prettiest.')
+      + ' The highlighted cell read ' + deps.length + ' other cell'
+      + (deps.length === 1 ? '' : 's') + ', painted amber — that list was recorded by the '
+      + 'recurrence\'s own reads, not written down beside it.';
+  }
+
+  presetIn.addEventListener('change', function () {
+    var p = MMP[presetIn.value];
+    if (p) { coinsIn.value = p.coins; amtIn.value = p.amount; }
+    redraw();
+  });
+  [coinsIn, amtIn, cellIn].forEach(function (el) {
+    el.addEventListener('input', redraw);
+    el.addEventListener('change', redraw);
+  });
+  redraw();
+  window.redrawLab = redraw;
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "dynamic-programming/where-the-greedy-choice-fails";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+  </script>
+</body>
+</html>

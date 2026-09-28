@@ -1,0 +1,2942 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Communicating Classes, Recurrence and Period | Lesson | Markov Chains, Decisions and Queues | Operations Research | Learn · geterdone.io</title>
+  <meta name="description" content="Three structural facts, all of them read off the arcs and none of them off the probabilities. Two states communicate when each can reach the other, which partitions the states into classes. A class is recurrent when nothing leaves it — a statement about which arcs exist, not about how large they are — and transient otherwise. The period of a class is the greatest common divisor of its cycle lengths, and the lab computes it without enumerating a single cycle. Irreducible and aperiodic are the two hypotheses of the convergence theorem, and this page is where they become checkable rather than assumed." />
+  <link rel="canonical" href="https://learn.geterdone.io/markov-chains-decisions-and-queues/communicating-classes-recurrence-and-period/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="Communicating Classes, Recurrence and Period | Lesson | Markov Chains, Decisions and Queues | Operations Research | Learn · geterdone.io" />
+  <meta property="og:description" content="Three structural facts, all of them read off the arcs and none of them off the probabilities. Two states communicate when each can reach the other, which partitions the states into classes. A class is recurrent when nothing leaves it — a statement about which arcs exist, not about how large they are — and transient otherwise. The period of a class is the greatest common divisor of its cycle lengths, and the lab computes it without enumerating a single cycle. Irreducible and aperiodic are the two hypotheses of the convergence theorem, and this page is where they become checkable rather than assumed." />
+  <meta property="og:url" content="https://learn.geterdone.io/markov-chains-decisions-and-queues/communicating-classes-recurrence-and-period/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Communicating Classes, Recurrence and Period | Lesson | Markov Chains, Decisions and Queues | Operations Research | Learn · geterdone.io" />
+  <meta name="twitter:description" content="Three structural facts, all of them read off the arcs and none of them off the probabilities. Two states communicate when each can reach the other, which partitions the states into classes. A class is recurrent when nothing leaves it — a statement about which arcs exist, not about how large they are — and transient otherwise. The period of a class is the greatest common divisor of its cycle lengths, and the lab computes it without enumerating a single cycle. Irreducible and aperiodic are the two hypotheses of the convergence theorem, and this page is where they become checkable rather than assumed." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/markov-chains-decisions-and-queues/communicating-classes-recurrence-and-period/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    @media (max-width: 920px) {
+      body[data-page-kind="supplemental"] [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/operations-research/">Operations Research</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Markov Chains, Decisions and Queues</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">Communicating Classes, Recurrence and Period</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The which states does the chain keep coming back to is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Markov Chains, Decisions and Queues &middot; The chain as an object</span>
+        <h1>Communicating Classes, Recurrence and Period</h1>
+        <p>Three structural facts, all of them read off the arcs and none of them off the probabilities. Two states <em>communicate</em> when each can reach the other, which partitions the states into classes. A class is <strong>recurrent</strong> when nothing leaves it &mdash; a statement about which arcs exist, not about how large they are &mdash; and <strong>transient</strong> otherwise. The <strong>period</strong> of a class is the greatest common divisor of its cycle lengths, and the lab computes it without enumerating a single cycle. Irreducible and aperiodic are the two hypotheses of the convergence theorem, and this page is where they become checkable rather than assumed.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">i → j when some Pⁿ[i][j] &gt; 0;  i ↔ j when both — and ↔ is an equivalence relation
+the classes are its equivalence classes: a partition, computed from reachability
+recurrent ⟺ no arc leaves the class          transient ⟺ some arc does
+irreducible ⟺ exactly one class ⟺ everything reaches everything
+period d = gcd of the lengths of the cycles through a state;  aperiodic ⟺ d = 1
+level the class by breadth-first search:  d = gcd over arcs of level(u) + 1 − level(v)</div>
+        <div class="float-label" style="right:16px;bottom:16px;">Structure from the arcs alone, with nothing about magnitudes in it</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>Three properties of the same digraph. The first partitions the states, the second says which parts the chain settles into, and the third says whether it settles at all or merely returns on a schedule.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Communication is an equivalence relation, so the classes are a partition</h3><p>Reachability is reflexive (<span class="math">n = 0</span>) and transitive (compose the paths), so two-way reachability is an equivalence relation and its classes tile the state space with no overlaps and nothing left over. That is why the lab can print a reachability table and a class list side by side: the second is forced by the first, and <span class="math">↔</span> in the table is exactly the entries that share a class.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Recurrent means no arc leaves, and an arc is an arc</h3><p>If some arc leads out of a class and never comes back, the chain takes it eventually &mdash; probability one, whatever the arc's size &mdash; and cannot return, so the class is visited finitely often. If no arc leaves, the class is closed and the chain that enters it stays. The test is a scan of the arcs out of the class, and a probability of <span class="math">1/1000</span> decides it exactly as a probability of <span class="math">1/2</span> does.</p></article><article class="card concept-card"><div class="icon">3</div><h3>The period is a gcd, and it is computed without listing cycles</h3><p>Take the lengths of all the cycles through a state and take their greatest common divisor. Enumerating cycles is expensive and unnecessary: level the class by breadth-first search and take the gcd of <span class="math">level(u) + 1 − level(v)</span> over every arc <span class="math">u → v</span> in it. Every cycle's length is a sum of those quantities, so the two gcds agree, and the second costs one traversal.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>What the arrows force, before any probability is looked at</h2></div><p>Reachability and its classes, the arc test for recurrence, the period as a gcd, and the two hypotheses the one unproved theorem on this path needs.</p></div>
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Reachability, communication and classes</span><p>State <span class="math">j</span> is <strong>reachable</strong> from <span class="math">i</span>, written <span class="math">i → j</span>, when <span class="math">Pⁿ[i][j] > 0</span> for some <span class="math">n ≥ 0</span>. States <span class="math">i</span> and <span class="math">j</span> <strong>communicate</strong>, written <span class="math">i ↔ j</span>, when <span class="math">i → j</span> and <span class="math">j → i</span>.</p><p><span class="math">↔</span> is an equivalence relation, and its classes are the <strong>communicating classes</strong>. A class <span class="math">C</span> is <strong>closed</strong>, or <strong>recurrent</strong>, when no arc leads from a state of <span class="math">C</span> to a state outside it, and <strong>transient</strong> otherwise. The chain is <strong>irreducible</strong> when there is exactly one class.</p></div><p>Reachability is computed as the transitive closure of the arc relation, so the table the lab prints is closed under composition rather than a list of single steps. A cell shows <span class="math">↔</span> when the two states reach each other, <span class="math">→</span> when only one direction works, and a dot when neither does; the <span class="math">↔</span> cells are precisely the pairs sharing a class.</p><h3>Why “no arc leaves” is the right test</h3><p>Suppose one arc leads out of <span class="math">C</span> and does not lead back. Each visit to its tail takes it with some fixed positive probability, so over infinitely many visits the chance of never taking it is zero. The chain therefore leaves <span class="math">C</span> with probability one and, since it cannot come back, visits <span class="math">C</span> finitely often: that is what transient means. If instead no arc leaves, the chain that enters <span class="math">C</span> can never be anywhere else, and every state of <span class="math">C</span> is visited again and again.</p><p>Nothing in that argument used a magnitude. It used only that the arc exists and that the probability of never taking a fixed positive chance infinitely often is zero. This is the single most common place to reason about the wrong thing: a reader looking at <span class="math">0.001</span> out of a class and <span class="math">0.999</span> inside it sees a class the chain is basically never going to leave, and the correct answer is that it leaves, every time, eventually.</p><div class="example"><span class="label">Example &middot; One state that can leave and never return</span><p>The three-state example <span class="math">1/2 1/4 1/4; 0 3/4 1/4; 0 1/2 1/2</span> has classes <span class="math">{trial}</span> and <span class="math">{kept, lapsed}</span>. The first column is zero below the diagonal, so nothing returns to <span class="math">trial</span>; the lab reports it transient and colours it red, and reports <span class="math">{kept, lapsed}</span> recurrent because no arc leaves it.</p><p>The chain is therefore <em>reducible</em>, so the convergence theorem does not apply to it. It still has a unique stationary distribution &mdash; <span class="math">(0, 2/3, 1/3)</span>, which mode <em>steady</em> computes &mdash; and the zero is not a rounding: the chain spends finitely much of its time at <span class="math">trial</span>, so the long-run fraction is exactly nothing.</p></div><h3>The period, and the gcd that computes it</h3><div class="defbox"><span class="label">Definition &middot; Period</span><p>The <strong>period</strong> of state <span class="math">i</span> is <span class="math">d(i) = gcd{n ≥ 1 : Pⁿ[i][i] > 0}</span>, the greatest common divisor of the lengths of the closed walks from <span class="math">i</span> back to itself. States in the same class have the same period, so it is a property of the class. A class with <span class="math">d = 1</span> is <strong>aperiodic</strong>.</p></div><p>A self-loop forces <span class="math">d = 1</span> immediately, since 1 divides everything. A three-state ring with no other arcs has closed walks of lengths <span class="math">3, 6, 9, …</span> and therefore period 3: the chain returns to where it started only at multiples of three, for ever, and no amount of waiting changes that.</p><p>The lab does not enumerate closed walks. It levels the class by breadth-first search from one of its states and takes the gcd of <span class="math">level(u) + 1 − level(v)</span> over every arc <span class="math">u → v</span> inside the class. Each closed walk's length is the sum of those quantities along it, so every walk length is a multiple of that gcd; and each arc lies on some closed walk, so the gcd of the walk lengths divides it. The two divide each other and are therefore equal, and one traversal has replaced an enumeration.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">the 3-cycle      0 1 0            classes        {1, 2, 3}, one class
+                 0 0 1            irreducible    yes
+                 1 0 0            period         3        aperiodic  no
+
+  levels from state 1 by breadth-first search:  1 → 0,  2 → 1,  3 → 2
+  arcs and level(u) + 1 − level(v):
+      1 → 2     0 + 1 − 1 = 0
+      2 → 3     1 + 1 − 2 = 0
+      3 → 1     2 + 1 − 0 = 3
+  gcd(0, 0, 3) = 3            and no cycle was ever written down
+
+the three-brand chain, every entry positive:
+      classes 1    irreducible yes    period 1    aperiodic yes</div><h3>The two hypotheses, and the theorem this path does not prove</h3><div class="thm"><span class="label">Theorem &middot; Convergence of the powers, stated and not proved</span><p>If a finite chain is irreducible and aperiodic then <span class="math">Pⁿ[i][j] → πⱼ</span> as <span class="math">n → ∞</span> for every <span class="math">i</span> and <span class="math">j</span>, where <span class="math">π</span> is the unique solution of <span class="math">πP = π</span> with <span class="math">Σπ = 1</span>.</p><p>This is one of the three results the footer of this subject names as <strong>stated and not proved</strong>. What is proved here is nothing; what is <em>computed</em> here is both hypotheses, on whatever matrix you type, and the conclusion's <span class="math">π</span> is obtained by solving a linear system in the material that follows &mdash; not as a limit.</p></div><p>A stated theorem whose hypotheses you can check is a different object from a stated theorem taken on trust. Both conditions are needed, and each fails on its own preset here. The three-cycle is irreducible and periodic: the powers return to the identity every third step and converge to nothing, while the linear system still has exactly one answer. The two-closed-group example is aperiodic and reducible: the powers do converge, and not to a single <span class="math">π</span>, because there is no single <span class="math">π</span> for them to converge to.</p><div class="example"><span class="label">Example &middot; Two closed groups, and a chain with no unique steady state</span><p>The four-state example <span class="math">1/2 1/2 0 0; 1/2 1/2 0 0; 0 0 1/3 2/3; 0 0 1/4 3/4</span> has two classes, <span class="math">{a, b}</span> and <span class="math">{c, d}</span>, and <em>both</em> are recurrent: no arc leaves either.</p><p>So the chain is reducible with two recurrent classes, and the balance equations have a whole family of solutions rather than one. The lab reports two recurrent classes here and says that mode <em>steady</em> on the same matrix refuses to print one of them as though it were the answer.</p></div></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Which states does the chain keep coming back to</h2></div><p>communicating classes, recurrence, and the period — the hypotheses, computed</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Which states can reach which, and can they get back</strong><span>a class is recurrent when no arc leaves it &mdash; a statement about arcs, not about sizes</span></div>
+        <div class="inline-legend"><span class="tone-green"><i class="legend-swatch"></i>a recurrent class</span><span class="tone-red"><i class="legend-swatch"></i>a transient class</span><span class="tone-amber"><i class="legend-swatch"></i>an arc that leaves a class</span><span class="tone-muted"><i class="legend-swatch"></i>an arc inside one</span></div>
+      </div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="mkGraph" viewBox="0 0 660 300" role="img" aria-label="The support digraph with each state coloured by its communicating class and the arcs that leave a class picked out."></svg></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="mkClasses"></table></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="mkReach"></table></div>
+      <div class="status-banner" id="mkStatus" style="margin-top:12px;"></div>
+
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>Type a matrix and read its structure off the arcs</h3>
+          <p>Classes come from reachability on the digraph, recurrence from whether any arc leaves a class, and the period from a gcd taken over a breadth-first levelling. These are the two hypotheses the convergence theorem needs, and this page computes both of them on whatever matrix you give it. Switch to the 3-cycle: irreducible, and period 3.</p>
+        <div class="field">
+          <label for="mkPreset">Worked example</label>
+          <select id="mkPreset"><option value="leaky" selected>One state that can leave and never return</option><option value="cycle">A 3-cycle: every state steps to the next</option><option value="split">Two closed groups of two states each</option><option value="weather">Two states, both reachable from both</option><option value="market">Three brands, with switching in every direction</option></select>
+        </div>
+        <div class="field">
+          <label for="mkP">Transition matrix</label>
+          <input id="mkP" type="text" value="1/2 1/4 1/4; 0 3/4 1/4; 0 1/2 1/2" inputmode="text" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="mkNames">State names</label>
+          <input id="mkNames" type="text" value="trial, kept, lapsed" inputmode="text" autocomplete="off">
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Classes</span><strong id="mkCountK">&mdash;</strong></div>
+          <div class="kpi"><span>Irreducible</span><strong id="mkIrredK">&mdash;</strong></div>
+          <div class="kpi"><span>Recurrent classes</span><strong id="mkRecK">&mdash;</strong></div>
+          <div class="kpi"><span>Transient states</span><strong id="mkTransK">&mdash;</strong></div>
+          <div class="kpi"><span>Period</span><strong id="mkPeriodK">&mdash;</strong></div>
+          <div class="kpi"><span>Aperiodic</span><strong id="mkAperK">&mdash;</strong></div>
+        </div>
+        <p class="small-copy" id="mkHint" style="margin:0;">Irreducible and aperiodic are the two hypotheses the convergence theorem needs, and both are computed here rather than assumed. Try the 3-cycle: it is irreducible, so the steady state is unique, and its period is 3, so the powers never settle. One hypothesis without the other is not enough, and this is the matrix that shows why.</p>
+
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Classifying a chain by hand</h2></div><p>Arcs, then closure, then classes, then the two properties. Every step is about the pattern and none of them is about the numbers.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the arcs, ignoring the probabilities entirely</h3><p>One arrow per positive entry, self-loops included. Cover the fractions up if it helps. Everything in this material is a property of the arrows, and keeping the magnitudes in view is how a reader talks themselves into treating a small probability as absent.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Close the relation, then group</h3><p>Find what each state can reach, following arrows as far as they go. Two states with arrows both ways share a class. The result is a partition; if you end up with a state in two groups, you have made an error, because communication is an equivalence relation and cannot overlap.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Test each class for an escaping arc</h3><p>Scan the arcs out of the class. One that leaves and does not come back makes the class transient, however small it is. None at all makes it recurrent, and a chain with exactly one class is irreducible.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Find the period as a gcd, not as an observation</h3><p>Level the class from any state and take the gcd of <span class="math">level(u) + 1 − level(v)</span> over its internal arcs. A self-loop anywhere gives 1 straight away. Do not conclude &ldquo;aperiodic&rdquo; from having failed to spot a rhythm: the gcd is a computation and the eye is not.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Say which hypotheses hold before quoting any convergence</h3><p>Irreducible and aperiodic together are what the convergence statement needs. Either one alone is not enough, and both of the presets that break it are on the dropdown of this page.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>Classes, closure and rhythm</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>Four matrices, classified: one leaky, one cyclic, one split, one where everything is fine</h3><p>The same four questions asked of four matrices: how many classes, is it irreducible, which classes are recurrent, and what is the period. Every answer below is read off the arcs.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">A   1/2 1/4 1/4 ;  0 3/4 1/4 ;  0 1/2 1/2        names  trial kept lapsed
+    arcs out of trial: to trial, kept, lapsed.  Into trial: none but itself.
+    classes {trial}  {kept, lapsed}       transient 1   recurrent 1
+    irreducible  no        period per class  1, 1
+
+B   0 1 0 ;  0 0 1 ;  1 0 0
+    classes {1, 2, 3}            irreducible  yes
+    period  gcd(0, 0, 3) = 3     aperiodic  no
+
+C   1/2 1/2 0 0 ; 1/2 1/2 0 0 ; 0 0 1/3 2/3 ; 0 0 1/4 3/4
+    classes {a, b}  {c, d}       no arc leaves EITHER
+    recurrent 2   transient 0    irreducible  no
+    two recurrent classes ⟹ the balance system is rank deficient
+
+D   7/10 2/10 1/10 ; 3/10 5/10 2/10 ; 1/10 3/10 6/10
+    every entry positive ⟹ one class, and every self-loop gives period 1
+    classes 1   irreducible yes   period 1   aperiodic yes
+
+  only D satisfies both hypotheses of the convergence statement</div><p>Matrix A is the one to sit with, because it is the case where the intuition &ldquo;transient means rare&rdquo; is most tempting and most wrong. The chain starts at <span class="math">trial</span> with probability one; it is there at step zero, and it may be there at step five. What makes <span class="math">{trial}</span> transient is that the number of visits is finite with probability one, and the long-run fraction of time spent there is therefore exactly zero &mdash; a fact you will see printed as an exact <span class="math">0</span> in the steady state, not as a small number.</p><p>Matrices B and C are the two failures, and they fail differently. B is irreducible, so the linear system has one answer; it is periodic, so the powers have none. C is aperiodic, so the powers settle; it is reducible with two recurrent classes, so what they settle to depends on where the chain started, and no single distribution is the answer.</p><p>For a rehearsal, take matrix B and add a self-loop: change the first row to <span class="math">1/2 1/2 0</span> and renormalise nothing else, so the matrix reads <span class="math">1/2 1/2 0; 0 0 1; 1 0 0</span>. The supplied first move is that it is still irreducible. Work out the period before you type it: the closed walks now have lengths 1 and 3, so the gcd is 1, and one added arc has turned a chain whose powers never settle into one whose powers do.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Treating a small escape probability as no escape</strong><span>The class with one thin arc out of it is transient, full stop. The size of the arc changes the expected time to escape, which is a different question and has its own material later; it does not change the classification, and a chain described as &ldquo;effectively closed&rdquo; will have an exactly zero stationary probability on every one of its states.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Concluding aperiodic because no rhythm was noticed</strong><span>The period is a gcd and has to be computed. A chain can have closed walks of lengths 4, 6 and 10 and period 2 with nothing obviously alternating about it. Aperiodicity has one easy sufficient sign &mdash; any self-loop &mdash; and beyond that the computation is the evidence.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Assuming irreducible and aperiodic mean the same thing</strong><span>They are independent. The three-cycle is irreducible and periodic; a chain with two closed groups each carrying self-loops is aperiodic and reducible. The convergence statement needs both, and each preset on this page that breaks one of them satisfies the other.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can partition a chain&#x27;s states from the arrows alone and say what each class is, without looking at a single probability.</strong><p>You should be able to compute reachability and read the classes off it, decide recurrence by scanning for an escaping arc and say why the arc's size is irrelevant, obtain the period as a gcd rather than by observation, and state the two hypotheses of the convergence result together with a matrix that fails each one.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Both hypotheses are now computable, and the statement they support is about a <em>limit</em>. The material that follows argues that the limit was never the point: <span class="math">πP = π</span> is n linear equations in n unknowns, one of them redundant, and solving it gives an exact answer on chains where no limit exists at all. &ldquo;The Steady State as a Linear System&rdquo; puts the solve and the iteration on the same page and prints the gap between them.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../transition-matrices-and-the-support-digraph/" rel="prev"><span>Lesson</span><strong>Transition Matrices and the Support Digraph</strong></a>
+      <a class="lesson-link next" href="../the-steady-state-as-a-linear-system/" rel="next"><span>Lesson</span><strong>The Steady State as a Linear System</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="markov-chains-decisions-and-queues/communicating-classes-recurrence-and-period" data-lesson-title="Communicating Classes, Recurrence and Period" data-course-title="Markov Chains, Decisions and Queues">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Markov Chains, Decisions and Queues.</strong> Every transition probability, matrix power, steady-state probability, expected number of visits, absorption probability, policy value, queue-length distribution, blocking probability and binomial probability on this course is an exact fraction, and the arithmetic behind them is Gauss-Jordan elimination over the rationals rather than anything numerical. That matters more here than it looks: the central claim is an equality &mdash; <span class="math">&pi;P</span> is <em>exactly</em> <span class="math">&pi;</span>, and the cut equations give <em>exactly</em> the fractions the full balance system gives &mdash; and an equality between two decimals that look alike is evidence of nothing. It also keeps numbers a double cannot hold: <span class="math">P&#8319;</span> on a five-state chain reaches fifteen-digit numerators by the twelfth power, and a truncated queue at ninety states has a <span class="math">&pi;&#8320;</span> whose denominator runs to a hundred and nineteen digits. <strong>One quantity here is not rational and says so</strong>: <span class="math">e^(&minus;&lambda;)</span> in the Poisson limit, computed by <span class="math">expNegApprox</span> as the reciprocal of a positive-term series so that nothing cancels, printed beside the exact binomial with the difference between them given as a number. One result is stated and not proved, and says so: the convergence of <span class="math">P&#8319;</span> to the steady state, whose two hypotheses this course computes and whose conclusion it obtains by solving instead. What none of this can do is decide whether the chain you wrote down is the process you meant.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure on this path is computed in your browser from the model the lesson states, and a solution proved optimal is optimal for the model you wrote down rather than for the situation it came from &mdash; each lesson names what the model left out.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "A class has one arc leaving it, of probability <span class=\"math\">1/10000<\/span>, and every other arc stays inside. Is the class recurrent?", "a": ["Yes, because the escape probability is negligible", "Yes, provided the chain starts inside it", "No: the chain takes that arc eventually with probability one and cannot return, so the class is transient", "It depends on how many states the class has"], "c": 2, "why": "Over infinitely many visits, the probability of never taking a fixed positive chance is zero. The class is left with probability one and never re-entered, so it is visited finitely often: transient. The magnitude affects how long you wait, not the classification."}, {"q": "A chain is irreducible with period 3. What does that say about its stationary distribution and about <span class=\"math\">P\u207f<\/span>?", "a": ["Both fail to exist", "The stationary distribution is unique and <span class=\"math\">P\u207f<\/span> does not converge", "<span class=\"math\">P\u207f<\/span> converges but the stationary distribution is not unique", "Both exist and agree, but convergence is slow"], "c": 1, "why": "Irreducibility is what makes the balance system have exactly one solution, and that solution is computed by elimination with no limit involved. Aperiodicity is what the convergence statement additionally needs; at period 3 the powers return to an earlier power exactly, for ever."}, {"q": "Why does the lab compute the period from a breadth-first levelling instead of listing cycles?", "a": ["Because listing cycles would give a different number", "Because a cycle's length is a sum of the per-arc quantities, so the two gcds divide each other and are equal \u2014 at the cost of one traversal instead of an enumeration", "Because cycles are only defined for undirected graphs", "Because the gcd of an empty list is undefined"], "c": 1, "why": "Every closed walk's length is the sum of <span class=\"math\">level(u) + 1 \u2212 level(v)<\/span> along it, so it is a multiple of the per-arc gcd; and every internal arc lies on some closed walk, so the walk gcd divides the arc gcd. Mutual divisibility gives equality, and the traversal is linear where an enumeration is not."}, {"q": "A four-state chain has two classes and BOTH are recurrent. What follows about <span class=\"math\">\u03c0P = \u03c0<\/span>?", "a": ["It has no solution at all", "It has a unique solution putting zero on one of the classes", "It has infinitely many solutions: each closed class has its own, and every mixture of them is stationary too", "It has exactly two solutions, one per class"], "c": 2, "why": "Each closed class carries a stationary distribution of its own, and any convex combination of two stationary distributions is stationary, so there is a whole family. The balance matrix is rank deficient, and the honest response is to say so rather than to print one member of the family."}];
+
+  (function () {
+
+  /* Exact rational arithmetic over BigInt.
+
+     Every number a lesson calls "the answer" lives in this type. BigInt rather
+     than Number because a few steps of elimination on a 3x3 system produces
+     numerators that leave the exact-integer range of a double, and a solution
+     that is silently wrong in the last digits is worse than no solution. */
+  function bgcd(a, b) {
+    if (a < 0n) a = -a;
+    if (b < 0n) b = -b;
+    while (b) { var t = a % b; a = b; b = t; }
+    return a;
+  }
+  function R(n, d) {
+    if (d === undefined) d = 1n;
+    n = BigInt(n); d = BigInt(d);
+    if (d === 0n) throw new Error('division by zero');
+    if (d < 0n) { n = -n; d = -d; }
+    var g = bgcd(n, d) || 1n;
+    return { n: n / g, d: d / g };
+  }
+  var R0 = R(0n), R1 = R(1n);
+  function Radd(a, b) { return R(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function Rsub(a, b) { return R(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function Rmul(a, b) { return R(a.n * b.n, a.d * b.d); }
+  function Rdiv(a, b) { return R(a.n * b.d, a.d * b.n); }
+  function Rneg(a) { return R(-a.n, a.d); }
+  function Rabs(a) { return a.n < 0n ? Rneg(a) : a; }
+  function Rinv(a) { return R(a.d, a.n); }
+  function Rzero(a) { return a.n === 0n; }
+  function Rsign(a) { return a.n === 0n ? 0 : (a.n < 0n ? -1 : 1); }
+  function Requ(a, b) { return a.n === b.n && a.d === b.d; }
+  function Rcmp(a, b) { var l = a.n * b.d, r = b.n * a.d; return l < r ? -1 : (l > r ? 1 : 0); }
+  function Rint(a) { return a.d === 1n; }
+  function Rpow(a, k) {
+    var out = R1, base = a, e = k < 0 ? -k : k;
+    while (e > 0) { if (e & 1) out = Rmul(out, base); base = Rmul(base, base); e >>= 1; }
+    return k < 0 ? Rinv(out) : out;
+  }
+  /* The reader's form: "3", "-7/4". Never "3/1", never "0/5". */
+  function Rtext(a) { return a.d === 1n ? String(a.n) : a.n + '/' + a.d; }
+  /* Parenthesised when it would otherwise glue onto a neighbouring symbol. */
+  function Rterm(a) { return (a.n < 0n || a.d !== 1n) ? '(' + Rtext(a) + ')' : Rtext(a); }
+  function Rnum(a) { return Number(a.n) / Number(a.d); }
+  /* A decimal, for the one place a lesson asks for one. Exact when it can be.
+
+     BigInt long division rather than Number(n)/Number(d).toFixed(). The old
+     form had two faults and the second is the one that shows.
+
+     It returned NaN. Past roughly 300 digits both halves of the quotient are
+     Infinity and Infinity/Infinity is NaN, so a page printed NaN to a reader.
+     A Bloom filter's exact rate at m = 1000, n = 100, k = 7 has a 2101-digit
+     denominator, and Karger's contraction probability has the same shape.
+
+     And it rounded exact ties the wrong way. -399/40 is exactly -9.975; the
+     nearest double is fractionally smaller in magnitude, so toFixed(2) gave
+     -9.97 where half away from zero is -9.98. 160 of 144,180 rationals over
+     the small-integer range disagreed, every one of them an exact tie.
+
+     Half away from zero, computed on the exact value: the doubling, the +1
+     and the halving are the rounding, done in integers. */
+  function Rdec(a, places) {
+    if (places === undefined) places = 6;
+    if (Rint(a)) return String(a.n);
+    var neg = a.n < 0n, num = neg ? -a.n : a.n;
+    var scale = 10n ** BigInt(places);
+    var q = (num * scale * 2n / a.d + 1n) / 2n;
+    var s = q.toString();
+    while (s.length <= places) s = '0' + s;
+    var out = (neg ? '-' : '') + s.slice(0, s.length - places)
+      + (places > 0 ? '.' + s.slice(s.length - places) : '');
+    return out.indexOf('.') >= 0 ? out.replace(/0+$/, '').replace(/\.$/, '') : out;
+  }
+  function Rparse(text) {
+    var s = String(text).trim();
+    var m = /^([+-]?\d+)\s*\/\s*(\d+)$/.exec(s);
+    /* A zero denominator is not a number this function can read, so it comes
+       back null like every other unreadable string. It used to reach R(), which
+       THROWS -- and a throw out of a parser is not a refusal, it is a dead
+       page: the lab's redraw stops, the panel keeps the last good figures, and
+       nothing tells the reader why. Typing 1/0 into the availability chain on
+       a published page did exactly that. Callers all handle null already;
+       every one of them was written to. */
+    if (m) return m[2] === '0' || /^0+$/.test(m[2]) ? null : R(BigInt(m[1]), BigInt(m[2]));
+    m = /^([+-]?\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]));
+    m = /^([+-]?)(\d*)\.(\d+)$/.exec(s);
+    if (m) {
+      var whole = m[2] || '0', frac = m[3];
+      var num = BigInt(whole + frac), den = 10n ** BigInt(frac.length);
+      return R(m[1] === '-' ? -num : num, den);
+    }
+    return null;
+  }
+  /* Is this rational a perfect square? Needed wherever a lesson must decide
+     between an exact answer and a radical one -- sqrt(4/9) is 2/3 and belongs
+     on the page as 2/3, while sqrt(2) must stay sqrt(2). */
+  function bisqrt(n) {
+    if (n < 0n) return null;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x * x === n ? x : null;
+  }
+  function Rsqrt(a) {
+    if (a.n < 0n) return null;
+    var p = bisqrt(a.n), q = bisqrt(a.d);
+    return (p === null || q === null) ? null : R(p, q);
+  }
+
+  function td(t, cls) { return '<td' + (cls ? ' class="' + cls + '"' : '') + '>' + t + '</td>'; }
+  function tdl(t, cls) {
+    return '<td style="text-align:left;"' + (cls ? ' class="' + cls + '"' : '') + '>' + t + '</td>';
+  }
+  function th(t) { return '<th>' + t + '</th>'; }
+  function rowhead(t) { return '<th class="rowhead">' + t + '</th>'; }
+  function tr(cells, cls) { return '<tr' + (cls ? ' class="' + cls + '"' : '') + '>' + cells.join('') + '</tr>'; }
+  function table(caption, heads, rows) {
+    var head = (heads && heads.length)
+      ? '<thead>' + tr(heads.map(function (h) { return th(h); })) + '</thead>' : '';
+    return '<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>' + caption + '</caption>'
+      + head + '<tbody>' + rows.join('') + '</tbody></table></div>';
+  }
+  /* The two-column "what was done / what it produced" table. The exemplar's
+     trace layout, kept identical so a reader moving between courses is reading
+     the same page furniture. */
+  function steps(caption, pairs) {
+    return table(caption, [], pairs.map(function (p) { return tr([rowhead(p[0]), tdl(p[1])]); }));
+  }
+  function chip(t, kind) { return '<span class="chip' + (kind ? ' ' + kind : '') + '">' + t + '</span>'; }
+  /* " + 3" or " - 7": a bare number as a continuation. Everything on this page
+     that writes "something + <number>" goes through it, because "a(n-1) + -7"
+     is not a thing a reader writes and not a thing a marker accepts. */
+  function plusnum(r) { return (Rsign(r) < 0 ? ' - ' : ' + ') + Rtext(Rabs(r)); }
+  function tone(t, kind) { return '<span class="tone-' + kind + '">' + t + '</span>'; }
+  function plural(n, one, many) { return n === 1 ? one : many; }
+  /* Reader text goes into innerHTML, and on this course the reader types < and
+     > all day. Escaped once, at the boundary, rather than trusted: "x + 2y <= 8"
+     written raw would lose everything from the < to the next > -- which is the
+     end of the cell -- and the page would quietly drop the reader's own words. */
+  function esc(t) {
+    return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  /* Rparse throws on a zero denominator, and 1/0 is a thing a reader types.
+     Every read of reader input goes through this, so a bad fraction becomes a
+     sentence in the status banner rather than an exception. */
+  function Rread(text) {
+    try { return Rparse(String(text).trim()); } catch (err) { return null; }
+  }
+  /* The one rounding this file performs, and it is never used to decide
+     anything -- only to sit beside an exact value that a reader may want to
+     place on a number line. Every caller labels it as a rounding. */
+  function approx(r, places) {
+    var v = Rnum(r);
+    if (!isFinite(v)) return 'not a real number';
+    return v.toFixed(places === undefined ? 4 : places);
+  }
+  /* The least common multiple of two rationals: lcm of the numerators over the
+     gcd of the denominators. For two integers this is the schoolbook lcm, which
+     is what the elimination mode needs; for 1/2 and 1/4 it is 1/2, which is
+     what keeps that mode from inventing multipliers with four-digit numerators
+     the moment a coefficient stops being whole. */
+  function Rlcm(a, b) {
+    if (Rzero(a) || Rzero(b)) return R0;
+    var an = a.n < 0n ? -a.n : a.n, bn = b.n < 0n ? -b.n : b.n;
+    return R(an / bgcd(an, bn) * bn, bgcd(a.d, b.d));
+  }
+
+  /* A matrix is an array of arrays of rationals. Nothing here rounds, and
+     nothing here caches: every routine recomputes from the entries it is given,
+     so two routines that agree agreed by arithmetic rather than by sharing a
+     variable. */
+  function Mcopy(M) { return M.map(function (r) { return r.slice(); }); }
+  function Mrows(M) { return M.length; }
+  function Mcols(M) { return M.length ? M[0].length : 0; }
+  function Msquare(M) { return M.length > 0 && M.length === Mcols(M); }
+  function Mshape(M) { return Mrows(M) + ' by ' + Mcols(M); }
+  function Mzero(r, c) {
+    var out = [];
+    for (var i = 0; i < r; i += 1) { var row = []; for (var j = 0; j < c; j += 1) row.push(R0); out.push(row); }
+    return out;
+  }
+  function Mid(n) {
+    var out = Mzero(n, n);
+    for (var i = 0; i < n; i += 1) out[i][i] = R1;
+    return out;
+  }
+  function Mmap2(A, B, fn) {
+    return A.map(function (row, i) { return row.map(function (v, j) { return fn(v, B[i][j]); }); });
+  }
+  function Madd(A, B) { return Mmap2(A, B, Radd); }
+  function Msub(A, B) { return Mmap2(A, B, Rsub); }
+  function Mscale(A, r) { return A.map(function (row) { return row.map(function (v) { return Rmul(v, r); }); }); }
+  function Mtrans(A) {
+    var out = Mzero(Mcols(A), Mrows(A));
+    for (var i = 0; i < Mrows(A); i += 1) for (var j = 0; j < Mcols(A); j += 1) out[j][i] = A[i][j];
+    return out;
+  }
+  function Msamesize(A, B) { return Mrows(A) === Mrows(B) && Mcols(A) === Mcols(B); }
+  function Mmul(A, B) {
+    if (Mcols(A) !== Mrows(B)) return null;
+    var out = Mzero(Mrows(A), Mcols(B));
+    for (var i = 0; i < Mrows(A); i += 1) {
+      for (var j = 0; j < Mcols(B); j += 1) {
+        var s = R0;
+        for (var k = 0; k < Mcols(A); k += 1) s = Radd(s, Rmul(A[i][k], B[k][j]));
+        out[i][j] = s;
+      }
+    }
+    return out;
+  }
+  /* The row-times-column sum for one entry, written out. This is the entry's
+     definition, and printing it is the only way the reader can check that the
+     number in the box came from the row and column it claims. */
+  function Mdottext(A, B, i, j) {
+    var parts = [];
+    for (var k = 0; k < Mcols(A); k += 1) {
+      parts.push('(' + Rtext(A[i][k]) + ')(' + Rtext(B[k][j]) + ')');
+    }
+    return parts.join(' + ');
+  }
+  function Mequ(A, B) {
+    if (!Msamesize(A, B)) return false;
+    for (var i = 0; i < Mrows(A); i += 1) {
+      for (var j = 0; j < Mcols(A); j += 1) if (!Requ(A[i][j], B[i][j])) return false;
+    }
+    return true;
+  }
+  function Maug(A, B) {
+    return A.map(function (row, i) { return row.concat(B[i]); });
+  }
+  function Mtake(M, from, count) {
+    return M.map(function (row) { return row.slice(from, from + count); });
+  }
+  function Mminor(M, i, j) {
+    var out = [];
+    for (var a = 0; a < M.length; a += 1) {
+      if (a === i) continue;
+      var row = [];
+      for (var b = 0; b < M[a].length; b += 1) { if (b === j) continue; row.push(M[a][b]); }
+      out.push(row);
+    }
+    return out;
+  }
+  /* Cofactor expansion along the first row, recursively. Not the fast way to
+     get a determinant, and that is the point: this is the definition the
+     lesson gives, and the row-reduction determinant beside it is the check. */
+  function Mdet(M) {
+    var n = M.length;
+    if (!Msquare(M)) return null;
+    if (n === 1) return M[0][0];
+    if (n === 2) return Rsub(Rmul(M[0][0], M[1][1]), Rmul(M[0][1], M[1][0]));
+    var total = R0;
+    for (var j = 0; j < n; j += 1) {
+      if (Rzero(M[0][j])) continue;
+      var term = Rmul(M[0][j], Mdet(Mminor(M, 0, j)));
+      total = (j % 2 === 0) ? Radd(total, term) : Rsub(total, term);
+    }
+    return total;
+  }
+
+  /* ---- the three elementary row operations, each on its own ---- */
+  function Mswap(M, i, j) {
+    var out = Mcopy(M), t = out[i]; out[i] = out[j]; out[j] = t;
+    return out;
+  }
+  function Mscalerow(M, i, s) {
+    var out = Mcopy(M);
+    out[i] = out[i].map(function (v) { return Rmul(v, s); });
+    return out;
+  }
+  function Maddrow(M, i, j, s) {
+    var out = Mcopy(M);
+    out[i] = out[i].map(function (v, c) { return Radd(v, Rmul(s, M[j][c])); });
+    return out;
+  }
+
+  /* Gaussian elimination: forward only, pivots left where they are. No row is
+     divided by its pivot, which is what keeps 3x + 2y = 24 from becoming
+     x + (2/3)y = 8 in the first line of a trace the reader is meant to follow. */
+  function Mgauss(M0, ncols) {
+    var M = Mcopy(M0), ops = [], pivots = [], row = 0;
+    var stop = ncols === undefined ? Mcols(M) : ncols;
+    for (var col = 0; col < stop && row < M.length; col += 1) {
+      var p = -1;
+      for (var i = row; i < M.length; i += 1) if (!Rzero(M[i][col])) { p = i; break; }
+      if (p < 0) continue;
+      if (p !== row) {
+        M = Mswap(M, row, p);
+        ops.push({ op: 'R' + (row + 1) + ' &lt;-&gt; R' + (p + 1),
+                   why: 'the pivot position held 0, so a row below it is brought up',
+                   after: Mcopy(M) });
+      }
+      for (var i2 = row + 1; i2 < M.length; i2 += 1) {
+        if (Rzero(M[i2][col])) continue;
+        var m = Rneg(Rdiv(M[i2][col], M[row][col]));
+        M = Maddrow(M, i2, row, m);
+        ops.push({ op: 'R' + (i2 + 1) + ' -&gt; R' + (i2 + 1) + ' + ' + Rterm(m) + 'R' + (row + 1),
+                   why: 'clears the entry below the pivot in column ' + (col + 1),
+                   after: Mcopy(M) });
+      }
+      pivots.push(col);
+      row += 1;
+    }
+    return { M: M, ops: ops, pivots: pivots, rank: pivots.length };
+  }
+
+  /* Gauss-Jordan: every pivot driven to 1 and every other entry in its column
+     driven to 0, recording each elementary operation with the matrix it
+     produced. `detf` is the factor the operations multiplied the determinant
+     by, so det(A) can be recovered from the reduced form without a second
+     implementation of anything. */
+  function Mrref(M0, opts) {
+    opts = opts || {};
+    var stop = opts.cols === undefined ? Mcols(M0) : opts.cols;
+    var M = Mcopy(M0), ops = [], pivots = [], detf = R1, row = 0;
+    for (var col = 0; col < stop && row < M.length; col += 1) {
+      var p = -1;
+      for (var i = row; i < M.length; i += 1) if (!Rzero(M[i][col])) { p = i; break; }
+      if (p < 0) continue;
+      if (p !== row) {
+        M = Mswap(M, row, p);
+        detf = Rneg(detf);
+        ops.push({ op: 'R' + (row + 1) + ' &lt;-&gt; R' + (p + 1),
+                   why: 'a swap, which multiplies the determinant by -1',
+                   after: Mcopy(M) });
+      }
+      var pv = M[row][col];
+      if (!Requ(pv, R1)) {
+        var s = Rinv(pv);
+        M = Mscalerow(M, row, s);
+        detf = Rmul(detf, s);
+        ops.push({ op: 'R' + (row + 1) + ' -&gt; ' + Rterm(s) + 'R' + (row + 1),
+                   why: 'makes the pivot 1, and multiplies the determinant by ' + Rtext(s),
+                   after: Mcopy(M) });
+      }
+      for (var i2 = 0; i2 < M.length; i2 += 1) {
+        if (i2 === row || Rzero(M[i2][col])) continue;
+        var m = Rneg(M[i2][col]);
+        M = Maddrow(M, i2, row, m);
+        ops.push({ op: 'R' + (i2 + 1) + ' -&gt; R' + (i2 + 1) + ' + ' + Rterm(m) + 'R' + (row + 1),
+                   why: 'clears column ' + (col + 1) + ', and leaves the determinant alone',
+                   after: Mcopy(M) });
+      }
+      pivots.push(col);
+      row += 1;
+    }
+    return { M: M, ops: ops, pivots: pivots, rank: pivots.length, detf: detf };
+  }
+
+  /* "2 1 -1; -3 -1 2" -- rows split on ; or a newline, entries on spaces or
+     commas. Every entry goes through Rparse, so 1/2 is an entry and 0.25
+     becomes 1/4 rather than a float that will drift three row operations later. */
+  function Mparse(text, what) {
+    var s = String(text).trim();
+    if (!s) return { bad: (what || 'the matrix') + ' box is empty' };
+    var lines = s.split(/[;\n]/).map(function (t) { return t.trim(); })
+                 .filter(function (t) { return t.length > 0; });
+    if (!lines.length) return { bad: (what || 'the matrix') + ' box has no rows in it' };
+    var out = [], width = -1;
+    for (var i = 0; i < lines.length; i += 1) {
+      var cells = lines[i].split(/[\s,]+/).filter(function (t) { return t.length > 0; });
+      var vals = [];
+      for (var j = 0; j < cells.length; j += 1) {
+        var r = Rread(cells[j]);
+        if (r === null) {
+          return { bad: (what || 'the matrix') + ', row ' + (i + 1) + ', entry ' + (j + 1) + ': "'
+            + esc(cells[j]) + '" is not a whole number or a fraction' };
+        }
+        vals.push(r);
+      }
+      if (!vals.length) return { bad: (what || 'the matrix') + ', row ' + (i + 1) + ' has no entries' };
+      if (width < 0) width = vals.length;
+      else if (vals.length !== width) {
+        return { bad: (what || 'the matrix') + ' is not rectangular: row 1 has ' + width
+          + ' entries and row ' + (i + 1) + ' has ' + vals.length };
+      }
+      out.push(vals);
+    }
+    if (out.length > 6 || width > 6) {
+      return { bad: 'this lab prints matrices up to 6 by 6, and that one is ' + out.length + ' by ' + width };
+    }
+    return { M: out };
+  }
+
+  /* A matrix as a table. `split` tints every column from that index on, which
+     is the augmented bar drawn with the one divider the stylesheet offers. */
+  function Mtable(caption, M, opts) {
+    opts = opts || {};
+    if (!M || !M.length) return table(caption, [], [tr([tdl('(no rows)')])]);
+    var rows = M.map(function (r, i) {
+      var cells = r.map(function (v, j) {
+        var cls = '';
+        if (opts.split !== undefined && j >= opts.split) cls = 'on';
+        if (opts.mark && opts.mark(i, j)) cls = 'on';
+        return td(Rtext(v), cls);
+      });
+      var head = (opts.rowlabels && opts.rowlabels[i] !== undefined) ? opts.rowlabels[i] : ('R' + (i + 1));
+      return tr([rowhead(head)].concat(cells), opts.focus === i ? 'focus' : '');
+    });
+    return table(caption, opts.heads ? [''].concat(opts.heads) : [], rows);
+  }
+  /* The trace: every operation with the matrix it produced. */
+  function Mtrace(caption, start, ops, opts) {
+    var blocks = [Mtable(caption + ' &mdash; the matrix as read', start, opts)];
+    if (!ops.length) {
+      blocks.push(steps(caption + ' &mdash; the operations', [['nothing to do', 'the matrix is already in that form']]));
+      return blocks.join('');
+    }
+    ops.forEach(function (o, i) {
+      blocks.push(Mtable('step ' + (i + 1) + ':  ' + o.op + '   (' + o.why + ')', o.after, opts));
+    });
+    return blocks.join('');
+  }
+
+  /* Printing a rational this path can actually produce.
+
+     algebra_core's Rdec and Rnum both go through Number, and this path
+     produces rationals Number cannot hold: P^12 on a five-state chain with
+     denominator-20 entries has entries of 15 digits over 16 (measured), and
+     (19/20)^400 is 512 digits over 521, of which Number() makes NaN.  So
+     decimals here are long division in BigInt.  queue.py already solved this for the System
+     Design queueing course; this is that solution lifted, not a fourteenth
+     one, so the two courses print the same number the same way. */
+
+  /* Decimal by BigInt long division, rounded half up at the last digit. */
+  function Rfixed(a, places) {
+    if (places === undefined) places = 3;
+    var neg = a.n < 0n, n = neg ? -a.n : a.n, d = a.d;
+    var scale = 10n ** BigInt(places);
+    var q = (2n * n * scale + d) / (2n * d);          /* round half up */
+    var whole = q / scale, frac = (q % scale).toString();
+    while (frac.length < places) frac = '0' + frac;
+    var body = places > 0 ? whole + '.' + frac : String(whole);
+    return (neg ? '-' : '') + body;
+  }
+
+  /* The exact fraction when a reader can read it, a decimal when the exact
+     form has run to twenty digits.  Both are the same number; only one of them
+     is evidence.  The cut is on DIGITS, not on magnitude, so it is the same
+     rule on every page of the Subject. */
+  function Rshort(a, places, digits) {
+    if (digits === undefined) digits = 9;
+    var wide = String(a.n < 0n ? -a.n : a.n).length > digits || String(a.d).length > digits;
+    return wide ? Rfixed(a, places === undefined ? 4 : places) : Rtext(a);
+  }
+  function Rpct(a, places) {
+    return Rfixed(Rmul(a, R(100n, 1n)), places === undefined ? 2 : places) + '%';
+  }
+
+  /* The fractional part a - floor(a), EXACT -- which is what makes a Gomory
+     cut a cut and not an approximation of one.  The floor is computed inline
+     rather than by calling Rfloor, because sysdesign_core.RCEIL_JS declares
+     that name and a kit concatenating both blocks would hold two of it. */
+  function Rfrac(a) {
+    var q = a.n / a.d;
+    if (a.n < 0n && q * a.d !== a.n) q -= 1n;
+    return Rsub(a, R(q, 1n));
+  }
+
+  /* Floor of the integer square root of a BigInt.  algebra_core's bisqrt
+     returns null for a non-square, which is right for deciding exactness and
+     useless for printing one: this never returns null. */
+  function bifloor(n) {
+    if (n < 0n) return 0n;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x;
+  }
+
+  /* THE ONE FUNCTION IN THIS MODULE THAT ROUNDS.  A surd {q, k} means
+     q*sqrt(k) and is exact; its decimal is not, and an EOQ of 40*sqrt(3) is
+     read off a page as 69.28 whatever we would prefer.  The digits come from
+     bifloor(q.n^2 * k * 10^(2p)) = floor(q.n * 10^p * sqrt k), computed with
+     three guard places and then rounded once, so the printed last digit is the
+     correctly rounded one.  Every lesson that calls this says it is rounded. */
+  function surdDec(s, places) {
+    if (places === undefined) places = 4;
+    var p = places + 3;
+    var neg = Rsign(s.q) < 0, n = neg ? -s.q.n : s.q.n;
+    var floored = bifloor(n * n * s.k * 10n ** BigInt(2 * p));
+    var v = R(floored, s.q.d * 10n ** BigInt(p));
+    return Rfixed(neg ? Rneg(v) : v, places);
+  }
+
+  /* Markov chains, Markov decision processes, and the birth-death queue they
+     all reduce to.  Needs algebra_systems.MATRIX_JS above it.
+
+     A transition matrix is rows-sum-to-one over rationals, and everything here
+     stays rational: P^12 on a five-state chain with denominator-20 entries has
+     entries 15 digits over 16, which is exactly the size Number stops being
+     able to hold and exactly where a lesson about long-run behaviour starts. */
+
+  /* P^n by repeated multiplication.
+
+     NOT NAMED Mpow.  algebra_basics.MONO_JS already defines Mpow -- and its
+     own Mmul -- for MONOMIAL LISTS, and a kit concatenating both blocks would
+     silently get the wrong one and report a plausible wrong matrix.  The
+     collision is the reason for the name. */
+  function chainPow(P, n) {
+    var out = Mid(P.length), base = P.map(function (r) { return r.slice(); }), e = n;
+    while (e > 0) {
+      if (e & 1) out = Mmul(out, base);
+      base = Mmul(base, base);
+      e >>= 1;
+    }
+    return out;
+  }
+
+  /* Communicating classes, by reachability on the SUPPORT digraph: i leads to
+     j when P[i][j] > 0, and i and j communicate when each leads to the other.
+     A class is recurrent when nothing leaves it -- a chain that can leave and
+     not come back is transient, which is a statement about arcs and not about
+     probabilities. */
+  function chainClasses(P) {
+    var n = P.length, i, j, k;
+    var reach = [];
+    for (i = 0; i < n; i += 1) {
+      var row = [];
+      for (j = 0; j < n; j += 1) row.push(i === j || !Rzero(P[i][j]));
+      reach.push(row);
+    }
+    for (k = 0; k < n; k += 1) for (i = 0; i < n; i += 1) for (j = 0; j < n; j += 1)
+      if (reach[i][k] && reach[k][j]) reach[i][j] = true;
+    var seen = [], classes = [];
+    for (i = 0; i < n; i += 1) seen.push(false);
+    for (i = 0; i < n; i += 1) {
+      if (seen[i]) continue;
+      var cls = [];
+      for (j = 0; j < n; j += 1) if (reach[i][j] && reach[j][i]) { cls.push(j); seen[j] = true; }
+      var closed = true, leaves = [];
+      for (j = 0; j < cls.length; j += 1) {
+        for (k = 0; k < n; k += 1) {
+          if (Rzero(P[cls[j]][k]) || cls.indexOf(k) >= 0) continue;
+          closed = false; leaves.push([cls[j], k]);
+        }
+      }
+      classes.push({ states: cls, recurrent: closed, transient: !closed, leaves: leaves,
+                     why: closed
+                       ? 'nothing leaves {' + cls.join(',') + '}, so once the chain is in it, it stays: recurrent'
+                       : 'from ' + (leaves.length ? leaves[0][0] + ' the chain can reach ' + leaves[0][1] : '')
+                         + ' and not return, so {' + cls.join(',') + '} is transient' });
+    }
+    return { classes: classes, reach: reach,
+             irreducible: classes.length === 1 };
+  }
+
+  /* The period of a class: the gcd of the lengths of every cycle through one
+     of its states.  Computed by levelling the class from that state and taking
+     the gcd of (level[u] + 1 - level[v]) over its arcs, which is the same
+     number without enumerating cycles. */
+  function chainPeriod(P, cls) {
+    var inCls = {}, i, j;
+    for (i = 0; i < cls.length; i += 1) inCls[cls[i]] = true;
+    var level = {}, queue = [cls[0]], g = 0;
+    level[cls[0]] = 0;
+    while (queue.length) {
+      var u = queue.shift();
+      for (j = 0; j < P.length; j += 1) {
+        if (Rzero(P[u][j]) || !inCls[j]) continue;
+        if (level[j] === undefined) { level[j] = level[u] + 1; queue.push(j); }
+        else {
+          var d = level[u] + 1 - level[j];
+          if (d < 0) d = -d;
+          var a = g, b = d;
+          while (b) { var t = a % b; a = b; b = t; }
+          g = a;
+        }
+      }
+    }
+    return { period: g === 0 ? 1 : g, levels: level,
+             aperiodic: (g === 0 ? 1 : g) === 1 };
+  }
+
+  /* pi P = pi with sum pi = 1.  The n balance equations are dependent -- their
+     columns sum to the same thing -- so ONE of them is dropped by name and
+     the normalisation takes its place.  `dropped` says which, because "we drop
+     an equation" without saying which one is where a reader loses the thread. */
+  function steadyState(P, dropIndex) {
+    var n = P.length, i, j;
+    var drop = dropIndex === undefined ? n - 1 : dropIndex;
+    var A = [];
+    for (j = 0; j < n; j += 1) {
+      if (j === drop) continue;
+      var row = [];
+      for (i = 0; i < n; i += 1) row.push(Rsub(P[i][j], i === j ? R1 : R0));
+      row.push(R0);
+      A.push(row);
+    }
+    var last = [];
+    for (i = 0; i < n; i += 1) last.push(R1);
+    last.push(R1);
+    A.push(last);
+    var red = Mrref(A, { cols: n });
+    var pi = [];
+    for (i = 0; i < n; i += 1) pi.push(red.rank === n ? red.M[i][n] : null);
+    var sum = R0;
+    for (i = 0; i < n; i += 1) if (pi[i] !== null) sum = Radd(sum, pi[i]);
+    return { system: A, dropped: drop, pi: pi, ops: red.ops, rank: red.rank,
+             unique: red.rank === n, sum: sum,
+             why: 'balance equation ' + (drop + 1) + ' is dropped because the n equations are dependent -- '
+               + 'every column of P - I sums to zero -- and sum pi = 1 takes its place' };
+  }
+
+  /* An absorbing chain, in the canonical blocks.
+       N = (I - Q)^-1  the expected visits to each transient state
+       t = N 1         the expected steps before absorption
+       B = N R         which absorbing state the chain ends in
+     `partials` is I + Q + ... + Q^k beside N, because N is the SUM of those
+     powers and a reader who has only been told the inverse formula has been
+     told the answer without the reason. */
+  function absorbing(P, abs, kmax) {
+    var n = P.length, i, j, k;
+    var isAbs = {}, trans = [];
+    for (i = 0; i < abs.length; i += 1) isAbs[abs[i]] = true;
+    for (i = 0; i < n; i += 1) if (!isAbs[i]) trans.push(i);
+    var Q = [], Rm = [];
+    for (i = 0; i < trans.length; i += 1) {
+      var qr = [], rr = [];
+      for (j = 0; j < trans.length; j += 1) qr.push(P[trans[i]][trans[j]]);
+      for (j = 0; j < abs.length; j += 1) rr.push(P[trans[i]][abs[j]]);
+      Q.push(qr); Rm.push(rr);
+    }
+    var m = trans.length;
+    var IQ = Msub(Mid(m), Q);
+    var red = Mrref(Maug(IQ, Mid(m)), { cols: m });
+    var N = red.rank === m ? Mtake(red.M, m, m) : null;
+    var t = null, Bm = null;
+    if (N) {
+      t = [];
+      for (i = 0; i < m; i += 1) {
+        var s = R0;
+        for (j = 0; j < m; j += 1) s = Radd(s, N[i][j]);
+        t.push(s);
+      }
+      Bm = Mmul(N, Rm);
+    }
+    var partials = [], acc = Mid(m), pw = Mid(m);
+    partials.push(acc.map(function (r) { return r.slice(); }));
+    for (k = 1; k <= (kmax === undefined ? 6 : kmax); k += 1) {
+      pw = Mmul(pw, Q);
+      acc = Madd(acc, pw);
+      partials.push(acc.map(function (r) { return r.slice(); }));
+    }
+    return { Q: Q, R: Rm, N: N, t: t, B: Bm, partials: partials, ops: red.ops,
+             transient: trans, absorbing: abs.slice(), singular: red.rank !== m };
+  }
+
+  /* ---- Markov decision processes --------------------------------------- */
+
+  /* Evaluate ONE policy: v = r_pi + gamma P_pi v, solved exactly rather than
+     iterated, so the page can show the iteration converging TO something. */
+  function policyEvaluate(P, r, policy, gamma) {
+    var n = policy.length, i, j;
+    var Ppi = [], rpi = [];
+    for (i = 0; i < n; i += 1) { Ppi.push(P[policy[i]][i].slice()); rpi.push(r[policy[i]][i]); }
+    var A = [];
+    for (i = 0; i < n; i += 1) {
+      var row = [];
+      for (j = 0; j < n; j += 1) row.push(Rsub(i === j ? R1 : R0, Rmul(gamma, Ppi[i][j])));
+      row.push(rpi[i]);
+      A.push(row);
+    }
+    var red = Mrref(A, { cols: n });
+    var v = [];
+    for (i = 0; i < n; i += 1) v.push(red.rank === n ? red.M[i][n] : null);
+    return { system: A, v: v, ops: red.ops, Ppi: Ppi, rpi: rpi, singular: red.rank !== n };
+  }
+
+  /* Policy iteration: evaluate exactly, improve greedily, repeat.  It stops
+     because there are finitely many policies and the value never decreases --
+     which is a better reason than "the numbers stopped moving". */
+  function policyIterate(P, r, gamma, opts) {
+    opts = opts || {};
+    var n = r[0].length, acts = P.length, i, a, j;
+    var policy = opts.start ? opts.start.slice() : [];
+    while (policy.length < n) policy.push(0);
+    var rounds = [], guard = 0;
+    while (guard < (opts.maxRounds || 20)) {
+      guard += 1;
+      var ev = policyEvaluate(P, r, policy, gamma);
+      var next = [], improve = [];
+      for (i = 0; i < n; i += 1) {
+        var best = null, arg = policy[i], per = [];
+        for (a = 0; a < acts; a += 1) {
+          var q = r[a][i];
+          for (j = 0; j < n; j += 1) q = Radd(q, Rmul(gamma, Rmul(P[a][i][j], ev.v[j])));
+          per.push({ act: a, value: q });
+          if (best === null || Rcmp(q, best) > 0) { best = q; arg = a; }
+        }
+        next.push(arg);
+        improve.push({ state: i, was: policy[i], now: arg, q: per, best: best });
+      }
+      rounds.push({ policy: policy.slice(), v: ev.v.slice(), improve: improve, system: ev.system, ops: ev.ops });
+      var same = true;
+      for (i = 0; i < n; i += 1) if (next[i] !== policy[i]) same = false;
+      policy = next;
+      if (same) break;
+    }
+    /* A few value-iteration steps beside the exact answer, with their
+       denominators growing one power of gamma's denominator per step.  Written
+       out here rather than handed to DPSEQ_JS's discountedValue: `markov` does
+       not carry that block, and ten lines is a better trade than fourteen
+       kilobytes to get one column back. */
+    var iteration = null;
+    if (opts.valueSteps) {
+      var best = rounds[rounds.length - 1].policy, v = [], iters = [], step;
+      for (i = 0; i < n; i += 1) v.push(R0);
+      iters.push(v.slice());
+      for (step = 0; step < opts.valueSteps; step += 1) {
+        var nv = [];
+        for (i = 0; i < n; i += 1) {
+          var acc = r[best[i]][i];
+          for (j = 0; j < n; j += 1) acc = Radd(acc, Rmul(gamma, Rmul(P[best[i]][i][j], v[j])));
+          nv.push(acc);
+        }
+        v = nv; iters.push(v.slice());
+      }
+      var gap = [];
+      for (i = 0; i < n; i += 1) gap.push(Rsub(v[i], rounds[rounds.length - 1].v[i]));
+      iteration = { vT: v, v: rounds[rounds.length - 1].v.slice(), gap: gap, iterations: iters };
+    }
+    return { rounds: rounds, policy: policy, v: rounds[rounds.length - 1].v,
+             iterations: rounds.length, valueIteration: iteration };
+  }
+
+  /* ---- the birth-death queue ------------------------------------------- */
+
+  /* THE KIT'S UNIFYING OBJECT.  Cut the chain between n and n + 1: what
+     crosses upward must cross back down, so pi_{n+1} mu_{n+1} = pi_n lam_n,
+     and every queue on this path is that one equation with different rates.
+     M/M/1 is lam_n = lam, mu_n = mu; M/M/s is mu_n = min(n, s) mu, and Erlang
+     C falls out of the same pi as a reading rather than a second formula.
+
+     `lam[n]` is the arrival rate in state n, for n = 0 .. N - 1.
+     `mu[n]`  is the service rate OUT OF state n + 1, that is mu_{n+1}.
+     The chain therefore has states 0 .. N.
+
+     `stable` answers the question about the UNTRUNCATED chain -- would this
+     still be a distribution if the last pair of rates went on forever -- which
+     is the question a reader is actually asking. */
+  function birthDeath(lam, mu, opts) {
+    opts = opts || {};
+    var s = opts.servers === undefined ? 1 : opts.servers;
+    var N = lam.length, n, ratios = [R1], cuts = [];
+    for (n = 0; n < N; n += 1) {
+      if (Rzero(mu[n])) break;
+      ratios.push(Rmul(ratios[n], Rdiv(lam[n], mu[n])));
+      cuts.push({ n: n, lam: lam[n], mu: mu[n], ratio: Rdiv(lam[n], mu[n]),
+                  why: 'pi_' + (n + 1) + ' = pi_' + n + ' * ' + Rtext(lam[n]) + ' / ' + Rtext(mu[n])
+                    + ' -- what crosses the cut between ' + n + ' and ' + (n + 1) + ' upward must cross back down' });
+    }
+    var total = R0;
+    for (n = 0; n < ratios.length; n += 1) total = Radd(total, ratios[n]);
+    var pi = ratios.map(function (v) { return Rdiv(v, total); });
+    var L = R0, Lq = R0, lamEff = R0;
+    for (n = 0; n < pi.length; n += 1) {
+      L = Radd(L, Rmul(R(BigInt(n), 1n), pi[n]));
+      if (n > s) Lq = Radd(Lq, Rmul(R(BigInt(n - s), 1n), pi[n]));
+      if (n < lam.length) lamEff = Radd(lamEff, Rmul(pi[n], lam[n]));
+    }
+    var W = Rzero(lamEff) ? null : Rdiv(L, lamEff);
+    var Wq = Rzero(lamEff) ? null : Rdiv(Lq, lamEff);
+    var stable = N > 0 && !Rzero(mu[N - 1]) && Rcmp(lam[N - 1], mu[N - 1]) < 0;
+    return { pi: pi, ratios: ratios, cuts: cuts, L: L, Lq: Lq, W: W, Wq: Wq,
+             lambdaEffective: lamEff, servers: s, stable: stable,
+             busy: Rsub(R1, pi[0]), states: pi.length,
+             why: 'Little\'s Law closes the loop: L = ' + Rtext(L) + ' and the rate that actually gets in is '
+               + Rtext(lamEff) + ', so W = L / lambda_eff' };
+  }
+
+  /* ------------------------------------------------- is it a transition matrix
+
+     A matrix whose rows do not sum to one is not a chain, and every quantity
+     below would still compute on it and mean nothing. So this refuses, names
+     the row, and the modes blank rather than paint. That is the difference
+     between a lab and a calculator with a Markov-shaped skin. */
+  function chainValid(M) {
+    if (!M || !M.length) return { ok: false, why: 'there is no matrix here' };
+    var n = M.length, i, j;
+    for (i = 0; i < n; i += 1) if (M[i].length !== n) {
+      return { ok: false, why: 'a transition matrix is square, and row ' + (i + 1) + ' has '
+        + M[i].length + ' entries against ' + n + ' rows' };
+    }
+    for (i = 0; i < n; i += 1) {
+      for (j = 0; j < n; j += 1) {
+        if (Rsign(M[i][j]) < 0) {
+          return { ok: false, why: 'entry (' + (i + 1) + ',' + (j + 1) + ') is '
+            + Rtext(M[i][j]) + ', and a probability cannot be negative' };
+        }
+        if (Rcmp(M[i][j], R1) > 0) {
+          return { ok: false, why: 'entry (' + (i + 1) + ',' + (j + 1) + ') is '
+            + Rtext(M[i][j]) + ', and a probability cannot exceed 1' };
+        }
+      }
+    }
+    var sums = [];
+    for (i = 0; i < n; i += 1) {
+      var s = R0;
+      for (j = 0; j < n; j += 1) s = Radd(s, M[i][j]);
+      sums.push(s);
+      if (!Requ(s, R1)) {
+        return { ok: false, sums: sums, row: i, why: 'row ' + (i + 1) + ' sums to ' + Rtext(s)
+          + ', not to 1 -- from state ' + (i + 1) + ' the chain has to go somewhere, and these '
+          + 'probabilities say it goes ' + (Rcmp(s, R1) > 0 ? 'more than' : 'less than')
+          + ' once' };
+      }
+    }
+    return { ok: true, sums: sums, n: n, why: 'every row sums to exactly 1, so this is a transition matrix' };
+  }
+  /* A distribution typed by a reader: non-negative and summing to one. Not
+     normalised silently -- a distribution that does not sum to one is a typo,
+     and rescaling it answers a question nobody asked. */
+  function readDist(text, n) {
+    var parts = String(text).trim().split(/[\s,;]+/).filter(function (t) { return t.length; });
+    if (parts.length !== n) return null;
+    var out = [], total = R0, k;
+    for (k = 0; k < parts.length; k += 1) {
+      var v = Rread(parts[k]);
+      if (v === null || Rsign(v) < 0) return null;
+      out.push(v); total = Radd(total, v);
+    }
+    return Requ(total, R1) ? out : null;
+  }
+  /* v P, one step of the row vector -- which is the direction a distribution
+     moves and the reason pi is a LEFT eigenvector. */
+  function pushDist(v, P) {
+    var n = P.length, out = [], i, j;
+    for (j = 0; j < n; j += 1) {
+      var s = R0;
+      for (i = 0; i < n; i += 1) s = Radd(s, Rmul(v[i], P[i][j]));
+      out.push(s);
+    }
+    return out;
+  }
+  /* v P^n, kept step by step so the page can show the walk rather than the
+     destination. Exact: the denominators grow and that is worth seeing. */
+  function distWalk(v, P, n) {
+    var rows = [v.slice()], k;
+    for (k = 0; k < n; k += 1) rows.push(pushDist(rows[rows.length - 1], P));
+    return rows;
+  }
+
+  /* --------------------------------------------- the check the page performs
+
+     pi is claimed to satisfy piP = pi and to sum to 1. Neither is assumed here:
+     piP is recomputed from the pi that came out of the solve, compared entry by
+     entry with Requ -- exact equality of rationals, not "close enough" -- and
+     the sum is added up. A page that asserted this instead of computing it
+     would be a page a reader has to trust. */
+  function steadyCheck(P, pi) {
+    if (!pi || pi.indexOf(null) >= 0) {
+      return { ok: false, residual: null, sum: null,
+               why: 'the system has no unique solution, so there is nothing to check' };
+    }
+    var moved = pushDist(pi, P), n = pi.length, i, worst = null, at = -1;
+    for (i = 0; i < n; i += 1) {
+      var d = Rsub(moved[i], pi[i]);
+      if (worst === null || Rcmp(Rabs(d), Rabs(worst)) > 0) { worst = d; at = i; }
+    }
+    var sum = R0;
+    for (i = 0; i < n; i += 1) sum = Radd(sum, pi[i]);
+    var exact = Rzero(worst) && Requ(sum, R1);
+    return { ok: exact, moved: moved, residual: worst, at: at, sum: sum,
+             why: exact
+               ? 'the page recomputed piP from the solution and every entry came back EXACTLY equal to '
+                 + 'pi, and the entries sum to exactly 1'
+               : 'piP differs from pi in entry ' + (at + 1) + ' by ' + Rtext(worst)
+                 + ' and the entries sum to ' + Rtext(sum) + ' -- either would mean the solve is wrong' };
+  }
+
+  /* --------------------------------- the iteration, which is a DIFFERENT thing
+
+     This is the only floating-point arithmetic in the kit and it exists to be
+     compared against. A rational is turned into a double through Rfixed's
+     BigInt long division rather than through Number(n)/Number(d), because this
+     path produces rationals whose numerator and denominator both overflow a
+     double while their RATIO is perfectly ordinary. */
+  function toFloat(r) { return parseFloat(Rfixed(r, 17)); }
+  function floatMatrix(P) {
+    return P.map(function (row) { return row.map(toFloat); });
+  }
+  /* v P^n in doubles, keeping only the vector. The whole point of the panel is
+     that this can be run for thousands of steps and still not be the answer. */
+  function floatWalk(Pf, start, n) {
+    var v = start.slice(), out = [], i, j, k;
+    for (k = 0; k < n; k += 1) {
+      var next = [];
+      for (j = 0; j < Pf.length; j += 1) {
+        var s = 0;
+        for (i = 0; i < Pf.length; i += 1) s += v[i] * Pf[i][j];
+        next.push(s);
+      }
+      v = next;
+      if (k < 8 || k === n - 1) out.push(v.slice());
+    }
+    return { v: v, sample: out };
+  }
+  /* How far the iteration got, and how far it did not. `places` is the number
+     of decimal places the two agree to, floored -- and it is computed from the
+     difference rather than assumed from the step count. */
+  function floatGap(pi, v) {
+    var worst = 0, at = -1, i;
+    for (i = 0; i < pi.length; i += 1) {
+      var d = Math.abs(v[i] - toFloat(pi[i]));
+      if (d > worst) { worst = d; at = i; }
+    }
+    var places = worst === 0 ? Infinity : Math.floor(-Math.log(worst) / Math.LN10);
+    return { gap: worst, at: at, places: places,
+             why: worst === 0
+               ? 'the iteration has reached the exact answer to every digit a double can hold, which is '
+                 + 'not the same as reaching it'
+               : 'the iteration is out by ' + worst.toExponential(3) + ' in entry ' + (at + 1)
+                 + ', which is agreement to about ' + places + ' decimal places' };
+  }
+  /* The EXACT distance from P^n to the steady state, as a rational, which is
+     what the float column cannot give. */
+  function exactGap(P, pi, n) {
+    if (!pi || pi.indexOf(null) >= 0) return null;
+    var Pn = chainPow(P, n), worst = R0, at = null, i, j;
+    for (i = 0; i < P.length; i += 1) {
+      for (j = 0; j < P.length; j += 1) {
+        var d = Rabs(Rsub(Pn[i][j], pi[j]));
+        if (Rcmp(d, worst) > 0) { worst = d; at = [i, j]; }
+      }
+    }
+    return { Pn: Pn, gap: worst, at: at };
+  }
+  /* Does P^n move at all between n and n + period? On a periodic chain it does
+     not settle, it CYCLES, and saying "it has not converged yet" about a
+     3-cycle is the misconception this answers. Exact equality, so the answer is
+     yes or no rather than a tolerance. */
+  function powerCycles(P, upto) {
+    var seen = [], k;
+    var cur = Mid(P.length);
+    for (k = 0; k <= upto; k += 1) {
+      var i;
+      for (i = 0; i < seen.length; i += 1) if (Mequ(seen[i], cur)) {
+        return { repeats: true, first: i, again: k, period: k - i,
+                 why: 'P^' + k + ' is EXACTLY P^' + i + ', so the powers repeat with period ' + (k - i)
+                   + ' and no limit exists -- the sequence does not fail to converge slowly, it does not '
+                   + 'converge at all' };
+      }
+      seen.push(cur);
+      cur = Mmul(cur, P);
+    }
+    return { repeats: false, first: -1, again: -1, period: 0,
+             why: 'no power up to P^' + upto + ' repeats an earlier one exactly' };
+  }
+  /* The sentence the path's footer requires. One function, so the wording
+     cannot drift between the two modes that print it. */
+  function convergenceNote() {
+    return 'The convergence of P&#8319; to the steady state is <strong>stated on this path and not '
+      + 'proved</strong> &mdash; it is one of the three results the footer names. What is computed here '
+      + 'is the steady state itself, as the exact solution of a linear system, and the hypotheses the '
+      + 'theorem needs: mode <em>classify</em> checks irreducibility and aperiodicity on the same matrix.';
+  }
+
+  /* ------------------------------------------------ drawing the support graph
+
+     The digraph of i -> j whenever P[i][j] > 0. Nodes on a circle, arcs bowed
+     so an antiparallel pair does not hide behind itself, self-loops as a
+     circle above the node. A string, with no element involved. */
+  function chainSvg(P, opts) {
+    opts = opts || {};
+    var n = P.length, w = opts.w || 660, hgt = opts.h || 300;
+    var cx = w / 2, cy = hgt / 2 + 4, rad = Math.min(w, hgt) / 2 - 54;
+    var pos = [], i, j;
+    for (i = 0; i < n; i += 1) {
+      var a = -Math.PI / 2 + 2 * Math.PI * i / n;
+      pos.push([cx + rad * Math.cos(a), cy + rad * Math.sin(a)]);
+    }
+    var defs = '<defs><marker id="mkArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" '
+      + 'markerHeight="6" orient="auto-start-reverse">'
+      + '<path d="M 0 0 L 10 5 L 0 10 z" fill="var(--muted)" /></marker></defs>';
+    var arcs = '', labels = '';
+    for (i = 0; i < n; i += 1) {
+      for (j = 0; j < n; j += 1) {
+        if (Rzero(P[i][j])) continue;
+        var tone = opts.arcTone ? opts.arcTone(i, j) : 'muted';
+        if (i === j) {
+          var lx = pos[i][0], ly = pos[i][1];
+          var ox = (lx - cx) / (rad || 1) * 26, oy = (ly - cy) / (rad || 1) * 26;
+          arcs += '<circle cx="' + (lx + ox).toFixed(1) + '" cy="' + (ly + oy).toFixed(1)
+            + '" r="13" fill="none" stroke="var(--' + tone + ')" stroke-width="1.4" />';
+          labels += '<text x="' + (lx + ox * 1.9).toFixed(1) + '" y="' + (ly + oy * 1.9).toFixed(1)
+            + '" font-size="10" fill="var(--' + tone + ')" text-anchor="middle">' + Rtext(P[i][j]) + '</text>';
+          continue;
+        }
+        var x1 = pos[i][0], y1 = pos[i][1], x2 = pos[j][0], y2 = pos[j][1];
+        var dx = x2 - x1, dy = y2 - y1, len = Math.sqrt(dx * dx + dy * dy) || 1;
+        var ux = dx / len, uy = dy / len;
+        var sx = x1 + ux * 19, sy = y1 + uy * 19, ex = x2 - ux * 22, ey = y2 - uy * 22;
+        /* bow every arc the same way round its own direction, so i->j and j->i
+           are two visibly different curves rather than one line drawn twice */
+        var mx = (sx + ex) / 2 - uy * 16, my = (sy + ey) / 2 + ux * 16;
+        arcs += '<path d="M ' + sx.toFixed(1) + ' ' + sy.toFixed(1) + ' Q ' + mx.toFixed(1) + ' '
+          + my.toFixed(1) + ' ' + ex.toFixed(1) + ' ' + ey.toFixed(1) + '" fill="none" stroke="var(--'
+          + tone + ')" stroke-width="1.4" marker-end="url(#mkArrow)" />';
+        labels += '<text x="' + mx.toFixed(1) + '" y="' + (my - 3).toFixed(1) + '" font-size="10" '
+          + 'fill="var(--' + tone + ')" text-anchor="middle">' + Rtext(P[i][j]) + '</text>';
+      }
+    }
+    var nodes = '';
+    for (i = 0; i < n; i += 1) {
+      var ntone = opts.nodeTone ? opts.nodeTone(i) : 'cyan';
+      nodes += '<circle cx="' + pos[i][0].toFixed(1) + '" cy="' + pos[i][1].toFixed(1)
+        + '" r="18" fill="var(--panel-solid)" stroke="var(--' + ntone + ')" stroke-width="2" />'
+        + '<text x="' + pos[i][0].toFixed(1) + '" y="' + (pos[i][1] + 4).toFixed(1)
+        + '" font-size="12" font-weight="700" fill="var(--' + ntone + ')" text-anchor="middle">'
+        + (opts.names && opts.names[i] ? opts.names[i] : String(i + 1)) + '</text>';
+    }
+    return defs + arcs + labels + nodes;
+  }
+  /* A distribution as a row of bars, for watching one push forward. */
+  function distSvg(rows, opts) {
+    opts = opts || {};
+    var w = opts.w || 660, hgt = opts.h || 190, L = 34, T = 14, B = 26;
+    if (!rows.length) return '<text x="14" y="24" font-size="11" fill="var(--muted)">nothing yet</text>';
+    var n = rows[0].length, steps = rows.length;
+    var iw = (w - L - 14) / steps, out = '';
+    out += '<line x1="' + L + '" y1="' + (T + hgt - T - B) + '" x2="' + (w - 14) + '" y2="'
+      + (T + hgt - T - B) + '" stroke="var(--line-strong)" />';
+    var base = hgt - B, k, i;
+    for (k = 0; k < steps; k += 1) {
+      var bw = Math.max(1.5, (iw - 6) / n);
+      for (i = 0; i < n; i += 1) {
+        var v = toFloat(rows[k][i]);
+        var bh = (base - T) * Math.max(0, Math.min(1, v));
+        out += '<rect x="' + (L + k * iw + 3 + i * bw).toFixed(2) + '" y="' + (base - bh).toFixed(2)
+          + '" width="' + Math.max(1, bw - 1).toFixed(2) + '" height="' + bh.toFixed(2)
+          + '" rx="1.5" fill="var(--' + ['cyan', 'purple', 'green', 'amber', 'blue', 'red'][i % 6]
+          + ')" opacity="0.85" />';
+      }
+      if (steps <= 18) {
+        out += '<text x="' + (L + k * iw + iw / 2).toFixed(2) + '" y="' + (base + 13)
+          + '" font-size="9" fill="var(--muted)" text-anchor="middle">' + k + '</text>';
+      }
+    }
+    out += '<text x="4" y="' + (T + 8) + '" font-size="10" fill="var(--muted)">1</text>'
+      + '<text x="4" y="' + base + '" font-size="10" fill="var(--muted)">0</text>';
+    if (opts.target) {
+      for (i = 0; i < opts.target.length; i += 1) {
+        var ty = base - (base - T) * Math.max(0, Math.min(1, toFloat(opts.target[i])));
+        out += '<line x1="' + L + '" y1="' + ty.toFixed(2) + '" x2="' + (w - 14) + '" y2="' + ty.toFixed(2)
+          + '" stroke="var(--' + ['cyan', 'purple', 'green', 'amber', 'blue', 'red'][i % 6]
+          + ')" stroke-width="1" stroke-dasharray="3 3" opacity="0.7" />';
+      }
+    }
+    return out;
+  }
+
+  function nameList(text, count) {
+    var parts = String(text || '').split(',').map(function (s) { return s.trim(); })
+      .filter(function (s) { return s.length; });
+    if (parts.length !== count) { parts = []; for (var k = 0; k < count; k += 1) parts.push(String(k + 1)); }
+    return parts;
+  }
+  /* Two channels, because they are two different things. A tile holding a
+     figure is TEXT and goes through textContent: it is what every other
+     kit on this path writes, it is what scripts/labcheck.js reads when it
+     checks a preset's `expect` against the shipped page, and it cannot
+     carry an HTML entity by accident. A tile holding a tone span is
+     markup and says so at the call site. Before this split every tile
+     here went through innerHTML, so every one of them read back empty
+     from getElementById(id).textContent and none could be pinned. */
+  function setKpi(id, text) { document.getElementById(id).textContent = text; }
+  function setKpiHtml(id, html) { document.getElementById(id).innerHTML = html; }
+  var PRESETS = {"weather": {"label": "Two states, both reachable from both", "P": "1/2 1/2; 1/4 3/4", "names": "fine, wet", "start": "1 0", "expect": {"chain": {"mcStatesK": "2", "mcAfterK": "683/2048, 1365/2048", "mcDenK": "4 digits"}, "classify": {"mkCountK": "1", "mkPeriodK": "1"}, "steady": {"msPiK": "1/3, 2/3", "msGapK": "1.110e-16"}}}, "market": {"label": "Three brands, with switching in every direction", "P": "7/10 2/10 1/10; 3/10 5/10 2/10; 1/10 3/10 6/10", "names": "A, B, C", "start": "1 0 0", "expect": {"chain": {"mcStatesK": "3", "mcArcsK": "9 of 9 possible", "mcDenK": "6 digits"}, "classify": {"mkCountK": "1", "mkRecK": "1", "mkPeriodK": "1"}, "steady": {"msPiK": "7/17, 11/34, 9/34", "msPlacesK": "15"}}}, "cycle": {"label": "A 3-cycle: every state steps to the next", "P": "0 1 0; 0 0 1; 1 0 0", "names": "1, 2, 3", "start": "1 0 0", "expect": {"chain": {"mcArcsK": "3 of 9 possible", "mcAfterK": "1, 0, 0", "mcWideK": "1 digit"}, "classify": {"mkCountK": "1", "mkPeriodK": "3"}, "steady": {"msPiK": "1/3, 1/3, 1/3", "msGapK": "6.667e-1", "msPlacesK": "0"}}}, "leaky": {"label": "One state that can leave and never return", "P": "1/2 1/4 1/4; 0 3/4 1/4; 0 1/2 1/2", "names": "trial, kept, lapsed", "start": "1 0 0", "expect": {"chain": {"mcArcsK": "7 of 9 possible", "mcAfterK": "1/64, 2667/4096, 1365/4096"}, "classify": {"mkCountK": "2", "mkTransK": "1", "mkPeriodK": "per class: 1, 1"}}}, "split": {"label": "Two closed groups of two states each", "P": "1/2 1/2 0 0; 1/2 1/2 0 0; 0 0 1/3 2/3; 0 0 1/4 3/4", "names": "a, b, c, d", "start": "1 0 0 0", "expect": {"classify": {"mkCountK": "2", "mkRecK": "2", "mkTransK": "0"}, "steady": {"msResidK": "\u2014", "msGapK": "\u2014", "msPlacesK": "\u2014"}}}, "five": {"label": "Five states, every entry over 20", "P": "4/20 4/20 4/20 4/20 4/20; 1/20 3/20 7/20 4/20 5/20; 2/20 2/20 6/20 7/20 3/20; 9/20 1/20 1/20 4/20 5/20; 3/20 4/20 6/20 2/20 5/20", "names": "1, 2, 3, 4, 5", "start": "1 0 0 0 0", "expect": {"chain": {"mcStatesK": "5", "mcWideK": "8 digits", "mcDenK": "8 digits"}, "steady": {"msPiK": "7525/37913, 5222/37913, 8860/37913, 8090/37913, 8216/37913", "msPlacesK": "15"}}}};
+
+  var presetS = document.getElementById('mkPreset');
+  var pIn = document.getElementById('mkP');
+  var namesIn = document.getElementById('mkNames');
+  var graphEl = document.getElementById('mkGraph');
+  var classesEl = document.getElementById('mkClasses');
+  var reachEl = document.getElementById('mkReach');
+  var statusEl = document.getElementById('mkStatus');
+
+  function blank(message) {
+    graphEl.innerHTML = ''; classesEl.innerHTML = ''; reachEl.innerHTML = '';
+    ['mkCountK', 'mkIrredK', 'mkRecK', 'mkTransK', 'mkPeriodK', 'mkAperK'].forEach(function (id) {
+      setKpi(id, '—');
+    });
+    statusEl.innerHTML = message;
+  }
+
+  function redraw() {
+    var parsed = Mparse(pIn.value, 'the transition matrix');
+    if (parsed.bad) { blank('<strong>' + parsed.bad + '.</strong>'); return; }
+    var P = parsed.M, valid = chainValid(P);
+    if (!valid.ok) {
+      blank('<strong>That is not a transition matrix.</strong> ' + valid.why.charAt(0).toUpperCase()
+        + valid.why.slice(1) + '. Reachability would still compute on it, and it would be reachability '
+        + 'in a graph that is not a chain.');
+      return;
+    }
+    var n = P.length, names = nameList(namesIn.value, n);
+    var cls = chainClasses(P);
+    var of = [], i, j, k;
+    for (i = 0; i < n; i += 1) of.push(-1);
+    for (k = 0; k < cls.classes.length; k += 1) {
+      for (i = 0; i < cls.classes[k].states.length; i += 1) of[cls.classes[k].states[i]] = k;
+    }
+    var leaving = {};
+    for (k = 0; k < cls.classes.length; k += 1) {
+      for (i = 0; i < cls.classes[k].leaves.length; i += 1) {
+        leaving[cls.classes[k].leaves[i][0] + ',' + cls.classes[k].leaves[i][1]] = true;
+      }
+    }
+    graphEl.innerHTML = chainSvg(P, {
+      w: 660, h: 300, names: names,
+      nodeTone: function (s) { return cls.classes[of[s]].recurrent ? 'green' : 'red'; },
+      arcTone: function (a, b) { return leaving[a + ',' + b] ? 'amber' : 'muted'; }
+    });
+
+    var rows = [], transient = 0, recurrent = 0, periods = [];
+    for (k = 0; k < cls.classes.length; k += 1) {
+      var c = cls.classes[k];
+      var per = chainPeriod(P, c.states);
+      periods.push(per.period);
+      if (c.recurrent) recurrent += 1; else transient += c.states.length;
+      rows.push(tr([
+        rowhead('{' + c.states.map(function (s) { return names[s]; }).join(', ') + '}'),
+        td(c.recurrent ? '<span class="tone-green">recurrent</span>'
+           : '<span class="tone-red">transient</span>'),
+        td(String(per.period) + (per.aperiodic ? ' <span class="tone-green">aperiodic</span>' : '')),
+        tdl(c.why)]));
+    }
+    classesEl.innerHTML = '<caption>The communicating classes, and why each is recurrent or '
+      + 'transient</caption><thead>' + tr([th('class'), th('kind'), th('period'), th('reason')])
+      + '</thead><tbody>' + rows.join('') + '</tbody>';
+
+    var rr = [], heads = [th('from &rarr; can reach')];
+    for (j = 0; j < n; j += 1) heads.push(th(names[j]));
+    for (i = 0; i < n; i += 1) {
+      var cells = [rowhead(names[i])];
+      for (j = 0; j < n; j += 1) {
+        var both = cls.reach[i][j] && cls.reach[j][i];
+        cells.push(td(cls.reach[i][j] ? (both ? '&harr;' : '&rarr;') : '&middot;',
+          both ? 'tone-green' : (cls.reach[i][j] ? 'tone-amber' : 'tone-muted')));
+      }
+      rr.push(tr(cells));
+    }
+    reachEl.innerHTML = '<caption>Reachability, closed under composition: &harr; means the two states '
+      + 'communicate and therefore share a class</caption><thead>' + tr(heads) + '</thead><tbody>'
+      + rr.join('') + '</tbody>';
+
+    var wholePeriod = cls.irreducible ? periods[0] : null;
+    setKpi('mkCountK', String(cls.classes.length));
+    setKpiHtml('mkIrredK', cls.irreducible ? '<span class="tone-green">yes</span>'
+      : '<span class="tone-red">no, ' + cls.classes.length + ' classes</span>');
+    setKpi('mkRecK', String(recurrent));
+    setKpi('mkTransK', String(transient));
+    setKpi('mkPeriodK', wholePeriod === null ? 'per class: ' + periods.join(', ') : String(wholePeriod));
+    setKpiHtml('mkAperK', wholePeriod === null ? '&mdash;'
+      : (wholePeriod === 1 ? '<span class="tone-green">yes</span>'
+         : '<span class="tone-red">no, period ' + wholePeriod + '</span>'));
+
+    statusEl.innerHTML = '<strong>' + cls.classes.length + ' communicating class'
+      + (cls.classes.length === 1 ? '' : 'es') + ', of which ' + recurrent + ' '
+      + (recurrent === 1 ? 'is' : 'are') + ' recurrent.</strong> '
+      + 'A class is recurrent when <em>nothing leaves it</em>. That is a statement about which arcs '
+      + 'exist and not about how large the probabilities are: an arc of probability 1/1000 out of a '
+      + 'class makes it transient just as surely as one of probability 1/2, because the chain takes it '
+      + 'eventually and then cannot come back. '
+      + (cls.irreducible
+          ? 'This chain is <span class="tone-green">irreducible</span> &mdash; one class, everything '
+            + 'reaches everything &mdash; with period ' + wholePeriod + '. '
+            + (wholePeriod === 1
+                ? 'It is also <span class="tone-green">aperiodic</span>, so it satisfies both '
+                  + 'hypotheses of the convergence theorem.'
+                : '<span class="tone-red">It is periodic</span>, so the second hypothesis fails: the '
+                  + 'steady state still exists and is still unique, because it solves a linear system, '
+                  + 'but P&#8319; does not approach it. Mode <em>steady</em> shows both on this matrix.')
+          : 'This chain is <span class="tone-red">reducible</span>: it has ' + cls.classes.length
+            + ' classes, so the convergence theorem does not apply. '
+            + (recurrent === 1
+                ? 'Exactly one of them is recurrent, so the balance equations still have a unique '
+                  + 'solution &mdash; it puts probability 0 on every transient state, which is where '
+                  + 'the chain spends finitely much of its time.'
+                : recurrent + ' of them are recurrent, so the balance equations have a WHOLE FAMILY of '
+                  + 'solutions: each closed group has its own steady state and every mixture of them is '
+                  + 'stationary too. Mode <em>steady</em> on this matrix refuses to print one.'))
+      + ' The period is computed as the gcd of the lengths of the cycles through a state, obtained by '
+      + 'levelling the class by breadth-first search and taking the gcd of level(u) + 1 &minus; level(v) '
+      + 'over its arcs &mdash; the same number without enumerating a single cycle.';
+  }
+
+  presetS.addEventListener('change', function () {
+    var p = PRESETS[presetS.value];
+    if (!p) return;
+    pIn.value = p.P; namesIn.value = p.names;
+    redraw();
+  });
+  [pIn, namesIn].forEach(function (el) { el.addEventListener('input', redraw); });
+  redraw();
+  window.redrawLab = redraw;
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "markov-chains-decisions-and-queues/communicating-classes-recurrence-and-period";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+  </script>
+</body>
+</html>

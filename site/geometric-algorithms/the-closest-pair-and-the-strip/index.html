@@ -1,0 +1,2596 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Closest Pair and the Strip | Lesson | Geometric Algorithms | Algorithms | Learn · geterdone.io</title>
+  <meta name="description" content="Sorting by x and recursing gives two candidate distances; the only pair the recursion can miss is one with a point on each side, and such a pair must lie within the smaller of those distances of the dividing line. Sorting that strip by y lets each point be compared with at most seven others, which is the classic bound. The lab measures the comparisons actually made and puts them beside 7n, and on twelve points the two are 5 and 84." />
+  <link rel="canonical" href="https://learn.geterdone.io/geometric-algorithms/the-closest-pair-and-the-strip/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="The Closest Pair and the Strip | Lesson | Geometric Algorithms | Algorithms | Learn · geterdone.io" />
+  <meta property="og:description" content="Sorting by x and recursing gives two candidate distances; the only pair the recursion can miss is one with a point on each side, and such a pair must lie within the smaller of those distances of the dividing line. Sorting that strip by y lets each point be compared with at most seven others, which is the classic bound. The lab measures the comparisons actually made and puts them beside 7n, and on twelve points the two are 5 and 84." />
+  <meta property="og:url" content="https://learn.geterdone.io/geometric-algorithms/the-closest-pair-and-the-strip/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="The Closest Pair and the Strip | Lesson | Geometric Algorithms | Algorithms | Learn · geterdone.io" />
+  <meta name="twitter:description" content="Sorting by x and recursing gives two candidate distances; the only pair the recursion can miss is one with a point on each side, and such a pair must lie within the smaller of those distances of the dividing line. Sorting that strip by y lets each point be compared with at most seven others, which is the classic bound. The lab measures the comparisons actually made and puts them beside 7n, and on twelve points the two are 5 and 84." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/geometric-algorithms/the-closest-pair-and-the-strip/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    @media (max-width: 920px) {
+      body[data-page-kind="supplemental"] [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/algorithms/">Algorithms</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Geometric Algorithms</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">The Closest Pair and the Strip</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The the closest pair, as a squared distance that is never rounded is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Geometric Algorithms &middot; Area, distance and the measured column</span>
+        <h1>The Closest Pair and the Strip</h1>
+        <p>Sorting by <span class="math">x</span> and recursing gives two candidate distances; the only pair the recursion can miss is one with a point on each side, and such a pair must lie within the smaller of those distances of the dividing line. Sorting that strip by <span class="math">y</span> lets each point be compared with at most seven others, which is the classic bound. The lab measures the comparisons actually made and puts them beside <span class="math">7n</span>, and on twelve points the two are 5 and 84.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">split by x, recurse, take d = the smaller of the two answers
+a missed pair must have one point each side and be within d of the line
+in the strip, sorted by y, each point needs at most 7 later neighbours
+twelve points: 17 comparisons against 66 for every pair
+strip comparisons 5, against the bound 7n = 84
+squared distances throughout: 2 is an integer and √2 is not</div>
+        <div class="float-label" style="right:16px;bottom:16px;">The split, the strip, and the measured count against the bound</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>What the recursion can miss, why the strip is enough to catch it, and what the seven-neighbour bound is and is not.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>The only pair at risk is a straddling pair</h3><p>Sort by <span class="math">x</span>, split at the median, recurse on each half. A pair with both points on the same side was considered by that side's recursive call. So the only pair the recursion can have missed has one point on each side &mdash; and if its distance is less than <span class="math">d</span>, the better of the two recursive answers, then both of its points are within <span class="math">d</span> of the dividing line. That is the whole of the merge step's obligation.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Seven is a packing argument, not an average</h3><p>Sort the strip by <span class="math">y</span>. If two strip points are more than <span class="math">d</span> apart in <span class="math">y</span> they cannot beat <span class="math">d</span>, so only a window matters. That window is a <span class="math">2d</span>-by-<span class="math">d</span> rectangle, and it cannot contain more than eight points that are pairwise at least <span class="math">d</span> apart &mdash; divide it into eight squares of side <span class="math">d/2</span> and note that two points in one such square would be closer than <span class="math">d</span>. So each point needs at most seven comparisons, whatever the input.</p></article><article class="card concept-card"><div class="icon">3</div><h3>The measured count is far below the bound, and that is not slack in the proof</h3><p>On the lab's twelve points the strip comparisons total 5 against a bound of <span class="math">7n = 84</span>, and the busiest single strip ran at <span class="math">4/5 = 0.80</span> comparisons per strip point. The bound is a worst case over every input; <span class="math">4/5</span> is a measurement of one. A gap between them is not evidence that the proof is loose, and the page says so in the status line.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>The recursion, the pair it can miss, and the strip that catches it</h2></div><p>The split, the merge obligation, the packing argument behind the seven, and the counts the lab measures against it.</p></div>
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; The divide-and-conquer closest pair</span><p>Sort the points by <span class="math">x</span>. If there are at most three, compare all pairs. Otherwise split at the median into <span class="math">L</span> and <span class="math">R</span>, recurse on each, and let <span class="math">d</span> be the smaller of the two distances returned &mdash; held throughout as <span class="math">d²</span>, which is an integer. Form the <strong>strip</strong>: the points whose <span class="math">x</span> is within <span class="math">d</span> of the dividing coordinate, tested as <span class="math">(x − mid)² &lt; d²</span> so that nothing is rooted, and sorted by <span class="math">y</span>. For each strip point, compare it with the following strip points until the <span class="math">y</span> gap alone reaches <span class="math">d</span>, again tested as <span class="math">(Δy)² ≥ d²</span>. Return the smallest distance seen.</p></div><div class="thm"><span class="label">Theorem &middot; The merge step is sufficient</span><p>If the closest pair has one point in <span class="math">L</span> and one in <span class="math">R</span>, then both lie within <span class="math">d</span> of the dividing line, and in the strip sorted by <span class="math">y</span> they are at most seven positions apart.</p></div><div class="proof"><p>Let <span class="math">p ∈ L</span> and <span class="math">q ∈ R</span> be a pair at distance less than <span class="math">d</span>. Then <span class="math">|px − qx| &lt; d</span>, and the dividing coordinate lies between <span class="math">px</span> and <span class="math">qx</span>, so each of them is within <span class="math">d</span> of it. Both are therefore in the strip, and <span class="math">|py − qy| &lt; d</span> as well, so the scan's early exit on the <span class="math">y</span> gap does not skip the pair.</p><p>For the position bound, consider the <span class="math">2d</span>-by-<span class="math">d</span> rectangle centred on the dividing line and running from <span class="math">py</span> to <span class="math">py + d</span>. Every strip point between <span class="math">p</span> and <span class="math">q</span> in the <span class="math">y</span> order lies in it. Cut the rectangle into eight squares of side <span class="math">d/2</span>; the diagonal of such a square is <span class="math">d/√2 &lt; d</span>, so two points in one square would be closer than <span class="math">d</span>, which contradicts <span class="math">d</span> being the best distance within <span class="math">L</span> and within <span class="math">R</span>. Hence the rectangle holds at most eight points including <span class="math">p</span>, so <span class="math">q</span> is at most seven positions after it.</p><p><span class="qed">&#9633;</span></p></div><p>Read the second half of that proof carefully, because it is where the constant comes from and it is not an estimate. The eight squares are a packing argument: two points within one half-<span class="math">d</span> square would violate the recursive guarantee, so there is at most one per square. The 7 is <span class="math">8 − 1</span>, and a different rectangle partition gives a slightly different constant &mdash; the literature has versions with 6 and with 4 &mdash; without changing the asymptotics at all.</p><div class="example"><span class="label">Example &middot; Twelve points, and where the answer was found</span><p>The lab opens on twelve points running left to right, with <span class="math">(11, 4)</span>, <span class="math">(12, 5)</span> and <span class="math">(13, 4)</span> bunched together near the middle. The closest squared distance is 2, between <span class="math">(11, 4)</span> and <span class="math">(12, 5)</span> &mdash; and also between <span class="math">(12, 5)</span> and <span class="math">(13, 4)</span>, so two pairs tie. The recursion made 17 comparisons; testing all 66 pairs gives the same answer. Five of those 17 were inside a strip, against a bound of <span class="math">7n = 84</span>.</p></div><p>It is worth being precise about where the winning pair was found, because the story about straddling pairs is easy to over-tell. Sorted by <span class="math">x</span>, the top-level split is at <span class="math">x = 14</span> and the left half's split is at <span class="math">x = 11</span>; <span class="math">(11, 4)</span>, <span class="math">(12, 5)</span> and <span class="math">(13, 4)</span> all land in the same three-point base case, and the pair is found by brute force there. The strip at the level above re-examines it and confirms it. So on this input the strip caught nothing the base cases had not already found &mdash; which is common, and is exactly why the strip cannot be dropped: nothing in the algorithm knows in advance that it was unnecessary here.</p><h3>The measured column and the proved column</h3><p>The lab's per-merge table gives, for each merge, the number of points, the size of the strip, and the comparisons made inside it. On the twelve points it reads: one merge with a strip of 2 making 1 comparison, one with a strip of 5 making 4, and the top-level merge with a strip of 2 making none. Total 5. The rightmost column is comparisons per strip point, as an exact fraction, and the largest is <span class="math">4/5</span>.</p><p>Beside it sits <span class="math">7n = 84</span>. Those two numbers are not the same kind of thing and the page labels them as such: 5 is a count of comparisons this run made, and 84 is a bound evaluated at <span class="math">n = 12</span>. Their ratio is not a measure of anything, and in particular it is not a measure of how loose the proof is. The proof is about the worst input; this is one input.</p><h3>What every pair costs, and when the recursion is worth it</h3><p>17 comparisons against 66 is a real saving at <span class="math">n = 12</span> and it is a small one in absolute terms. The lab's five-point worked examples show the recursion doing 4 comparisons against 10, and its two-point example doing 1 against 1, where the recursion never happens at all. The crossover is where <span class="math">n log n</span> falls below <span class="math">n(n − 1)/2</span>, and at these sizes the constants matter more than the asymptotics.</p><p>The reason to build it anyway is the reason to build any of this: the bound is <span class="math">O(n log n)</span> for every input, and the quadratic scan is <span class="math">Θ(n²)</span> for every input. The lab runs both on the same points precisely because a recursion that drops a straddling pair returns a number that is real, plausible and too large, with no internal sign that anything went wrong.</p></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The closest pair, as a squared distance that is never rounded</h2></div><p>Divide and conquer against every pair, and the strip against 7n</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>The closest pair, without a square root</strong><span>divide and conquer against every pair</span></div>
+        <div class="inline-legend"><span class="tone-cyan"><i class="legend-swatch"></i>the closest pair</span><span class="tone-purple"><i class="legend-swatch"></i>in the strip</span><span class="tone-muted"><i class="legend-swatch"></i>everything else</span></div>
+      </div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="clPlot" viewBox="0 0 660 280" role="img" aria-label="The points with the closest pair joined and the dividing line drawn."></svg></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="clLevels"></table></div>
+      <div class="status-banner" id="clStatus" style="margin-top:12px;"></div>
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>Twelve points, the strip, and the comparisons it actually made</h3>
+          <p>Distances here are squared, so the comparison that decides the answer is an integer comparison and nothing is rounded. Every pair is tested separately on each redraw, because a recursion that misses a pair across the dividing line still returns a plausible number. The per-merge table is where the seven-neighbour claim meets the count.</p>
+        <div class="field">
+          <label for="clPreset">Worked example</label>
+          <select id="clPreset"><option value="scatter" selected>twelve points, one close pair</option><option value="column">two columns either side of the split</option><option value="grid">a regular grid: many pairs at the minimum</option><option value="duplicate">the same point twice: distance zero</option><option value="pair">two points and nothing else</option></select>
+        </div>
+        <div class="field">
+          <label for="clSpec">Points, as x, y</label>
+          <input id="clSpec" type="text" value="" inputmode="text" autocomplete="off" placeholder="2, 9; 5, 1; 8, 14; 11, 4">
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Points</span><strong id="clN">&mdash;</strong></div>
+          <div class="kpi"><span>Squared distance</span><strong id="clD2">&mdash;</strong></div>
+          <div class="kpi"><span>The pair</span><strong id="clPair">&mdash;</strong></div>
+          <div class="kpi"><span>Comparisons, divide and conquer</span><strong id="clDC">&mdash;</strong></div>
+          <div class="kpi"><span>Comparisons, every pair</span><strong id="clBrute">&mdash;</strong></div>
+          <div class="kpi"><span>Strip comparisons against 7n</span><strong id="clStrip">&mdash;</strong></div>
+        </div>
+        <p class="small-copy" id="clHint" style="margin:0;">Points are <span class="tt">x, y</span> separated by semicolons. Nothing here is square-rooted: the answer is a squared distance, which is an exact integer, and comparing squared distances orders points the same way comparing distances does. The strip column is the claim the lesson proves — each point in the strip is compared with at most seven others — beside the number of comparisons actually made.</p>
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Running the recursion, and checking it</h2></div><p>Recurse, then take seriously the one pair the recursion could not see.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Sort by x once, not at every level</h3><p>The split needs the points in <span class="math">x</span> order and re-sorting at every level would add a logarithmic factor. Sort once at the top and pass slices down; the strip needs a <span class="math">y</span> order, which is a separate and much smaller sort.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Take <span class="math">d</span> as the better of the two halves before building the strip</h3><p>The strip reaches <span class="math">d</span> either side of the line, so it cannot be built until both recursive calls have returned. This is the step that makes the algorithm a merge rather than two independent computations.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Scan forward only, and stop on the y gap</h3><p>For each strip point compare it with the following ones and break as soon as the <span class="math">y</span> difference alone is at least <span class="math">d</span>. Comparing backwards as well would double the work and find nothing new, and omitting the break is what turns a linear merge into a quadratic one on a strip that holds everything.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Check the answer against every pair on small inputs</h3><p>A recursion that drops a straddling pair returns a real distance between two real points. There is no invariant it violates and no assertion it fails. The only check is an independent enumeration, and the lab runs one on every redraw.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>Strips, bounds, and measured counts</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>The twelve points, merge by merge</h3><p>Sorted by <span class="math">x</span> the points are <span class="math">(2, 9)</span>, <span class="math">(5, 1)</span>, <span class="math">(8, 14)</span>, <span class="math">(11, 4)</span>, <span class="math">(12, 5)</span>, <span class="math">(13, 4)</span>, <span class="math">(14, 12)</span>, <span class="math">(17, 2)</span>, <span class="math">(20, 10)</span>, <span class="math">(23, 6)</span>, <span class="math">(26, 15)</span>, <span class="math">(29, 3)</span>.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">the recursion tree
+  split all 12 at x = 14
+    split the left 6 at x = 11
+      base  (2, 9) (5, 1) (8, 14)          3 comparisons, best 61
+      base  (11, 4) (12, 5) (13, 4)        3 comparisons, best 2
+    split the right 6 at x = 23
+      base  (14, 12) (17, 2) (20, 10)      3 comparisons
+      base  (23, 6) (26, 15) (29, 3)       3 comparisons
+
+merge   depth   points   in the strip   comparisons   per strip point
+  1       1        6          2              1            1/2
+  2       1        6          5              4            4/5
+  3       0       12          2              0            0
+
+  comparisons, divide and conquer   17
+  comparisons, every pair           66
+  strip comparisons                 5      against 7n = 84
+  squared distance                  2      pair (11, 4) (12, 5)
+  pairs attaining it                2</div><p>Twelve of the seventeen comparisons are in the four base cases, three each. The merges account for five, and the top-level merge for none at all: by the time it runs, <span class="math">d</span> is 2, so the strip about <span class="math">x = 14</span> holds only points within <span class="math">√2</span> of it, which is two of them, and they are far enough apart in <span class="math">y</span> that the scan breaks immediately.</p><p>The winning pair was found in a base case, not in a strip. That is worth stating plainly because the strip is usually introduced as the thing that finds the answer; its actual job is to make sure the answer cannot be missed. On this input it had nothing to find, and the algorithm has no way of knowing that in advance &mdash; which is why the merge runs regardless.</p><p>For a faded rehearsal, predict the whole table for the ten points in two columns at <span class="math">x = 0</span> and <span class="math">x = 1</span>, which is another of the lab's worked examples. The supplied first move is that every point is within <span class="math">d</span> of the dividing line there, so the strip at the top level holds all ten. Say how many comparisons the top-level merge then makes, and check whether the per-strip-point figure gets anywhere near seven.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Rebuilding the sort at every level</strong><span>Sorting by <span class="math">x</span> inside the recursion turns <span class="math">n log n</span> into <span class="math">n log² n</span>. Sort once and pass slices. The <span class="math">y</span> sort of the strip is unavoidable at each merge unless you carry a second ordering through the recursion, and at the sizes this lab handles it is not the dominant cost anyway.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Comparing every pair within the strip</strong><span>The strip can hold every point &mdash; one of the lab's worked examples is two columns one unit apart, where the top-level strip holds all ten points. Without the <span class="math">y</span> sort and the early break, the merge becomes quadratic and the whole recursion degrades to <span class="math">Θ(n²)</span>. The seven-neighbour argument is what licenses the break, and the break is what makes the merge linear.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Taking a square root anywhere</strong><span>The answer is a squared distance, and squared lattice distances are integers. Rooting them introduces an approximation into the one comparison that decides the result. Two coincident points give squared distance 0, which is exactly representable and needs no special case; the lab has that as a worked example.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can state exactly which pair the recursion can miss, and justify the constant in the strip scan.</strong><p>You should be able to explain why only straddling pairs are at risk and why they lie in the strip, reproduce the packing argument that bounds the forward scan, read the per-merge table as measurements, and say why a measured count far below <span class="math">7n</span> says nothing about the tightness of the proof.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> That closes this course. Every page of it reduced to the sign of one determinant, computed exactly, and every page put a count from the input on screen beside a claim about all inputs &mdash; 22 wrong signs out of 29 swept magnitudes, 6 pair tests out of 6 possible, 5 strip comparisons against 84. Randomised Algorithms takes up the same distinction from the other side, where the count is a random variable and the claim is about its expectation.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../inside-by-parity-and-by-winding/" rel="prev"><span>Lesson</span><strong>Inside, by Parity and by Winding</strong></a>
+      <a class="lesson-link next" href="../"><span>Course</span><strong>Geometric Algorithms</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="geometric-algorithms/the-closest-pair-and-the-strip" data-lesson-title="The Closest Pair and the Strip" data-course-title="Geometric Algorithms">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Geometric Algorithms.</strong> Every count on this course is produced by running the algorithm on the points you typed. Determinants, doubled areas, squared distances, hull sizes, pair tests, stack operations and crossing counts are exact integers, computed in arbitrary-precision arithmetic, and no page here rounds one. Areas and comparisons-per-point are exact fractions, printed as fractions with a decimal beside them for reading rather than instead of them. Three quantities on these pages are not exact and each is labelled where it appears: the double-precision determinant, which &ldquo;The Magnitude Where Doubles Lose the Sign&rdquo; measures rather than a defect; the <span class="math">n</span> times <span class="math">log₂ n</span> reference column on the convex-hull page, which is a function evaluated at the number of points on screen and carries no verdict; and the decimal printed beside each exact fraction. Every algorithm is checked against a route that shares no code with it &mdash; the hull against the separating-line definition by brute force, the four-sign segment test against an exact solve for the two parameters, the shoelace area against the trapezoid rule, ray parity against the winding number, and the sweep, the calipers and the closest-pair recursion each against testing every pair &mdash; and where two exact routes disagree the page says so and declines to name a winner. What the labs cannot do is quantify over inputs: 22 wrong signs out of 29 magnitudes, 6 pair tests out of 6, and 5 strip comparisons against a bound of 84 are all measurements of the input shown, and each page names the proof that the corresponding claim rests on instead.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every count is measured by running the algorithm on the input shown, and a count on one input is not a bound.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "Why is it enough for the merge step to look only at points within <span class=\"math\">d<\/span> of the dividing line?", "a": ["Because points further away are unlikely to be close to each other", "Because a pair beating <span class=\"math\">d<\/span> must have one point on each side, and then each point is within <span class=\"math\">d<\/span> of the line in <span class=\"math\">x<\/span>", "Because the recursion already compared them", "Because the strip is sorted by <span class=\"math\">y<\/span>"], "c": 1, "why": "A same-side pair was handled by that side's recursive call, so only a straddling pair can be missed; and if such a pair is closer than <span class=\"math\">d<\/span> then its <span class=\"math\">x<\/span> gap is under <span class=\"math\">d<\/span> and the line sits between the two coordinates, so each point is within <span class=\"math\">d<\/span> of it. That is a proof, not a likelihood argument."}, {"q": "The lab measures 5 strip comparisons against a bound of <span class=\"math\">7n = 84<\/span>. What does the gap show?", "a": ["That the seven-neighbour proof is loose and could be improved", "That the bound is a worst case over all inputs and 5 is a count on this one; the gap is not evidence about the proof", "That the strip was built incorrectly", "That <span class=\"math\">n<\/span> should be the strip size, not the point count"], "c": 1, "why": "Measured and proved are different kinds of claim, and this whole path is organised around not confusing them. The bound says no input can exceed <span class=\"math\">7n<\/span>; this input used 5. Neither number is wrong and neither is evidence about the other. Sharper constants than 7 do exist, and that is a separate matter from the gap on one input."}, {"q": "On these twelve points the closest pair was found inside a base case rather than in a strip. What follows about the merge step?", "a": ["It can be skipped when the halves are far apart", "It is unnecessary on this input and cannot be skipped, because nothing in the algorithm can tell in advance that it is unnecessary", "It was implemented incorrectly", "The split should have been made elsewhere"], "c": 1, "why": "The merge's job is to rule out a straddling pair, and on this input there is none that beats <span class=\"math\">d<\/span>. That is a fact about the input, discovered by running the merge. Skipping it would require knowing the answer first, which is the same shape of error as reading a measured count as a bound."}];
+
+  (function () {
+
+  /* The one shape. See the module docstring: a routine that RUNS an algorithm
+     returns { result, counts, trace }, and this is the only place that object
+     is spelled, so a kit cannot invent a second convention by accident. */
+  function runOf(result, counts, trace) {
+    return { result: result, counts: counts || {}, trace: trace || [] };
+  }
+  /* A counter with a fixed vocabulary. bump() on an unknown key still works --
+     refusing would turn a panel into a crash -- but the vocabulary is what the
+     panels are laid out from, so a new key is a decision, not a typo. */
+  var COUNT_KEYS = ['compares', 'swaps', 'moves', 'probes', 'hops', 'finds',
+    'unions', 'pushes', 'pops', 'relaxations', 'nodes', 'calls', 'reads',
+    'writes', 'cells', 'rounds'];
+  function counter() {
+    var c = {};
+    for (var i = 0; i < COUNT_KEYS.length; i += 1) c[COUNT_KEYS[i]] = 0;
+    return c;
+  }
+  /* Drop the keys that stayed zero: a panel showing "swaps 0" for an algorithm
+     that cannot swap is noise, and the reader cannot tell it from a bug. */
+  function usedCounts(c) {
+    var out = {};
+    Object.keys(c).forEach(function (k) { if (c[k]) out[k] = c[k]; });
+    return out;
+  }
+
+  /* Exact rational arithmetic over BigInt.
+
+     Every number a lesson calls "the answer" lives in this type. BigInt rather
+     than Number because a few steps of elimination on a 3x3 system produces
+     numerators that leave the exact-integer range of a double, and a solution
+     that is silently wrong in the last digits is worse than no solution. */
+  function bgcd(a, b) {
+    if (a < 0n) a = -a;
+    if (b < 0n) b = -b;
+    while (b) { var t = a % b; a = b; b = t; }
+    return a;
+  }
+  function R(n, d) {
+    if (d === undefined) d = 1n;
+    n = BigInt(n); d = BigInt(d);
+    if (d === 0n) throw new Error('division by zero');
+    if (d < 0n) { n = -n; d = -d; }
+    var g = bgcd(n, d) || 1n;
+    return { n: n / g, d: d / g };
+  }
+  var R0 = R(0n), R1 = R(1n);
+  function Radd(a, b) { return R(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function Rsub(a, b) { return R(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function Rmul(a, b) { return R(a.n * b.n, a.d * b.d); }
+  function Rdiv(a, b) { return R(a.n * b.d, a.d * b.n); }
+  function Rneg(a) { return R(-a.n, a.d); }
+  function Rabs(a) { return a.n < 0n ? Rneg(a) : a; }
+  function Rinv(a) { return R(a.d, a.n); }
+  function Rzero(a) { return a.n === 0n; }
+  function Rsign(a) { return a.n === 0n ? 0 : (a.n < 0n ? -1 : 1); }
+  function Requ(a, b) { return a.n === b.n && a.d === b.d; }
+  function Rcmp(a, b) { var l = a.n * b.d, r = b.n * a.d; return l < r ? -1 : (l > r ? 1 : 0); }
+  function Rint(a) { return a.d === 1n; }
+  function Rpow(a, k) {
+    var out = R1, base = a, e = k < 0 ? -k : k;
+    while (e > 0) { if (e & 1) out = Rmul(out, base); base = Rmul(base, base); e >>= 1; }
+    return k < 0 ? Rinv(out) : out;
+  }
+  /* The reader's form: "3", "-7/4". Never "3/1", never "0/5". */
+  function Rtext(a) { return a.d === 1n ? String(a.n) : a.n + '/' + a.d; }
+  /* Parenthesised when it would otherwise glue onto a neighbouring symbol. */
+  function Rterm(a) { return (a.n < 0n || a.d !== 1n) ? '(' + Rtext(a) + ')' : Rtext(a); }
+  function Rnum(a) { return Number(a.n) / Number(a.d); }
+  /* A decimal, for the one place a lesson asks for one. Exact when it can be.
+
+     BigInt long division rather than Number(n)/Number(d).toFixed(). The old
+     form had two faults and the second is the one that shows.
+
+     It returned NaN. Past roughly 300 digits both halves of the quotient are
+     Infinity and Infinity/Infinity is NaN, so a page printed NaN to a reader.
+     A Bloom filter's exact rate at m = 1000, n = 100, k = 7 has a 2101-digit
+     denominator, and Karger's contraction probability has the same shape.
+
+     And it rounded exact ties the wrong way. -399/40 is exactly -9.975; the
+     nearest double is fractionally smaller in magnitude, so toFixed(2) gave
+     -9.97 where half away from zero is -9.98. 160 of 144,180 rationals over
+     the small-integer range disagreed, every one of them an exact tie.
+
+     Half away from zero, computed on the exact value: the doubling, the +1
+     and the halving are the rounding, done in integers. */
+  function Rdec(a, places) {
+    if (places === undefined) places = 6;
+    if (Rint(a)) return String(a.n);
+    var neg = a.n < 0n, num = neg ? -a.n : a.n;
+    var scale = 10n ** BigInt(places);
+    var q = (num * scale * 2n / a.d + 1n) / 2n;
+    var s = q.toString();
+    while (s.length <= places) s = '0' + s;
+    var out = (neg ? '-' : '') + s.slice(0, s.length - places)
+      + (places > 0 ? '.' + s.slice(s.length - places) : '');
+    return out.indexOf('.') >= 0 ? out.replace(/0+$/, '').replace(/\.$/, '') : out;
+  }
+  function Rparse(text) {
+    var s = String(text).trim();
+    var m = /^([+-]?\d+)\s*\/\s*(\d+)$/.exec(s);
+    /* A zero denominator is not a number this function can read, so it comes
+       back null like every other unreadable string. It used to reach R(), which
+       THROWS -- and a throw out of a parser is not a refusal, it is a dead
+       page: the lab's redraw stops, the panel keeps the last good figures, and
+       nothing tells the reader why. Typing 1/0 into the availability chain on
+       a published page did exactly that. Callers all handle null already;
+       every one of them was written to. */
+    if (m) return m[2] === '0' || /^0+$/.test(m[2]) ? null : R(BigInt(m[1]), BigInt(m[2]));
+    m = /^([+-]?\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]));
+    m = /^([+-]?)(\d*)\.(\d+)$/.exec(s);
+    if (m) {
+      var whole = m[2] || '0', frac = m[3];
+      var num = BigInt(whole + frac), den = 10n ** BigInt(frac.length);
+      return R(m[1] === '-' ? -num : num, den);
+    }
+    return null;
+  }
+  /* Is this rational a perfect square? Needed wherever a lesson must decide
+     between an exact answer and a radical one -- sqrt(4/9) is 2/3 and belongs
+     on the page as 2/3, while sqrt(2) must stay sqrt(2). */
+  function bisqrt(n) {
+    if (n < 0n) return null;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x * x === n ? x : null;
+  }
+  function Rsqrt(a) {
+    if (a.n < 0n) return null;
+    var p = bisqrt(a.n), q = bisqrt(a.d);
+    return (p === null || q === null) ? null : R(p, q);
+  }
+
+  /* Computational geometry in EXACT INTEGERS. No distance on this course is
+     square-rooted: a comparison of distances is a comparison of squared
+     distances, and the answer to every question the course asks -- which side,
+     do they cross, which is closer, what is the area -- is a determinant, a
+     sign, or a doubled area, all of them integers.
+
+     BigInt, and not Number, for the determinants. orient2 on coordinates near
+     10^8 produces cross products near 10^16, which is past 2^53, and a double
+     there returns a WRONG SIGN. Measured, not asserted: at a = (0, 0),
+     b = (134217729, 134217728), c = (134217728, 134217727) the exact
+     determinant is -1 -- a right turn -- and the double gives 0, which reads as
+     three collinear points. A hull built on that answer has a vertex missing
+     and a point-in-polygon test on it flips. The mode prints the float beside
+     the exact value for exactly that reason, and it is the one deliberate
+     float in this block. */
+  function orient2(a, b, c) {
+    var d = (BigInt(b[0]) - BigInt(a[0])) * (BigInt(c[1]) - BigInt(a[1]))
+          - (BigInt(b[1]) - BigInt(a[1])) * (BigInt(c[0]) - BigInt(a[0]));
+    return d;
+  }
+  function orientSign(a, b, c) {
+    var d = orient2(a, b, c);
+    return d > 0n ? 1 : (d < 0n ? -1 : 0);
+  }
+  /* The same determinant in double arithmetic, for the column the lesson puts
+     beside the exact one. It is here to be WRONG in front of the reader. */
+  function orient2Float(a, b, c) {
+    return (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
+  }
+  function boxOverlap(p1, p2, q1, q2) {
+    return Math.min(p1[0], p2[0]) <= Math.max(q1[0], q2[0])
+        && Math.min(q1[0], q2[0]) <= Math.max(p1[0], p2[0])
+        && Math.min(p1[1], p2[1]) <= Math.max(q1[1], q2[1])
+        && Math.min(q1[1], q2[1]) <= Math.max(p1[1], p2[1]);
+  }
+  function onSegment(a, b, q) {
+    return orientSign(a, b, q) === 0
+      && Math.min(a[0], b[0]) <= q[0] && q[0] <= Math.max(a[0], b[0])
+      && Math.min(a[1], b[1]) <= q[1] && q[1] <= Math.max(a[1], b[1]);
+  }
+  /* Four orientations and the verdict, collinear cases included -- which is
+     where a segment-intersection test is usually wrong. */
+  function straddle(p1, p2, q1, q2) {
+    var d1 = orientSign(q1, q2, p1), d2 = orientSign(q1, q2, p2);
+    var d3 = orientSign(p1, p2, q1), d4 = orientSign(p1, p2, q2);
+    var proper = ((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0))
+              && ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0));
+    var touching = onSegment(q1, q2, p1) || onSegment(q1, q2, p2)
+                || onSegment(p1, p2, q1) || onSegment(p1, p2, q2);
+    return { d: [d1, d2, d3, d4], proper: proper, touching: touching,
+             intersect: proper || touching, boxes: boxOverlap(p1, p2, q1, q2) };
+  }
+
+  function lexSort(points) {
+    return points.slice().sort(function (a, b) { return a[0] - b[0] || a[1] - b[1]; });
+  }
+  /* Jarvis's march: wrap the hull one vertex at a time, so the work is n per
+     hull vertex -- n*h, which beats n log n exactly when h is small, and the
+     mode plots both. */
+  function jarvis(points) {
+    var c = counter(), pts = lexSort(points), hull = [], start = 0, i;
+    if (pts.length < 3) return runOf({ hull: pts, h: pts.length }, usedCounts(c), []);
+    var at = 0, trace = [];
+    do {
+      hull.push(pts[at]);
+      var next = (at + 1) % pts.length;
+      for (i = 0; i < pts.length; i += 1) {
+        c.compares += 1;
+        var o = orientSign(pts[at], pts[i], pts[next]);
+        if (o > 0) next = i;
+      }
+      trace.push({ at: trace.length, from: pts[at], to: pts[next] });
+      at = next;
+    } while (at !== 0 && hull.length <= pts.length);
+    return runOf({ hull: hull, h: hull.length, work: pts.length * hull.length,
+                   nlogn: pts.length * ilog2(Math.max(2, pts.length)) },
+                 usedCounts(c), trace);
+  }
+  /* Andrew's monotone chain. The stack is the mode: pushes and pops against
+     2n, which is the amortised argument -- a point is pushed once and popped
+     at most once. */
+  function monotoneChain(points) {
+    var c = counter(), pts = lexSort(points), trace = [], i;
+    function half(list) {
+      var stack = [];
+      list.forEach(function (p) {
+        while (stack.length >= 2) {
+          c.compares += 1;
+          if (orientSign(stack[stack.length - 2], stack[stack.length - 1], p) > 0) break;
+          stack.pop(); c.pops += 1;
+          trace.push({ at: trace.length, action: 'pop', stack: stack.slice() });
+        }
+        stack.push(p); c.pushes += 1;
+        trace.push({ at: trace.length, action: 'push', point: p, stack: stack.slice() });
+      });
+      return stack;
+    }
+    var lower = half(pts), upper = half(pts.slice().reverse());
+    var hull = lower.slice(0, -1).concat(upper.slice(0, -1));
+    return runOf({ hull: hull, h: hull.length, lower: lower, upper: upper,
+                   bound: 2 * pts.length }, usedCounts(c), trace);
+  }
+  /* Lift x to (x, x^2): the hull of the lifted points reads back the sorted
+     order, which is the reduction that puts an n log n LOWER bound under every
+     convex hull algorithm. */
+  function liftParabola(xs) {
+    return xs.map(function (x) { return [x, x * x]; });
+  }
+
+  function dist2(a, b) {
+    var dx = BigInt(a[0]) - BigInt(b[0]), dy = BigInt(a[1]) - BigInt(b[1]);
+    return dx * dx + dy * dy;
+  }
+  /* Closest pair by divide and conquer, with the STRIP comparisons counted --
+     the claim being that each point is compared with at most seven others, and
+     the panel plots the measured total against 7n. Squared distances, so
+     nothing is rounded. */
+  function closestPair(points) {
+    var c = counter(), pts = lexSort(points), levels = [], stripTotal = 0;
+    function rec(list, depth) {
+      c.calls += 1;
+      if (list.length <= 3) {
+        var best = null, pair = null;
+        for (var i = 0; i < list.length; i += 1) for (var j = i + 1; j < list.length; j += 1) {
+          c.compares += 1;
+          var d = dist2(list[i], list[j]);
+          if (best === null || d < best) { best = d; pair = [list[i], list[j]]; }
+        }
+        return { d: best, pair: pair };
+      }
+      var mid = list.length >> 1, midX = list[mid][0];
+      var L = rec(list.slice(0, mid), depth + 1), Rr = rec(list.slice(mid), depth + 1);
+      var best2 = L.d === null ? Rr.d : (Rr.d === null ? L.d : (L.d < Rr.d ? L.d : Rr.d));
+      var pair2 = (L.d !== null && (Rr.d === null || L.d <= Rr.d)) ? L.pair : Rr.pair;
+      var strip = list.filter(function (p) {
+        var dx = BigInt(p[0]) - BigInt(midX);
+        return best2 === null || dx * dx < best2;
+      }).sort(function (a, b) { return a[1] - b[1]; });
+      var here = 0;
+      for (var k = 0; k < strip.length; k += 1) {
+        for (var t = k + 1; t < strip.length && t <= k + 7; t += 1) {
+          var dy = BigInt(strip[t][1]) - BigInt(strip[k][1]);
+          if (best2 !== null && dy * dy >= best2) break;
+          c.compares += 1; here += 1;
+          var dd = dist2(strip[k], strip[t]);
+          if (best2 === null || dd < best2) { best2 = dd; pair2 = [strip[k], strip[t]]; }
+        }
+      }
+      stripTotal += here;
+      levels.push({ depth: depth, n: list.length, strip: strip.length, compares: here });
+      return { d: best2, pair: pair2 };
+    }
+    var out = rec(pts, 0);
+    return runOf({ d2: out.d, pair: out.pair, levels: levels, stripCompares: stripTotal,
+                   bound: 7 * pts.length }, usedCounts(c), levels);
+  }
+
+  /* The sweep: events sorted by x, with the status structure holding the
+     segments currently crossed by the sweep line. The status structure IS
+     TREE_JS's bstRun in the lesson, which is the point -- a data structure met
+     in course 1 turns up as the engine of a geometry algorithm. */
+  function sweepEvents(segments) {
+    var events = [];
+    segments.forEach(function (s, i) {
+      var a = s[0], b = s[1];
+      if (a[0] > b[0]) { var t = a; a = b; b = t; }
+      events.push({ x: a[0], y: a[1], kind: 'start', seg: i });
+      events.push({ x: b[0], y: b[1], kind: 'end', seg: i });
+    });
+    /* A COMPARATOR, not a wish. This read
+         p.x - q.x || (p.kind === 'start' ? -1 : 1) || p.y - q.y
+       whose middle term is ALWAYS truthy, so two things followed: the y
+       tie-break was dead code and could never run, and the comparator was
+       inconsistent -- for two starts at the same x it returned -1 for cmp(p,q)
+       AND -1 for cmp(q,p). "Starts before ends at equal x" is what the sweep's
+       correctness argument rests on, and it was resting on whatever the engine's
+       sort does with a comparator that contradicts itself. It happened to hold
+       on every shipped preset. Now it is a difference of ranks, which is
+       antisymmetric, and the y ordering behind it can actually be reached. */
+    var kindRank = function (e) { return e.kind === 'start' ? 0 : 1; };
+    events.sort(function (p, q) {
+      return p.x - q.x || kindRank(p) - kindRank(q) || p.y - q.y;
+    });
+    var active = [], c = counter(), crossings = [], trace = [];
+    events.forEach(function (e) {
+      if (e.kind === 'start') {
+        active.forEach(function (j) {
+          c.compares += 1;
+          var r = straddle(segments[e.seg][0], segments[e.seg][1], segments[j][0], segments[j][1]);
+          if (r.intersect) crossings.push([e.seg, j]);
+        });
+        active.push(e.seg);
+      } else {
+        active = active.filter(function (j) { return j !== e.seg; });
+      }
+      trace.push({ at: trace.length, x: e.x, kind: e.kind, seg: e.seg, active: active.slice() });
+    });
+    var allPairs = segments.length * (segments.length - 1) / 2;
+    return runOf({ events: events, crossings: crossings, tests: c.compares || 0,
+                   allPairs: allPairs }, usedCounts(c), trace);
+  }
+
+  /* The doubled signed area, exactly -- doubled so it stays an integer, which
+     is why the lesson works with 2A and halves only at the end. The sign is the
+     orientation, which is information a magnitude would throw away. */
+  function shoelace2(poly) {
+    var s = 0n;
+    for (var i = 0; i < poly.length; i += 1) {
+      var a = poly[i], b = poly[(i + 1) % poly.length];
+      s += BigInt(a[0]) * BigInt(b[1]) - BigInt(b[0]) * BigInt(a[1]);
+    }
+    return s;
+  }
+  /* Point in polygon by ray crossing, INCLUDING the vertex case -- a ray
+     through a vertex is the bug every implementation has, and the fix is the
+     half-open rule below: count an edge only when one endpoint is strictly
+     above the ray and the other is not. */
+  function rayParity(poly, q) {
+    var crossings = 0, onEdge = false, detail = [];
+    for (var i = 0; i < poly.length; i += 1) {
+      var a = poly[i], b = poly[(i + 1) % poly.length];
+      if (onSegment(a, b, q)) onEdge = true;
+      var above = (a[1] > q[1]) !== (b[1] > q[1]);
+      if (above) {
+        var side = orientSign(a, b, q) * (b[1] > a[1] ? 1 : -1);
+        if (side > 0) crossings += 1;
+        detail.push({ edge: i, counted: side > 0 });
+      }
+    }
+    return { crossings: crossings, inside: !onEdge && crossings % 2 === 1,
+             onBoundary: onEdge, detail: detail };
+  }
+
+  /* A 2-d tree, split on x then y by depth, and a range query that reports how
+     many NODES it visited -- which is the figure, because the whole claim of a
+     k-d tree is that the visit count is far under n. */
+  function kdBuild(points, depth) {
+    if (!points.length) return null;
+    depth = depth || 0;
+    var axis = depth % 2;
+    var sorted = points.slice().sort(function (a, b) { return a[axis] - b[axis] || a[1 - axis] - b[1 - axis]; });
+    var mid = sorted.length >> 1;
+    return { point: sorted[mid], axis: axis, depth: depth,
+             l: kdBuild(sorted.slice(0, mid), depth + 1),
+             r: kdBuild(sorted.slice(mid + 1), depth + 1) };
+  }
+  function kdKids(n) { return [n.l, n.r]; }
+  function kdRange(tree, rect) {
+    var c = counter(), found = [];
+    (function visit(n) {
+      if (!n) return;
+      c.nodes += 1;
+      var p = n.point;
+      if (p[0] >= rect[0] && p[0] <= rect[2] && p[1] >= rect[1] && p[1] <= rect[3]) found.push(p);
+      var lo = n.axis === 0 ? rect[0] : rect[1], hi = n.axis === 0 ? rect[2] : rect[3];
+      if (lo <= p[n.axis]) visit(n.l);
+      if (hi >= p[n.axis]) visit(n.r);
+    })(tree);
+    return runOf({ found: found, visited: c.nodes }, usedCounts(c), []);
+  }
+
+  /* Rotating calipers: the diameter of a convex polygon is between an
+     ANTIPODAL pair, so the squared diameter comes from h pairs rather than
+     n^2 -- and it is exact, because it is never square-rooted. */
+  function calipers(hull) {
+    var c = counter(), n = hull.length, best = 0n, pair = null, pairs = [];
+    if (n < 2) return runOf({ d2: 0n, pair: null, pairs: [] }, usedCounts(c), []);
+    var j = 1;
+    for (var i = 0; i < n; i += 1) {
+      var ni = (i + 1) % n;
+      while (true) {
+        var area1 = orient2(hull[i], hull[ni], hull[(j + 1) % n]);
+        var area0 = orient2(hull[i], hull[ni], hull[j]);
+        c.compares += 1;
+        if (area1 > area0) j = (j + 1) % n; else break;
+      }
+      pairs.push([i, j]);
+      var d = dist2(hull[i], hull[j]);
+      if (d > best) { best = d; pair = [hull[i], hull[j]]; }
+      var d2b = dist2(hull[ni], hull[j]);
+      if (d2b > best) { best = d2b; pair = [hull[ni], hull[j]]; }
+    }
+    return runOf({ d2: best, pair: pair, pairs: pairs }, usedCounts(c), []);
+  }
+  /* The brute-force diameter, for the mode to agree with. n^2/2 pairs. */
+  function diameterBrute(points) {
+    var best = 0n, pair = null;
+    for (var i = 0; i < points.length; i += 1) for (var j = i + 1; j < points.length; j += 1) {
+      var d = dist2(points[i], points[j]);
+      if (d > best) { best = d; pair = [points[i], points[j]]; }
+    }
+    return { d2: best, pair: pair };
+  }
+
+  /* ------------------------------------------------------ what a reader types
+
+     A clause is `x, y` and clauses are separated by semicolons or newlines.
+     Coordinates are WHOLE NUMBERS and a decimal point is refused rather than
+     rounded: every predicate below is a BigInt determinant, and a coordinate
+     that is not an integer is a coordinate this course cannot be exact about.
+     Anything past 2^53 is refused too -- not because the determinant would
+     overflow, which it cannot, but because the NUMBER the reader typed would
+     already be the wrong number before any determinant was taken. */
+  function geoParse(text, cap) {
+    var clauses = String(text === undefined || text === null ? '' : text)
+                    .replace(/[()\[\]]/g, ' ').split(/[;\n]+/);
+    var pts = [], i;
+    for (i = 0; i < clauses.length; i += 1) {
+      var body = clauses[i].trim();
+      if (!body) continue;
+      var parts = body.split(/[,\s]+/).filter(function (s) { return s.length; });
+      if (parts.length !== 2) return { bad: 'clause ' + (i + 1) + ' is not one point' };
+      if (!/^-?\d+$/.test(parts[0]) || !/^-?\d+$/.test(parts[1])) {
+        return { bad: 'every coordinate must be a whole number' };
+      }
+      var x = parseInt(parts[0], 10), y = parseInt(parts[1], 10);
+      if (!Number.isSafeInteger(x) || !Number.isSafeInteger(y)) {
+        return { bad: 'a coordinate is past 2^53, where the input itself is already rounded' };
+      }
+      pts.push([x, y]);
+    }
+    if (!pts.length) return { bad: 'no points' };
+    if (cap && pts.length > cap) return { bad: pts.length + ' points, and this mode stops at ' + cap };
+    return { points: pts };
+  }
+  function geoParseSegments(text, cap) {
+    var p = geoParse(text, cap ? 2 * cap : 0);
+    if (p.bad) return p;
+    if (p.points.length % 2 !== 0) return { bad: 'a segment is two points, so the count must be even' };
+    var segs = [], i;
+    for (i = 0; i < p.points.length; i += 2) segs.push([p.points[i], p.points[i + 1]]);
+    if (!segs.length) return { bad: 'no segments' };
+    return { segments: segs, points: p.points };
+  }
+  function geoPointText(p) { return '(' + p[0] + ', ' + p[1] + ')'; }
+  function geoListText(list) { return list.map(geoPointText).join(' '); }
+  function geoKey(p) { return p[0] + '|' + p[1]; }
+  function geoPlural(n, one, many) { return n === 1 ? one : many; }
+  function geoStep(v, lo, hi) { return v < lo ? lo : (v > hi ? hi : v); }
+  /* Duplicates are removed and COUNTED. Both hull routines misbehave on them
+     -- the chain can return one point twice and gift wrapping does -- so this
+     is the first thing every hull mode does, and the count is shown. */
+  function geoDedupe(points) {
+    var seen = {}, out = [], dropped = 0;
+    points.forEach(function (p) {
+      var k = geoKey(p);
+      if (seen[k]) { dropped += 1; return; }
+      seen[k] = true; out.push(p);
+    });
+    return { points: out, dropped: dropped };
+  }
+  /* (b - a) . (c - a), in BigInt. Used to place a collinear point ALONG a
+     line, which a determinant cannot do: it is zero for every point on it. */
+  function geoDot(a, b, c) {
+    return (BigInt(b[0]) - BigInt(a[0])) * (BigInt(c[0]) - BigInt(a[0]))
+         + (BigInt(b[1]) - BigInt(a[1])) * (BigInt(c[1]) - BigInt(a[1]));
+  }
+  /* The SAME determinant as orient2, by cofactor expansion of
+     [[ax, ay, 1], [bx, by, 1], [cx, cy, 1]]. Six products in a different
+     arrangement, so a transposed term shows as a disagreement rather than as a
+     plausible number that nothing contradicts. */
+  function geoDet3(a, b, c) {
+    var ax = BigInt(a[0]), ay = BigInt(a[1]), bx = BigInt(b[0]), by = BigInt(b[1]);
+    var cx = BigInt(c[0]), cy = BigInt(c[1]);
+    return ax * (by - cy) - ay * (bx - cx) + (bx * cy - cx * by);
+  }
+  function geoFloatSign(a, b, c) {
+    var d = orient2Float(a, b, c);
+    return d > 0 ? 1 : (d < 0 ? -1 : 0);
+  }
+  /* THE FAMILY THE COURSE OPENS ON. a = (0, 0), b = (2^k + 1, 2^k),
+     c = (2^k, 2^k - 1). The exact determinant is (2^k+1)(2^k-1) - 2^k*2^k,
+     which is -1 for every k: a right turn, always, at any magnitude. In
+     doubles both products land on the same representable number once
+     2k > 53, and the test reports 0. */
+  function geoNeedle(k) {
+    var P = Math.pow(2, k);
+    return [[0, 0], [P + 1, P], [P, P - 1]];
+  }
+  function geoNeedleSweep(lo, hi) {
+    var rows = [], k, disagree = 0, first = null;
+    for (k = lo; k <= hi; k += 1) {
+      var t = geoNeedle(k);
+      if (!Number.isSafeInteger(t[1][0])) break;
+      var ex = orientSign(t[0], t[1], t[2]), fl = geoFloatSign(t[0], t[1], t[2]);
+      if (ex !== fl) { disagree += 1; if (first === null) first = k; }
+      rows.push({ k: k, tri: t, exact: ex, float: fl, det: orient2(t[0], t[1], t[2]),
+                  detFloat: orient2Float(t[0], t[1], t[2]), agree: ex === fl });
+    }
+    return { rows: rows, disagree: disagree, first: first, tested: rows.length };
+  }
+  /* p is OUTSIDE the convex hull of `others`, exactly and from the definition.
+     There is a separating line through p with every other point weakly on one
+     side, and every point that lies ON that line lies strictly beyond p along
+     it -- which is the clause that distinguishes "p is a vertex" from "p sits
+     inside an edge". Rotating a separating line about p until it touches a
+     point of the set is why testing the lines through p and each other point
+     is enough. */
+  function geoOutside(p, others) {
+    if (!others.length) return true;
+    for (var j = 0; j < others.length; j += 1) {
+      var t = others[j];
+      if (t[0] === p[0] && t[1] === p[1]) return false;
+      var pos = 0, neg = 0, on = [], r;
+      for (r = 0; r < others.length; r += 1) {
+        var s = orientSign(p, t, others[r]);
+        if (s > 0) pos += 1; else if (s < 0) neg += 1; else on.push(others[r]);
+      }
+      if (pos && neg) continue;
+      var ok = true;
+      for (r = 0; r < on.length; r += 1) if (geoDot(p, t, on[r]) <= 0n) { ok = false; break; }
+      if (ok) return true;
+    }
+    return false;
+  }
+  /* The VERTEX set: every point that is outside the hull of the others. */
+  function geoVertexBrute(points) {
+    var out = [], i;
+    for (i = 0; i < points.length; i += 1) {
+      var others = points.filter(function (_, j) { return j !== i; });
+      if (geoOutside(points[i], others)) out.push(points[i]);
+    }
+    return out;
+  }
+  /* The BOUNDARY set, in the words the definition is usually given in: some
+     line through the point has every other point on one side. An edge's
+     interior satisfies that and is not a vertex, which is the whole of the
+     difference between the two hull algorithms on degenerate input. */
+  function geoBoundaryBrute(points) {
+    var out = [], i, j, r;
+    for (i = 0; i < points.length; i += 1) {
+      var p = points[i], on = points.length < 2;
+      for (j = 0; j < points.length && !on; j += 1) {
+        if (j === i) continue;
+        var pos = 0, neg = 0;
+        for (r = 0; r < points.length; r += 1) {
+          var s = orientSign(p, points[j], points[r]);
+          if (s > 0) pos += 1; else if (s < 0) neg += 1;
+        }
+        if (!(pos && neg)) on = true;
+      }
+      if (on) out.push(p);
+    }
+    return out;
+  }
+  function geoSameSet(a, b) {
+    return a.map(geoKey).sort().join(' ') === b.map(geoKey).sort().join(' ');
+  }
+  /* Andrew's monotone chain with the PREDICATE AS A PARAMETER, so the double
+     arm is the exact arm with one function swapped and nothing else changed.
+     It is pinned to algo_core's monotoneChain in scripts/mathcheck.js on every
+     input with two or more distinct points; the one place they differ is a
+     single point, where monotoneChain returns an empty hull. */
+  function geoChainWith(points, sign) {
+    var pts = lexSort(points), pops = 0, pushes = 0, trace = [];
+    function half(list, name) {
+      var stack = [];
+      list.forEach(function (p) {
+        while (stack.length >= 2
+               && sign(stack[stack.length - 2], stack[stack.length - 1], p) <= 0) {
+          var off = stack.pop();
+          pops += 1;
+          trace.push({ at: trace.length, side: name, action: 'pop', point: off,
+                       depth: stack.length });
+        }
+        stack.push(p); pushes += 1;
+        trace.push({ at: trace.length, side: name, action: 'push', point: p,
+                     depth: stack.length });
+      });
+      return stack;
+    }
+    var lower = half(pts, 'lower'), upper = half(pts.slice().reverse(), 'upper');
+    var hull = lower.slice(0, -1).concat(upper.slice(0, -1));
+    if (!hull.length && pts.length) hull = [pts[0]];
+    return { hull: hull, h: hull.length, lower: lower, upper: upper, trace: trace,
+             pops: pops, pushes: pushes, bound: 2 * pts.length };
+  }
+  function geoExactHull(points) { return geoChainWith(points, orientSign); }
+  function geoFloatHull(points) { return geoChainWith(points, geoFloatSign); }
+
+  /* Two segments cross, by exact PARAMETERS rather than by four orientations.
+     p1 + t(p2 - p1) = q1 + u(q2 - q1); t and u are ratios of determinants, and
+     the test 0 <= t <= 1 is done by comparing numerator with denominator after
+     forcing the denominator positive, so nothing is ever divided. */
+  function geoSegOracle(p1, p2, q1, q2) {
+    var rx = BigInt(p2[0]) - BigInt(p1[0]), ry = BigInt(p2[1]) - BigInt(p1[1]);
+    var sx = BigInt(q2[0]) - BigInt(q1[0]), sy = BigInt(q2[1]) - BigInt(q1[1]);
+    var wx = BigInt(q1[0]) - BigInt(p1[0]), wy = BigInt(q1[1]) - BigInt(p1[1]);
+    var den = rx * sy - ry * sx;
+    if (den !== 0n) {
+      var tn = wx * sy - wy * sx, un = wx * ry - wy * rx;
+      var d = den < 0n ? -den : den;
+      var ts = den < 0n ? -tn : tn, us = den < 0n ? -un : un;
+      return { intersect: ts >= 0n && ts <= d && us >= 0n && us <= d,
+               parallel: false, collinear: false };
+    }
+    if (wx * ry - wy * rx !== 0n) return { intersect: false, parallel: true, collinear: false };
+    var rr = rx * rx + ry * ry;
+    if (rr === 0n) return { intersect: onSegment(q1, q2, p1), parallel: true, collinear: true };
+    var t0 = wx * rx + wy * ry, t1 = t0 + (sx * rx + sy * ry);
+    var lo = t0 < t1 ? t0 : t1, hi = t0 < t1 ? t1 : t0;
+    return { intersect: hi >= 0n && lo <= rr, parallel: true, collinear: true };
+  }
+  function geoSweepBrute(segments) {
+    var out = [], i, j;
+    for (i = 0; i < segments.length; i += 1) for (j = i + 1; j < segments.length; j += 1) {
+      if (geoSegOracle(segments[i][0], segments[i][1],
+                       segments[j][0], segments[j][1]).intersect) out.push([i, j]);
+    }
+    return out;
+  }
+  function geoPairKeys(list) {
+    return list.map(function (p) { return Math.min(p[0], p[1]) + '-' + Math.max(p[0], p[1]); })
+               .sort().join(' ');
+  }
+
+  /* 2A by the trapezoid rule: sum (x_i - x_{i+1})(y_i + y_{i+1}). Algebraically
+     the shoelace sum, arithmetically a different set of products, which is what
+     makes it worth printing beside it. */
+  function geoAreaTrapezoid(poly) {
+    var s = 0n, i;
+    for (i = 0; i < poly.length; i += 1) {
+      var a = poly[i], b = poly[(i + 1) % poly.length];
+      s += (BigInt(a[0]) - BigInt(b[0])) * (BigInt(a[1]) + BigInt(b[1]));
+    }
+    return s;
+  }
+  /* The WINDING NUMBER: how many times the boundary goes round the point.
+     A different question from ray parity, with the same answer on a simple
+     polygon -- which is why the mode checks simplicity before it says so. */
+  function geoWinding(poly, q) {
+    var w = 0, on = false, i;
+    for (i = 0; i < poly.length; i += 1) {
+      var a = poly[i], b = poly[(i + 1) % poly.length];
+      if (onSegment(a, b, q)) on = true;
+      if (a[1] <= q[1]) {
+        if (b[1] > q[1] && orientSign(a, b, q) > 0) w += 1;
+      } else if (b[1] <= q[1] && orientSign(a, b, q) < 0) w -= 1;
+    }
+    return { winding: w, inside: !on && w !== 0, onBoundary: on };
+  }
+  function geoSimple(poly) {
+    var n = poly.length, bad = [], i, j;
+    for (i = 0; i < n; i += 1) for (j = i + 1; j < n; j += 1) {
+      if ((i + 1) % n === j || (j + 1) % n === i) continue;
+      if (geoSegOracle(poly[i], poly[(i + 1) % n], poly[j], poly[(j + 1) % n]).intersect) {
+        bad.push([i, j]);
+      }
+    }
+    return { simple: bad.length === 0, crossings: bad };
+  }
+  function geoClosestBrute(points) {
+    var best = null, pair = null, tests = 0, i, j;
+    for (i = 0; i < points.length; i += 1) for (j = i + 1; j < points.length; j += 1) {
+      tests += 1;
+      var d = dist2(points[i], points[j]);
+      if (best === null || d < best) { best = d; pair = [points[i], points[j]]; }
+    }
+    return { d2: best, pair: pair, tests: tests };
+  }
+  function geoRangeBrute(points, rect) {
+    return points.filter(function (p) {
+      return p[0] >= rect[0] && p[0] <= rect[2] && p[1] >= rect[1] && p[1] <= rect[3];
+    });
+  }
+
+  /* ------------------------------------------------------------- the drawing
+
+     One frame for every mode: the data's own bounding box mapped into the
+     viewBox with one scale on both axes, so a right angle stays a right angle
+     and the picture of a determinant is not a picture of a stretch. */
+  function geoFrame(points, opts) {
+    opts = opts || {};
+    var w = opts.width === undefined ? 520 : opts.width;
+    var h = opts.height === undefined ? 300 : opts.height;
+    var pad = opts.pad === undefined ? 24 : opts.pad;
+    var xs = points.map(function (p) { return p[0]; });
+    var ys = points.map(function (p) { return p[1]; });
+    var x0 = Math.min.apply(null, xs), x1 = Math.max.apply(null, xs);
+    var y0 = Math.min.apply(null, ys), y1 = Math.max.apply(null, ys);
+    if (x1 === x0) { x0 -= 1; x1 += 1; }
+    if (y1 === y0) { y0 -= 1; y1 += 1; }
+    var s = Math.min((w - 2 * pad) / (x1 - x0), (h - 2 * pad) / (y1 - y0));
+    var ox = pad + ((w - 2 * pad) - (x1 - x0) * s) / 2;
+    var oy = pad + ((h - 2 * pad) - (y1 - y0) * s) / 2;
+    return {
+      w: w, h: h,
+      X: function (x) { return ox + (x - x0) * s; },
+      Y: function (y) { return h - oy - (y - y0) * s; }
+    };
+  }
+  function geoLine(f, a, b, tone, width, dash) {
+    return '<line x1="' + f.X(a[0]).toFixed(1) + '" y1="' + f.Y(a[1]).toFixed(1)
+      + '" x2="' + f.X(b[0]).toFixed(1) + '" y2="' + f.Y(b[1]).toFixed(1)
+      + '" stroke="var(--' + tone + ')" stroke-width="' + (width || 1.6) + '"'
+      + (dash ? ' stroke-dasharray="' + dash + '"' : '') + ' />';
+  }
+  function geoPoly(f, pts, tone, fill) {
+    if (pts.length < 2) return '';
+    var d = pts.map(function (p) { return f.X(p[0]).toFixed(1) + ',' + f.Y(p[1]).toFixed(1); }).join(' ');
+    return '<polygon points="' + d + '" fill="' + (fill ? 'var(--' + tone + ')' : 'none')
+      + '" fill-opacity="' + (fill ? '0.14' : '0') + '" stroke="var(--' + tone
+      + ')" stroke-width="2" stroke-linejoin="round" />';
+  }
+  function geoDot2(f, p, tone, radius, label) {
+    var s = '<circle cx="' + f.X(p[0]).toFixed(1) + '" cy="' + f.Y(p[1]).toFixed(1)
+      + '" r="' + (radius || 4.5) + '" fill="var(--' + tone + ')" stroke="var(--line-strong)" '
+      + 'stroke-width="1" />';
+    if (label) {
+      s += '<text x="' + (f.X(p[0]) + 7).toFixed(1) + '" y="' + (f.Y(p[1]) - 6).toFixed(1)
+        + '" font-size="9" font-weight="700" fill="var(--muted)">' + label + '</text>';
+    }
+    return s;
+  }
+  function geoRect(f, rect, tone) {
+    var x = Math.min(f.X(rect[0]), f.X(rect[2])), y = Math.min(f.Y(rect[1]), f.Y(rect[3]));
+    var w = Math.abs(f.X(rect[2]) - f.X(rect[0])), h = Math.abs(f.Y(rect[3]) - f.Y(rect[1]));
+    return '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + w.toFixed(1)
+      + '" height="' + h.toFixed(1) + '" fill="var(--' + tone + ')" fill-opacity="0.10" '
+      + 'stroke="var(--' + tone + ')" stroke-width="1.6" stroke-dasharray="4 3" />';
+  }
+  function geoScene(points, layers, opts) {
+    var f = geoFrame(points, opts);
+    return { frame: f, svg: layers(f) };
+  }
+  /* Every number below came from running the algorithm on the points on
+     screen. That is one input. Where a page states something about all
+     inputs it either checks the definition exhaustively on this one and
+     says so, or it names the proof the lesson gives -- and where the
+     measured count and the proved bound differ, both are printed. */
+  var CLP = {
+    'scatter': { spec: '2, 9; 5, 1; 8, 14; 11, 4; 14, 12; 17, 2; 20, 10; 23, 6; 26, 15; 29, 3; 12, 5; 13, 4' },
+    'column': { spec: '0, 0; 0, 3; 0, 6; 0, 9; 0, 12; 1, 1; 1, 4; 1, 7; 1, 10; 1, 13' },
+    'grid': { spec: '0, 0; 4, 0; 8, 0; 0, 4; 4, 4; 8, 4; 0, 8; 4, 8; 8, 8' },
+    'duplicate': { spec: '0, 0; 5, 5; 9, 2; 5, 5; 3, 8' },
+    'pair': { spec: '0, 0; 3, 4' }
+  };
+
+  var presetIn = document.getElementById('clPreset'), specIn = document.getElementById('clSpec');
+  var plot = document.getElementById('clPlot'), levels = document.getElementById('clLevels');
+  var status = document.getElementById('clStatus');
+  var KPIS = ['clN', 'clD2', 'clPair', 'clDC', 'clBrute', 'clStrip'];
+
+  function blank(why) {
+    plot.innerHTML = ''; levels.innerHTML = '';
+    for (var i = 0; i < KPIS.length; i += 1) document.getElementById(KPIS[i]).textContent = '—';
+    status.innerHTML = '<span class="tone-red">' + why + '.</span> Points are '
+      + '<span class="tt">x, y</span> separated by semicolons.';
+  }
+
+  function redraw() {
+    var parsed = geoParse(specIn.value, 24);
+    if (parsed.bad) { blank(parsed.bad); return; }
+    var P = parsed.points;
+    if (P.length < 2) { blank('a closest pair needs two points'); return; }
+
+    var run = closestPair(P), res = run.result;
+    var brute = geoClosestBrute(P);
+    var agree = String(res.d2) === String(brute.d2);
+    var sorted = lexSort(P), mid = sorted[sorted.length >> 1];
+
+    var f = geoFrame(P, { width: 660, height: 280 });
+    var ys = P.map(function (p) { return p[1]; });
+    var svg = geoLine(f, [mid[0], Math.min.apply(null, ys) - 1],
+                         [mid[0], Math.max.apply(null, ys) + 1], 'purple', 1.4, '4 3');
+    P.forEach(function (p) { svg += geoDot2(f, p, 'muted', 4, null); });
+    if (res.pair) {
+      svg += geoLine(f, res.pair[0], res.pair[1], 'cyan', 3);
+      svg += geoDot2(f, res.pair[0], 'cyan', 5.5, geoPointText(res.pair[0]));
+      svg += geoDot2(f, res.pair[1], 'cyan', 5.5, geoPointText(res.pair[1]));
+    }
+    plot.innerHTML = svg;
+
+    var rows = '';
+    res.levels.forEach(function (l, i) {
+      var per = l.strip ? R(BigInt(l.compares), BigInt(l.strip)) : null;
+      rows += '<tr><th class="rowhead">' + (i + 1) + '</th><td>' + l.depth + '</td><td>' + l.n
+        + '</td><td>' + l.strip + '</td><td>' + l.compares + '</td><td>'
+        + (per ? Rtext(per) + ' = ' + Rnum(per).toFixed(2) : '—') + '</td></tr>';
+    });
+    levels.innerHTML = '<caption>One row per merge, deepest first: the size of the strip and the '
+      + 'comparisons made inside it. The last column is comparisons per strip point, and the '
+      + 'lesson proves it cannot pass 7</caption><thead><tr><th>merge</th><th>depth</th>'
+      + '<th>points</th><th>in the strip</th><th>comparisons</th><th>per strip point</th>'
+      + '</tr></thead><tbody>' + rows + '</tbody>';
+
+    var dc = run.counts.compares || 0;
+    /* The busiest strip, as an exact fraction: compared by cross-multiplying
+       rather than by dividing, so the winner is decided without rounding. */
+    var worst = R(0n, 1n);
+    res.levels.forEach(function (l) {
+      if (!l.strip) return;
+      var r = R(BigInt(l.compares), BigInt(l.strip));
+      if (Rcmp(r, worst) > 0) worst = r;
+    });
+    document.getElementById('clN').textContent = P.length;
+    document.getElementById('clD2').textContent = String(res.d2)
+      + (res.d2 === 0n ? ' — two points coincide' : '');
+    document.getElementById('clPair').textContent = res.pair
+      ? (geoPointText(res.pair[0]) + ' ' + geoPointText(res.pair[1])) : '—';
+    document.getElementById('clDC').textContent = dc;
+    document.getElementById('clBrute').textContent = brute.tests;
+    document.getElementById('clStrip').textContent = res.stripCompares + ' against ' + res.bound;
+
+    status.innerHTML = '<strong>Squared distance ' + res.d2 + '</strong>'
+      + (res.pair ? ', between ' + geoPointText(res.pair[0]) + ' and '
+                    + geoPointText(res.pair[1]) : '') + '. '
+      + (agree
+          ? 'Testing all ' + brute.tests + ' pairs reaches the same value, so the recursion did '
+            + 'not miss a pair by splitting it across the line — which is the one way this '
+            + 'algorithm can be wrong and still look finished. '
+          : '<span class="tone-red">Testing every pair gives ' + brute.d2 + ' instead. The '
+            + 'recursion missed a pair.</span> ')
+      + 'It used <span class="tone-cyan">' + dc + '</span> comparison'
+      + geoPlural(dc, '', 's') + ' against ' + brute.tests + ' for the brute force'
+      + (dc < brute.tests ? '' : ', which at this size is no saving at all — the recursion pays '
+          + 'for itself only once n is large enough that n log n is under n(n−1)/2')
+      + '. Inside the strips it made ' + res.stripCompares + ' comparison'
+      + geoPlural(res.stripCompares, '', 's') + ' against the bound of 7n = ' + res.bound
+      + ', and the busiest single strip ran at ' + Rtext(worst) + ' = '
+      + Rnum(worst).toFixed(2) + ' comparisons per point. '
+      + 'The bound is a proof about every input; ' + Rtext(worst) + ' is a measurement of '
+      + 'this one, and the gap between them is not evidence that the proof is loose.';
+  }
+
+  function apply() {
+    var p = CLP[presetIn.value];
+    if (!p) return;
+    specIn.value = p.spec;
+    redraw();
+  }
+  var START = CLP[presetIn.value];
+  if (START && !specIn.value) specIn.value = START.spec;
+  presetIn.addEventListener('change', apply);
+  specIn.addEventListener('input', redraw);
+  redraw();
+  window.redrawLab = redraw;
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "geometric-algorithms/the-closest-pair-and-the-strip";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+  </script>
+</body>
+</html>

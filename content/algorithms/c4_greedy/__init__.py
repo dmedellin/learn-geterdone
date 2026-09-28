@@ -95,7 +95,7 @@ COURSE = {
     "not_covered": [
         "Greedy set cover and its `ln n` ratio. It is an approximation argument charged "
         "against a lower bound rather than a claim of optimality, and it belongs with the "
-        "other ratios at the end of the path rather than here.",
+        "other approximation ratios in Intractability and Approximation rather than here.",
         "Matroid intersection, matroid union, and the greedy algorithm for weighted matroid "
         "intersection. The single-matroid theorem is what explains Kruskal, and the "
         "intersection theory is a subject rather than a lesson.",

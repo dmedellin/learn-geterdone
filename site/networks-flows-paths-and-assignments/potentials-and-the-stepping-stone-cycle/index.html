@@ -1,0 +1,3281 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Potentials and the Stepping-Stone Cycle | Lesson | Networks: Flows, Paths and Assignments | Operations Research | Learn · geterdone.io</title>
+  <meta name="description" content="Solve uᵢ + vⱼ = cᵢⱼ on the occupied cells and every empty cell gets a reduced cost. A negative one means an improvement, and taking it means finding the unique cycle that cell closes in the basis and alternating plus and minus round it. The potentials are the dual solution, the reduced costs are the dual constraints, and the method is the simplex method with the tableau drawn differently." />
+  <link rel="canonical" href="https://learn.geterdone.io/networks-flows-paths-and-assignments/potentials-and-the-stepping-stone-cycle/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="Potentials and the Stepping-Stone Cycle | Lesson | Networks: Flows, Paths and Assignments | Operations Research | Learn · geterdone.io" />
+  <meta property="og:description" content="Solve uᵢ + vⱼ = cᵢⱼ on the occupied cells and every empty cell gets a reduced cost. A negative one means an improvement, and taking it means finding the unique cycle that cell closes in the basis and alternating plus and minus round it. The potentials are the dual solution, the reduced costs are the dual constraints, and the method is the simplex method with the tableau drawn differently." />
+  <meta property="og:url" content="https://learn.geterdone.io/networks-flows-paths-and-assignments/potentials-and-the-stepping-stone-cycle/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Potentials and the Stepping-Stone Cycle | Lesson | Networks: Flows, Paths and Assignments | Operations Research | Learn · geterdone.io" />
+  <meta name="twitter:description" content="Solve uᵢ + vⱼ = cᵢⱼ on the occupied cells and every empty cell gets a reduced cost. A negative one means an improvement, and taking it means finding the unique cycle that cell closes in the basis and alternating plus and minus round it. The potentials are the dual solution, the reduced costs are the dual constraints, and the method is the simplex method with the tableau drawn differently." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/networks-flows-paths-and-assignments/potentials-and-the-stepping-stone-cycle/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    @media (max-width: 920px) {
+      body[data-page-kind="supplemental"] [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/operations-research/">Operations Research</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Networks: Flows, Paths and Assignments</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">Potentials and the Stepping-Stone Cycle</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The the simplex, rewritten for a tableau is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Networks: Flows, Paths and Assignments &middot; The transportation tableau</span>
+        <h1>Potentials and the Stepping-Stone Cycle</h1>
+        <p>Solve <span class="math">uᵢ + vⱼ = cᵢⱼ</span> on the occupied cells and every empty cell gets a reduced cost. A negative one means an improvement, and taking it means finding the unique cycle that cell closes in the basis and alternating plus and minus round it. The potentials are the dual solution, the reduced costs are the dual constraints, and the method is the simplex method with the tableau drawn differently.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">uᵢ + vⱼ = cᵢⱼ  on every BASIC cell         m + n − 1 equations, m + n unknowns
+fix one potential — any one — and the rest follow; the reduced costs do not move
+reduced cost of an empty cell    c̄ᵢⱼ = cᵢⱼ − uᵢ − vⱼ
+all c̄ᵢⱼ ≥ 0  ⟺  optimal                  a negative one is an improving direction
+the entering cell closes ONE cycle in the basis; alternate + and − round it
+θ = the smallest allocation on a minus cell, and that cell leaves the basis</div>
+        <div class="float-label" style="right:16px;bottom:16px;">The dual on the left, the pivot on the right</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>Two of these are the simplex method in disguise. The third is the one readers get wrong on paper, because the shape they expect is not always the shape they get.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>The potentials are the dual, and one of them is free</h3><p>There are <span class="math">m + n</span> potentials and only <span class="math">m + n − 1</span> equations, so the system is under-determined by exactly one degree of freedom. Fixing <span class="math">u₁ = 0</span> is a normalisation, not a fact: fix any other potential instead and every <span class="math">u</span> and every <span class="math">v</span> moves, while not one reduced cost changes. The lab recomputes the entire reduced-cost table under any normalisation you choose, so this is watched rather than asserted.</p></article><article class="card concept-card"><div class="icon">2</div><h3>A reduced cost is what a route would save, per unit</h3><p><span class="math">c̄ᵢⱼ = cᵢⱼ − uᵢ − vⱼ</span> is the difference between shipping through cell <span class="math">(i, j)</span> and shipping the same unit round the basis. Negative means the route is cheaper than the current plan by that much per unit; zero on every empty cell means no route is cheaper, which is optimality. This is the dual-feasibility test from the duality course, written for a tableau.</p></article><article class="card concept-card"><div class="icon">3</div><h3>The cycle is a cycle, and it is not always a rectangle</h3><p>Adding one cell to a spanning tree creates exactly one cycle, and that cycle is what the flow moves round. Readers reach for a rectangle &mdash; along the row, down the column, back &mdash; and on the lab's default start the very first pivot has a six-cornered staircase instead, with the rectangle's fourth corner falling on an empty cell. A cycle may cross an empty cell; it may only turn at an occupied one.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>Pricing the empty cells, and moving flow round the cycle that follows</h2></div><p>The potentials and what they are, then the reduced costs, then the pivot in full on a table where the obvious shape fails.</p></div>
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Potentials and reduced costs</span><p>Given a basis of <span class="math">m + n − 1</span> occupied cells, the <strong>potentials</strong> <span class="math">uᵢ</span> and <span class="math">vⱼ</span> are the solution of <span class="math">uᵢ + vⱼ = cᵢⱼ</span> over those cells, with one potential fixed arbitrarily. The <strong>reduced cost</strong> of any cell is <span class="math">c̄ᵢⱼ = cᵢⱼ − uᵢ − vⱼ</span>.</p><p>Basic cells have reduced cost zero by construction. If every empty cell has <span class="math">c̄ᵢⱼ ≥ 0</span> the current plan is optimal; otherwise a cell with <span class="math">c̄ᵢⱼ &lt; 0</span> enters.</p></div><p>The system is solvable exactly when the occupied cells form a spanning tree, which is why the count mattered so much in &ldquo;The Transportation Problem&rdquo;. Connected gives every potential a value; acyclic stops two equations from disagreeing about one of them. Solve it by starting anywhere and walking the tree: each basic cell hands a known <span class="math">u</span> to an unknown <span class="math">v</span> or the other way round.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">the north-west start on the three-plant table, basis in bold
+
+              D1     D2     D3     D4      u
+   A         [5]   [10]      .      .      0
+   B           .    [5]   [15]    [5]      5
+   C           .      .      .   [10]      3
+   v          10      2      4     15
+
+   check   u_A + v_D1 = 0 + 10 = 10 = c        ok
+           u_B + v_D3 = 5 +  4 =  9 = c        ok
+
+reduced costs   c - u - v   on every cell
+
+              D1     D2     D3     D4
+   A           0      0     16     -4
+   B          -3      0      0      0
+   C          -9      9      9      0
+
+   most negative:  (C, D1) at -9        Dantzig&#x27;s rule
+   first negative: (A, D4) at -4        Bland&#x27;s rule</div><p>Fix <span class="math">u_A = 0</span> and the potentials are <span class="math">u = (0, 5, 3)</span>, <span class="math">v = (10, 2, 4, 15)</span>. Fix <span class="math">v_D1 = 0</span> instead and they become <span class="math">u = (10, 15, 13)</span>, <span class="math">v = (0, −8, −6, 5)</span> &mdash; every one of the seven has moved, by 10. Not one of the twelve reduced costs changes, because each is <span class="math">cᵢⱼ − uᵢ − vⱼ</span> and the shift cancels. The lab has a control for each of the seven and reports the shift each produces: <span class="math">0, 5, 3, −10, −2, −4, −15</span>.</p><h3>Taking the cell, and the cycle it closes</h3><p>The basis is a spanning tree of the rows and columns. Adding one more cell to a spanning tree creates exactly one cycle, and that cycle alternates between moving along a row and moving down a column. Put a plus on the entering cell, then alternate signs round the cycle. Every plus cell gains <span class="math">θ</span>, every minus cell loses it, and the row and column sums are unchanged for every <span class="math">θ</span>.</p><div class="example"><span class="label">Example &middot; The staircase, on the first pivot</span><p><span class="math">(C, D1)</span> enters with a reduced cost of <span class="math">−9</span>. The cycle the lab computes has six corners: <span class="math">(C,D1)+ (C,D4)− (B,D4)+ (B,D2)− (A,D2)+ (A,D1)−</span>. The rectangle a reader guesses &mdash; along row C, up column D1 &mdash; would need to turn at <span class="math">(B, D1)</span>, and <span class="math">(B, D1)</span> is empty, so the guess is refused and the walk goes further.</p><p><span class="math">θ</span> is the smallest allocation on a minus cell: the minus cells carry <span class="math">10</span>, <span class="math">5</span> and <span class="math">5</span>, so <span class="math">θ = 5</span> and <span class="math">(B, D2)</span> leaves. The cost falls from 520 to 475, which is <span class="math">9 × 5</span> less.</p></div><p>The lab draws the guess alongside the computed cycle and names the corner that breaks it. On the second pivot of the same run the guess closes and the two agree; on the third, the entering cell's column holds no other occupied cell at all, so there is no rectangle to draw. The guess is not always wrong, which is exactly why it has to be checked.</p><h3>Degeneracy, and what it does to the cost</h3><div class="example"><span class="label">Example &middot; A pivot that changes the basis and not the bill</span><p>The second pivot of the default run brings <span class="math">(A, D4)</span> in, and the smallest allocation on a minus cell is <span class="math">0</span> &mdash; the zero at <span class="math">(A, D1)</span>. So <span class="math">θ = 0</span>: the cell enters, <span class="math">(A, D1)</span> leaves, the basis is different, and the cost stands still at 475.</p><p>The run's costs are <span class="math">520 → 475 → 475 → 435</span>, and an implementation asserting that every iteration is strictly cheaper would fail on the shipped example. Non-increasing is the claim. This is the degeneracy of the simplex course, arriving in a tableau that looks nothing like a simplex tableau.</p></div><p>Three pivots from the north-west start, one from the least-cost start, and both land on 435 at the same plan. The entering rule moves the path and not the destination: on the surplus table, Dantzig's rule takes three pivots from either start while Bland's takes four from one and six from the other, all four finishing at 605.</p><p>And the dummy question from &ldquo;The Transportation Problem&rdquo; can now be settled with a number. Price the dummy column at ten times the dearest real route &mdash; 160 rather than 0 &mdash; and re-solve the surplus table. The real shipping bill is 605 either way. Every feasible plan sends the same 10 units to the dummy, so the penalty adds a constant of 1600 to every plan and the cheapest one cannot move. What does move is the least-cost <em>start</em>, from 665 to 635, because that rule reads the cost table; the north-west start does not move at all, because it never reads one.</p></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>The simplex, rewritten for a tableau</h2></div><p>u and v price the empty cells, and a closed path of ±θ does the pivot</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>One iteration, and the cycle it turns on</strong><span>u + v on the occupied cells, c &minus; u &minus; v on the rest, and a closed path of &plusmn;&theta;</span></div>
+        <div class="inline-legend"><span class="tone-purple"><i class="legend-swatch"></i>the stepping-stone cycle</span><span class="tone-cyan"><i class="legend-swatch"></i>entering cell</span><span class="tone-red"><i class="legend-swatch"></i>leaving cell</span><span class="tone-amber"><i class="legend-swatch"></i>a negative reduced cost</span></div>
+      </div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="tmGrid" viewBox="0 0 660 280" role="img" aria-label="The transportation tableau with the stepping-stone cycle drawn as a closed path through the cells it moves, plus and minus alternating around it."></svg></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="tmTheta"></table></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="tmNormT"></table></div>
+      <div class="status-banner" id="tmStatus" style="margin-top:12px;"></div>
+
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>One pivot at a time, with the cycle drawn on the tableau</h3>
+          <p>The potentials, the reduced costs, the entering cell under either rule, the cycle with a plus or a minus on every corner, <span class="math">θ</span> tabulated over the minus cells and a ring on the cell that leaves. The rectangle a reader guesses first is drawn too, and when it fails the corner that breaks it is highlighted rather than described.</p>
+        <div class="field">
+          <label for="tmPreset">Worked example</label>
+          <select id="tmPreset"><option value="balanced" selected>Three plants, four depots (supply and demand already balance)</option><option value="surplus">Three mills, three yards (supply exceeds demand)</option><option value="degenerate">Three depots, three shops (the north-west rule ties)</option></select>
+        </div>
+        <div class="field">
+          <label for="tmStart">Starting solution</label>
+          <select id="tmStart"><option value="northwest" selected>North-west corner</option><option value="least">Least cost</option></select>
+        </div>
+        <div class="field">
+          <label for="tmRule">Entering cell</label>
+          <select id="tmRule"><option value="dantzig" selected>Most negative reduced cost</option><option value="bland">First negative, in row order</option></select>
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="tmIter">Iteration</label><span class="range-value" id="tmIterOut">0</span></div>
+          <input id="tmIter" type="range" min="0" max="3" step="1" value="0" />
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="tmNorm">Which potential is fixed at zero</label><span class="range-value" id="tmNormOut">0</span></div>
+          <input id="tmNorm" type="range" min="0" max="6" step="1" value="0" />
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>Entering cell</span><strong id="tmEnterK">&mdash;</strong></div>
+          <div class="kpi"><span>&theta;</span><strong id="tmThetaK">&mdash;</strong></div>
+          <div class="kpi"><span>Leaving cell</span><strong id="tmLeaveK">&mdash;</strong></div>
+          <div class="kpi"><span>Cost after this iteration</span><strong id="tmCostK">&mdash;</strong></div>
+          <div class="kpi"><span>The cycle, checked</span><strong id="tmCheckK">&mdash;</strong></div>
+          <div class="kpi"><span>The rectangle a reader guesses</span><strong id="tmRectK">&mdash;</strong></div>
+        </div>
+        <p class="small-copy" id="tmHint" style="margin:0;">A stepping-stone cycle may cross an empty cell and may only turn at an occupied one. That is the rule the rectangle guess breaks, and when it breaks it the offending corner is ringed on the tableau rather than described.</p>
+
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>One iteration, start to finish</h2></div><p>Potentials, prices, entering cell, cycle, theta, leaving cell. Then do it again; there is nothing else in the method.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Solve the potentials on the occupied cells</h3><p>Fix one &mdash; any one &mdash; and walk the tree, each basic cell determining one new potential from one already known. If you get stuck with potentials still unknown, the basis is disconnected and the repair from &ldquo;The Transportation Problem&rdquo; is needed.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Price every empty cell, and check the basic ones came out zero</h3><p><span class="math">c̄ᵢⱼ = cᵢⱼ − uᵢ − vⱼ</span>. The basic cells must all price at zero; if one does not, the potentials are wrong and there is no point going on. All non-negative on the empty cells means you have finished.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Choose the entering cell by a stated rule</h3><p>Most negative, or first negative in row order. Say which you are using: they pick different cells on the very first tableau of the worked example, and they take different numbers of pivots to the same answer.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Trace the cycle, turning only where something is allocated</h3><p>From the entering cell, alternate row moves and column moves back to where you started. Every corner after the first must be an occupied cell. You may cross an empty cell in passing; you may not turn at one, and the cycle is unique so there is nothing to choose.</p></article><article class="card concept-card"><div class="icon">5</div><h3>Move <span class="math">θ</span> round it and update</h3><p><span class="math">θ</span> is the smallest allocation on a minus corner. Add it to the plus corners, take it off the minus corners, and remove exactly one cell that hit zero &mdash; if two did, keep one as a basic zero, or the count breaks.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>Potentials, prices and the cycle</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>The default table, from the north-west start to the optimum</h3><p>Three pivots. Everything below is what the lab reports at each step, including the degenerate one and the two occasions on which the rectangle guess fails.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">START   north-west, cost 520
+   basis  (1,1)=5 (1,2)=10 (2,2)=5 (2,3)=15 (2,4)=5 (3,4)=10
+
+PIVOT 1   u = (0, 5, 3)    v = (10, 2, 4, 15)
+   reduced     0   0  16  -4  /  -3   0   0   0  /  -9   9   9   0
+   enters      (3,1) at -9                 Dantzig
+   guess       rectangle turns at (2,1), which is EMPTY   REFUSED
+   cycle       (3,1)+ (3,4)- (2,4)+ (2,2)- (1,2)+ (1,1)-   six corners
+   theta       min(10, 5, 5) = 5,  and (2,2) leaves
+   cost        520 - 9(5) = 475
+
+PIVOT 2   u = (0, -4, -6)  v = (10, 2, 13, 24)
+   enters      (1,4) at -13
+   guess       (1,4) (1,1) (3,1) (3,4) closes on four occupied corners
+   cycle       the same four
+   theta       0,  and (1,1) leaves            DEGENERATE
+   cost        475 - 13(0) = 475               unchanged
+
+PIVOT 3   u = (0, 9, 7)    v = (-3, 2, 0, 11)
+   enters      (2,2) at -4
+   guess       no rectangle: column 3 holds no other occupied cell
+   cycle       (2,2)+ (2,4)- (1,4)+ (1,2)-
+   theta       10,  and (2,4) leaves
+   cost        475 - 4(10) = 435
+
+STOP      u = (0, 5, 7)    v = (-3, 2, 4, 11)
+   reduced    13  0  16  0  / 10  0  0  4  /  0  5  5  0
+   none negative, so 435 is optimal
+   plan       0  5  0 10  /  0 10 15  0  /  5  0  0  5
+
+from the LEAST-COST start the same table needs ONE pivot, to the same 435</div><p>Pivot 2 is the one to sit with. A cell enters, a cell leaves, the plan does not move an ounce of anything, and the cost is identical. That is not a bug and it is not a waste: the basis has changed, and the next tableau prices the cells differently because of it, which is how pivot 3 becomes available.</p><p>For a rehearsal, run the same table from the least-cost start. It opens at 475 and one pivot takes it to 435. Then ask which start you would rather have: the cheaper opening took fewer pivots here, and on the surplus table it takes more under one of the two entering rules. There is no theorem in this neighbourhood, which is worth knowing.</p><p>The harder rehearsal: switch the entering rule to Bland's and run the default table again. The first cell to enter is now <span class="math">(1,4)</span> at <span class="math">−4</span> rather than <span class="math">(3,1)</span> at <span class="math">−9</span>, and the path is different all the way down. Both finish at 435. A pivot rule is a policy about the route, not about the destination.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Believing <span class="math">u₁ = 0</span> is part of the method</strong><span>It is one arbitrary choice out of <span class="math">m + n</span>, made so that a solvable system has a unique answer. Readers who think the potentials are determined go looking for an error when someone else's <span class="math">u</span> and <span class="math">v</span> differ from theirs by a constant, and sometimes recompute a whole tableau over it. Check the reduced costs instead: those really are determined, and they are what the method uses.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Looking for a rectangle instead of tracing the cycle</strong><span>On the lab's very first pivot the cycle has six corners, and the rectangle a reader draws needs to turn on an empty cell. The habit survives because rectangles are common &mdash; the second pivot of the same run is one &mdash; which makes it worse, not better. Trace the path: alternate row and column moves, turn only where something is allocated, and stop when you are back at the start.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Removing two cells when two of them hit zero together</strong><span>If <span class="math">θ</span> is attained on more than one minus corner, exactly one of them leaves and the others stay in the basis carrying zero. Removing both drops the count below <span class="math">m + n − 1</span>, the basis stops being a spanning tree, and the next set of potentials cannot be solved for &mdash; with the cause now several steps behind you.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can run a full iteration by hand and produce the cycle without guessing its shape.</strong><p>You should be able to solve the potentials from any normalisation, price every empty cell, state the entering rule you are using and apply it, trace the unique cycle turning only at occupied cells, compute <span class="math">θ</span> over the minus corners, and say which cell leaves &mdash; including when <span class="math">θ</span> is zero.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Both the transportation optima on this lesson came out in whole units, and so did every intermediate plan, and nothing in the method ever mentioned integrality: <span class="math">θ</span> was the smallest of a set of whole allocations, so it was whole, so every updated allocation was whole. That argument only works because the cycle has coefficients of plus and minus one, which is a property of the matrix. The next lesson, “Total Unimodularity and Integer Corners”, is where that property gets a name and a proof &mdash; and where a matrix that does not have it produces a corner made of halves.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../the-transportation-problem/" rel="prev"><span>Lesson</span><strong>The Transportation Problem</strong></a>
+      <a class="lesson-link next" href="../total-unimodularity-and-integer-corners/" rel="next"><span>Lesson</span><strong>Total Unimodularity and Integer Corners</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="networks-flows-paths-and-assignments/potentials-and-the-stepping-stone-cycle" data-lesson-title="Potentials and the Stepping-Stone Cycle" data-course-title="Networks: Flows, Paths and Assignments">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Networks: Flows, Paths and Assignments.</strong> Every flow, cost, determinant, potential and cut capacity on this course is an exact fraction, and nothing here is rounded, because nothing here needs to be: the data are rational and the arithmetic stays rational. That matters more on this course than on most, since the central claim is that certain corners are exactly whole. A flow reported as <span class="math">0.9999999</span> would not be evidence of anything. Where a corner is genuinely not whole &mdash; the odd cycle's <span class="math">1/2</span> &mdash; the lab prints the halves as halves, which is the point.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure on this path is computed in your browser from the model the lesson states, and a solution proved optimal is optimal for the model you wrote down rather than for the situation it came from &mdash; each lesson names what the model left out.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "You solve the potentials with <span class=\"math\">u\u2081 = 0<\/span> and then again with <span class=\"math\">v\u2081 = 0<\/span>. What changes?", "a": ["Every potential moves, and every reduced cost moves with it", "Every potential moves, and not one reduced cost changes", "Nothing moves: the potentials are determined by the costs", "Only the potentials in the first row and first column move"], "c": 1, "why": "There are <span class=\"math\">m + n<\/span> unknowns and <span class=\"math\">m + n \u2212 1<\/span> independent equations, so one potential is free. On the lab's first tableau, fixing <span class=\"math\">v\u2081 = 0<\/span> instead of <span class=\"math\">u\u2081 = 0<\/span> shifts all seven by 10 &mdash; and each reduced cost is <span class=\"math\">c\u1d62\u2c7c \u2212 u\u1d62 \u2212 v\u2c7c<\/span>, in which the shift appears once positively and once negatively and cancels. That is what makes the choice a normalisation."}, {"q": "An entering cell's stepping-stone cycle passes through a cell that is empty. Is that allowed?", "a": ["No: every corner of the cycle must be occupied", "Yes if the cycle crosses it in a straight line, but it may not turn there", "Yes, and it may turn there provided the allocation would stay non-negative", "Only if the empty cell is in the entering cell's own row"], "c": 1, "why": "A corner is where the path changes between a row move and a column move, and every corner after the entering cell must carry an allocation, because only allocated cells can give up <span class=\"math\">\u03b8<\/span>. Crossing an unoccupied cell in passing changes nothing. The lab's own check refuses a drawn cycle that turns at an empty cell and names the cell."}, {"q": "A pivot is taken and <span class=\"math\">\u03b8<\/span> comes out zero. What has happened?", "a": ["The tableau is optimal and the method should stop", "The entering cell was chosen wrongly", "The basis changes, the plan does not, and the cost stands still", "The problem is unbounded"], "c": 2, "why": "A minus corner already carrying zero caps <span class=\"math\">\u03b8<\/span> at zero. The entering cell joins the basis, the zero cell leaves, and nothing is shipped differently &mdash; but the potentials and hence every reduced cost are recomputed from the new basis, which is what makes progress possible afterwards. The default run costs 520, 475, 475 and 435 for exactly this reason."}, {"q": "On a transportation problem with a dummy column, you price the dummy at ten times the dearest real route instead of at zero. What happens to the optimal plan?", "a": ["It gets cheaper, because the penalty discourages waste", "It does not change, because every feasible plan sends the same amount to the dummy", "It changes, because the reduced costs in the dummy column all move", "It becomes infeasible"], "c": 1, "why": "The dummy's column demand is fixed, so every feasible plan sends exactly that quantity there and a uniform price adds the same constant to all of them. On the lab's surplus table the constant is 1600 and the real bill stays at 605. What does move is the least-cost starting rule, from 665 to 635, because that rule reads the cost table &mdash; the north-west rule, which does not, gives the same start either way."}];
+
+  (function () {
+
+  /* Exact rational arithmetic over BigInt.
+
+     Every number a lesson calls "the answer" lives in this type. BigInt rather
+     than Number because a few steps of elimination on a 3x3 system produces
+     numerators that leave the exact-integer range of a double, and a solution
+     that is silently wrong in the last digits is worse than no solution. */
+  function bgcd(a, b) {
+    if (a < 0n) a = -a;
+    if (b < 0n) b = -b;
+    while (b) { var t = a % b; a = b; b = t; }
+    return a;
+  }
+  function R(n, d) {
+    if (d === undefined) d = 1n;
+    n = BigInt(n); d = BigInt(d);
+    if (d === 0n) throw new Error('division by zero');
+    if (d < 0n) { n = -n; d = -d; }
+    var g = bgcd(n, d) || 1n;
+    return { n: n / g, d: d / g };
+  }
+  var R0 = R(0n), R1 = R(1n);
+  function Radd(a, b) { return R(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function Rsub(a, b) { return R(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function Rmul(a, b) { return R(a.n * b.n, a.d * b.d); }
+  function Rdiv(a, b) { return R(a.n * b.d, a.d * b.n); }
+  function Rneg(a) { return R(-a.n, a.d); }
+  function Rabs(a) { return a.n < 0n ? Rneg(a) : a; }
+  function Rinv(a) { return R(a.d, a.n); }
+  function Rzero(a) { return a.n === 0n; }
+  function Rsign(a) { return a.n === 0n ? 0 : (a.n < 0n ? -1 : 1); }
+  function Requ(a, b) { return a.n === b.n && a.d === b.d; }
+  function Rcmp(a, b) { var l = a.n * b.d, r = b.n * a.d; return l < r ? -1 : (l > r ? 1 : 0); }
+  function Rint(a) { return a.d === 1n; }
+  function Rpow(a, k) {
+    var out = R1, base = a, e = k < 0 ? -k : k;
+    while (e > 0) { if (e & 1) out = Rmul(out, base); base = Rmul(base, base); e >>= 1; }
+    return k < 0 ? Rinv(out) : out;
+  }
+  /* The reader's form: "3", "-7/4". Never "3/1", never "0/5". */
+  function Rtext(a) { return a.d === 1n ? String(a.n) : a.n + '/' + a.d; }
+  /* Parenthesised when it would otherwise glue onto a neighbouring symbol. */
+  function Rterm(a) { return (a.n < 0n || a.d !== 1n) ? '(' + Rtext(a) + ')' : Rtext(a); }
+  function Rnum(a) { return Number(a.n) / Number(a.d); }
+  /* A decimal, for the one place a lesson asks for one. Exact when it can be.
+
+     BigInt long division rather than Number(n)/Number(d).toFixed(). The old
+     form had two faults and the second is the one that shows.
+
+     It returned NaN. Past roughly 300 digits both halves of the quotient are
+     Infinity and Infinity/Infinity is NaN, so a page printed NaN to a reader.
+     A Bloom filter's exact rate at m = 1000, n = 100, k = 7 has a 2101-digit
+     denominator, and Karger's contraction probability has the same shape.
+
+     And it rounded exact ties the wrong way. -399/40 is exactly -9.975; the
+     nearest double is fractionally smaller in magnitude, so toFixed(2) gave
+     -9.97 where half away from zero is -9.98. 160 of 144,180 rationals over
+     the small-integer range disagreed, every one of them an exact tie.
+
+     Half away from zero, computed on the exact value: the doubling, the +1
+     and the halving are the rounding, done in integers. */
+  function Rdec(a, places) {
+    if (places === undefined) places = 6;
+    if (Rint(a)) return String(a.n);
+    var neg = a.n < 0n, num = neg ? -a.n : a.n;
+    var scale = 10n ** BigInt(places);
+    var q = (num * scale * 2n / a.d + 1n) / 2n;
+    var s = q.toString();
+    while (s.length <= places) s = '0' + s;
+    var out = (neg ? '-' : '') + s.slice(0, s.length - places)
+      + (places > 0 ? '.' + s.slice(s.length - places) : '');
+    return out.indexOf('.') >= 0 ? out.replace(/0+$/, '').replace(/\.$/, '') : out;
+  }
+  function Rparse(text) {
+    var s = String(text).trim();
+    var m = /^([+-]?\d+)\s*\/\s*(\d+)$/.exec(s);
+    /* A zero denominator is not a number this function can read, so it comes
+       back null like every other unreadable string. It used to reach R(), which
+       THROWS -- and a throw out of a parser is not a refusal, it is a dead
+       page: the lab's redraw stops, the panel keeps the last good figures, and
+       nothing tells the reader why. Typing 1/0 into the availability chain on
+       a published page did exactly that. Callers all handle null already;
+       every one of them was written to. */
+    if (m) return m[2] === '0' || /^0+$/.test(m[2]) ? null : R(BigInt(m[1]), BigInt(m[2]));
+    m = /^([+-]?\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]));
+    m = /^([+-]?)(\d*)\.(\d+)$/.exec(s);
+    if (m) {
+      var whole = m[2] || '0', frac = m[3];
+      var num = BigInt(whole + frac), den = 10n ** BigInt(frac.length);
+      return R(m[1] === '-' ? -num : num, den);
+    }
+    return null;
+  }
+  /* Is this rational a perfect square? Needed wherever a lesson must decide
+     between an exact answer and a radical one -- sqrt(4/9) is 2/3 and belongs
+     on the page as 2/3, while sqrt(2) must stay sqrt(2). */
+  function bisqrt(n) {
+    if (n < 0n) return null;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x * x === n ? x : null;
+  }
+  function Rsqrt(a) {
+    if (a.n < 0n) return null;
+    var p = bisqrt(a.n), q = bisqrt(a.d);
+    return (p === null || q === null) ? null : R(p, q);
+  }
+
+  function td(t, cls) { return '<td' + (cls ? ' class="' + cls + '"' : '') + '>' + t + '</td>'; }
+  function tdl(t, cls) {
+    return '<td style="text-align:left;"' + (cls ? ' class="' + cls + '"' : '') + '>' + t + '</td>';
+  }
+  function th(t) { return '<th>' + t + '</th>'; }
+  function rowhead(t) { return '<th class="rowhead">' + t + '</th>'; }
+  function tr(cells, cls) { return '<tr' + (cls ? ' class="' + cls + '"' : '') + '>' + cells.join('') + '</tr>'; }
+  function table(caption, heads, rows) {
+    var head = (heads && heads.length)
+      ? '<thead>' + tr(heads.map(function (h) { return th(h); })) + '</thead>' : '';
+    return '<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>' + caption + '</caption>'
+      + head + '<tbody>' + rows.join('') + '</tbody></table></div>';
+  }
+  /* The two-column "what was done / what it produced" table. The exemplar's
+     trace layout, kept identical so a reader moving between courses is reading
+     the same page furniture. */
+  function steps(caption, pairs) {
+    return table(caption, [], pairs.map(function (p) { return tr([rowhead(p[0]), tdl(p[1])]); }));
+  }
+  function chip(t, kind) { return '<span class="chip' + (kind ? ' ' + kind : '') + '">' + t + '</span>'; }
+  /* " + 3" or " - 7": a bare number as a continuation. Everything on this page
+     that writes "something + <number>" goes through it, because "a(n-1) + -7"
+     is not a thing a reader writes and not a thing a marker accepts. */
+  function plusnum(r) { return (Rsign(r) < 0 ? ' - ' : ' + ') + Rtext(Rabs(r)); }
+  function tone(t, kind) { return '<span class="tone-' + kind + '">' + t + '</span>'; }
+  function plural(n, one, many) { return n === 1 ? one : many; }
+  /* Reader text goes into innerHTML, and on this course the reader types < and
+     > all day. Escaped once, at the boundary, rather than trusted: "x + 2y <= 8"
+     written raw would lose everything from the < to the next > -- which is the
+     end of the cell -- and the page would quietly drop the reader's own words. */
+  function esc(t) {
+    return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  /* Rparse throws on a zero denominator, and 1/0 is a thing a reader types.
+     Every read of reader input goes through this, so a bad fraction becomes a
+     sentence in the status banner rather than an exception. */
+  function Rread(text) {
+    try { return Rparse(String(text).trim()); } catch (err) { return null; }
+  }
+  /* The one rounding this file performs, and it is never used to decide
+     anything -- only to sit beside an exact value that a reader may want to
+     place on a number line. Every caller labels it as a rounding. */
+  function approx(r, places) {
+    var v = Rnum(r);
+    if (!isFinite(v)) return 'not a real number';
+    return v.toFixed(places === undefined ? 4 : places);
+  }
+  /* The least common multiple of two rationals: lcm of the numerators over the
+     gcd of the denominators. For two integers this is the schoolbook lcm, which
+     is what the elimination mode needs; for 1/2 and 1/4 it is 1/2, which is
+     what keeps that mode from inventing multipliers with four-digit numerators
+     the moment a coefficient stops being whole. */
+  function Rlcm(a, b) {
+    if (Rzero(a) || Rzero(b)) return R0;
+    var an = a.n < 0n ? -a.n : a.n, bn = b.n < 0n ? -b.n : b.n;
+    return R(an / bgcd(an, bn) * bn, bgcd(a.d, b.d));
+  }
+
+  /* Printing a rational this path can actually produce.
+
+     algebra_core's Rdec and Rnum both go through Number, and this path
+     produces rationals Number cannot hold: P^12 on a five-state chain with
+     denominator-20 entries has entries of 15 digits over 16 (measured), and
+     (19/20)^400 is 512 digits over 521, of which Number() makes NaN.  So
+     decimals here are long division in BigInt.  queue.py already solved this for the System
+     Design queueing course; this is that solution lifted, not a fourteenth
+     one, so the two courses print the same number the same way. */
+
+  /* Decimal by BigInt long division, rounded half up at the last digit. */
+  function Rfixed(a, places) {
+    if (places === undefined) places = 3;
+    var neg = a.n < 0n, n = neg ? -a.n : a.n, d = a.d;
+    var scale = 10n ** BigInt(places);
+    var q = (2n * n * scale + d) / (2n * d);          /* round half up */
+    var whole = q / scale, frac = (q % scale).toString();
+    while (frac.length < places) frac = '0' + frac;
+    var body = places > 0 ? whole + '.' + frac : String(whole);
+    return (neg ? '-' : '') + body;
+  }
+
+  /* The exact fraction when a reader can read it, a decimal when the exact
+     form has run to twenty digits.  Both are the same number; only one of them
+     is evidence.  The cut is on DIGITS, not on magnitude, so it is the same
+     rule on every page of the Subject. */
+  function Rshort(a, places, digits) {
+    if (digits === undefined) digits = 9;
+    var wide = String(a.n < 0n ? -a.n : a.n).length > digits || String(a.d).length > digits;
+    return wide ? Rfixed(a, places === undefined ? 4 : places) : Rtext(a);
+  }
+  function Rpct(a, places) {
+    return Rfixed(Rmul(a, R(100n, 1n)), places === undefined ? 2 : places) + '%';
+  }
+
+  /* The fractional part a - floor(a), EXACT -- which is what makes a Gomory
+     cut a cut and not an approximation of one.  The floor is computed inline
+     rather than by calling Rfloor, because sysdesign_core.RCEIL_JS declares
+     that name and a kit concatenating both blocks would hold two of it. */
+  function Rfrac(a) {
+    var q = a.n / a.d;
+    if (a.n < 0n && q * a.d !== a.n) q -= 1n;
+    return Rsub(a, R(q, 1n));
+  }
+
+  /* Floor of the integer square root of a BigInt.  algebra_core's bisqrt
+     returns null for a non-square, which is right for deciding exactness and
+     useless for printing one: this never returns null. */
+  function bifloor(n) {
+    if (n < 0n) return 0n;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x;
+  }
+
+  /* THE ONE FUNCTION IN THIS MODULE THAT ROUNDS.  A surd {q, k} means
+     q*sqrt(k) and is exact; its decimal is not, and an EOQ of 40*sqrt(3) is
+     read off a page as 69.28 whatever we would prefer.  The digits come from
+     bifloor(q.n^2 * k * 10^(2p)) = floor(q.n * 10^p * sqrt k), computed with
+     three guard places and then rounded once, so the printed last digit is the
+     correctly rounded one.  Every lesson that calls this says it is rounded. */
+  function surdDec(s, places) {
+    if (places === undefined) places = 4;
+    var p = places + 3;
+    var neg = Rsign(s.q) < 0, n = neg ? -s.q.n : s.q.n;
+    var floored = bifloor(n * n * s.k * 10n ** BigInt(2 * p));
+    var v = R(floored, s.q.d * 10n ** BigInt(p));
+    return Rfixed(neg ? Rneg(v) : v, places);
+  }
+
+  /* Networks.  A node is an id, an arc is {from, to, cost, cap}, and every
+     number is a rational.  Needs algebra_systems.MATRIX_JS for Mdet.
+
+     graph.py's GRAPH_JS cannot be reused for any of this and the reason is
+     worth stating: its routines close over module-level N, A and LESSON rather
+     than taking a graph; link(M, i, j) writes both directions, so every graph
+     it builds is undirected; its weights come from the formula
+     ((7a + 13b) % 9) + 1 rather than from data; and dijkstra runs on Infinity
+     and Number.  Its circular layout is four lines inline in a drawing routine
+     rather than a shared function, so "the SVG layout can be shared" is not
+     true as written -- and a source and a sink on a circle is unreadable
+     anyway, which is why `network` gets its own layered layout, kit-local. */
+
+  function netIndex(nodes) {
+    var ix = {}, i;
+    for (i = 0; i < nodes.length; i += 1) ix[nodes[i]] = i;
+    return ix;
+  }
+
+  /* The node-arc incidence matrix: +1 at the tail, -1 at the head.  Every
+     network problem on this path is one LP with this matrix and different
+     data, which is the claim C4 L2 makes and this function is the evidence. */
+  function incidence(nodes, arcs) {
+    var ix = netIndex(nodes), M = [], i, j;
+    for (i = 0; i < nodes.length; i += 1) {
+      var row = [];
+      for (j = 0; j < arcs.length; j += 1) {
+        row.push(ix[arcs[j].from] === i ? R1 : (ix[arcs[j].to] === i ? R(-1n, 1n) : R0));
+      }
+      M.push(row);
+    }
+    return M;
+  }
+
+  /* Net flow out of every node, and the nodes where it does not match what the
+     node is supposed to supply.  Naming the violated nodes is the point: "the
+     flow is invalid" is not a lesson and "node C sends out 3 more than it takes
+     in, and it is supposed to send 0" is. */
+  function conservation(nodes, arcs, flow, supply) {
+    var ix = netIndex(nodes), net = [], out = [], into = [], i, j;
+    for (i = 0; i < nodes.length; i += 1) { net.push(R0); out.push(R0); into.push(R0); }
+    for (j = 0; j < arcs.length; j += 1) {
+      var f = flow[j] === undefined ? R0 : flow[j];
+      out[ix[arcs[j].from]] = Radd(out[ix[arcs[j].from]], f);
+      into[ix[arcs[j].to]] = Radd(into[ix[arcs[j].to]], f);
+    }
+    var violated = [], rows = [];
+    for (i = 0; i < nodes.length; i += 1) {
+      net[i] = Rsub(out[i], into[i]);
+      var want = (supply && supply[nodes[i]] !== undefined) ? supply[nodes[i]] : R0;
+      var ok = Requ(net[i], want);
+      rows.push({ node: nodes[i], out: out[i], into: into[i], net: net[i], want: want, ok: ok,
+                  why: Rtext(out[i]) + ' out - ' + Rtext(into[i]) + ' in = ' + Rtext(net[i])
+                    + ', and ' + nodes[i] + ' must net ' + Rtext(want) });
+      if (!ok) violated.push(nodes[i]);
+    }
+    return { net: net, rows: rows, violated: violated, ok: violated.length === 0 };
+  }
+
+  /* The determinant of any chosen rows and columns, exact.  Mtake slices a
+     CONTIGUOUS block, so the gather is here and the determinant is Mdet's. */
+  function submatrixDet(M, rows, cols) {
+    var sub = rows.map(function (i) { return cols.map(function (j) { return M[i][j]; }); });
+    return Mdet(sub);
+  }
+  /* Every k x k determinant up to kmax, with the ones outside {0, +-1} listed.
+     Totally unimodular means every one of them is in that set, and the only
+     honest way to show it at lesson size is to look at all of them. */
+  function unimodularSweep(M, kmax, cap) {
+    cap = cap || 20000;
+    var nr = M.length, nc = nr ? M[0].length : 0, k, seen = 0;
+    var bad = [], counts = [], stop = false;
+    var pick = function (n, k2) {
+      var out = [], idx = [], i;
+      for (i = 0; i < k2; i += 1) idx.push(i);
+      while (true) {
+        out.push(idx.slice());
+        var p = k2 - 1;
+        while (p >= 0 && idx[p] === n - k2 + p) p -= 1;
+        if (p < 0) break;
+        idx[p] += 1;
+        for (i = p + 1; i < k2; i += 1) idx[i] = idx[i - 1] + 1;
+      }
+      return out;
+    };
+    for (k = 1; k <= Math.min(kmax, nr, nc) && !stop; k += 1) {
+      var rs = pick(nr, k), cs = pick(nc, k), a, b, count = 0;
+      for (a = 0; a < rs.length && !stop; a += 1) {
+        for (b = 0; b < cs.length; b += 1) {
+          seen += 1; count += 1;
+          if (seen > cap) { stop = true; break; }
+          var d = submatrixDet(M, rs[a], cs[b]);
+          if (!(Rzero(d) || Requ(d, R1) || Requ(d, R(-1n, 1n)))) {
+            bad.push({ k: k, rows: rs[a], cols: cs[b], det: d });
+          }
+        }
+      }
+      counts.push({ k: k, checked: count });
+    }
+    return { bad: bad, counts: counts, checked: seen, truncated: stop,
+             unimodular: bad.length === 0 && !stop };
+  }
+
+  /* ---- order, and the longest path ------------------------------------- */
+
+  /* An order, or the cycle that prevents one.  A project network with a cycle
+     has no schedule and saying which activities form the loop is the answer. */
+  function topoOrder(nodes, arcs) {
+    var ix = netIndex(nodes), n = nodes.length, deg = [], adj = [], i, j;
+    for (i = 0; i < n; i += 1) { deg.push(0); adj.push([]); }
+    for (j = 0; j < arcs.length; j += 1) {
+      adj[ix[arcs[j].from]].push(ix[arcs[j].to]);
+      deg[ix[arcs[j].to]] += 1;
+    }
+    var queue = [], order = [];
+    for (i = 0; i < n; i += 1) if (deg[i] === 0) queue.push(i);
+    while (queue.length) {
+      var v = queue.shift();
+      order.push(nodes[v]);
+      for (i = 0; i < adj[v].length; i += 1) {
+        deg[adj[v][i]] -= 1;
+        if (deg[adj[v][i]] === 0) queue.push(adj[v][i]);
+      }
+    }
+    if (order.length === n) return { order: order, cycle: null };
+    /* Walk forward inside what is left until a node repeats: that walk IS a
+       cycle, and every node left has an incoming arc from the leftovers. */
+    var left = {}, k;
+    for (i = 0; i < n; i += 1) left[i] = deg[i] > 0;
+    var start = -1;
+    for (i = 0; i < n; i += 1) if (left[i]) { start = i; break; }
+    var seen = {}, walk = [], cur = start;
+    while (seen[cur] === undefined) {
+      seen[cur] = walk.length; walk.push(cur);
+      var nxt = -1;
+      for (k = 0; k < adj[cur].length; k += 1) if (left[adj[cur][k]]) { nxt = adj[cur][k]; break; }
+      if (nxt < 0) break;
+      cur = nxt;
+    }
+    var cyc = seen[cur] === undefined ? walk : walk.slice(seen[cur]);
+    return { order: order, cycle: cyc.map(function (q) { return nodes[q]; }) };
+  }
+
+  /* The longest path, by relaxation in topological order.  Longest is the
+     right question for a project network and it is only well posed because the
+     graph is acyclic -- which topoOrder has just checked. */
+  function longestPath(nodes, arcs, s, t) {
+    var top = topoOrder(nodes, arcs);
+    if (top.cycle) return { dist: null, path: null, arcs: null, value: null, cycle: top.cycle, order: null };
+    var ix = netIndex(nodes), dist = [], pred = [], predArc = [], i, j;
+    for (i = 0; i < nodes.length; i += 1) {
+      dist.push(s === undefined ? R0 : (nodes[i] === s ? R0 : null));
+      pred.push(-1); predArc.push(-1);
+    }
+    for (i = 0; i < top.order.length; i += 1) {
+      var v = ix[top.order[i]];
+      if (dist[v] === null) continue;
+      for (j = 0; j < arcs.length; j += 1) {
+        if (ix[arcs[j].from] !== v) continue;
+        var w = ix[arcs[j].to], cand = Radd(dist[v], arcs[j].cost || R0);
+        if (dist[w] === null || Rcmp(cand, dist[w]) > 0) { dist[w] = cand; pred[w] = v; predArc[w] = j; }
+      }
+    }
+    var end = -1;
+    if (t !== undefined) end = ix[t];
+    else for (i = 0; i < nodes.length; i += 1) if (dist[i] !== null && (end < 0 || Rcmp(dist[i], dist[end]) > 0)) end = i;
+    var path = [], used = [];
+    if (end >= 0 && dist[end] !== null) {
+      var cur = end;
+      while (cur >= 0) {
+        path.unshift(nodes[cur]);
+        if (predArc[cur] >= 0) used.unshift(predArc[cur]);
+        cur = pred[cur];
+      }
+    }
+    return { dist: dist, pred: pred, path: path, arcs: used,
+             value: end >= 0 ? dist[end] : null, order: top.order, cycle: null };
+  }
+
+  /* The forward and backward passes, and everything a CPM table holds.
+     `activities` is [{id, dur, pred: [id]}].  `paths` is every critical path,
+     not one of them -- "shorten a critical activity and watch a SECOND path
+     become critical" is the lesson, and it needs the plural. */
+  function cpmPasses(activities) {
+    var ix = {}, i, j;
+    for (i = 0; i < activities.length; i += 1) ix[activities[i].id] = i;
+    var nodes = activities.map(function (a) { return a.id; }), arcs = [];
+    for (i = 0; i < activities.length; i += 1) {
+      var ps = activities[i].pred || [];
+      for (j = 0; j < ps.length; j += 1) arcs.push({ from: ps[j], to: activities[i].id, cost: R0 });
+    }
+    var top = topoOrder(nodes, arcs);
+    if (top.cycle) return { cycle: top.cycle, ES: null, critical: null, paths: null };
+    var ES = [], EF = [], LS = [], LF = [], slack = [];
+    for (i = 0; i < activities.length; i += 1) { ES.push(R0); EF.push(R0); }
+    for (i = 0; i < top.order.length; i += 1) {
+      var v = ix[top.order[i]], ps2 = activities[v].pred || [], e = R0;
+      for (j = 0; j < ps2.length; j += 1) if (Rcmp(EF[ix[ps2[j]]], e) > 0) e = EF[ix[ps2[j]]];
+      ES[v] = e; EF[v] = Radd(e, activities[v].dur);
+    }
+    var makespan = R0;
+    for (i = 0; i < activities.length; i += 1) if (Rcmp(EF[i], makespan) > 0) makespan = EF[i];
+    var succ = [];
+    for (i = 0; i < activities.length; i += 1) { LF.push(null); LS.push(null); succ.push([]); }
+    for (i = 0; i < activities.length; i += 1) {
+      var ps3 = activities[i].pred || [];
+      for (j = 0; j < ps3.length; j += 1) succ[ix[ps3[j]]].push(i);
+    }
+    for (i = top.order.length - 1; i >= 0; i -= 1) {
+      var v2 = ix[top.order[i]];
+      if (!succ[v2].length) LF[v2] = makespan;
+      else {
+        var l = null;
+        for (j = 0; j < succ[v2].length; j += 1) {
+          var cand = LS[succ[v2][j]];
+          if (l === null || Rcmp(cand, l) < 0) l = cand;
+        }
+        LF[v2] = l;
+      }
+      LS[v2] = Rsub(LF[v2], activities[v2].dur);
+    }
+    var critical = [];
+    for (i = 0; i < activities.length; i += 1) {
+      slack.push(Rsub(LS[i], ES[i]));
+      if (Rzero(slack[i])) critical.push(activities[i].id);
+    }
+    /* Every critical path: a chain of zero-slack activities each starting when
+       its predecessor finishes. */
+    var paths = [], build = function (i2, acc) {
+      if (paths.length > 200) return;
+      var nxt = [], k;
+      for (k = 0; k < succ[i2].length; k += 1) {
+        var w = succ[i2][k];
+        if (Rzero(slack[w]) && Requ(ES[w], EF[i2])) nxt.push(w);
+      }
+      if (!nxt.length) { paths.push(acc.slice()); return; }
+      for (k = 0; k < nxt.length; k += 1) { acc.push(activities[nxt[k]].id); build(nxt[k], acc); acc.pop(); }
+    };
+    for (i = 0; i < activities.length; i += 1) {
+      if (!Rzero(slack[i]) || (activities[i].pred || []).length) continue;
+      build(i, [activities[i].id]);
+    }
+    return { ES: ES, EF: EF, LS: LS, LF: LF, slack: slack, critical: critical,
+             paths: paths, makespan: makespan, order: top.order, cycle: null,
+             ids: activities.map(function (a) { return a.id; }) };
+  }
+
+  /* ---- labels, potentials, residuals, cuts ----------------------------- */
+
+  /* Bellman-Ford round by round, on RATIONAL arc costs.  The n-th round is not
+     bookkeeping: an improvement there is the certificate of a negative cycle,
+     and the cycle comes back with the arcs that make its cost negative. */
+  function bellmanRounds(nodes, arcs, s) {
+    var ix = netIndex(nodes), n = nodes.length, dist = [], pred = [], predArc = [], i, j, k;
+    for (i = 0; i < n; i += 1) { dist.push(nodes[i] === s ? R0 : null); pred.push(-1); predArc.push(-1); }
+    var rounds = [{ round: 0, dist: dist.slice(), changed: [] }];
+    var negative = false, hit = -1;
+    for (k = 1; k <= n; k += 1) {
+      var changed = [];
+      for (j = 0; j < arcs.length; j += 1) {
+        var u = ix[arcs[j].from], v = ix[arcs[j].to];
+        if (dist[u] === null) continue;
+        var cand = Radd(dist[u], arcs[j].cost);
+        if (dist[v] === null || Rcmp(cand, dist[v]) < 0) {
+          dist[v] = cand; pred[v] = u; predArc[v] = j; changed.push(nodes[v]);
+        }
+      }
+      rounds.push({ round: k, dist: dist.slice(), changed: changed });
+      if (k === n && changed.length) { negative = true; hit = ix[changed[0]]; }
+      if (!changed.length) break;
+    }
+    var cycle = null, cycleCost = null, cycleArcs = null;
+    if (negative) {
+      var cur = hit;
+      for (i = 0; i < n; i += 1) cur = pred[cur];      /* walk into the cycle */
+      var seen = [], at = cur;
+      do { seen.push(at); at = pred[at]; } while (at !== cur && seen.length <= n + 1);
+      seen.push(cur);
+      seen.reverse();
+      cycle = seen.map(function (q) { return nodes[q]; });
+      cycleArcs = []; cycleCost = R0;
+      for (i = 1; i < seen.length; i += 1) {
+        cycleArcs.push(predArc[seen[i]]);
+        cycleCost = Radd(cycleCost, arcs[predArc[seen[i]]].cost);
+      }
+    }
+    return { rounds: rounds, dist: dist, pred: pred, negative: negative,
+             cycle: cycle, cycleArcs: cycleArcs, cycleCost: cycleCost, nodes: nodes };
+  }
+
+  /* Every arc tested against pi_j - pi_i <= c_ij, the tight-arc subgraph, and
+     pi_t - pi_s.  Feasible potentials exist exactly when no negative cycle
+     does, so this is the dual reading of bellmanRounds and the two must agree. */
+  function potentialCheck(nodes, arcs, pi, s, t) {
+    var ix = netIndex(nodes), rows = [], violated = [], tight = [], j;
+    for (j = 0; j < arcs.length; j += 1) {
+      var gap = Rsub(pi[ix[arcs[j].to]], pi[ix[arcs[j].from]]);
+      var slackv = Rsub(arcs[j].cost, gap), ok = Rsign(slackv) >= 0;
+      rows.push({ arc: j, from: arcs[j].from, to: arcs[j].to, cost: arcs[j].cost,
+                  gap: gap, slack: slackv, ok: ok, tight: Rzero(slackv),
+                  why: Rtext(pi[ix[arcs[j].to]]) + ' - ' + Rtext(pi[ix[arcs[j].from]]) + ' = '
+                    + Rtext(gap) + (ok ? ' &lt;= ' : ' &gt; ') + Rtext(arcs[j].cost) });
+      if (!ok) violated.push(j);
+      if (Rzero(slackv)) tight.push(j);
+    }
+    return { rows: rows, violated: violated, tight: tight, ok: violated.length === 0,
+             value: (s !== undefined && t !== undefined) ? Rsub(pi[ix[t]], pi[ix[s]]) : null };
+  }
+
+  /* The residual network: what is left forward, and what can be undone. */
+  function residual(arcs, flow) {
+    var out = [], j;
+    for (j = 0; j < arcs.length; j += 1) {
+      var f = flow[j] === undefined ? R0 : flow[j], cap = arcs[j].cap;
+      var fwd = Rsub(cap, f);
+      if (Rsign(fwd) > 0) out.push({ from: arcs[j].from, to: arcs[j].to, cap: fwd, of: j, kind: 'forward' });
+      if (Rsign(f) > 0) out.push({ from: arcs[j].to, to: arcs[j].from, cap: f, of: j, kind: 'backward' });
+    }
+    return out;
+  }
+  /* The source side of the minimum cut, once no augmenting path is left. */
+  function reachable(nodes, resArcs, s) {
+    var seen = {}, queue = [s], order = [];
+    seen[s] = true;
+    while (queue.length) {
+      var v = queue.shift(); order.push(v);
+      for (var j = 0; j < resArcs.length; j += 1) {
+        if (resArcs[j].from !== v || seen[resArcs[j].to]) continue;
+        seen[resArcs[j].to] = true; queue.push(resArcs[j].to);
+      }
+    }
+    return { set: order, inSet: seen,
+             other: nodes.filter(function (v) { return !seen[v]; }) };
+  }
+  /* The capacity of ANY cut the reader picks, so >= can be exhibited rather
+     than asserted.  Only arcs LEAVING S count -- arcs coming back are free,
+     and that asymmetry is the half a reader gets wrong. */
+  function cutCapacity(nodes, arcs, S) {
+    var inS = {}, i, j, total = R0, crossing = [], back = [];
+    for (i = 0; i < S.length; i += 1) inS[S[i]] = true;
+    for (j = 0; j < arcs.length; j += 1) {
+      if (inS[arcs[j].from] && !inS[arcs[j].to]) { total = Radd(total, arcs[j].cap); crossing.push(j); }
+      else if (!inS[arcs[j].from] && inS[arcs[j].to]) back.push(j);
+    }
+    return { capacity: total, crossing: crossing, back: back, S: S.slice() };
+  }
+
+  /* ---- matching, and the cover Koenig gives -------------------------- */
+
+  /* A maximum matching by augmenting paths, the MINIMUM VERTEX COVER read off
+     the alternating-reachable set by Koenig's theorem, and Hall's deficient
+     set S with |N(S)| < |S| when the matching is imperfect.
+
+     This is what makes the Hungarian method's minimum cover COMPUTABLE.  The
+     "draw lines until you cannot" heuristic a textbook shows is not an
+     algorithm, and a lab that implements it is guessing; the cover here is the
+     one Koenig's theorem names, and its size equals the matching's by
+     construction.
+
+     `edges` is [[leftId, rightId], ...]. */
+  function bipartiteMatch(left, right, edges) {
+    var li = netIndex(left), ri = netIndex(right), i, j;
+    var adj = left.map(function () { return []; });
+    for (j = 0; j < edges.length; j += 1) adj[li[edges[j][0]]].push(ri[edges[j][1]]);
+    var matchL = left.map(function () { return -1; });
+    var matchR = right.map(function () { return -1; });
+    var tryAugment = function (u, seen) {
+      for (var k = 0; k < adj[u].length; k += 1) {
+        var v = adj[u][k];
+        if (seen[v]) continue;
+        seen[v] = true;
+        if (matchR[v] < 0 || tryAugment(matchR[v], seen)) { matchR[v] = u; matchL[u] = v; return true; }
+      }
+      return false;
+    };
+    for (i = 0; i < left.length; i += 1) if (matchL[i] < 0) tryAugment(i, {});
+    /* Alternating reachability from the UNMATCHED left vertices. */
+    var zl = {}, zr = {}, stack = [];
+    for (i = 0; i < left.length; i += 1) if (matchL[i] < 0) { zl[i] = true; stack.push(i); }
+    while (stack.length) {
+      var u2 = stack.pop();
+      for (j = 0; j < adj[u2].length; j += 1) {
+        var v2 = adj[u2][j];
+        if (matchL[u2] === v2 || zr[v2]) continue;          /* cross unmatched edges */
+        zr[v2] = true;
+        if (matchR[v2] >= 0 && !zl[matchR[v2]]) { zl[matchR[v2]] = true; stack.push(matchR[v2]); }
+      }
+    }
+    var matching = [], coverL = [], coverR = [], S = [], NS = [];
+    for (i = 0; i < left.length; i += 1) {
+      if (matchL[i] >= 0) matching.push({ left: left[i], right: right[matchL[i]], li: i, ri: matchL[i] });
+      if (!zl[i]) coverL.push(left[i]); else S.push(left[i]);
+    }
+    for (j = 0; j < right.length; j += 1) if (zr[j]) { coverR.push(right[j]); NS.push(right[j]); }
+    return { matching: matching, size: matching.length,
+             cover: { left: coverL, right: coverR, size: coverL.length + coverR.length },
+             /* Both of these were named for the opposite of what they hold.
+                `hall` was true exactly when HALL'S CONDITION FAILS, and
+                `perfect` was true when the matching saturates the SMALLER
+                side -- so a three-by-two instance reported perfect: true with
+                an applicant unplaced. Nothing reader-facing was wrong only
+                because the one caller recomputes its own verdict. Renamed to
+                what they are; a caller reaching for either name now gets the
+                sense it reads as. */
+             deficient: { S: S, N: NS, gap: S.length - NS.length,
+                          violated: S.length > NS.length },
+             alternating: { left: S.slice(), right: NS.slice() },
+             saturatesSmallerSide:
+               matching.length === Math.min(left.length, right.length),
+             matchL: matchL, matchR: matchR };
+  }
+
+  /* The transportation tableau.  Needs NET_JS above it: `hungarian` reads its
+     minimum cover out of bipartiteMatch, by Koenig, rather than drawing lines.
+
+     A basic solution here is a list of cells [{i, j, x}], and it has m + n - 1
+     of them -- a spanning tree of the row/column bipartite graph.  Every
+     routine below is that fact used twice: the potentials are the tree solved,
+     and the stepping-stone cycle is the one cycle an extra edge creates. */
+
+  /* Total supply and total demand are rarely equal and the difference is
+     always MEANINGFUL: goods that stay in the warehouse, or demand that goes
+     unmet.  The dummy row or column is where that meaning lives. */
+  function balance(supply, demand, cost) {
+    var ts = supply.reduce(Radd, R0), td = demand.reduce(Radd, R0);
+    var s = supply.slice(), d = demand.slice(), c = cost ? cost.map(function (r) { return r.slice(); }) : null;
+    var cmp = Rcmp(ts, td), dummy = null, amount = R0, why;
+    if (cmp > 0) {
+      dummy = 'col'; amount = Rsub(ts, td); d.push(amount);
+      if (c) c = c.map(function (r) { return r.concat([R0]); });
+      why = 'supply exceeds demand by ' + Rtext(amount)
+        + ', so a zero-cost dummy DESTINATION holds what is never shipped';
+    } else if (cmp < 0) {
+      dummy = 'row'; amount = Rsub(td, ts); s.push(amount);
+      if (c) { var w = []; for (var j = 0; j < d.length; j += 1) w.push(R0); c = c.concat([w]); }
+      why = 'demand exceeds supply by ' + Rtext(amount)
+        + ', so a zero-cost dummy SOURCE carries the shortfall, and whoever is assigned it goes unserved';
+    } else why = 'supply and demand already balance at ' + Rtext(ts) + ', so no dummy is needed';
+    return { supply: s, demand: d, cost: c, dummy: dummy, amount: amount,
+             totalSupply: ts, totalDemand: td, why: why };
+  }
+
+  /* The north-west corner rule: allocate at the top-left cell still open.  It
+     ignores cost entirely, which is the point -- it gives a starting basis,
+     not a good one, and MODI improves it. */
+  function northwest(cost, supply, demand) {
+    var m = supply.length, n = demand.length, s = supply.slice(), d = demand.slice();
+    var x = [], basis = [], steps = [], i = 0, j = 0, degenerate = false;
+    for (var a = 0; a < m; a += 1) { var row = []; for (var b = 0; b < n; b += 1) row.push(R0); x.push(row); }
+    while (i < m && j < n) {
+      var amt = Rcmp(s[i], d[j]) < 0 ? s[i] : d[j];
+      x[i][j] = amt; basis.push({ i: i, j: j, x: amt });
+      steps.push({ i: i, j: j, amount: amt, supplyLeft: Rsub(s[i], amt), demandLeft: Rsub(d[j], amt),
+                   why: 'cell (' + (i + 1) + ',' + (j + 1) + ') is the open north-west corner; it takes min('
+                     + Rtext(s[i]) + ', ' + Rtext(d[j]) + ') = ' + Rtext(amt) });
+      s[i] = Rsub(s[i], amt); d[j] = Rsub(d[j], amt);
+      if (i === m - 1 && j === n - 1) break;
+      if (Rzero(s[i]) && Rzero(d[j])) {
+        degenerate = true;
+        if (i < m - 1) i += 1; else j += 1;
+      } else if (Rzero(s[i])) i += 1; else j += 1;
+    }
+    return transFinish(x, basis, steps, degenerate, m, n, cost, 'north-west corner');
+  }
+
+  /* The least-cost rule: always fill the cheapest open cell.  Better starts,
+     same machinery, and the comparison of the two is the lesson. */
+  function leastCost(cost, supply, demand) {
+    var m = supply.length, n = demand.length, s = supply.slice(), d = demand.slice();
+    var x = [], basis = [], steps = [], rows = [], cols = [], i, j, degenerate = false;
+    for (i = 0; i < m; i += 1) { var row = []; for (j = 0; j < n; j += 1) row.push(R0); x.push(row); rows.push(i); }
+    for (j = 0; j < n; j += 1) cols.push(j);
+    while (rows.length && cols.length) {
+      var bi = -1, bj = -1;
+      for (var a = 0; a < rows.length; a += 1) {
+        for (var b = 0; b < cols.length; b += 1) {
+          if (bi < 0 || Rcmp(cost[rows[a]][cols[b]], cost[bi][bj]) < 0) { bi = rows[a]; bj = cols[b]; }
+        }
+      }
+      var amt = Rcmp(s[bi], d[bj]) < 0 ? s[bi] : d[bj];
+      x[bi][bj] = amt; basis.push({ i: bi, j: bj, x: amt });
+      steps.push({ i: bi, j: bj, amount: amt, cost: cost[bi][bj],
+                   why: 'cell (' + (bi + 1) + ',' + (bj + 1) + ') is the cheapest still open at '
+                     + Rtext(cost[bi][bj]) + '; it takes ' + Rtext(amt) });
+      s[bi] = Rsub(s[bi], amt); d[bj] = Rsub(d[bj], amt);
+      if (rows.length + cols.length === 2) break;
+      if (Rzero(s[bi]) && Rzero(d[bj])) { degenerate = true; rows.splice(rows.indexOf(bi), 1); }
+      else if (Rzero(s[bi])) rows.splice(rows.indexOf(bi), 1);
+      else cols.splice(cols.indexOf(bj), 1);
+    }
+    return transFinish(x, basis, steps, degenerate, m, n, cost, 'least cost');
+  }
+
+  /* m + n - 1 basic cells or the solution is not a basic one, and the cells
+     that carry zero are the named epsilons rather than an embarrassment. */
+  function transFinish(x, basis, steps, degenerate, m, n, cost, rule) {
+    var want = m + n - 1, eps = [], total = R0, k;
+    for (k = 0; k < basis.length; k += 1) {
+      if (Rzero(basis[k].x)) eps.push({ i: basis[k].i, j: basis[k].j });
+      if (cost) total = Radd(total, Rmul(cost[basis[k].i][basis[k].j], basis[k].x));
+    }
+    return { x: x, basis: basis, steps: steps, rule: rule,
+             degenerate: degenerate || eps.length > 0, epsilon: eps,
+             count: basis.length, want: want, cost: total,
+             why: basis.length === want
+               ? 'the ' + rule + ' rule left ' + basis.length + ' basic cells, which is m + n - 1 = ' + want
+                 + (eps.length ? ', ' + eps.length + ' of them carrying zero (the named epsilon cells)' : '')
+               : 'the ' + rule + ' rule left ' + basis.length + ' basic cells where m + n - 1 = ' + want };
+  }
+
+  /* u_i + v_j = c_ij on the basic cells, with ONE free variable set to zero --
+     the tree has m + n - 1 edges and m + n nodes, so exactly one degree of
+     freedom, and the choice of which u to zero moves every number without
+     moving any reduced cost.  c_ij - u_i - v_j on the rest. */
+  function uvPotentials(cost, basis, m, n) {
+    m = m || cost.length; n = n || cost[0].length;
+    var u = [], v = [], i, j, k;
+    for (i = 0; i < m; i += 1) u.push(null);
+    for (j = 0; j < n; j += 1) v.push(null);
+    u[0] = R0;
+    var order = [{ kind: 'u', at: 0, value: R0, why: 'u1 is set to 0; the system has one degree of freedom and this uses it' }];
+    var moved = true;
+    while (moved) {
+      moved = false;
+      for (k = 0; k < basis.length; k += 1) {
+        var c = basis[k], cij = cost[c.i][c.j];
+        if (u[c.i] !== null && v[c.j] === null) {
+          v[c.j] = Rsub(cij, u[c.i]); moved = true;
+          order.push({ kind: 'v', at: c.j, value: v[c.j], cell: [c.i, c.j],
+                       why: 'v' + (c.j + 1) + ' = ' + Rtext(cij) + ' - ' + Rtext(u[c.i]) + ' = ' + Rtext(v[c.j])
+                         + ', from the basic cell (' + (c.i + 1) + ',' + (c.j + 1) + ')' });
+        } else if (v[c.j] !== null && u[c.i] === null) {
+          u[c.i] = Rsub(cij, v[c.j]); moved = true;
+          order.push({ kind: 'u', at: c.i, value: u[c.i], cell: [c.i, c.j],
+                       why: 'u' + (c.i + 1) + ' = ' + Rtext(cij) + ' - ' + Rtext(v[c.j]) + ' = ' + Rtext(u[c.i])
+                         + ', from the basic cell (' + (c.i + 1) + ',' + (c.j + 1) + ')' });
+        }
+      }
+    }
+    var isBasic = {};
+    for (k = 0; k < basis.length; k += 1) isBasic[basis[k].i + ',' + basis[k].j] = true;
+    var reduced = [], entering = null, connected = true;
+    for (i = 0; i < m; i += 1) if (u[i] === null) connected = false;
+    for (j = 0; j < n; j += 1) if (v[j] === null) connected = false;
+    for (i = 0; i < m; i += 1) {
+      var row = [];
+      for (j = 0; j < n; j += 1) {
+        if (!connected || u[i] === null || v[j] === null) { row.push(null); continue; }
+        var r = Rsub(cost[i][j], Radd(u[i], v[j]));
+        row.push(r);
+        if (!isBasic[i + ',' + j] && Rsign(r) < 0
+            && (entering === null || Rcmp(r, entering.value) < 0)) entering = { i: i, j: j, value: r };
+      }
+      reduced.push(row);
+    }
+    return { u: u, v: v, reduced: reduced, entering: entering, order: order,
+             connected: connected, optimal: entering === null && connected };
+  }
+
+  /* The stepping-stone cycle: the UNIQUE cycle an entering cell creates in the
+     spanning forest of basic cells, as an ordered, signed list starting at the
+     entering cell.  theta is the minimum over the minus cells, and the cell
+     that attains it leaves.
+
+     Found by a path search in the tree, not by "look for a rectangle" -- the
+     cycle is rectangular only in the easy pictures, and a lab that assumes it
+     is fails on the first realistic tableau. */
+  function stoneCycle(basis, enter, m, n) {
+    var adj = {}, k, key = function (kind, i) { return kind + i; };
+    for (k = 0; k < basis.length; k += 1) {
+      var a = key('r', basis[k].i), b = key('c', basis[k].j);
+      (adj[a] = adj[a] || []).push({ to: b, cell: basis[k] });
+      (adj[b] = adj[b] || []).push({ to: a, cell: basis[k] });
+    }
+    var start = key('r', enter.i), goal = key('c', enter.j);
+    var seen = {}, path = null;
+    var walk = function (at, acc) {
+      if (at === goal) { path = acc.slice(); return true; }
+      seen[at] = true;
+      var list = adj[at] || [];
+      for (var q = 0; q < list.length; q += 1) {
+        if (seen[list[q].to]) continue;
+        acc.push(list[q].cell);
+        if (walk(list[q].to, acc)) return true;
+        acc.pop();
+      }
+      return false;
+    };
+    walk(start, []);
+    if (path === null) return { cells: null, theta: null, leaving: null, found: false,
+                                why: 'the basic cells do not connect row ' + (enter.i + 1)
+                                  + ' to column ' + (enter.j + 1) + ', so no stepping-stone cycle exists' };
+    var cells = [{ i: enter.i, j: enter.j, x: R0, sign: 1, entering: true }];
+    for (k = 0; k < path.length; k += 1) {
+      cells.push({ i: path[k].i, j: path[k].j, x: path[k].x, sign: (k % 2 === 0) ? -1 : 1 });
+    }
+    var theta = null, leaving = null;
+    for (k = 0; k < cells.length; k += 1) {
+      if (cells[k].sign > 0) continue;
+      if (theta === null || Rcmp(cells[k].x, theta) < 0) { theta = cells[k].x; leaving = cells[k]; }
+    }
+    return { cells: cells, theta: theta, leaving: leaving, found: true,
+             minus: cells.filter(function (c) { return c.sign < 0; }),
+             why: 'theta = ' + (theta === null ? '-' : Rtext(theta))
+               + ', the smallest allocation on a minus cell; cell ('
+               + (leaving ? (leaving.i + 1) + ',' + (leaving.j + 1) : '-') + ') leaves' };
+  }
+
+  /* The Hungarian method, with the cover computed rather than drawn.
+
+     Steps 1 and 2 are the row and column reductions.  Step 3 is the part every
+     textbook hand-waves: the MINIMUM number of lines covering all the zeros.
+     By Koenig's theorem that number is the size of a maximum matching on the
+     zero cells, and the cover itself falls out of the alternating-reachable
+     set -- which is what bipartiteMatch returns.  The "draw lines until you
+     cannot" recipe is not an algorithm and cannot be implemented honestly. */
+  function hungarian(cost) {
+    var n = cost.length, i, j, steps = [];
+    var M = cost.map(function (r) { return r.slice(); });
+    var rowMin = [], colMin = [];
+    for (i = 0; i < n; i += 1) {
+      var mn = M[i][0];
+      for (j = 1; j < n; j += 1) if (Rcmp(M[i][j], mn) < 0) mn = M[i][j];
+      rowMin.push(mn);
+      for (j = 0; j < n; j += 1) M[i][j] = Rsub(M[i][j], mn);
+    }
+    steps.push({ kind: 'rows', amounts: rowMin.slice(), M: M.map(function (r) { return r.slice(); }),
+                 why: 'each row loses its own minimum; every assignment uses exactly one cell of each row, so this shifts every total by the same amount and changes no ranking' });
+    for (j = 0; j < n; j += 1) {
+      var mc = M[0][j];
+      for (i = 1; i < n; i += 1) if (Rcmp(M[i][j], mc) < 0) mc = M[i][j];
+      colMin.push(mc);
+      for (i = 0; i < n; i += 1) M[i][j] = Rsub(M[i][j], mc);
+    }
+    steps.push({ kind: 'cols', amounts: colMin.slice(), M: M.map(function (r) { return r.slice(); }),
+                 why: 'and each column loses its own minimum, for the same reason' });
+    var left = [], right = [], guard = 0, match = null;
+    for (i = 0; i < n; i += 1) { left.push('r' + i); right.push('c' + i); }
+    while (guard < 4 * n + 4) {
+      guard += 1;
+      var edges = [];
+      for (i = 0; i < n; i += 1) for (j = 0; j < n; j += 1) if (Rzero(M[i][j])) edges.push(['r' + i, 'c' + j]);
+      match = bipartiteMatch(left, right, edges);
+      steps.push({ kind: 'cover', size: match.cover.size, cover: match.cover,
+                   matching: match.matching.map(function (p) { return [Number(p.left.slice(1)), Number(p.right.slice(1))]; }),
+                   M: M.map(function (r) { return r.slice(); }),
+                   why: 'a maximum matching on the zero cells has ' + match.size
+                     + ' pairs, so by Koenig the minimum cover has ' + match.cover.size
+                     + ' lines -- ' + (match.cover.size === n ? 'enough, so an assignment exists among the zeros'
+                       : 'fewer than ' + n + ', so the zeros cannot carry an assignment yet') });
+      if (match.cover.size >= n) break;
+      var covR = {}, covC = {};
+      for (i = 0; i < match.cover.left.length; i += 1) covR[Number(match.cover.left[i].slice(1))] = true;
+      for (j = 0; j < match.cover.right.length; j += 1) covC[Number(match.cover.right[j].slice(1))] = true;
+      var theta = null;
+      for (i = 0; i < n; i += 1) for (j = 0; j < n; j += 1) {
+        if (covR[i] || covC[j]) continue;
+        if (theta === null || Rcmp(M[i][j], theta) < 0) theta = M[i][j];
+      }
+      if (theta === null) break;
+      for (i = 0; i < n; i += 1) for (j = 0; j < n; j += 1) {
+        if (!covR[i] && !covC[j]) M[i][j] = Rsub(M[i][j], theta);
+        else if (covR[i] && covC[j]) M[i][j] = Radd(M[i][j], theta);
+      }
+      steps.push({ kind: 'adjust', theta: theta, M: M.map(function (r) { return r.slice(); }),
+                   why: 'the smallest uncovered entry is ' + Rtext(theta)
+                     + '; it comes off every uncovered entry and goes onto every doubly covered one, which creates a new zero without destroying the old ones' });
+    }
+    var assignment = [], value = R0;
+    for (i = 0; i < n; i += 1) assignment.push(-1);
+    for (i = 0; i < match.matching.length; i += 1) {
+      var r = Number(match.matching[i].left.slice(1)), c = Number(match.matching[i].right.slice(1));
+      assignment[r] = c; value = Radd(value, cost[r][c]);
+    }
+    return { steps: steps, matching: match.matching, cover: match.cover,
+             assignment: assignment, value: value, reduced: M,
+             complete: match.size === n };
+  }
+
+  /* ------------------------------------------------------------- reading in
+
+     A tableau typed by a reader: rows separated by ';', entries by spaces or
+     commas. Every entry goes through FORMAT_JS's Rread, so "7/2" is exact and
+     "banana" is null rather than NaN. */
+  function parseRow(text) {
+    var parts = String(text).trim().split(/[\s,]+/), out = [], k;
+    for (k = 0; k < parts.length; k += 1) {
+      if (!parts[k]) continue;
+      var v = Rread(parts[k]);
+      if (v === null) return null;
+      out.push(v);
+    }
+    return out.length ? out : null;
+  }
+  function parseGrid(text) {
+    var rows = String(text).split(';'), out = [], k;
+    for (k = 0; k < rows.length; k += 1) {
+      if (!rows[k].trim()) continue;
+      var r = parseRow(rows[k]);
+      if (r === null) return null;
+      out.push(r);
+    }
+    if (!out.length) return null;
+    for (k = 1; k < out.length; k += 1) if (out[k].length !== out[0].length) return null;
+    return out;
+  }
+  /* c dot x over the whole tableau, and over the REAL cells only -- the second
+     is what the dummy costs, or rather what it does not. */
+  function tableauCost(cost, x, rows, cols) {
+    var total = R0, i, j;
+    for (i = 0; i < x.length; i += 1) {
+      if (rows !== undefined && rows !== null && i >= rows) continue;
+      for (j = 0; j < x[i].length; j += 1) {
+        if (cols !== undefined && cols !== null && j >= cols) continue;
+        total = Radd(total, Rmul(cost[i][j], x[i][j]));
+      }
+    }
+    return total;
+  }
+
+  /* ------------------------------------------------- the basis as a forest
+
+     m + n - 1 basic cells on m + n row/column nodes is a SPANNING TREE, and
+     everything the transportation simplex does is that sentence used twice.
+     `basisForest` is the test: a cycle among the basic cells means the
+     potentials are over-determined, and fewer than m + n - 1 edges means some
+     entering cell has no cycle at all. */
+  function basisForest(basis, m, n) {
+    var parent = [], k, i;
+    for (i = 0; i < m + n; i += 1) parent.push(i);
+    var find = function (a) { while (parent[a] !== a) { parent[a] = parent[parent[a]]; a = parent[a]; } return a; };
+    var cycle = null, edges = 0;
+    for (k = 0; k < basis.length; k += 1) {
+      var ra = find(basis[k].i), rb = find(m + basis[k].j);
+      if (ra === rb) { if (cycle === null) cycle = { i: basis[k].i, j: basis[k].j }; continue; }
+      parent[ra] = rb; edges += 1;
+    }
+    var roots = {};
+    for (i = 0; i < m + n; i += 1) roots[find(i)] = true;
+    var components = Object.keys(roots).length;
+    return { acyclic: cycle === null, cycle: cycle, edges: edges, components: components,
+             spanning: components === 1 && cycle === null && basis.length === m + n - 1,
+             why: cycle !== null
+               ? 'the basic cells contain a cycle through (' + (cycle.i + 1) + ',' + (cycle.j + 1)
+                 + '), so they are not a tree and the potentials are over-determined'
+               : (components === 1
+                   ? 'the ' + basis.length + ' basic cells form a spanning tree of the ' + m
+                     + ' supply nodes and ' + n + ' demand nodes'
+                   : 'the basic cells fall into ' + components
+                     + ' pieces, so some empty cell has no stepping-stone cycle at all') };
+  }
+
+  /* A degenerate start has FEWER than m + n - 1 basic cells, and then some
+     entering cell has no cycle. The repair is a zero allocation -- the epsilon
+     cell -- placed where it JOINS TWO PIECES of the forest rather than
+     anywhere convenient, because a cell inside one piece would close a cycle.
+     The cheapest such cell is chosen so the choice is stated rather than
+     arbitrary, and every cell added is named. */
+  function padBasis(basis, m, n, cost) {
+    var out = basis.map(function (c) { return { i: c.i, j: c.j, x: c.x }; });
+    var added = [], guard = 0;
+    while (out.length < m + n - 1 && guard < m * n + 1) {
+      guard += 1;
+      var parent = [], i, j, k;
+      for (i = 0; i < m + n; i += 1) parent.push(i);
+      var find = function (a) { while (parent[a] !== a) { parent[a] = parent[parent[a]]; a = parent[a]; } return a; };
+      for (k = 0; k < out.length; k += 1) parent[find(out[k].i)] = find(m + out[k].j);
+      var bi = -1, bj = -1;
+      for (i = 0; i < m; i += 1) for (j = 0; j < n; j += 1) {
+        if (find(i) === find(m + j)) continue;
+        if (bi < 0 || Rcmp(cost[i][j], cost[bi][bj]) < 0) { bi = i; bj = j; }
+      }
+      if (bi < 0) break;
+      out.push({ i: bi, j: bj, x: R0, epsilon: true });
+      added.push({ i: bi, j: bj, cost: cost[bi][bj] });
+    }
+    var names = added.map(function (c) { return '(' + (c.i + 1) + ',' + (c.j + 1) + ')'; });
+    return { basis: out, added: added, count: out.length, want: m + n - 1,
+             why: added.length === 0
+               ? 'the start already occupies m + n - 1 = ' + (m + n - 1) + ' cells, so nothing was added'
+               : 'the start was degenerate, so a zero allocation was placed in '
+                 + names.join(' and ') + ' -- the cheapest cell that joins two pieces of the '
+                 + 'forest without closing a cycle; a zero anywhere inside one piece would close one' };
+  }
+
+  /* ------------------------------------------------------ entering and cycle
+
+     Two entering rules, because the reader should see that the OPTIMUM does
+     not depend on the rule and the path to it does. Dantzig takes the most
+     negative reduced cost; Bland takes the first negative one in row order and
+     cannot cycle. */
+  function pickEntering(reduced, basis, m, n, rule) {
+    var isBasic = {}, k, i, j;
+    for (k = 0; k < basis.length; k += 1) isBasic[basis[k].i + ',' + basis[k].j] = true;
+    var best = null;
+    for (i = 0; i < m; i += 1) {
+      for (j = 0; j < n; j += 1) {
+        var r = reduced[i][j];
+        if (r === null || isBasic[i + ',' + j] || Rsign(r) >= 0) continue;
+        if (best === null) { best = { i: i, j: j, value: r }; if (rule === 'bland') return best; continue; }
+        if (rule === 'bland') return best;
+        if (Rcmp(r, best.value) < 0) best = { i: i, j: j, value: r };
+      }
+    }
+    return best;
+  }
+
+  /* The rule readers break, checked on the cycle actually drawn: signs
+     alternate from the entering cell, every corner after the first carries an
+     allocation, and each row and each column of the tableau is used exactly
+     twice or not at all. A cycle may CROSS an empty cell; it may not TURN at
+     one, and turning is what having a corner there means. */
+  function checkCycle(cells, basis) {
+    if (!cells || cells.length < 4) {
+      return { ok: false, bad: null, why: 'a stepping-stone cycle needs at least four corners' };
+    }
+    if (cells.length % 2 !== 0) {
+      return { ok: false, bad: null, why: 'a cycle alternating + and - must have an even number of corners' };
+    }
+    var occupied = {}, k;
+    for (k = 0; k < basis.length; k += 1) occupied[basis[k].i + ',' + basis[k].j] = true;
+    var rows = {}, cols = {};
+    for (k = 0; k < cells.length; k += 1) {
+      var c = cells[k], want = (k % 2 === 0) ? 1 : -1;
+      if (c.sign !== want) {
+        return { ok: false, bad: c, why: 'corner (' + (c.i + 1) + ',' + (c.j + 1)
+          + ') carries the wrong sign; the signs alternate from the entering cell outwards' };
+      }
+      if (k > 0 && !occupied[c.i + ',' + c.j]) {
+        return { ok: false, bad: c, why: 'the path turns at (' + (c.i + 1) + ',' + (c.j + 1)
+          + '), which carries no allocation -- a stepping-stone cycle may cross an empty cell '
+          + 'but may only turn at an occupied one' };
+      }
+      rows[c.i] = (rows[c.i] || 0) + 1;
+      cols[c.j] = (cols[c.j] || 0) + 1;
+    }
+    var key;
+    for (key in rows) if (rows[key] !== 2) {
+      return { ok: false, bad: { i: Number(key), j: -1 },
+               why: 'row ' + (Number(key) + 1) + ' has ' + rows[key]
+                 + ' corners on the path; a cycle enters and leaves every row it touches exactly once' };
+    }
+    for (key in cols) if (cols[key] !== 2) {
+      return { ok: false, bad: { i: -1, j: Number(key) },
+               why: 'column ' + (Number(key) + 1) + ' has ' + cols[key]
+                 + ' corners on the path; a cycle enters and leaves every column it touches exactly once' };
+    }
+    return { ok: true, bad: null,
+             why: 'the path has ' + cells.length + ' corners, alternating + and -, every one after the '
+               + 'entering cell occupied, and every row and column it touches used exactly twice' };
+  }
+
+  /* The guess a reader makes before the walk: along the entering row to the
+     first occupied cell, down that column to the first occupied cell, and back
+     along that row. It closes only when the fourth corner is occupied too, and
+     the corner that is empty is the one to highlight. */
+  function rectangleGuess(basis, enter, m, n) {
+    var occupied = {}, k, i, j;
+    for (k = 0; k < basis.length; k += 1) occupied[basis[k].i + ',' + basis[k].j] = true;
+    var j2 = -1, i2 = -1;
+    for (j = 0; j < n; j += 1) if (j !== enter.j && occupied[enter.i + ',' + j]) { j2 = j; break; }
+    if (j2 < 0) {
+      return { ok: false, cells: null, corner: null,
+               why: 'row ' + (enter.i + 1) + ' has no other occupied cell, so no rectangle starts here at all' };
+    }
+    for (i = 0; i < m; i += 1) if (i !== enter.i && occupied[i + ',' + j2]) { i2 = i; break; }
+    if (i2 < 0) {
+      return { ok: false, cells: null, corner: null,
+               why: 'column ' + (j2 + 1) + ' has no other occupied cell, so the rectangle cannot turn downwards' };
+    }
+    var cells = [{ i: enter.i, j: enter.j }, { i: enter.i, j: j2 }, { i: i2, j: j2 }, { i: i2, j: enter.j }];
+    var closes = occupied[i2 + ',' + enter.j] === true;
+    return { ok: closes, cells: cells, corner: closes ? null : { i: i2, j: enter.j },
+             why: closes
+               ? 'the plain rectangle (' + (enter.i + 1) + ',' + (enter.j + 1) + ') - ('
+                 + (enter.i + 1) + ',' + (j2 + 1) + ') - (' + (i2 + 1) + ',' + (j2 + 1) + ') - ('
+                 + (i2 + 1) + ',' + (enter.j + 1) + ') closes on four occupied corners, so here the guess '
+                 + 'and the computed cycle agree'
+               : 'the fourth corner (' + (i2 + 1) + ',' + (enter.j + 1) + ') is EMPTY, so the rectangle would '
+                 + 'turn where nothing is allocated; the guess is refused and the computed cycle goes further' };
+  }
+
+  /* ------------------------------------------------------- the normalisation
+
+     u_1 = 0 is not an assumption about the answer. The m + n potentials are
+     determined only up to adding t to every u and subtracting it from every v,
+     so the reader fixes whichever one they like and watches every u and every
+     v move while not one reduced cost does. */
+  function shiftPotentials(uv, cost, kind, at) {
+    var m = uv.u.length, n = uv.v.length, i, j;
+    if (!uv.connected) return null;
+    if (kind === 'v') { if (at < 0 || at >= n) return null; }
+    else if (at < 0 || at >= m) return null;
+    var t = kind === 'v' ? Rneg(uv.v[at]) : uv.u[at];
+    var u = [], v = [];
+    for (i = 0; i < m; i += 1) u.push(Rsub(uv.u[i], t));
+    for (j = 0; j < n; j += 1) v.push(Radd(uv.v[j], t));
+    var reduced = [], same = true;
+    for (i = 0; i < m; i += 1) {
+      var row = [];
+      for (j = 0; j < n; j += 1) {
+        var r = Rsub(cost[i][j], Radd(u[i], v[j]));
+        row.push(r);
+        if (uv.reduced[i][j] === null || !Requ(r, uv.reduced[i][j])) same = false;
+      }
+      reduced.push(row);
+    }
+    return { u: u, v: v, reduced: reduced, shift: t, kind: kind, at: at, same: same,
+             why: 'fixing ' + kind + (at + 1) + ' = 0 moves every potential by '
+               + Rtext(t) + (Rzero(t) ? ' (which is none, here)' : '')
+               + ' and leaves every reduced cost exactly where it was' };
+  }
+
+  /* ------------------------------------------------------- the MODI iteration
+
+     One call, every iteration kept. The lab shows them one at a time rather
+     than animating, because the thing to look at is the cycle and a cycle that
+     flashes past is a decoration. */
+  function modiRun(cost, start, m, n, opts) {
+    opts = opts || {};
+    var rule = opts.rule === 'bland' ? 'bland' : 'dantzig';
+    var pad = padBasis(start.basis, m, n, cost);
+    var basis = pad.basis.map(function (c) { return { i: c.i, j: c.j, x: c.x }; });
+    var x = start.x.map(function (r) { return r.slice(); });
+    var iterations = [], guard = 0, capped = false, k;
+    while (true) {
+      guard += 1;
+      if (guard > 4 * (m + n) + 8) { capped = true; break; }
+      var uv = uvPotentials(cost, basis, m, n);
+      var enter = uv.connected ? pickEntering(uv.reduced, basis, m, n, rule) : null;
+      var it = { basis: basis.map(function (c) { return { i: c.i, j: c.j, x: c.x }; }),
+                 x: x.map(function (r) { return r.slice(); }), uv: uv, entering: enter,
+                 cost: tableauCost(cost, x), forest: basisForest(basis, m, n),
+                 cycle: null, check: null, rect: null, optimal: enter === null && uv.connected };
+      if (enter === null) { iterations.push(it); break; }
+      var cyc = stoneCycle(basis, enter, m, n);
+      it.cycle = cyc;
+      it.check = cyc.found ? checkCycle(cyc.cells, basis) : { ok: false, bad: null, why: cyc.why };
+      it.rect = rectangleGuess(basis, enter, m, n);
+      iterations.push(it);
+      if (!cyc.found || !it.check.ok) break;
+      for (k = 0; k < cyc.cells.length; k += 1) {
+        var c = cyc.cells[k];
+        x[c.i][c.j] = c.sign > 0 ? Radd(x[c.i][c.j], cyc.theta) : Rsub(x[c.i][c.j], cyc.theta);
+      }
+      var left = false;
+      basis = basis.filter(function (b) {
+        if (!left && b.i === cyc.leaving.i && b.j === cyc.leaving.j) { left = true; return false; }
+        return true;
+      }).concat([{ i: enter.i, j: enter.j }]).map(function (b) {
+        return { i: b.i, j: b.j, x: x[b.i][b.j] };
+      });
+    }
+    var last = iterations[iterations.length - 1];
+    return { iterations: iterations, pad: pad, capped: capped,
+             optimal: !capped && last !== undefined && last.optimal === true,
+             cost: last === undefined ? R0 : last.cost, x: x };
+  }
+
+  /* --------------------------------------------------------- the assignment
+
+     The dual of the assignment problem, recovered from what the Hungarian
+     method left behind. M_ij = c_ij - u_i - v_j holds by construction at every
+     step, so u and v are recoverable from the final reduced matrix up to a
+     shift u_i - t, v_j + t -- and because the matrix is SQUARE that shift adds
+     n*t and subtracts n*t, so sum(u) + sum(v) is the same number whichever
+     recovery you pick. That number is the dual objective, and it equals the
+     assignment's cost: strong duality, on this instance, computed twice. */
+  function assignDual(cost, reduced) {
+    var n = cost.length, u = [], v = [], i, j;
+    /* v_1 := 0 is the recovery's own normalisation, and the sum is immune to it. */
+    for (i = 0; i < n; i += 1) u.push(Rsub(cost[i][0], reduced[i][0]));
+    for (j = 0; j < n; j += 1) v.push(Rsub(Rsub(cost[0][j], reduced[0][j]), u[0]));
+    var consistent = true, feasible = true, total = R0;
+    for (i = 0; i < n; i += 1) {
+      for (j = 0; j < n; j += 1) {
+        if (!Requ(Radd(Radd(u[i], v[j]), reduced[i][j]), cost[i][j])) consistent = false;
+        if (Rsign(reduced[i][j]) < 0) feasible = false;
+      }
+    }
+    for (i = 0; i < n; i += 1) total = Radd(total, u[i]);
+    for (j = 0; j < n; j += 1) total = Radd(total, v[j]);
+    return { u: u, v: v, total: total, consistent: consistent, feasible: feasible,
+             why: 'the row and column constants add to ' + Rtext(total)
+               + ', and u_i + v_j <= c_ij holds ' + (feasible ? 'in every cell' : 'nowhere near everywhere') };
+  }
+
+  /* Does the cover the matching produced actually cover every zero? Koenig
+     says a cover of that size exists; this checks that THIS one is a cover,
+     on the page, in front of the reader. */
+  function coverCheck(M, cover) {
+    var n = M.length, rows = {}, cols = {}, missed = [], i, j;
+    for (i = 0; i < cover.left.length; i += 1) rows[Number(String(cover.left[i]).slice(1))] = true;
+    for (j = 0; j < cover.right.length; j += 1) cols[Number(String(cover.right[j]).slice(1))] = true;
+    for (i = 0; i < n; i += 1) {
+      for (j = 0; j < n; j += 1) {
+        if (Rzero(M[i][j]) && !rows[i] && !cols[j]) missed.push({ i: i, j: j });
+      }
+    }
+    return { ok: missed.length === 0, missed: missed, rows: rows, cols: cols, size: cover.size,
+             why: missed.length === 0
+               ? 'every zero lies in one of the ' + cover.size + ' covered lines'
+               : missed.length + ' zero cell(s) lie outside the cover, which would make it not a cover' };
+  }
+
+  /* Cheapest cell first, and never revisited. It is what a reader does by hand
+     and it is not the Hungarian method; the gap is the point, and on a matrix
+     where it happens to be right the page says that a lucky answer is not a
+     proof. */
+  function greedyAssign(cost) {
+    var n = cost.length, usedR = {}, usedC = {}, assignment = [], order = [], i, j, k;
+    for (i = 0; i < n; i += 1) assignment.push(-1);
+    for (k = 0; k < n; k += 1) {
+      var bi = -1, bj = -1;
+      for (i = 0; i < n; i += 1) {
+        if (usedR[i]) continue;
+        for (j = 0; j < n; j += 1) {
+          if (usedC[j]) continue;
+          if (bi < 0 || Rcmp(cost[i][j], cost[bi][bj]) < 0) { bi = i; bj = j; }
+        }
+      }
+      if (bi < 0) break;
+      usedR[bi] = true; usedC[bj] = true; assignment[bi] = bj;
+      order.push({ i: bi, j: bj, cost: cost[bi][bj] });
+    }
+    var value = R0;
+    for (i = 0; i < n; i += 1) if (assignment[i] >= 0) value = Radd(value, cost[i][assignment[i]]);
+    return { assignment: assignment, order: order, value: value, complete: order.length === n };
+  }
+  var PRESETS = {"balanced": {"label": "Three plants, four depots (supply and demand already balance)", "cost": "10 2 20 11; 12 7 9 20; 4 14 16 18", "supply": "15 25 10", "demand": "5 15 15 15", "rows": "Plant A, Plant B, Plant C", "cols": "Depot 1, Depot 2, Depot 3, Depot 4"}, "surplus": {"label": "Three mills, three yards (supply exceeds demand)", "cost": "8 6 10; 9 12 13; 14 9 16", "supply": "20 30 25", "demand": "20 25 20", "rows": "Mill A, Mill B, Mill C", "cols": "Yard 1, Yard 2, Yard 3"}, "degenerate": {"label": "Three depots, three shops (the north-west rule ties)", "cost": "5 3 8; 4 7 6; 9 2 5", "supply": "10 20 10", "demand": "10 20 10", "rows": "Depot A, Depot B, Depot C", "cols": "Shop 1, Shop 2, Shop 3"}};
+
+  var presetS = document.getElementById('tmPreset');
+  var startS = document.getElementById('tmStart');
+  var ruleS = document.getElementById('tmRule');
+  var iterS = document.getElementById('tmIter');
+  var normS = document.getElementById('tmNorm');
+  var gridEl = document.getElementById('tmGrid');
+  var thetaEl = document.getElementById('tmTheta');
+  var normEl = document.getElementById('tmNormT');
+  var statusEl = document.getElementById('tmStatus');
+
+  function setKpi(id, html) { document.getElementById(id).innerHTML = html; }
+  function cellName(c) { return '(' + (c.i + 1) + ',' + (c.j + 1) + ')'; }
+  function geom(m, n) {
+    var left = 8, lab = 64, supw = 52, uw = 52;
+    var cw = Math.floor((660 - left - lab - supw - uw - 8) / n), ch = 56, top = 30;
+    return { left: left, lab: lab, x0: left + lab, cw: cw, ch: ch, top: top,
+             supx: left + lab + n * cw, ux: left + lab + n * cw + supw, supw: supw, uw: uw,
+             demy: top + m * ch, vy: top + m * ch + 26, height: top + m * ch + 70 };
+  }
+  function box(g, i, j) {
+    return { x: g.x0 + j * g.cw, y: g.top + i * g.ch, cx: g.x0 + j * g.cw + g.cw / 2,
+             cy: g.top + i * g.ch + g.ch / 2 };
+  }
+  function ring(g, i, j, colour, dashed) {
+    var b = box(g, i, j);
+    return '<rect x="' + (b.x + 2) + '" y="' + (b.y + 2) + '" width="' + (g.cw - 4) + '" height="'
+      + (g.ch - 4) + '" rx="4" fill="none" stroke="var(--' + colour + ')" stroke-width="2"'
+      + (dashed ? ' stroke-dasharray="5 3"' : '') + ' />';
+  }
+
+  function redraw() {
+    var p = PRESETS[presetS.value];
+    var cost = parseGrid(p.cost), sup = parseRow(p.supply), dem = parseRow(p.demand);
+    var bal = balance(sup, dem, cost);
+    var C = bal.cost, S = bal.supply, D = bal.demand, m = S.length, n = D.length, i, j, k;
+    var start = startS.value === 'least' ? leastCost(C, S, D) : northwest(C, S, D);
+    var run = modiRun(C, start, m, n, { rule: ruleS.value });
+    var total = run.iterations.length;
+
+    iterS.max = String(total - 1);
+    var at = Math.max(0, Math.min(total - 1, +iterS.value || 0));
+    document.getElementById('tmIterOut').textContent = (at + 1) + ' of ' + total;
+    var it = run.iterations[at];
+
+    normS.max = String(m + n - 1);
+    var normAt = Math.max(0, Math.min(m + n - 1, +normS.value || 0));
+    var normKind = normAt < m ? 'u' : 'v', normIx = normAt < m ? normAt : normAt - m;
+    document.getElementById('tmNormOut').textContent = normKind + (normIx + 1) + ' = 0';
+    var shift = shiftPotentials(it.uv, C, normKind, normIx);
+    var u = shift === null ? it.uv.u : shift.u, v = shift === null ? it.uv.v : shift.v;
+    var reduced = shift === null ? it.uv.reduced : shift.reduced;
+
+    var basicAt = {};
+    for (k = 0; k < it.basis.length; k += 1) basicAt[it.basis[k].i + ',' + it.basis[k].j] = it.basis[k];
+    var onCycle = {};
+    if (it.cycle && it.cycle.cells) {
+      for (k = 0; k < it.cycle.cells.length; k += 1) {
+        onCycle[it.cycle.cells[k].i + ',' + it.cycle.cells[k].j] = it.cycle.cells[k];
+      }
+    }
+
+    /* ---- the tableau, drawn ------------------------------------------- */
+    var g = geom(m, n), svg = '';
+    gridEl.setAttribute('viewBox', '0 0 660 ' + g.height);
+    for (j = 0; j < n; j += 1) {
+      svg += '<text x="' + (g.x0 + j * g.cw + g.cw / 2) + '" y="20" font-size="11" fill="var(--muted)" '
+        + 'text-anchor="middle">' + ((bal.dummy === 'col' && j === n - 1) ? 'dummy' : 'to ' + (j + 1)) + '</text>';
+    }
+    svg += '<text x="' + (g.supx + g.supw / 2) + '" y="20" font-size="11" fill="var(--muted)" '
+      + 'text-anchor="middle">supply</text>'
+      + '<text x="' + (g.ux + g.uw / 2) + '" y="20" font-size="11" fill="var(--cyan)" '
+      + 'text-anchor="middle">u</text>';
+    for (i = 0; i < m; i += 1) {
+      var b0 = box(g, i, 0);
+      svg += '<text x="' + (g.left + 4) + '" y="' + (b0.cy + 4) + '" font-size="11" fill="var(--muted)">'
+        + ((bal.dummy === 'row' && i === m - 1) ? 'dummy' : 'from ' + (i + 1)) + '</text>';
+      for (j = 0; j < n; j += 1) {
+        var b = box(g, i, j), basic = basicAt[i + ',' + j], cyc = onCycle[i + ',' + j];
+        var fill = basic ? 'var(--panel-3)' : 'var(--panel-2)';
+        svg += '<rect x="' + b.x + '" y="' + b.y + '" width="' + g.cw + '" height="' + g.ch
+          + '" fill="' + fill + '" stroke="var(--line)" stroke-width="1" />'
+          + '<text x="' + (b.x + 5) + '" y="' + (b.y + 14) + '" font-size="10" fill="var(--muted)">'
+          + Rshort(C[i][j]) + '</text>';
+        if (basic) {
+          svg += '<text x="' + b.cx + '" y="' + (b.cy + 8) + '" font-size="15" font-weight="700" '
+            + 'fill="var(--text)" text-anchor="middle">' + Rshort(it.x[i][j]) + '</text>';
+          if (Rzero(it.x[i][j])) {
+            svg += '<text x="' + b.cx + '" y="' + (b.y + g.ch - 6) + '" font-size="9" fill="var(--amber)" '
+              + 'text-anchor="middle">epsilon</text>';
+          }
+        } else if (reduced[i][j] !== null) {
+          var neg = Rsign(reduced[i][j]) < 0;
+          svg += '<text x="' + b.cx + '" y="' + (b.cy + 6) + '" font-size="12" fill="var(--'
+            + (neg ? 'amber' : 'muted') + ')" text-anchor="middle">' + Rshort(reduced[i][j]) + '</text>';
+        }
+        if (cyc) {
+          svg += '<text x="' + (b.x + g.cw - 6) + '" y="' + (b.y + 15) + '" font-size="12" '
+            + 'font-weight="700" fill="var(--purple)" text-anchor="end">'
+            + (cyc.sign > 0 ? '+' : '-') + '</text>';
+        }
+      }
+      svg += '<rect x="' + g.supx + '" y="' + b0.y + '" width="' + g.supw + '" height="' + g.ch
+        + '" fill="var(--panel-2)" stroke="var(--line)" />'
+        + '<text x="' + (g.supx + g.supw / 2) + '" y="' + (b0.cy + 5) + '" font-size="12" '
+        + 'fill="var(--text)" text-anchor="middle">' + Rshort(S[i]) + '</text>'
+        + '<text x="' + (g.ux + g.uw / 2) + '" y="' + (b0.cy + 5) + '" font-size="12" '
+        + 'fill="var(--cyan)" text-anchor="middle">' + (u[i] === null ? '?' : Rshort(u[i])) + '</text>';
+    }
+    svg += '<text x="' + (g.left + 4) + '" y="' + (g.demy + 17) + '" font-size="11" fill="var(--muted)">demand</text>'
+      + '<text x="' + (g.left + 4) + '" y="' + (g.vy + 17) + '" font-size="11" fill="var(--cyan)">v</text>';
+    for (j = 0; j < n; j += 1) {
+      var cxj = g.x0 + j * g.cw + g.cw / 2;
+      svg += '<text x="' + cxj + '" y="' + (g.demy + 17) + '" font-size="12" fill="var(--text)" '
+        + 'text-anchor="middle">' + Rshort(D[j]) + '</text>'
+        + '<text x="' + cxj + '" y="' + (g.vy + 17) + '" font-size="12" fill="var(--cyan)" '
+        + 'text-anchor="middle">' + (v[j] === null ? '?' : Rshort(v[j])) + '</text>';
+    }
+
+    /* The refused rectangle first, so the computed cycle draws over it. */
+    if (it.rect && it.rect.cells && !it.rect.ok) {
+      var rpts = it.rect.cells.map(function (c) { var q = box(g, c.i, c.j); return q.cx + ',' + q.cy; });
+      svg += '<polygon points="' + rpts.join(' ') + '" fill="none" stroke="var(--muted)" '
+        + 'stroke-width="1.5" stroke-dasharray="3 4" opacity="0.8" />';
+      if (it.rect.corner) svg += ring(g, it.rect.corner.i, it.rect.corner.j, 'red', true);
+    }
+    if (it.cycle && it.cycle.cells) {
+      var pts = it.cycle.cells.map(function (c) { var q = box(g, c.i, c.j); return q.cx + ',' + q.cy; });
+      svg += '<polygon points="' + pts.join(' ') + '" fill="none" stroke="var(--purple)" stroke-width="2.5" />';
+      for (k = 0; k < it.cycle.cells.length; k += 1) {
+        var qc = box(g, it.cycle.cells[k].i, it.cycle.cells[k].j);
+        svg += '<circle cx="' + qc.cx + '" cy="' + qc.cy + '" r="4" fill="var(--purple)" />';
+      }
+    }
+    if (it.entering) svg += ring(g, it.entering.i, it.entering.j, 'cyan', false);
+    if (it.cycle && it.cycle.leaving) svg += ring(g, it.cycle.leaving.i, it.cycle.leaving.j, 'red', false);
+    svg += '<text x="' + g.left + '" y="' + (g.height - 6) + '" font-size="10" fill="var(--muted)">'
+      + (it.optimal
+          ? 'every empty cell prices at zero or above, so no cycle improves this tableau'
+          : 'the path turns only at occupied cells; ' + Rshort(it.cycle && it.cycle.theta !== null
+              ? it.cycle.theta : R0) + ' moves round it, added at + and taken at -')
+      + '</text>';
+    gridEl.innerHTML = svg;
+
+    /* ---- theta over the minus cells ----------------------------------- */
+    var trows = [];
+    if (it.cycle && it.cycle.found && it.cycle.minus) {
+      for (k = 0; k < it.cycle.minus.length; k += 1) {
+        var mc = it.cycle.minus[k];
+        var isLeaving = it.cycle.leaving && mc.i === it.cycle.leaving.i && mc.j === it.cycle.leaving.j;
+        var leftOver = Rsub(mc.x, it.cycle.theta);
+        var note = isLeaving ? 'the smallest, so this cell leaves'
+          : (Rzero(leftOver)
+              ? 'ties with the smallest, so it stays in the basis carrying zero -- a named epsilon cell'
+              : 'larger, so it survives with ' + Rshort(leftOver) + ' left');
+        trows.push(tr([rowhead(cellName(mc)), td(Rshort(mc.x)),
+          td(note, isLeaving ? 'tone-red' : (Rzero(leftOver) ? 'tone-amber' : 'tone-muted'))]));
+      }
+    } else {
+      trows.push(tr([rowhead('none'),
+        td('&mdash;'), td(it.optimal ? 'this tableau is optimal, so there is no cycle to move round'
+          : 'no cycle was found for the entering cell')]));
+    }
+    thetaEl.innerHTML = '<caption>&theta; is the smallest allocation on a minus corner &mdash; the ratio test, '
+      + 'in tableau clothing</caption><thead>'
+      + tr([th('minus cell'), th('allocation'), th('what &theta; does to it')]) + '</thead><tbody>'
+      + trows.join('') + '</tbody>';
+
+    /* ---- the normalisation, demonstrated ------------------------------ */
+    var nrows = [], base = it.uv;
+    var uCells = [rowhead('u, with u1 = 0')], u2Cells = [rowhead('u, with ' + normKind + (normIx + 1) + ' = 0')];
+    for (i = 0; i < m; i += 1) {
+      uCells.push(td(base.u[i] === null ? '?' : Rshort(base.u[i])));
+      u2Cells.push(td(u[i] === null ? '?' : Rshort(u[i]), 'tone-cyan'));
+    }
+    var vCells = [rowhead('v, with u1 = 0')], v2Cells = [rowhead('v, with ' + normKind + (normIx + 1) + ' = 0')];
+    for (j = 0; j < n; j += 1) {
+      vCells.push(td(base.v[j] === null ? '?' : Rshort(base.v[j])));
+      v2Cells.push(td(v[j] === null ? '?' : Rshort(v[j]), 'tone-cyan'));
+    }
+    while (uCells.length < Math.max(m, n) + 1) uCells.push(td(''));
+    while (u2Cells.length < Math.max(m, n) + 1) u2Cells.push(td(''));
+    while (vCells.length < Math.max(m, n) + 1) vCells.push(td(''));
+    while (v2Cells.length < Math.max(m, n) + 1) v2Cells.push(td(''));
+    nrows.push(tr(uCells), tr(u2Cells), tr(vCells), tr(v2Cells));
+    var heads = [th('')];
+    for (k = 0; k < Math.max(m, n); k += 1) heads.push(th(String(k + 1)));
+    normEl.innerHTML = '<caption>Move the normalisation and every potential moves; the reduced costs do not'
+      + (shift !== null && Rzero(shift.shift)
+          ? ' &mdash; the slider is sitting on the normalisation the potentials were solved with, so the two '
+            + 'pairs agree here; move it and they will not'
+          : (Rsign(shift.shift) < 0
+              ? ' &mdash; every u has gained ' + Rshort(Rneg(shift.shift)) + ' and every v has lost it'
+              : ' &mdash; every u has lost ' + Rshort(shift.shift) + ' and every v has gained it'))
+      + '</caption><thead>' + tr(heads) + '</thead><tbody>' + nrows.join('') + '</tbody>';
+
+    /* ---- the readouts -------------------------------------------------- */
+    setKpi('tmEnterK', it.entering
+      ? cellName(it.entering) + ' at ' + Rshort(it.entering.value)
+      : '<span class="tone-green">none &mdash; optimal</span>');
+    setKpi('tmThetaK', it.cycle && it.cycle.theta !== null
+      ? Rshort(it.cycle.theta) + (Rzero(it.cycle.theta)
+          ? ' <span class="tone-amber">a degenerate pivot</span>' : '')
+      : '&mdash;');
+    setKpi('tmLeaveK', it.cycle && it.cycle.leaving ? cellName(it.cycle.leaving) : '&mdash;');
+    setKpi('tmCostK', Rshort(it.cost)
+      + (at + 1 < total ? ' &rarr; ' + Rshort(run.iterations[at + 1].cost) : ''));
+    setKpi('tmCheckK', it.check
+      ? (it.check.ok ? '<span class="tone-green">a legal cycle</span>'
+          : '<span class="tone-red">refused</span>')
+      : '&mdash;');
+    setKpi('tmRectK', it.rect
+      ? (it.rect.ok ? '<span class="tone-green">closes, and agrees</span>'
+          : '<span class="tone-red">refused at ' + (it.rect.corner ? cellName(it.rect.corner) : 'the start') + '</span>')
+      : '&mdash;');
+
+    var lines = [];
+    if (run.pad.added.length) lines.push(run.pad.why.charAt(0).toUpperCase() + run.pad.why.slice(1) + '.');
+    lines.push('<strong>' + it.forest.why.charAt(0).toUpperCase() + it.forest.why.slice(1) + '</strong>, '
+      + 'so u + v = c has exactly one solution once one potential is fixed.');
+    if (it.optimal) {
+      lines.push('No empty cell prices below zero, so this tableau is <strong>optimal at '
+        + Rshort(it.cost) + '</strong>, reached in ' + (total - 1) + ' improvement '
+        + (total === 2 ? 'step' : 'steps') + ' from the ' + start.rule + ' start.');
+    } else if (it.cycle && it.cycle.found && it.check.ok) {
+      lines.push('Cell ' + cellName(it.entering) + ' prices at ' + Rshort(it.entering.value)
+        + ', so one unit sent there saves that much. ' + it.check.why.charAt(0).toUpperCase()
+        + it.check.why.slice(1) + '. ' + it.cycle.why.charAt(0).toUpperCase() + it.cycle.why.slice(1) + '.');
+      lines.push(it.rect.why.charAt(0).toUpperCase() + it.rect.why.slice(1) + '.');
+    } else {
+      lines.push('<span class="tone-red">' + (it.check ? it.check.why : 'no cycle was found') + '</span>');
+    }
+    statusEl.innerHTML = lines.join(' ');
+  }
+
+  [presetS, startS, ruleS].forEach(function (el) {
+    el.addEventListener('change', function () { iterS.value = '0'; redraw(); });
+  });
+  [iterS, normS].forEach(function (el) { el.addEventListener('input', redraw); });
+  redraw();
+  window.redrawLab = redraw;
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "networks-flows-paths-and-assignments/potentials-and-the-stepping-stone-cycle";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+  </script>
+</body>
+</html>

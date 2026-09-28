@@ -1560,7 +1560,7 @@ LESSONS = [
                 "`#1, #4, #8, #11`. The pass ran backwards and the run came out forwards, "
                 "which is the whole of the stability argument written in one line of "
                 "bookkeeping.",
-                "Now switch the placement control to front to back and watch the same twelve "
+                "Now switch the placement control to run from the front and watch the same twelve "
                 "records come out `0#6 1#9 1#2 2#12 2#7 3#10 3#5 3#3 4#11 4#8 4#4 4#1`: still "
                 "sorted by key, with every run reversed and eleven pairs flagged. The lab "
                 "counts those pairs rather than asserting the property.",
@@ -1593,7 +1593,7 @@ LESSONS = [
                     "nodes are comparisons &mdash; and counting sort is not in that model, so "
                     "the theorem's hypothesis fails and its conclusion says nothing here. The "
                     "third answer is also false as arithmetic: 17 is less than 29."},
-            {"q": "What breaks if the placement pass runs front to back with the same prefix array?",
+            {"q": "What breaks if the placement pass runs from the front with the same prefix array?",
              "a": ["The output is not sorted",
                    "The output is sorted, but every run of equal keys comes out reversed",
                    "The prefix sums come out wrong",

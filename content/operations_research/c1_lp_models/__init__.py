@@ -17,7 +17,7 @@ COURSE = {
     ),
     "blurb": (
         "Systems and Matrices ended with an objective and four inequalities already written "
-        "down. This course is about writing them. It asks three questions in a fixed order "
+        "down. This course is about writing them. It asks three questions in the same order "
         "&mdash; what do I decide, what do I want, what stops me &mdash; and answers them four "
         "times over on the model families that cover most of applied optimisation; then it "
         "shows which non-linear-looking requirements are secretly linear, converts everything "

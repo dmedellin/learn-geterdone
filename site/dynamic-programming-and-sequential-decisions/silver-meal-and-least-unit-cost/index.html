@@ -1,0 +1,2912 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Silver-Meal and Least Unit Cost | Lesson | Dynamic Programming and Sequential Decisions | Operations Research | Learn · geterdone.io</title>
+  <meta name="description" content="Both rules build the plan left to right: start an interval, keep extending it while an average falls, stop when the average turns up, start again. They differ only in which average they watch — cost per period, or cost per unit — and that is enough to make them disagree with each other as well as with the exact answer. Neither dominates the other, and the instance that shows it has one of them paying 24 too much with three orders and the other 30 too much with two." />
+  <link rel="canonical" href="https://learn.geterdone.io/dynamic-programming-and-sequential-decisions/silver-meal-and-least-unit-cost/" />
+  <meta name="author" content="dmedellin" />
+
+  <!-- Favicon: inline data-URI SVG, no external asset. -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%238ff3ff'/%3E%3Cstop offset='1' stop-color='%2336d6e7'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Cg fill='%23041116'%3E%3Ccircle cx='32' cy='20' r='6'/%3E%3Ccircle cx='20' cy='43' r='6'/%3E%3Ccircle cx='44' cy='43' r='6'/%3E%3C/g%3E%3C/svg%3E" />
+
+  <meta name="theme-color" content="#071019" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#edf4f8" media="(prefers-color-scheme: light)" />
+
+  <!-- og:image is deliberately OMITTED: a share card needs an absolute hosted
+       image URL and this page is self-contained. -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Learn &middot; geterdone.io" />
+  <meta property="og:title" content="Silver-Meal and Least Unit Cost | Lesson | Dynamic Programming and Sequential Decisions | Operations Research | Learn · geterdone.io" />
+  <meta property="og:description" content="Both rules build the plan left to right: start an interval, keep extending it while an average falls, stop when the average turns up, start again. They differ only in which average they watch — cost per period, or cost per unit — and that is enough to make them disagree with each other as well as with the exact answer. Neither dominates the other, and the instance that shows it has one of them paying 24 too much with three orders and the other 30 too much with two." />
+  <meta property="og:url" content="https://learn.geterdone.io/dynamic-programming-and-sequential-decisions/silver-meal-and-least-unit-cost/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Silver-Meal and Least Unit Cost | Lesson | Dynamic Programming and Sequential Decisions | Operations Research | Learn · geterdone.io" />
+  <meta name="twitter:description" content="Both rules build the plan left to right: start an interval, keep extending it while an average falls, stop when the average turns up, start again. They differ only in which average they watch — cost per period, or cost per unit — and that is enough to make them disagree with each other as well as with the exact answer. Neither dominates the other, and the instance that shows it has one of them paying 24 too much with three orders and the other 30 too much with two." />
+  <meta name="twitter:url" content="https://learn.geterdone.io/dynamic-programming-and-sequential-decisions/silver-meal-and-least-unit-cost/" />
+
+  <style>
+    /* ---------------------------------------------------------------------
+       DESIGN TOKENS -- the only place a theme-dependent colour may live.
+
+       Two light paths, value-identical, both generated from one Python
+       constant (theme.LIGHT_TOKENS): the explicit toggle and the system
+       preference. Components read tokens and never name a theme.
+       --------------------------------------------------------------------- */
+    :root {
+      color-scheme: dark;
+      --bg: #071019;
+      --bg-2: #0b1622;
+      --panel: rgba(16, 31, 46, 0.91);
+      --panel-solid: #101f2e;
+      --panel-2: #142638;
+      --panel-3: #182d41;
+      --text: #edf7ff;
+      --muted: #95aabd;
+      --line: rgba(170, 202, 226, 0.16);
+      --line-strong: rgba(170, 202, 226, 0.3);
+      --cyan: #37d7e7;
+      --cyan-2: #91f4ff;
+      --green: #41e39b;
+      --red: #ff7b86;
+      --amber: #ffc857;
+      --purple: #b69cff;
+      --blue: #8fb6ff;
+      --on-accent: #041116;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --radius: 20px;
+      --radius-sm: 12px;
+      --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    /* System preference, only while the reader has made NO explicit choice.
+       The :not([data-theme="dark"]) guard is what lets an explicit dark pick
+       survive on a light-mode OS. */
+    @media (prefers-color-scheme: light) {
+      :root:not([data-theme="dark"]) {
+        color-scheme: light;
+        --bg: #edf4f8;
+        --bg-2: #f9fbfd;
+        --panel: rgba(255, 255, 255, 0.94);
+        --panel-solid: #ffffff;
+        --panel-2: #f3f8fb;
+        --panel-3: #eaf2f7;
+        --text: #102433;
+        --muted: #4f6373;
+        --line: rgba(24, 62, 88, 0.13);
+        --line-strong: rgba(24, 62, 88, 0.24);
+        --cyan: #0b6875;
+        --cyan-2: #0b6d79;
+        --green: #0d6e48;
+        --red: #b9242e;
+        --amber: #8a5a06;
+        --purple: #6b46d6;
+        --blue: #1d5fd0;
+        --on-accent: #ffffff;
+        --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+      }
+    }
+
+    /* Explicit choice (localStorage key: learn-theme). Value-identical to the
+       block above -- both are generated from the same constant. */
+    [data-theme="light"] {
+      color-scheme: light;
+      --bg: #edf4f8;
+      --bg-2: #f9fbfd;
+      --panel: rgba(255, 255, 255, 0.94);
+      --panel-solid: #ffffff;
+      --panel-2: #f3f8fb;
+      --panel-3: #eaf2f7;
+      --text: #102433;
+      --muted: #4f6373;
+      --line: rgba(24, 62, 88, 0.13);
+      --line-strong: rgba(24, 62, 88, 0.24);
+      --cyan: #0b6875;
+      --cyan-2: #0b6d79;
+      --green: #0d6e48;
+      --red: #b9242e;
+      --amber: #8a5a06;
+      --purple: #6b46d6;
+      --blue: #1d5fd0;
+      --on-accent: #ffffff;
+      --shadow: 0 22px 55px rgba(39, 77, 101, 0.14);
+    }
+
+    [data-theme="dark"] { color-scheme: dark; }
+
+    * { box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(55, 215, 231, 0.13), transparent 31rem),
+        radial-gradient(circle at 88% 13%, rgba(182, 156, 255, 0.12), transparent 29rem),
+        linear-gradient(180deg, var(--bg), var(--bg-2));
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button { font: inherit; color: inherit; }
+    a { color: inherit; }
+    svg { max-width: 100%; }
+    p { overflow-wrap: anywhere; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--cyan);
+      outline-offset: 3px;
+      border-radius: 6px;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .skip-link {
+      position: absolute;
+      left: 12px;
+      top: -100px;
+      z-index: 60;
+      padding: 11px 15px;
+      border-radius: 12px;
+      color: var(--on-accent);
+      background: var(--cyan-2);
+      font-weight: 800;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: top 140ms ease;
+    }
+    .skip-link:focus-visible { top: 12px; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 22px 0 64px;
+    }
+
+    /* ---------- Top bar ---------- */
+    .topbar {
+      position: sticky;
+      top: 12px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--panel-solid) 82%, transparent);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: none;
+      border-radius: 11px;
+      color: var(--on-accent);
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      font-weight: 800;
+      font-size: 0.92rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+
+    .brand-copy { display: flex; flex-direction: column; min-width: 0; }
+    .brand-copy strong { font-size: 0.98rem; letter-spacing: -0.01em; }
+    .brand-copy span {
+      font-size: 0.74rem;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    .topnav { display: flex; gap: 6px; flex-wrap: wrap; }
+    .topnav a {
+      padding: 8px 12px;
+      border-radius: 10px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.87rem;
+      font-weight: 650;
+    }
+    .topnav a:hover { color: var(--text); background: var(--panel-2); }
+    .topnav a[aria-current="page"] { color: var(--text); background: var(--panel-2); }
+
+    /* The masthead is space-between, so the right-hand controls have to be
+       ONE child or they get spread apart with the sign-in stranded in the
+       middle of the bar. */
+    /* The browser's own [hidden] rule is `display: none` at UA precedence, so
+       ANY class that sets display beats it. .btn sets inline-flex, which is why
+       "Sign out" sat next to "Sign in" on a page that said "Not signed in":
+       the attribute was set correctly and did nothing. Author-level and
+       !important so hidden means hidden regardless of what else matches. */
+    [hidden] { display: none !important; }
+
+    .topbar-actions { display: flex; align-items: center; gap: 8px; flex: none; }
+
+    /* The masthead sign-in. Sized to sit beside the theme toggle rather than
+       compete with it: this library locks nothing, so the control has to be
+       findable without reading like the price of entry. The dot goes solid
+       green only once a session is actually found. */
+    .signin-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      flex: none;
+      padding: 0 12px;
+      height: 40px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.84rem;
+      font-weight: 650;
+      white-space: nowrap;
+    }
+    .signin-btn:hover { color: var(--text); border-color: var(--line-strong); }
+    .signin-btn[aria-current="page"] { color: var(--text); border-color: var(--line-strong); }
+    .signin-mark { font-size: 0.6rem; color: var(--line-strong); line-height: 1; }
+    .signin-btn.is-in .signin-mark { color: var(--green); }
+
+    /* Narrow masthead: the word goes, the dot stays. The label is hidden
+       visually but stays in the DOM, so the control keeps "Sign in" as its
+       accessible name rather than becoming an unlabelled target. */
+    @media (max-width: 560px) {
+      .signin-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .signin-btn { padding: 0; width: 40px; justify-content: center; }
+    }
+
+    .icon-btn {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      flex: none;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+      cursor: pointer;
+      font-size: 1.05rem;
+    }
+    .icon-btn:hover { border-color: var(--line-strong); }
+
+    /* ---------- Breadcrumb ---------- */
+    .crumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin: 18px 2px 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .crumbs a { text-decoration: none; font-weight: 650; }
+    .crumbs a:hover { color: var(--text); text-decoration: underline; }
+    .crumb-sep { opacity: 0.5; }
+    .crumb-current { color: var(--text); font-weight: 650; }
+
+    .noscript-note {
+      margin: 18px 0 0;
+      padding: 14px 16px;
+      border: 1px solid var(--amber);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+      font-size: 0.9rem;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 26px;
+      align-items: center;
+      margin-top: 26px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    @media (max-width: 900px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--cyan);
+      font-size: 0.75rem;
+      font-weight: 750;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--cyan) 22%, transparent);
+    }
+
+    .hero h1 {
+      margin: 14px 0 10px;
+      font-size: clamp(1.85rem, 4.1vw, 2.9rem);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero p { margin: 0; color: var(--muted); font-size: 1.02rem; }
+    .gradient-text {
+      background: linear-gradient(120deg, var(--cyan-2), var(--purple));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 11px 17px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .btn:hover { border-color: var(--cyan); }
+    .btn.primary {
+      border-color: transparent;
+      background: linear-gradient(120deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+    }
+    .btn.small { padding: 8px 13px; font-size: 0.83rem; }
+
+    .hero-visual {
+      position: relative;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel-2);
+    }
+    .hero-visual svg { display: block; width: 100%; height: auto; }
+    .float-label {
+      position: absolute;
+      padding: 5px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--panel-solid) 88%, transparent);
+      color: var(--muted);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ---------- Sections and cards ---------- */
+    .section { margin-top: 34px; }
+    .section-head {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    @media (max-width: 820px) { .section-head { grid-template-columns: minmax(0, 1fr); } }
+    .section-head h2 {
+      margin: 4px 0 0;
+      font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+      letter-spacing: -0.02em;
+    }
+    .section-head > p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+    .kicker {
+      margin: 0;
+      color: var(--cyan);
+      font-size: 0.74rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-sm);
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 18px; }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(215px, 1fr)); gap: 14px; }
+
+    .concept-card { padding: 17px; }
+    .concept-card h3 { margin: 11px 0 7px; font-size: 1.02rem; letter-spacing: -0.01em; }
+    .concept-card p { margin: 0; color: var(--muted); font-size: 0.9rem; }
+    .icon {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Mathematical notation ----------
+       No web font, no MathML dependency, no external renderer: notation is
+       plain characters in a monospace run, styled so it reads as an expression
+       rather than as prose. Everything a lesson needs (set builder, quantifiers,
+       congruences, binomials) is expressible in Unicode this way, and it stays
+       selectable, searchable and screen-reader legible. */
+    .math {
+      padding: 1px 5px;
+      border-radius: 5px;
+      background: var(--panel-3);
+      font-family: var(--mono);
+      font-size: 0.92em;
+      white-space: normal;
+      overflow-wrap: anywhere;
+    }
+    .mathblock {
+      margin: 12px 0;
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 0.92rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      white-space: pre;
+    }
+
+    .defbox, .thm, .example {
+      margin: 14px 0;
+      padding: 14px 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .defbox { border-left: 3px solid var(--purple); }
+    .thm { border-left: 3px solid var(--amber); }
+    .example { border-left: 3px solid var(--green); }
+    .defbox > .label, .thm > .label, .example > .label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.71rem;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .defbox > .label { color: var(--purple); }
+    .thm > .label { color: var(--amber); }
+    .example > .label { color: var(--green); }
+    .defbox p, .thm p, .example p { margin: 0 0 8px; font-size: 0.92rem; }
+    .defbox p:last-child, .thm p:last-child, .example p:last-child { margin-bottom: 0; }
+
+    .proof { margin: 12px 0 0; padding-left: 14px; border-left: 2px solid var(--line-strong); }
+    .proof p { margin: 0 0 8px; font-size: 0.9rem; color: var(--muted); }
+    .proof p:last-child { margin-bottom: 0; }
+    .qed { color: var(--cyan); font-weight: 800; }
+
+    .prose p { font-size: 0.95rem; }
+    .prose p:first-child { margin-top: 0; }
+    .prose p:last-child { margin-bottom: 0; }
+    .prose ul, .prose ol { margin: 10px 0; padding-left: 22px; font-size: 0.93rem; }
+    .prose li { margin-bottom: 6px; }
+    .prose h3 { margin: 0 0 10px; font-size: 1.05rem; letter-spacing: -0.01em; }
+
+    /* ---------- The lab ---------- */
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+    @media (max-width: 980px) { .lab-layout { grid-template-columns: minmax(0, 1fr); } }
+
+    .lab-main { padding: 16px; }
+    .lab-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .lab-title { display: flex; flex-direction: column; }
+    .lab-title strong { font-size: 0.98rem; }
+    .lab-title span { color: var(--muted); font-size: 0.79rem; }
+    .inline-legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.76rem; color: var(--muted); }
+    .inline-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-swatch { width: 10px; height: 10px; border-radius: 3px; background: currentColor; }
+    .tone-cyan { color: var(--cyan); }
+    .tone-purple { color: var(--purple); }
+    .tone-green { color: var(--green); }
+    .tone-amber { color: var(--amber); }
+    .tone-red { color: var(--red); }
+    .tone-blue { color: var(--blue); }
+    .tone-muted { color: var(--muted); }
+
+    .lab-stage {
+      min-height: 210px;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      overflow-x: auto;
+    }
+    .lab-stage svg { display: block; width: 100%; height: auto; }
+    /* Semantic SVG implementations in the generated lab registry use one of
+       these three source-owned viewBox widths. On a narrower screen the lab
+       stage becomes the named horizontal camera instead of shrinking 10–12px
+       labels below a complete raster glyph core. Print keeps authored sizing. */
+    @media screen {
+      .lab-stage svg[viewBox^="0 0 460 "] { min-width: 460px; }
+      .lab-stage svg[viewBox^="0 0 520 "] { min-width: 520px; }
+      .lab-stage svg[viewBox^="0 0 660 "] { min-width: 660px; }
+    }
+
+    /* ---------- Graphs ----------
+       Tokens only. A component override scoped to [data-theme="light"] would
+       light the toggle path and leave the reader whose OS is light with a dark
+       graph on a light page, which is the exact failure this library pins
+       against elsewhere. Everything below inherits from the palette instead. */
+    .plot-grid { stroke: var(--line); stroke-width: 1; }
+    .plot-axis { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-tick { fill: var(--muted); font-family: var(--mono); font-size: 11px; }
+    .plot-tickmark { stroke: var(--line-strong); stroke-width: 1.6; }
+    .plot-curve { fill: none; stroke: var(--cyan); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+    .plot-curve.alt { stroke: var(--purple); }
+    .plot-curve.parent { stroke: var(--muted); stroke-width: 1.8; stroke-dasharray: 5 5; }
+    .plot-curve.warn { stroke: var(--red); }
+    .plot-curve.good { stroke: var(--green); }
+    .plot-point { fill: var(--amber); stroke: var(--bg); stroke-width: 1.6; }
+    .plot-point.root { fill: var(--green); }
+    .plot-point.vertex { fill: var(--purple); }
+    /* An open circle is a point the function does NOT take -- a hole, an open
+       endpoint. Filled versus hollow is the whole content of several lessons,
+       so the two never differ by colour alone. */
+    .plot-hole { fill: var(--panel-2); stroke: var(--cyan); stroke-width: 2.2; }
+    .plot-asym { stroke: var(--red); stroke-width: 1.5; stroke-dasharray: 6 5; }
+    .plot-aux { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 4 4; }
+    .plot-label { fill: var(--text); font-family: var(--mono); font-size: 12px; }
+    .plot-shade { fill: var(--cyan); opacity: 0.16; }
+    .plot-shade.alt { fill: var(--purple); opacity: 0.16; }
+    .plot-interval { stroke: var(--cyan); stroke-width: 4; }
+    .plot-end { stroke: var(--cyan); stroke-width: 2.4; }
+    .plot-end.closed { fill: var(--cyan); }
+    .plot-end.open { fill: var(--panel-2); }
+
+    .side-panel { display: flex; flex-direction: column; gap: 13px; padding: 17px; }
+    .side-panel h3 { margin: 0; font-size: 1rem; }
+    .side-panel > p { margin: 0; color: var(--muted); font-size: 0.86rem; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label { color: var(--muted); font-size: 0.78rem; font-weight: 700; }
+    .field select, .field input[type="text"], .field input[type="number"] {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.88rem;
+    }
+    .field select { font-family: inherit; }
+    .field input[type="text"], .field input[type="number"] { font-family: var(--mono); }
+
+    .range-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .range-value {
+      padding: 2px 8px;
+      border-radius: 7px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 700;
+    }
+    input[type="range"] { width: 100%; accent-color: var(--cyan); }
+
+    .small-copy { color: var(--muted); font-size: 0.8rem; }
+
+    .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(94px, 1fr)); gap: 8px; }
+    .kpi {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      padding: 9px 10px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+    }
+    .kpi span { color: var(--muted); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+    .kpi strong { font-family: var(--mono); font-size: 0.98rem; overflow-wrap: anywhere; }
+
+    .status-banner {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-left: 3px solid var(--cyan);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.86rem;
+    }
+
+    /* ---------- Tables: truth tables, matrices, traces ---------- */
+    .table-wrap { overflow-x: auto; }
+    table.tt {
+      width: 100%;
+      border-collapse: collapse;
+      font-family: var(--mono);
+      font-size: 0.83rem;
+    }
+    table.tt caption {
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.8rem;
+      text-align: left;
+    }
+    table.tt th, table.tt td {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      text-align: center;
+      white-space: nowrap;
+    }
+    table.tt th { background: var(--panel-3); color: var(--muted); font-weight: 700; }
+    table.tt td.t { color: var(--green); font-weight: 700; }
+    table.tt td.f { color: var(--red); font-weight: 700; }
+    table.tt tr.focus td { background: color-mix(in srgb, var(--cyan) 14%, transparent); }
+    table.tt td.on { background: color-mix(in srgb, var(--cyan) 18%, transparent); color: var(--text); }
+    table.tt th.rowhead { background: var(--panel-3); text-align: right; }
+
+    .chip {
+      display: inline-block;
+      margin: 2px 4px 2px 0;
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      font-family: var(--mono);
+      font-size: 0.79rem;
+    }
+    .chip.ok { border-color: var(--green); color: var(--green); }
+    .chip.no { border-color: var(--red); color: var(--red); }
+    .chip.hi { border-color: var(--cyan); color: var(--cyan); }
+
+    /* ---------- Practice ---------- */
+    .practice { display: flex; flex-direction: column; gap: 11px; padding: 18px; }
+    .practice-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .practice-head h3 { margin: 0; font-size: 1rem; }
+    .score {
+      padding: 4px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+    .choice-grid { display: grid; gap: 8px; }
+    .choice {
+      padding: 10px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font-size: 0.88rem;
+      text-align: left;
+      cursor: pointer;
+    }
+    .choice:hover { border-color: var(--cyan); }
+    .choice.right { border-color: var(--green); color: var(--green); }
+    .choice.wrong { border-color: var(--red); color: var(--red); }
+    .feedback {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ---------- Lists, callouts, notes ---------- */
+    .lesson-list { display: flex; flex-direction: column; gap: 10px; }
+    .lesson-row { display: flex; gap: 12px; align-items: flex-start; }
+    .lesson-row .num {
+      display: grid;
+      place-items: center;
+      width: 26px;
+      height: 26px;
+      flex: none;
+      border-radius: 8px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .lesson-row strong { display: block; font-size: 0.92rem; }
+    .lesson-row span { display: block; color: var(--muted); font-size: 0.85rem; }
+
+    .callout { display: flex; gap: 12px; align-items: flex-start; }
+    .callout .mark {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--green);
+      font-weight: 800;
+    }
+    .callout strong { display: block; font-size: 0.94rem; }
+    .callout p { margin: 5px 0 0; color: var(--muted); font-size: 0.88rem; }
+
+    .note {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+    .note strong { color: var(--text); }
+
+    .rule-output {
+      padding: 13px 15px;
+      border: 1px dashed var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--muted);
+      font-size: 0.89rem;
+    }
+
+    /* ---------- Course home: syllabus ---------- */
+    .syllabus { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .syllabus-item {
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .syllabus-item:hover { border-color: var(--cyan); }
+    .syllabus-item .num {
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      flex: none;
+      border-radius: 9px;
+      background: var(--panel-3);
+      color: var(--cyan);
+      font-family: var(--mono);
+      font-size: 0.82rem;
+      font-weight: 800;
+    }
+    .syllabus-item strong { display: block; font-size: 0.95rem; letter-spacing: -0.01em; }
+    .syllabus-item span { display: block; margin-top: 4px; color: var(--muted); font-size: 0.85rem; }
+
+    /* ---------- Path page: the spine ---------- */
+    .spine { display: flex; flex-direction: column; gap: 12px; }
+    .spine-item {
+      display: grid;
+      grid-template-columns: 46px minmax(0, 1fr);
+      gap: 15px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+      text-decoration: none;
+      box-shadow: var(--shadow);
+    }
+    .spine-item:hover { border-color: var(--cyan); }
+    .spine-num {
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: linear-gradient(135deg, var(--cyan-2), var(--cyan));
+      color: var(--on-accent);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 800;
+    }
+    .spine-body strong { display: block; font-size: 1.05rem; letter-spacing: -0.01em; }
+    .spine-body p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .spine-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 9px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .spine-meta span {
+      padding: 3px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel-2);
+    }
+
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin: 0; }
+    .stats > div {
+      padding: 13px 15px;
+      border: 1px solid var(--line);
+      border-radius: 11px;
+      background: var(--panel-2);
+    }
+    .stats dt { color: var(--muted); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .stats dd { margin: 5px 0 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em; }
+    .stats dd small { display: block; margin-top: 2px; color: var(--muted); font-size: 0.76rem; font-weight: 600; letter-spacing: 0; }
+
+    /* ---------- The lesson pager ---------- */
+    .lesson-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .lesson-link {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .lesson-link:hover { border-color: var(--cyan); }
+    .lesson-link span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .lesson-link strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .lesson-link.next { text-align: right; }
+    .lesson-link.prev + .lesson-link.next { grid-column: auto; }
+
+    /* ---------- Course pager (path-nav) ----------
+       The course-to-course control, matching the library's existing shape:
+       nav.path-nav holding a.path-move prev / a.path-move next. Distinct from
+       the LESSON pager (.lesson-nav) on purpose -- one moves within a course,
+       the other between courses, and collapsing them would make "next" mean
+       two things. */
+    .path-nav {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+    .path-move {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+      text-decoration: none;
+    }
+    .path-move:hover { border-color: var(--cyan); }
+    .path-move span { color: var(--muted); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; }
+    .path-move strong { font-size: 0.94rem; letter-spacing: -0.01em; }
+    .path-move.next { text-align: right; }
+    .path-move.is-complete { border-color: var(--line-strong); background: var(--panel-3); }
+
+    /* ---------- Completion marks ----------
+       A note the reader makes to themselves, kept in localStorage. Never a
+       network request on a lesson page, and never a gate: the material reads
+       identically whether or not anything is ticked. */
+    .progress-bar {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      margin-top: 22px;
+      padding: 15px 17px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--panel-2);
+    }
+    .progress-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      align-self: flex-start;
+      padding: 10px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .progress-toggle:hover { border-color: var(--cyan); }
+    .progress-toggle .progress-tick {
+      display: grid;
+      place-items: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 1px solid var(--line-strong);
+      background: var(--panel-2);
+      color: transparent;
+      font-size: 0.8rem;
+      font-weight: 900;
+    }
+    .progress-toggle.is-done { border-color: var(--green); color: var(--green); }
+    .progress-toggle.is-done .progress-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .progress-note { margin: 0; color: var(--muted); font-size: 0.82rem; }
+    .progress-note a { color: var(--cyan); }
+    .course-progress {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .syllabus-item.is-done .num { background: var(--green); color: var(--on-accent); }
+    .spine-progress { color: var(--green); font-weight: 750; }
+
+    /* ---------- Footer ---------- */
+    .footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+    .footer p { margin: 0 0 7px; }
+    .footer a { font-weight: 650; }
+
+    .lesson-feedback {
+      margin-top: 18px;
+      padding: 17px 19px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: var(--panel);
+    }
+    .lesson-feedback h2 { margin: 0 0 6px; font-size: 1.06rem; letter-spacing: -0.01em; }
+    .fb-lead { margin: 0 0 13px; color: var(--muted); font-size: 0.85rem; }
+    .fb-sr {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .fb-text {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 11px 13px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--panel-2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+    .fb-text::placeholder { color: var(--muted); opacity: 1; }
+    .fb-text:focus { outline: 2px solid var(--cyan); outline-offset: 1px; }
+    .fb-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+      margin-top: 11px;
+    }
+    .fb-count { color: var(--muted); font-size: 0.82rem; font-weight: 650; }
+
+    .fb-list { list-style: none; margin: 15px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+    .fb-item {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 11px;
+      align-items: start;
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel-2);
+    }
+    .fb-item.is-done { border-color: var(--green); }
+    .fb-item.is-done .fb-body { color: var(--muted); text-decoration: line-through; }
+    .fb-tick {
+      display: grid;
+      place-items: center;
+      width: 24px;
+      height: 24px;
+      padding: 0;
+      border: 1px solid var(--line-strong);
+      border-radius: 7px;
+      background: var(--panel);
+      color: transparent;
+      font-size: 0.78rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+    .fb-tick:hover { border-color: var(--cyan); }
+    .fb-item.is-done .fb-tick {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--on-accent);
+    }
+    .fb-body { margin: 0; font-size: 0.9rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .fb-when { display: block; margin-top: 4px; color: var(--muted); font-size: 0.76rem; font-weight: 600; }
+    .fb-drop {
+      border: 1px solid transparent;
+      border-radius: 7px;
+      background: none;
+      color: var(--muted);
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 3px 7px;
+    }
+    .fb-drop:hover { color: var(--red); border-color: var(--line); }
+    .fb-empty { margin: 15px 0 0; color: var(--muted); font-size: 0.85rem; }
+
+    body[data-page-kind] {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+    }
+    body[data-page-kind] .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; padding: 16px 0 48px; }
+    body[data-page-kind] .skip-link { position: absolute; top: -100px; left: 12px; z-index: 60; padding: 12px 16px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); }
+    body[data-page-kind] .skip-link:focus-visible { top: 12px; }
+    [data-ui="masthead"] {
+      display: grid; grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: center; gap: 16px; padding: 10px 14px;
+      border: 1px solid var(--line); border-radius: 16px;
+      background: var(--panel); color: var(--text);
+    }
+    [data-ui="masthead"] .brand { display: flex; gap: 10px; align-items: center; text-decoration: none; min-width: 44px; min-height: 44px; }
+    [data-ui="masthead"] .brand-mark { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--cyan); color: var(--on-accent); flex: none; }
+    [data-ui="masthead"] .brand-mark svg { width: 23px; height: 23px; }
+    [data-ui="masthead"] .brand-copy strong { font-size: 1rem; letter-spacing: 0; }
+    [data-ui="masthead"] .brand-copy { display: block; }
+    [data-ui="masthead"] .topnav { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+    [data-ui="masthead"] .topnav a { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 12px; font-size: .9rem; border-radius: 10px; }
+    [data-ui="masthead"] .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    [data-ui="masthead"] .signin-btn { min-width: 44px; min-height: 44px; padding: 8px 10px; }
+    [data-ui="masthead"] .signin-label { display: inline; }
+    [data-ui="masthead"] .icon-btn { display: inline-flex; justify-content: center; align-items: center; min-width: 44px; width: 44px; height: 44px; }
+    [data-ui="breadcrumbs"] { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0; font-size: .88rem; color: var(--muted); overflow-wrap: anywhere; }
+    [data-ui="breadcrumbs"] a { display: inline-flex; align-items: center; min-height: 44px; }
+    [data-ui="hero"] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 28px; margin: 24px 0 32px; padding: 28px; border: 1px solid var(--line); border-radius: 18px; background: var(--panel); align-items: center; }
+    [data-ui="hero"]:not(:has(> :nth-child(2))) { grid-template-columns: minmax(0, 1fr); }
+    [data-ui="hero"] > * { min-width: 0; }
+    [data-ui="hero"] h1 { font-size: clamp(2rem, 3.5vw, 3.2rem); line-height: 1.12; letter-spacing: -.035em; margin: 14px 0 18px; max-width: 24ch; overflow-wrap: anywhere; }
+    [data-ui="hero"] > div:first-child > p { max-width: 65ch; font-size: 1.05rem; line-height: 1.7; }
+    /* --muted measures 3.91:1 dark and 4.19:1 light against the hero panel, and
+       the eyebrow is 12.8px, so it needs 4.5:1. --cyan reaches it dark (5.37:1)
+       but not light (4.33:1); --text clears both (8.63:1 / 10.66:1) and matches
+       the page-kind rule below. Size and letter-spacing carry the de-emphasis. */
+    [data-ui="hero"] .eyebrow { display: block; color: var(--text); font-size: .8rem; letter-spacing: .04em; }
+    [data-ui="page-kind"] { color: var(--text); }
+    [data-ui="hero"] .hero-visual, [data-ui="hero"] .hero-card { width: 100%; min-width: 0; margin: 0; border-radius: 14px; }
+    [data-ui="hero"] .mathblock { white-space: pre-wrap; overflow-wrap: anywhere; }
+    [data-ui="primary-actions"] { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+    [data-ui="primary-actions"] .icon-btn { min-width: 44px; min-height: 44px; }
+    body[data-page-kind] .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--panel-2); color: var(--text); font: inherit; font-size: .9rem; font-weight: 650; text-decoration: none; white-space: normal; }
+    body[data-page-kind] .btn.primary { background: var(--cyan); border-color: var(--cyan); color: var(--on-accent); }
+    /* A label remains readable when a plotted curve crosses behind it.
+       Node labels with accent ink already sit on their own filled shapes. */
+    body[data-page-kind] svg text:not([fill="var(--on-accent)"]) {
+      paint-order: stroke; stroke: var(--panel-2); stroke-width: 3px; stroke-linejoin: round;
+    }
+    /* Lab controls share the same hit-box floor as the navigation, including
+       buttons created after load by quizzes and interactive tables. */
+    body[data-page-kind] button, body[data-page-kind] [role="button"],
+    body[data-page-kind] select, body[data-page-kind] summary,
+    body[data-page-kind] input[type="button"], body[data-page-kind] input[type="submit"],
+    body[data-page-kind] input[type="reset"] { min-width: 44px; min-height: 44px; }
+    /* Table cells ignore min-height; their height is a minimum row size. */
+    body[data-page-kind] td[role="button"] { height: 44px; }
+    body[data-page-kind] .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr)); }
+    body[data-page-kind] .kpi { min-width: 0; overflow-wrap: anywhere; }
+    body[data-page-kind] .section { margin-top: 32px; }
+    body[data-page-kind] h2 { font-size: clamp(1.45rem, 2.3vw, 2rem); line-height: 1.25; letter-spacing: -.02em; }
+    body[data-page-kind] .section-head { margin-bottom: 18px; }
+    /* 72ch is a readable measure for a bare paragraph, but .prose is the lesson
+       body CARD, not the text inside it. Capping the card left every generated
+       Algebra and Discrete Mathematics lesson 659px wide in a 1160px column,
+       with half the row empty beside a visible card edge, while every sibling
+       section stayed full width. The card was full width before this branch;
+       the definition boxes and math blocks it contains still are. */
+    body[data-page-kind] .section-head p { max-width: 72ch; }
+    body[data-page-kind] .card, body[data-page-kind] .note-card, body[data-page-kind] .course-card, body[data-page-kind] .lesson-card { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    body[data-page-kind] .card-pad, body[data-page-kind] .note-card, body[data-page-kind] .course-card { padding: 22px; }
+    body[data-page-kind] .grid-3, body[data-page-kind] .overview-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 18px; }
+    [data-ui="metadata"] .stats, dl[data-ui="metadata"] { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: 14px; }
+    [data-ui="metadata"] dt { color: var(--muted); font-size: .85rem; }
+    [data-ui="metadata"] dd { font-size: 1.35rem; line-height: 1.3; margin: 8px 0 0; }
+    [data-ui="metadata"] dl > div, dl[data-ui="metadata"] > div { padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="course-list"] .spine, .subject-courses { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="course-list"] .spine-item { display: block; padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    [data-ui="lesson-list"] .course-step { display: block; margin: 0; padding: 0; min-width: 0; container-type: inline-size; container-name: lesson-step; }
+    /* Legacy rows use a 296px thumbnail at a 760px viewport. In the shared
+       two-column grid, orientation must instead respect the card's width. */
+    @container lesson-step (max-width: 560px) {
+      [data-ui="lesson-list"] .course-step .lesson-card { flex-direction: column; }
+      [data-ui="lesson-list"] .course-step .thumb { width: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    }
+    [data-ui="lesson-list"] .step-rail, [data-ui="lesson-list"] .course-step::before, [data-ui="lesson-list"] .course-step::after { display: none; }
+    [data-ui="lesson-list"] .syllabus-item { padding: 22px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+    [data-ui="lesson-list"] .lesson-link { display: flex; align-items: center; min-height: 44px; }
+    body[data-page-kind] .lesson-state { display: block; margin-top: 10px; color: var(--muted); font-size: .8rem; font-weight: 650; }
+    body[data-page-kind] .is-done .lesson-state { color: var(--green); }
+    [data-ui="lesson-navigation"], [data-ui="course-navigation"] { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 32px; }
+    [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow-wrap: anywhere; }
+    [data-ui="footer"] { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); font-size: .84rem; color: var(--muted); }
+    body[data-page-kind] [hidden] { display: none !important; }
+    @media (pointer: coarse) {
+      /* The native slider remains its manipulation target. This floor also
+         applies to controls created later by a lab, without script patching. */
+      body[data-page-kind] input:not([type="hidden"]), body[data-page-kind] textarea,
+      body[data-page-kind] select, body[data-page-kind] button,
+      body[data-page-kind] [role="button"], body[data-page-kind] summary,
+      body[data-page-kind] a[href] { min-width: 44px; min-height: 44px; box-sizing: border-box; }
+      body[data-page-kind] label:has(input[type="checkbox"]),
+      body[data-page-kind] label:has(input[type="radio"]),
+      body[data-page-kind] label:has(input[type="file"]) {
+        display: inline-flex; align-items: center; min-width: 44px; min-height: 44px;
+      }
+    }
+    /* Prose links wrap inside one hit box at every width. A fragmented inline
+       anchor can have a bounding center in its surrounding paragraph. */
+    body[data-page-kind] p a[href], body[data-page-kind] .reference a[href],
+    body[data-page-kind] .reference-list a[href], body[data-page-kind] h3 a[href],
+    body[data-page-kind] .stage-nav a[href] {
+      display: inline-flex; align-items: center; vertical-align: middle;
+      max-width: 100%; white-space: normal; overflow-wrap: anywhere;
+    }
+    @media (max-width: 920px) {
+      body[data-page-kind="supplemental"] [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 720px) {
+      [data-ui="masthead"] { grid-template-columns: minmax(0, 1fr) auto; position: static; gap: 8px; padding: 10px; }
+      [data-ui="masthead"] .brand { grid-column: 1; grid-row: 1; }
+      [data-ui="masthead"] .topbar-actions { grid-column: 2; grid-row: 1; }
+      [data-ui="masthead"] .topnav { display: flex; grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; }
+      [data-ui="masthead"] .topnav a { padding-inline: 10px; }
+      [data-ui="hero"] { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px; }
+      [data-ui="hero"] .float-label { max-width: calc(100% - 32px); white-space: normal; }
+      [data-ui="course-list"] .spine, .subject-courses, [data-ui="lesson-list"] .course-track, [data-ui="lesson-list"] .syllabus { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"], [data-ui="course-navigation"] { grid-template-columns: minmax(0, 1fr); }
+      [data-ui="lesson-navigation"] > a, [data-ui="course-navigation"] > a { grid-column: 1; }
+    }
+  </style>
+
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('learn-theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) { /* Storage can be unavailable (private mode, file://). */ }
+    })();
+  </script>
+</head>
+<body data-page-kind="lesson">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="shell">
+    <header class="topbar" data-ui="masthead">
+      <a class="brand" href="../../" aria-label="Learn library">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" focusable="false"><path d="M3 5h7l2 2 2-2h7v15h-7l-2 1-2-1H3z" /><path d="M12 7v14" /></svg></span>
+        <span class="brand-copy"><strong>Learn</strong></span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="../../#paths">Subjects</a>
+        <a href="../../#courses">Courses</a>
+        <a href="../../progress/">Progress</a>
+      </nav>
+      <div class="topbar-actions"><a class="signin-btn" id="signinLink" href="../../progress/" title="Optional. Signing in carries your completion ticks to your other devices; it unlocks nothing, because nothing here is locked."><span class="signin-mark" aria-hidden="true">&#9679;</span><span class="signin-label" id="signinLabel">Sign in</span></a><button class="icon-btn" id="themeToggle" type="button" aria-label="Toggle light and dark theme" title="Toggle theme">&#9790;</button></div>
+    </header>
+    <nav class="crumbs" data-ui="breadcrumbs" aria-label="Breadcrumb">
+      <a href="../../">Learn library</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../../paths/operations-research/">Operations Research</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <a href="../">Dynamic Programming and Sequential Decisions</a>
+      <span class="crumb-sep" aria-hidden="true">/</span>
+      <span class="crumb-current" aria-current="page">Silver-Meal and Least Unit Cost</span>
+    </nav>
+
+    <noscript>
+      <div class="noscript-note"><strong>JavaScript is required for the interactive lesson.</strong> The two rules of thumb, against the exact answer is computed in your browser, so it stays blank while scripting is off. Everything written &mdash; the definitions, the worked example, the common mistakes and the understanding check &mdash; reads normally.</div>
+    </noscript>
+
+    <main id="main">
+    <section class="hero" data-ui="hero">
+      <div>
+        <span class="eyebrow"><span class="pulse" aria-hidden="true"></span><span data-ui="page-kind">Lesson</span> &middot; Dynamic Programming and Sequential Decisions &middot; Ordering over time</span>
+        <h1>Silver-Meal and Least Unit Cost</h1>
+        <p>Both rules build the plan left to right: start an interval, keep extending it while an average falls, stop when the average turns up, start again. They differ only in which average they watch &mdash; cost per period, or cost per unit &mdash; and that is enough to make them disagree with each other as well as with the exact answer. Neither dominates the other, and the instance that shows it has one of them paying 24 too much with three orders and the other 30 too much with two.</p>
+        <div class="hero-actions" data-ui="primary-actions"><a class="btn primary" href="#lab">Open the interactive lesson</a><a class="btn ghost" href="#practice">Practice</a></div>
+      </div>
+      <div class="hero-visual">
+        <div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">Silver-Meal      extend while the average cost per PERIOD is falling
+least unit cost  extend while the average cost per UNIT is falling
+both stop at the first turn upwards, and neither can see past it
+demand 17 25 73 113 89,  K = 116,  h = 1:   exact 462
+   Silver-Meal 486, three orders, 24 too much
+   least unit cost 492, two orders, 30 too much
+demand 10 62 12 130 154 129,  K = 54,  h = 2:  exact 294, SM 294, LUC 600</div>
+        <div class="float-label" style="right:16px;bottom:16px;">Two averages, two stopping points, and what each one costs</div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="section-head"><div><p class="kicker">Core ideas</p><h2>What this lesson establishes</h2></div><p>Three ideas: what the rules do, why they can be wrong, and how to price the wrongness without trusting either rule's own bookkeeping.</p></div>
+      <div class="grid-3"><article class="card concept-card"><div class="icon">1</div><h3>Both rules are myopic in the same way, and greedy in different ways</h3><p>Each starts an interval at the first uncovered period and extends it one period at a time, watching a running average. While the average falls, extending looks worthwhile; at the first increase the rule closes the interval and starts a new one at the next period. Neither ever revisits a decision, so a plan is built in one left-to-right sweep, and the whole question is which average is being watched.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Per period and per unit are different questions</h3><p>Silver-Meal divides the interval's total cost by the number of periods it covers; least unit cost divides it by the quantity ordered. When demand is rising sharply, adding a period adds a lot of quantity, so the per-unit average keeps falling long after the per-period average has turned up &mdash; which is exactly why least unit cost places fewer, longer orders on the instances here, and why the two rules disagree rather than one being a rough version of the other.</p></article><article class="card concept-card"><div class="icon">3</div><h3>A heuristic&#x27;s own cost figure is not evidence</h3><p>Each rule reports a total as it goes. That total is produced by the same code that chose the plan, so it cannot testify to it. The lab prices each plan again from the demand, the setup charge and the holding rate &mdash; the same function that prices the exact plan &mdash; so the comparison is between three plans measured with one instrument, which is the only kind of comparison worth making.</p></article></div>
+    </section>
+    <section class="section" id="read">
+      <div class="section-head"><div><p class="kicker">The material</p><h2>Two rules, traced, and then priced against the exact answer</h2></div><p>What each rule does step by step, the instance where one of them is lucky, and the instance where both of them are not.</p></div>
+      <article class="card card-pad prose"><div class="defbox"><span class="label">Definition &middot; Silver-Meal and least unit cost</span><p>Both rules build a plan by intervals. Starting at the first uncovered period <span class="math">t</span>, consider covering <span class="math">t</span> through <span class="math">t+k</span> for <span class="math">k = 0, 1, 2, ...</span>. The interval's cost is <span class="math">K + h ×</span> its holding, and the rule compares a running average as <span class="math">k</span> grows.</p><p><strong>Silver-Meal</strong> uses the average per period, <span class="math">(K + h × holding) / (k+1)</span>. <strong>Least unit cost</strong> uses the average per unit, <span class="math">(K + h × holding) / (quantity covered)</span>. Each extends while its average strictly falls and closes the interval at the first value that does not, then starts again at the next uncovered period.</p></div><p>Two things follow immediately. Both rules always terminate, because every interval covers at least one period. And both are exact on the first interval only in the sense that they stop where their own average stops &mdash; neither has any notion of what happens after the interval it is currently building, so neither can trade a worse interval now for a much better one later. That is the failure mode, and it is structural rather than a matter of tuning.</p><h3>The instance where both of them miss</h3><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">demand  17  25  73  113  89        K = 116     h = 1
+
+EXACT (the recursion of the previous page)
+   orders at 1, 3, 4      covering 1-2, 3, 4-5
+   cost  141 + 116 + 205  =  462
+
+SILVER-MEAL, average per PERIOD
+   from 1:  116/1 = 116   141/2 = 70.5   287/3 = 95.66..   turned up, span 2
+   from 3:  116/1 = 116   229/2 = 114.5  407/3 = 135.66..  turned up, span 2
+   from 5:  116/1 = 116                                    last period, span 1
+   plan  1-2, 3-4, 5      cost  141 + 229 + 116  =  486     three orders
+
+LEAST UNIT COST, average per UNIT
+   from 1:  116/17 = 6.82   141/42 = 3.357   287/115 = 2.496   626/228 = 2.745
+                                                     turned up, span 3
+   from 4:  116/113 = 1.026   205/202 = 1.014        ran out, span 2
+   plan  1-3, 4-5         cost  287 + 205  =  492            two orders
+
+   exact 462      Silver-Meal 486 (+24)      least unit cost 492 (+30)</div><p>Neither rule dominates. Silver-Meal is 24 over with three orders; least unit cost is 30 over with two. They do not merely differ in how much they lose, they differ in what kind of plan they produce, and no amount of preferring one of them in advance is justified by this instance &mdash; or, as the next paragraph shows, by the other one.</p><h3>The instance where one of them is exactly right</h3><p>Take the six-period demand of &ldquo;Wagner-Whitin and the Order Intervals&rdquo;: 10, 62, 12, 130, 154, 129 with a setup of 54 and a holding rate of 2. Silver-Meal produces precisely the exact plan &mdash; five orders, with periods 2 and 3 covered together &mdash; and costs 294, which is the optimum. Least unit cost produces four orders and costs 600, more than twice the optimum.</p><div class="example"><span class="label">Example &middot; Why least unit cost goes so badly wrong there</span><p>Starting at period 1 it compares 116/17-style ratios: <span class="math">54/10 = 5.4</span>, then <span class="math">178/72 ≈ 2.47</span>, then <span class="math">226/84 ≈ 2.69</span>. So it covers periods 1 and 2 together and stops. Starting again at period 3 it sees <span class="math">54/12 = 4.5</span> and then <span class="math">314/142 ≈ 2.21</span>, so it covers periods 3 and 4 together &mdash; which means carrying 130 units for a period at 2 each.</p><p>That single decision costs 260 in holding to save one setup charge of 54. The per-unit average is falling the whole time, because the 130 units in the denominator swamp the 260 in the numerator; the average is a ratio and the rule is watching the ratio rather than the money.</p></div><p>So on one instance Silver-Meal is exact and least unit cost is more than double; on another Silver-Meal is 24 over and least unit cost 30 over. Two instances is not a study, and this page does not claim one. What it claims is narrower and is measured: neither rule dominates the other, and the honest way to use either is to price its output against the recursion whenever you can afford to.</p><h3>The instance where everything agrees</h3><p>Flat demand of 30 for six periods, a setup of 80 and a holding rate of 1: both rules and the recursion produce the same three-order plan costing 330. That is the case a textbook reaches for when it wants to show a heuristic in a good light, and it is exactly the case that cannot distinguish the rules from each other or from the exact answer. A flat instance is where a heuristic looks best, which is why it is not the test.</p><p>The lab plots the cost of each plan against the number of orders it places, which makes one thing visible that a table does not: the exact plan is not always the one with the most orders or the fewest. On the five-period instance the optimum has three orders, one heuristic has three and is still wrong, and the other has two. The order count is not the thing being optimised and reading the plot as though it were is a mistake worth making once, on the page, with the numbers in front of you.</p><p>What none of this settles is whether the exact plan is worth having. The recursion needs the whole horizon in advance and the heuristics need only the next few periods, so on a rolling forecast the comparison is not between 462 and 486 at all &mdash; it is between two different problems. That is a judgement about the situation rather than about the arithmetic, and it is the reason both rules are still in use.</p></article>
+    </section>
+    <section class="section" id="lab">
+      <div class="section-head"><div><p class="kicker">Interactive</p><h2>Two rules of thumb, against the exact answer</h2></div><p>Silver-Meal and least-unit-cost watch different averages and stop in different places</p></div>
+      <div class="lab-layout">
+        <article class="card lab-main">
+      <div class="lab-toolbar">
+        <div class="lab-title"><strong>Two rules of thumb, against the exact answer</strong><span>a heuristic that stops when the average turns up can stop in the wrong place</span></div>
+        <div class="inline-legend"><span class="tone-green"><i class="legend-swatch"></i>the exact plan</span><span class="tone-cyan"><i class="legend-swatch"></i>Silver-Meal</span><span class="tone-amber"><i class="legend-swatch"></i>least unit cost</span><span class="tone-red"><i class="legend-swatch"></i>what the rule left on the table</span></div>
+      </div>
+      <div class="lab-stage" tabindex="0" role="region" aria-label="Interactive diagram; scroll horizontally for complete labels"><svg id="heDemand" viewBox="0 0 660 140" role="img" aria-label="Demand period by period, with the exact plan's order periods marked."></svg><svg id="heCost" viewBox="0 0 520 220" role="img" aria-label="The cost of each plan, against the number of orders it places."></svg></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="heTrail"></table></div>
+      <div class="table-wrap" style="margin-top:12px;" tabindex="0" role="region" aria-label="Data table"><table class="tt" id="heCompare"></table></div>
+      <div class="status-banner" id="heStatus" style="margin-top:12px;"></div>
+        </article>
+        <aside class="card side-panel" aria-live="polite">
+          <h3>Trace both rules, and price what each of them produces</h3>
+          <p>Each rule is traced interval by interval with the running average it was watching, so the period it stops at is visible rather than asserted. Every plan &mdash; both heuristics and the exact one &mdash; is then priced again from the demand and the two charges by the same function, so the three totals are comparable. This example is the one where both rules miss and neither dominates; the first in the list is the one where Silver-Meal happens to be exact.</p>
+        <div class="field">
+          <label for="hePreset">Worked example</label>
+          <select id="hePreset"><option value="split">the two heuristics disagree with each other</option><option value="both" selected>both of them miss, and by different amounts</option><option value="agree">steady demand, and everything agrees</option></select>
+        </div>
+        <div class="field">
+          <label for="heDemandIn">Demand, period by period</label>
+          <input id="heDemandIn" type="text" value="" inputmode="text" autocomplete="off" placeholder="17 25 73 113 89">
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="heK">The charge for placing an order</label><span class="range-value" id="heKOut">116</span></div>
+          <input id="heK" type="range" min="10" max="200" step="2" value="116" />
+        </div>
+        <div>
+          <div class="range-row"><label class="small-copy" for="heH">Holding cost, per unit per period</label><span class="range-value" id="heHOut">1</span></div>
+          <input id="heH" type="range" min="1" max="10" step="1" value="1" />
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi"><span>The exact cost</span><strong id="heExact">&mdash;</strong></div>
+          <div class="kpi"><span>Silver-Meal costs</span><strong id="heSM">&mdash;</strong></div>
+          <div class="kpi"><span>Least unit cost costs</span><strong id="heLUC">&mdash;</strong></div>
+          <div class="kpi"><span>What Silver-Meal gives away</span><strong id="heGapSM">&mdash;</strong></div>
+          <div class="kpi"><span>What least unit cost gives away</span><strong id="heGapLUC">&mdash;</strong></div>
+          <div class="kpi"><span>Every plan priced again?</span><strong id="heRepriced">&mdash;</strong></div>
+        </div>
+        <p class="small-copy" id="heHint" style="margin:0;">Silver-Meal extends an interval while the average cost per PERIOD is falling; least-unit-cost extends it while the average cost per UNIT is falling. They are different questions, they stop in different places, and neither of them can see past the first turn &mdash; which is the failure mode, not the cost.</p>
+        </aside>
+      </div>
+    </section>
+    <section class="section" id="process">
+      <div class="section-head"><div><p class="kicker">Method</p><h2>Tracing a rule honestly</h2></div><p>Four steps. The fourth is the one that turns a demonstration into a measurement.</p></div>
+      <div class="grid-4"><article class="card concept-card"><div class="icon">1</div><h3>Write the running total for each candidate interval, not just the average</h3><p><span class="math">K</span> plus <span class="math">h</span> times the holding, for covering one period, two periods, three. The average is that total divided by something, and keeping the total in view stops you from losing track of what the ratio is a ratio of.</p></article><article class="card concept-card"><div class="icon">2</div><h3>Divide by the right denominator, and be able to say which</h3><p>Periods for Silver-Meal, units for least unit cost. Writing both columns side by side once is worth more than remembering which is which, because the point of the lesson is that the choice of denominator changes the plan.</p></article><article class="card concept-card"><div class="icon">3</div><h3>Stop at the first value that is not smaller, and start again</h3><p>Not the smallest over the whole horizon &mdash; the first turn upwards. That is what makes these rules cheap and what makes them wrong; a rule that searched for the global minimum of the average would be doing more work than the recursion.</p></article><article class="card concept-card"><div class="icon">4</div><h3>Price the finished plan from the demand, not from the rule&#x27;s own running total</h3><p>Setup charges plus <span class="math">h</span> times unit-periods, computed independently. Then subtract the exact cost to get the gap. A heuristic that reports its own cost is not a witness to it, and the whole comparison depends on one instrument measuring all three plans.</p></article></div>
+    </section>
+    <section class="section" id="practice">
+      <div class="grid-2">
+      <article class="card practice">
+        <div class="practice-head"><h3>Averages, stopping points and what a gap means</h3><span class="score" id="quizScore">Score 0 / 0</span></div>
+        <p id="quizPrompt" class="small-copy" style="margin:0;"></p>
+        <div class="choice-grid" id="quizChoices"></div>
+        <div class="feedback" id="quizFeedback" aria-live="polite">Choose the answer you can justify.</div>
+        <button class="btn small" id="quizNext" type="button" style="margin-top:2px;">Next question</button>
+      </article>
+      <article class="card card-pad prose"><h3>Two rules on two instances, priced with one instrument</h3><p>The five-period instance where both rules miss, and the six-period one where Silver-Meal is exactly right. Every cost below is the plan priced from the demand rather than the number the rule reported.</p><div class="mathblock" tabindex="0" role="region" aria-label="Mathematical notation">INSTANCE A     demand 17 25 73 113 89        K = 116     h = 1
+
+   exact            orders at 1, 3, 4       141 + 116 + 205  =  462
+   Silver-Meal      orders at 1, 3, 5       141 + 229 + 116  =  486     +24
+   least unit cost  orders at 1, 4          287 + 205        =  492     +30
+
+   three orders is not the problem: the exact plan also places three.
+   Silver-Meal covers 3-4 where the optimum covers 3 alone and 4-5 together.
+
+INSTANCE B     demand 10 62 12 130 154 129   K = 54      h = 2
+
+   exact            orders at 1, 2, 4, 5, 6                   =  294
+   Silver-Meal      orders at 1, 2, 4, 5, 6                   =  294     +0
+   least unit cost  orders at 1, 3, 5, 6                      =  600   +306
+
+   least unit cost covers 3-4 together, carrying 130 units one period:
+      holding 2 x 130 = 260,   to save one setup charge of 54.
+
+INSTANCE C     demand 30 30 30 30 30 30      K = 80      h = 1
+
+   exact 330      Silver-Meal 330      least unit cost 330
+   all three place three orders covering 1-2, 3-4, 5-6.</div><p>Instance C is the one to be suspicious of. Every rule agrees, every plan is tidy, and nothing has been tested: with demand flat there is no way for the two averages to disagree, so the instance cannot distinguish the rules even in principle. A demonstration built on it would be a demonstration of nothing.</p><p>For a rehearsal, take instance A and raise the setup charge with the slider until least unit cost becomes exact. Then keep going and watch whether it stays exact. The interesting part is that the gap is not monotone in the charge: a heuristic can be right, then wrong, then right again as a parameter moves, which is another way of saying its error is not an approximation.</p><p>The harder rehearsal: find a demand sequence on which least unit cost beats Silver-Meal. It exists &mdash; the per-unit average is the better guide when demand rises steeply and holding is cheap &mdash; and constructing one is the only way to be sure you believe &ldquo;neither dominates&rdquo; rather than having read it.</p></article>
+      </div>
+    </section>
+    <section class="section">
+      <div class="grid-2">
+        <article class="card card-pad"><h3 style="margin-top:0;">Common mistakes</h3><div class="lesson-list"><div class="lesson-row"><div class="num">1</div><div><strong>Reading the gap as an approximation error that shrinks with care</strong><span>It does not shrink and there is nothing to tune. Both rules stop at the first turn upwards by construction, so the plans they can produce form a restricted set, and the exact plan is often not in it. Raising or lowering a charge moves a heuristic from exact to badly wrong and back again, which is the signature of a different search rather than a noisy one.</span></div></div><div class="lesson-row"><div class="num">2</div><div><strong>Choosing between the rules once, in advance</strong><span>The measured fact on this page is that neither dominates. Silver-Meal is exact on one of the instances here and 24 over on another; least unit cost is 30 over on one and more than double on the other. Any general preference has to come from knowing something about the demand pattern, and if you know that much you can usually afford the recursion.</span></div></div><div class="lesson-row"><div class="num">3</div><div><strong>Comparing the number of orders instead of the cost</strong><span>On the five-period instance the exact plan and the Silver-Meal plan both place three orders and differ by 24, while the least-unit-cost plan places two and differs by 30. The order count is not the objective; it is a feature of the plan, and a plot of cost against order count is there to make that separation visible rather than to suggest a target.</span></div></div></div></article>
+        <article class="card card-pad"><h3 style="margin-top:0;">Check your understanding</h3><div class="callout"><div class="mark">&#10003;</div><div><strong>Finish when you can trace both rules by hand on a five-period instance, price each plan independently, and say why neither rule dominates.</strong><p>You should be able to write the running average for each candidate interval under both denominators, identify where each rule stops and why, price each finished plan from the demand rather than from the rule's own total, and reproduce the instance where both rules miss by different amounts with different numbers of orders.</p></div></div><div class="note" style="margin-top:12px;"><strong>Note:</strong> Everything so far has been deterministic: the arcs, the returns and the demands were known before anything was decided. The next lesson, &ldquo;The Stochastic Recursion&rdquo;, puts chance inside the transition, so a value becomes an expectation and the maximum sits outside it. The recursion itself barely changes. What changes is that the best action in a state can now depend on how many periods are left, which means a policy has a time index and the stationary case becomes the special one.</div></article>
+      </div>
+    </section>
+    </main>
+
+    <div class="progress-bar" data-ui="progress">
+      <button class="progress-toggle" id="progressToggle" type="button" aria-pressed="false">
+        <span class="progress-tick" aria-hidden="true">&#10003;</span><span id="progressLabel">Mark this lesson complete</span>
+      </button>
+      <p class="progress-note">Kept in this browser only, for you. Nothing is sent anywhere and nothing checks it.
+        <a href="../../progress/">Carry it to another device</a>.</p>
+    </div>
+
+    <nav class="lesson-nav" data-ui="lesson-navigation" aria-label="Course and lesson links">
+      <a class="lesson-link prev" href="../wagner-whitin-and-the-order-intervals/" rel="prev"><span>Lesson</span><strong>Wagner-Whitin and the Order Intervals</strong></a>
+      <a class="lesson-link next" href="../the-stochastic-recursion/" rel="next"><span>Lesson</span><strong>The Stochastic Recursion</strong></a>
+    </nav>
+
+    <section class="lesson-feedback" data-ui="feedback" id="lessonFeedback"
+             data-lesson-id="dynamic-programming-and-sequential-decisions/silver-meal-and-least-unit-cost" data-lesson-title="Silver-Meal and Least Unit Cost" data-course-title="Dynamic Programming and Sequential Decisions">
+      <h2>Feedback and recommendations</h2>
+      <p class="fb-lead">Something to change about this lesson? Write it down, tick it off when it
+        is handled, and export the list when you want to act on it. Kept in this browser only:
+        nothing is sent anywhere, and nobody is notified.</p>
+      <form class="fb-form" id="fbForm">
+        <label class="fb-sr" for="fbText">Your recommendation for this lesson</label>
+        <textarea class="fb-text" id="fbText" rows="3"
+                  placeholder="e.g. the warm-up period should be explained before the first worked example"></textarea>
+        <div class="fb-actions">
+          <button class="btn primary" type="submit">Add recommendation</button>
+          <button class="btn" type="button" id="fbExport">Export as Markdown</button>
+          <span class="fb-count" id="fbCount"></span>
+        </div>
+      </form>
+      <ul class="fb-list" id="fbList"></ul>
+      <p class="fb-empty" id="fbEmpty">No recommendations yet for this lesson.</p>
+    </section>
+
+    <footer class="footer" data-ui="footer">
+      <p><strong>Dynamic Programming and Sequential Decisions.</strong> Every value, cost, expectation, threshold, posterior and fixed point on this course is an exact fraction. A three-period expectation prints as <span class="math">53/8</span>, a search is worth <span class="math">71/3</span>, a discounted value is <span class="math">22/7</span>, and the secretary table at four candidates is <span class="math">1/4</span>, <span class="math">11/24</span>, <span class="math">5/12</span>, <span class="math">1/4</span> rather than four decimals. That is doing real work here rather than decorating: the closing lesson&rsquo;s whole argument is that value iteration never reaches the fixed point, and the evidence is the denominator growing from one digit to ten in twelve steps while the exact answer was available at step zero &mdash; a float would have hidden both the exactness and the cost behind the same fifteen digits. Two numbers on the course are genuinely irrational and both are labelled where they appear: <span class="math">1/e</span>, and the <span class="math">n/e</span> built from it. Every other decimal here says &ldquo;exact, shown to so many places&rdquo;. What none of this can check is the state: a recursion is exact about the problem you described to it, and each lesson ends by naming what its description left out.</p>
+      <p>&copy; 2026 dmedellin &middot; Released under the MIT License &middot; Educational use only &mdash; every figure on this path is computed in your browser from the model the lesson states, and a solution proved optimal is optimal for the model you wrote down rather than for the situation it came from &mdash; each lesson names what the model left out.</p>
+      <p><a href="https://learn.geterdone.io">learn.geterdone.io</a></p>
+    </footer>
+  </div>
+  <script>
+    /* Theme toggle. Same control, same key ('learn-theme'), same static label
+       as every other page in the library. The button's accessible name is never
+       rewritten from script: a label that describes state has to choose between
+       naming the current theme and the next one, and courses chose differently. */
+    (function () {
+      var root = document.documentElement;
+      var toggle = document.getElementById('themeToggle');
+      var KEY = 'learn-theme';
+      var mql = window.matchMedia('(prefers-color-scheme: light)');
+      function stored() {
+        try { return localStorage.getItem(KEY); } catch (e) { return null; }
+      }
+      function resolved() {
+        var t = root.dataset.theme;
+        if (t === 'light' || t === 'dark') return t;
+        return mql.matches ? 'light' : 'dark';
+      }
+      function paintIcon() { toggle.textContent = resolved() === 'light' ? '\u2600' : '\u263E'; }
+      toggle.addEventListener('click', function () {
+        var next = resolved() === 'light' ? 'dark' : 'light';
+        root.dataset.theme = next;
+        try { localStorage.setItem(KEY, next); } catch (e) { /* Storage can be unavailable. */ }
+        paintIcon();
+      });
+      if (typeof mql.addEventListener === 'function') {
+        mql.addEventListener('change', function () { if (!stored()) paintIcon(); });
+      }
+      paintIcon();
+    })();
+
+    (function () {
+      var a = document.getElementById('signinLink');
+      if (!a) return;
+      var s = null;
+      try { s = JSON.parse(sessionStorage.getItem('learn-auth') || 'null'); }
+      catch (e) { return; }
+      if (!s || !s.access_token) return;
+      var label = document.getElementById('signinLabel');
+      var name = null;
+      /* Same read the progress page does: the ID token names the account, for
+         display only. Nothing here trusts it for authorisation, because there
+         is nothing to authorise. */
+      try {
+        if (s.id_token) {
+          var c = JSON.parse(atob(s.id_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+          name = c.name || c.preferred_username || null;
+        }
+      } catch (e) { name = null; }
+      if (label) label.textContent = name ? String(name).split(' ')[0] : 'Signed in';
+      a.setAttribute('title', (name ? 'Signed in as ' + name : 'Signed in')
+        + '. Your completion ticks can follow you to another device.');
+      a.classList.add('is-in');
+    }());
+  var QUIZ = [{"q": "Silver-Meal and least unit cost differ in exactly one respect. Which?", "a": ["One works forwards and the other backwards", "One allows shortages and the other does not", "The denominator of the running average: periods covered, against units ordered", "One stops at the first turn upwards and the other at the global minimum"], "c": 2, "why": "Both build intervals left to right and both stop at the first turn upwards. Dividing the same total by the number of periods or by the quantity is the whole difference, and it is enough to make them produce plans with different numbers of orders on the same data."}, {"q": "On the five-period instance the exact cost is 462, Silver-Meal costs 486 and least unit cost 492. What does that show?", "a": ["That Silver-Meal is the better rule", "That neither rule dominates: on this instance Silver-Meal is closer, and on the six-period instance least unit cost costs more than twice the optimum while Silver-Meal is exact", "That both rules are approximations converging to the optimum", "That the optimum has fewer orders than either rule places"], "c": 1, "why": "Two instances is not a ranking. What is measured is that they miss differently &mdash; 24 with three orders against 30 with two &mdash; and that on other data the ordering reverses sharply. The exact plan on the five-period instance also places three orders, so the order count is not the thing that went wrong."}, {"q": "Why does the lab price every plan again from the demand rather than using the total each rule reported?", "a": ["Because the rules do not report a total", "Because the rounding would otherwise differ", "Because a rule's own bookkeeping is produced by the code that chose the plan, so it cannot testify to it &mdash; all three plans need one instrument", "Because the exact plan is priced differently from a heuristic plan"], "c": 2, "why": "The comparison is the whole content of the lesson, so the measurement has to be independent of the thing measured. One pricing function is applied to all three plans, and it also checks that each plan covers every period exactly once, which is a way a reconstructed plan can be wrong without costing anything."}, {"q": "With demand flat at 30 for six periods, all three methods agree at 330. What has that instance tested?", "a": ["That the heuristics are correct", "That the heuristics are correct when demand is known", "Almost nothing: with demand flat the two averages cannot disagree, so the instance cannot distinguish the rules even in principle", "That the exact recursion is unnecessary for flat demand"], "c": 2, "why": "It is the friendly case, and a friendly case is not a test. The reason it is in the lab at all is to be recognised as one: a heuristic looks best exactly where nothing can separate it from the alternative, and a demonstration built on such an instance demonstrates nothing."}];
+
+  (function () {
+
+  /* Exact rational arithmetic over BigInt.
+
+     Every number a lesson calls "the answer" lives in this type. BigInt rather
+     than Number because a few steps of elimination on a 3x3 system produces
+     numerators that leave the exact-integer range of a double, and a solution
+     that is silently wrong in the last digits is worse than no solution. */
+  function bgcd(a, b) {
+    if (a < 0n) a = -a;
+    if (b < 0n) b = -b;
+    while (b) { var t = a % b; a = b; b = t; }
+    return a;
+  }
+  function R(n, d) {
+    if (d === undefined) d = 1n;
+    n = BigInt(n); d = BigInt(d);
+    if (d === 0n) throw new Error('division by zero');
+    if (d < 0n) { n = -n; d = -d; }
+    var g = bgcd(n, d) || 1n;
+    return { n: n / g, d: d / g };
+  }
+  var R0 = R(0n), R1 = R(1n);
+  function Radd(a, b) { return R(a.n * b.d + b.n * a.d, a.d * b.d); }
+  function Rsub(a, b) { return R(a.n * b.d - b.n * a.d, a.d * b.d); }
+  function Rmul(a, b) { return R(a.n * b.n, a.d * b.d); }
+  function Rdiv(a, b) { return R(a.n * b.d, a.d * b.n); }
+  function Rneg(a) { return R(-a.n, a.d); }
+  function Rabs(a) { return a.n < 0n ? Rneg(a) : a; }
+  function Rinv(a) { return R(a.d, a.n); }
+  function Rzero(a) { return a.n === 0n; }
+  function Rsign(a) { return a.n === 0n ? 0 : (a.n < 0n ? -1 : 1); }
+  function Requ(a, b) { return a.n === b.n && a.d === b.d; }
+  function Rcmp(a, b) { var l = a.n * b.d, r = b.n * a.d; return l < r ? -1 : (l > r ? 1 : 0); }
+  function Rint(a) { return a.d === 1n; }
+  function Rpow(a, k) {
+    var out = R1, base = a, e = k < 0 ? -k : k;
+    while (e > 0) { if (e & 1) out = Rmul(out, base); base = Rmul(base, base); e >>= 1; }
+    return k < 0 ? Rinv(out) : out;
+  }
+  /* The reader's form: "3", "-7/4". Never "3/1", never "0/5". */
+  function Rtext(a) { return a.d === 1n ? String(a.n) : a.n + '/' + a.d; }
+  /* Parenthesised when it would otherwise glue onto a neighbouring symbol. */
+  function Rterm(a) { return (a.n < 0n || a.d !== 1n) ? '(' + Rtext(a) + ')' : Rtext(a); }
+  function Rnum(a) { return Number(a.n) / Number(a.d); }
+  /* A decimal, for the one place a lesson asks for one. Exact when it can be.
+
+     BigInt long division rather than Number(n)/Number(d).toFixed(). The old
+     form had two faults and the second is the one that shows.
+
+     It returned NaN. Past roughly 300 digits both halves of the quotient are
+     Infinity and Infinity/Infinity is NaN, so a page printed NaN to a reader.
+     A Bloom filter's exact rate at m = 1000, n = 100, k = 7 has a 2101-digit
+     denominator, and Karger's contraction probability has the same shape.
+
+     And it rounded exact ties the wrong way. -399/40 is exactly -9.975; the
+     nearest double is fractionally smaller in magnitude, so toFixed(2) gave
+     -9.97 where half away from zero is -9.98. 160 of 144,180 rationals over
+     the small-integer range disagreed, every one of them an exact tie.
+
+     Half away from zero, computed on the exact value: the doubling, the +1
+     and the halving are the rounding, done in integers. */
+  function Rdec(a, places) {
+    if (places === undefined) places = 6;
+    if (Rint(a)) return String(a.n);
+    var neg = a.n < 0n, num = neg ? -a.n : a.n;
+    var scale = 10n ** BigInt(places);
+    var q = (num * scale * 2n / a.d + 1n) / 2n;
+    var s = q.toString();
+    while (s.length <= places) s = '0' + s;
+    var out = (neg ? '-' : '') + s.slice(0, s.length - places)
+      + (places > 0 ? '.' + s.slice(s.length - places) : '');
+    return out.indexOf('.') >= 0 ? out.replace(/0+$/, '').replace(/\.$/, '') : out;
+  }
+  function Rparse(text) {
+    var s = String(text).trim();
+    var m = /^([+-]?\d+)\s*\/\s*(\d+)$/.exec(s);
+    /* A zero denominator is not a number this function can read, so it comes
+       back null like every other unreadable string. It used to reach R(), which
+       THROWS -- and a throw out of a parser is not a refusal, it is a dead
+       page: the lab's redraw stops, the panel keeps the last good figures, and
+       nothing tells the reader why. Typing 1/0 into the availability chain on
+       a published page did exactly that. Callers all handle null already;
+       every one of them was written to. */
+    if (m) return m[2] === '0' || /^0+$/.test(m[2]) ? null : R(BigInt(m[1]), BigInt(m[2]));
+    m = /^([+-]?\d+)$/.exec(s);
+    if (m) return R(BigInt(m[1]));
+    m = /^([+-]?)(\d*)\.(\d+)$/.exec(s);
+    if (m) {
+      var whole = m[2] || '0', frac = m[3];
+      var num = BigInt(whole + frac), den = 10n ** BigInt(frac.length);
+      return R(m[1] === '-' ? -num : num, den);
+    }
+    return null;
+  }
+  /* Is this rational a perfect square? Needed wherever a lesson must decide
+     between an exact answer and a radical one -- sqrt(4/9) is 2/3 and belongs
+     on the page as 2/3, while sqrt(2) must stay sqrt(2). */
+  function bisqrt(n) {
+    if (n < 0n) return null;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x * x === n ? x : null;
+  }
+  function Rsqrt(a) {
+    if (a.n < 0n) return null;
+    var p = bisqrt(a.n), q = bisqrt(a.d);
+    return (p === null || q === null) ? null : R(p, q);
+  }
+
+  function td(t, cls) { return '<td' + (cls ? ' class="' + cls + '"' : '') + '>' + t + '</td>'; }
+  function tdl(t, cls) {
+    return '<td style="text-align:left;"' + (cls ? ' class="' + cls + '"' : '') + '>' + t + '</td>';
+  }
+  function th(t) { return '<th>' + t + '</th>'; }
+  function rowhead(t) { return '<th class="rowhead">' + t + '</th>'; }
+  function tr(cells, cls) { return '<tr' + (cls ? ' class="' + cls + '"' : '') + '>' + cells.join('') + '</tr>'; }
+  function table(caption, heads, rows) {
+    var head = (heads && heads.length)
+      ? '<thead>' + tr(heads.map(function (h) { return th(h); })) + '</thead>' : '';
+    return '<div class="table-wrap" tabindex="0" role="region" aria-label="Data table"><table class="tt"><caption>' + caption + '</caption>'
+      + head + '<tbody>' + rows.join('') + '</tbody></table></div>';
+  }
+  /* The two-column "what was done / what it produced" table. The exemplar's
+     trace layout, kept identical so a reader moving between courses is reading
+     the same page furniture. */
+  function steps(caption, pairs) {
+    return table(caption, [], pairs.map(function (p) { return tr([rowhead(p[0]), tdl(p[1])]); }));
+  }
+  function chip(t, kind) { return '<span class="chip' + (kind ? ' ' + kind : '') + '">' + t + '</span>'; }
+  /* " + 3" or " - 7": a bare number as a continuation. Everything on this page
+     that writes "something + <number>" goes through it, because "a(n-1) + -7"
+     is not a thing a reader writes and not a thing a marker accepts. */
+  function plusnum(r) { return (Rsign(r) < 0 ? ' - ' : ' + ') + Rtext(Rabs(r)); }
+  function tone(t, kind) { return '<span class="tone-' + kind + '">' + t + '</span>'; }
+  function plural(n, one, many) { return n === 1 ? one : many; }
+  /* Reader text goes into innerHTML, and on this course the reader types < and
+     > all day. Escaped once, at the boundary, rather than trusted: "x + 2y <= 8"
+     written raw would lose everything from the < to the next > -- which is the
+     end of the cell -- and the page would quietly drop the reader's own words. */
+  function esc(t) {
+    return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  /* Rparse throws on a zero denominator, and 1/0 is a thing a reader types.
+     Every read of reader input goes through this, so a bad fraction becomes a
+     sentence in the status banner rather than an exception. */
+  function Rread(text) {
+    try { return Rparse(String(text).trim()); } catch (err) { return null; }
+  }
+  /* The one rounding this file performs, and it is never used to decide
+     anything -- only to sit beside an exact value that a reader may want to
+     place on a number line. Every caller labels it as a rounding. */
+  function approx(r, places) {
+    var v = Rnum(r);
+    if (!isFinite(v)) return 'not a real number';
+    return v.toFixed(places === undefined ? 4 : places);
+  }
+  /* The least common multiple of two rationals: lcm of the numerators over the
+     gcd of the denominators. For two integers this is the schoolbook lcm, which
+     is what the elimination mode needs; for 1/2 and 1/4 it is 1/2, which is
+     what keeps that mode from inventing multipliers with four-digit numerators
+     the moment a coefficient stops being whole. */
+  function Rlcm(a, b) {
+    if (Rzero(a) || Rzero(b)) return R0;
+    var an = a.n < 0n ? -a.n : a.n, bn = b.n < 0n ? -b.n : b.n;
+    return R(an / bgcd(an, bn) * bn, bgcd(a.d, b.d));
+  }
+
+  /* Printing a rational this path can actually produce.
+
+     algebra_core's Rdec and Rnum both go through Number, and this path
+     produces rationals Number cannot hold: P^12 on a five-state chain with
+     denominator-20 entries has entries of 15 digits over 16 (measured), and
+     (19/20)^400 is 512 digits over 521, of which Number() makes NaN.  So
+     decimals here are long division in BigInt.  queue.py already solved this for the System
+     Design queueing course; this is that solution lifted, not a fourteenth
+     one, so the two courses print the same number the same way. */
+
+  /* Decimal by BigInt long division, rounded half up at the last digit. */
+  function Rfixed(a, places) {
+    if (places === undefined) places = 3;
+    var neg = a.n < 0n, n = neg ? -a.n : a.n, d = a.d;
+    var scale = 10n ** BigInt(places);
+    var q = (2n * n * scale + d) / (2n * d);          /* round half up */
+    var whole = q / scale, frac = (q % scale).toString();
+    while (frac.length < places) frac = '0' + frac;
+    var body = places > 0 ? whole + '.' + frac : String(whole);
+    return (neg ? '-' : '') + body;
+  }
+
+  /* The exact fraction when a reader can read it, a decimal when the exact
+     form has run to twenty digits.  Both are the same number; only one of them
+     is evidence.  The cut is on DIGITS, not on magnitude, so it is the same
+     rule on every page of the Subject. */
+  function Rshort(a, places, digits) {
+    if (digits === undefined) digits = 9;
+    var wide = String(a.n < 0n ? -a.n : a.n).length > digits || String(a.d).length > digits;
+    return wide ? Rfixed(a, places === undefined ? 4 : places) : Rtext(a);
+  }
+  function Rpct(a, places) {
+    return Rfixed(Rmul(a, R(100n, 1n)), places === undefined ? 2 : places) + '%';
+  }
+
+  /* The fractional part a - floor(a), EXACT -- which is what makes a Gomory
+     cut a cut and not an approximation of one.  The floor is computed inline
+     rather than by calling Rfloor, because sysdesign_core.RCEIL_JS declares
+     that name and a kit concatenating both blocks would hold two of it. */
+  function Rfrac(a) {
+    var q = a.n / a.d;
+    if (a.n < 0n && q * a.d !== a.n) q -= 1n;
+    return Rsub(a, R(q, 1n));
+  }
+
+  /* Floor of the integer square root of a BigInt.  algebra_core's bisqrt
+     returns null for a non-square, which is right for deciding exactness and
+     useless for printing one: this never returns null. */
+  function bifloor(n) {
+    if (n < 0n) return 0n;
+    if (n < 2n) return n;
+    var x = n, y = (x + 1n) / 2n;
+    while (y < x) { x = y; y = (x + n / x) / 2n; }
+    return x;
+  }
+
+  /* THE ONE FUNCTION IN THIS MODULE THAT ROUNDS.  A surd {q, k} means
+     q*sqrt(k) and is exact; its decimal is not, and an EOQ of 40*sqrt(3) is
+     read off a page as 69.28 whatever we would prefer.  The digits come from
+     bifloor(q.n^2 * k * 10^(2p)) = floor(q.n * 10^p * sqrt k), computed with
+     three guard places and then rounded once, so the printed last digit is the
+     correctly rounded one.  Every lesson that calls this says it is rounded. */
+  function surdDec(s, places) {
+    if (places === undefined) places = 4;
+    var p = places + 3;
+    var neg = Rsign(s.q) < 0, n = neg ? -s.q.n : s.q.n;
+    var floored = bifloor(n * n * s.k * 10n ** BigInt(2 * p));
+    var v = R(floored, s.q.d * 10n ** BigInt(p));
+    return Rfixed(neg ? Rneg(v) : v, places);
+  }
+
+  /* Dynamic programming, backwards.  Needs algebra_systems.MATRIX_JS (for the
+     exact fixed point) and sysdesign_core.HARMONIC_JS (for the secretary sum).
+
+     Every table here is filled from the END, which is the half of the subject
+     a reader finds strange and the half that makes it work: the value of being
+     somewhere is the cost of the step plus the value of where it leads, and
+     the only place that recursion bottoms out is the finish. */
+
+  /* The stage-by-stage value table, with TIES KEPT.
+
+     "The optimal policy is unique" is the misconception C7 L1 is built on, and
+     the only way to refute it on a page is to carry every argmin rather than
+     the first one found.  `stages` is an array of arrays of node ids, earliest
+     first; `arcs` is [{from, to, cost}]. */
+  function backwardStages(stages, arcs, opts) {
+    opts = opts || {};
+    var minimise = opts.maximise !== true;
+    var f = {}, argmin = {}, ties = [], s, i, j;
+    var last = stages[stages.length - 1];
+    for (i = 0; i < last.length; i += 1) f[last[i]] = opts.terminal && opts.terminal[last[i]] !== undefined
+      ? opts.terminal[last[i]] : R0;
+    for (s = stages.length - 2; s >= 0; s -= 1) {
+      for (i = 0; i < stages[s].length; i += 1) {
+        var v = stages[s][i], best = null, picks = [];
+        for (j = 0; j < arcs.length; j += 1) {
+          if (arcs[j].from !== v || f[arcs[j].to] === undefined) continue;
+          var val = Radd(arcs[j].cost, f[arcs[j].to]);
+          var better = best === null || (minimise ? Rcmp(val, best) < 0 : Rcmp(val, best) > 0);
+          if (better) { best = val; picks = [{ arc: j, to: arcs[j].to, value: val }]; }
+          else if (Requ(val, best)) picks.push({ arc: j, to: arcs[j].to, value: val });
+        }
+        f[v] = best === null ? null : best;
+        argmin[v] = picks;
+        if (picks.length > 1) ties.push({ node: v, stage: s, picks: picks.slice() });
+      }
+    }
+    /* Every optimal path, not one: the ties are the point. */
+    var policy = [], start = stages[0];
+    var walk = function (v, acc) {
+      if (policy.length > 200) return;
+      if (!argmin[v] || !argmin[v].length) { policy.push(acc.slice()); return; }
+      for (var k = 0; k < argmin[v].length; k += 1) {
+        acc.push(argmin[v][k].to); walk(argmin[v][k].to, acc); acc.pop();
+      }
+    };
+    for (i = 0; i < start.length; i += 1) walk(start[i], [start[i]]);
+    return { f: f, argmin: argmin, policy: policy, ties: ties,
+             value: start.length === 1 ? f[start[0]] : null, stages: stages };
+  }
+
+  /* The finite-horizon stochastic recursion on exact rationals.
+     P[a][i][j], r[a][i], T periods, V_T = 0 unless a terminal value is given. */
+  function stochasticDp(states, acts, P, r, T, opts) {
+    opts = opts || {};
+    var maximise = opts.minimise !== true, n = states.length, a, i, j, t;
+    var V = [], policy = [], table = [];
+    var vT = [];
+    for (i = 0; i < n; i += 1) vT.push(opts.terminal ? opts.terminal[i] : R0);
+    V[T] = vT;
+    for (t = T - 1; t >= 0; t -= 1) {
+      var row = [], pol = [], detail = [];
+      for (i = 0; i < n; i += 1) {
+        var best = null, arg = -1, per = [];
+        for (a = 0; a < acts.length; a += 1) {
+          var v = r[a][i];
+          for (j = 0; j < n; j += 1) v = Radd(v, Rmul(P[a][i][j], V[t + 1][j]));
+          per.push({ act: a, name: acts[a], value: v });
+          if (best === null || (maximise ? Rcmp(v, best) > 0 : Rcmp(v, best) < 0)) { best = v; arg = a; }
+        }
+        row.push(best); pol.push(arg);
+        detail.push({ state: states[i], best: best, act: acts[arg], options: per });
+      }
+      V[t] = row; policy[t] = pol; table[t] = detail;
+    }
+    return { V: V, policy: policy, table: table, states: states, acts: acts, T: T };
+  }
+
+  /* ---- lot sizing ------------------------------------------------------ */
+
+  /* Wagner-Whitin: the exact minimum-cost order plan.  F(t) is the cheapest
+     way to cover periods 1..t, and the recursion is over the period the LAST
+     order was placed in -- which works because an optimal plan never orders
+     while stock remains, so every plan is a partition into order intervals. */
+  function wagnerWhitin(demand, K, h) {
+    var T = demand.length, F = [R0], from = [0], detail = [], t, j;
+    for (t = 1; t <= T; t += 1) {
+      var best = null, arg = -1, opts = [];
+      for (j = 1; j <= t; j += 1) {
+        var hold = R0, i;
+        for (i = j; i <= t; i += 1) hold = Radd(hold, Rmul(R(BigInt(i - j), 1n), demand[i - 1]));
+        var v = Radd(F[j - 1], Radd(K, Rmul(h, hold)));
+        opts.push({ orderAt: j, value: v, holding: Rmul(h, hold), before: F[j - 1] });
+        if (best === null || Rcmp(v, best) < 0) { best = v; arg = j; }
+      }
+      F.push(best); from.push(arg);
+      detail.push({ t: t, value: best, orderAt: arg, options: opts });
+    }
+    var plan = [], t2 = T;
+    while (t2 > 0) {
+      var j2 = from[t2], q = R0, i2;
+      for (i2 = j2; i2 <= t2; i2 += 1) q = Radd(q, demand[i2 - 1]);
+      plan.unshift({ period: j2, quantity: q, covers: [j2, t2] });
+      t2 = j2 - 1;
+    }
+    return { F: F, plan: plan, orders: plan.length, cost: F[T], detail: detail, from: from };
+  }
+
+  /* Silver-Meal (least average cost per PERIOD) and least-unit-cost (least
+     average cost per UNIT), both traced, both measured against the exact
+     answer.  They are different heuristics and they can disagree with each
+     other as well as with Wagner-Whitin, which is the lesson. */
+  function lotsizeHeuristics(demand, K, h) {
+    var T = demand.length;
+    var run = function (perUnit) {
+      var t = 0, plan = [], steps = [], cost = R0;
+      while (t < T) {
+        var hold = R0, qty = R0, best = null, span = 1, k;
+        var trail = [];
+        for (k = 0; k + t < T; k += 1) {
+          hold = Radd(hold, Rmul(R(BigInt(k), 1n), demand[t + k]));
+          qty = Radd(qty, demand[t + k]);
+          var total = Radd(K, Rmul(h, hold));
+          var avg = perUnit ? (Rzero(qty) ? null : Rdiv(total, qty)) : Rdiv(total, R(BigInt(k + 1), 1n));
+          trail.push({ periods: k + 1, total: total, average: avg, quantity: qty });
+          if (avg === null) continue;
+          if (best === null || Rcmp(avg, best) < 0) { best = avg; span = k + 1; }
+          else break;                       /* the averages have turned up */
+        }
+        var q2 = R0, hold2 = R0;
+        for (k = 0; k < span; k += 1) {
+          q2 = Radd(q2, demand[t + k]);
+          hold2 = Radd(hold2, Rmul(R(BigInt(k), 1n), demand[t + k]));
+        }
+        cost = Radd(cost, Radd(K, Rmul(h, hold2)));
+        plan.push({ period: t + 1, quantity: q2, covers: [t + 1, t + span] });
+        steps.push({ from: t + 1, span: span, trail: trail });
+        t += span;
+      }
+      return { plan: plan, steps: steps, cost: cost, orders: plan.length };
+    };
+    var exact = wagnerWhitin(demand, K, h);
+    var sm = run(false), luc = run(true);
+    sm.gap = Rsub(sm.cost, exact.cost);
+    luc.gap = Rsub(luc.cost, exact.cost);
+    sm.excess = Rzero(exact.cost) ? null : Rdiv(sm.gap, exact.cost);
+    luc.excess = Rzero(exact.cost) ? null : Rdiv(luc.gap, exact.cost);
+    return { silverMeal: sm, leastUnitCost: luc, exact: exact };
+  }
+
+  /* ---- stopping -------------------------------------------------------- */
+
+  /* Sell-or-wait with T periods left and a search cost c: the threshold in
+     each period is the value of carrying on, and an offer is taken exactly
+     when it beats that.  V(0) = 0; V(t) = E[max(x, V(t-1))] - c.
+
+     An offer is money, so this pmf's VALUES are rationals -- unlike the
+     integer-valued ones pmfConvolve builds for the inventory kit. */
+  function stopThresholds(pmf, T, c) {
+    var v = R0, rows = [], t, k;
+    for (t = 1; t <= T; t += 1) {
+      var e = R0;
+      for (k = 0; k < pmf.length; k += 1) {
+        var x = pmf[k][0], val = Rcmp(x, v) > 0 ? x : v;
+        e = Radd(e, Rmul(pmf[k][1], val));
+      }
+      var next = Rsub(e, c);
+      rows.unshift({ left: t, threshold: v, continuation: next,
+                     accept: pmf.filter(function (p) { return Rcmp(p[0], v) > 0; })
+                                .map(function (p) { return p[0]; }),
+                     why: 'with ' + t + ' period(s) left, carrying on is worth ' + Rtext(next)
+                       + ', so an offer is taken when it beats ' + Rtext(v) });
+      v = next;
+    }
+    return { rows: rows, value: v, thresholds: rows.map(function (r) { return r.threshold; }) };
+  }
+
+  /* The secretary problem, exactly:
+       P(success | r) = ((r-1)/n) * sum_{i=r}^{n} 1/(i-1),   and P(1) = 1/n.
+     The sum is harmonic() from sysdesign_core.HARMONIC_JS, so the whole table
+     is rational and the "1/e" a textbook quotes is the LIMIT beside it, not
+     the answer -- it is n * expNegApprox(1), and it rounds. */
+  function secretaryExact(n) {
+    var probs = [], r, best = 1, bestP = R(1n, BigInt(n));
+    probs.push({ r: 1, p: bestP });
+    /* The tail is H(n-1) - H(r-2), and rebuilding both harmonic numbers on
+       every row makes the table quadratic in n -- at the slider's top setting
+       that was most of a redraw, 72 ms of it. It is carried instead: the tail
+       at r = 2 IS H(n-1), and each step up drops exactly one term. Same
+       rationals, same order, one harmonic() call for the whole table. */
+    var sum = harmonic(n - 1, 1);
+    for (r = 2; r <= n; r += 1) {
+      if (r > 2) sum = Rsub(sum, R(1n, BigInt(r - 2)));
+      var p = Rmul(R(BigInt(r - 1), BigInt(n)), sum);
+      probs.push({ r: r, p: p });
+      if (Rcmp(p, bestP) > 0) { bestP = p; best = r; }
+    }
+    return { probs: probs, best: best, bestP: bestP, n: n };
+  }
+
+  /* ---- decision trees -------------------------------------------------- */
+
+  /* Fold a decision tree back to its root.  A node is
+       {kind: 'leaf', value}
+       {kind: 'chance',   children: [{p, node, label}]}
+       {kind: 'decision', children: [{node, label}]}
+     and every node comes back with the value it folded to.
+
+     EVPI and EVSI need more than a tree -- they need to know WHICH states the
+     chance nodes share -- so they are computed only when the tree carries a
+     payoff matrix, a prior, and (for EVSI) a likelihood.  Returning null
+     rather than a number invented from the tree's shape is the honest half. */
+  function foldBack(tree) {
+    var values = [], order = [];
+    var fold = function (node, path) {
+      var out = { node: node, path: path, kind: node.kind, label: node.label };
+      if (node.kind === 'leaf') out.value = node.value;
+      else if (node.kind === 'chance') {
+        var e = R0, k;
+        for (k = 0; k < node.children.length; k += 1) {
+          var c = fold(node.children[k].node, path + '.' + k);
+          e = Radd(e, Rmul(node.children[k].p, c.value));
+        }
+        out.value = e;
+      } else {
+        var best = null, arg = -1, k2;
+        for (k2 = 0; k2 < node.children.length; k2 += 1) {
+          var c2 = fold(node.children[k2].node, path + '.' + k2);
+          if (best === null || Rcmp(c2.value, best) > 0) { best = c2.value; arg = k2; }
+        }
+        out.value = best; out.choice = arg; out.choiceLabel = node.children[arg].label;
+      }
+      values.push(out); order.push(path);
+      return out;
+    };
+    var root = fold(tree.root || tree, '0');
+    var evpi = null, evsi = null, perfect = null, priorBest = null;
+    if (tree.payoff && tree.prior) {
+      var A = tree.payoff.length, S = tree.prior.length, a, s;
+      priorBest = null;
+      for (a = 0; a < A; a += 1) {
+        var v = R0;
+        for (s = 0; s < S; s += 1) v = Radd(v, Rmul(tree.prior[s], tree.payoff[a][s]));
+        if (priorBest === null || Rcmp(v, priorBest) > 0) priorBest = v;
+      }
+      perfect = R0;
+      for (s = 0; s < S; s += 1) {
+        var bs = null;
+        for (a = 0; a < A; a += 1) if (bs === null || Rcmp(tree.payoff[a][s], bs) > 0) bs = tree.payoff[a][s];
+        perfect = Radd(perfect, Rmul(tree.prior[s], bs));
+      }
+      evpi = Rsub(perfect, priorBest);
+      if (tree.likelihood) {
+        /* likelihood[signal][state] = P(signal | state) */
+        var withInfo = R0, g;
+        for (g = 0; g < tree.likelihood.length; g += 1) {
+          var pg = R0, joint = [];
+          for (s = 0; s < S; s += 1) {
+            var jj = Rmul(tree.prior[s], tree.likelihood[g][s]);
+            joint.push(jj); pg = Radd(pg, jj);
+          }
+          if (Rzero(pg)) continue;
+          var bestA = null;
+          for (a = 0; a < A; a += 1) {
+            var v2 = R0;
+            for (s = 0; s < S; s += 1) v2 = Radd(v2, Rmul(joint[s], tree.payoff[a][s]));
+            if (bestA === null || Rcmp(v2, bestA) > 0) bestA = v2;
+          }
+          withInfo = Radd(withInfo, bestA);     /* already weighted by P(signal) */
+        }
+        evsi = Rsub(withInfo, priorBest);
+      }
+    }
+    return { root: root, values: values, value: root.value,
+             evpi: evpi, evsi: evsi, perfect: perfect, prior: priorBest };
+  }
+
+  /* Value iteration beside the exact fixed point.  v_{k+1} = r + gamma P v_k
+     from v_0 = 0 -- with its denominators growing one power of gamma's
+     denominator per step, which is worth SEEING -- against
+     v* = (I - gamma P)^-1 r by Mrref, and the gap column between them. */
+  function discountedValue(P, r, gamma, T) {
+    var n = P.length, i, j, k;
+    var v = [], iter = [];
+    for (i = 0; i < n; i += 1) v.push(R0);
+    iter.push(v.slice());
+    for (k = 0; k < T; k += 1) {
+      var nv = [];
+      for (i = 0; i < n; i += 1) {
+        var s = r[i];
+        for (j = 0; j < n; j += 1) s = Radd(s, Rmul(gamma, Rmul(P[i][j], v[j])));
+        nv.push(s);
+      }
+      v = nv; iter.push(v.slice());
+    }
+    var A = [];
+    for (i = 0; i < n; i += 1) {
+      var row = [];
+      for (j = 0; j < n; j += 1) row.push(Rsub(i === j ? R1 : R0, Rmul(gamma, P[i][j])));
+      row.push(r[i]);
+      A.push(row);
+    }
+    var red = Mrref(A, { cols: n });
+    var star = [];
+    for (i = 0; i < n; i += 1) star.push(red.M[i][n]);
+    var gap = [];
+    for (i = 0; i < n; i += 1) gap.push(Rsub(v[i], star[i]));
+    return { vT: v, v: star, gap: gap, iterations: iter, ops: red.ops,
+             singular: red.rank !== n, system: A };
+  }
+
+
+  /* ================================================ a staged network, as text
+
+     Stages are separated by semicolons and nodes by spaces:
+
+         A ; B C ; D E ; F
+
+     and an arc is  tail>head cost .  An arc may skip a stage forward -- the
+     recursion handles it, because the value of a node is filled once every
+     node it can reach already has one -- but it may never point backwards or
+     sideways, and the refusal says which arc did. */
+
+  var DPNODES = 16;      /* nodes the drawing can label */
+  var DPARCS = 28;
+  var DPPATHS = 4000;    /* paths the enumeration will walk before refusing */
+
+  function dpClauses(text, sep) {
+    var parts = String(text).split(sep || /[,;\n]+/), out = [], i;
+    for (i = 0; i < parts.length; i += 1) {
+      var s = parts[i].trim();
+      if (s) out.push(s);
+    }
+    return out;
+  }
+
+  function parseStages(text) {
+    var cols = dpClauses(text, /[;\n]+/), stages = [], seen = {}, total = 0, i, k;
+    if (cols.length < 2) return { bad: 'a staged network needs at least two stages, separated by a semicolon' };
+    for (i = 0; i < cols.length; i += 1) {
+      var names = cols[i].split(/[\s,]+/).filter(function (t) { return t.length; }), col = [];
+      if (!names.length) return { bad: 'stage ' + (i + 1) + ' has no nodes in it' };
+      for (k = 0; k < names.length; k += 1) {
+        if (!/^[A-Za-z0-9][A-Za-z0-9]{0,3}$/.test(names[k])) {
+          return { bad: '"' + esc(names[k]) + '" is not a node name: up to four letters or digits' };
+        }
+        if (seen[names[k]] !== undefined) {
+          return { bad: esc(names[k]) + ' is in two stages at once, and a stage is meant to say when' };
+        }
+        seen[names[k]] = i;
+        col.push(names[k]);
+        total += 1;
+      }
+      stages.push(col);
+    }
+    if (total > DPNODES) {
+      return { bad: 'that is ' + total + ' nodes, and this drawing labels at most ' + DPNODES };
+    }
+    return { stages: stages, stageOf: seen };
+  }
+
+  function parseDpArcs(text, stageOf) {
+    var cl = dpClauses(text), arcs = [], i;
+    if (!cl.length) return { bad: 'there are no arcs here yet' };
+    if (cl.length > DPARCS) {
+      return { bad: 'that is ' + cl.length + ' arcs, and this drawing labels at most ' + DPARCS };
+    }
+    for (i = 0; i < cl.length; i += 1) {
+      var m = /^([A-Za-z0-9][A-Za-z0-9]{0,3})\s*(?:->|>)\s*([A-Za-z0-9][A-Za-z0-9]{0,3})\s+(.*)$/.exec(cl[i]);
+      if (!m) {
+        return { bad: '"' + esc(cl[i]) + '" is not an arc: write the tail, then &gt;, then the head, then its cost' };
+      }
+      if (stageOf[m[1]] === undefined) return { bad: 'there is no node called ' + esc(m[1]) + ' in any stage' };
+      if (stageOf[m[2]] === undefined) return { bad: 'there is no node called ' + esc(m[2]) + ' in any stage' };
+      if (stageOf[m[2]] <= stageOf[m[1]]) {
+        return { bad: esc(m[1]) + ' is in stage ' + (stageOf[m[1]] + 1) + ' and ' + esc(m[2])
+                      + ' in stage ' + (stageOf[m[2]] + 1) + ', so that arc runs backwards or sideways; '
+                      + 'a staged network only ever moves forward' };
+      }
+      var v = Rread(m[3].trim());
+      if (v === null) return { bad: '"' + esc(m[3]) + '" in "' + esc(cl[i]) + '" is not a number' };
+      arcs.push({ from: m[1], to: m[2], cost: v });
+    }
+    return { arcs: arcs };
+  }
+
+  /* THE ORACLE.  Every path from a first-stage node to a last-stage one,
+     walked forward and priced as it goes.  This shares no line with
+     `backwardStages`: it never forms a value for a node, only for a whole
+     path, and it is exponential on purpose -- it is what the recursion is a
+     shortcut FOR, and the mode prints both numbers. */
+  function everyPath(stages, arcs, opts) {
+    opts = opts || {};
+    var maximise = opts.maximise === true, cap = opts.cap || DPPATHS;
+    var last = {}, k, i;
+    for (k = 0; k < stages[stages.length - 1].length; k += 1) last[stages[stages.length - 1][k]] = true;
+    var out = [], best = null, bestPaths = [], count = 0, truncated = false;
+    var walk = function (at, acc, cost) {
+      if (truncated) return;
+      if (last[at]) {
+        count += 1;
+        if (count > cap) { truncated = true; return; }
+        var end = opts.terminal && opts.terminal[at] !== undefined ? Radd(cost, opts.terminal[at]) : cost;
+        out.push({ path: acc.slice(), cost: end });
+        if (best === null || (maximise ? Rcmp(end, best) > 0 : Rcmp(end, best) < 0)) {
+          best = end; bestPaths = [acc.slice()];
+        } else if (Requ(end, best)) bestPaths.push(acc.slice());
+        return;
+      }
+      for (var j = 0; j < arcs.length; j += 1) {
+        if (arcs[j].from !== at) continue;
+        acc.push(arcs[j].to);
+        walk(arcs[j].to, acc, Radd(cost, arcs[j].cost));
+        acc.pop();
+      }
+    };
+    for (i = 0; i < stages[0].length; i += 1) walk(stages[0][i], [stages[0][i]], R0);
+    return { paths: out, best: best, bestPaths: bestPaths, count: count, truncated: truncated };
+  }
+
+  /* A path priced from the arcs, so a path the recursion RETURNS can be
+     checked rather than believed. */
+  function pathCost(path, arcs) {
+    var total = R0, k, j;
+    for (k = 0; k + 1 < path.length; k += 1) {
+      var hit = -1;
+      for (j = 0; j < arcs.length; j += 1) {
+        if (arcs[j].from === path[k] && arcs[j].to === path[k + 1]) { hit = j; break; }
+      }
+      if (hit < 0) return { ok: false, why: 'there is no arc from ' + path[k] + ' to ' + path[k + 1] };
+      total = Radd(total, arcs[hit].cost);
+    }
+    return { ok: true, cost: total };
+  }
+
+  /* ============================================================== drawing
+
+     The layered picture the staged modes share: one column per stage, one
+     circle per node, arcs labelled with their cost and thickened when they are
+     on an optimal path. */
+  function dpXY(v) { return Math.round(v * 10) / 10; }
+
+  function dpNet(stages, arcs, opts) {
+    opts = opts || {};
+    var width = opts.width || 660, height = opts.height || 280;
+    var left = 40, right = width - 40, top = 34, bottom = height - 26;
+    var pos = {}, s = '', i, k, j;
+    var cols = stages.length, dx = cols > 1 ? (right - left) / (cols - 1) : 0;
+    for (i = 0; i < cols; i += 1) {
+      var m = stages[i].length;
+      for (k = 0; k < m; k += 1) {
+        var y = m === 1 ? (top + bottom) / 2
+          : top + (bottom - top) * (k / (m - 1)) * (m > 1 ? 1 : 0);
+        pos[stages[i][k]] = { x: left + i * dx, y: y };
+      }
+      s += '<text x="' + dpXY(left + i * dx) + '" y="16" text-anchor="middle" font-size="10" '
+        + 'fill="var(--muted)">' + (opts.stageName ? opts.stageName(i) : 'stage ' + (i + 1)) + '</text>';
+    }
+    for (j = 0; j < arcs.length; j += 1) {
+      var a = pos[arcs[j].from], b = pos[arcs[j].to];
+      if (!a || !b) continue;
+      var tone = (opts.tone && opts.tone(j)) || 'line-strong';
+      var wide = opts.wide && opts.wide(j);
+      var ddx = b.x - a.x, ddy = b.y - a.y, len = Math.sqrt(ddx * ddx + ddy * ddy) || 1;
+      var ux = ddx / len, uy = ddy / len;
+      s += '<line x1="' + dpXY(a.x + ux * 15) + '" y1="' + dpXY(a.y + uy * 15) + '" x2="'
+        + dpXY(b.x - ux * 15) + '" y2="' + dpXY(b.y - uy * 15) + '" stroke="var(--' + tone
+        + ')" stroke-width="' + (wide ? 2.6 : 1.1) + '" />';
+      var label = opts.label ? opts.label(j) : Rtext(arcs[j].cost);
+      if (label) {
+        s += '<text x="' + dpXY((a.x + b.x) / 2 - uy * 9) + '" y="' + dpXY((a.y + b.y) / 2 + ux * 9 + 3)
+          + '" text-anchor="middle" font-size="9" fill="var(--' + (wide ? tone : 'muted') + ')">'
+          + label + '</text>';
+      }
+    }
+    for (i = 0; i < cols; i += 1) {
+      for (k = 0; k < stages[i].length; k += 1) {
+        var id = stages[i][k], p = pos[id];
+        var ring = (opts.nodeTone && opts.nodeTone(id)) || 'line-strong';
+        s += '<circle cx="' + dpXY(p.x) + '" cy="' + dpXY(p.y) + '" r="14" fill="var(--panel-2)" '
+          + 'stroke="var(--' + ring + ')" stroke-width="1.6" />'
+          + '<text x="' + dpXY(p.x) + '" y="' + dpXY(p.y + 4) + '" text-anchor="middle" font-size="11" '
+          + 'font-weight="700" fill="var(--text)">' + id + '</text>';
+        var under = opts.under && opts.under(id);
+        if (under) {
+          s += '<text x="' + dpXY(p.x) + '" y="' + dpXY(p.y + 28) + '" text-anchor="middle" '
+            + 'font-size="9" fill="var(--cyan)">' + under + '</text>';
+        }
+      }
+    }
+    if (opts.caption) {
+      s += '<text x="' + dpXY(width / 2) + '" y="' + dpXY(height - 6) + '" text-anchor="middle" '
+        + 'font-size="10" fill="var(--muted)">' + opts.caption + '</text>';
+    }
+    return s;
+  }
+
+  /* ========================================= allocation, built from a table
+
+     `P 0 5 9 12` is an activity and what it returns for 0, 1, 2, 3 units.  The
+     staged network is BUILT from that table rather than typed: a node is
+     "how many units are left before this activity decides", which is the thing
+     a reader has to see to understand what a state is. */
+  function parseReturns(text) {
+    var cl = dpClauses(text, /[;\n]+/), acts = [], width = null, i, k;
+    if (!cl.length) return { bad: 'there are no activities here yet' };
+    if (cl.length > 4) return { bad: 'that is ' + cl.length + ' activities, and this lab allocates across at most 4' };
+    for (i = 0; i < cl.length; i += 1) {
+      var parts = cl[i].split(/[\s,]+/).filter(function (t) { return t.length; });
+      if (parts.length < 2) return { bad: '"' + esc(cl[i]) + '" gives no returns at all' };
+      var name = parts[0], vals = [];
+      if (!/^[A-Za-z][A-Za-z0-9]{0,3}$/.test(name)) {
+        return { bad: '"' + esc(name) + '" is not an activity name' };
+      }
+      for (k = 1; k < parts.length; k += 1) {
+        var v = Rread(parts[k]);
+        if (v === null) return { bad: '"' + esc(parts[k]) + '" in "' + esc(cl[i]) + '" is not a number' };
+        vals.push(v);
+      }
+      if (width === null) width = vals.length;
+      if (vals.length !== width) {
+        return { bad: esc(name) + ' gives ' + vals.length + ' returns where ' + acts[0].id + ' gives '
+                      + width + '; every activity has to be priced at the same levels' };
+      }
+      if (!Rzero(vals[0])) {
+        return { bad: 'putting nothing into ' + esc(name) + ' returns ' + Rtext(vals[0])
+                      + ', and a table whose first column is not zero is measuring something else' };
+      }
+      acts.push({ id: name, ret: vals });
+    }
+    if (width > 7) return { bad: 'that is ' + (width - 1) + ' units, and this lab allocates at most 6' };
+    return { acts: acts, levels: width - 1 };
+  }
+
+  /* The stages and arcs of the allocation network, from the return table. */
+  function allocNetwork(acts, units) {
+    var stages = [], arcs = [], i, r, x;
+    for (i = 0; i <= acts.length; i += 1) {
+      var col = [];
+      for (r = units; r >= 0; r -= 1) col.push('s' + i + 'r' + r);
+      stages.push(col);
+    }
+    for (i = 0; i < acts.length; i += 1) {
+      for (r = 0; r <= units; r += 1) {
+        for (x = 0; x <= r && x < acts[i].ret.length; x += 1) {
+          arcs.push({ from: 's' + i + 'r' + r, to: 's' + (i + 1) + 'r' + (r - x),
+                      cost: acts[i].ret[x], act: i, take: x });
+        }
+      }
+    }
+    return { stages: stages, arcs: arcs, start: 's0r' + units };
+  }
+
+  /* THE ORACLE for the allocation.  Every way to split the units, enumerated
+     directly from the table with no network anywhere near it. */
+  function everyAllocation(acts, units) {
+    var best = null, bestAt = [], count = 0, k = acts.length, pick = [];
+    var walk = function (i, left) {
+      if (i === k) {
+        count += 1;
+        var total = R0, q;
+        for (q = 0; q < k; q += 1) total = Radd(total, acts[q].ret[pick[q]]);
+        if (best === null || Rcmp(total, best) > 0) { best = total; bestAt = [pick.slice()]; }
+        else if (Requ(total, best)) bestAt.push(pick.slice());
+        return;
+      }
+      for (var x = 0; x <= left && x < acts[i].ret.length; x += 1) {
+        pick.push(x); walk(i + 1, left - x); pick.pop();
+      }
+    };
+    walk(0, units);
+    return { best: best, at: bestAt, count: count };
+  }
+
+  /* ====================================== plans, priced from scratch
+
+     A lot-sizing plan is a list of orders.  Every routine that produces one
+     also reports a cost; this prices the plan again from the demand, the setup
+     charge and the holding rate, so a heuristic's own bookkeeping is never the
+     only witness to what it spent. */
+  function planCost(plan, demand, K, h) {
+    var total = R0, covered = [], k, t;
+    for (k = 0; k < demand.length; k += 1) covered.push(false);
+    for (k = 0; k < plan.length; k += 1) {
+      var from = plan[k].covers[0], to = plan[k].covers[1], qty = R0, hold = R0;
+      for (t = from; t <= to; t += 1) {
+        if (t < 1 || t > demand.length) return { ok: false, why: 'the plan covers a period that does not exist' };
+        if (covered[t - 1]) return { ok: false, why: 'period ' + t + ' is covered twice' };
+        covered[t - 1] = true;
+        qty = Radd(qty, demand[t - 1]);
+        hold = Radd(hold, Rmul(R(BigInt(t - from), 1n), demand[t - 1]));
+      }
+      if (!Requ(qty, plan[k].quantity)) {
+        return { ok: false, why: 'the order in period ' + from + ' is ' + Rtext(plan[k].quantity)
+                                 + ' where the demand it covers is ' + Rtext(qty) };
+      }
+      total = Radd(total, Radd(K, Rmul(h, hold)));
+    }
+    for (k = 0; k < demand.length; k += 1) {
+      if (!covered[k]) return { ok: false, why: 'period ' + (k + 1) + ' is never covered' };
+    }
+    return { ok: true, cost: total };
+  }
+
+  /* THE ORACLE for lot sizing: every subset of periods to order in.  An
+     optimal plan never orders while stock remains, so a plan IS a partition of
+     1..T into consecutive intervals, and there are 2^(T-1) of them. */
+  function everyOrderPattern(demand, K, h, cap) {
+    var T = demand.length, limit = cap || 4096;
+    if (T > 13 || (1 << (T - 1)) > limit) {
+      return { truncated: true, why: T + ' periods is 2^' + (T - 1)
+                                     + ' order patterns, past what this page enumerates' };
+    }
+    var best = null, bestMask = null, count = 0, mask, k, t;
+    for (mask = 0; mask < (1 << (T - 1)); mask += 1) {
+      var orders = [0];
+      for (k = 1; k < T; k += 1) if (mask & (1 << (k - 1))) orders.push(k);
+      var cost = R0;
+      for (k = 0; k < orders.length; k += 1) {
+        var from = orders[k], to = k + 1 < orders.length ? orders[k + 1] : T;
+        cost = Radd(cost, K);
+        for (t = from; t < to; t += 1) cost = Radd(cost, Rmul(h, Rmul(R(BigInt(t - from), 1n), demand[t])));
+      }
+      count += 1;
+      if (best === null || Rcmp(cost, best) < 0) { best = cost; bestMask = orders.slice(); }
+    }
+    return { truncated: false, best: best, orders: bestMask, count: count };
+  }
+
+  /* A row of numbers, as a reader types them. */
+  function parseRow(text) {
+    var parts = String(text).split(/[\s,;]+/).filter(function (t) { return t.length; }), out = [], k;
+    if (!parts.length) return null;
+    for (k = 0; k < parts.length; k += 1) {
+      var v = Rread(parts[k]);
+      if (v === null) return null;
+      out.push(v);
+    }
+    return out;
+  }
+
+  /* A table a reader types: one row per line, rows separated by semicolons. */
+  function parseMatrixRows(text, rows, cols) {
+    var lines = dpClauses(text, /[;\n]+/), out = [], i;
+    if (rows && lines.length !== rows) {
+      return { bad: 'that is ' + lines.length + ' row' + (lines.length === 1 ? '' : 's')
+                    + ' where ' + rows + ' were expected' };
+    }
+    for (i = 0; i < lines.length; i += 1) {
+      var vals = parseRow(lines[i]);
+      if (vals === null) return { bad: 'row ' + (i + 1) + ' is not a row of numbers' };
+      if (cols && vals.length !== cols) {
+        return { bad: 'row ' + (i + 1) + ' has ' + vals.length + ' entries where ' + cols + ' were expected' };
+      }
+      if (i && vals.length !== out[0].length) {
+        return { bad: 'row ' + (i + 1) + ' has ' + vals.length + ' entries and row 1 has ' + out[0].length };
+      }
+      out.push(vals);
+    }
+    if (!out.length) return { bad: 'there is no table here yet' };
+    return { rows: out };
+  }
+
+  /* A distribution: value:probability pairs that must sum to one exactly.  A
+     page that renormalised silently would be answering a different question
+     from the one the reader typed. */
+  function parsePmf(text) {
+    var cl = dpClauses(text), out = [], total = R0, i;
+    if (!cl.length) return { bad: 'there is no distribution here yet' };
+    for (i = 0; i < cl.length; i += 1) {
+      var m = /^(-?[0-9/.]+)\s*[:=]\s*(.*)$/.exec(cl[i]);
+      if (!m) return { bad: '"' + esc(cl[i]) + '" is not a value and a probability: write 20:1/3' };
+      var v = Rread(m[1]), p = Rread(m[2].trim());
+      if (v === null) return { bad: '"' + esc(m[1]) + '" is not a number' };
+      if (p === null) return { bad: '"' + esc(m[2]) + '" is not a probability' };
+      if (Rsign(p) < 0) return { bad: 'a probability of ' + Rtext(p) + ' is negative' };
+      total = Radd(total, p);
+      out.push([v, p]);
+    }
+    if (!Requ(total, R1)) {
+      return { bad: 'those probabilities add to ' + Rtext(total) + ' rather than 1 — nothing here '
+                    + 'renormalises for you, because a distribution that does not add up is a '
+                    + 'modelling error rather than a typing one' };
+    }
+    return { pmf: out };
+  }
+
+  /* One plot for the modes that have a curve: a list of series, each a list of
+     [x, y] rationals.  Exact in, pixels out -- `Rnum` appears here and nowhere
+     else in those modes. */
+  function dpPlot(series, opts) {
+    opts = opts || {};
+    var width = opts.width || 520, height = opts.height || 240;
+    var left = 46, right = width - 14, top = 16, bottom = height - 30;
+    var xlo = null, xhi = null, ylo = null, yhi = null, i, k;
+    for (i = 0; i < series.length; i += 1) {
+      for (k = 0; k < series[i].points.length; k += 1) {
+        var px = Rnum(series[i].points[k][0]), py = Rnum(series[i].points[k][1]);
+        if (xlo === null || px < xlo) xlo = px;
+        if (xhi === null || px > xhi) xhi = px;
+        if (ylo === null || py < ylo) ylo = py;
+        if (yhi === null || py > yhi) yhi = py;
+      }
+    }
+    if (xlo === null) return '';
+    if (opts.zero && ylo > 0) ylo = 0;
+    if (xhi === xlo) xhi = xlo + 1;
+    if (yhi === ylo) yhi = ylo + 1;
+    var X = function (v) { return left + (right - left) * ((Rnum(v) - xlo) / (xhi - xlo)); };
+    var Y = function (v) { return bottom - (bottom - top) * ((Rnum(v) - ylo) / (yhi - ylo)); };
+    var s = '<line x1="' + dpXY(left) + '" y1="' + dpXY(bottom) + '" x2="' + dpXY(right) + '" y2="'
+      + dpXY(bottom) + '" stroke="var(--line-strong)" stroke-width="1" />'
+      + '<line x1="' + dpXY(left) + '" y1="' + dpXY(top) + '" x2="' + dpXY(left) + '" y2="'
+      + dpXY(bottom) + '" stroke="var(--line-strong)" stroke-width="1" />';
+    for (i = 0; i < series.length; i += 1) {
+      var se = series[i], tone = se.tone || 'cyan', d = '';
+      for (k = 0; k < se.points.length; k += 1) {
+        d += (k ? ' L ' : 'M ') + dpXY(X(se.points[k][0])) + ' ' + dpXY(Y(se.points[k][1]));
+      }
+      if (se.points.length > 1 && se.line !== false) {
+        s += '<path d="' + d + '" fill="none" stroke="var(--' + tone + ')" stroke-width="'
+          + (se.wide ? 2.4 : 1.6) + '"' + (se.dash ? ' stroke-dasharray="4 3"' : '') + ' />';
+      }
+      if (se.dots !== false) {
+        for (k = 0; k < se.points.length; k += 1) {
+          var mark = se.mark && se.mark(k);
+          s += '<circle cx="' + dpXY(X(se.points[k][0])) + '" cy="' + dpXY(Y(se.points[k][1]))
+            + '" r="' + (mark ? 4.4 : 2.6) + '" fill="var(--' + (mark ? 'purple' : tone) + ')" />';
+        }
+      }
+      if (se.name) {
+        s += '<text x="' + dpXY(right) + '" y="' + dpXY(top + 12 + i * 13) + '" text-anchor="end" '
+          + 'font-size="10" fill="var(--' + tone + ')">' + se.name + '</text>';
+      }
+    }
+    s += '<text x="' + dpXY(left) + '" y="' + dpXY(bottom + 15) + '" text-anchor="middle" font-size="10" '
+      + 'fill="var(--muted)">' + (opts.xlo === undefined ? xlo : opts.xlo) + '</text>'
+      + '<text x="' + dpXY(right) + '" y="' + dpXY(bottom + 15) + '" text-anchor="middle" font-size="10" '
+      + 'fill="var(--muted)">' + (opts.xhi === undefined ? xhi : opts.xhi) + '</text>'
+      + '<text x="' + dpXY(left - 6) + '" y="' + dpXY(top + 4) + '" text-anchor="end" font-size="10" '
+      + 'fill="var(--muted)">' + (opts.yhi === undefined ? yhi : opts.yhi) + '</text>'
+      + '<text x="' + dpXY(left - 6) + '" y="' + dpXY(bottom) + '" text-anchor="end" font-size="10" '
+      + 'fill="var(--muted)">' + (opts.ylo === undefined ? ylo : opts.ylo) + '</text>';
+    if (opts.caption) {
+      s += '<text x="' + dpXY(width / 2) + '" y="' + dpXY(height - 6) + '" text-anchor="middle" '
+        + 'font-size="10" fill="var(--muted)">' + opts.caption + '</text>';
+    }
+    return s;
+  }
+
+  /* Bars over a discrete index: demand, an order plan, a threshold per period. */
+  function dpBars(items, opts) {
+    opts = opts || {};
+    var width = opts.width || 660, height = opts.height || 140;
+    var left = 36, right = width - 12, top = 18, bottom = height - 26;
+    var hi = null, k;
+    for (k = 0; k < items.length; k += 1) {
+      var v = Rnum(items[k].value);
+      if (hi === null || v > hi) hi = v;
+    }
+    if (!(hi > 0)) hi = 1;
+    var step = (right - left) / Math.max(1, items.length), s = '';
+    s += '<line x1="' + dpXY(left) + '" y1="' + dpXY(bottom) + '" x2="' + dpXY(right) + '" y2="'
+      + dpXY(bottom) + '" stroke="var(--line-strong)" stroke-width="1" />';
+    for (k = 0; k < items.length; k += 1) {
+      var h = (bottom - top) * (Rnum(items[k].value) / hi), x = left + step * k + step * 0.18;
+      var w = step * 0.64, tone = items[k].tone || 'cyan';
+      s += '<rect x="' + dpXY(x) + '" y="' + dpXY(bottom - h) + '" width="' + dpXY(w) + '" height="'
+        + dpXY(Math.max(1, h)) + '" rx="2" fill="var(--' + tone + ')" fill-opacity="0.32" stroke="var(--'
+        + tone + ')" stroke-width="1.2" />'
+        + '<text x="' + dpXY(x + w / 2) + '" y="' + dpXY(bottom - h - 4) + '" text-anchor="middle" '
+        + 'font-size="9" font-weight="600" fill="var(--' + tone + ')">' + Rtext(items[k].value) + '</text>'
+        + '<text x="' + dpXY(x + w / 2) + '" y="' + dpXY(bottom + 13) + '" text-anchor="middle" '
+        + 'font-size="9" fill="var(--muted)">' + items[k].label + '</text>';
+    }
+    if (opts.caption) {
+      s += '<text x="' + dpXY(width / 2) + '" y="' + dpXY(height - 4) + '" text-anchor="middle" '
+        + 'font-size="10" fill="var(--muted)">' + opts.caption + '</text>';
+    }
+    return s;
+  }
+
+  var HEP = {
+    'split': { demand: '10 62 12 130 154 129', K: '54', h: '2' },
+    'both': { demand: '17 25 73 113 89', K: '116', h: '1' },
+    'agree': { demand: '30 30 30 30 30 30', K: '80', h: '1' }
+  };
+
+  var presetIn = document.getElementById('hePreset'), demIn = document.getElementById('heDemandIn');
+  var kIn = document.getElementById('heK'), hIn = document.getElementById('heH');
+  var demSvg = document.getElementById('heDemand'), costSvg = document.getElementById('heCost');
+  var trailT = document.getElementById('heTrail'), cmpT = document.getElementById('heCompare');
+  var status = document.getElementById('heStatus');
+  var KPIS = ['heExact', 'heSM', 'heLUC', 'heGapSM', 'heGapLUC', 'heRepriced'];
+
+  function blank(why) {
+    demSvg.innerHTML = ''; costSvg.innerHTML = ''; trailT.innerHTML = ''; cmpT.innerHTML = '';
+    for (var i = 0; i < KPIS.length; i += 1) document.getElementById(KPIS[i]).textContent = '—';
+    status.innerHTML = '<span class="tone-red">' + why + '.</span> Demand is a row of numbers, one '
+      + 'for each period.';
+  }
+
+  function redraw() {
+    var demand = parseRow(demIn.value);
+    if (demand === null) { blank('that is not a row of numbers'); return; }
+    if (demand.length < 2 || demand.length > 10) {
+      blank('this lab plans between 2 and 10 periods, and that is ' + (demand ? demand.length : 0));
+      return;
+    }
+    var i, k;
+    for (i = 0; i < demand.length; i += 1) {
+      if (Rsign(demand[i]) < 0) { blank('period ' + (i + 1) + ' has negative demand in it'); return; }
+    }
+    var K = R(BigInt(Math.round(+kIn.value)), 1n), h = R(BigInt(Math.round(+hIn.value)), 1n);
+    document.getElementById('heKOut').textContent = Rtext(K);
+    document.getElementById('heHOut').textContent = Rtext(h);
+    var hr = lotsizeHeuristics(demand, K, h);
+    var plans = [['the exact plan', hr.exact.plan, hr.exact.cost, 'green'],
+                 ['Silver-Meal', hr.silverMeal.plan, hr.silverMeal.cost, 'cyan'],
+                 ['least unit cost', hr.leastUnitCost.plan, hr.leastUnitCost.cost, 'amber']];
+    var repriced = true, why = '';
+    for (i = 0; i < plans.length; i += 1) {
+      var pc = planCost(plans[i][1], demand, K, h);
+      if (!pc.ok) { repriced = false; why = plans[i][0] + ': ' + pc.why; break; }
+      if (!Requ(pc.cost, plans[i][2])) {
+        repriced = false;
+        why = plans[i][0] + ' reports ' + Rtext(plans[i][2]) + ' and its plan costs ' + Rtext(pc.cost);
+        break;
+      }
+    }
+    if (!repriced) { blank('a plan does not cost what it says it costs — ' + why); return; }
+
+    var exactAt = {};
+    for (i = 0; i < hr.exact.plan.length; i += 1) exactAt[hr.exact.plan[i].period] = true;
+    demSvg.innerHTML = dpBars(demand.map(function (d, q) {
+      return { label: 't' + (q + 1), value: d, tone: exactAt[q + 1] ? 'green' : 'cyan' };
+    }), { width: 660, height: 140, caption: 'demand, with the exact plan\'s order periods in green' });
+    costSvg.innerHTML = dpPlot([{ name: 'cost against orders placed', tone: 'purple', line: false,
+        points: plans.map(function (p) { return [R(BigInt(p[1].length), 1n), p[2]]; }),
+        mark: function (q) { return q === 0; } }],
+      { width: 520, height: 220, zero: false, caption: 'orders placed, against what the plan costs' });
+
+    var rows = '';
+    var trails = [['Silver-Meal', hr.silverMeal, 'per period'], ['least unit cost', hr.leastUnitCost, 'per unit']];
+    for (i = 0; i < trails.length; i += 1) {
+      var st = trails[i][1].steps;
+      for (k = 0; k < st.length; k += 1) {
+        var cells = st[k].trail.map(function (q) {
+          return q.periods + ' period' + plural(q.periods, '', 's') + ': ' + Rtext(q.total) + ' / '
+                 + (trails[i][2] === 'per unit' ? Rtext(q.quantity) : q.periods) + ' = '
+                 + (q.average === null ? '—' : Rtext(q.average));
+        });
+        rows += tr([rowhead(trails[i][0]), td('from period ' + st[k].from),
+                    td(st[k].span + ' period' + plural(st[k].span, '', 's')),
+                    tdl(cells.join(' &nbsp;|&nbsp; '))],
+                   i === 0 ? 'tone-cyan' : 'tone-amber');
+      }
+    }
+    trailT.innerHTML = '<caption>Each rule, interval by interval, with the average it watched</caption>'
+      + '<thead>' + tr([th('rule'), th('starting at'), th('it took'), th('the averages it saw')])
+      + '</thead><tbody>' + rows + '</tbody>';
+
+    var crows = '';
+    for (i = 0; i < plans.length; i += 1) {
+      var periods = plans[i][1].map(function (q) { return q.period; }).join(', ');
+      var gap = Rsub(plans[i][2], hr.exact.cost);
+      crows += tr([rowhead(plans[i][0]), td(String(plans[i][1].length)), td(periods),
+                   td(Rtext(plans[i][2])),
+                   td(Rzero(gap) ? tone('optimal', 'green') : tone('+' + Rtext(gap), 'red'))],
+                  Rzero(gap) ? 'tone-green' : 'tone-red');
+    }
+    cmpT.innerHTML = '<caption>Three plans on the same demand</caption><thead>'
+      + tr([th('plan'), th('orders'), th('placed in periods'), th('costs'), th('over the exact answer')])
+      + '</thead><tbody>' + crows + '</tbody>';
+
+    document.getElementById('heExact').textContent = Rtext(hr.exact.cost);
+    document.getElementById('heSM').textContent = Rtext(hr.silverMeal.cost);
+    document.getElementById('heLUC').textContent = Rtext(hr.leastUnitCost.cost);
+    document.getElementById('heGapSM').textContent = Rtext(hr.silverMeal.gap)
+      + (hr.silverMeal.excess === null ? '' : ' (' + Rpct(hr.silverMeal.excess, 2) + ')');
+    document.getElementById('heGapLUC').textContent = Rtext(hr.leastUnitCost.gap)
+      + (hr.leastUnitCost.excess === null ? '' : ' (' + Rpct(hr.leastUnitCost.excess, 2) + ')');
+    document.getElementById('heRepriced').textContent = 'yes — all three';
+
+    var same = Requ(hr.silverMeal.cost, hr.leastUnitCost.cost);
+    status.innerHTML = '<strong>The exact plan costs ' + tone(Rtext(hr.exact.cost), 'green')
+      + '; Silver-Meal ' + tone(Rtext(hr.silverMeal.cost), 'cyan') + ' and least-unit-cost '
+      + tone(Rtext(hr.leastUnitCost.cost), 'amber') + '.</strong> '
+      + (same ? 'The two heuristics agree with each other here — which is not the same as being right. '
+              : 'The two heuristics do not even agree with each other, which is worth more than either '
+                + 'of their answers: a rule of thumb is a rule, and two rules are two answers. ')
+      + (Rzero(hr.silverMeal.gap) && Rzero(hr.leastUnitCost.gap)
+          ? 'On this instance both of them happen to find the optimum. Change the order charge and '
+            + 'watch how quickly that stops being true.'
+          : 'Each rule stops extending an interval the first time its average turns up, and neither '
+            + 'can see that the average turns back down again one period later. That is the whole of '
+            + 'the failure, and it costs '
+            + Rtext(Rcmp(hr.silverMeal.gap, hr.leastUnitCost.gap) > 0 ? hr.silverMeal.gap : hr.leastUnitCost.gap)
+            + ' at worst here.')
+      + ' Every plan above was priced again from the demand before it was compared, so a rule cannot '
+      + 'look good by mis-reporting its own bill.';
+  }
+
+  function apply() {
+    var p = HEP[presetIn.value];
+    if (!p) return;
+    demIn.value = p.demand; kIn.value = p.K; hIn.value = p.h;
+    redraw();
+  }
+  var START = HEP[presetIn.value] || HEP[Object.keys(HEP)[0]];
+  if (START && !demIn.value) demIn.value = START.demand;
+
+  presetIn.addEventListener('change', apply);
+  demIn.addEventListener('input', redraw);
+  kIn.addEventListener('input', redraw);
+  hIn.addEventListener('input', redraw);
+  redraw();
+  window.redrawLab = redraw;
+  })();
+
+    /* Practice. The questions are lesson data; this only presents and scores
+       them. Every wrong answer gets the reason it is wrong, not just a cross:
+       an unexplained "incorrect" teaches the reader to guess again. */
+    (function () {
+      var prompt = document.getElementById('quizPrompt');
+      if (!prompt) return;
+      var choices = document.getElementById('quizChoices');
+      var feedback = document.getElementById('quizFeedback');
+      var scoreOut = document.getElementById('quizScore');
+      var nextBtn = document.getElementById('quizNext');
+      var index = 0, asked = 0, right = 0, answered = false;
+
+      function paintScore() { scoreOut.textContent = 'Score ' + right + ' / ' + asked; }
+
+      function render() {
+        var q = QUIZ[index % QUIZ.length];
+        answered = false;
+        prompt.innerHTML = q.q;
+        choices.textContent = '';
+        feedback.innerHTML = 'Choose the answer you can justify.';
+        q.a.forEach(function (text, i) {
+          var b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'choice';
+          b.innerHTML = text;
+          b.addEventListener('click', function () { pick(q, i, b); });
+          choices.appendChild(b);
+        });
+      }
+
+      function pick(q, i, button) {
+        if (answered) return;
+        answered = true;
+        asked += 1;
+        var correct = i === q.c;
+        if (correct) right += 1;
+        button.classList.add(correct ? 'right' : 'wrong');
+        if (!correct) {
+          choices.children[q.c].classList.add('right');
+        }
+        feedback.innerHTML = (correct ? '<strong>Correct.</strong> ' : '<strong>Not quite.</strong> ') + q.why;
+        paintScore();
+      }
+
+      nextBtn.addEventListener('click', function () { index += 1; render(); });
+      paintScore();
+      render();
+    })();
+
+  /* Completion marks. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-progress';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function done(id) { return Object.prototype.hasOwnProperty.call(read(), id); }
+    function toggle(id) {
+      var map = read();
+      if (done(id)) { delete map[id]; } else { map[id] = new Date().toISOString().slice(0, 10); }
+      write(map);
+      return done(id);
+    }
+    window.learnProgress = { read: read, done: done, toggle: toggle, key: KEY };
+  })();
+
+  (function () {
+    var button = document.getElementById('progressToggle');
+    if (!button || !window.learnProgress) return;
+    var id = "dynamic-programming-and-sequential-decisions/silver-meal-and-least-unit-cost";
+    var label = document.getElementById('progressLabel');
+    function paint() {
+      var on = window.learnProgress.done(id);
+      button.classList.toggle('is-done', on);
+      button.setAttribute('aria-pressed', on ? 'true' : 'false');
+      label.textContent = on ? 'Marked complete' : 'Mark this lesson complete';
+    }
+    button.addEventListener('click', function () { window.learnProgress.toggle(id); paint(); });
+    paint();
+  })();
+
+  /* Recommendations. localStorage only: no request leaves the page. */
+  (function () {
+    var KEY = 'learn-feedback';
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || '{}') || {}; }
+      catch (e) { return {}; }
+    }
+    function write(map) {
+      try { localStorage.setItem(KEY, JSON.stringify(map)); } catch (e) { /* private mode */ }
+    }
+    function today() { return new Date().toISOString().slice(0, 10); }
+    var counter = 0;
+    function newId() {
+      counter += 1;
+      return Date.now().toString(36) + '-' + counter.toString(36);
+    }
+    function list(lesson) {
+      var all = read()[lesson];
+      return Object.prototype.toString.call(all) === '[object Array]' ? all : [];
+    }
+    function save(lesson, items) {
+      var map = read();
+      if (items.length) { map[lesson] = items; } else { delete map[lesson]; }
+      write(map);
+    }
+    function add(lesson, text) {
+      text = String(text == null ? '' : text).trim();
+      if (!text) return null;
+      var items = list(lesson);
+      var item = { id: newId(), text: text, done: false, created: today(), closed: null };
+      items.push(item);
+      save(lesson, items);
+      return item;
+    }
+    function toggle(lesson, id) {
+      var items = list(lesson);
+      items.forEach(function (item) {
+        if (item.id !== id) return;
+        item.done = !item.done;
+        item.closed = item.done ? today() : null;
+      });
+      save(lesson, items);
+    }
+    function remove(lesson, id) {
+      save(lesson, list(lesson).filter(function (item) { return item.id !== id; }));
+    }
+
+    /* A checklist somebody can act on: the done state ticked in the page is the
+       done state in the file. Titles are passed in because this store knows
+       lesson IDS, not what they are called. */
+    function markdown(entries, heading) {
+      var out = ['# ' + heading, ''];
+      entries.forEach(function (entry) {
+        if (!entry.items.length) return;
+        out.push('## ' + entry.title);
+        if (entry.url) out.push('');
+        if (entry.url) out.push(entry.url);
+        out.push('');
+        entry.items.forEach(function (item) {
+          var when = item.done && item.closed
+            ? ' _(added ' + item.created + ', done ' + item.closed + ')_'
+            : ' _(added ' + item.created + ')_';
+          out.push('- [' + (item.done ? 'x' : ' ') + '] ' +
+                   String(item.text).replace(/\r?\n/g, ' ') + when);
+        });
+        out.push('');
+      });
+      if (out.length === 2) out.push('_No recommendations recorded._');
+      return out.join('\n');
+    }
+
+    /* A Blob and an <a download>. This is a LOCAL save, not a request: nothing
+       is uploaded and no origin is contacted. */
+    function download(filename, text, type) {
+      var blob = new Blob([text], { type: (type || 'text/markdown') + ';charset=utf-8' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 0);
+    }
+    function slugify(text) {
+      return String(text).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    }
+
+    window.learnFeedback = {
+      key: KEY, read: read, list: list, add: add, toggle: toggle, remove: remove,
+      markdown: markdown, download: download, slugify: slugify, today: today
+    };
+  })();
+
+  (function () {
+    var root = document.getElementById('lessonFeedback');
+    if (!root || !window.learnFeedback) return;
+    var F = window.learnFeedback;
+    var id = root.getAttribute('data-lesson-id');
+    var lessonTitle = root.getAttribute('data-lesson-title') || id;
+    var courseTitle = root.getAttribute('data-course-title') || '';
+    var listEl = document.getElementById('fbList');
+    var emptyEl = document.getElementById('fbEmpty');
+    var countEl = document.getElementById('fbCount');
+    var textEl = document.getElementById('fbText');
+
+    function esc(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function paint() {
+      var items = F.list(id);
+      listEl.innerHTML = items.map(function (item) {
+        var when = item.done && item.closed
+          ? 'Added ' + item.created + ' \u00b7 done ' + item.closed
+          : 'Added ' + item.created;
+        return '<li class="fb-item' + (item.done ? ' is-done' : '') + '">' +
+          '<button class="fb-tick" type="button" data-act="toggle" data-id="' + esc(item.id) + '"' +
+          ' aria-pressed="' + (item.done ? 'true' : 'false') + '"' +
+          ' title="Mark this recommendation done"><span aria-hidden="true">&#10003;</span>' +
+          '<span class="fb-sr">Mark done</span></button>' +
+          '<span><p class="fb-body">' + esc(item.text) + '</p>' +
+          '<span class="fb-when">' + when + '</span></span>' +
+          '<button class="fb-drop" type="button" data-act="remove" data-id="' + esc(item.id) + '">Remove</button>' +
+          '</li>';
+      }).join('');
+      var open = items.filter(function (i) { return !i.done; }).length;
+      emptyEl.hidden = items.length > 0;
+      listEl.hidden = items.length === 0;
+      countEl.textContent = items.length
+        ? open + ' open \u00b7 ' + (items.length - open) + ' done'
+        : '';
+    }
+    document.getElementById('fbForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (F.add(id, textEl.value)) { textEl.value = ''; paint(); }
+      textEl.focus();
+    });
+    listEl.addEventListener('click', function (event) {
+      var button = event.target.closest ? event.target.closest('[data-act]') : null;
+      if (!button) return;
+      var act = button.getAttribute('data-act');
+      if (act === 'toggle') F.toggle(id, button.getAttribute('data-id'));
+      if (act === 'remove') F.remove(id, button.getAttribute('data-id'));
+      paint();
+    });
+    document.getElementById('fbExport').addEventListener('click', function () {
+      var heading = 'Feedback \u2014 ' + (courseTitle ? courseTitle + ' \u00b7 ' : '') + lessonTitle;
+      var body = F.markdown(
+        [{ title: lessonTitle, url: '/' + id + '/', items: F.list(id) }], heading);
+      F.download('feedback-' + F.slugify(id) + '.md', body);
+    });
+    paint();
+  })();
+  </script>
+</body>
+</html>

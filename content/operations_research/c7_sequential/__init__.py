@@ -158,10 +158,12 @@ COURSE = {
         "this course, it is genuinely useful, and it needs both scenario trees and a decomposition "
         "method; naming it is as far as this course goes.",
         "<strong>The one limit this course prints and does not prove.</strong> The secretary "
-        "problem&rsquo;s `n/e` is the limiting position of the optimal `r`, and the argument that "
-        "it is the limit is an asymptotic one this path has not built. It appears on the page "
-        "labelled as rounded, beside an exact table of fractions that never needs it, and the "
-        "best `r` is read off that table rather than off the limit.",
+        "problem&rsquo;s `n/e` is where the optimal `r` sits in the limit, and the page holds it "
+        "against the number you reject, which is `r − 1` &mdash; at a hundred candidates, 36.7879 "
+        "against 37. The argument that it is the limit is an asymptotic one this path has not "
+        "built. It appears on the page labelled as rounded, beside an exact table of fractions "
+        "that never needs it, and how many to reject is read off that table rather than off the "
+        "limit.",
     ],
     "footer_lead": (
         "Every value, cost, expectation, threshold, posterior and fixed point on this course is "

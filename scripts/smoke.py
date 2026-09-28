@@ -955,6 +955,251 @@ SYSDESIGN_COURSE_LESSONS = tuple(
     for lesson in lessons
 )
 
+# The Algorithms path. Generated from content/algorithms/ and kept in the
+# same shape as the three paths above it: one row per course, and the check
+# ids built from it so smoke and the invariant suite cannot probe different
+# URL sets.
+ALGO_PATH_PAGE_PATH = "/paths/algorithms/"
+ALGO_MATERIAL_MARKER = "a count on one input is not a bound"
+ALGO_COURSES = (
+    ("data-structures", "Data Structures", (
+        "arrays-linked-lists-and-the-cost-model",
+        "stacks-queues-and-the-two-stack-queue",
+        "priority-queues-and-binary-heaps", "building-a-heap-in-linear-time",
+        "hashing-with-chaining", "open-addressing-and-linear-probing",
+        "resizing-and-the-load-factor", "binary-search-trees",
+        "the-shape-problem-and-random-bsts", "rotations-and-the-avl-invariant",
+        "avl-insertion", "augmenting-a-tree", "union-find",
+        "choosing-a-structure"
+    )),
+    ("sorting-and-selection", "Sorting and Selection", (
+        "what-a-sort-must-promise", "partitioning",
+        "quicksort-and-its-worst-case", "randomised-quicksort", "heapsort",
+        "counting-sort", "radix-sort", "bucket-sort-and-average-case-claims",
+        "quickselect", "median-of-medians", "adversary-arguments",
+        "k-way-merge-and-external-sorting"
+    )),
+    ("graph-algorithms", "Graph Algorithms", (
+        "depth-first-search-and-the-timestamps", "topological-order",
+        "bridges-and-cut-vertices", "strongly-connected-components",
+        "the-cut-property", "kruskals-algorithm", "prims-algorithm",
+        "relaxation-and-dijkstras-schedule",
+        "negative-weights-and-bellman-ford",
+        "shortest-and-longest-paths-in-a-dag", "augmenting-paths",
+        "max-flow-and-min-cut", "bipartite-matching"
+    )),
+    ("greedy-and-matroids", "Greedy Algorithms and Matroids", (
+        "greedy-rules-and-the-optimum", "the-exchange-argument",
+        "interval-partitioning-and-the-depth", "huffman-codes",
+        "why-huffman-is-optimal", "independence-systems-and-matroids",
+        "greedy-for-every-weighting", "stable-matching-and-who-it-favours",
+        "caching-and-the-offline-bound", "fractional-and-0-1-knapsack"
+    )),
+    ("dynamic-programming", "Dynamic Programming and Optimal Substructure", (
+        "where-the-greedy-choice-fails",
+        "overlapping-subproblems-and-the-memo",
+        "the-fill-order-is-part-of-the-algorithm",
+        "every-bracketing-and-the-one-the-table-found",
+        "the-knapsack-table-and-what-each-cell-reads",
+        "one-row-and-the-direction-of-the-loop",
+        "edit-distance-and-performing-the-script",
+        "the-tails-array-is-not-the-subsequence",
+        "combinations-or-ordered-sequences", "dynamic-programming-on-a-tree",
+        "won-and-lost-positions", "subsets-as-a-table-and-where-it-loses"
+    )),
+    ("strings-and-pattern-matching", "Strings and Pattern Matching", (
+        "naive-matching-and-the-two-numbers",
+        "where-the-simple-algorithm-wins", "the-text-built-to-reach-the-bound",
+        "borders-and-the-failure-function", "the-amortised-bound-as-a-count",
+        "the-matcher-as-a-machine", "shifting-by-more-than-one",
+        "the-text-where-nothing-is-skipped",
+        "a-rolling-hash-and-its-collisions", "choosing-a-modulus",
+        "one-pass-for-every-word", "the-suffix-array-and-what-it-answers"
+    )),
+    ("geometric-algorithms", "Geometric Algorithms", (
+        "the-orientation-test", "the-magnitude-where-doubles-lose-the-sign",
+        "the-vertex-a-rounded-determinant-deletes",
+        "the-convex-hull-and-its-definition",
+        "three-answers-on-a-square-with-midpoints", "the-two-furthest-points",
+        "do-two-segments-meet", "four-zero-signs-and-two-different-answers",
+        "the-sweep-line-and-the-work-it-does-not-save",
+        "the-doubled-area-and-what-its-sign-carries",
+        "inside-by-parity-and-by-winding", "the-closest-pair-and-the-strip"
+    )),
+    ("randomised-algorithms", "Randomised Algorithms", (
+        "uniform-sampling-and-the-shuffle-that-is-not",
+        "the-cost-is-a-distribution", "from-an-expectation-to-a-probability",
+        "balls-in-bins-and-the-birthday-bound", "universal-hashing",
+        "the-probabilistic-method", "where-the-7m-8-argument-stops",
+        "kargers-contraction", "repetition-and-the-probability-it-buys",
+        "witnesses-liars-and-one-sided-error", "treaps", "skip-lists",
+        "bloom-filters", "the-count-min-sketch"
+    )),
+    ("intractability-and-approximation", "Intractability and Approximation", (
+        "decision-search-and-the-certificate", "a-reduction-is-a-construction",
+        "what-the-solution-map-preserves", "one-structure-three-problems",
+        "numbers-as-gadgets", "circuits-tours-and-the-chain",
+        "a-bound-the-search-can-see", "parameterising-the-budget",
+        "twice-a-matching", "the-hypothesis-doing-the-work",
+        "charging-every-element", "accuracy-by-the-epsilon",
+        "what-a-measurement-settles"
+    )),
+)
+
+ALGO_PATH_PAGE_MARKERS = (
+    canonical_marker(ALGO_PATH_PAGE_PATH),
+    ALGO_COURSES[0][1],
+    ALGO_COURSES[-1][1],
+    'href="../../%s/"' % ALGO_COURSES[-1][0],
+)
+
+ALGO_COURSE_HOMES = tuple(
+    (
+        "algo-course%d-home" % number,
+        "/%s/" % slug,
+        generated_page_markers("/%s/" % slug, ALGO_MATERIAL_MARKER, title),
+    )
+    for number, (slug, title, _lessons) in enumerate(ALGO_COURSES, start=1)
+)
+
+ALGO_COURSE_LESSONS = tuple(
+    (
+        "algo-course%d-lesson-%s" % (number, lesson),
+        "/%s/%s/" % (slug, lesson),
+        generated_page_markers("/%s/%s/" % (slug, lesson), ALGO_MATERIAL_MARKER, title),
+    )
+    for number, (slug, title, lessons) in enumerate(ALGO_COURSES, start=1)
+    for lesson in lessons
+)
+
+# The Operations Research path. Generated from content/operations_research/
+# and kept in the same shape as the four paths above it: one row per course,
+# and the check ids built from it so smoke and the invariant suite cannot
+# probe different URL sets.
+OR_PATH_PAGE_PATH = "/paths/operations-research/"
+OR_MATERIAL_MARKER = "optimal for the model you wrote down"
+OR_COURSES = (
+    ("linear-programming-models", "Linear Programming Models", (
+        "decision-variables-objective-and-constraints",
+        "product-mix-and-resource-constraints",
+        "covering-diet-and-minimisation-models",
+        "blending-and-ratio-constraints",
+        "multiperiod-planning-and-balance-constraints",
+        "reformulations-that-keep-linearity",
+        "goal-programming-and-deviation-variables",
+        "standard-form-slack-and-surplus", "basic-solutions-and-corners",
+        "convexity-and-why-a-local-optimum-is-global"
+    )),
+    ("the-simplex-method", "The Simplex Method", (
+        "adjacent-corners-and-the-simplex-idea", "the-simplex-tableau",
+        "the-ratio-test", "reduced-costs-and-the-optimality-test",
+        "artificial-variables-and-two-phase-simplex",
+        "unbounded-and-alternative-optima-in-the-tableau",
+        "degeneracy-cycling-and-blands-rule",
+        "the-tableau-as-a-matrix-product",
+        "termination-and-the-klee-minty-cube"
+    )),
+    ("duality-and-sensitivity-analysis", "Duality and Sensitivity Analysis", (
+        "the-dual-problem", "weak-duality-and-certificates-of-optimality",
+        "strong-duality-from-the-final-tableau", "complementary-slackness",
+        "shadow-prices-and-right-hand-side-ranging",
+        "objective-coefficient-ranging-and-reduced-costs",
+        "pricing-a-new-activity-and-adding-a-constraint",
+        "the-dual-simplex-method",
+        "parametric-objectives-and-the-pareto-front",
+        "zero-sum-games-and-the-minimax-theorem"
+    )),
+    ("networks-flows-paths-and-assignments", "Networks: Flows, Paths and Assignments", (
+        "arcs-capacities-and-conservation", "the-minimum-cost-flow-programme",
+        "the-transportation-problem",
+        "potentials-and-the-stepping-stone-cycle",
+        "total-unimodularity-and-integer-corners", "the-assignment-problem",
+        "project-networks-and-the-critical-path",
+        "shortest-paths-and-node-potentials", "maximum-flow-and-minimum-cut",
+        "bipartite-matching-and-halls-condition"
+    )),
+    ("integer-programming", "Integer Programming", (
+        "when-rounding-fails-the-lp-relaxation",
+        "binary-variables-and-logical-constraints",
+        "the-knapsack-and-set-covering-models",
+        "fixed-charges-facility-location-and-big-m",
+        "either-or-constraints-and-disjunctions", "branch-and-bound",
+        "incumbents-bounds-and-the-optimality-gap",
+        "cutting-planes-and-gomory-cuts", "the-travelling-salesman-problem"
+    )),
+    ("scheduling", "Scheduling", (
+        "one-machine-and-six-objectives",
+        "shortest-processing-time-and-the-adjacent-exchange",
+        "smiths-rule-and-weighted-completion-time",
+        "earliest-due-date-and-maximum-lateness",
+        "minimising-the-number-of-late-jobs",
+        "two-machines-in-series-and-johnsons-rule",
+        "machines-in-parallel-and-the-lpt-bound",
+        "the-job-shop-and-disjunctive-orientations",
+        "crashing-a-project-and-the-time-cost-curve"
+    )),
+    ("dynamic-programming-and-sequential-decisions", "Dynamic Programming and Sequential Decisions", (
+        "filling-the-table-from-the-end", "the-state-is-what-is-left",
+        "wagner-whitin-and-the-order-intervals",
+        "silver-meal-and-least-unit-cost", "the-stochastic-recursion",
+        "folding-a-decision-tree-back", "thresholds-and-when-to-stop-looking",
+        "the-secretary-problem-exactly", "value-iteration-and-the-fixed-point"
+    )),
+    ("inventory-models", "Inventory Models", (
+        "the-economic-order-quantity", "the-order-quantity-as-a-discriminant",
+        "all-units-price-breaks", "production-runs-and-planned-backorders",
+        "the-newsvendor-and-the-critical-ratio",
+        "reorder-points-and-two-service-levels",
+        "periodic-review-and-the-base-stock-level"
+    )),
+    ("markov-chains-decisions-and-queues", "Markov Chains, Decisions and Queues", (
+        "transition-matrices-and-the-support-digraph",
+        "communicating-classes-recurrence-and-period",
+        "the-steady-state-as-a-linear-system",
+        "absorbing-states-and-the-fundamental-matrix",
+        "markov-decision-processes-and-policy-iteration",
+        "the-cut-equation-and-every-queue-from-it",
+        "the-mm1-chain-and-the-cost-of-truncation",
+        "more-servers-and-erlang-c-read-off-pi",
+        "finite-buffers-blocking-and-the-admitted-rate",
+        "the-poisson-limit-and-where-exactness-stops"
+    )),
+    ("simulation-and-variance-reduction", "Simulation and Variance Reduction", (
+        "random-numbers-and-inverse-transform-sampling",
+        "monte-carlo-and-the-standard-error", "how-sure-chebyshevs-bound",
+        "discrete-event-simulation-of-a-queue",
+        "warm-up-and-the-initial-transient", "common-random-numbers",
+        "antithetic-variates", "control-variates",
+        "importance-sampling-for-rare-events"
+    )),
+)
+
+OR_PATH_PAGE_MARKERS = (
+    canonical_marker(OR_PATH_PAGE_PATH),
+    OR_COURSES[0][1],
+    OR_COURSES[-1][1],
+    'href="../../%s/"' % OR_COURSES[-1][0],
+)
+
+OR_COURSE_HOMES = tuple(
+    (
+        "or-course%d-home" % number,
+        "/%s/" % slug,
+        generated_page_markers("/%s/" % slug, OR_MATERIAL_MARKER, title),
+    )
+    for number, (slug, title, _lessons) in enumerate(OR_COURSES, start=1)
+)
+
+OR_COURSE_LESSONS = tuple(
+    (
+        "or-course%d-lesson-%s" % (number, lesson),
+        "/%s/%s/" % (slug, lesson),
+        generated_page_markers("/%s/%s/" % (slug, lesson), OR_MATERIAL_MARKER, title),
+    )
+    for number, (slug, title, lessons) in enumerate(OR_COURSES, start=1)
+    for lesson in lessons
+)
+
 PUBLISHED_ASSETS = (
     (
         "journal-schema",
@@ -1046,6 +1291,8 @@ def path_page_targets(args):
         ("discrete-math-path", MATH_PATH_PAGE_PATH, MATH_PATH_PAGE_MARKERS),
         ("algebra-path", ALGEBRA_PATH_PAGE_PATH, ALGEBRA_PATH_PAGE_MARKERS),
         ("sysdesign-path", SYSDESIGN_PATH_PAGE_PATH, SYSDESIGN_PATH_PAGE_MARKERS),
+        ("algo-path", ALGO_PATH_PAGE_PATH, ALGO_PATH_PAGE_MARKERS),
+        ("or-path", OR_PATH_PAGE_PATH, OR_PATH_PAGE_MARKERS),
     ]
 
 
@@ -1065,7 +1312,8 @@ def course_home_targets(args):
     targets = [("course-home", args.course_path, tuple(args.course_marker))]
     seen = {args.course_path}
     for check_id, path, markers in (COURSE_HOMES + MATH_COURSE_HOMES
-                                    + ALGEBRA_COURSE_HOMES + SYSDESIGN_COURSE_HOMES):
+                                    + ALGEBRA_COURSE_HOMES + SYSDESIGN_COURSE_HOMES
+                                    + ALGO_COURSE_HOMES + OR_COURSE_HOMES):
         if path in seen:
             continue
         seen.add(path)
@@ -1099,6 +1347,8 @@ def lesson_targets(args):
         + MATH_COURSE_LESSONS
         + ALGEBRA_COURSE_LESSONS
         + SYSDESIGN_COURSE_LESSONS
+        + ALGO_COURSE_LESSONS
+        + OR_COURSE_LESSONS
         + AUTH_PAGE_TARGETS
     ):
         if path in seen:
